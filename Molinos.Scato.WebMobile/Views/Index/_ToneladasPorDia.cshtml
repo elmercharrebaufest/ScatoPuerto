@@ -1,0 +1,43 @@
+﻿@using Molinos.Scato.Dominio.Recursos
+@using Molinos.Scato.WebMobile.Helpers
+@model Molinos.Scato.Dominio.Dto.GraficoEficienciaHidraulicasDto
+@{
+    ViewBag.Title = Textos.GraficoDePlanta_Titulo;
+    Layout = null;
+}
+
+<script type="text/javascript" src="@Url.Script("~/scripts/graficoToneladasPorDia.js")"></script>
+<script type="text/javascript">
+    var textoToneladasPorDia = "@Textos.ToneladasPorDia"
+</script>
+
+<br />
+<div id="graficoToneladasPorDia" class="col border rounded panel-padding">
+    <form id="formToneladasPorDia">
+        <div class="form-row">
+            <div class="col-12 col-sm h5 mt-auto  text-center">
+                @Textos.ToneladasPorDia
+            </div>
+            <div class="col-12 col-sm m-auto">
+                @Html.TextBoxFor(model => model.MaterialDescripcion, new { @class = "form-control", @id = "materialDescripcionToneladasPorDia" })
+                @Html.ValidationMessageFor(model => model.MaterialDescripcion)
+                @Html.HiddenFor(model => model.MaterialId, new { @id = "materialIdToneladasPorDia" })
+            </div>
+            <div class="col-12 col-sm m-auto">
+                @Html.LabelFor(model => model.Fecha, new { @class = "sr-only" })
+                <div class="input-group date ancho-maximo">
+                    @Html.EditorFor(model => model.Fecha, Model != null ? Model.Fecha.FormattedFixed() : string.Empty, "FechaToneladasPorDia")
+                </div>
+                @Html.ValidationMessageFor(model => model.Fecha)
+            </div>
+            <div class="col-12 col-sm m-auto">
+                <button class="btn btn-outline-success w-100" data-bind="click: generarGraficoToneldasPorDia">@Textos.Generar</button>
+            </div>
+        </div>
+    </form>
+    <div class="row" id="partialContainerToneladasPorDia">
+        @Html.Partial("_GraficoToneladasPorDia", Model)
+    </div>
+</div>
+
+<div id="autocompleteCorr"></div>

@@ -1,0 +1,48 @@
+﻿@using Molinos.Scato.Dominio.Consultas
+@using Molinos.Scato.Dominio.Dto
+@using Molinos.Scato.Dominio.Recursos
+@using Molinos.Scato.Web.Helpers
+@{
+
+    Layout = null;
+    var items = (InstanciaWorkflowDto[])ViewBag.Items;
+}
+<style>
+    th {
+        color: #36634b !important;
+    }
+    #tablacuposCargados.table th, #tablacuposCargados.table td {
+        text-align: center !important;
+        line-height: 4px !important;
+    }
+</style>
+
+<table class="table table-striped" id="tablacuposCargados">
+    <thead>
+        <tr>
+            <th>@Textos.Garita</th>
+            <th>@Textos.Patente</th>
+            <th>@Textos.Cupo_NumeroDeCartaPorte</th>
+            <th>@Textos.Tarjeta</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in items)
+        {
+        <tr>
+            @if (i.PuestoDeTrabajo.Contains("2"))
+            {
+                <td>2</td>
+            }
+            else
+            {
+                <td>1</td>
+            }
+            <td>@i.Patente</td>
+            <td>@i.NumeroDocumentoDeIngreso</td>
+            <td>@i.NumeroDeTarjeta</td>
+        </tr>
+        }
+
+    </tbody>
+</table>

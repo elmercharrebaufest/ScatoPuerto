@@ -1,0 +1,16 @@
+﻿@model Molinos.Scato.Dominio.Dto.CalleDto
+
+<div class="control-group">
+    @Html.LabelFor(model => model.Codigo, new {@class = "control-label"})
+    <div class="controls">
+        @Html.TextBoxFor(model => model.Codigo, new {@class = "input-medium"})
+        @Html.ValidationMessageFor(model => model.Codigo)
+    </div>
+</div>
+<div class="control-group">
+    @Html.LabelFor(model => model.Nombre, new {@class = "control-label"})
+    <div class="controls">
+        @Html.TextBoxFor(model => model.Nombre, new {@class = "input-large"})
+        @Html.ValidationMessageFor(model => model.Nombre)
+    </div>
+</div>

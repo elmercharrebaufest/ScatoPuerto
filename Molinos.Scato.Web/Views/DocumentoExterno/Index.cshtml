@@ -1,0 +1,103 @@
+﻿@using Molinos.Scato.Dominio.Recursos
+@model Molinos.Scato.Dominio.Dto.DocumentoExternoDto
+@using Molinos.Scato.Dominio.Recursos
+@using Molinos.Scato.Web.Helpers
+@{
+    ViewBag.Title = "";
+    var tiposDocumentoIdentidad = (IEnumerable<SelectListItem>)ViewBag.TiposDocumentoIdentidad;
+}
+
+@Html.ValidationSummary(true)
+
+@Scripts.Render("~/bundles/jqueryval")
+
+@if (ViewBag.success != null && ViewContext.ViewData.ModelState.IsValid)
+{
+    <script>MostrarAlertaExitosa();</script>
+}
+<link href="~/Content/bulma.min.css" rel="stylesheet" />
+<style>
+
+    .file.is-info .file-cta {
+        background-color: #0044cc !important;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="titSecciones">@Textos.DocumentoExterno_Titulo</div>
+</div>
+
+@using (Html.BeginForm("Index", "DocumentoExterno", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+<div class="container-fluid grillaPad">
+    <div class="row-fluid">
+        <div class="span12">
+            <fieldset class="grupo-carta-porte">
+                Ingresar Cartas de porte
+                <div class="row row-carta-porte">
+                    <div class="field span4" id="file-js-example" style="margin-top: 3px;">
+                        <div class="file is-info has-name">
+                            <label class="file-label" style="margin:0">
+                                <input class="file-input" multiple="multiple" type="file" name="resume">
+                                <span class="file-cta" style="width:123px; height:19px">
+                                    <span class="file-label">
+                                        Seleccione Archivo
+                                    </span>
+                                </span>
+                                <span class="file-name" style="color: gray; width:197px; height:19px">
+                                    Ningún Archivo Seleccionado
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="span2" style="margin-top: 6px; margin-left: -2px;">
+                        <button type="submit" class="btn" id="guardar" style="width:85%">Guardar</button>
+                    </div>
+                </div>        @Html.ValidationMessageFor(model => model.ArchivoRutaDestino)
+
+            </fieldset>
+        </div>
+    </div>
+</div>
+}
+
+    <div class="container-fluid content grillaPad">
+        <div class="row">
+            <div class="span12search bordeGris" style="width:auto">
+                @using (Ajax.BeginForm("Index", null, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "gridContainer" }, new { id = "search-form", @class = "form-search" }))
+                {
+                    @Html.Label("Filtrar por Número de Documento")
+                    <input type="text" name="filtro" class="input-large" />
+                    <button type="submit" class="btn">@Textos.Filtrar</button>
+                }
+            </div>
+        </div>
+
+        <div id="gridContainer" data-grid-url="@Url.Action("Index")">
+            @Html.Partial("Listar")
+        </div>
+    </div>
+
+
+    <script>
+        const fileInput = document.querySelector('#file-js-example input[type=file]');
+        $("#file-js-example").change(function () {
+            if (fileInput.files.length > 0) {
+                const fileName = document.querySelector('#file-js-example .file-name');
+                fileName.textContent = fileInput.files[0].name;
+            }
+        });
+        $('#documentos').val(null);
+
+        $("#guardar").click(function () {
+            
+            var $fileUpload = $("input[type='file']");
+            if (parseInt($fileUpload.get(0).files.length) > 200) {
+                MostrarAlertaError("Solo puede subir un máximo de 200 archivos");
+                return false;
+            } else {
+                BlockUI();
+                return true;
+            }
+        });
+    </script>
