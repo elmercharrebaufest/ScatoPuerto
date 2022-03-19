@@ -1,0 +1,89 @@
+<div class='container mt-4 pr-1'>
+    <div>
+        <form [formGroup]="solidosForm">
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label>Amarró</label>
+                    <input formControlName="fechaAmarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                </div>
+                <div class="form-group col-3">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input formControlName="horaAmarro" class="form-control" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro" [format]="24" (change)="validarAMPM($event)">
+                        <img src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeAmarro (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
+                </div>
+                <div class="form-group col-2">
+                    <label>Viento</label>
+                    <input class="form-control" placeholder="Km/h" formControlName="vientoAmarro" />
+                </div>
+                <div class="form-group col-3">
+                    <label>Dirección</label>
+                    <!-- <input class="form-control" formControlName="direccionAmarro" /> -->
+                    <select class="form-control" formControlName="direccionAmarro">
+                        <option value="null"></option>
+                        <option value="norte">Norte</option>
+                        <option value="sur">Sur</option>
+                        <option value="este">Este</option>
+                        <option value="oeste">Oeste</option>
+                        <option value="noroeste">Noroeste</option>
+                        <option value="suroeste">Suroeste</option>
+                        <option value="noreste">Noreste</option>
+                        <option value="sureste">Sureste</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label>Desamarró</label>
+                    <input formControlName="fechaDesamarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                </div>
+                <div class="form-group col-3">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input formControlName="horaDesamarro"  class="form-control" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro" [format]="24" (change)="validarAMPM($event)">
+                        <img src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeDesamarro (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
+                </div>
+                <div class="form-group col-2">
+                    <label>&nbsp;</label>
+                    <input class="form-control" placeholder="Km/h" formControlName="vientoDesamarro" />
+                </div>
+                <div class="form-group col-3">
+                    <label>&nbsp;</label>
+                    <!-- <input class="form-control" formControlName="direccionDesamarro" /> -->
+                    <select class="form-control" formControlName="direccionDesamarro">
+                        <option value="null"></option>
+                        <option value="norte">Norte</option>
+                        <option value="sur">Sur</option>
+                        <option value="este">Este</option>
+                        <option value="oeste">Oeste</option>
+                        <option value="noroeste">Noroeste</option>
+                        <option value="suroeste">Suroeste</option>
+                        <option value="noreste">Noreste</option>
+                        <option value="sureste">Sureste</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label>Habilitación</label>
+                    <input type="date" formControlName="fechaHabilitacion" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                </div>
+                <div class="form-group col-3">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control" formControlName="horaHabilitacion" placeholder="00:00" [ngxTimepicker]="fullTimeHabilitacion" [format]="24" (change)="validarAMPM($event)">
+                        <img src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeHabilitacion (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
+                </div>
+            </div>
+            <div class='col mt-5 p-0'>
+                <p>Velocidad Máxima del viento para amarre 35 Km/h</p>
+            </div>
+        </form>
+    </div>
+</div>

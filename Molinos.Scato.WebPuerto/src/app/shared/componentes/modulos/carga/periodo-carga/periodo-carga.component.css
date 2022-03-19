@@ -1,0 +1,36 @@
+input[type="date"]::-webkit-calendar-picker-indicator {
+    padding: 0px;
+    margin: 0px;
+}
+
+.input_img {  position:relative;}
+.input_img input { margin:0 0 0 4px;}
+
+.imgClockInput1 { 
+    display:block; 
+    position:absolute; 
+    top:0.5rem; 
+    right: 0.5rem; 
+}
+
+.imgClockInput2 { 
+    display:block; 
+    position:absolute; 
+    top:0.5rem; 
+    right: 0.5rem; 
+}
+
+@media screen and (min-width: 800px) and (max-width: 1250px) {
+    .fecha {
+        width: 140px !important;
+    }
+    .hora {
+        width: 78px !important;
+    }
+    .imgClockInput1 {
+        right: -0.7rem;
+    }
+    .imgClockInput2 {
+        right: 0px;
+    }
+}

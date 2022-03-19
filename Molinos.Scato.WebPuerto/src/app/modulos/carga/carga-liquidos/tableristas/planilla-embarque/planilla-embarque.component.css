@@ -1,0 +1,54 @@
+.referencias span{
+    float: left;
+    color: rgb(105, 105, 105);
+}
+
+.referencias span:first-child{
+    font-weight: bold;
+    color: black;
+}
+
+table {
+    table-layout:fixed;
+}
+table td {
+    position: relative;
+    height: 40px !important;
+}
+
+table td input {
+    position: absolute;
+    display: block;
+    top:0;
+    left:0;
+    margin: 0;
+    height: 38px;
+    width: 100%;
+    border: none;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-first-name, .form-last-name {
+	width: 46%;
+}
+
+.form-last-name {
+	float: right;
+}
+.control-bloqueado{
+    background-color: #e9ecef;
+}
+table td select {
+    position: absolute;
+    display: block;
+    top:0;
+    left:0;
+    margin: 0;
+    height: 38px;
+    width: 100%;
+    border: none;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+}

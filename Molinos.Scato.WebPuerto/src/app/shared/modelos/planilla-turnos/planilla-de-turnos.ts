@@ -1,0 +1,21 @@
+import { CorteTurno } from "./corte-turno";
+import { Turno } from "./turno";
+import { ObsCalidad } from "../obs-calidad";
+
+export class PlanillaDeTurnos{
+    fecha: Date;
+    fechaMiliseconds: any;
+    id?: number;
+    turnoPuerto: TurnoPuerto;
+    cerrado: boolean;
+    enviado: boolean;
+    moduloDeCargaPlanillaDeTurnosTurnosDetalles: Turno[];
+    moduloDeCargaPlanillaDeTurnosTurnosCortes: CorteTurno[];
+    indexDia: number;
+}
+
+export class TurnoPuerto{
+    id: number;
+    nombre: string;
+    orden: number
+}
