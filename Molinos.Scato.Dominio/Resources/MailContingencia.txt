@@ -1,3 +1,0 @@
-Estimados,<br/>
-Se ha {2} la contingencia por {0}, por el usuario {1} <br/>
-<br/>
