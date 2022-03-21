@@ -1,0 +1,197 @@
+<div class='bg-white px-4 min-h5 shadow mt-4'>
+    <app-collapse-button collapseSelectorId='planillaTurno'></app-collapse-button>
+    <h4 class='colorTitle pt-4'>Planilla de turnos sólido. Recibidores</h4>
+
+    <form [formGroup]='formTurnos' *ngIf='turnoPuerto'>
+        <div class='mt-4 px-4 pb-4'>
+            <table class='table table-bordered turnos'>
+                <thead>
+                    <tr class='table-active'>
+                        <th>Día</th>
+                        <th>Turno</th>
+                        <th colspan="2">Bodega</th>
+                        <th colspan="2">Mano</th>
+                        <th colspan="2">Producto</th>
+                        <th colspan="2">Destino</th>
+                        <th colspan="2">Exportador</th>
+                        <th colspan="2">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container formArrayName='diasTurno'>
+                        <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
+                            <tr>
+                                <td [attr.rowspan]='getRowSpan(dia) + 4'>
+                                    <div class='column-center'>
+                                        <span><b>{{hoy}}</b></span>
+                                        <span class='toneladas'>{{getCantDia(dia) | number: '1.0-0'}}</span>
+                                        <span class='turno'>por día</span>
+                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelDia(bodega.bodegaParcel, d)}} Tn.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <ng-container formArrayName='turnos'>
+                                <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index' [formGroupName]='t'>
+                                    <tr>
+                                        <td [attr.rowspan]='getRowSpanTurno(turno) + 3'>
+                                            <div class="column-center">
+                                                <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto : getTurnoHorario(d, t)?.nombre}}</b></span>
+                                                <span class='toneladas'>{{getCantTurno(turno) | number: '1.0-0'}}</span>
+                                                <span class='turno'>por turno</span>
+                                                <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)}} Tn.</span>
+                                            </div>
+                                            <button class='btn bt-cerrar-turno' (click)='enviarTurno(d, t, addButton)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
+                                                {{!turno.value.enviado ? 'Enviar Turno' : 'Turno Enviado'}}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosDetalles'>
+                                        <ng-container *ngFor='let result of getTurno(d, t).controls; let i = index'
+                                            [formGroupName]='i'>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <select formControlName='bodegaParcel'>
+                                                        <option [value]='0'></option>
+                                                        <option *ngFor='let bodega of bodegas' [value]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}</option>
+                                                    </select>
+                                                </td>
+                                                <td colspan="2"><input type="number" formControlName='mano'></td>
+                                                <td colspan="2">
+                                                    <select formControlName='materialPuerto'>
+                                                        <option [value]='0'></option>
+                                                        <option *ngFor='let producto of productos' [ngValue]='producto'>{{producto.descripcionCorta}}</option>
+                                                    </select>
+                                                </td>
+                                                <td colspan="2">
+                                                    <select formControlName='destino'>
+                                                        <option [value]='0'></option>
+                                                        <option *ngFor='let destino of destinos' [ngValue]='destino'>{{destino.nombre}}</option>
+                                                    </select>
+                                                </td>
+                                                <td colspan="2">
+                                                    <select formControlName='exportador'>
+                                                        <option *ngFor='let exportador of exportadores' [ngValue]='exportador'>{{exportador.nombre}}</option>
+                                                    </select>
+                                                </td>
+                                                <td colspan="2"><input type="number" formControlName='cantidad'></td>
+                                            </tr>
+                                        </ng-container>
+                                    </ng-container>
+                                    <tr class='table-active'>
+                                        <td colspan="12" class='btn-add-cell'>
+                                            <div class='btn-add-container center-bt'>
+                                                <button type='button' class='btn btn-primary bt-circle'
+                                                    style='margin-top: -5px;'>+</button>
+                                                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar observaciones</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class='table-active'>
+                                        <td colspan="12" class='btn-add-cell'>
+                                            <div class='btn-add-container center-bt' (click)='openModalCorte(addCorte, d, t)' #addButton>
+                                                <button type='button' class='btn btn-primary bt-circle'
+                                                    style='margin-top: -5px;'>+</button>
+                                                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf='getCorteTurnos(d, t).controls.length > 0'>
+                                        <td colspan="10" class='p-0'>
+                                            <table class='tabla table-bordered tabla-embebida'>
+                                                <thead>
+                                                    <tr class='table-active'>
+                                                        <th>Motivo</th>
+                                                        <th>Inicio</th>
+                                                        <th>Fin</th>
+                                                        <th>Tiempo total</th>
+                                                        <th>Observaciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosCortes'>
+                                                        <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
+                                                            <tr>
+                                                                <td>
+                                                                    {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
+                                                                </td>
+                                                                <td>
+                                                                    {{corte.controls.horaInicio.value}}hs
+                                                                </td>
+                                                                <td>
+                                                                    {{corte.controls.horaFin.value}}hs
+                                                                </td>
+                                                                <td>
+                                                                    {{corte.controls.tiempoTotal.value}}hs
+                                                                </td>
+                                                                <td>
+                                                                    {{corte.controls.observaciones.value}}
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+    <ng-template #addCorte let-modal>
+        <div class='modal-body'>
+            <form [formGroup]='formCorte' fxLayout='row wrap'>
+                <div fxFlex='100' class='label-float'>
+                    <label>Motivo</label>
+                    <select formControlName='motivosDeCorte'>
+                        <option *ngFor='let motivo of motivosCorte' [ngValue]='motivo'>
+                            {{motivo.siglas}} - {{motivo.nombre}}
+                        </option>
+                    </select>
+                </div>
+                <div fxFlex='33' class='pr-10 mt-2'>
+                    <label>Inicio</label>
+                    <div class='input_img'>
+                        <input formControlName='horaInicio' #inicioCorteInput placeholder="00:00" [ngxTimepicker]='inicioTime'
+                            [format]='24' class='w-100' (focusout)='calcularTotal()'>
+                        <img src='assets/reloj.svg' class='imgClockInput1'>
+                    </div>
+                    <ngx-material-timepicker #inicioTime></ngx-material-timepicker>
+                </div>
+                <div fxFlex='33' class='pr-10 pl-10 mt-2'>
+                    <label>Fin</label>
+                    <div class='input_img'>
+                        <input formControlName='horaFin' placeholder="00:00" [ngxTimepicker]='finTime' [format]='24'
+                            class='w-100' (focusout)='calcularTotal()'>
+                        <img src='assets/reloj.svg' class='imgClockInput1'>
+                    </div>
+                    <ngx-material-timepicker #finTime></ngx-material-timepicker>
+                </div>
+                <div fxFlex='33' class='pl-10 mt-2'>
+                    <label>Tiempo Total</label>
+                    <div class='input_img'>
+                        <input formControlName='tiempoTotal' placeholder="00:00" [ngxTimepicker]='totalTime' [format]='24'
+                            class='w-100'>
+                        <img src='assets/reloj.svg' class='imgClockInput1'>
+                    </div>
+                    <ngx-material-timepicker #totalTime></ngx-material-timepicker>
+                </div>
+                <div fxFlex='100' class='label-float mt-3'>
+                    <label>Observaciones</label>
+                    <textarea rows='5' formControlName='observaciones'></textarea>
+                </div>
+                <div fxFlex='100' class='right-buttons-turnos'>
+                    <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
+                    <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+
+
+    <p-toast position='top-center' key='enviar-turno'></p-toast>
+</div>

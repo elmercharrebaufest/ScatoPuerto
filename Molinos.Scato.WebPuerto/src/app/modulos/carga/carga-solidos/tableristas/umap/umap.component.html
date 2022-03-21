@@ -1,0 +1,82 @@
+<div fxLayout='row wrap'>
+    <div fxFlex='40'>
+        <app-amarre></app-amarre>
+    </div>
+    <div fxFlex='60'>
+        <div class='container mt-1 pr-1' [formGroup]="forms">
+            <h4 class='colorTitle pt-4'>UMAP</h4>
+            <perfect-scrollbar>
+                <div fxLayout='row wrap' class='max-40vh' formArrayName="umap">
+                    <form *ngFor="let item of forms.get('umap')['controls']; let i=index"
+                    [formGroupName]="i">
+                        <div fxFlex='100'>
+                            <div fxLayout='row wrap'>
+                                <div class="form-group" fxFlex='20'>
+                                    <label>Encendido</label>
+                                    <input type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" formControlName='fechaEncendido' />
+                                </div>
+                                <div class="form-group" fxFlex='14'>
+                                    <label>&nbsp;</label>
+                                    <div class="input_img">
+                                        <input class="form-control hora" formControlName='horaEncendido' placeholder="00:00" [ngxTimepicker]="encendidoTime"
+                                            [format]="24">
+                                        <img src="assets/reloj.svg" class="imgClockInput1">
+                                    </div>
+                                    <ngx-material-timepicker #encendidoTime>
+                                    </ngx-material-timepicker>
+                                </div>
+
+                                <div class="form-group" fxFlex='20'>
+                                    <label>Apagado</label>
+                                    <input type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" formControlName='fechaApagado'/>
+                                </div>
+                                <div class="form-group" fxFlex='14'>
+                                    <label>&nbsp;</label>
+                                    <div class="input_img">
+                                        <input class="form-control hora" placeholder="00:00" [ngxTimepicker]="apagadoTime"
+                                            [format]="24" formControlName='horaApagado'>
+                                        <img src="assets/reloj.svg" class="imgClockInput1">
+                                    </div>
+                                    <ngx-material-timepicker #apagadoTime>
+                                    </ngx-material-timepicker>
+                                </div>
+
+                                <div class="form-group pl-1" fxFlex='10'>
+                                    <label>Viento</label>
+                                    <input type="number" class="form-control" placeholder="Km/h" formControlName='velocidadDelViento'/>
+                                </div>
+                                <div class="form-group pl-1" fxFlex='18'>
+                                    <label>Dirección</label>
+                                    <select class="form-control" formControlName="direccionDelViento">
+                                        <option value="null"></option>
+                                        <option value="norte">Norte</option>
+                                        <option value="sur">Sur</option>
+                                        <option value="este">Este</option>
+                                        <option value="oeste">Oeste</option>
+                                        <option value="noroeste">Noroeste</option>
+                                        <option value="suroeste">Suroeste</option>
+                                        <option value="noreste">Noreste</option>
+                                        <option value="sureste">Sureste</option>
+                                    </select>
+                                </div>
+                                <div fxFlex='8' class='full-center' *ngIf='i != 0'>
+                                    <i class='fas fa-times' (click)='deleteHorario(i)'></i>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <i class='fas fa-angle-down float-down-arrow' *ngIf="forms.get('umap')['controls'].length > 2"></i>
+                </div>
+            </perfect-scrollbar>
+            <hr>
+            <div fxLayout='row wrap'>
+                <div fxFlex='80'>
+                    <div class='btn-add-container pt-btn-add' (click)='addUmap()'>
+                        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encedido</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

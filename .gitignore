@@ -1,0 +1,11 @@
+﻿.vs
+*.vspscc
+*/bin
+*/obj
+*.user
+*.dbmdl
+*.jfm
+*.rsuser
+/packages
+*.vssscc
+*rdl.data

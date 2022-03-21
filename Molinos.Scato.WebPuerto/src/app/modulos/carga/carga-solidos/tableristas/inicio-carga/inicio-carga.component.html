@@ -1,0 +1,52 @@
+<div class='bg-white shadow mt-4 px-4 pb-4'>
+  <form [formGroup]="inicioCargaForm">
+    <div class="row">
+      <div class="col-4">
+        <h4 class="info-header colorTitle pt-4">Inicio de carga</h4>
+      </div>
+
+      <div class="col-2">
+        <input id="FIC" type="date" value="" max="3000-12-31" min="1000-01-01" style="margin-top: 20px;"  class="form-control" formControlName='fechaInicioCarga'/>
+      </div>
+
+      <div class="col-2" >
+        <div class="input_img" style="margin-top: 20px;">
+          <input class="form-control" formControlName='horaInicioCarga' [disabled]="!editandoFecha && cargaIniciada" placeholder="00:00" [ngxTimepicker]="encendidoTime" [format]="24">
+          <img src="assets/reloj.svg" class="imgClockInput1">
+        </div>
+        <ngx-material-timepicker #encendidoTime ></ngx-material-timepicker>
+      </div>
+      
+      <div class="col-1" *ngIf="!cargaIniciada" style="margin-top: 20px" >
+        <button [disabled]="inicioCargaForm.invalid" 
+                class="btn btn-success" 
+                (click)='preguntarGuardarInicioCarga()'>INICIAR</button>
+      </div> 
+      <!-- LAPIZ PARA EDICIÓN -->
+      <div class="col-1" *ngIf="!editandoFecha && cargaIniciada">
+        <svg style="margin-top: 20px"  id="Componente_176_1" 
+            data-name="Componente 176 – 1" xmlns="http://www.w3.org/2000/svg" 
+            width="34" height="34" viewBox="0 0 34 34"
+            (click)='toggleEditarFecha()'>
+          <g id="Grupo_25" data-name="Grupo 25" transform="translate(-365 -223.174)">
+          <path id="Trazado_75" data-name="Trazado 75" d="M351.264,321.238l-14.729,14.728a.925.925,0,0,0-.242.423l-1.265,4.869a.929.929,0,0,0,1.132,1.132l4.869-1.265a.925.925,0,0,0,.423-.242l14.728-14.728v0l2.965-2.964a.929.929,0,0,0,0-1.313l-3.6-3.6a.929.929,0,0,0-1.313,0l-2.965,2.964Zm-10.945,18.154-3.094.8.8-3.094,13.893-13.893,2.291,2.291Zm14.568-19.15,2.29,2.291-1.652,1.652-2.291-2.291Z" transform="translate(35 -89.826)" fill="#717171"/>
+          </g>
+          <rect id="Rectángulo_111" data-name="Rectángulo 111" width="34" height="34" fill="none"/>
+        </svg>
+      </div> 
+        
+      <div class="row" *ngIf="editandoFecha && cargaIniciada">
+        <div class="col">
+          <button class="btn btn-primary" 
+                  style="margin-top: 20px;" 
+                  (click)='preguntarGuardarInicioCarga()'>GUARDAR</button>
+        </div>
+        <div class="col">
+          <button class="btn btn-secondary" 
+                  style="margin-top: 20px;" 
+                  (click)="toggleEditarFecha()">CANCELAR</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

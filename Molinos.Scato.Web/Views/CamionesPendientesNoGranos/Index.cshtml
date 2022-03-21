@@ -1,0 +1,28 @@
+﻿@using Molinos.Scato.Dominio.Dto
+@using Molinos.Scato.Dominio.Recursos
+@using Molinos.Scato.Web.Helpers
+@model Molinos.Scato.Dominio.Dto.CargaDeCupoDto
+@{
+    var workflows = (WorkflowDto[])ViewBag.Workflows;
+}
+<script type="text/javascript">
+</script>
+<style>
+</style>
+
+<div class="container-fluid">
+    <div class="titSecciones">@Textos.Pendiente</div>
+</div>
+
+<div id="Automatica" class="container-fluid">
+    <div class="row-fluid">
+        <div class="span4">
+            <h5>Patente: @Html.DisplayFor(x => x.Patente)</h5>
+            @foreach (var w in workflows)
+            {
+                var codigo = w.Codigo.Replace("1029-", "slo.").Remove(0, 4);
+                @Html.ActionLink(w.Descripcion, "Index", Textos.ResourceManager.GetString("Workflow_" + codigo), new { workflow = w.Codigo, cargaDeCupoId = Model.Id }, new { @class = "btn btn-large btn-block btn-primary" })
+            }
+        </div>
+    </div>
+</div>
