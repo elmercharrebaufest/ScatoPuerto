@@ -1002,7 +1002,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarAlmacen.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarBalanzaEstaEnCero.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarPermiso.cs" />
-    <Compile Include="Procesamiento\ProcesadorModificarRecorridoCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoDemora.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoDestino.cs" />
     <Compile Include="Procesamiento\ProcesadorAlmacenarObservacion.cs" />
