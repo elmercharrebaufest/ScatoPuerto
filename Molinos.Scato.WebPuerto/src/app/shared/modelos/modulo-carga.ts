@@ -1,9 +1,13 @@
-import { Balanza78 } from "./balanza78";
 import { ElementoGrafico } from "./elemento-grafico";
 import { ModuloDeCargaHabilitacionDeTanques } from "./habilitacion-tanques";
 import { LineasDeEmbarque } from "./linea-embarque";
 import { ManosDeEmbarque } from "./mano-embarque";
+import { PlanillaDeTurnos } from "./planilla-turnos/planilla-de-turnos";
 import { TabiquesDeEmbarque } from "./tabique-embarque";
+// import { ModuloDeCargaBalanzasBack } from '@ScatoModels/balanzadas/balanza';
+import { PeriodoDeCarga } from "./periodo-carga";
+import { Umap } from "./umap";
+import { PlanillaDeEmbarque } from "./planilla-de-embarque";
 
 export class ModuloDeCarga{
     id: number;
@@ -12,7 +16,11 @@ export class ModuloDeCarga{
     moduloDeCargaTabiquesDeEmbarque: TabiquesDeEmbarque[];
     moduloDeCargaHabilitacionDeTanques: ModuloDeCargaHabilitacionDeTanques;
     moduloDeCargaLineasDeEmbarque: LineasDeEmbarque[];
-    moduloDeCargaBalanzas: Balanza78[];
+    moduloDeCargaPlanillaDeTurnosTurnos: PlanillaDeTurnos[];
+    moduloDeCargaPlanillaDeEmbarque: PlanillaDeEmbarque[];
+    // moduloDeCargaBalanzas: ModuloDeCargaBalanzasBack[];
+    moduloDeCargaPeriodoDeCarga: PeriodoDeCarga[];
+    moduloDeCargaUmap: Umap[];
     enviado: boolean;
     usuarioFinalizacion: string;
     cargado?: boolean;
@@ -26,7 +34,10 @@ export class ModuloDeCarga{
         moduloDeCargaTabiquesDeEmbarque?,
         moduloDeCargaHabilitacionDeTanques?,
         moduloDeCargaLineasDeEmbarque?,
-        moduloDeCargaBalanzas?
+        moduloDeCargaPeriodoDeCarga?,
+        moduloDeCargaPlanillaDeEmbarque?,
+        moduloDeCargaUmap?
+        // moduloDeCargaBalanzas?,
         ){
     this.id = id;
     this.moduloDeCargaElementoGrafico = moduloDeCargaElementoGrafico;
@@ -34,8 +45,11 @@ export class ModuloDeCarga{
     this.moduloDeCargaTabiquesDeEmbarque = moduloDeCargaTabiquesDeEmbarque;
     this.moduloDeCargaHabilitacionDeTanques = moduloDeCargaHabilitacionDeTanques;
     this.moduloDeCargaLineasDeEmbarque = moduloDeCargaLineasDeEmbarque;
-    this.moduloDeCargaBalanzas = moduloDeCargaBalanzas;
+    this.moduloDeCargaPlanillaDeEmbarque = moduloDeCargaPlanillaDeEmbarque;
+    // this.moduloDeCargaBalanzas = moduloDeCargaBalanzas;
     this.enviado = enviado;
+    this.moduloDeCargaPeriodoDeCarga = moduloDeCargaPeriodoDeCarga;
     this.usuarioFinalizacion = usuarioFinalizacion;
+    this.moduloDeCargaUmap = moduloDeCargaUmap;
     }
 }

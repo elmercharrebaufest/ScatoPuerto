@@ -1,5 +1,6 @@
-import { Injectable } from "@angular/core";
+import { EventEmitter, Injectable, Output } from "@angular/core";
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { ObsCalidad } from "@ScatoModels/obs-calidad";
 
 @Injectable({
     providedIn: 'root'
@@ -9,6 +10,8 @@ export class ProcesoCalidadService {
     private noryoun: InstanciaWorkflowPuerto;
     private vicentin: InstanciaWorkflowPuerto;
     private otrosMuelles: InstanciaWorkflowPuerto;
+
+    @Output() sendObsCalidad = new EventEmitter<ObsCalidad>();
 
     getSanBenito() {
         return this.sanBenito;
@@ -35,4 +38,9 @@ export class ProcesoCalidadService {
     setOtrosMuelles(embarque: InstanciaWorkflowPuerto) {
         this.otrosMuelles = embarque;
     }
+
+    setObsCalidad(obsCalidad: ObsCalidad){
+        this.sendObsCalidad.emit(obsCalidad);
+    }
+    
 }

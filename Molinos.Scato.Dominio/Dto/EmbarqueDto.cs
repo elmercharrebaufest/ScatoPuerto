@@ -47,14 +47,19 @@ namespace Molinos.Scato.Dominio.Dto
         public decimal Puntal { get; set; }
         public DateTime? FechaLibrePlatica { get; set; }
         public string HoraLibrePlatica { get; set; }
-
         public EstadoBuqueDto EstadoBuque { get; set; }
-
         public VaporDto Vapor { get; set; }
-
         public object Clone()
         {
             return this.MemberwiseClone();
         }
+        public string filePathShipParticular { get; set; }
+        public string shipParticularArchivoNombre { get; set; }
+        public DateTime? FechaHoraInicioCarga { get; set; }
+        public string UsuarioInicioCarga { get; set; }
+
+        public IList<EmbarqueInformacionDto> EmbarqueInformacion { get; set; }
+        public IList<EmbarqueInformacionViajeDto> EmbarqueInformacionViaje { get; set; }
+        public IList<EmbarquePosicionDto> EmbarquePosicion { get; set; }
     }
 }

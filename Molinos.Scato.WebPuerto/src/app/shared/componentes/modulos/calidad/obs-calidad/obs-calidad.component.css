@@ -4,7 +4,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .input_img {  position:relative;}
-.input_img input { margin:0 0 0 4px;}
+.input_img input { margin:0 0 0 0px;}
 
 .imgClockInput1 { 
     display:block; 

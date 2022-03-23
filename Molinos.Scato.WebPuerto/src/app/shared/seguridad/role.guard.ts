@@ -1,8 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivateChild, Router } from "@angular/router";
-//import { Store } from "@ngrx/store";
 import { SessionService } from "@ScatoServicios/session.service";
-import { Usuario } from "../interfaces/usuario";
 
 @Injectable()
 export class RoleGuard implements CanActivateChild{

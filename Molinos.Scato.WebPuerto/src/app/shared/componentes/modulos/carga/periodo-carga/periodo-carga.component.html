@@ -4,64 +4,88 @@
     <div id="collapsePeriodoDeCarga" class="collapse show">
         <form [formGroup]="periodoCargaForm">
             <div class="row">
-                <div class="col-4 border-right">
-                    <div class="form-row" formGroupName="amarro">
-                        <div class="form-group col-5">
+                <div class="col-5 border-right">
+                    <div class="form-row">
+                        <div class="form-group col-4">
                             <label class="font-weight-bold">Amarró</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date" formControlName="fechaAmarro" max="3000-12-31" min="1000-01-01" class="form-control fecha"/>
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
+                                <input class="form-control hora" formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
                                     [format]="24" >
                                 <img src="assets/reloj.svg" class="imgClockInput1">
                             </div>
                             <ngx-material-timepicker #fullTimeAmarro>
                             </ngx-material-timepicker>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-2 pl-2">
                             <label class="font-weight-bold">Viento</label>
-                            <input class="form-control" formControlName="viento"/>
+                            <input class="form-control" placeholder="Km/h" formControlName="vientoAmarro"/>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-4">
                             <label class="font-weight-bold">Dirección</label>
-                            <input class="form-control" formControlName="direccion"/>
+                            <!-- <input class="form-control" formControlName="direccionAmarro"/> -->
+                            <select class="form-control" formControlName="direccionAmarro">
+                                <option value="null"></option>
+                                <option value="norte">Norte</option>
+                                <option value="sur">Sur</option>
+                                <option value="este">Este</option>
+                                <option value="oeste">Oeste</option>
+                                <option value="noroeste">Noroeste</option>
+                                <option value="suroeste">Suroeste</option>
+                                <option value="noreste">Noreste</option>
+                                <option value="sureste">Sureste</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-row" formGroupName="desamarro">
-                        <div class="form-group col-5">
+
+                    <div class="form-row">
+                        <div class="form-group col-4">
                             <label class="font-weight-bold">Desamarró</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date" formControlName="fechaDesamarro" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
+                                <input class="form-control hora" formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
                                     [format]="24" >
                                 <img src="assets/reloj.svg" class="imgClockInput1">
                             </div>
                             <ngx-material-timepicker #fullTimeDesamarro>
                             </ngx-material-timepicker>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-2 pl-2">
                             <label>&nbsp;</label>
-                            <input class="form-control" formControlName="viento"/>
+                            <input class="form-control" placeholder="Km/h" formControlName="vientoDesamarro"/>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-4">
                             <label>&nbsp;</label>
-                            <input class="form-control"  formControlName="direccion"/>
+                            <!-- <input class="form-control"  formControlName="direccionDesamarro"/> -->
+                            <select class="form-control" formControlName="direccionDesamarro">
+                                <option value="null"></option>
+                                <option value="norte">Norte</option>
+                                <option value="sur">Sur</option>
+                                <option value="este">Este</option>
+                                <option value="oeste">Oeste</option>
+                                <option value="noroeste">Noroeste</option>
+                                <option value="suroeste">Suroeste</option>
+                                <option value="noreste">Noreste</option>
+                                <option value="sureste">Sureste</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-row" formGroupName="habilitacion">
-                        <div class="form-group col-5">
+
+                    <div class="form-row">
+                        <div class="form-group col-4">
                             <label class="font-weight-bold">Habilitación</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date" formControlName="fechaHabilitacion" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeHabilitacion"
+                                <input class="form-control hora" formControlName="horaHabilitacion" placeholder="00:00" [ngxTimepicker]="fullTimeHabilitacion"
                                     [format]="24" >
                                 <img src="assets/reloj.svg" class="imgClockInput1">
                             </div>
@@ -70,16 +94,17 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="col-4 border-right">
-                    <div class="form-row" formGroupName="conexionManguera">
+                    <div class="form-row" >
                         <div class="form-group col-8">
                             <label class="font-weight-bold">Conexión de mangueras</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date" formControlName="fechaConexionMangueras" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
                         <div class="form-group col-4">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeMangueras"
+                                <input class="form-control horaManguera" formControlName="horaConexionMangueras" placeholder="00:00" [ngxTimepicker]="fullTimeMangueras"
                                     [format]="24" >
                                 <img src="assets/reloj.svg" class="imgClockInput2">
                             </div>
@@ -87,15 +112,15 @@
                             </ngx-material-timepicker>
                         </div>
                     </div>
-                    <div class="form-row" formGroupName="desconexionManguera">
+                    <div class="form-row">
                         <div class="form-group col-8">
                             <label class="font-weight-bold">Desconexión de mangueras</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date" formControlName="fechaDesconexionMangueras" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
                         <div class="form-group col-4">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeDescMangueras"
+                                <input class="form-control horaManguera" formControlName="horaDesconexionMangueras" placeholder="00:00" [ngxTimepicker]="fullTimeDescMangueras"
                                     [format]="24" >
                                 <img src="assets/reloj.svg" class="imgClockInput2">
                             </div>
@@ -104,16 +129,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
-                    <div class="form-row" formGroupName="comienzoCarga">
+
+                <div class="col-3">
+                    <div class="form-row">
                         <div class="form-group col-8">
                             <label class="font-weight-bold">Comienzo de carga</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date" formControlName="fechaComienzoCarga" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
                         <div class="form-group col-4">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeCarga"
+                                <input class="form-control horaCarga" formControlName="horaComienzoCarga" placeholder="00:00" [ngxTimepicker]="fullTimeCarga"
                                     [format]="24" >
                                 <img src="assets/reloj.svg" class="imgClockInput2">
                             </div>
@@ -121,15 +147,15 @@
                             </ngx-material-timepicker>
                         </div>
                     </div>
-                    <div class="form-row" formGroupName="finCarga">
+                    <div class="form-row" >
                         <div class="form-group col-8">
                             <label class="font-weight-bold">Finalización de carga</label>
-                            <input type="date" formControlName="fecha" max="3000-12-31" min="1000-01-01" class="form-control" />
+                            <input type="date"  formControlName="fechaFinalizacionCarga" max="3000-12-31" min="1000-01-01" class="form-control fecha"/>
                         </div>
                         <div class="form-group col-4">
                             <label>&nbsp;</label>
                             <div class="input_img">
-                                <input class="form-control" formControlName="hora" placeholder="00:00" [ngxTimepicker]="fullTimeFinCarga"
+                                <input class="form-control horaCarga" formControlName="horaFinalizacionCarga" placeholder="00:00" [ngxTimepicker]="fullTimeFinCarga"
                                     [format]="24" (blur)="clForm()" >
                                 <img src="assets/reloj.svg" class="imgClockInput2">
                             </div>

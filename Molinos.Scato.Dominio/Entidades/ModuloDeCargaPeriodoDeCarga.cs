@@ -18,5 +18,14 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string DireccionDesamarro { get; set; }
         public virtual DateTime? FechaHabilitacion { get; set; }
         public virtual string HoraHabilitacion { get; set; }
+        public virtual DateTime? FechaConexionMangueras { get; set; }
+        public virtual DateTime? FechaDesconexionMangueras { get; set; }
+        public virtual DateTime? FechaComienzoCarga { get; set; }
+        public virtual DateTime? FechaFinalizacionCarga { get; set; }
+        public virtual string HoraConexionMangueras { get; set; }
+        public virtual string HoraDesconexionMangueras { get; set; }
+        public virtual string HoraComienzoCarga { get; set; }
+        public virtual string HoraFinalizacionCarga { get; set; }
+
     }
 }

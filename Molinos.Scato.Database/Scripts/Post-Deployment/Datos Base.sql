@@ -139,7 +139,6 @@ IF NOT EXISTS (select 1 from Permiso where Codigo = 96) BEGIN INSERT INTO [Permi
 IF NOT EXISTS (select 1 from Permiso where Codigo = 97) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('ABM Cliente', 0, 97, NULL); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 98) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Transmision A Sap Manual', 0, 98, NULL); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 99) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('CP Otros Puertos', 0, 99, NULL); END
-IF NOT EXISTS (select 1 from Permiso where Codigo = 604) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('ABM Categoria Camiones',0,604, NULL); END
 
 IF NOT EXISTS (select 1 from Permiso where Codigo = 100) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Actividad Autorizar Descuentos Entregador', 1, 100, 'AutorizarDescuentosEntregador'); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 101) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Actividad Autorizar Transportista Inhabilitado', 1, 101, 'AutorizarTransportistaInhabilitado'); END
@@ -237,10 +236,6 @@ IF NOT EXISTS (select 1 from Permiso where Codigo = 192) BEGIN INSERT INTO [Perm
 IF NOT EXISTS (select 1 from Permiso where Codigo = 193) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Actividad Calado Rechazar', 1, 193, 'Calado'); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 194) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Pago de Recibo Municipal',1,194,null); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 195) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Devolución de Recibo Municipal',1,195,null); END
-IF NOT EXISTS (select 1 from Permiso where Codigo = 196) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Balanza Automatica',1,196,null); END
-IF NOT EXISTS (select 1 from Permiso where Codigo = 197) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Actividad Salida de centro Playa',1,197,'SalidaDeCentroPlaya'); END
-IF NOT EXISTS (select 1 from Permiso where Codigo = 198) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Camion Demorado',1,198,'CamionDemorado'); END
-IF NOT EXISTS (select 1 from Permiso where Codigo = 199) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('En Espera HB4',1,199,'EnEsperaHB4'); END
 
 
 IF NOT EXISTS (select 1 from Permiso where Codigo = 200) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('IniciarWorkflow', 1, 200, NULL); END
@@ -312,6 +307,7 @@ IF NOT EXISTS (select 1 from Permiso where Codigo = 264) BEGIN INSERT INTO [Perm
 
 IF NOT EXISTS (select 1 from Permiso where Codigo = 300) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Balanceros', 2, 300, NULL); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 301) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Administradores', 2, 301, NULL); END
+
 IF NOT EXISTS (select 1 from Permiso where Codigo = 302) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('PuestoComando', 2, 302, NULL); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 303) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('IngresoPlayaInterna', 2, 303, NULL); END
 IF NOT EXISTS (select 1 from Permiso where Codigo = 304) BEGIN INSERT INTO [Permiso]([Descripcion],[TipoPermiso],[Codigo],[ActividadWorkflow]) VALUES ('Entregadores', 2, 304, NULL); END
@@ -712,8 +708,6 @@ IF NOT EXISTS (select 1 from [Campo] where [Direccion] = 'IntermediarioFlete') B
 IF NOT EXISTS (select 1 from [Campo] where [Direccion] = 'MercadoATermino') BEGIN INSERT INTO [Campo]([Descripcion],[Direccion]) VALUES ('Mercado A Termino', 'MercadoATermino') END
 IF NOT EXISTS (select 1 from [Campo] where [Direccion] = 'CuitMercadoATermino') BEGIN INSERT INTO [Campo]([Descripcion],[Direccion]) VALUES ('Cuit Mercado A Termino', 'CuitMercadoATermino') END
 IF NOT EXISTS (select 1 from [Campo] where [Direccion] = 'CuitIntermediarioDelFlete') BEGIN INSERT INTO [Campo]([Descripcion],[Direccion]) VALUES ('Cuit Intermediario Del Flete', 'CuitIntermediarioDelFlete') END
-IF NOT EXISTS (select 1 from [Campo] where [Direccion] = 'CTGSap') BEGIN INSERT INTO [Campo]([Descripcion],[Direccion]) VALUES ('CTG SAP','CTGSap') END
-
 
 -- Formato de Campos
 IF NOT EXISTS (select 1 from [FormatoDeCampo] where [Campo_Id] = (SELECT TOP 1 Id FROM Campo where Direccion = 'NumeroDeDocumentoDeIngreso') AND [FormatoDeImpresion_Id] =  (SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'CartaDePorte')) BEGIN INSERT INTO [FormatoDeCampo]([Campo_Id],[FormatoDeImpresion_Id],[Letra_Id],[Alineacion],[Fila],[Columna],[Tamaño],[Negrita],[Cursiva],[Subrayado],[EsColumna],[TipoDeCampo]) VALUES ((SELECT TOP 1 Id FROM Campo where Direccion = 'NumeroDeDocumentoDeIngreso'),(SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'CartaDePorte'),(SELECT TOP 1 Id FROM Letra where Descripcion = 'Arial'),0,1,0,10,0,0,0,0,0) END
@@ -741,7 +735,6 @@ IF NOT EXISTS (select 1 from [FormatoDeCampo] where [Campo_Id] = (SELECT TOP 1 I
 IF NOT EXISTS (select 1 from [FormatoDeCampo] where [Campo_Id] = (SELECT TOP 1 Id FROM Campo where Direccion = 'Chofer') AND [FormatoDeImpresion_Id] =  (SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'ConstanciaCIU')) BEGIN INSERT INTO [FormatoDeCampo]([Campo_Id],[FormatoDeImpresion_Id],[Letra_Id],[Alineacion],[Fila],[Columna],[Tamaño],[Negrita],[Cursiva],[Subrayado],[EsColumna],[TipoDeCampo]) VALUES ((SELECT TOP 1 Id FROM Campo where Direccion = 'Chofer'),(SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'CartaDePorte'),(SELECT TOP 1 Id FROM Letra where Descripcion = 'Arial'),0,2,0,10,0,0,0,0,0) END
 IF NOT EXISTS (select 1 from [FormatoDeCampo] where [Campo_Id] = (SELECT TOP 1 Id FROM Campo where Direccion = 'Material') AND [FormatoDeImpresion_Id] =  (SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'ConstanciaCIU')) BEGIN INSERT INTO [FormatoDeCampo]([Campo_Id],[FormatoDeImpresion_Id],[Letra_Id],[Alineacion],[Fila],[Columna],[Tamaño],[Negrita],[Cursiva],[Subrayado],[EsColumna],[TipoDeCampo]) VALUES ((SELECT TOP 1 Id FROM Campo where Direccion = 'Material'),(SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'CartaDePorte'),(SELECT TOP 1 Id FROM Letra where Descripcion = 'Arial'),0,2,1,10,0,0,0,0,0) END
 IF NOT EXISTS (select 1 from [FormatoDeCampo] where [Campo_Id] = (SELECT TOP 1 Id FROM Campo where Direccion = 'Patente') AND [FormatoDeImpresion_Id] =  (SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'ConstanciaCIU')) BEGIN INSERT INTO [FormatoDeCampo]([Campo_Id],[FormatoDeImpresion_Id],[Letra_Id],[Alineacion],[Fila],[Columna],[Tamaño],[Negrita],[Cursiva],[Subrayado],[EsColumna],[TipoDeCampo]) VALUES ((SELECT TOP 1 Id FROM Campo where Direccion = 'Patente'),(SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'CartaDePorte'),(SELECT TOP 1 Id FROM Letra where Descripcion = 'Arial'),0,3,0,10,0,0,0,0,0) END
-IF NOT EXISTS (select 1 from [FormatoDeCampo] where [Campo_Id] = (SELECT TOP 1 Id FROM Campo where Direccion = 'CTGSap') AND [FormatoDeImpresion_Id] =  (SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'LibroMovimientosExistenciaGranos')) BEGIN INSERT INTO [FormatoDeCampo]([Campo_Id],[FormatoDeImpresion_Id],[Letra_Id],[Alineacion],[Fila],[Columna],[Tamaño],[Negrita],[Cursiva],[Subrayado],[EsColumna],[TipoDeCampo]) VALUES ((SELECT TOP 1 Id FROM Campo where Direccion = 'CTGSap'),(SELECT TOP 1 Id FROM FormatoDeImpresion where Descripcion = 'LibroMovimientosExistenciaGranos'),(SELECT TOP 1 Id FROM Letra where Descripcion = 'Arial'),0,3,0,10,0,0,0,0,0) END
 
 -- Variedad
 IF NOT EXISTS (select 1 from [Variedad] where [Descripcion] ='ALICANT BOUCHET') BEGIN INSERT INTO [Variedad]([Descripcion],[NumeroINV]) VALUES ('ALICANT BOUCHET','126') END
@@ -1016,25 +1009,6 @@ IF NOT EXISTS (select 1 from MaterialReporteDeMovimientos where Ingreso = 1 and 
 IF NOT EXISTS (select 1 from MaterialReporteDeMovimientos where Ingreso = 1 and Descripcion = 'SOJA EPA') BEGIN insert into MaterialReporteDeMovimientos(Descripcion,Material, Ingreso, Orden) values ('SOJA EPA','', 1, 35); END
 
 GO
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Celda 1') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Celda 1','Celda 1', 0); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Celda 2') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Celda 2','Celda 2', 1); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Celda 29') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Celda 29','Celda 29', 2); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 3') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 3','Silo 3',  3); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 4') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 4','Silo 4',  4); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 5') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 5','Silo 5',  5); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 6') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 6','Silo 6',  6); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 18') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 18','Silo 18',  7); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 19') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 19','Silo 19',  8); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 9') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 9','Silo 9',  9); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 25') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 25','Silo 25',  10); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 26') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 26','Silo 26',  11); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 16') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 16','Silo 16',  12); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo 17') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo 17','Silo 17',  13); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo L3 A') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo L3 A','Silo L3 A',  14); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Silo L3 B') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Silo L3 B','Silo L3 B',  15); END
-IF NOT EXISTS (select 1 from AlmacenReporteDeMovimientos where  Descripcion = 'Embarques') BEGIN insert into AlmacenReporteDeMovimientos(Descripcion,Almacen,Orden) values ('Embarques','Embarques',  16); END
-
-GO
 IF NOT EXISTS (select 1 from [CoordinadorPuerto] where [Nombre] ='Enerfo') BEGIN INSERT INTO [CoordinadorPuerto]([Nombre]) VALUES ('Enerfo') END
 IF NOT EXISTS (select 1 from [CoordinadorPuerto] where [Nombre] ='LDC') BEGIN INSERT INTO [CoordinadorPuerto]([Nombre]) VALUES ('LDC') END
 IF NOT EXISTS (select 1 from [CoordinadorPuerto] where [Nombre] ='ADM') BEGIN INSERT INTO [CoordinadorPuerto]([Nombre]) VALUES ('ADM') END
@@ -1155,20 +1129,6 @@ IF NOT EXISTS (select 1 from UbicacionDeBuquePuerto where Nombre = 'En Viaje') B
 
 GO
 
-IF NOT EXISTS (SELECT 1 FROM MensajeCartelLed mcl WHERE mcl.Codigo = 'GaritaIngresoAsignarCalle')
-BEGIN
-	INSERT INTO MensajeCartelLed (Codigo, Orden, Mensaje, Programa, Trama, Variable, SegundosDeEspera, DescripcionFormatoMensaje, Habilitado) VALUES('GaritaIngresoAsignarCalle', 1, '{1}', '01', '01', '00', 0, '{1}: patente del camion', 1)
-	INSERT INTO MensajeCartelLed (Codigo, Orden, Mensaje, Programa, Trama, Variable, SegundosDeEspera, DescripcionFormatoMensaje, Habilitado) VALUES('GaritaIngresoAsignarCalle', 2, '{0}', '01', '01', '01', 0, '{0}: nombre de calle asignada', 1)
-	INSERT INTO MensajeCartelLed (Codigo, Orden, Mensaje, Programa, Trama, Variable, SegundosDeEspera, DescripcionFormatoMensaje, Habilitado) VALUES('GaritaIngresoAsignarCalle', 3, 'PARE', '01', '02', '00', 0, 'Se limpia el cartel', 1)
-END
-
-IF NOT EXISTS (SELECT 1 FROM MensajeCartelLed mcl WHERE mcl.Codigo = 'BalanzaLimpiarCartelLed') BEGIN INSERT INTO MensajeCartelLed (Codigo, Orden, Mensaje, Programa, Trama, Variable, SegundosDeEspera, DescripcionFormatoMensaje, Habilitado) VALUES('BalanzaLimpiarCartelLed', 1, '', '01', '01', '00', 0, 'Se limpia el cartel', 1) END
-IF NOT EXISTS (SELECT 1 FROM MensajeCartelLed mcl WHERE mcl.Codigo = 'BalanzaAvanzarCamion') BEGIN INSERT INTO MensajeCartelLed (Codigo, Orden, Mensaje, Programa, Trama, Variable, SegundosDeEspera, DescripcionFormatoMensaje, Habilitado) VALUES('BalanzaAvanzarCamion', 1, 'Avance, no esta bien posicionado', '01', '01', '00', 0, '', 1) END
-IF NOT EXISTS (SELECT 1 FROM MensajeCartelLed mcl WHERE mcl.Codigo = 'BalanzaRetrocederCamion') BEGIN INSERT INTO MensajeCartelLed (Codigo, Orden, Mensaje, Programa, Trama, Variable, SegundosDeEspera, DescripcionFormatoMensaje, Habilitado) VALUES('BalanzaRetrocederCamion', 1, 'Retroceda, no esta bien posicionado', '01', '01', '00', 0, '', 1) END
-
-GO
-GO
-
 --Celdas de Mano de Embarque
 IF NOT EXISTS (select 1 from CeldaManoDeEmbarque where Nombre = '7') BEGIN insert into CeldaManoDeEmbarque(Nombre, Posicion) values ('7', 1); END
 IF NOT EXISTS (select 1 from CeldaManoDeEmbarque where Nombre = '20') BEGIN insert into CeldaManoDeEmbarque(Nombre, Posicion) values ('20', 2); END
@@ -1205,22 +1165,39 @@ IF NOT EXISTS (select 1 from MotivosLimpieza where Nombre = 'Otros') BEGIN inser
 GO
 
 --Motivos Fallas de Balanzas
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Falta Eléctrica') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Falta Eléctrica', 'E'); END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Falta Mecánica') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Falta Mecánica', 'M'); END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas Puerto') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas Puerto', 'OP'); END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas Comercial') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas Comercial', 'OC'); END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas Buque') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas Buque', 'OB'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Baja Carga Buque') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Baja Carga Buque', 'BCB'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Baja Carga Puerto') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Baja Carga Puerto', 'BCP'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Calidad de Mercadería') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Calidad de Mercadería', 'C'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Fallas Eléctricas de equipos de MOA') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Fallas Eléctricas de equipos de MOA', 'E'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Por Fuleo de bodegas') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Por Fuleo de bodegas', 'F'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Por Habilitación del buque') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Por Habilitación del buque', 'H'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Fallas Mecánicas de equipos de MOA') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Fallas Mecánicas de equipos de MOA', 'M'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Normal') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Normal', 'N'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas de Puerto MOA') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas de Puerto MOA', 'OP'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas de MOA Comercial') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas de MOA Comercial', 'OC'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas del Buque') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas del Buque', 'OB'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Pala/Paleo') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Pala/Paleo', 'P'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Terceros', '3ro'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Otros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Otros', 'T'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Espera Determinante') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Espera Determinante', 'ED'); END
 GO
 
 --Motivos De Corte
-IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Falta Eléctrica') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Falta Eléctrica', 'E'); END
-IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Falta Mecánica') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Falta Mecánica', 'M'); END
-IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Operativas Puerto') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Operativas Puerto', 'OP'); END
-IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Operativas Comercial') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Operativas Comercial', 'OC'); END
-IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Operativas Buque') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Operativas Buque', 'OB'); END
-IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Espera Determinante') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Espera Determinante', 'ED'); END
-GO
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Baja Carga Buque') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Baja Carga Buque', 'BCB'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Baja Carga Puerto') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Baja Carga Puerto', 'BCP'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Calidad de Mercadería') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Calidad de Mercadería', 'C'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Fallas Eléctricas de equipos de MOA') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Fallas Eléctricas de equipos de MOA', 'E'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Por Fuleo de bodegas') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Por Fuleo de bodegas', 'F'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Por Habilitación del buque') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Por Habilitación del buque', 'H'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Fallas Mecánicas de equipos de MOA') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Fallas Mecánicas de equipos de MOA', 'M'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Normal') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Normal', 'N'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Operativas de Puerto MOA') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Operativas de Puerto MOA', 'OP'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Operativas de MOA Comercial') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Operativas de MOA Comercial', 'OC'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Operativas del Buque') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Operativas del Buque', 'OB'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Terceros') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Terceros', '3ro'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Otros') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Otros', 'T'); END
+-- IF NOT EXISTS (select 1 from MotivosDeCorte where Nombre = 'Espera Determinante') BEGIN insert into MotivosDeCorte(Nombre, Siglas) values ('Espera Determinante', 'ED'); END
+-- GO
 
 --Turnos de Puerto
 IF NOT EXISTS (select 1 from TurnoPuerto where Nombre = '00-06') BEGIN insert into TurnoPuerto(Nombre, Orden) values ('00-06', 1); END
@@ -1231,7 +1208,7 @@ GO
 
  --Material puerto
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE GIRASOL' and CodigoSap = '19908018') BEGIN insert into MaterialPuerto(Descripcion, CodigoSap, Almacen_Id,EsLiquido) values ('SEMILLA DE GIRASOL','19908018', null, 0); END
-IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'POROTO DE SOJA' and CodigoSap = '19908017' and Almacen_Id = 1 and DescripcionCorta = 'PDS') BEGIN insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, Almacen_Id, EsLiquido) values ('POROTO DE SOJA','PDS', '19908017', null, 0); END
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'POROTO DE SOJA' and CodigoSap = '19908017' and Almacen_Id = 1 and DescripcionCorta = 'PDS') BEGIN insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, Almacen_Id, EsLiquido) values ('POROTO DE SOJA','PDS', '19908017', 1, 0); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE GIRASOL OLEICO' and CodigoSap = '19908019') BEGIN insert into MaterialPuerto(Descripcion, CodigoSap, Almacen_Id, EsLiquido) values ('SEMILLA DE GIRASOL OLEICO','19908019', null, 1); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE MAIZ' and CodigoSap = '19908036') BEGIN insert into MaterialPuerto(Descripcion, CodigoSap, Almacen_Id, EsLiquido) values ('SEMILLA DE MAIZ','19908036', null, 0); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'MAIZ' and DescripcionCorta = 'MAIZ' and CodigoSap = '99108' and Almacen_Id = 251 and EsLiquido = 0) BEGIN insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, Almacen_Id, EsLiquido) values ('MAIZ','MAIZ','99108', 251, 0); END
@@ -1247,133 +1224,7 @@ IF NOT EXISTS (select 1 from EstadoBuque where Descripcion = 'ControlCalidad' an
 IF NOT EXISTS (select 1 from EstadoBuque where Descripcion = 'PostOperativo' and Id = 4) BEGIN insert into EstadoBuque(Descripcion, Id) values ('PostOperativo',4); END
 GO
 
---Sentidos de Mano de Embarque
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Norte a sur') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Norte a sur'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Sur a norte') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Sur a norte'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Centro a sur') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Centro a sur'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Centro a norte') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Centro a norte'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Oeste a este') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Oeste a este'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Este a oeste') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Este a oeste'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Centro a este') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Centro a este'); END
-IF NOT EXISTS (select 1 from SentidoManoDeEmbarque where Nombre = 'Centro a Oeste') BEGIN insert into SentidoManoDeEmbarque(Nombre) values ('Centro a Oeste'); END
-GO
-
-GO
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJHUM' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'HUMEDAD','MPSOJHUM',1); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJGQU' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'GRANOS QUEBRADOS','MPSOJGQU',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJGDA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'DAÑADOS','MPSOJGDA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJCEX' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'CUERPOS EXTRAÑOS','MPSOJCEX',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJMCHA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'CHAMICO','MPSOJMCHA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJTIE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'TIERRA','MPSOJTIE',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJOLO' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'OLOR','MPSOJOLO',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJREV' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'REVOLCADOS EN TIERRA','MPSOJREV',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJMOH' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'AMOHOSADOS','MPSOJMOH',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJAVE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'AVERIADOS','MPSOJAVE',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPSOJGVE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (4,'GRANOS VERDES','MPSOJGVE',0); END
-
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZGRA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'GRADO','MPMAZGRA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZPHE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'PESO HECTOLITRICO','MPMAZPHE',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZGDA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'DAÑADOS','MPMAZGDA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZQUE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'GRANOS QUEBRADOS','MPMAZQUE',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZMEX' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'CUERPOS EXTRAÑOS','MPMAZMEX',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZTIP' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'TIPO','MPMAZTIP',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZHUM' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'HUMEDAD','MPMAZHUM',1); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZOLO' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'OLOR','MPMAZOLO',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPMAZAMO' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (386,'AMOHOSADOS','MPMAZAMO',0); END
-
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPGRA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'GRADO','MPTRPGRA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPPHE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'PESO HECTOLITRICO','MPTRPPHE',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPCEX' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'CUERPOS EXTRAÑOS','MPTRPCEX',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPARD' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'ARDIDOS','MPTRPARD',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPTDA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'DAÑADOS','MPTRPTDA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPCAR' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'GRANOS CON CARBON','MPTRPCAR',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPPZB' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'PANZA BLANCA','MPTRPPZB',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPQUE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'GRANOS QUEBRADOS','MPTRPQUE',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPPIC' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'GRANOS PICADOS','MPTRPPIC',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPHM' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'HUMEDAD','MPTRPHM',1); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPINS' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'INSECTOS VIVOS','MPTRPINS',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPOLO' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'OLOR','MPTRPOLO',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPPST' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'PSP TIERRA','MPTRPPST',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPTRPRTI' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (13,'REVOLCADOS EN TIERRA','MPTRPRTI',0); END
-
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRACI' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'ACIDEZ','MPGIRACI',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRAOL' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'ALTO_OLEICO','MPGIRAOL',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRCEX' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'CUERPOS EXTRAÑOS','MPGIRCEX',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRCHA' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'CHAMICO','MPGIRCHA',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRGAR' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'ARDIDOS','MPGIRGAR',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRHUM' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'HUMEDAD','MPGIRHUM',1); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRINV' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'INSECTOS VIVOS','MPGIRINV',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRMGR' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'MATERIAS GRASAS','MPGIRMGR',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRMOH' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'AMOHOSADOS','MPGIRMOH',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIROLO' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'OLOR','MPGIROLO',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRREV' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'REVOLCADOS EN TIERRA','MPGIRREV',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRTEM' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'TEMPERATURA','MPGIRTEM',0); END
-IF NOT EXISTS (select 1 from EquivalenciasCaracteristicasCpOtrosPuertos where CodigoSap = 'MPGIRTIE' ) BEGIN insert into EquivalenciasCaracteristicasCpOtrosPuertos ( Material_Id,CodigoExterno,CodigoSap,EsHumedad) values (5,'TIERRA','MPGIRTIE',0); END
-GO
-
---Configuracion Etapas Automaticas
-IF NOT EXISTS (SELECT 1 FROM ConfiguracionAutomatizacionEtapas ca WHERE ca.Actividad = 'Coordinacion' and ca.CentroId = 5) BEGIN INSERT INTO ConfiguracionAutomatizacionEtapas (Descripcion, CentroId, Actividad, MinutosEjecucion, FechaCreacion, Deshabilitada) VALUES('Pase automatico - Etapa Coordinacion', 5, 'Coordinacion', 60, '2021-09-27 08:00:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM ConfiguracionAutomatizacionEtapas ca WHERE ca.Actividad = 'AutorizarDescuentosEntregador' and ca.CentroId = 5) BEGIN INSERT INTO ConfiguracionAutomatizacionEtapas (Descripcion, CentroId, Actividad, MinutosEjecucion, FechaCreacion, Deshabilitada) VALUES('Pase automatico - Etapa Autorizar Descuentos Entregador', 5, 'AutorizarDescuentosEntregador', 60, '2021-09-27 08:00:00.000', 0) END
-GO
-
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[NumeroCPESeq]') AND type = 'SO')
-BEGIN
-CREATE SEQUENCE NumeroCPESeq
-START WITH 1
-INCREMENT BY 1
-MINVALUE 1
-MAXVALUE 9999
-CYCLE
-;
-END
-GO
 
 --Estados del buque
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaDeTurnos') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaDeTurnos','SupervisoresPuertosanLorenzo@molinosagro.com.ar;sebastian.bolger@molinosagro.com.ar,fabricio.herrera@molinosagro.com.ar;jose.luis.gomez@molinosagro.com.ar;marcelo.gustavo.lopez@molinosagro.com.ar;sebastian.muniz@molinosagro.com.ar;german.turcutto@molinosagro.com.ar;Pablo.Yturres@molinosagro.com.ar;mauro.mir@molinosagro.com.ar;nestor.abalos@molinosagro.com.ar'); END
-GO
-
---Configuracion Ramal Ferroviario AFIP
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 1) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(1, 'Roca', '2021-11-01 19:30:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 2) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(2, 'Sarmiento', '2021-11-01 19:30:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 3) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(3, 'Mitre', '2021-11-01 19:30:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 4) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(4, 'Urquiza', '2021-11-01 19:30:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 5) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(5, 'Belgrano', '2021-11-01 19:30:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 6) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(6, 'San Martín', '2021-11-01 19:30:00.000', 0) END
-IF NOT EXISTS (SELECT 1 FROM RamalFerroviario rf WHERE rf.CodigoAfip = 99) BEGIN INSERT INTO RamalFerroviario (CodigoAfip, Descripcion, FechaCreacion, Deshabilitada) VALUES(99, 'Otro', '2021-11-01 19:30:00.000', 0) END
-GO
-
--- Motivos inactividad
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Almuerzo') BEGIN insert into MotivoInactividad (Descripcion) values ('Almuerzo'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Cena') BEGIN insert into MotivoInactividad (Descripcion) values ('Cena'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Desayuno – Merienda') BEGIN insert into MotivoInactividad (Descripcion) values ('Desayuno – Merienda'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Cambio de turno') BEGIN insert into MotivoInactividad (Descripcion) values ('Cambio de turno'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Rotación perito') BEGIN insert into MotivoInactividad (Descripcion) values ('Rotación perito'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Rotación caladores') BEGIN insert into MotivoInactividad (Descripcion) values ('Rotación caladores'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Presencia de Carga No Homogénea') BEGIN insert into MotivoInactividad (Descripcion) values ('Presencia de Carga No Homogénea'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Intervención Mecánico J1') BEGIN insert into MotivoInactividad (Descripcion) values ('Intervención Mecánico J1'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Falta camiones Pre Calado') BEGIN insert into MotivoInactividad (Descripcion) values ('Falta camiones Pre Calado'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Post calado lleno por gestión de filas') BEGIN insert into MotivoInactividad (Descripcion) values ('Post calado lleno por gestión de filas'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Intervención eléctrica J1') BEGIN insert into MotivoInactividad (Descripcion) values ('Intervención eléctrica J1'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Intervención Mecánica J2') BEGIN insert into MotivoInactividad (Descripcion) values ('Intervención Mecánica J2'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Intervención eléctrica J2') BEGIN insert into MotivoInactividad (Descripcion) values ('Intervención eléctrica J2'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Mantenimiento Jorgensen J1') BEGIN insert into MotivoInactividad (Descripcion) values ('Mantenimiento Jorgensen J1'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Mantenimiento Jorgensen J2') BEGIN insert into MotivoInactividad (Descripcion) values ('Mantenimiento Jorgensen J2'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Limpieza filtros') BEGIN insert into MotivoInactividad (Descripcion) values ('Limpieza filtros'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Sonda tapada') BEGIN insert into MotivoInactividad (Descripcion) values ('Sonda tapada'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Limpieza calles') BEGIN insert into MotivoInactividad (Descripcion) values ('Limpieza calles'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Sanitarios') BEGIN insert into MotivoInactividad (Descripcion) values ('Sanitarios'); END
-IF NOT EXISTS (select 1 from MotivoInactividad where Descripcion = 'Camión roto') BEGIN insert into MotivoInactividad (Descripcion) values ('Camión roto'); END
-
-GO
-
---Entidades
-IF NOT EXISTS (SELECT 1 FROM Entidad WHERE Codigo = 'EVIST') BEGIN INSERT INTO Entidad VALUES('EVIST', 'Visteo') END
-GO
-
---Tipos De Actividad
-IF NOT EXISTS (SELECT 1 FROM TipoDeActividad WHERE Codigo = 'TRECH') BEGIN INSERT INTO TipoDeActividad VALUES('TRECH', 'Rechazar') END
-GO
-
---Entidades con Tipos De Actividad
-IF NOT EXISTS (SELECT 1 FROM EntidadTipoDeActividad WHERE Entidad_Id = (SELECT Id FROM Entidad WHERE Codigo = 'EVIST') AND TipoDeActividad_Id = (SELECT Id FROM TipoDeActividad WHERE Codigo = 'TRECH')) BEGIN INSERT INTO EntidadTipoDeActividad VALUES((SELECT Id FROM Entidad WHERE Codigo = 'EVIST'), (SELECT Id FROM TipoDeActividad WHERE Codigo = 'TRECH')) END
 GO

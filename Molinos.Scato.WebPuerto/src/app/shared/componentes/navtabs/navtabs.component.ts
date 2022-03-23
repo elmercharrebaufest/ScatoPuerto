@@ -61,14 +61,33 @@ export class NavtabsComponent implements OnInit, OnChanges {
         this.elementosSinPlano = this.elementos.filter(e => e.cargado.toString() === 'false');
         this.elementos = this.elementos.filter(e => e.cargado.toString() === 'true');
       }
+      // if (!this.embarqueId) {
+      //   this.embarqueId = this.elementos[0].id;
+      //   this._procesoService.setEmbarque(this.elementos[0].id);
+      // }
       if (!this.embarqueId) {
-        this.embarqueId = this.elementos[0].id;
-        this._procesoService.setEmbarque(this.elementos[0].id);
+        let embarqueSelectedEnLocalStorage = this.obtenerEmbarqueSelectedEnLocalStorage();
+        if(!embarqueSelectedEnLocalStorage){
+          this.embarqueId = this.elementos[0].id;
+          this._procesoService.setEmbarque(this.elementos[0].id);
+        } else {
+          this.embarqueId = embarqueSelectedEnLocalStorage.id;
+          this._procesoService.setEmbarque(embarqueSelectedEnLocalStorage.id);
+        }
       }
     }
   }
 
+  obtenerEmbarqueSelectedEnLocalStorage(): EmbarqueNav {
+    let embarqueSelected = JSON.parse( localStorage.getItem("embarqueSelected") );
+    return embarqueSelected;
+  }
+
   ngAfterViewInit() {
+    let indice = this.elementos.findIndex( x => x.id == this.embarqueId );
+    if(indice > 7)
+      document.getElementById('mostrarMas2').click();
+
     if (this.elementos.length > 0) {
       var elementoSeleccionado = document.getElementById(this.embarqueId.toString());
       if (elementoSeleccionado) elementoSeleccionado.classList.add("btn-seleccionado");

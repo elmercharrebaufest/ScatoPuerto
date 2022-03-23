@@ -1,4 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { BalanzaService } from '@ScatoServicios/balanza.service';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 
 @Component({
@@ -16,9 +20,21 @@ export class GraficosRitmosComponent implements OnInit {
   turno: any;
   colorRitmo = '';
   cantTurnos: number = 0;
+  balanzadasCompletas: any;
+
+  vaporId: number = 0;
+  moduloDeCargaId: number = 0;
+  embarque: EmbarqueNav;
+  embarqueId: number;
+  barquitos: InstanciaWorkflowPuerto[] = [];
+
   constructor(
-    private _turnosService: TurnosService
+    private _turnosService: TurnosService,
+    private _procesoService: DatosEmbarquesProcesoService,
+    private balanzaService: BalanzaService,
   ) {
+    this.vaporId = this._procesoService.getVaporId();
+    this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
   }
 
   ngOnInit(): void {
@@ -32,7 +48,7 @@ export class GraficosRitmosComponent implements OnInit {
     let turnos = this._turnosService.getTurnos();
     if (turnos) {
       let cant = 0;
-      for (let turno of turnos.turno) {
+      for (let turno of turnos.moduloDeCargaPlanillaDeTurnosTurnosDetalles) {
         cant += turno.cantidad;
       }
       this.valorRitmo = (this.valorRitmo * this.cantTurnos) + cant;
@@ -47,7 +63,7 @@ export class GraficosRitmosComponent implements OnInit {
 
     this._turnosService.sendTurnos.subscribe(res => {
       let cant: number = 0;
-      for (let turno of res.turno) {
+      for (let turno of res.moduloDeCargaPlanillaDeTurnosTurnosDetalles) {
         cant += Number(turno.cantidad);
       }
       this.valorCargando += Number(cant);
@@ -66,6 +82,16 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeBalanzas() {
+    this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
+      console.log('obtenerRitmos: ', res);
+      this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
+      this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
+      this.valorRitmo = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
+    });
 
+    this._procesoService.sendTotalPlanoDeEmbarque.subscribe(res => {
+      this.tnTotales = res;
+    });
   }
+
 }

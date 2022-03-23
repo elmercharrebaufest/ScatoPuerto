@@ -122,7 +122,7 @@
                 <div class="form-group col-4">
                   <input
                          type="text"
-                         class="form-control"
+                         class="form-control prueba22"
                          formControlName="exportador"
                          maxlength="50"
                          placeholder="Exportador"
@@ -131,11 +131,12 @@
                          [inputFormatter]="formatterExportador"
                          [resultFormatter]="formatterExportador"
                          (blur)="onBlurExportador()"
-                         (change)='sendExportador($event.target.value)'
+                         (change)='sendExportador($event.target.value, j)'
                          />
-                </div>
+                        </div>
+                        <!-- (change)='sendExportador($event.target.value)' -->
                 <div class="form-group col-4">
-                  <select class="custom-select" formControlName="materialPuerto" (change)='sendExportador($event.target.value)'>
+                  <select class="custom-select" formControlName="materialPuerto" (change)='sendMaterialPuerto($event.target.value)'>
                     <option value ="" selected></option>
                     <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
                   </select>
@@ -226,12 +227,12 @@
         <div class="row ml-2 mb-2">
           <div class="form-check mr-2">
             <input class="form-check-input" type="radio" name="defensasMoviles"
-                   id="Si" formControlName="defensasMoviles" value="Si">
+                   id="Si" formControlName="defensasMoviles" [value]="true">
             <label class="form-check-label" for="Si">Si</label>
           </div>
           <div class="form-check">
             <input class="form-check-input" type="radio" name="defensasMoviles"
-                   id="No" formControlName="defensasMoviles" value="No">
+                   id="No" formControlName="defensasMoviles" [value]="false">
             <label class="form-check-label" for="No">No</label>
           </div>
         </div>

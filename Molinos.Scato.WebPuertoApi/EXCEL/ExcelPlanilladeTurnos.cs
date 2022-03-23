@@ -11,13 +11,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 {
     public class ExcelLiquido
     {
-        public void GenerarArchivo(ResultadoPrevisualizar resultado, ModuloDeCargaPlanillaDeTurnosDto turnos, int IdModuloDeCarga)
+        public void GenerarArchivo(ResultadoPrevisualizar resultado, List<ModuloDeCargaPlanillaDeTurnosTurnosDto> turnos, int IdModuloDeCarga)
         {
             var workbook = GenerarExcel(turnos, IdModuloDeCarga);
             resultado.Archivo = workbook;
         }
 
-        private static byte[] GenerarExcel(ModuloDeCargaPlanillaDeTurnosDto turnos, int IdModuloDeCarga)
+        private static byte[] GenerarExcel(List<ModuloDeCargaPlanillaDeTurnosTurnosDto> turnos, int IdModuloDeCarga)
         {
             var workbook = new HSSFWorkbook();
             var sheet = (HSSFSheet)workbook.CreateSheet("Planilla de Turnos");
@@ -33,32 +33,41 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             ICellStyle estiloRegion = EstiloRegion(workbook);
             ICellStyle estiloRegionTurnos = EstiloRegionTurnos(workbook);
             //Valores
-            var encabezado = false;
-            var i = 1;
-          
-             var row = sheet.CreateRow(i);
-            InsertTableHeaderTurnos(sheet, estiloHeaderTabla, i);
-            InsertRowsTurnos(sheet, ref i, turnos, estiloContenido, estiloContenidoBold, estiloRegion, estiloRegionTurnos, estiloHeaderTabla, estiloCabeceraCorte);
-            
 
-            sheet.SetColumnWidth(0, (int)Math.Floor(30m * 256)); 
-            sheet.SetColumnWidth(1, (int)Math.Floor(15m * 256)); 
-            sheet.SetColumnWidth(2, (int)Math.Floor(15m * 256)); 
-            sheet.SetColumnWidth(3, (int)Math.Floor(15m * 256)); 
-            sheet.SetColumnWidth(4, (int)Math.Floor(40m * 256)); 
-            sheet.SetColumnWidth(5, (int)Math.Floor(10m * 256)); 
-            sheet.SetColumnWidth(6, (int)Math.Floor(18m * 256)); 
-            sheet.SetColumnWidth(7, (int)Math.Floor(40m * 256));
-            sheet.SetColumnWidth(8, (int)Math.Floor(40m * 256));
-            sheet.SetColumnWidth(9, (int)Math.Floor(40m * 256));
-            sheet.SetColumnWidth(10, (int)Math.Floor(40m * 256));
-            sheet.SetColumnWidth(11, (int)Math.Floor(40m * 256));
+            var i = 0;
+
+            foreach (var turno in turnos)
+            {
+                i = CreateSeparatorRow(sheet, workbook, i);
+                i = InsertTableHeaderTurnos(sheet, estiloHeaderTabla, i);
+                i = InsertRowsTurnos(sheet, i, turno, turno, estiloContenido, estiloContenidoBold, estiloRegion, estiloRegionTurnos, estiloHeaderTabla, estiloCabeceraCorte);                
+            }
+
+            //Resize columns
+            for (int j = 0; j < 11; j++)
+            {
+                sheet.AutoSizeColumn(j);
+            }
+            sheet.SetColumnWidth(4, (int)Math.Floor(40m * 256));
 
             using (var fileData = new MemoryStream())
             {
                 workbook.Write(fileData);
                 return fileData.ToArray();
             }
+        }
+
+        private static int CreateSeparatorRow(HSSFSheet sheet, HSSFWorkbook workbook,int i)
+        {
+            IRow row = sheet.CreateRow(i);
+            for (int j = 0; j <= 11; j++)
+            {
+                ICellStyle SeparatorCellStyle = EstiloRegionSeparator(workbook);
+                var cell = row.CreateCell(j);
+                cell.CellStyle = SeparatorCellStyle;
+            }
+            i++;
+            return i;
         }
 
         private static ICellStyle EstiloRegion(HSSFWorkbook workbook)
@@ -79,7 +88,20 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             cellBorderStyleColumnTitles.WrapText = true;
             return cellBorderStyleColumnTitles;
         }
+        private static ICellStyle EstiloRegionSeparator(HSSFWorkbook workbook)
+        {
+            var fontBold = workbook.CreateFont();
+            fontBold.FontHeightInPoints = 12;
+            fontBold.Boldweight = (short)FontBoldWeight.Bold;
 
+            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
+            cellBorderStyleColumnTitles.SetFont(fontBold);
+            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LemonChiffon.Index;
+            cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
+            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
+            cellBorderStyleColumnTitles.WrapText = true;
+            return cellBorderStyleColumnTitles;
+        }
         private static ICellStyle EstiloRegionTurnos(HSSFWorkbook workbook)
         {
             var fontBold = workbook.CreateFont();
@@ -105,8 +127,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
           
             cellBorderStyleColumnTitles.SetFont(fontBold);
-            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Red.Index;
-            
+            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;            
             cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             cellBorderStyleColumnTitles.WrapText = true;
@@ -197,22 +218,29 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return cellBorderStyleColumnTitles;
         }
 
-        private static void InsertRowsTurnos(HSSFSheet sheet, ref int i,  ModuloDeCargaPlanillaDeTurnosDto turnosPlanilla, ICellStyle font, ICellStyle fontBold, ICellStyle estiloRegion, ICellStyle estiloRegionTurnos, ICellStyle estiloHeaderTabla, ICellStyle estiloCabeceraCorte)
+        private static int InsertRowsTurnos(HSSFSheet sheet, int i, ModuloDeCargaPlanillaDeTurnosTurnosDto registroTurno,  ModuloDeCargaPlanillaDeTurnosTurnosDto turnosPlanilla, ICellStyle font, ICellStyle fontBold, ICellStyle estiloRegion, ICellStyle estiloRegionTurnos, ICellStyle estiloHeaderTabla, ICellStyle estiloCabeceraCorte)
         {
+            //if(registroTurno.ObservacionesDeCalidadDto == null)
+            //{
+            //    ObservacionesDeCalidadDto obs = new ObservacionesDeCalidadDto();
+            //    registroTurno.ObservacionesDeCalidadDto = obs;
+            //}
             
             bool crearfecha = true;
             bool crearTurno = true;
 
-            foreach (var planilla in turnosPlanilla.ModuloDeCargaPlanillaDeTurnosTurnos)
-            {
+            string turno;
+            DateTime? fecha;
+            IRow row;
+            ICell celda;
              
-                foreach (var turnoPlanilla in planilla.ModuloDeCargaPlanillaDeTurnosTurnosDetalles)
+                foreach (var turnoDetalle in registroTurno.ModuloDeCargaPlanillaDeTurnosTurnosDetalles)
                 {
-                    var turno = planilla.TurnoPuerto.Nombre;
-                    var fecha = turnosPlanilla.Fecha;
+                    turno = registroTurno.TurnoPuerto.Nombre;
+                    fecha = turnosPlanilla.Fecha;
                     
-                    var row = sheet.CreateRow(i);
-                    var celda = row.CreateCell(0);
+                    row = sheet.CreateRow(i);
+                    celda = row.CreateCell(0);
                     
                     if (crearfecha)
                     {
@@ -226,80 +254,117 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     
                     if (crearTurno)
                     {
-                        celda.SetCellValue(planilla.TurnoPuerto.Nombre);
+                        celda.SetCellValue(registroTurno.TurnoPuerto.Nombre);
                         crearTurno = false;
                         
                     }
                     celda.CellStyle = estiloRegion;
                     celda = row.CreateCell(2);
-                    celda.SetCellValue(turnoPlanilla.Exportador.Nombre);
+                    celda.SetCellValue(turnoDetalle.Exportador.Nombre);
                     celda.CellStyle = font;
                     celda = row.CreateCell(3);
-                    celda.SetCellValue(turnoPlanilla.Linea);
+                    celda.SetCellValue(turnoDetalle.Linea_Id);
                     celda.CellStyle = font;
                     celda = row.CreateCell(4);
-                    celda.SetCellValue(turnoPlanilla.BodegaParcel);
+                    celda.SetCellValue(turnoDetalle.BodegaParcel);
                     celda.CellStyle = font;
                     celda = row.CreateCell(5);
-                    celda.SetCellValue(turnoPlanilla.MaterialPuerto.Descripcion);
+                    celda.SetCellValue(turnoDetalle.MaterialPuerto.Descripcion);
                     celda.CellStyle = font;
                     celda = row.CreateCell(6);
-                    celda.SetCellValue(turnoPlanilla.Tk);
+                    celda.SetCellValue(turnoDetalle.Tk);
                     celda.CellStyle = font;
                     celda = row.CreateCell(7);
-                    celda.SetCellValue(turnoPlanilla.Temperatura);
+                    celda.SetCellValue(turnoDetalle.Temperatura);
                     celda.CellStyle = font;
                     celda = row.CreateCell(8);
-                    celda.SetCellValue(turnoPlanilla.MedidaInicialCM);
+                    celda.SetCellValue(turnoDetalle.MedidaInicialCM);
                     celda.CellStyle = font;
                     celda = row.CreateCell(9);
-                    celda.SetCellValue(turnoPlanilla.MedidaFinalCM);
+                    celda.SetCellValue(turnoDetalle.MedidaFinalCM);
                     celda.CellStyle =  font;
                     celda = row.CreateCell(10);
-                    celda.SetCellValue(turnoPlanilla.Destino.Nombre);
+                    celda.SetCellValue(turnoDetalle.Destino.Nombre);
                     celda.CellStyle = font;
                     celda = row.CreateCell(11);
-                    celda.SetCellValue(turnoPlanilla.Cantidad);
+                    celda.SetCellValue(turnoDetalle.Cantidad.ToString());
                     celda.CellStyle = font;
                     i++;
                 }
 
-                // sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(1, i, 0, 0));
-
-                //sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(1, i, 1, 1));
-                int x = i + 4;
-                InsertTableHeaderCortes(sheet, estiloHeaderTabla,estiloRegionTurnos, estiloCabeceraCorte, x);
-                foreach (var cortesPlanilla in planilla.ModuloDeCargaPlanillaDeTurnosTurnosCortes)
+                i = InsertTableHeaderCortes(sheet, estiloHeaderTabla,estiloRegionTurnos, estiloCabeceraCorte, estiloRegion, i);
+                foreach (var registroCortes in registroTurno.ModuloDeCargaPlanillaDeTurnosTurnosCortes)
                 {
-                    var turno = planilla.TurnoPuerto.Nombre;
-                    var fecha = turnosPlanilla.Fecha;
+                    turno = registroTurno.TurnoPuerto.Nombre;
+                    fecha = turnosPlanilla.Fecha;
 
-                    var row = sheet.CreateRow(x+1);
-                    
-                    var celda = row.CreateCell(0);
-                    celda.SetCellValue(cortesPlanilla.MotivosDeCorte.Nombre);                    
-                    celda.CellStyle = font;
-                    
+                    row = sheet.CreateRow(i);
+
+                    celda = row.CreateCell(0);
+                    celda.CellStyle = estiloRegionTurnos;
                     celda = row.CreateCell(1);
-                    celda.SetCellValue(cortesPlanilla.HoraInicio);
-                    celda.CellStyle = font;
+                    celda.CellStyle = estiloRegion;
                     celda = row.CreateCell(2);
-                    celda.SetCellValue(cortesPlanilla.HoraFin);
-                    celda.CellStyle = font;
+                    celda.SetCellValue(registroCortes.MotivosDeCorte.Nombre);                    
+                    celda.CellStyle = font;                    
                     celda = row.CreateCell(3);
-                    celda.SetCellValue(cortesPlanilla.TiempoTotal);
+                    celda.SetCellValue(registroCortes.HoraInicio);
                     celda.CellStyle = font;
                     celda = row.CreateCell(4);
-                    celda.SetCellValue(cortesPlanilla.Observaciones);
+                    celda.SetCellValue(registroCortes.HoraFin);
                     celda.CellStyle = font;
-                    x++;
+                    celda = row.CreateCell(5);
+                    celda.SetCellValue(registroCortes.TiempoTotal);
+                    celda.CellStyle = font;
+                    celda = row.CreateCell(6);
+                    celda.SetCellValue(registroCortes.Observaciones);
+                    celda.CellStyle = font;
+                    i++;
                 }
-            }
+
+            turno = registroTurno.TurnoPuerto.Nombre;
+            fecha = turnosPlanilla.Fecha;
+            //if (registroTurno.ObservacionesDeCalidadDto != null)
+            //{
+            //    i = InsertTableHeaderObservacionesDeCalidad(sheet, estiloHeaderTabla, estiloRegionTurnos, estiloCabeceraCorte, estiloRegion, i);
+
+
+
+            //    row = sheet.CreateRow(i);
+
+            //    celda = row.CreateCell(0);
+            //    celda.CellStyle = estiloRegionTurnos;
+            //    celda = row.CreateCell(1);
+            //    celda.CellStyle = estiloRegion;
+
+            //    celda = row.CreateCell(2);
+            //    celda.SetCellValue(registroTurno.ObservacionesDeCalidadDto.Fecha);
+            //    celda.CellStyle = font;
+
+            //    celda = row.CreateCell(3);
+            //    celda.SetCellValue(registroTurno.ObservacionesDeCalidadDto.Hora);
+            //    celda.CellStyle = font;
+
+            //    celda = row.CreateCell(4);
+            //    celda.SetCellValue(registroTurno.ObservacionesDeCalidadDto.Observaciones);
+            //    celda.CellStyle = font;
+
+            //    celda = row.CreateCell(5);
+            //    celda.SetCellValue("");
+            //    celda.CellStyle = font;
+
+            //    celda = row.CreateCell(6);
+            //    celda.SetCellValue("");
+            //    celda.CellStyle = font;
+            //    i++;
+             
+            //}
+            return i;
         }
          
         private static int InsertTableHeaderTurnos(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, int i)
         {
-            var row = sheet.CreateRow(0);
+            var row = sheet.CreateRow(i);
             var celda =  row.CreateCell(0);
             
             celda.CellStyle = cellBorderStyleColumnTitles;
@@ -337,20 +402,109 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             celda = row.CreateCell(11);
             celda.CellStyle = cellBorderStyleColumnTitles;
             celda.SetCellValue("Cant.");
-            return i;
+            return ++i;
         }
 
-        private static int InsertTableHeaderCortes(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles,ICellStyle estiloRegionTurnos,ICellStyle estiloCabeceraCorte, int i)
+        private static int InsertTableHeaderCortes(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles,ICellStyle estiloRegionTurnos,ICellStyle estiloCabeceraCorte, ICellStyle estiloRegion, int i)
         {
-            var row1 = sheet.CreateRow(i-1);
+            var row1 = sheet.CreateRow(i);
             var celda1 = row1.CreateCell(0);
+            celda1.CellStyle = estiloRegionTurnos;
+            celda1 = row1.CreateCell(1);
+            celda1.CellStyle = estiloRegion;
+            celda1 = row1.CreateCell(2);
             celda1.CellStyle = estiloCabeceraCorte;
            
+            celda1 = row1.CreateCell(3);
+            celda1.CellStyle = estiloCabeceraCorte;
+            celda1 = row1.CreateCell(4);
+            celda1.SetCellValue("CORTES");
+            celda1.CellStyle = estiloCabeceraCorte;            
+            celda1 = row1.CreateCell(5);
+            celda1.CellStyle = estiloCabeceraCorte;
+            celda1 = row1.CreateCell(6);
+            celda1.CellStyle = estiloCabeceraCorte;
+            //sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(i - 1, i - 1, 0, 4));
+            i++;
+            var row = sheet.CreateRow(i);
+            var celda = row.CreateCell(0);
+            celda.CellStyle = estiloRegionTurnos;
+            celda.SetCellValue("");
+            celda = row.CreateCell(1);
+            celda.CellStyle = estiloRegion;
+            celda = row.CreateCell(2);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Motivo");
+            celda = row.CreateCell(3);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Inicio");
+            celda = row.CreateCell(4);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Fin");
+            celda = row.CreateCell(5);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Tiempo.Total");
+            celda = row.CreateCell(6);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Observaciones");
+            return ++i;
+        }
+
+        private static int InsertTableHeaderObservacionesDeCalidad(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, ICellStyle estiloRegionTurnos, ICellStyle estiloCabeceraCorte, ICellStyle estiloRegion, int i)
+        {
+            var row1 = sheet.CreateRow(i);
+            var celda1 = row1.CreateCell(0);
+            celda1.CellStyle = estiloRegionTurnos;
+            celda1 = row1.CreateCell(1);
+            celda1.CellStyle = estiloRegion;
+            celda1 = row1.CreateCell(2);
+            celda1.CellStyle = estiloCabeceraCorte;
+            celda1 = row1.CreateCell(3);
+            celda1.CellStyle = estiloCabeceraCorte;
+            celda1 = row1.CreateCell(4);
+            celda1.SetCellValue("Observaciones de calidad");
+            celda1.CellStyle = estiloCabeceraCorte;
+            celda1 = row1.CreateCell(5);
+            celda1.CellStyle = estiloCabeceraCorte;
+            celda1 = row1.CreateCell(6);
+            celda1.CellStyle = estiloCabeceraCorte;
+            //sheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(i - 1, i - 1, 0, 4));
+            i++;
+            var row = sheet.CreateRow(i);
+            var celda = row.CreateCell(0);
+            celda.CellStyle = estiloRegionTurnos;
+            celda = row.CreateCell(1);
+            celda.CellStyle = estiloRegion;
+            celda.SetCellValue("");
+            celda = row.CreateCell(2);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Fecha");
+            celda = row.CreateCell(3);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Hora");
+            celda = row.CreateCell(4);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("Observacion");
+            celda = row.CreateCell(5);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("");
+            celda = row.CreateCell(6);
+            celda.CellStyle = cellBorderStyleColumnTitles;
+            celda.SetCellValue("");
+            return ++i;
+        }
+
+        private static int InsertTableHeaderObservacionesDeCalidad(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, ICellStyle estiloRegionTurnos, ICellStyle estiloCabeceraCorte, int i)
+        {
+            var row1 = sheet.CreateRow(i - 1);
+            var celda1 = row1.CreateCell(0);
+            celda1.CellStyle = estiloCabeceraCorte;
+
             celda1 = row1.CreateCell(1);
             celda1.CellStyle = estiloCabeceraCorte;
             celda1 = row1.CreateCell(2);
-            celda1.SetCellValue("CORTES");
-            celda1.CellStyle = estiloCabeceraCorte;            
+            celda1.SetCellValue("");
+            celda1.CellStyle = estiloCabeceraCorte;
             celda1 = row1.CreateCell(3);
             celda1.CellStyle = estiloCabeceraCorte;
             celda1 = row1.CreateCell(4);

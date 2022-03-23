@@ -84,3 +84,6 @@ label{ font-weight: bold; }
 .custom-select{
     text-align: center;
 }
+.temperatura-error{
+    border: 1px solid red;
+}

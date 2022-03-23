@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <table class="claseTable">
+    <table class="claseTable" >
       <div fxLayout='row wrap' class="mt-4">
         <div fxFlex='100'>
           <div fxLayout='row wrap' class="tituloCentrado" >
@@ -72,14 +72,14 @@
 
                       <tbody>
                         <tr class="claseTr" >
-                          <td class="claseTd" >
+                          <td>
 
                             <div class="form-group pl-2" fxFlex='9'>
                                 <select class="custom-select" formControlName="linea">
                                   <option *ngFor="let l of lineas" [ngValue]="l.nombreLinea"> {{ l.nombreLinea }} </option>
                                 </select>
                             </div>
-                            <div class="form-group pl-2" fxFlex='10'>
+                            <div class="form-group pl-2" fxFlex='10' (change)="onFocusOutEvent(i)">
                                 <select class="custom-select" 
                                         formControlName="materialPuerto"
                                         [compareWith]="compareLineas">
@@ -105,7 +105,7 @@
                                 </select>
                             </div>
                             <div class="form-group" fxFlex='6'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="temperaturaInicial"/>
+                              <input type="text" (focusout)="onFocusOutEvent(i)" class="inputLineasEmbarque" formControlName="temperaturaInicial"/>
                             </div>
                             <div class="form-group" fxFlex='6'>
                               <input type="text" class="inputLineasEmbarque" formControlName="alturaInicialCM" placeholder="CM" />
@@ -155,6 +155,9 @@
         </perfect-scrollbar>
       </div>
     </table>
-
+    <br/>
+    <div class="text-center">
+      <button type="button" class="btn btn-primary" (click)="guardar()">GUARDAR</button>
+   </div>
   </div>
 </div>

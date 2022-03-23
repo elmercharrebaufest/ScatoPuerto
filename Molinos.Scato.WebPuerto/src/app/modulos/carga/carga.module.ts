@@ -5,7 +5,7 @@ import { CargaLiquidosComponent } from "./carga-liquidos/carga-liquidos.componen
 import { LineasComponent } from "./carga-liquidos/operaciones/lineas/lineas.component";
 import { TanquesComponent } from "./carga-liquidos/operaciones/tanques/tanques.component";
 import { PlanillaEmbarqueComponent } from "./carga-liquidos/tableristas/planilla-embarque/planilla-embarque.component";
-import { PlanillaTurnoLiquidosComponent } from "./carga-liquidos/tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component";
+import { PlanillaTurnoLiquidosComponent } from './carga-liquidos/tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
 import { CargaRoutingModule } from "./carga-routing.module";
 import { CargaSolidosComponent } from "./carga-solidos/carga-solidos.component";
 import { GraficoCargaComponent } from "./carga-solidos/operaciones/grafico-carga/grafico-carga.component";
@@ -17,6 +17,8 @@ import { UmapComponent } from "./carga-solidos/tableristas/umap/umap.component";
 import { CargaComponent } from "./carga.component";
 import {ListboxModule} from 'primeng/listbox';
 import { PeriodoCargaComponent } from "app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component";
+import { BodegasComponent } from './carga-solidos/tableristas/bodegas/bodegas.component';
+import { InicioCargaComponent } from "./carga-solidos/tableristas/inicio-carga/inicio-carga.component";
 
 @NgModule({
     imports: [
@@ -38,7 +40,9 @@ import { PeriodoCargaComponent } from "app/shared/componentes/modulos/carga/peri
         CargaLiquidosComponent,
         TanquesComponent,
         LineasComponent,
-        PlanillaTurnoLiquidosComponent
+        PlanillaTurnoLiquidosComponent,
+        BodegasComponent,
+        InicioCargaComponent
     ],
     exports: [
         ManosComponent,
@@ -48,6 +52,8 @@ import { PeriodoCargaComponent } from "app/shared/componentes/modulos/carga/peri
         CargaLiquidosComponent,
         LineasComponent,
         InfoAdicionalComponent,
+        PlanillaTurnoLiquidosComponent,
+        BalanzasRitmosComponent
     ]
 })
 export class CargaModule {}

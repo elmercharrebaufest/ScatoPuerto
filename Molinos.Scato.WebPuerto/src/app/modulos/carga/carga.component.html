@@ -22,38 +22,13 @@
 
         <!--Modulos Solidos-->
         <ng-container *ngIf='!embarqueSelected.esLiquido'>
-            <app-carga-solidos *ngIf='!embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)'>
+            <app-carga-solidos [cargaComercialIncompleto]='planoContent.cargaComercialIncompleto' *ngIf='!embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)'>
             </app-carga-solidos>
-            <!-- <div fxLayout='row wrap'>
-                <div fxFlex='50'>
-                    <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos>
-                </div>
-                <div fxFlex='50' class='pb-3'>
-                    <app-info-adicional></app-info-adicional>
-                </div>
-            </div> -->
         </ng-container>
 
         <!--Modulos Liquidos-->
         <ng-container *ngIf='embarqueSelected.esLiquido'>
             <app-carga-liquidos (hideSpinner)='hideSpinner($event)'></app-carga-liquidos>
-
-            <!-- Rol Tablerista -->
-            <!-- <ng-container *ngIf='embarqueSelected.nombreUbicacion.toLowerCase() == "muelle de carga"'> -->
-
-            <!-- <ng-container>
-                <div class='bg-white px-4 min-h5 shadow mt-4'>
-                    <app-planilla-embarque></app-planilla-embarque>
-                </div>
-                <div class='bg-white px-4 min-h5 shadow mt-4'>
-                    <app-planilla-turno-liquidos></app-planilla-turno-liquidos>
-                </div>
-                <div class='mt-5' style='margin-left: 25%; width: 50%;'>
-                    <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos>
-                </div>
-            </ng-container> -->
-
-            <!-- -->
         </ng-container>
     </ng-container>
 </div>

@@ -12,5 +12,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string HoraEncendido { get; set; }
         public virtual DateTime? FechaApagado { get; set; }
         public virtual string HoraApagado { get; set; }
+        public virtual string DireccionDelViento { get; set; }
+        public virtual string VelocidadDelViento { get; set; }
     }
 }

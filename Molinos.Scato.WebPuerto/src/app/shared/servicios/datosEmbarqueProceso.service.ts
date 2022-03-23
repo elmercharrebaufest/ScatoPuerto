@@ -1,7 +1,10 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
+import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
+import { EmbarqueService } from './embarque.service';
 import { ModuloDeCargaService } from './modulo-de-carga.service';
+import { WorkflowService } from '@ScatoServicios/workflow.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,10 +19,21 @@ export class DatosEmbarquesProcesoService {
     private datosGrafico: Object;
     private moduloDeCarga: ModuloDeCarga;
     private estadoAltura: any;
+    private vientoAmarre: string;
+    private direccionViento: string;
+    private fechaHoraInicioCarga: Date;
+    private vaporId: number;
     @Output() sendEstadoAltura = new EventEmitter<number>();
     @Output() sendEmbarque = new EventEmitter<EmbarqueNav>();
+    @Output() sendTotalPlanoDeEmbarque = new EventEmitter<number>();
+    @Output() sendTotalCargadoBalanzas = new EventEmitter<number>();
+    @Output() sendFechaHoraInicioCarga = new EventEmitter<Date>();
 
-    constructor(private _moduloCargaService: ModuloDeCargaService){}
+    constructor(
+        private _moduloCargaService: ModuloDeCargaService,
+        private _embarqueService: EmbarqueService,
+        private workflowService: WorkflowService
+        ){}
 
     //GUARDA LOS DATOS DEL EMBARQUE SELECCIONADO
     /**
@@ -35,11 +49,21 @@ export class DatosEmbarquesProcesoService {
             this.sendEmbarque.emit(this.embarqueSelected);
             this.planoCargaId = this.embarqueSelected.planoDeCargaId;
             this.moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
-            this._moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe(
-                res => {
-                    this.moduloDeCarga = res;
-                }
-            )
+            
+            this._embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((res: Embarque) => {
+                this.fechaHoraInicioCarga = res.fechaHoraInicioCarga
+            });
+            
+            this._moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe( res => {
+                this.moduloDeCarga = res;
+                this.vientoAmarre = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].vientoAmarro : '';
+                this.direccionViento = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].direccionAmarro : '';
+            });
+
+            this.workflowService.obtenerListado().subscribe( (resp: any) => {
+                let barquitos = resp.find(x => x.embarque.id === this.embarqueId);
+                this.vaporId = barquitos['embarque'].vapor.id;
+            });
         }
     }
 
@@ -77,6 +101,11 @@ export class DatosEmbarquesProcesoService {
         this.estadoAltura = altura;
     }
 
+    //OBTIENE EL ID DEL VAPOR
+    getVaporId(){
+        return this.vaporId;
+    }
+
     //OBTIENE LA LISTA DE EMBARQUES
     getEmbarquesList() {
         return this.embarques;
@@ -96,7 +125,14 @@ export class DatosEmbarquesProcesoService {
     getModuloDeCargaId() {
         return this.moduloDeCargaId;
     }
-
+    //OBTIENE VELOCIDAD DEL VIENTO
+    getVientoAmarre(){
+        return this.vientoAmarre;
+    }
+    //OBTIENE DIRECCION DEL VIENTO
+    getDireccionViento(){
+        return this.direccionViento;
+    }
     //OBTIENE EL ID DEL EMBARQUE
     getEmbarqueId() {
         return this.embarqueId;
@@ -115,6 +151,13 @@ export class DatosEmbarquesProcesoService {
     //OBTIENE ESTADO DE ALTURA
     getEstadoAltura(){
         return this.estadoAltura;
+    }
+
+    getFechaHoraInicioCarga(){
+        return this.fechaHoraInicioCarga;
+    }
+    setFechaHoraInicioCarga(fechaHoraInicioCarga){
+        this.fechaHoraInicioCarga = fechaHoraInicioCarga;
     }
 
     disposeData(){

@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadScreen } from '@ScatoInterfaces/load-screen';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { PlanoContentComponent } from './plano-content/plano-content.component';
 
@@ -12,6 +13,7 @@ import { PlanoContentComponent } from './plano-content/plano-content.component';
   styleUrls: ['./plano-de-carga.component.css']
 })
 export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
+  confirmationDialogService: any;
   mostrarSpinner: boolean = true;
   mostrarNavtabs: boolean = false;
   mostrarPlano: boolean = false;
@@ -20,11 +22,16 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
   estadoAlturaValor: string;
   planoDeCargaId: number;
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
+  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
+                  {id: 2, descripcion: 'Cargando'}, 
+                  {id: 3, descripcion: 'ControlCalidad'}, 
+                  {id: 4, descripcion: 'PostOperativo'}];
 
   constructor(
     private route: ActivatedRoute,
     private workflowService: WorkflowService,
     private _procesoService: DatosEmbarquesProcesoService,
+    private embarqueService: EmbarqueService,
     private _changeDet: ChangeDetectorRef
   ) {
     super();
@@ -67,6 +74,13 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
 
   guardarPlanoDeCarga(finalizar: boolean) {
     this._changeDet.detectChanges();
+    this.modificarEstadoBuque('PreOperativo');
     this.planoContent.guardarPlanoDeCarga(finalizar);
+  }
+
+  modificarEstadoBuque(estado: string){
+    let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
+    let idEmbarque = this.route.snapshot.params.id;
+    this.embarqueService.actualizarEstadoBuque(idEmbarque, estadoBuque.id).subscribe( res => console.log(res) );
   }
 }

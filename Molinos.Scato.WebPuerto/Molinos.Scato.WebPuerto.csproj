@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -54,6 +53,9 @@
   <ItemGroup>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
@@ -154,11 +156,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +232,8 @@
     <Content Include="src\app\modulos\carga\carga-liquidos\operaciones\lineas\lineas.component.css" />
     <Content Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-embarque\planilla-embarque.component.html" />
     <Content Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-embarque\planilla-embarque.component.css" />
+    <Content Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-turno-liquidos\planilla-turno-liquidos.component.html" />
+    <Content Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-turno-liquidos\planilla-turno-liquidos.component.css" />
     <!-- Carga Solidos HTML/CSS -->
     <Content Include="src\app\modulos\carga\carga-solidos\carga-solidos.component.html" />
     <Content Include="src\app\modulos\carga\carga-solidos\carga-solidos.component.css" />
@@ -250,6 +249,10 @@
     <Content Include="src\app\modulos\carga\carga-solidos\tableristas\info-adicional\info-adicional.component.css" />
     <Content Include="src\app\modulos\carga\carga-solidos\tableristas\umap\umap.component.html" />
     <Content Include="src\app\modulos\carga\carga-solidos\tableristas\umap\umap.component.css" />
+    <Content Include="src\app\modulos\carga\carga-solidos\tableristas\bodegas\bodegas.component.html" />
+    <Content Include="src\app\modulos\carga\carga-solidos\tableristas\bodegas\bodegas.component.css" />
+    <Content Include="src\app\modulos\carga\carga-solidos\tableristas\inicio-carga\inicio-carga.component.html" />
+    <Content Include="src\app\modulos\carga\carga-solidos\tableristas\inicio-carga\inicio-carga.component.css" />
     <!-- Calidad HTML/CSS -->
     <Content Include="src\app\modulos\calidad\calidad.component.html" />
     <Content Include="src\app\modulos\calidad\calidad.component.css" />
@@ -327,6 +330,7 @@
     <TypeScriptCompile Include="src\app\app.component.spec.ts" />
     <TypeScriptCompile Include="src\app\app.component.ts" />
     <TypeScriptCompile Include="src\app\app.module.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\planilla-de-embarque.ts" />
     <!-- Module Shared TS -->
     <TypeScriptCompile Include="src\app\shared\shared.module.ts" />
     <!-- componentes shared TS -->
@@ -367,6 +371,8 @@
     <TypeScriptCompile Include="src\app\shared\servicios\balanzas78.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\balanza.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\lineas.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\pdf.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\funciones-generales.service.ts" />
     <!-- models TS -->
     <TypeScriptCompile Include="src\app\shared\modelos\modulo-carga-listado.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\agencia-control-privado.ts" />
@@ -403,9 +409,17 @@
     <TypeScriptCompile Include="src\app\shared\modelos\material-puerto.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\permiso.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\habilitacion-tanques.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\motivo-balanza.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\balanza78.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\balanza.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\corte-turno.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\motivo-de-corte.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\planilla-de-turnos.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\turno.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\obs-calidad.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\balanza.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\balanza78.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\periodo-carga.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\umap.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\recibo-buque.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />    
     <!-- enums TS -->
     <TypeScriptCompile Include="src\app\shared\enums\permisos-scato.ts" />
     <TypeScriptCompile Include="src\app\shared\enums\tipo-alerta.ts" />
@@ -429,6 +443,10 @@
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque-routing.module.ts" />
+    <!-- Componente PDF ReciboBuque -->
+    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.css" />
+    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.html" />
     <!-- lineup TS -->
     <TypeScriptCompile Include="src\app\modulos\lineup\embarque\lineup-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\lineup.component.ts" />
@@ -449,6 +467,7 @@
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\operaciones\tanques\tanques.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\operaciones\lineas\lineas.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-embarque\planilla-embarque.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-turno-liquidos\planilla-turno-liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\mangueras-carga\mangueras-carga.component.ts" />
     <!-- carga solido TS -->
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\carga-solidos.component.ts" />
@@ -458,6 +477,8 @@
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\balanzas-ritmos\balanzas-ritmos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\info-adicional\info-adicional.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\umap\umap.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\bodegas\bodegas.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\inicio-carga\inicio-carga.component.ts" />
     <!-- Calidad TS -->
     <TypeScriptCompile Include="src\app\modulos\calidad\liquidos\liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\solidos\solidos.component.ts" />
@@ -496,7 +517,9 @@
     <Content Include="tsconfig.spec.json" />
     <Content Include="tslint.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Molinos.Scato.Actividades\Molinos.Scato.Actividades.csproj">
       <Project>{98EC024C-6439-44B1-8B1E-29E457B2201F}</Project>
@@ -562,12 +585,6 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -593,5 +610,11 @@
         <DestinationRelativePath>dist\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
     </ItemGroup>
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
 </Project>

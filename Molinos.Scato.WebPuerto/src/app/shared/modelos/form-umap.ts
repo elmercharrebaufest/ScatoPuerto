@@ -5,10 +5,12 @@ export class FormUmap{
 
     constructor(){
         this.formulario = new FormGroup({
-            fecha_encendido: new FormControl(),
-            hora_encendido: new FormControl(),
-            fecha_apagado: new FormControl(),
-            hora_apagado: new FormControl(),
+            fechaEncendido: new FormControl(),
+            horaEncendido: new FormControl(),
+            fechaApagado: new FormControl(),
+            horaApagado: new FormControl(),
+            velocidadDelViento: new FormControl(),
+            direccionDelViento: new FormControl(),
         });
     }
 }

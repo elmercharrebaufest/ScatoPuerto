@@ -284,13 +284,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/PlanoDeCarga/ListarBalanzadaBuque")]
-        public HttpResponseMessage ListarBalanzadaBuque(int buque)
+        public HttpResponseMessage ListarBalanzadaBuque(int buque, int ritmoBajaCarga)
         {
             try
             {
 
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                servicio.ListarBalanzadaBuque(buque)
+                                servicio.ListarBalanzadaBuque(buque, ritmoBajaCarga)
                             );
             }
             catch (Exception ex)

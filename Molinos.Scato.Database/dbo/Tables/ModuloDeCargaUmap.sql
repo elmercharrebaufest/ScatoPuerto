@@ -6,6 +6,8 @@
 	[HoraEncendido]				nvarchar(8) NULL,
 	[FechaApagado]				datetime NULL,
 	[HoraApagado]				nvarchar(8) NULL,
+    [DireccionDelViento] NVARCHAR(8) NULL, 
+    [VelocidadDelViento] NVARCHAR(18) NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCargaUmap] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaUmap_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade
 );

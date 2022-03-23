@@ -21,6 +21,8 @@ import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
+import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
+import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/planilla-embarque.component';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -32,6 +34,8 @@ export class CargaLiquidosComponent implements OnInit {
   @Input() datosGrafico: any;
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
+  @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
+  @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
   datatanks: any;
   enviado: boolean;
   usuarioFinalizacion: string;
@@ -42,7 +46,13 @@ export class CargaLiquidosComponent implements OnInit {
   tanquesValue: any;
   lineasEmbarque: LineasDeEmbarque[];
   cargaPdf: boolean = false;
+  mostrarTableristaOperando = true;
   private user: Usuario;
+  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
+                  {id: 2, descripcion: 'Cargando'}, 
+                  {id: 3, descripcion: 'ControlCalidad'}, 
+                  {id: 4, descripcion: 'PostOperativo'}];
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private _tanquesService: EstadoTanquesService,
@@ -82,6 +92,7 @@ export class CargaLiquidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
+        // this.mostrarTableristaOperando = res.estadoBuque.descripcion == "Operando";
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
           descripcionCorta: m.descripcionCorta,
@@ -99,6 +110,13 @@ export class CargaLiquidosComponent implements OnInit {
   obtenerModuloDeCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe(resp => {
       this.enviado = resp.enviado;
+      if (resp.moduloDeCargaPeriodoDeCarga){
+        // console.log('resp.moduloDeCargaPeriodoDeCarga[0]: ', resp.moduloDeCargaPeriodoDeCarga[0]);
+        if(!resp.moduloDeCargaPeriodoDeCarga[0])
+          return
+        else
+          this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
+      }
     });
   }
 
@@ -165,10 +183,15 @@ export class CargaLiquidosComponent implements OnInit {
       this.usuarioFinalizacion = null;
 
     let lineasEmbarque = this.lineasComponent.obtenerLineasEmbarque();
+    let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
+    let planillaDeEmbarque = this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque();
+    console.log('planillaDeEmbarque -->>');
+    console.log(planillaDeEmbarque);
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
-      null, null, [this.tanquesValue], lineasEmbarque);
+      null, null, [this.tanquesValue], lineasEmbarque, [periodoCarga], planillaDeEmbarque);
+    // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
+    //   null, null, [this.tanquesValue], null, [periodoCarga]);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
-
       if (finalizar)
       this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {this.imprimir(finalizar)},
@@ -182,9 +205,19 @@ export class CargaLiquidosComponent implements OnInit {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
       }
+
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       this.hideSpinner.emit(false);
     });
+  }
+
+  modificarEstadoBuque(estado: string){
+    let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
+    this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
+      console.log(res);
+      let texto = "Se envió a Tableristas correctamente";
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
+    } );
   }
 
   enviarMail() {

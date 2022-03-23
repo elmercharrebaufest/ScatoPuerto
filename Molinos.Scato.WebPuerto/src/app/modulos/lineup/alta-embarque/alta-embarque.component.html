@@ -292,6 +292,13 @@
                   </div>
                 </div>
 
+                <div class="row">
+                  <div class="form-group col">
+                    <label for="fechaHastaLimpieza" class="font-weight-bold">Total hs: {{totalHorasLimpieza}}</label>
+                  </div>
+                  <div class="form-group col"></div>
+                </div>
+
                 <div class="form-group">
                   <label for="motivosLimpiezaList" class="font-weight-bold">Motivo</label>
                   <div class="input-group">
@@ -366,9 +373,7 @@
                     <input type="text" class="form-control" formControlName="manga"
                           placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
                   </div>
-                </div>
 
-                <div class="row">                      
                   <div class="form-group col">
                     <label for="puntal" class="font-weight-bold">Puntal</label>
                     <input type="text" class="form-control" formControlName="puntal"
@@ -376,7 +381,7 @@
                   </div>
                 </div>
 
-                <div class="row">
+                <!-- <div class="row">
                   <div class="form-group col">
                     <label for="fechaLibrePlatica" class="font-weight-bold">Libre Platica</label>
                     <div class="input_img">
@@ -393,7 +398,23 @@
                     </div>
                     <ngx-material-timepicker #fullTime3 ></ngx-material-timepicker>
                   </div>
-                </div>
+                </div> -->
+
+                <!-- <div class="col">
+                  <div class="form-group col-7">
+                    <label class="btn btn-outline-dark btn-sm" *ngIf="fileShipParticular == null">
+                      <img src="assets/clip.svg">
+                      Adjuntar Ship Particular
+                      <input type="file" class="form-control-file" (change)="onFileChangeShipParticular($event)"
+                             formControlName="filePathShipParticular" hidden>
+                    </label>
+                    <img src="assets/trashIcon.svg" *ngIf="fileShipParticular != null" (click)="deleteArchivo('shipParticular')">
+                    <label class="btn btn-link" (click)="descargarArchivo('shipParticular')">
+                      {{fileNameShipParticular}}
+                    </label>
+                  </div>
+                </div> -->
+
               </div>
             </div>
           </div>

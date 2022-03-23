@@ -9,6 +9,7 @@ export class TurnosService {
     @Output() sendExportadores = new EventEmitter<any>();
     @Output() sendBodega = new EventEmitter<any>();
     private turnos: any;
+    private mails: any;
     private tnTotales: number = 0;
     private formExportadores: any;
     private bodega: any;
@@ -16,6 +17,11 @@ export class TurnosService {
     setTurnos(turno: any){
         this.turnos = turno;
         this.sendTurnos.emit(turno);
+    }
+    setTurnosMail(turno: any, mail:any){
+        this.turnos = turno;
+        this.mails = mail;
+       // this.sendTurnos.emit(turno, mail);
     }
 
     getTurnos(){

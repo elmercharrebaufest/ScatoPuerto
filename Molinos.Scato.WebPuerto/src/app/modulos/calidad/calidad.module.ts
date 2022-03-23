@@ -9,6 +9,7 @@ import { NIRComponent } from "./solidos/nir/nir.component";
 import { SolidosComponent } from "./solidos/solidos.component";
 import { PlanillaTurnosSolidosComponent } from './solidos/planilla-turnos-solidos/planilla-turnos-solidos.component';
 import { PlanillaTurnosLiquidosCalidadComponent } from './liquidos/planilla-turnos-liquidos-calidad/planilla-turnos-liquidos-calidad.component';
+import { TestpdfComponent } from "../testpdf/testpdf.component";
 
 @NgModule({
     imports: [
@@ -23,7 +24,8 @@ import { PlanillaTurnosLiquidosCalidadComponent } from './liquidos/planilla-turn
         SolidosComponent,
         LiquidosComponent,
         PlanillaTurnosSolidosComponent,
-        PlanillaTurnosLiquidosCalidadComponent
+        PlanillaTurnosLiquidosCalidadComponent,
+        TestpdfComponent
     ],
 })
 

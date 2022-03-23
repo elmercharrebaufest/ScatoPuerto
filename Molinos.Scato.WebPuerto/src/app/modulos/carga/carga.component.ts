@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { PlanoContentComponent } from '../lineup/plano-de-carga/plano-content/plano-content.component';
 
 
 @Component({
@@ -19,6 +20,9 @@ export class CargaComponent implements OnInit, OnDestroy {
   embarquesEnLineUp: EmbarqueNav[];
   embarqueSelected: EmbarqueNav;
   unsubscribe: Subject<any>;
+  embarqueSelectedEnLocalStorage: EmbarqueNav;
+  
+  @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
 
   constructor(
     private workflowService: WorkflowService,
@@ -68,9 +72,21 @@ export class CargaComponent implements OnInit, OnDestroy {
     this.mostrarCargas = false;
     this.mostrarSpinner = true;
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+
+    this.grabarEmbarqueSelectedEnLocalStorage( this.embarqueSelected );
+  }
+
+  grabarEmbarqueSelectedEnLocalStorage( embarqueSelected: EmbarqueNav ){
+    localStorage.setItem("embarqueSelected", JSON.stringify(embarqueSelected));
+  }
+
+  obtenerEmbarqueSelectedEnLocalStorage(): EmbarqueNav {
+    let embarqueSelected = JSON.parse( localStorage.getItem("embarqueSelected") );
+    return embarqueSelected;
   }
 
   ngOnDestroy() {
-    this.unsubscribe.complete()
+    this.unsubscribe.complete();
+    localStorage.removeItem('embarqueSelected');
   }
 }

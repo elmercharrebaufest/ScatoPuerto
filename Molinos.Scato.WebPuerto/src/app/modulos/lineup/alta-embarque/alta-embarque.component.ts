@@ -48,11 +48,15 @@ export class AltaEmbarqueComponent implements OnInit {
   destinoPuerto: Destino[];
   PlanoDeCargaId: number;
   private state: string;
+  totalHorasLimpieza: number = 0;
+
+  fileShipParticular: string | ArrayBuffer;
+  fileNameShipParticular: string = 'Ningun archivo elegido';
 
   @ViewChild('horaRecalada') horaRecalada: ElementRef;
   @ViewChild('horaDesdeLimpieza') horaDesdeLimpieza: ElementRef;
   @ViewChild('horaHastaLimpieza') horaHastaLimpieza: ElementRef;
-  @ViewChild('horaLibrePlatica') horaLibrePlatica: ElementRef;
+  // @ViewChild('horaLibrePlatica') horaLibrePlatica: ElementRef;
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
 
   constructor(private formBuilder: FormBuilder,
@@ -116,8 +120,10 @@ export class AltaEmbarqueComponent implements OnInit {
       eslora: [],
       manga: [],
       puntal: [],
-      fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
-      horaLibrePlatica: [],
+      // fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
+      // horaLibrePlatica: [],
+      filePathShipParticular: [],
+      shipParticularArchivoNombre: [],
     });
 
     if (this.state === 'modulo-carga'){
@@ -205,13 +211,20 @@ export class AltaEmbarqueComponent implements OnInit {
 
           this.horaHastaLimpieza.nativeElement.value = res.horaHastaLimpieza != null ? res.horaHastaLimpieza : '';
 
+          // Calculo total horas limpieza
+          let fechaDesdeLimpieza = this.embarqueForm.get('fechaDesdeLimpieza').value;
+          let horaDesdeLimpieza = this.embarqueForm.get('horaDesdeLimpieza').value;
+          let fechaHastaLimpieza = this.embarqueForm.get('fechaHastaLimpieza').value;
+          let horaHastaLimpieza = this.embarqueForm.get('horaHastaLimpieza').value;
+          this.totalHorasLimpieza = this.calcularHorasLimpieza(fechaDesdeLimpieza, horaDesdeLimpieza, fechaHastaLimpieza, horaHastaLimpieza);
+          
           // SHIP PARTICULAR
-          if (res.fechaLibrePlatica != null)
-            this.embarqueForm.get('fechaLibrePlatica').setValue(new Date(res.fechaLibrePlatica).toISOString().slice(0, 10));
-          else
-            this.embarqueForm.get('fechaLibrePlatica').setValue('');
+          // if (res.fechaLibrePlatica != null)
+          //   this.embarqueForm.get('fechaLibrePlatica').setValue(new Date(res.fechaLibrePlatica).toISOString().slice(0, 10));
+          // else
+          //   this.embarqueForm.get('fechaLibrePlatica').setValue('');
 
-          this.horaLibrePlatica.nativeElement.value = res.horaLibrePlatica != null ? res.horaLibrePlatica : '';
+          // this.horaLibrePlatica.nativeElement.value = res.horaLibrePlatica != null ? res.horaLibrePlatica : '';
 
           if (res.ubicacion != null && res.ubicacion != 0 && typeof this.ubicacionDeBuquePuerto != 'undefined')
             this.embarqueForm.get('ubicacionDeBuque').setValue(
@@ -224,6 +237,9 @@ export class AltaEmbarqueComponent implements OnInit {
               this.destinoPuerto.find(x => x.id == res.destino.id));
           else
             this.embarqueForm.get('destino').setValue('');
+
+          this.fileNameShipParticular = res.shipParticularArchivoNombre != null ? res.shipParticularArchivoNombre : 'Ningun archivo elegido';
+          this.fileShipParticular = res.filePathShipParticular;
           //--------------------
           this.embarqueService.obtenerListadoAgenciasMaritimas().subscribe(res1 => {
             res.agencias = res1.map(x => new AgenciaMaritimaPuerto(x.id, x.nombre));
@@ -278,6 +294,18 @@ export class AltaEmbarqueComponent implements OnInit {
     }
   }
 
+  calcularHorasLimpieza(fechaDesde, horaDesde, fechaHasta, horaHasta): number {
+    let horas = 0;
+    if(fechaDesde!='' && horaDesde!='' && fechaHasta!='' && horaHasta!=''){
+      let lfechahoraDesde = fechaDesde + ' ' + horaDesde;
+      let lfechahoraHasta = fechaHasta + ' ' + horaHasta;
+      let fechahoraDesde = new Date(lfechahoraDesde);
+      let fechahoraHasta = new Date(lfechahoraHasta);
+      horas = (fechahoraHasta.getTime() - fechahoraDesde.getTime()) / 3600000;
+    }
+    return horas;
+  }
+
   get materialesPuertoCantidadFormArray(): FormArray {
     return this.embarqueForm.get("materialesPuertoCantidad") as FormArray
   }
@@ -329,12 +357,15 @@ export class AltaEmbarqueComponent implements OnInit {
       this.horaHastaLimpieza.nativeElement.value ?
         this.horaHastaLimpieza.nativeElement.value : '');
 
-    this.embarqueForm.get('fechaLibrePlatica').setValue(
-      this.embarqueForm.value.fechaLibrePlatica + ' ' + this.horaLibrePlatica.nativeElement.value);
+    // this.embarqueForm.get('fechaLibrePlatica').setValue(
+    //   this.embarqueForm.value.fechaLibrePlatica + ' ' + this.horaLibrePlatica.nativeElement.value);
 
-    this.embarqueForm.get('horaLibrePlatica').setValue(
-      this.horaLibrePlatica.nativeElement.value ?
-        this.horaLibrePlatica.nativeElement.value : '');
+    // this.embarqueForm.get('horaLibrePlatica').setValue(
+    //   this.horaLibrePlatica.nativeElement.value ?
+    //     this.horaLibrePlatica.nativeElement.value : '');
+
+    this.embarqueForm.value.filePathShipParticular = this.fileShipParticular;
+    this.embarqueForm.value.shipParticularArchivoNombre = this.fileNameShipParticular;
 
     this.embarqueForm.value.agencias =
       this.embarqueForm.value.agenciasList != null && this.embarqueForm.value.agenciasList.length > 0 ?
@@ -479,11 +510,11 @@ export class AltaEmbarqueComponent implements OnInit {
     this.embarqueForm.get('horaHastaLimpieza').setValue(
       this.horaHastaLimpieza.nativeElement.value ? this.horaHastaLimpieza.nativeElement.value : '');
 
-    this.embarqueForm.get('fechaLibrePlatica').setValue(
-      this.embarqueForm.value.fechaLibrePlatica + ' ' + this.horaLibrePlatica.nativeElement.value);
+    // this.embarqueForm.get('fechaLibrePlatica').setValue(
+    //   this.embarqueForm.value.fechaLibrePlatica + ' ' + this.horaLibrePlatica.nativeElement.value);
 
-    this.embarqueForm.get('horaLibrePlatica').setValue(
-      this.horaLibrePlatica.nativeElement.value ? this.horaLibrePlatica.nativeElement.value : '');
+    // this.embarqueForm.get('horaLibrePlatica').setValue(
+    //   this.horaLibrePlatica.nativeElement.value ? this.horaLibrePlatica.nativeElement.value : '');
 
     this.embarqueForm.value.motivosLimpieza =
       this.embarqueForm.value.motivosLimpiezaList != null && this.embarqueForm.value.motivosLimpiezaList.length > 0 ?
@@ -502,6 +533,9 @@ export class AltaEmbarqueComponent implements OnInit {
         this.ataList.find(x => x.id == this.embarqueForm.value.ataList[0].id) : '';
 
     this.embarqueForm.value.esLiquido = this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido;
+
+    this.embarqueForm.value.filePathShipParticular = this.fileShipParticular;
+    this.embarqueForm.value.shipParticularArchivoNombre = this.fileNameShipParticular;
 
     this.embarqueService.modificarEmbarque(this.embarqueForm.value)
       .subscribe((res: any) => {
@@ -555,6 +589,63 @@ export class AltaEmbarqueComponent implements OnInit {
       else
         control.get('cantidad').enable();
     });
+  }
+
+  onFileChangeShipParticular(event) {
+    if (event.target.files && event.target.files.length) {
+      let file = event.target.files[0];
+      let fileReader = new FileReader();
+
+      fileReader.onloadend = (e) => {
+        this.fileShipParticular = fileReader.result;
+        this.fileNameShipParticular = file.name;
+      }
+      fileReader.readAsDataURL(file);
+    }
+  }
+
+  public descargarArchivo(tipo: string) {
+    if (this.fileNameShipParticular == 'Ningun archivo elegido')
+      return;
+    let base64 = this.fileShipParticular;
+    let imageName = this.fileNameShipParticular;
+
+    // const imageBlob = this.dataURItoBlob('');
+    const imageBlob = this.dataURItoBlob(base64);
+
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(imageBlob, imageName);
+    }
+    else {
+      let elem = window.document.createElement('a');
+      elem.href = window.URL.createObjectURL(imageBlob);
+      elem.download = imageName;
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
+    }
+  }
+
+  dataURItoBlob(dataURI) {
+    const byteString = window.atob(dataURI);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const int8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+      int8Array[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([int8Array]);
+    return blob;
+  }
+
+  deleteArchivo(tipo: string) {
+    // if (tipo == 'secuencia') {
+    //   this.fileSecuencia = null;
+    //   this.fileNameSecuencia = 'Ningun archivo elegido';
+    // }
+    // else {
+      this.fileShipParticular = null;
+      this.fileNameShipParticular = 'Ningun archivo elegido';
+    // }
   }
 
   public numberOnly(event): boolean {

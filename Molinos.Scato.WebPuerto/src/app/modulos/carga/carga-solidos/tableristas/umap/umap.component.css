@@ -55,3 +55,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .full-center i:hover{
     cursor: pointer;
 }
+
+/* en chiquito */
+@media screen and (min-width: 800px) and (max-width: 1250px) {
+    .fecha {
+        width: 140px !important;
+    }
+    .hora {
+        width: 78px !important;
+    }
+    .imgClockInput1 {
+        right: 0.9rem !important;
+    }
+}

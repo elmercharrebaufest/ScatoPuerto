@@ -98,9 +98,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         string ObtenerBalanzaNombre(int id);
 
-        [OperationContract]
+[OperationContract]
         IList<BalanzaDto> ListarTodasLasBalanzasActivas(int centroId);
-
         [OperationContract]
         IList<BalanzaDto> ListarTodasLasBalanzas(int centroId);
 
@@ -274,10 +273,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ChoferDto ObtenerChofer(int id);
-
-        [OperationContract]
+[OperationContract]
         CategoriaVehiculoDto ObtenerCategoriaVehiculo(int id);
-
         [OperationContract]
         KmPorProveedorDto ObtenerKmPorProveedor(int id);
 
@@ -586,12 +583,13 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         BocaDestinoDto ObtenerBocaDestino(int id);
-
+        
         [OperationContract]
         IList<CaladoPorCaracteristicaDto> ListarCaladoPorCaracteristicas(int caladoId);
 
         [OperationContract]
         IList<CalleDto> ObtenerCallesDeCallesPorRecorridoSegunMaterial(int materialId, int calleId, TipoCalidad calidadCamion);
+
 
         [OperationContract]
         ListaPaginada<CaladoPorCaracteristicaDto> ListarPaginadoCaladoPorCaracteristica(int caladoId, Paginacion paginacion);
@@ -607,9 +605,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<RecorridoDto> ListarRecorridosPorDocumento(string tipoDoc, string numeroDoc);
-
+        
         [OperationContract]
         DatosRecorridoDto RecorridoPorTarjetaDeAcceso(string tarjetaDeAcceso);
+
 
         [OperationContract]
         RecorridoDto RecorridoSinPesosPorNumeroDeDocumento(TipoDocumentoIngreso tipo, string numeroDoc);
@@ -2017,7 +2016,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<CargaDto> ListarCargasSinPaginado(CargaFiltroDto filtro);
-
+        
         [OperationContract]
         ListaPaginada<CargaDto> ListarEmbarquePorBuques(CargaFiltroDto filtro, Paginacion paginacion);
 
@@ -2214,7 +2213,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         UltimoEstadoDto ObtenerEstadoRecorrido(Guid id);
-
+        
         [OperationContract]
         UltimoEstadoDto ObtenerMotivoAutorizarRecorrido(Guid id);
 
@@ -2443,10 +2442,10 @@ namespace Molinos.Scato.Servicios
         IList<UbicacionDeBuquePuertoDto> ListarUbicacionDeBuquePuerto();
 
         [OperationContract]
-        BalanzaDto ObtenerBalanzaPorPuestoDeTrabajoSinTipoVehiculo(int puestoDeTrabajoId);
+        List<string> ObtenerUsuariosPlanoDeCarga();
 
         [OperationContract]
-        List<string> ObtenerUsuariosPlanoDeCarga();
+        BalanzaDto ObtenerBalanzaPorPuestoDeTrabajoSinTipoVehiculo(int puestoDeTrabajoId);
 
         [OperationContract]
         bool ExistePagoRealizado(string patente);
@@ -2488,10 +2487,10 @@ namespace Molinos.Scato.Servicios
         decimal ObtenerDensidadPorTemperaturaDeMaterial(int materialPuertoId, int grado);
 
         [OperationContract]
-        int ObtenerLlenadoMinimetroPorTanque(string cm, string mm, string tanqueNum);
+        string ObtenerLlenadoMilimetroPorTanque(string cm, string mm, string tanqueNum);
 
         [OperationContract]
-        IList<BalanzadaDto> ListarBalanzadaBuque(int buque);
+        BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga);
 
         [OperationContract]
         IList<CargaDto> ListarCargaBalanzaPuerto();
@@ -2526,6 +2525,64 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         MaterialPorCentroDto ObtenerMaterialPorCodigoAfip(int centroId, int material);
 
+        [OperationContract]
+        void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id);
+
+        [OperationContract]
+        void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
+        [OperationContract]
+        void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id);
+
+
+        [OperationContract]
+        List<string> ObtenerDestinatariosPlanillaTurnos();
+
+        [OperationContract]
+        IList<BalanzasCortesDto> ObtenerCortesBalanzas(int IdModuloDeCarga);
+        
+        [OperationContract]
+        void GuardarFechaInicioCarga(int embarque_Id, DateTime fechaHoraInicioCarga);
+
+        [OperationContract]
+        void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos);
+
+        [OperationContract]
+        void EliminarCorteBalanza(int idCorteBalanza);
+        [OperationContract]
+        Dictionary<string, int> ObtenerRitmos(int vapor_id, int modulodecarga_id);
+
+        [OperationContract]
+        IList<BodegaDto> ListadoBodegas();
+
+        [OperationContract]
+       Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
+
+
+
+        [OperationContract]
+        ModuloDeCargaPlanillaDeTurnosTurnosDto ObtenerModuloDeCargaPlanillaDeTurnosTurnos(int turnoPuerto_id, int moduloDeCarga_id);
+
+        [OperationContract]
+        IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion();
+        //[OperationContract]
+        //void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto);
+
+        [OperationContract]
+        Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id);
+        MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion);
+
+        [OperationContract]
+        List<MaterialDto> ListarMaterialGranosConCodigoONCCA();
+
+        [OperationContract]
+        CartaPorteElectronicaDto ObtenerCartaPorteElectronica(int id);
+
+        [OperationContract]
+        Resultado ActualizarFechaEstadoCacheadoCPECentro(int id, string mensaje);
+        
+        [OperationContract]
+        string ObtenerDispositivoBarreraEntrada(int puestoId);
+        
         [OperationContract]
         ProveedorDto ObtenerProveedorPorId(int Id);
 
@@ -2576,20 +2633,5 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<EntidadTipoDeActividadDto> ListarActividadesPorEntidad(string codigoEntidad);
-
-        [OperationContract]
-        MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion);
-
-        [OperationContract]
-        List<MaterialDto> ListarMaterialGranosConCodigoONCCA();
-
-        [OperationContract]
-        CartaPorteElectronicaDto ObtenerCartaPorteElectronica(int id);
-
-        [OperationContract]
-        Resultado ActualizarFechaEstadoCacheadoCPECentro(int id, string mensaje);
-        
-        [OperationContract]
-        string ObtenerDispositivoBarreraEntrada(int puestoId);
     }
 }

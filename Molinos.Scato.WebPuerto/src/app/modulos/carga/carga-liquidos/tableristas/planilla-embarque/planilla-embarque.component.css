@@ -29,6 +29,16 @@ table td input {
     box-sizing: border-box;
 }
 
+.form-first-name, .form-last-name {
+	width: 46%;
+}
+
+.form-last-name {
+	float: right;
+}
+.control-bloqueado{
+    background-color: #e9ecef;
+}
 table td select {
     position: absolute;
     display: block;

@@ -16,7 +16,10 @@
             elemento.nombreUbicacion
             :':') : ''}}
         </button>
-        <button *ngIf="this.elementos.length > 7 && i == 6 && desplegado == false" (click)="mostrarMas()" class="btn btn-sm mr-2 mt-2 btn-mas">Ver más</button>
+        <button *ngIf="this.elementos.length > 7 && i == 6 && desplegado == false" 
+                id='mostrarMas2'
+                (click)="mostrarMas()" 
+                class="btn btn-sm mr-2 mt-2 btn-mas">Ver más</button>
     </ng-container>
     <button *ngIf="desplegado" (click)="mostrarMenos()" class="btn btn-sm mr-2 mt-2 btn-mas">Ver menos</button>
 </section>

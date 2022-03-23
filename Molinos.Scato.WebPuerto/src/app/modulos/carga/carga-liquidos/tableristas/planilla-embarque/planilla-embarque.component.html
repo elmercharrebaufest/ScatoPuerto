@@ -3,71 +3,96 @@
 
 <div id='planillaEmbarque' class='pb-5 collapse show'>
     <div fxLayout='row wrap'>
-        <div fxFlex='80' class='pr-4'>
+        <div fxFlex='100' class='pr-4'>
             <form [formGroup]='lineasEmbarque'>
-                <table class='table table-bordered turnos'>
+                <table class='table table-bordered turnos w-auto'>
                     <thead>
                         <tr class='table-active'>
-                            <th>Exportador</th>
+                            <th style="width: 15%;">Exportador</th>
                             <th>Partida</th>
                             <th>Tks de abordo</th>
-                            <th>Destino</th>
+                            <th  style="width: 10%;">Destino</th>
                             <th>Tks de tierra</th>
-                            <th>Tn.</th>
-                            <th>Producto</th>
-                            <th>Comenzó</th>
-                            <th>Finalizó</th>
+                            <th  style="width: 8%;">Tn.</th>
+                            <th style="width: 10%;">Producto</th>
+                            <th style="width: 17%;">Fecha inicio</th>
+                            <!--<th>Hora inicio</th>-->
+                            <th style="width: 17%;">Fecha fin</th>
+                            <!--<th>Hora fin</th>-->
                         </tr>
                     </thead>
                     <tbody>
                         <ng-container formArrayName='linea'>
                             <ng-container *ngFor='let l of linea.controls; let i = index' [formGroupName]='i'>
                                 <tr>
-                                    <td>
-                                        <select formControlName='exportador'>
-                                            <option *ngFor='let exportador of exportadores' [value]='exportador.exportador.id'>
-                                                {{exportador.exportador.nombre}}
+                                    <td scope="row">
+                                        <select formControlName='exportador' [compareWith]='compareLineaItem'>
+                                            <option [value]='0'></option>
+                                            <option *ngFor='let exportador of exportadores' [ngValue]='exportador'>
+                                                {{exportador.nombre}}
                                             </option>
                                         </select>
                                     </td>
                                     <td>
-                                        <select formControlName='partida' (change)='autoCompleteParcel($event.target.value, l)'>
+                                        <select formControlName='bodegaParcel' [compareWith]='compareLineaItem' (change)='autoCompleteParcel($event.target.value, l)'>
                                             <option [value]='0'></option>
                                             <option *ngFor='let bodega of bodegas' [value]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}</option>
                                         </select>
                                     </td>
                                     <td>
-                                        <select formControlName='tksAbordo'>
+                                        <input formControlName="tanqueDeAbordo" class="control-bloqueado">
+                                        <!-- <select formControlName='tanqueDeAbordo' [compareWith]='compareLineaItem'>
                                             <option [value]='0'></option>
-                                            <option *ngFor='let tanque of tanquesAbordo' [value]='tanque'>{{tanque}}</option>
+                                            <option *ngFor='let tanque of tanquesAbordo' [ngValue]='tanque'>{{tanque}}</option>
+                                        </select> -->
+                                    </td>
+                                    <td>
+                                        <select formControlName='destino' [compareWith]='compareLineaItem' class="control-bloqueado">
+                                            <option [value]='0'></option>
+                                            <option *ngFor='let bodega of bodegas' [ngValue]='bodega.destino ? bodega.destino : ""'>{{bodega.destino ? bodega.destino.nombre : ''}}</option>
                                         </select>
                                     </td>
                                     <td>
-                                        <select formControlName='destino'>
+                                        <select formControlName='tk' [compareWith]='compareLineaItem'>
                                             <option [value]='0'></option>
-                                            <option *ngFor='let bodega of bodegas' [value]='bodega.destino ? bodega.destino.id : ""'>{{bodega.destino ? bodega.destino.nombre : ''}}</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select formControlName='tksTierra'>
                                             <option *ngFor='let linea of lineas' [value]='linea.tkInicial'>{{linea.tkInicial}}</option>
                                         </select>
                                     </td>
                                     <td>
-                                        <input formControlName='tn' type='number'>
+                                        <input formControlName='tn'  class="control-bloqueado">
                                     </td>
                                     <td>
-                                        <select formControlName='producto'>
+                                        <select formControlName='materialPuerto' [compareWith]='compareLineaItem' class="control-bloqueado">
                                             <option [value]='0'></option>
-                                            <option *ngFor='let producto of productos' [value]='producto'>{{producto}}</option>
+                                            <option *ngFor='let producto of productos' [ngValue]='producto'>{{producto.descripcionCorta}}</option>
                                         </select>
                                     </td>
                                     <td>
-                                        <input formControlName='comenzo'>
+                                        <input type="datetime-local" formControlName='fechaComienzoCarga' >
                                     </td>
+                                    <!--
                                     <td>
-                                        <input formControlName='finalizo'>
+                                        <div>
+                                            <input formControlName='horaComienzoCarga' placeholder="00:00" [ngxTimepicker]='horaComienzo'
+                                                [format]='24' class='w-100'>
+                                            <img src='assets/reloj.svg' class='imgClockInput1'>
+                                            <ngx-material-timepicker #horaComienzo></ngx-material-timepicker>
+                                        </div>                                        
                                     </td>
+                                    -->
+                                    <td>
+                                        <input type="datetime-local" formControlName='fechaFinalizacionCarga' [value]="fechaFinalizacionCarga">
+                                    </td>
+                                    <!--
+                                    <td >
+                                        <div >
+                                            <input formControlName='horaFinalizacionCarga' placeholder="00:00" [ngxTimepicker]='horaFinalizacion'
+                                                [format]='24' class='w-100'>
+                                            <img src='assets/reloj.svg' class='imgClockInput1'>
+                                            <ngx-material-timepicker #horaFinalizacion></ngx-material-timepicker>
+                                        </div>
+                                    </td>
+                                    -->
                                 </tr>
                             </ng-container>
                         </ng-container>
@@ -75,13 +100,49 @@
                 </table>
             </form>
         </div>
-        <div fxFlex='20' class='referencias'>
+        <!-- <div fxFlex='20' class='referencias'>
             <span>REFERENCIAS</span>
             <span><b>CSBO=</b> Aceite crudo de soja</span>
             <span><b>CSFO=</b> Aceite crudo de girasol</span>
             <span><b>RSBO=</b> Aceite refinado de soja</span>
             <span><b>RSFO=</b> Aceite refinado de girasol</span>
             <span><b>FAME=</b> Biodiesel</span>
+        </div> -->
+    </div>
+
+    <div class="col">
+        <div class="row referencias">
+            <span>REFERENCIAS</span>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <span><b>CSBO=</b> Aceite crudo de soja</span>
+                </div>
+                <div class="row">
+                    <span><b>CSFO=</b> Aceite crudo de girasol</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <span><b>RSBO=</b> Aceite refinado de soja</span>
+                </div>
+                <div class="row">
+                    <span><b>RSFO=</b> Aceite refinado de girasol</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <span><b>FAME=</b> Biodiesel</span>
+                </div>
+                <div class="row"></div>
+            </div>
+            
         </div>
     </div>
+    <br/>
+    <div class="text-center">
+        <button type="button" class="btn btn-primary" (click)="guardar()">GUARDAR</button>
+     </div>
+    
 </div>

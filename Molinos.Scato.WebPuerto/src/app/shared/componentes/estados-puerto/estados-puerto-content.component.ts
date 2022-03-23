@@ -25,7 +25,11 @@ export class EstadosPuertoContentComponent implements OnInit {
 
   ngOnInit(): void {
     this.lineupService.obtenerEstadoPuerto().subscribe(x => { 
-      this.estadoPuerto = x; this.cargarEstadosPuerto(); this.enviarEstadoAlturaValor();});
+      
+      this.estadoPuerto = x; 
+      this.cargarEstadosPuerto(); 
+      this.enviarEstadoAlturaValor();
+    });
   }
 
   public cargarEstadosPuerto(){

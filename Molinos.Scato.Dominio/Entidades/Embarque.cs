@@ -45,7 +45,14 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual DateTime? FechaLibrePlatica { get; set; }
         public virtual string HoraLibrePlatica { get; set; }
         public virtual EstadoBuque EstadoBuque { get; set; }
+        public virtual string shipParticularArchivoNombre { get; set; }
+        public virtual string filePathShipParticular { get; set; }
+        public virtual DateTime? FechaHoraInicioCarga { get; set; }
+        public virtual string UsuarioInicioCarga { get; set; }
 
+        public virtual ICollection<EmbarqueInformacion> EmbarqueInformacion { get; set; }
+        public virtual ICollection<EmbarqueInformacionViaje> EmbarqueInformacionViaje { get; set; }
+        public virtual ICollection<EmbarquePosicion> EmbarquePosicion { get; set; }
 
     }
 }

@@ -4,6 +4,7 @@ import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
+import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
@@ -33,6 +34,7 @@ export class SolidosComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
+    private balanzas78Service: Balanzas78Service,
     private _changeDetector: ChangeDetectorRef) {
       
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
@@ -72,7 +74,15 @@ export class SolidosComponent implements OnInit {
       this.sentidosManoDeEmbarque = res1;
       this.celdasManoDeEmbarque = res2;
       this._changeDetector.detectChanges();
+      
       if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
+          
+          // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
+          this.balanzas78Service.setEmbarqueBalanza(this.embarqueSelected.moduloDeCargaId);
+          this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
+          this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
+          this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
+          this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
     });
 
     this.hideSpinner.emit(false);

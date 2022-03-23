@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { GraficoCargaComponent } from './operaciones/grafico-carga/grafico-carga.component';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
@@ -23,8 +23,12 @@ import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { ManosComponent } from './operaciones/manos/manos.component';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
-// import { Balanza78 } from '@ScatoModels/balanzadas/balanza78';
-// import { BalanzasComponent } from './tableristas/balanzas/balanzas.component';
+import { BalanzasComponent } from './tableristas/balanzas/balanzas.component';
+// import { BalanzadasAgrupadas } from '@ScatoModels/balanzadas/balanza78';
+import { UmapComponent } from './tableristas/umap/umap.component';
+import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
+// import { ModuloDeCargaBalanzasBack } from '@ScatoModels/balanzadas/balanza';
+// import { ListadoTotalBalanzadasBack } from '@ScatoModels/balanzadas/balanza';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -36,7 +40,12 @@ export class CargaSolidosComponent implements OnInit {
   @Output() guardarPlano = new EventEmitter<boolean>();
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
-  // @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
+  @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
+  @ViewChild(UmapComponent) umapComponent: UmapComponent;
+  @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
+
+  @Input() cargaComercialIncompleto: boolean;
+  
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
   celdasManoDeEmbarque: CeldaManoDeEmbarque[];
@@ -46,10 +55,13 @@ export class CargaSolidosComponent implements OnInit {
   materialesPuerto: MaterialPuerto[];
   adjunto: any;
   cargaPdf: boolean = false;
-
-  private user: Usuario
-
-  // balanzasEmbarque: Balanza78[];
+  // balanzadasEmbarque: ListadoTotalBalanzadasBack[];
+  // balanzasEmbarque: BalanzadasAgrupadas[];
+  private user: Usuario;
+  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
+                  {id: 2, descripcion: 'Cargando'}, 
+                  {id: 3, descripcion: 'ControlCalidad'}, 
+                  {id: 4, descripcion: 'PostOperativo'}];
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -89,6 +101,7 @@ export class CargaSolidosComponent implements OnInit {
           color: m.color
         }));
       });
+      
     this.drawGraphic();
   }
 
@@ -118,6 +131,10 @@ export class CargaSolidosComponent implements OnInit {
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
+
+        console.log('obtenerModuloDeCarga: ', res);
+        
+
         this.enviado = res.enviado;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
@@ -127,12 +144,15 @@ export class CargaSolidosComponent implements OnInit {
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchManosDeEmbarque(res.moduloDeCargaManosDeEmbarque);
-          
-          // console.log('res.moduloDeCargaManosDeEmbarque: ', res.moduloDeCargaManosDeEmbarque);
-          
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
+        }
+        if (res.moduloDeCargaUmap.length > 0) {
+          this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
+        }
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+          this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
   }
@@ -142,22 +162,23 @@ export class CargaSolidosComponent implements OnInit {
     let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
 
     let textareas: HTMLCollection = document.getElementsByClassName('replaceToDiv');
-    while (textareas.length) {
+    while(textareas.length){
       let div = document.createElement('div');
-      div.setAttribute("contenteditable", "true");
+      div.setAttribute("contenteditable","true");
       let text = document.createTextNode((<HTMLInputElement>textareas[0]).value);
       div.appendChild(text);
       textareas[0].replaceWith(div);
-    }
-
-
+  }
+  
     html2canvas(document.getElementById('graficoCargaCanva'), { backgroundColor: '#fff' }).then((canvas) => {
       canvas.style.backgroundColor = 'white';
+      canvas.style.whiteSpace = 'normal'; 
       let img = canvas.toDataURL('image/jpg');
       doc.addImage(img, 'JPG', 15, 15, 260, 160);
       html2canvas(document.getElementById('manosDeEmbarque'), { backgroundColor: '#fff' }).then((canvas2) => {
         doc.addPage('a4', 'l');
         canvas.style.backgroundColor = 'white';
+        canvas2.style.wordBreak = "break-all"
         let img2 = canvas2.toDataURL('image/jpg');
         doc.addImage(img2, 'JPG', 15, 15, 270, 130);
 
@@ -186,18 +207,28 @@ export class CargaSolidosComponent implements OnInit {
   guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
-    if (this.enviado && !finalizar) {
-      var texto = "Se ha modificado con éxito la carga. Si desea informar los cambios, haga click en FINALIZAR.";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
+    if( this.cargaComercialIncompleto ){
+      let texto = "Por favor, verificar que los datos de la Carga Comercial esten completos.";
+
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
         .then((confirmed) => {
-          if (confirmed)
-            this.guardarContinuacion(finalizar);
-          else
-            return;
+          if (confirmed) return;
         }).catch(() => window.location.reload());
+    } else {
+
+      if (this.enviado && !finalizar) {
+        var texto = "Se ha modificado con éxito la carga. Si desea informar los cambios, haga click en FINALIZAR.";
+        this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
+          .then((confirmed) => {
+            if (confirmed)
+              this.guardarContinuacion(finalizar);
+            else
+              return;
+          }).catch(() => window.location.reload());
+      }
+      else
+        this.guardarContinuacion(finalizar);
     }
-    else
-      this.guardarContinuacion(finalizar);
   }
 
   guardarContinuacion(finalizar: boolean) {
@@ -211,25 +242,22 @@ export class CargaSolidosComponent implements OnInit {
 
     let elementosGraficos = this.graficoCarga.obtenerElementosGraficos();
 
-    // let balanza7 = this.balanzasComponent.obtenerBalanzas7();
-    // let balanza8 = this.balanzasComponent.obtenerBalanzas8();
-    // this.balanzasEmbarque = balanza7.concat(balanza8);
-    // console.log('balanzasEmbarque: ', this.balanzasEmbarque);
+    // this.balanzadasEmbarque = this.balanzasComponent.obtenerBalanzadas78();
+    // console.log('balanzasEmbarque a guardar: ', this.balanzadasEmbarque);
+    console.log('obtenerAmarre: ', this.umapComponent.obtenerAmarre());
+    console.log('obtenerUmap: ', this.umapComponent.obtenerUmap());
 
-    console.log('obtenerManosDeEmbarque(): ', this.manosComponent.obtenerManosDeEmbarque());
-    
-
-    // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
-    //   this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null, this.balanzasEmbarque );
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
-      this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques());
+      this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
+      [this.umapComponent.obtenerAmarre()], this.umapComponent.obtenerUmap());
+
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
-      this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-      .then(() => {this.imprimir(finalizar)},
-        error => {
-          this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-        }).catch(() => window.location.reload())
+        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+          .then(() => {this.imprimir(finalizar)},
+            error => {
+              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+            }).catch(() => window.location.reload())
       else {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {},
@@ -241,6 +269,16 @@ export class CargaSolidosComponent implements OnInit {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       this.cargaPdf = true;
     });
+  }
+
+  modificarEstadoBuque(estado: string){
+    let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
+    this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
+      console.log(res);
+
+      let texto = "Se envió a Tableristas correctamente";
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
+    } );
   }
 
   enviarMail() {

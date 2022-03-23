@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -18,35 +19,36 @@ export class AmarreComponent implements OnInit {
 
   newForm(){
     this.solidosForm = this._builder.group({
-      amarro: this.initAmarre(),
-      desamarro: this.initAmarre(),
-      habilitacion: this.initFechaHora()
+      fechaAmarro : "",
+      horaAmarro : "",
+      vientoAmarro : "",
+      direccionAmarro : "",
+      fechaDesamarro : "",
+      horaDesamarro : "",
+      vientoDesamarro : "",
+      direccionDesamarro : "",
+      fechaHabilitacion : "",
+      horaHabilitacion : "",
     })
-  }
-
-  initFechaHora(){
-    return this._builder.group({
-      id: '',
-      fecha: '',
-      hora: '',
-    });
-  }
-
-  initAmarre(){
-    return this._builder.group({
-      id: '',
-      fecha: '',
-      hora: '',
-      viento: '',
-      direccion: ''
-    });
+    // this.solidosForm = this._builder.group({
+    //   amarro: this.initAmarre(),
+    //   desamarro: this.initAmarre(),
+    //   habilitacion: this.initFechaHora()
+    // })
   }
 
   validarAMPM(event){
     
   }
 
-  guardarAmarre(){
-    
+  updateAmarre(amarre){
+    amarre.fechaAmarro = amarre.fechaAmarro ?  formatDate(amarre.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : " ";
+    amarre.fechaDesamarro =  amarre.fechaDesamarro ? formatDate(amarre.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : " ";
+    amarre.fechaHabilitacion = amarre.fechaHabilitacion ? formatDate(amarre.fechaHabilitacion, 'yyyy-MM-dd', 'es-ar') : " ";
+    this.solidosForm.patchValue(amarre);
+  }
+
+  obtenerAmarre(){
+    return this.solidosForm.getRawValue();
   }
 }

@@ -23,14 +23,18 @@ export class EmbarqueService {
   }
 
   altaEmbarque(embarque: Embarque){
+    console.log('altaEmbarque: ', embarque);
+    
     return this.http.post(`${this.url}Embarque/AltaEmbarque`, embarque, { 'withCredentials' : true});
   }
 
   modificarEmbarque(embarque: Embarque){
+    console.log('modificarEmbarque: ', embarque);
+    
     return this.http.post(`${this.url}Embarque/ModificarEmbarque`, embarque, { 'withCredentials' : true});
   }
 
-  obtenerEmbarque(id: number){
+  obtenerEmbarque(id: number): Observable<Embarque>{
     return this.http.get<Embarque>(`${this.url}Embarque/ObtenerEmbarque?id=`+id, { 'withCredentials' : true});
   }
   obtenerListadoMateriales(): Observable<MaterialPuerto[]>{
@@ -101,7 +105,7 @@ export class EmbarqueService {
     return this.http.post(`${this.url}Embarque/EliminarATAPuerto?ATAId=`+ATAId, { 'withCredentials': true });
   }
 
-  actualizarEstadoBuque(embarqueId: number, orden: number) {
-    return this.http.post(`${this.url}Embarque/ActualizarEstadoBuque?embarqueId=${embarqueId}&orden=${orden}`, { 'withCredentials': true });
+  actualizarEstadoBuque(embarque_Id: number, estado: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/ActualizarEstadoBuque?Embarque_Id=${embarque_Id}&Estado=${estado}`, { 'withCredentials': true });
   }
 }

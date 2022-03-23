@@ -354,54 +354,58 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var destino = planilla.Destino != null ? Repositorio.Obtener<Destino>(planilla.Destino.Id) : null;
                     var materialPuerto = planilla.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id) : null;
 
-                    moduloDeCarga.ModuloDeCargaPlanillaDeEmbarque.Add(new ModuloDeCargaPlanillaDeEmbarque
+                    if (exportador != null && destino != null && materialPuerto != null)
                     {
-                        ModuloDeCarga = moduloDeCarga,
-                        Exportador = exportador,
-                        BodegaParcel = planilla.BodegaParcel,
-                        TanqueDeAbordo = planilla.TanqueDeAbordo,
-                        Destino = destino,
-                        Tk = planilla.Tk,
-                        Cantidad = planilla.Cantidad,
-                        MaterialPuerto = materialPuerto,
-                        FechaComienzoCarga = planilla.FechaComienzoCarga,
-                        HoraComienzoCarga = planilla.HoraComienzoCarga,
-                        FechaFinalizacionCarga = planilla.FechaFinalizacionCarga,
-                        HoraFinalizacionCarga = planilla.HoraFinalizacionCarga
-                    });
+                        moduloDeCarga.ModuloDeCargaPlanillaDeEmbarque.Add(new ModuloDeCargaPlanillaDeEmbarque
+                        {
+                            ModuloDeCarga = moduloDeCarga,
+                            Exportador = exportador,
+                            BodegaParcel = planilla.BodegaParcel,
+                            TanqueDeAbordo = planilla.TanqueDeAbordo,
+                            Destino = destino,
+                            Tk = planilla.Tk,
+                            Tn = planilla.Tn,
+                            Cantidad = planilla.Cantidad,
+                            MaterialPuerto = materialPuerto,
+                            FechaComienzoCarga = planilla.FechaComienzoCarga,
+                            FechaFinalizacionCarga = planilla.FechaFinalizacionCarga
+                        });
+
+                    }
+
                 }
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.ToList());
-            if (comando.Dto.ModuloDeCargaPlanillaDeTurnos != null)
-            {
-                foreach (var planilla in comando.Dto.ModuloDeCargaPlanillaDeTurnos)
-                {
-                    var moduloDeCargaPlanillaDeTurnos = new ModuloDeCargaPlanillaDeTurnos
-                    {
-                        ModuloDeCarga = moduloDeCarga,
-                        Fecha = planilla.Fecha
-                    };
+            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.ToList());
+            //if (comando.Dto.ModuloDeCargaPlanillaDeTurnos != null)
+            //{
+            //    foreach (var planilla in comando.Dto.ModuloDeCargaPlanillaDeTurnos)
+            //    {
+            //        var moduloDeCargaPlanillaDeTurnos = new ModuloDeCargaPlanillaDeTurnos
+            //        {
+            //            ModuloDeCarga = moduloDeCarga,
+            //            Fecha = planilla.Fecha
+            //        };
 
-                    moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos = new List<ModuloDeCargaPlanillaDeTurnosTurnos>();
-                    planilla.ModuloDeCargaPlanillaDeTurnosTurnos.ToList()
-                    .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos.Add(new ModuloDeCargaPlanillaDeTurnosTurnos
-                    {
-                        TurnoPuerto = turnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(turnos.TurnoPuerto.Id) : null,
-                        Cerrado = turnos.Cerrado,
-                        Enviado = turnos.Enviado
-                        //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
-                        //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
-                    }));
+            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos = new List<ModuloDeCargaPlanillaDeTurnosTurnos>();
+            //        planilla.ModuloDeCargaPlanillaDeTurnosTurnos.ToList()
+            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos.Add(new ModuloDeCargaPlanillaDeTurnosTurnos
+            //        {
+            //            TurnoPuerto = turnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(turnos.TurnoPuerto.Id) : null,
+            //            Cerrado = turnos.Cerrado,
+            //            Enviado = turnos.Enviado
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
+            //        }));
 
-                    moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
-                    {
-                        ModuloDeCarga = moduloDeCarga,
-                        Fecha = planilla.Fecha,
-                        ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos
-                    });
-                }
-            }
+            //        moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
+            //        {
+            //            ModuloDeCarga = moduloDeCarga,
+            //            Fecha = planilla.Fecha,
+            //            ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos
+            //        });
+            //    }
+            //}
             // LÍQUIDOS
             /////////////////////////
 
@@ -411,21 +415,80 @@ namespace Molinos.Scato.Servicios.Procesamiento
             Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPeriodoDeCarga.ToList());
             if (comando.Dto.ModuloDeCargaPeriodoDeCarga != null)
             {
-                foreach (var periodo in comando.Dto.ModuloDeCargaPeriodoDeCarga)
+                var moduloDeCargaPeriodoDeCarga_DB = Repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(comando.Dto.ModuloDeCargaPeriodoDeCarga[0].Id);
+
+                if (moduloDeCargaPeriodoDeCarga_DB != null)
+                {
+                    moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Add(new ModuloDeCargaPeriodoDeCarga
+                    {
+                        Id = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].Id,
+                        ModuloDeCarga = moduloDeCarga,
+                        FechaAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaAmarro,
+                        HoraAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraAmarro,
+                        VientoAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].VientoAmarro,
+                        DireccionAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].DireccionAmarro,
+                        FechaDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaDesamarro,
+                        HoraDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraDesamarro,
+                        VientoDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].VientoDesamarro,
+                        DireccionDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].DireccionDesamarro,
+                        FechaHabilitacion = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaHabilitacion,
+                        HoraHabilitacion = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraHabilitacion,
+                        FechaDesconexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaDesconexionMangueras,
+                        HoraDesconexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraDesconexionMangueras,
+                        FechaConexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaConexionMangueras,
+                        HoraConexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraConexionMangueras,
+                        FechaComienzoCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaComienzoCarga,
+                        HoraComienzoCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraComienzoCarga,
+                        FechaFinalizacionCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaFinalizacionCarga,
+                        HoraFinalizacionCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraFinalizacionCarga
+                    });
+                }
+                else
                 {
                     moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Add(new ModuloDeCargaPeriodoDeCarga
                     {
                         ModuloDeCarga = moduloDeCarga,
-                        FechaAmarro = periodo.FechaAmarro,
-                        HoraAmarro = periodo.HoraAmarro,
-                        VientoAmarro = periodo.VientoAmarro,
-                        DireccionAmarro = periodo.DireccionAmarro,
-                        FechaDesamarro = periodo.FechaDesamarro,
-                        HoraDesamarro = periodo.HoraDesamarro,
-                        VientoDesamarro = periodo.VientoDesamarro,
-                        DireccionDesamarro = periodo.DireccionDesamarro,
-                        FechaHabilitacion = periodo.FechaHabilitacion,
-                        HoraHabilitacion = periodo.HoraHabilitacion
+                        FechaAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaAmarro,
+                        HoraAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraAmarro,
+                        VientoAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].VientoAmarro,
+                        DireccionAmarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].DireccionAmarro,
+                        FechaDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaDesamarro,
+                        HoraDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraDesamarro,
+                        VientoDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].VientoDesamarro,
+                        DireccionDesamarro = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].DireccionDesamarro,
+                        FechaHabilitacion = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaHabilitacion,
+                        HoraHabilitacion = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraHabilitacion,
+                        FechaDesconexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaDesconexionMangueras,
+                        HoraDesconexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraDesconexionMangueras,
+                        FechaConexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaConexionMangueras,
+                        HoraConexionMangueras = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraConexionMangueras,
+                        FechaComienzoCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaComienzoCarga,
+                        HoraComienzoCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraComienzoCarga,
+                        FechaFinalizacionCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].FechaFinalizacionCarga,
+                        HoraFinalizacionCarga = comando.Dto.ModuloDeCargaPeriodoDeCarga[0].HoraFinalizacionCarga
+                    });
+                }
+
+            }
+
+            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
+            if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
+            {
+                foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
+                {
+                    moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
+                    {
+                        Id = Nir.Id,
+                        ModuloDeCarga = moduloDeCarga,
+                        Bodega = Nir.Bodega,
+                        Fecha = Nir.Fecha,
+                        HD = Nir.HD,
+                        Hora = Nir.Hora,
+                        Origen = Nir.Origen,
+                        PH = Nir.PH,
+                        ProtBase = Nir.ProtBase,
+                        Prot_BS = Nir.Prot_BS,
+                        Ritmo = Nir.Ritmo
                     });
                 }
             }
@@ -446,28 +509,30 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         FechaEncendido = umap.FechaEncendido,
                         HoraEncendido = umap.HoraEncendido,
                         FechaApagado = umap.FechaApagado,
-                        HoraApagado = umap.HoraApagado
+                        HoraApagado = umap.HoraApagado,
+                        DireccionDelViento = umap.DireccionDelViento,
+                        VelocidadDelViento = umap.VelocidadDelViento
                     });
                 }
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaBalanzas.ToList());
-            if (comando.Dto.ModuloDeCargaBalanzas != null)
-            {
-                foreach (var balanzas in comando.Dto.ModuloDeCargaBalanzas)
-                {
-                    var motivosFallasBalanza = balanzas.MotivosFallasBalanza != null ? Repositorio.Obtener<MotivosFallasBalanza>(balanzas.MotivosFallasBalanza.Id) : null;
+            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaBalanzas.ToList());
+            //if (comando.Dto.ModuloDeCargaBalanzas != null)
+            //{
+            //    foreach (var balanzas in comando.Dto.ModuloDeCargaBalanzas)
+            //    {
+            //        var motivosFallasBalanza = balanzas.MotivosFallasBalanza != null ? Repositorio.Obtener<MotivosFallasBalanza>(balanzas.MotivosFallasBalanza.Id) : null;
                     
-                    moduloDeCarga.ModuloDeCargaBalanzas.Add(new ModuloDeCargaBalanzas
-                    {
+            //        moduloDeCarga.ModuloDeCargaBalanzas.Add(new ModuloDeCargaBalanzas
+            //        {
                         
-                       // ModuloDeCarga = moduloDeCarga,
-                        MotivosFallasBalanza = motivosFallasBalanza,
-                        Observaciones = balanzas.Observaciones,
+            //           // ModuloDeCarga = moduloDeCarga,
+            //            MotivosFallasBalanza = motivosFallasBalanza,
+            //            Observaciones = balanzas.Observaciones,
                     
-                    });
-                }
-            }
+            //        });
+            //    }
+            //}
             // SÓLIDOS
             /////////////////////////
             ///// TABLERISTAS /////

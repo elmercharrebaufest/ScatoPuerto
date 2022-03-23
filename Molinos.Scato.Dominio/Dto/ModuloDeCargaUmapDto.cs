@@ -9,5 +9,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraEncendido { get; set; }
         public DateTime? FechaApagado { get; set; }
         public string HoraApagado { get; set; }
+        public string DireccionDelViento { get; set; }
+        public string VelocidadDelViento { get; set; }
     }
 }

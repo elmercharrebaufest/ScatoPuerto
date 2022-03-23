@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[PlanoDeCarga] (
     [Id]               INT            IDENTITY (1, 1) NOT NULL,
-    [Observaciones]    NVARCHAR(500)                  NULL,
+    [Observaciones]    NVARCHAR(MAX)                  NULL,
     [CaladoSalida]     DECIMAL(18,2)                  NOT NULL default 0,
     [FilePathPlano]         VARCHAR(MAX)                   NULL,
     [FilePathSecuencia]         VARCHAR(MAX)                   NULL,

@@ -55,6 +55,7 @@ export class PlanoContentComponent implements OnInit {
   opcionABMSeleccionada: string;
   tituloABM: string;
   listadoExportadoresModificado: boolean = false;
+  cargaComercialIncompleto: boolean = false;
 
   esLiquido: boolean = false;
 
@@ -611,6 +612,8 @@ export class PlanoContentComponent implements OnInit {
   calcularTotal() {
     if (this.esLiquido)
       this._turnoService.setTnTotales(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
+      
+    this._procesoService.sendTotalPlanoDeEmbarque.emit(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
     return this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0);
   }
 
@@ -882,8 +885,46 @@ export class PlanoContentComponent implements OnInit {
     }
   }
 
-  sendExportador(value: any) {
-    this._turnoService.setExportadores(value.controls.cargasComerciales.value);
+  sendExportador(value: any, j: number) {
+    if( this.cargasComercialesFormArray.controls[j]['controls'].exportador.value === undefined ){
+      this.planoDeCargaForm.get('cargasComerciales')['controls'][j]['controls'].exportador.value = null;
+      this.planoDeCargaForm.get('cargasComerciales').value[j].exportador = null;
+      (<HTMLInputElement>document.getElementsByClassName("prueba22")[j]).value = '';
+    }
+
+    this._turnoService.setExportadores(this.cargasComercialesFormArray.controls[j]['controls'].exportador.value);
+    this.verificarCargaComercial();
+  }
+
+  sendMaterialPuerto(value: any) {
+    this._turnoService.setExportadores(value);
+    this.verificarCargaComercial();
+  }
+
+  verificarCargaComercial(){
+    let cant = 0;
+    for(let i=0; i<this.cargasComercialesFormArray.controls.length; i++ ){
+      if( (( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null || 
+          this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
+          (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== null ||
+            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== '') ) ||
+          ((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== null || 
+          this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== '') &&
+          (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
+            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === '') ))  &&
+          !( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null || 
+            this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') && 
+            (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
+            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === '') ) )
+      {
+        cant += 1;
+      }
+    }
+
+    if(cant>0) 
+      this.cargaComercialIncompleto = true;
+    else
+      this.cargaComercialIncompleto = false;
   }
 
   sendDataParcel(bodegas) {

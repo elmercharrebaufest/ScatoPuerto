@@ -50,6 +50,10 @@ export class Embarque {
   horaLibrePlatica: string;
   vapor: Vapor;
   estadoBuque: EstadoBuque;
+  filePathShipParticular: string | ArrayBuffer;
+  shipParticularArchivoNombre: string;
+  fechaHoraInicioCarga: Date;
+  usuarioInicioCarga: string;
 }
 
 export class Vapor{

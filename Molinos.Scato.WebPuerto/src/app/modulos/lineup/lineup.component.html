@@ -56,12 +56,13 @@
             <button class="btn btn-molinos" (click)="altaEmbarque()">+Crear alta de embarque</button>
           </ng-container>        
         </div>
-      </div>    
-
+      </div>
       <app-estados-puerto-content></app-estados-puerto-content>
-    </div>    
+    </div>
   </div>
+  
   <app-cargando-muelle *ngIf="sanBenitoCargandoMuelle" [instanciaWorkflow]="sanBenitoCargandoMuelle"></app-cargando-muelle>
+
   <div fxFlex *ngIf="listadoEmbarques">
     <div *ngIf="!mostrarCalendario">
       <div class="row m-lg-4" *ngFor="let instanciaWorkflow of sanBenito; let i = index;" #puertoSanBenito>

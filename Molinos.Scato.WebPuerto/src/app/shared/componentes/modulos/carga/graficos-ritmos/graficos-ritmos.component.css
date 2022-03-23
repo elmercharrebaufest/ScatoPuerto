@@ -14,7 +14,7 @@
 
 .card-ritmo-grafico{
     background-color: transparent;
-    max-height: 250px;
+    max-height: 270px;
 }
 
 .center-knob{
@@ -33,7 +33,7 @@
 }
 
 ::ng-deep .p-knob-text{
-    font-size: 1.1rem !important;
+    font-size: 0.9rem !important;
     padding-bottom: 18px;
 }
 
@@ -45,6 +45,11 @@
 
 .img-toneladas{
     position: absolute;
-    width: 40px;
+    width: 35px;
     margin-top: -25px;
+}
+
+.referencia-carga-neto{
+    font-size: 9px;
+    text-align: center;
 }

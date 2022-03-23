@@ -120,3 +120,102 @@
     right: 0;
     position: absolute;
 }
+
+.tnTotales {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-12)/15px var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--tipografia-principal);
+    text-align: left;
+    font: normal normal bold 12px/15px Roboto;
+    letter-spacing: 0px;
+    color: #1A1A1A;
+}
+.prodToneladas {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) var(--unnamed-font-size-12)/15px var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--tipografia-principal);
+    text-align: left;
+    font: normal normal normal 12px/15px Roboto;
+    letter-spacing: 0px;
+    color: #1A1A1A;
+}
+
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    padding: 0px;
+    margin: 0px;
+}
+
+.input_img {  position:relative;}
+.input_img input { margin:0 0 0 4px;}
+
+/* .input_img input { margin:0;} */
+
+/* .imgClockInput1 { 
+    display:block; 
+    position:absolute; 
+    top:0.5rem; 
+    left:4.5rem; 
+} */
+
+.label-float label{
+    width: 100%;
+}
+
+.label-float textarea{
+    width: 100%;
+}
+
+.imgClockInput2 { 
+    display:block; 
+    position:absolute; 
+    top:0.5rem; 
+    left:6.5rem; 
+}
+
+.min-h5{
+  min-height: 5rem;
+}
+
+.imgClockInput1 { 
+    display:block; 
+    position:absolute; 
+    top:0.3rem; 
+    right: 0.3rem; 
+}
+
+.corte {
+    display: flex;
+    align-items: flex-end;
+}
+
+.fecha-inicio-corte-balanza{
+    border: aliceblue;
+    margin-left: 2px;
+    width: 100%;
+}
+.icono{
+    width: 25px;
+    height: 25px;
+    float: right !important;
+}
+
+.al-medio{
+    display: flex;
+    align-items: center;
+}
+
+.labelPersonalizado{
+    margin: 0px,0px,0px;
+}
+
+@media screen and (min-width: 800px) and (max-width: 1250px) {
+    .icono{
+        width: 20px;
+        height: 20px;
+        float: right;
+    }
+    .textoChico{
+        font-size: 12px;
+    }
+}

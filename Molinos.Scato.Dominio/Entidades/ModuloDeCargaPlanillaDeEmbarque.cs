@@ -16,8 +16,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Cantidad { get; set; }
         public virtual MaterialPuerto MaterialPuerto { get; set; }
         public virtual DateTime? FechaComienzoCarga { get; set; }
-        public virtual string HoraComienzoCarga { get; set; }
         public virtual DateTime? FechaFinalizacionCarga { get; set; }
-        public virtual string HoraFinalizacionCarga { get; set; }
+        public int Tn { get; set; }
     }
 }

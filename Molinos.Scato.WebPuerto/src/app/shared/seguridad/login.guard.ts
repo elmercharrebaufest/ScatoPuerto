@@ -1,4 +1,4 @@
-import { CanActivate, CanActivateChild } from "@angular/router";
+import { CanActivate } from "@angular/router";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { SessionService } from "@ScatoServicios/session.service";

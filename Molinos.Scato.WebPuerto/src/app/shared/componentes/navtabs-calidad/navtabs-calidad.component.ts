@@ -45,7 +45,11 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     this.buqueVicentin = this.procesoCalidadService.getVicentin();
     this.buqueOtrosMuelles = this.procesoCalidadService.getOtrosMuelles();
 
-    this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
+    // this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
+
+    if(this.buqueSanBenito){
+      this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
+    }
 
     this.elementos = this._procesoService.getEmbarquesList();
     this.embarqueId = this._procesoService.getEmbarqueId();
@@ -71,14 +75,25 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
         this.embarqueId = this.elementos[0].id;
         this._procesoService.setEmbarque(this.elementos[0].id);
       }
-    }
+    } 
+    // else {
+    //   this.cargado = false;
+    // }
   }
 
   ngAfterViewInit() {
     if (this.elementos.length > 0) {
       var elementoSeleccionado = document.getElementById(this.embarqueId.toString());
       if (elementoSeleccionado) elementoSeleccionado.classList.add("btn-seleccionado");
-    }
+
+      // this.showPlano.emit(true);
+
+      // this.cargado = true;
+    } 
+    // else {
+    //   this.cargado = false;
+    // }
+    
     this.showPlano.emit(true);
 
     this.cargado = true;

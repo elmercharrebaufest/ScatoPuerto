@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
-import { FormUmap } from '@ScatoModels/form-umap';
+import { formatDate } from '@angular/common';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/amarre.component';
 
 @Component({
   selector: 'app-umap',
@@ -8,26 +9,61 @@ import { FormUmap } from '@ScatoModels/form-umap';
   styleUrls: ['./umap.component.css']
 })
 export class UmapComponent implements OnInit {
-  public forms: FormGroup[];
-  constructor() { }
+  public forms: FormGroup;
+  @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
+  constructor(private builder: FormBuilder) { }
 
   ngOnInit(): void {
-    this.forms = [new FormUmap().formulario];
+    this.forms = this.builder.group({
+      umap: this.builder.array([this.initUmap()])
+    });
   }
 
-  guardarUMAP(){
-    for (let form of this.forms){
-      console.log(form)
-    }
+  initUmap(){
+    return this.builder.group({
+      fechaEncendido: '',
+      horaEncendido: '',
+      fechaApagado:'',
+      horaApagado: '',
+      velocidadDelViento: '',
+      direccionDelViento: ''
+    });
   }
 
-  addTimeRow(){
-    let newTime = new FormUmap().formulario;
-    this.forms.push(newTime);
+  obtenerUmap(){
+    return this.umapFormArray.getRawValue();
   }
 
-  deleteHorario(form: FormGroup){
-    let index = this.forms.indexOf(form);
-    this.forms.splice(index, 1);
+  obtenerAmarre(){
+    return this.amarreComponent.obtenerAmarre();
+  }
+
+  updateUMAP(umap){
+    while(this.umapFormArray.length < umap.length) this.umapFormArray.push(this.initUmap());
+    umap.forEach(element => {
+      element.fechaEncendido = element.fechaEncendido ?  formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar') : " ";
+      element.fechaApagado = element.fechaApagado ?  formatDate(element.fechaApagado, 'yyyy-MM-dd', 'es-ar') : " ";
+    });
+    this.umapFormArray.patchValue(umap);
+  }
+
+  updateAmarre(amarre){
+    this.amarreComponent.updateAmarre(amarre);
+  }
+
+  get umapFormArray(): FormArray {
+    return this.forms.get("umap") as FormArray;
+  }
+
+  addUmap(){
+    this.umapFormArray.push(this.initUmap());
+  }
+
+  isFirstOnList(form){
+    return this.umapFormArray.value.indexOf(form.value) != 0;
+  }
+
+  deleteHorario(index: number){
+    this.umapFormArray.removeAt(index);
   }
 }

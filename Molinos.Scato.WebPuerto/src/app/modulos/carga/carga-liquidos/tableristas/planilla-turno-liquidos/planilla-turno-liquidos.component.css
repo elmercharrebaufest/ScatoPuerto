@@ -97,7 +97,9 @@ table.turnos th:nth-child(2) {
 table.turnos table.tabla-embebida th{
     width: auto;
 }
-
+.th-fijo{
+    display: block;
+}
 .btn-add-cell{
     height: fit-content !important;
     min-height: 52px !important;
@@ -158,4 +160,34 @@ table.turnos table.tabla-embebida th{
 .parcel-cantidad{
     font-size: 11px;
     color: grey;
+}
+
+.parcelChecks{
+    display: flex;
+    flex-direction: column;
+}
+
+
+.divHeaderRightLeft {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  .divHeaderLeft {
+    display: inline-block;
+    flex: 1;
+  }
+ .divHeaderRight {
+    display: inline-block;
+    margin-right: 80px;
+    margin-top: 15px;
+  }
+
+  img[_ngcontent-eem-c196] {
+    position: absolute;
+    right: 1rem;
+    z-index: 1;
+    cursor: pointer;
+    margin-top: 5px;
 }

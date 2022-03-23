@@ -1,10 +1,13 @@
-﻿namespace Molinos.Scato.Dominio.Dto
+﻿using Molinos.Scato.Dominio.Entidades;
+
+namespace Molinos.Scato.Dominio.Dto
 {
     public class ModuloDeCargaPlanillaDeTurnosTurnosDetallesDto
     {
         public int Id { get; set; }
         public ExportadorDto Exportador { get; set; }
-        public string Linea { get; set; }
+        public int Linea_Id { get; set; }
+        //public ModuloDeCargaLineasDeEmbarque Linea { get; set; }
         public int BodegaParcel { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public string Tk { get; set; }
@@ -14,6 +17,6 @@
         public double MedidaFinalCM { get; set; }
         public double MedidaFinalMM { get; set; }
         public DestinoDto Destino { get; set; }
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
     }
 }

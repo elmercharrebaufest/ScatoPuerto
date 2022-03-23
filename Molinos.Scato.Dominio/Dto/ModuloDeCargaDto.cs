@@ -35,13 +35,14 @@ namespace Molinos.Scato.Dominio.Dto
             // LÍQUIDO //
                 public IList<ModuloDeCargaMangueraCargaDto> ModuloDeCargaMangueraCarga { get; set; }
                 public IList<ModuloDeCargaPlanillaDeEmbarqueDto> ModuloDeCargaPlanillaDeEmbarque { get; set; }
-                public IList<ModuloDeCargaPlanillaDeTurnosDto> ModuloDeCargaPlanillaDeTurnos { get; set; }
+                public IList<ModuloDeCargaPlanillaDeTurnosTurnosDto> ModuloDeCargaPlanillaDeTurnosTurnos { get; set; }
             // LÍQUIDO //
 
             public IList<ModuloDeCargaPeriodoDeCargaDto> ModuloDeCargaPeriodoDeCarga { get; set; } //LÍQUIDO Y SÓLIDO
+            public IList<ModuloDeCargaNirManualPuertoDto> ModuloDeCargaNirManualPuerto { get; set; } //LÍQUIDO Y SÓLIDO
 
-            // SÓLIDO //
-                public IList<ModuloDeCargaUmapDto> ModuloDeCargaUmap { get; set; }
+        // SÓLIDO //
+        public IList<ModuloDeCargaUmapDto> ModuloDeCargaUmap { get; set; }
                 public IList<ModuloDeCargaBalanzasDto> ModuloDeCargaBalanzas { get; set; }
                 public IList<ModuloDeCargaRitmosEmbarqueDto> ModuloDeCargaRitmosEmbarque { get; set; }
         // SÓLIDO //

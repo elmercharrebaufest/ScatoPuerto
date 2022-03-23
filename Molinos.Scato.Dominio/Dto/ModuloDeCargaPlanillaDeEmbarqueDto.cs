@@ -13,8 +13,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Cantidad { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public DateTime? FechaComienzoCarga { get; set; }
-        public string HoraComienzoCarga { get; set; }
         public DateTime? FechaFinalizacionCarga { get; set; }
-        public string HoraFinalizacionCarga { get; set; }
+        public int Tn { get; set; }
     }
 }
