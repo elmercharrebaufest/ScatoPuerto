@@ -150,7 +150,10 @@ export class ManosComponent implements OnInit {
         });
     });
   }
-
+  expandir()
+  {
+    document.getElementById('manosTabiques').className = "collapse show px-4 bg-white";
+  }
   buscarSilosRestantes(posicion: number): number{
     let cantSilosRestantes = 0;
     for(let mano in this.manosYTabiquesForm.get('manosDeEmbarque')['controls']){

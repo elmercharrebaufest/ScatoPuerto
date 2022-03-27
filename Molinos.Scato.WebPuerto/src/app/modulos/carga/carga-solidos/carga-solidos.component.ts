@@ -158,6 +158,8 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   imprimir(imprimir: boolean = false) {
+    this.graficoCarga.expandir();
+    this.manosComponent.expandir();
     this.cargaPdf = true;
     let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
 
@@ -207,6 +209,7 @@ export class CargaSolidosComponent implements OnInit {
   guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
+   alert("guardarSolido");
     if( this.cargaComercialIncompleto ){
       let texto = "Por favor, verificar que los datos de la Carga Comercial esten completos.";
 
