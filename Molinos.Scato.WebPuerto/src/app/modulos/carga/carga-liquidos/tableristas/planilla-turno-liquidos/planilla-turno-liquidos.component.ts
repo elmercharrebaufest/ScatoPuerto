@@ -111,7 +111,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
     }, 2000);
   }
 
-
+  expandir()
+  {
+    document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
+  }
   newForm() {
     this.formTurnos = this._builder.group({
       diasTurno: this._builder.array([this.initDia()]),
