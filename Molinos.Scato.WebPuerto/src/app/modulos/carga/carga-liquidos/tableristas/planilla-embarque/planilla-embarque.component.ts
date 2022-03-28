@@ -41,7 +41,10 @@ export class PlanillaEmbarqueComponent implements OnInit {
   ngOnInit(): void {
     this.newForm();
   }
-
+  expandir()
+  {
+    document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
+  }
   newForm() {
     this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     
