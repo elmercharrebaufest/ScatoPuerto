@@ -160,6 +160,10 @@ export class LineasComponent implements OnInit {
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
   }
 
+  expandir()
+  {
+    document.getElementById('collapseLineasEmbarque').className = "collapse show";
+  }
   cargarEmbarque(idEmbarque: number) {
     this.embarqueService.obtenerEmbarque(idEmbarque).subscribe(
       res => {
