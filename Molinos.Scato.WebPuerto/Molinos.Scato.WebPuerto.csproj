@@ -276,6 +276,7 @@
     <Content Include="src\assets\collapseUp.svg" />
     <Content Include="src\assets\circleNeutral.svg" />
     <Content Include="src\assets\clip.svg" />
+    <Content Include="src\assets\iconMolinos.png" />
     <Content Include="src\assets\information.svg" />
     <Content Include="src\assets\logo.svg" />
     <Content Include="src\assets\Mas.svg" />
@@ -419,7 +420,7 @@
     <TypeScriptCompile Include="src\app\shared\modelos\periodo-carga.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\umap.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\recibo-buque.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />    
+    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />
     <!-- enums TS -->
     <TypeScriptCompile Include="src\app\shared\enums\permisos-scato.ts" />
     <TypeScriptCompile Include="src\app\shared\enums\tipo-alerta.ts" />

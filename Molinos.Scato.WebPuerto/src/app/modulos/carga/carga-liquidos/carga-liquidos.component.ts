@@ -23,8 +23,8 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
 import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/planilla-embarque.component';
+import { TanquesComponent } from './operaciones/tanques/tanques.component';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
-
 @Component({
   selector: 'app-carga-liquidos',
   templateUrl: './carga-liquidos.component.html',
@@ -37,6 +37,7 @@ export class CargaLiquidosComponent implements OnInit {
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
+  @ViewChild(TanquesComponent) tanquesComponent: TanquesComponent;
   @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent:PlanillaEmbarqueComponent;
   datatanks: any;
   enviado: boolean;
@@ -49,6 +50,7 @@ export class CargaLiquidosComponent implements OnInit {
   lineasEmbarque: LineasDeEmbarque[];
   cargaPdf: boolean = false;
   mostrarTableristaOperando = true;
+  tanquesSeleccionados: any;
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
@@ -123,11 +125,13 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   imprimir(imprimir: boolean = false) {
+    
     this.lineasComponent.expandir();
     this.planillaEmbarqueComponent.expandir();
     this.planillaTurnoLiquidosComponent.expandir();
     this.cargaPdf = true;
     let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
+    //graficos
     html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas) => {
       canvas.style.backgroundColor = 'white';
       let img = canvas.toDataURL('image/jpg');
@@ -153,6 +157,7 @@ export class CargaLiquidosComponent implements OnInit {
     })
   })
   }
+
 
   cargarPDF(file) {
     if (file) {
@@ -195,8 +200,7 @@ export class CargaLiquidosComponent implements OnInit {
     let lineasEmbarque = this.lineasComponent.obtenerLineasEmbarque();
     let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
     let planillaDeEmbarque = this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque();
-    console.log('planillaDeEmbarque -->>');
-    console.log(planillaDeEmbarque);
+
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
       null, null, [this.tanquesValue], lineasEmbarque, [periodoCarga], planillaDeEmbarque);
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
@@ -224,7 +228,7 @@ export class CargaLiquidosComponent implements OnInit {
   modificarEstadoBuque(estado: string){
     let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
     this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
-      console.log(res);
+
       let texto = "Se envió a Tableristas correctamente";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
@@ -271,21 +275,8 @@ export class CargaLiquidosComponent implements OnInit {
       });
   }
 
-  //initFechaHora(){
-  //  return this.formBuilder.group({
-  //    id: '',
-  //    fecha: '',
-  //    hora: '',
-  //  });
-  //}
+  onTanquesSeleccionados(tanques) {
+    this.tanquesSeleccionados = tanques;
+  }
 
-  //initAmarre(){
-  //  return this.formBuilder.group({
-  //    id: '',
-  //    fecha: '',
-  //    hora: '',
-  //    viento: '',
-  //    direccion: ''
-  //  });
-  //}
 }

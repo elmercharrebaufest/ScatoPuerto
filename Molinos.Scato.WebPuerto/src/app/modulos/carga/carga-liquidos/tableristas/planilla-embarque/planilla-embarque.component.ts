@@ -6,7 +6,6 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-
 @Component({
   selector: 'app-planilla-embarque',
   templateUrl: './planilla-embarque.component.html',

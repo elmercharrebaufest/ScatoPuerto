@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
@@ -15,6 +15,7 @@ export class TanquesComponent implements OnInit {
   datosEmbarque: any;
   embarque: EmbarqueNav;
   moduloDeCarga: any;
+  @Output() tanquesSeleccionados  = new EventEmitter<any>();
   constructor(
     private _tanksService: EstadoTanquesService,
     private _procesoService: DatosEmbarquesProcesoService,
@@ -71,6 +72,7 @@ export class TanquesComponent implements OnInit {
       this.tankGroup.get('Tanque38').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque38);
       this.tankGroup.get('Tanque40').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque40);
       this._tanksService.setTank(this.tankGroup);
+      this.tanquesSeleccionados.emit(this.tankGroup);
     } else {
       this._moduloCargaService.obtenerUltimaHabilitacionDeTanques().subscribe(
         (res: any) => {
@@ -93,6 +95,7 @@ export class TanquesComponent implements OnInit {
             this.tankGroup.get('Tanque40').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque40);
           }
           this._tanksService.setTank(this.tankGroup);
+          this.tanquesSeleccionados.emit(this.tankGroup);
         }
       )
     };
