@@ -14,7 +14,8 @@
 
 .card-ritmo-grafico{
     background-color: transparent;
-    max-height: 270px;
+    /* max-height: 270px; */
+    max-height: 400px;
 }
 
 .center-knob{
@@ -50,6 +51,27 @@
 }
 
 .referencia-carga-neto{
-    font-size: 9px;
+    font-size: 11px;
     text-align: center;
+}
+
+@media screen and (min-width: 1284px) and (max-width: 1632px){
+    .img-toneladas-circulo3{
+        margin-top: -60px;
+    }
+}
+@media screen and (min-width: 1266px) and (max-width: 1282px){
+    .img-toneladas-circulo3{
+        margin-top: -35px;
+    }
+}
+@media screen and (min-width: 756px) and (max-width: 1262px){
+    .img-toneladas-circulo3{
+        margin-top: -50px;
+    }
+}
+@media screen and (min-width: 440px) and (max-width: 748px){
+    .img-toneladas-circulo3{
+        margin-top: -65px;
+    }
 }

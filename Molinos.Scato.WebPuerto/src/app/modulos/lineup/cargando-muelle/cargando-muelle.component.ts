@@ -24,11 +24,20 @@ export class CargandoMuelleComponent implements OnInit {
   ngOnInit(): void {
 
     if(this.instanciaWorkflow){
+      
+      if(this.instanciaWorkflow.embarque.esLiquido){
+        this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        .subscribe( res => {
+          console.log('obtenerRitmosLiquidos: ', res);
+          this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
+        });
+      }else{
       this.balanzaService.obtenerRitmos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
         .subscribe( res => {
           console.log('obtenerRitmos: ', res);
           this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
         });
+      }
   
       // this.balanzaService.listarBalanzadaBuque(this.instanciaWorkflow.embarque.vapor.id).subscribe(res => this.balanzas = res.balanzadasBajaCarga);
     }

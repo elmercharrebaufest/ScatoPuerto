@@ -45,45 +45,25 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeTurnos() {
-    let turnos = this._turnosService.getTurnos();
-    if (turnos) {
-      let cant = 0;
-      for (let turno of turnos.moduloDeCargaPlanillaDeTurnosTurnosDetalles) {
-        cant += turno.cantidad;
-      }
-      this.valorRitmo = (this.valorRitmo * this.cantTurnos) + cant;
-      this.cantTurnos++;
-      this.valorRitmo = Math.round(this.valorRitmo / (this.cantTurnos * 6));
+    this.balanzaService.obtenerRitmosLiquidos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
+      // console.log('==> GRAFICOS-RITMOS - Líquido: ', res);
+      this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
+      this.valorNeto = res?.ritmoAcumuladoNeto ? res.ritmoAcumuladoNeto : 0;
+      this.valorRitmo = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
       this.colorRitmo = this.valorRitmo > 1000 ? '#1F8649' : '#F0AD4E';
-    }
-
-    let tns = Number(this._turnosService.getTnTotales());
-    if (tns)
-      this.tnTotales = tns;
-
-    this._turnosService.sendTurnos.subscribe(res => {
-      let cant: number = 0;
-      for (let turno of res.moduloDeCargaPlanillaDeTurnosTurnosDetalles) {
-        cant += Number(turno.cantidad);
-      }
-      this.valorCargando += Number(cant);
-      this.valorRitmo = (this.valorRitmo * this.cantTurnos * 6) + Number(cant);
-      this.cantTurnos++;
-      this.valorRitmo = Math.round(this.valorRitmo / (this.cantTurnos * 6));
-      this.colorRitmo = this.valorRitmo > 1000 ? '#1F8649' : '#F0AD4E';
-      let fecha = new Date();
-      this.horaActualizacion = `${fecha.getHours()}:${fecha.getMinutes()}hs`
     });
+
     this._turnosService.sendTnTotal.subscribe(res => {
       this.tnTotales = res;
-    })
+    });
+
     let fecha = new Date();
-    this.horaActualizacion = `${fecha.getHours()}:${fecha.getMinutes()}hs`
+    this.horaActualizacion = `${fecha.getHours()}:${fecha.getMinutes()}hs`;
   }
 
   subscribeBalanzas() {
     this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
-      console.log('obtenerRitmos: ', res);
+      // console.log('obtenerRitmos: ', res);
       this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
       this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
       this.valorRitmo = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;

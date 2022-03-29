@@ -120,10 +120,11 @@ export class AltaEmbarqueComponent implements OnInit {
       eslora: [],
       manga: [],
       puntal: [],
-      // fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
-      // horaLibrePlatica: [],
-      filePathShipParticular: [],
-      shipParticularArchivoNombre: [],
+      fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
+      horaLibrePlatica: [],
+      // TODO: Revisar plano-content, porque posiblemente sea como viene el valor del campo filePathShipParticular
+      // filePathShipParticular: [''],
+      // shipParticularArchivoNombre: [''],
     });
 
     if (this.state === 'modulo-carga'){
@@ -133,11 +134,11 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.get('otrosMuelles').disable();
     }
 
-    forkJoin([this.embarqueService.obtenerListadoTipoDeBuquePuerto(),
+    forkJoin([
+      this.embarqueService.obtenerListadoTipoDeBuquePuerto(),
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto(),
     this.planoDeCargaService.obtenerDestinos()
-    ]).subscribe(([res1, res2, res3
-    ]) => {
+    ]).subscribe(([res1, res2, res3]) => {
       this.tipoDeBuquePuerto = res1;
       this.ubicacionDeBuquePuerto = res2;
       this.destinoPuerto = res3;
@@ -157,12 +158,15 @@ export class AltaEmbarqueComponent implements OnInit {
     if (this.embarqueId != 0) {
       this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(
         res => {
+          console.log('obtenerEmbarque: ', res);
+
           var filtered = this.listadoMateriales.filter(
             function (e) {
               return this.indexOf(e.id) < 0;
             },
             res.materialesPuertoCantidad.map(x => x.materialId)
           );
+
           filtered.map(x => new MaterialPuertoCantidad({
             materialId: x.id,
             descripcionCorta: x.descripcionCorta,
@@ -171,6 +175,7 @@ export class AltaEmbarqueComponent implements OnInit {
           })).forEach(x => {
             res.materialesPuertoCantidad.push(x);
           });
+
           this.embarqueForm.patchValue(res);
           this.checkLiquidOrSolid(res.materialesPuertoCantidad.find(x => x.cantidad != 0));
 

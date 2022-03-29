@@ -1,34 +1,36 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+
 import { forkJoin } from 'rxjs';
-import { GraficoCargaComponent } from './operaciones/grafico-carga/grafico-carga.component';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
-import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
-import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
-import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
-import { Mail } from '@ScatoModels/mail';
-import { Embarque } from '@ScatoModels/embarque';
-import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { Alerta } from '@ScatoModels/alerta';
-import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
+// MODELOS
+import { Alerta } from '@ScatoModels/alerta';
+import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
+import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { Mail } from '@ScatoModels/mail';
+import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
+import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
+// SERVICIOS
 import { AlertService } from '@ScatoServicios/alert.service';
-import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { EmbarqueService } from '@ScatoServicios/embarque.service';
-import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
-import { ManosComponent } from './operaciones/manos/manos.component';
 import { SessionService } from '@ScatoServicios/session.service';
-import { Usuario } from '@ScatoInterfaces/usuario';
+// COMPONENTES
 import { BalanzasComponent } from './tableristas/balanzas/balanzas.component';
-// import { BalanzadasAgrupadas } from '@ScatoModels/balanzadas/balanza78';
+import { GraficoCargaComponent } from './operaciones/grafico-carga/grafico-carga.component';
+import { ManosComponent } from './operaciones/manos/manos.component';
+import { NIRComponent } from '../../calidad/solidos/nir/nir.component';
 import { UmapComponent } from './tableristas/umap/umap.component';
-import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
-// import { ModuloDeCargaBalanzasBack } from '@ScatoModels/balanzadas/balanza';
-// import { ListadoTotalBalanzadasBack } from '@ScatoModels/balanzadas/balanza';
+
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Usuario } from '@ScatoInterfaces/usuario';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -36,15 +38,14 @@ import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.co
   styleUrls: ['./carga-solidos.component.css']
 })
 export class CargaSolidosComponent implements OnInit {
-  @Output() hideSpinner = new EventEmitter<boolean>();
+  @Input() cargaComercialIncompleto: boolean;
   @Output() guardarPlano = new EventEmitter<boolean>();
+  @Output() hideSpinner = new EventEmitter<boolean>();
+  @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
-  @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
+  @ViewChild(NIRComponent) nirComponent: NIRComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
-  @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
-
-  @Input() cargaComercialIncompleto: boolean;
   
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
@@ -55,8 +56,7 @@ export class CargaSolidosComponent implements OnInit {
   materialesPuerto: MaterialPuerto[];
   adjunto: any;
   cargaPdf: boolean = false;
-  // balanzadasEmbarque: ListadoTotalBalanzadasBack[];
-  // balanzasEmbarque: BalanzadasAgrupadas[];
+  
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
