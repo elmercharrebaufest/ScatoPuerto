@@ -344,91 +344,6 @@ export class AltaEmbarqueComponent implements OnInit {
        return;
       }
      }
-       
-
-  //     if (this.invalidRequiredMaterial() && this.invalidTipoBuque() && this.invalidNombreBuque() && this.invalidBandera()) {
-  //       this.confirmationDialogService.confirm('Advertencia', 'Los campos materialesPuertoCantidad,tipoDeBuque,nombreBuque y destino son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['nombreBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['destino'].setErrors({ 'error': true });
-  //       return;
-  //     }
-  //     else if(!this.invalidRequiredMaterial() && this.invalidTipoBuque() && this.invalidNombreBuque() && this.invalidBandera())
-  //     {
-  //       alert("validar")
-  //       this.confirmationDialogService.confirm('Advertencia', 'Los campos tipoDeBuque,nombreBuque y destino son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['nombreBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['destino'].setErrors({ 'error': true });
-  //     }
-  //    else if (this.invalidRequiredMaterial() &&  this.invalidTipoBuque() && this.invalidNombreBuque() && !this.invalidBandera() ) {
-  //     this.confirmationDialogService.confirm('Advertencia', 'Los campos materialesPuertoCantidad,tipoDeBuque y nombreBuque   son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //     this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-  //     this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //     this.embarqueForm.controls['nombreBuque'].setErrors({ 'error': true });
-  //     }
-  //    else if (this.invalidRequiredMaterial() && this.invalidTipoBuque() && !this.invalidNombreBuque() && !this.invalidBandera() ) {
-  //     this.confirmationDialogService.confirm('Advertencia', 'Los campos materialesPuertoCantidad y tipoDeBuque   son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //     this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //       return;
-  //     }
-
-  //     else if (this.invalidRequiredMaterial() && this.invalidNombreBuque() && !this.invalidTipoBuque() && !this.invalidBandera()) {
-  //       this.confirmationDialogService.confirm('Advertencia', 'Los campos materialesPuertoCantidad y nombreBuque   son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['nombreBuque'].setErrors({ 'error': true });
-  //       return;
-  //     }
-  //     else if (this.invalidRequiredMaterial() && this.invalidBandera() && !this.invalidNombreBuque() && !this.invalidTipoBuque() ) {
-  //       this.confirmationDialogService.confirm('Advertencia', 'Los campos materialesPuertoCantidad y destino   son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['destino'].setErrors({ 'error': true });
-  //       return;
-  //     }
-
-  //     else if (this.invalidTipoBuque() && this.invalidNombreBuque() && !this.invalidRequiredMaterial() && !this.invalidBandera()) {
-  //       this.confirmationDialogService.confirm('Advertencia', 'Los campos tipoDeBuque y nombreBuque   son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['nombreBuque'].setErrors({ 'error': true });
-  //       return;
-  //     }
-
-  //     else if (this.invalidTipoBuque() && this.invalidBandera() && !this.invalidNombreBuque() && !this.invalidRequiredMaterial()) {
-  //       this.confirmationDialogService.confirm('Advertencia', 'Los campos tipoDeBuque y destino   son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['destino'].setErrors({ 'error': true });
-  //       return;
-  //     }
-  //     else if (this.invalidNombreBuque() && this.invalidBandera() && !this.invalidRequiredMaterial() && !this.invalidTipoBuque() ) {
-  //       this.confirmationDialogService.confirm('Advertencia', 'Hay campos que son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //       this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //       this.embarqueForm.controls['destino'].setErrors({ 'error': true });
-  //       return;
-  //     }
-
-  //   else  if (this.invalidRequiredMaterial() && !this.invalidNombreBuque() && !this.invalidBandera() && !this.invalidTipoBuque()) {
-  //     this.confirmationDialogService.confirm('Advertencia', 'El campo tipoBuque es materialesPuertoCantidad', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //     this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-  //       return;
-  //     }
-     
-  //  else if ( this.invalidTipoBuque() && !this.invalidRequiredMaterial() && !this.invalidNombreBuque() && !this.invalidBandera()) {
-  //   this.confirmationDialogService.confirm('Advertencia', 'El campo tipoBuque es requerido', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //   this.embarqueForm.controls['tipoDeBuque'].setErrors({ 'error': true });
-  //     return;
-  //   }
-  //   else if (this.invalidNombreBuque() && !this.invalidRequiredMaterial() && !this.invalidTipoBuque() && !this.invalidBandera()) {
-  //     this.confirmationDialogService.confirm('Advertencia', 'El campo nombreBuque es requerido', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //     this.embarqueForm.controls['nombreBuque'].setErrors({ 'error': true });
-  //     return;
-  //   }
-  //  else  if (this.invalidBandera()&& !this.invalidNombreBuque() && !this.invalidRequiredMaterial() && !this.invalidTipoBuque()) {
-  //   this.confirmationDialogService.confirm('Advertencia', 'El campo destino es requerido', 'Cerrar', '', null, null, Tipoalerta.Warning)
-  //   this.embarqueForm.controls['destino'].setErrors({ 'error': true });
-  //     return;
-  //   }
     this.mostrarSpinner = true;
 
     this.embarqueForm.get('fechaRecalada').setValue(
@@ -696,7 +611,6 @@ export class AltaEmbarqueComponent implements OnInit {
       {
         control.get('cantidad').disable();
       }
-      
       else
       {
         control.get('cantidad').enable();
