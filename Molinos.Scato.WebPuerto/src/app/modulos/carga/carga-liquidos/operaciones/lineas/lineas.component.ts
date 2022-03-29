@@ -159,7 +159,10 @@ export class LineasComponent implements OnInit {
     });
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
   }
-
+  expandir()
+  {
+    document.getElementById('collapseLineasEmbarque').className = "collapse show";
+  }
   cargarEmbarque(idEmbarque: number) {
     this.embarqueService.obtenerEmbarque(idEmbarque).subscribe(
       res => {
@@ -182,7 +185,7 @@ export class LineasComponent implements OnInit {
     return this.formBuilder.group({
       id: x?.id ?? "",
       linea: x?.linea ?? "",
-      tkInicial: x ? this.tanquesOption.find(t => t.value == x.tkInicial) : '',
+      tkInicial: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '',
       materialPuerto: x?.materialPuerto ?? "",
       temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: false }],
       alturaInicialCM: [{ value: x && x.alturaInicialCM ? x.alturaInicialCM > 0 ? x.alturaInicialCM : "" : "", disabled: false }],
@@ -204,7 +207,7 @@ export class LineasComponent implements OnInit {
 
   obtenerModuloDeCarga() {
     this.moduloDeCarga = this._procesoService.getModuloDeCarga();
-    
+    this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
     if (this.moduloDeCarga.moduloDeCargaLineasDeEmbarque && this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.length > 0) {
       this.lineasEmbarque.clear();
 
@@ -278,7 +281,6 @@ export class LineasComponent implements OnInit {
 
   guardar() {
     this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe( res => {
-    console.log(res);
     let texto = "Se guardaron las lineas de embarque correctamente";
     this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
   } );

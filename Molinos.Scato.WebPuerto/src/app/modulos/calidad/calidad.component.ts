@@ -66,6 +66,7 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     // this.embarqueId = this._procesoService.getEmbarqueId();
 
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
+    this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
 
     // this.workflowService.obtenerListado().subscribe((resp: any) => {
     //   this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
@@ -82,17 +83,16 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // this.embarque = this._procesoService.getEmbarqueSelected();
+    this.embarque = this._procesoService.getEmbarqueSelected();
     // this.embarqueId = this._procesoService.getEmbarqueId();
     // this.subscribeEmbarques();
     
-
     // if( this.vaporId > 0 ){
      this.trabajoOrdenado();
      this.obtenerBalanzadasEnVivo();
   //  }
 
-   //this.inicializarReciboBuque();
+    this.inicializarReciboBuque();
   }
 
   subscribeEmbarques(){
@@ -177,7 +177,6 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     this.procesoCalidadService.setOtrosMuelles(this.buqueEnOtrosMuelles);
   }
 
-  // TODO: lo nuevo para datos de balanzadas -----------------------------
   obtenerBalanzadasEnVivo() {
 
     this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.filtroBalanza7);
@@ -218,10 +217,11 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getDescripcionCortaMaterial(materialId: number): string{
-    let {descripcionCorta} = this.materialesPuerto.find( x => x.id = materialId );
+    if (!materialId) return '';
+
+    let {descripcionCorta} = this.materialesPuerto.find( x => x.id == materialId );
     return descripcionCorta;
   }
-  // finTODO: lo nuevo para datos de balanzadas --------------------------
 
   showPlano(event: boolean) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();

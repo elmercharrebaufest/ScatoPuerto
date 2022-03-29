@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
 import { Balanzas, Bodega, InfoTableristas } from '@ScatoModels/balanzadas/balanza';
-import { Ritmos } from '@ScatoModels/balanzadas/ritmos';
+import { Ritmos, RitmosLiquido } from '@ScatoModels/balanzadas/ritmos';
 
 @Injectable({
   providedIn: 'root'
@@ -39,5 +39,8 @@ export class BalanzaService {
 
     obtenerRitmos(vapor_id: number, modulodecarga_id: number): Observable<Ritmos>{
       return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+    }
+    obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
+      return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 }

@@ -105,7 +105,12 @@ table.turnos table.tabla-embebida th{
     min-height: 52px !important;
     vertical-align: middle !important;
 }
-
+.header-fijo {
+    position: sticky;
+    top:0;
+    z-index: 10;
+    background-color: #DADADA
+}
 .bt-cerrar-turno{
     position: absolute;
     bottom: 7px;
