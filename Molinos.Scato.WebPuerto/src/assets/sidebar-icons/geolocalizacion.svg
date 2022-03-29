@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="61" height="61" viewBox="0 0 61 61">
+<defs>
+<style>.a,.c,.d{fill:none;}.b{clip-path:url(#a);}.c,.d{stroke:#4c60a7;}.c{stroke-linecap:round;}.e{stroke:none;}</style>
+<filter id="Elipse" x="0" y="0" width="61" height="61" filterUnits="userSpaceOnUse">
+<feOffset dy="3" input="SourceAlpha"/>
+<feGaussianBlur stdDeviation="3" result="blur"/>
+<feFlood flood-opacity="0.161"/>
+<feComposite operator="in" in2="blur"/>
+<feComposite in="SourceGraphic"/>
+</filter>
+</defs>
+<g id="Componente_177_1" data-name="Componente 177 – 1" transform="translate(9 6)">
+<g transform="matrix(1, 0, 0, 1, -9, -6)" filter="url(#Elipse)">
+</g>
+<path id="icono_geo" d="M7605.823,14306.351h0l-.43-.48a50.66,50.66,0,0,1-4-5.17c-2.685-3.977-4.046-7.3-4.046-9.874a8.475,8.475,0,1,1,16.95,0c0,2.574-1.361,5.9-4.046,9.874a50.539,50.539,0,0,1-4,5.17l-.433.48Zm0-19.2a3.459,3.459,0,1,0,3.461,3.461A3.463,3.463,0,0,0,7605.823,14287.152Z" transform="translate(-7583.85 -14272.848)" fill="none" stroke="#3376a1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+</g>
+</svg>

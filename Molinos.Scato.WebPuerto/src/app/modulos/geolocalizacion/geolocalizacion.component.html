@@ -1,0 +1,59 @@
+<ship-spinner [message]="'Cargando Line Up. Por favor, espere...'" *ngIf='mostrarSpinner'></ship-spinner>
+<div class="container-fluid mt-4" style="flex-direction: column;" *ngIf='mostrarContent'>
+    
+    <!-- Cabecera-->
+
+    <div class="row m-lg-4">
+        <div class="col pl-0">
+          <div class="row">
+            <div class="col">
+              <label>Actualizado: {{fechaActualizacion | date : 'dd-MM H:mm'}}hs</label>
+            </div>
+          </div>
+        </div>
+        <div class="col pl-0">
+          <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-light btn-circle " >
+                  <i class="fa fa-list-ul fa-2x c-celeste" (click)="cambiarLineUp()"></i>
+                </button>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+    <div class="row m-lg-4">
+        <div class="col pl-0">
+          <div class="row">
+            <div class="col">
+              <h1>Geolocalización</h1>
+            </div>
+          </div>
+        </div>
+        <div class="col pl-0">
+            <div class="row">
+              <div class="col">
+                <button class="btn btn-muelles color-muelle-sanbenito">San Benito</button>
+                <button style="margin-left: 10px;" class="btn btn-muelles color-muelle-nouryon" >Nouryon</button>
+                <button style="margin-left: 10px;" class="btn btn-muelles color-muelle-vicentin" >Vicentin</button>
+                <button style="margin-left: 10px;" class="btn btn-muelles color-muelle-otros-muelles" >Otros Muelles</button>
+              </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Contenido-->
+    <div class="geolocalizacion">
+        <div class="geolocalizacion__mapa">
+            <app-mapa-buque [listaPuntosInteres]="listaPuntosInteres" 
+                            *ngIf="listaPuntosInteres">
+            </app-mapa-buque>
+        </div>
+        <div class="geolocalizacion__listado">
+            <app-lista-buques></app-lista-buques>
+        </div>
+    </div>
+
+
+</div>

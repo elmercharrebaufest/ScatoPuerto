@@ -17,6 +17,7 @@
     box-shadow: 8px 1px 16px -3px rgba(0, 0, 0, 0.37);
     -webkit-box-shadow: 8px 1px 16px -3px rgba(0, 0, 0, 0.37);
     -moz-box-shadow: 8px 1px 16px -3px rgba(0, 0, 0, 0.37);
+    z-index: 5000 !important;
 }
 
 .links-container hr{
@@ -56,6 +57,13 @@
 .links-container a div.item-container div.icon-operaciones{
     -webkit-mask: url('assets/sidebar-icons/operaciones.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/operaciones.svg') no-repeat center;
+    width: 27px;
+    height: 27px;
+}
+
+.links-container a div.item-container div.icon-geolocalizacion{
+    -webkit-mask: url('assets/sidebar-icons/geolocalizacion.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/geolocalizacion.svg') no-repeat center;
     width: 27px;
     height: 27px;
 }

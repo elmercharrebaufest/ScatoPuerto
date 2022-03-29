@@ -200,7 +200,9 @@ export class LineupComponent implements OnInit, Observador {
   public cambiarVista() {
     this.mostrarCalendario = !this.mostrarCalendario;
   }
-
+  public cambiarGeolocalizacion() {
+    this.router.navigate(['geolocalizacion']);
+  }
   estadoSanBenito() {
     let ubicacion = this.ubicacionDeBuquePuerto ? this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id : '';
     return this.sanBenito && this.sanBenito.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';

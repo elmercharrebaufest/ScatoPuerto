@@ -9983,18 +9983,6 @@ resultado.Patente = rutaFoto.Patente;
 
         }
 
-        public IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion()
-        {
-            try
-            {
-                return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>().ToList();
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
         //public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
         //{
         //    ModuloDeCargaPlanillaDeTurnosTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.Id == idPlanillaDeTurnos);
@@ -10360,6 +10348,10 @@ resultado.Patente = rutaFoto.Patente;
         public IList<EntidadTipoDeActividadDto> ListarActividadesPorEntidad(string codigoEntidad)
         {
             return Listar<EntidadTipoDeActividad, EntidadTipoDeActividadDto>(x => x.Entidad.Codigo == codigoEntidad);
+        }
+        public IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado)
+        {
+            return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
         }
     }
 }

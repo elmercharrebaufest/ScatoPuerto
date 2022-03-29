@@ -371,7 +371,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(!resultado.HayErrores ? true : false);
         }
 
-
+        /*
         [HttpGet]
         [Route("api/Embarque/ObtenerPuntosInteresGeolocalizacion")]
         public HttpResponseMessage ObtenerPuntosInteresGeolocalizacion()
@@ -380,6 +380,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerPuntosInteresGeolocalizacion()
             );
         }
+        */
 
         [HttpPost]
         [Route("api/Embarque/RegistrarEmbarqueGeolocalizacion")]

@@ -1,0 +1,9 @@
+.header-geo-fijo {
+    position: sticky;
+    top:0;
+    z-index: 10;
+    background-color: #DADADA
+} 
+.tabla-listado{
+    max-height: 300px
+}
