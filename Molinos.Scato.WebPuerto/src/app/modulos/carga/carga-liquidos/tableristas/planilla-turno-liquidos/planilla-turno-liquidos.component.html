@@ -7,28 +7,29 @@
     <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
     <button class='btn btn-success divHeaderRight' (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
     <br>
+    <br>
     
     <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup" >
         <div class='mt-4 px-4 pb-4' style="height: 800px;">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
             <table class='table table-bordered turnos'>
-                <thead>
-                    <tr class='table-active'>
-                        <th>Día</th>
-                        <th>Turno</th>
-                        <th>Exportador</th>
-                        <th>Línea</th>
-                        <th>Partida</th>
-                        <th>Producto</th>
-                        <th>Tk</th>
-                        <th>°C</th>
-                        <th>Med.Ini. CM</th>
-                        <th>Med.Ini. MM</th>
-                        <th>Med.fin. CM</th>
-                        <th>Med.fin. MM</th>
-                        <th>Destino</th>
-                        <th>Cant.</th>
+                <thead class="header-fijo" >
+                    <tr>
+                        <th class="header-fijo">Día</th>
+                        <th class="header-fijo">Turno</th>
+                        <th class="header-fijo">Exportador</th>
+                        <th class="header-fijo">Línea</th>
+                        <th class="header-fijo">Partida</th>
+                        <th class="header-fijo">Producto</th>
+                        <th class="header-fijo">Tk</th>
+                        <th class="header-fijo">°C</th>
+                        <th class="header-fijo">Med.Ini. CM</th>
+                        <th class="header-fijo">Med.Ini. MM</th>
+                        <th class="header-fijo">Med.fin. CM</th>
+                        <th class="header-fijo">Med.fin. MM</th>
+                        <th class="header-fijo">Destino</th>
+                        <th class="header-fijo">Cant.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +53,7 @@
                                                 <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
                                                 <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
                                                 <span class='turno'>por turno</span>
-                                                <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span>
+                                                <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span><br>
                                             </div>
                                             <!--<button class='btn bt-cerrar-turno' (click)='enviarTurno(d, t, addButton)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
                                                 {{!turno.value.enviado ? 'Enviar Turno' : 'Turno Enviado'}}
@@ -102,7 +103,6 @@
                                                     <select formControlName='tk' (change)='getCantidadLinea(result)'>
                                                         <option *ngFor='let linea of lineas' [ngValue]='linea.tkInicial'>{{linea.tkInicial}}</option>
                                                     </select>
-                                                -->
                                                 </td>
                                                 <!-- °C -->
                                                 <td><input type="number" formControlName='temperatura' (change)='getCantidadLinea(result)'></td>
@@ -131,34 +131,34 @@
                                         </td>
                                     </tr>
                                     <tr *ngIf='getCorteTurnos(d, t).controls.length > 0'>
-                                        <td colspan="10" class='p-0'>
+                                        <td colspan="12" class='p-0'>
                                             <table class='tabla table-bordered tabla-embebida'>
                                                 <thead>
                                                     <tr class='table-active'>
-                                                        <th>Motivo</th>
-                                                        <th>Inicio</th>
-                                                        <th>Fin</th>
-                                                        <th>Tiempo total</th>
-                                                        <th>Observaciones</th>
+                                                        <th colspan="4">Motivo</th>
+                                                        <th colspan="1">Inicio</th>
+                                                        <th colspan="1">Fin</th>
+                                                        <th colspan="1">Tiempo total</th>
+                                                        <th colspan="5">Observaciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosCortes'>
                                                         <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
                                                             <tr>
-                                                                <td>
+                                                                <td colspan="4">
                                                                     {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                 </td>
-                                                                <td>
+                                                                <td colspan="1">
                                                                     {{corte.controls.horaInicio.value}}hs
                                                                 </td>
-                                                                <td>
+                                                                <td colspan="1">
                                                                     {{corte.controls.horaFin.value}}hs
                                                                 </td>
-                                                                <td>
+                                                                <td colspan="1">
                                                                     {{corte.controls.tiempoTotal.value}}hs
                                                                 </td>
-                                                                <td >
+                                                                <td colspan="5">
                                                                     {{corte.controls.observaciones.value}}
                                                                 </td>
                                                             </tr>
@@ -251,7 +251,7 @@
     </ng-template>
 
     <ng-template #agregarTurno let-modal>
-        <div class='modal-body' style="height: 230px;">
+        <div class='modal-body' style="height: 230px; z-index: 200">
             <form [formGroup]='formNuevoTurno' fxLayout='row wrap'>|
                 <div class='pr-10 mt-2'>
                     <label>Fecha</label>

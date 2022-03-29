@@ -3,12 +3,12 @@ import { Turno } from "./turno";
 import { ObsCalidad } from "../obs-calidad";
 
 export class PlanillaDeTurnos{
-    fecha: Date;
+    fecha: any;
     fechaMiliseconds: any;
     id?: number;
     turnoPuerto: TurnoPuerto;
     cerrado: boolean;
-    enviado: boolean;
+    enviado: boolean
     moduloDeCargaPlanillaDeTurnosTurnosDetalles: Turno[];
     moduloDeCargaPlanillaDeTurnosTurnosCortes: CorteTurno[];
     indexDia: number;
