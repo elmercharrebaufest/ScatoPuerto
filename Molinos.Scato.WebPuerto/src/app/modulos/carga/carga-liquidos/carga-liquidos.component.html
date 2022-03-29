@@ -4,13 +4,13 @@
 </ng-container>
 <ship-spinner *ngIf='cargaPdf' [src]='"pdf"'></ship-spinner>
 <div id="grafico-liquidos" class="mt-4 shadow bg-white min-h5">
-    <app-tanques></app-tanques>
+    <app-tanques (tanquesSeleccionados)="onTanquesSeleccionados($event)"></app-tanques>
 </div>
 
 <div class="row mt-4" id='lineas-embarque-print'>
   <div class="col">
-    <div id="lineasEmbarque" class="shadow" style="background-color: white; min-height: 5rem;">
-      <app-lineas></app-lineas>
+    <div id="lineasEmbarque" class="shadow" style="background-color: white; min-height: 5rem;" *ngIf="tanquesSeleccionados">
+      <app-lineas [tanquesSeleccionados] = "tanquesSeleccionados"></app-lineas>
     </div>
   </div>
 </div>
@@ -19,10 +19,10 @@
 <!-- <ng-container *ngIf='embarqueSelected.nombreUbicacion.toLowerCase() == "muelle de carga"'> -->
 
 <ng-container *ngIf="mostrarTableristaOperando">
-  <div class='bg-white px-4 min-h5 shadow mt-4'>
+  <div class='bg-white px-4 min-h5 shadow mt-4' id="planilla-embarque">
       <app-planilla-embarque></app-planilla-embarque>
   </div>
-  <div class='bg-white px-4 min-h5 shadow mt-4'>
+  <div class='bg-white px-4 min-h5 shadow mt-4' id="turno-liquidos">
       <app-planilla-turno-liquidos></app-planilla-turno-liquidos>
   </div>
   <div class='mt-5' style='margin-left: 25%; width: 50%;'>

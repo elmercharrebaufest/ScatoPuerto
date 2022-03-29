@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { pairwise, startWith } from 'rxjs/operators';
 // MODELOS
@@ -21,7 +21,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
   templateUrl: './lineas.component.html',
   styleUrls: ['./lineas.component.css']
 })
-export class LineasComponent implements OnInit {
+export class LineasComponent implements OnInit, OnChanges {
   confirmationDialogService: any;
   embarque: EmbarqueNav;
   formInitialValues: any;
@@ -36,6 +36,7 @@ export class LineasComponent implements OnInit {
   colorSelected: any[] = new Array();
 
   moduloDeCarga: ModuloDeCarga;
+  @Input() tanquesSeleccionados;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -46,7 +47,6 @@ export class LineasComponent implements OnInit {
     private _tanquesService: EstadoTanquesService,
     private _lineasService: LineasService,
   ) {
-    this.confirmationDialogService = confirmationDialogService;
 
     this._tanquesService.sendData.subscribe(resObj => {
       let tanks = new Array();
@@ -57,9 +57,34 @@ export class LineasComponent implements OnInit {
 
       this.tanquesOption = tanks;
     });
+    this.confirmationDialogService = confirmationDialogService;
+
+  }
+
+  ngOnChanges(){
+
+    this._tanquesService.sendData.subscribe(resObj => {
+      let tanks = new Array();
+      for (var [key, value] of Object.entries(resObj.value)) {
+        let tank = { [key]: value, value: key.substr(6), color: (value ? 'tanqueSi' : 'tanqueNo') }
+        tanks.push(tank);
+      }
+
+      this.tanquesOption = tanks;
+    });
+      if(this.tanquesOption == undefined){
+        let tanks = new Array();
+        for (var [key, value] of Object.entries(this.tanquesSeleccionados.value)) {
+          let tank = { [key]: value, value: key.substr(6), color: (value ? 'tanqueSi' : 'tanqueNo') }
+          tanks.push(tank);
+        }
+        this.tanquesOption = tanks; 
+      }
+    
   }
 
   ngOnInit(): void {
+
     this._procesoService.sendEmbarque.subscribe(
       res => this.embarque = res
     )
@@ -159,10 +184,12 @@ export class LineasComponent implements OnInit {
     });
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
   }
+
   expandir()
   {
     document.getElementById('collapseLineasEmbarque').className = "collapse show";
   }
+
   cargarEmbarque(idEmbarque: number) {
     this.embarqueService.obtenerEmbarque(idEmbarque).subscribe(
       res => {
@@ -280,10 +307,33 @@ export class LineasComponent implements OnInit {
   }
 
   guardar() {
+    const lineasEmabarque = this.obtenerLineasEmbarque();
+    let erroresLinea = false;
+    lineasEmabarque.forEach(item =>{
+      if (
+          (item.linea == ''          || item.linea == undefined) ||
+          (item.tkInicial == ''      || item.tkInicial == undefined) ||
+          (item.materialPuerto == '' || item.materialPuerto == undefined)
+         ){
+          erroresLinea = true;
+          return;
+         }
+    });
+    if (erroresLinea){
+        var texto = "No se puede guardar, debido a que no se han completado la información para el registro de linea.";
+        this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
+            .then((confirmed) => {
+              if (confirmed)  
+              return;
+              else
+                return;
+            }).catch();
+    }else{
     this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe( res => {
     let texto = "Se guardaron las lineas de embarque correctamente";
     this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
   } );
 }
+  }
 
 }
