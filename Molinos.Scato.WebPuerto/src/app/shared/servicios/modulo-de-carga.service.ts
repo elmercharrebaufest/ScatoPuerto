@@ -6,10 +6,9 @@ import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { ModuloDeCargaListado } from '@ScatoModels/modulo-carga-listado';
-// import { MotivosFallasBalanza } from '@ScatoModels/motivo-balanza';
 import { MotivosDeCorte } from '@ScatoModels/planilla-turnos/motivo-de-corte';
-import { MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
-import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
+import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
+import { Nir } from '@ScatoModels/nir';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +17,7 @@ export class ModuloDeCargaService {
   url: string = environment.apiUrl;
 
   constructor(
-    private http: HttpClient,
-    private funcionesGeneralesService: FuncionesGeneralesService,
+    private http: HttpClient
   ) {
 
   }
@@ -121,5 +119,12 @@ export class ModuloDeCargaService {
 
   guardarPlanillaDeEmbarque(planillaDeEmbarqueDtos: any, idModuloDeCarga: number){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, planillaDeEmbarqueDtos, { 'withCredentials': true});  
+  }
+
+  obtenerNir(moduloDeCarga_id: number): Observable<Nir[]>{
+    return this.http.get<Nir[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
+  }
+  obtenerListadoBodegas(): Observable<Bodega[]>{
+    return this.http.get<Bodega[]>(`${this.url}ModuloDeCarga/ListadoBodegas`, { 'withCredentials' : true});
   }
 }
