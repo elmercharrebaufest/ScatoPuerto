@@ -209,7 +209,6 @@ export class CargaSolidosComponent implements OnInit {
   guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
-   alert("guardarSolido");
     if( this.cargaComercialIncompleto ){
       let texto = "Por favor, verificar que los datos de la Carga Comercial esten completos.";
 
@@ -267,10 +266,10 @@ export class CargaSolidosComponent implements OnInit {
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
+            this.cargaPdf = false;
       }
 
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
-      this.cargaPdf = true;
     });
   }
 
