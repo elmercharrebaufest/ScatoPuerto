@@ -476,11 +476,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
                 {
+                    var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
+
                     moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
                     {
                         Id = Nir.Id,
                         ModuloDeCarga = moduloDeCarga,
-                        Bodega = Nir.Bodega,
+                        Bodega = bodega,
                         Fecha = Nir.Fecha,
                         HD = Nir.HD,
                         Hora = Nir.Hora,
@@ -488,7 +490,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         PH = Nir.PH,
                         ProtBase = Nir.ProtBase,
                         Prot_BS = Nir.Prot_BS,
-                        Ritmo = Nir.Ritmo
+                        Ritmo = Nir.Ritmo,
+                        Material_id = Nir.Material_id,
+                        Mano = Nir.Mano
                     });
                 }
             }

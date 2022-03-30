@@ -23,8 +23,8 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
 import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/planilla-embarque.component';
+import { TanquesComponent } from './operaciones/tanques/tanques.component';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
-
 @Component({
   selector: 'app-carga-liquidos',
   templateUrl: './carga-liquidos.component.html',
@@ -37,6 +37,7 @@ export class CargaLiquidosComponent implements OnInit {
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
+  @ViewChild(TanquesComponent) tanquesComponent: TanquesComponent;
   @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent:PlanillaEmbarqueComponent;
   datatanks: any;
   enviado: boolean;
@@ -49,6 +50,7 @@ export class CargaLiquidosComponent implements OnInit {
   lineasEmbarque: LineasDeEmbarque[];
   cargaPdf: boolean = false;
   mostrarTableristaOperando = true;
+  tanquesSeleccionados: any;
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
@@ -123,11 +125,13 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   imprimir(imprimir: boolean = false) {
+    
     this.lineasComponent.expandir();
     this.planillaEmbarqueComponent.expandir();
     this.planillaTurnoLiquidosComponent.expandir();
     this.cargaPdf = true;
     let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
+    //graficos
     html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas) => {
       canvas.style.backgroundColor = 'white';
       let img = canvas.toDataURL('image/jpg');
@@ -154,6 +158,7 @@ export class CargaLiquidosComponent implements OnInit {
   })
   }
 
+
   cargarPDF(file) {
     if (file) {
       const reader = new FileReader();
@@ -166,6 +171,10 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   guardar(finalizar: boolean) {
+
+    let fechasHorasOK = this.validarFechas();
+    if(!fechasHorasOK)
+      return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     //CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     this.hideSpinner.emit(true);
@@ -183,6 +192,57 @@ export class CargaLiquidosComponent implements OnInit {
       this.guardarContinuacion(finalizar);
   }
 
+  validarFechas(): boolean{
+    let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
+    console.log('--- periodoCarga --- : ', periodoCarga);
+
+    let fechaAmarro1 = new Date(periodoCarga.fechaAmarro+' '+periodoCarga.horaAmarro);
+    let fechaAmarro2 = fechaAmarro1.getTime();
+    let fechaDesamarro1 = new Date(periodoCarga.fechaDesamarro+' '+periodoCarga.horaDesamarro);
+    let fechaDesamarro2 = fechaDesamarro1.getTime();
+
+    let fechaConexionMangueras1 = new Date(periodoCarga.fechaConexionMangueras+' '+periodoCarga.horaConexionMangueras);
+    let fechaConexionMangueras2 = fechaConexionMangueras1.getTime();
+    let fechaDesconexionMangueras1 = new Date(periodoCarga.fechaDesconexionMangueras+' '+periodoCarga.horaDesconexionMangueras);
+    let fechaDesconexionMangueras2 = fechaDesconexionMangueras1.getTime();
+
+    let fechaComienzoCarga1 = new Date(periodoCarga.fechaComienzoCarga+' '+periodoCarga.horaComienzoCarga);
+    let fechaComienzoCarga2 = fechaComienzoCarga1.getTime();
+    let fechaFinalizacionCarga1 = new Date(periodoCarga.fechaFinalizacionCarga+' '+periodoCarga.horaFinalizacionCarga);
+    let fechaFinalizacionCarga2 = fechaFinalizacionCarga1.getTime();
+    
+    if(fechaAmarro2 && fechaDesamarro2){
+      if( fechaAmarro2 > fechaDesamarro2 ){
+        this.mensajeGenerico('La fecha-hora de Amarre es mayor a la fecha-hora del Desamarre.');
+        return false;
+      }
+    }
+    if(fechaConexionMangueras2 && fechaDesconexionMangueras2){
+      if( fechaConexionMangueras2 > fechaDesconexionMangueras2 ){
+        this.mensajeGenerico('La fecha-hora de Conexión de Mangueras es mayor a la fecha-hora de Desconexión de Mangueras.');
+        return false;
+      }
+    }
+    if(fechaComienzoCarga2 && fechaFinalizacionCarga2){
+      if( fechaComienzoCarga2 > fechaFinalizacionCarga2 ){
+        this.mensajeGenerico('La fecha-hora de Comienzo de Carga es mayor a la fecha-hora de Finalización de Carga.');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  mensajeGenerico(text: string){
+    this.confirmationDialogService.confirm("Atención!", text, 'Aceptar', '', null, null, Tipoalerta.Success)
+      .then( (confirmed) => {
+        if (confirmed) console.log('Mensaje: '+text);
+      })
+      .catch(() => {
+        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+      });
+  }
+
   guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
       this.enviado = finalizar;
@@ -195,8 +255,7 @@ export class CargaLiquidosComponent implements OnInit {
     let lineasEmbarque = this.lineasComponent.obtenerLineasEmbarque();
     let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
     let planillaDeEmbarque = this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque();
-    console.log('planillaDeEmbarque -->>');
-    console.log(planillaDeEmbarque);
+
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
       null, null, [this.tanquesValue], lineasEmbarque, [periodoCarga], planillaDeEmbarque);
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
@@ -224,7 +283,7 @@ export class CargaLiquidosComponent implements OnInit {
   modificarEstadoBuque(estado: string){
     let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
     this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
-      console.log(res);
+
       let texto = "Se envió a Tableristas correctamente";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
@@ -271,21 +330,8 @@ export class CargaLiquidosComponent implements OnInit {
       });
   }
 
-  //initFechaHora(){
-  //  return this.formBuilder.group({
-  //    id: '',
-  //    fecha: '',
-  //    hora: '',
-  //  });
-  //}
+  onTanquesSeleccionados(tanques) {
+    this.tanquesSeleccionados = tanques;
+  }
 
-  //initAmarre(){
-  //  return this.formBuilder.group({
-  //    id: '',
-  //    fecha: '',
-  //    hora: '',
-  //    viento: '',
-  //    direccion: ''
-  //  });
-  //}
 }

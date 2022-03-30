@@ -45,7 +45,8 @@ const components = [
     SpinnerComponent,
     PeriodoCargaComponent,
     AmarreComponent,
-    NavtabsCalidadComponent
+    NavtabsCalidadComponent,
+
 ]
 const libs = [
     CommonModule,
