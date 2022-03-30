@@ -3,3 +3,9 @@ export class Ritmos {
     totalCargado: number;
     ritmoCargaNeto: number;
 }
+
+export class RitmosLiquido {
+    llevasCargado: number;
+    ritmoAcumulado: number;
+    ritmoAcumuladoNeto: number;
+}

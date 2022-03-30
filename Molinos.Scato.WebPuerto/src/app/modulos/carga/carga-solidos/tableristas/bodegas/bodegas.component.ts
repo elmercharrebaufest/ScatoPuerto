@@ -44,10 +44,8 @@ export class BodegasComponent implements OnInit, OnDestroy {
     private _balanzaService: BalanzaService,) {
 
     this.unsubscribe = new Subject();
-
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.materialesPuerto = this.datosEmbarque.listaMateriales;
-
     this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
   }
 
@@ -64,19 +62,12 @@ export class BodegasComponent implements OnInit, OnDestroy {
     this.balanzas78Service.sendDataBalanzada7y8Completas
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( (blzas7y8: Balanzas[]) => {
-        // console.log('BalanzadasCompletas: ', blzas7y8);
-
         let balanzadasUnidas: BalanzadasUnidas[] = [];
-
         let balanzadasDataOK = blzas7y8.filter( x => x.material_id > 0 && x.tn > 0 && x.bodega_id > 0 );
-        console.log('balanzadasDataOK: ', balanzadasDataOK);
-        
         balanzadasUnidas = this.unirBalanzadasParaBodegas(balanzadasDataOK);
 
         if(balanzadasUnidas.length>0){
-
           this.bodegasProductosTn = this.agruparBodegasProductosTn(balanzadasUnidas);
-          // console.log('this.bodegasProductosTn: ', this.bodegasProductosTn);
           this.bodegasProductosTn.sort(((a, b) => a.nroBodega - b.nroBodega));
 
           for(let bodega in this.bodegasProductosTn){
@@ -113,7 +104,7 @@ export class BodegasComponent implements OnInit, OnDestroy {
   }
 
   getNombreBodega(bodega_id: number): string{
-    let bodega = this.bodegas.find( x => x.id = bodega_id );
+    let bodega = this.bodegas.find( x => x.id == bodega_id );
 
     if(!bodega)
       return '';
@@ -127,7 +118,7 @@ export class BodegasComponent implements OnInit, OnDestroy {
   }
 
   getDescripcionCortaMaterial(materialId: number): string{
-    let materialesPuerto = this.materialesPuerto.find( x => x.id = materialId );
+    let materialesPuerto = this.materialesPuerto.find( x => x.id == materialId );
 
     if(!materialesPuerto)
       return '';
@@ -182,5 +173,4 @@ export class BodegasComponent implements OnInit, OnDestroy {
     this.unsubscribe.next();
     this.unsubscribe.complete();
   }
-
 }

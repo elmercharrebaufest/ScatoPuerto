@@ -31,7 +31,10 @@ export class GraficoCargaComponent implements AfterViewInit {
   ngAfterViewInit(){
     this.makeDraggable(document.getElementById('grafico-carga'));
   }
-
+  expandir()
+  {
+    document.getElementById('collapseGrafico').className = "collapse show bg-white pb-2";
+  }
   initEventosManos(){
     this._manosEmbarqueService.removerManoDeEmbarque.subscribe(
       res => this.removerManoDeEmbarque(res.celda, res.sentido)

@@ -2633,5 +2633,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<EntidadTipoDeActividadDto> ListarActividadesPorEntidad(string codigoEntidad);
+
+        [OperationContract]
+        IList<ModuloDeCargaNirManualPuertoDto> ObtenerModuloDeCargaNirManualPuerto(int IdModuloDeCarga);
     }
 }

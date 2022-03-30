@@ -77,9 +77,9 @@ export class Balanzas78Service {
     this.interval = setInterval(() => {
       this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
         .subscribe(resp => {
-          console.log('++++++++++++++++++++++++++++++++++');
-          console.log('sincronizarBalanzasCortes desde SERV', resp);
-          console.log('++++++++++++++++++++++++++++++++++');
+          // console.log('++++++++++++++++++++++++++++++++++');
+          // console.log('sincronizarBalanzasCortes desde SERV', resp);
+          // console.log('++++++++++++++++++++++++++++++++++');
           
           this.balanzadasArray = resp.balanzas;
           this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
