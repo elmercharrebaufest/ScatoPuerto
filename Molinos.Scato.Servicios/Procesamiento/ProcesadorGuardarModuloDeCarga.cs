@@ -387,22 +387,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
             //            Fecha = planilla.Fecha
             //        };
 
-            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos = new List<ModuloDeCargaPlanillaDeTurnosTurnos>();
-            //        planilla.ModuloDeCargaPlanillaDeTurnosTurnos.ToList()
-            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos.Add(new ModuloDeCargaPlanillaDeTurnosTurnos
+            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos = new List<ModuloDeCargaPlanillaDeTurnos>();
+            //        planilla.ModuloDeCargaPlanillaDeTurnos.ToList()
+            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
             //        {
             //            TurnoPuerto = turnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(turnos.TurnoPuerto.Id) : null,
             //            Cerrado = turnos.Cerrado,
             //            Enviado = turnos.Enviado
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetalles> ModuloDeCargaPlanillaDeTurnosDetalles { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortes> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
             //        }));
 
             //        moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
             //        {
             //            ModuloDeCarga = moduloDeCarga,
             //            Fecha = planilla.Fecha,
-            //            ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos
+            //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos
             //        });
             //    }
             //}

@@ -29,8 +29,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 x => x.MapFrom(y => y.ModuloDeCargaMangueraCarga))
                 .ForMember(x => x.ModuloDeCargaPlanillaDeEmbarque,
                 x => x.MapFrom(y => y.ModuloDeCargaPlanillaDeEmbarque))
-                .ForMember(x => x.ModuloDeCargaPlanillaDeTurnosTurnos,
-                x => x.MapFrom(y => y.ModuloDeCargaPlanillaDeTurnosTurnos))
+                .ForMember(x => x.ModuloDeCargaPlanillaDeTurnos,
+                x => x.MapFrom(y => y.ModuloDeCargaPlanillaDeTurnos))
                 .ForMember(x => x.ModuloDeCargaPeriodoDeCarga,
                 x => x.MapFrom(y => y.ModuloDeCargaPeriodoDeCarga))
                 .ForMember(x => x.ModuloDeCargaUmap,

@@ -9223,16 +9223,16 @@ resultado.Patente = rutaFoto.Patente;
             return 0;
         }
 
-        public ModuloDeCargaPlanillaDeTurnosTurnosDto ObtenerModuloDeCargaPlanillaDeTurnosTurnos(int turnoPuerto_id, int moduloDeCarga_id)
+        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id)
         {
-            ModuloDeCargaPlanillaDeTurnosTurnosDto moduloDeCargaPlanillaDeTurnosTurnosDto = new ModuloDeCargaPlanillaDeTurnosTurnosDto();
+            ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
             DateTime dateWithoutHours = new DateTime();
             dateWithoutHours = DateTime.Now.Date;
-            moduloDeCargaPlanillaDeTurnosTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnosTurnos, ModuloDeCargaPlanillaDeTurnosTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id);
+            moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id);
 
-            if (moduloDeCargaPlanillaDeTurnosTurnosDto != null)
+            if (moduloDeCargaPlanillaDeTurnosDto != null)
             {
-                return moduloDeCargaPlanillaDeTurnosTurnosDto;
+                return moduloDeCargaPlanillaDeTurnosDto;
             }
             return null;
 
@@ -10004,7 +10004,7 @@ resultado.Patente = rutaFoto.Patente;
         }
         //public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
         //{
-        //    ModuloDeCargaPlanillaDeTurnosTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.Id == idPlanillaDeTurnos);
+        //    ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
 
         //    foreach (var item in observacionesDeCalidadDto)
         //    {
@@ -10020,7 +10020,7 @@ resultado.Patente = rutaFoto.Patente;
         //        {
         //            observacionesDeCalidad_db = new ObservacionesDeCalidad()
         //            {
-        //            ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnosTurnos,
+        //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnosTurnos,
         //            Fecha = item.Fecha,
         //            //Hora = item.Hora,
         //            Observaciones = item.Observaciones,
@@ -10039,7 +10039,7 @@ resultado.Patente = rutaFoto.Patente;
             var ritmoAcumuladoLiquidos = 0;
             var totalTiempoCorte = 0;
             var ritmoAcumuladoNeto = 0;
-           var planillaDeTurnosTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
+           var planillaDeTurnosTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
             if (planillaDeTurnosTurnos !=null)
             {
                 var cantTurnos = 0;
@@ -10048,8 +10048,8 @@ resultado.Patente = rutaFoto.Patente;
                 foreach (var turn in planillaDeTurnosTurnos)
                 {
                     var idPlanilla = turn.Id;
-                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosTurnosCortes;
-                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosTurnosDetalles;
+                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortesLiquido;
+                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetallesLiquido;
 
                     foreach (var item in turnosDetalles)
                     {
@@ -10058,7 +10058,7 @@ resultado.Patente = rutaFoto.Patente;
                         cantTurnos++;
                     }
                     minutosCargando = (cantTurnos * 6) * 60;
-                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnosTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
+                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortesLiquido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
                     {
                         foreach (var cort in cortesTurnos)
                         {

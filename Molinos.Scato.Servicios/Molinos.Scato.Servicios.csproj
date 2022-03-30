@@ -186,9 +186,9 @@
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaNirManualPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPeriodoDeCargaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeEmbarqueMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosTurnosCortesMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosTurnosDetallesMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosTurnosMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosCortesLiquidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaRitmosEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaTabiquesDeEmbarqueHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaTabiquesDeEmbarqueMappingProfile.cs" />
@@ -557,7 +557,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarMotivosLimpieza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloDeCarga.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeTurnos.cs" />
-    <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeTurnosTurnos.cs" />
     <Compile Include="Procesamiento\ProcesadorImprimirEtiquetaAuditoriaCamara.cs" />
     <Compile Include="Procesamiento\ProcesadorLeerNumeroCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanoDeCarga.cs" />

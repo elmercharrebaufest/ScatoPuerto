@@ -1,6 +1,6 @@
 ﻿namespace Molinos.Scato.Dominio.Dto
 {
-    public class ModuloDeCargaPlanillaDeTurnosTurnosCortesDto
+    public class ModuloDeCargaPlanillaDeTurnosCortesLiquidoDto
     {
         public int Id { get; set; }
         public MotivosDeCorteDto MotivosDeCorte { get; set; }
