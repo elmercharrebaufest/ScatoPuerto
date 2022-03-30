@@ -23,6 +23,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
 import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/planilla-embarque.component';
+import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -36,6 +37,7 @@ export class CargaLiquidosComponent implements OnInit {
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
+  @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent:PlanillaEmbarqueComponent;
   datatanks: any;
   enviado: boolean;
   usuarioFinalizacion: string;
@@ -121,18 +123,25 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   imprimir(imprimir: boolean = false) {
+    this.lineasComponent.expandir();
+    this.planillaEmbarqueComponent.expandir();
+    this.planillaTurnoLiquidosComponent.expandir();
     this.cargaPdf = true;
     let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
-    html2canvas(document.getElementById('grafico-liquidos'), { backgroundColor: '#fff' }).then((canvas) => {
+    html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas) => {
       canvas.style.backgroundColor = 'white';
       let img = canvas.toDataURL('image/jpg');
       doc.addImage(img, 'JPG', 15, 15, 260, 160);
-      html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas2) => {
+      html2canvas(document.getElementById('planilla-embarque'), { backgroundColor: '#fff' }).then((canvas2) => {
         doc.addPage('a4', 'l')
         canvas.style.backgroundColor = 'white';
         let img2 = canvas2.toDataURL('image/jpg');
         doc.addImage(img2, 'JPG', 15, 15, 270, 130);
-
+        html2canvas(document.getElementById('turno-liquidos'), { backgroundColor: '#fff' }).then((canvas3) => {
+          doc.addPage('a4', 'l')
+          canvas.style.backgroundColor = 'white';
+          let img3 = canvas3.toDataURL('image/jpg');
+          doc.addImage(img3, 'JPG', 15, 15, 270, 100);
         if (!imprimir) {
           this.cargaPdf = false;
           doc.output('pdfobjectnewwindow');
@@ -142,6 +151,7 @@ export class CargaLiquidosComponent implements OnInit {
         }
       })
     })
+  })
   }
 
   cargarPDF(file) {
