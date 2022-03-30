@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class ModuloDeCargaPlanillaDeTurnosTurnos : IIdentificable
+    public class ModuloDeCargaPlanillaDeTurnos : IIdentificable
     {
         [Key]
         public virtual int Id { get; set; }
@@ -13,8 +13,9 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual TurnoPuerto TurnoPuerto { get; set; }
         public virtual bool Cerrado { get; set; }
         public virtual bool Enviado { get; set; }
-        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
-        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
+        public virtual bool EsLiquido { get; set; }
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetallesLiquido> ModuloDeCargaPlanillaDeTurnosDetallesLiquido { get; set; }
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortesLiquido> ModuloDeCargaPlanillaDeTurnosCortesLiquido { get; set; }
 
         // public virtual ObservacionesDeCalidad ObservacionesDeCalidad { get; set; }
     }

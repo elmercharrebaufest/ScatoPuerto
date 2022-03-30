@@ -11,13 +11,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 {
     public class ExcelLiquido
     {
-        public void GenerarArchivo(ResultadoPrevisualizar resultado, List<ModuloDeCargaPlanillaDeTurnosTurnosDto> turnos, int IdModuloDeCarga)
+        public void GenerarArchivo(ResultadoPrevisualizar resultado, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, int IdModuloDeCarga)
         {
             var workbook = GenerarExcel(turnos, IdModuloDeCarga);
             resultado.Archivo = workbook;
         }
 
-        private static byte[] GenerarExcel(List<ModuloDeCargaPlanillaDeTurnosTurnosDto> turnos, int IdModuloDeCarga)
+        private static byte[] GenerarExcel(List<ModuloDeCargaPlanillaDeTurnosDto> turnos, int IdModuloDeCarga)
         {
             var workbook = new HSSFWorkbook();
             var sheet = (HSSFSheet)workbook.CreateSheet("Planilla de Turnos");
@@ -218,7 +218,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return cellBorderStyleColumnTitles;
         }
 
-        private static int InsertRowsTurnos(HSSFSheet sheet, int i, ModuloDeCargaPlanillaDeTurnosTurnosDto registroTurno,  ModuloDeCargaPlanillaDeTurnosTurnosDto turnosPlanilla, ICellStyle font, ICellStyle fontBold, ICellStyle estiloRegion, ICellStyle estiloRegionTurnos, ICellStyle estiloHeaderTabla, ICellStyle estiloCabeceraCorte)
+        private static int InsertRowsTurnos(HSSFSheet sheet, int i, ModuloDeCargaPlanillaDeTurnosDto registroTurno,  ModuloDeCargaPlanillaDeTurnosDto turnosPlanilla, ICellStyle font, ICellStyle fontBold, ICellStyle estiloRegion, ICellStyle estiloRegionTurnos, ICellStyle estiloHeaderTabla, ICellStyle estiloCabeceraCorte)
         {
             //if(registroTurno.ObservacionesDeCalidadDto == null)
             //{
@@ -234,7 +234,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             IRow row;
             ICell celda;
              
-                foreach (var turnoDetalle in registroTurno.ModuloDeCargaPlanillaDeTurnosTurnosDetalles)
+                foreach (var turnoDetalle in registroTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                 {
                     turno = registroTurno.TurnoPuerto.Nombre;
                     fecha = turnosPlanilla.Fecha;
@@ -293,7 +293,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 }
 
                 i = InsertTableHeaderCortes(sheet, estiloHeaderTabla,estiloRegionTurnos, estiloCabeceraCorte, estiloRegion, i);
-                foreach (var registroCortes in registroTurno.ModuloDeCargaPlanillaDeTurnosTurnosCortes)
+                foreach (var registroCortes in registroTurno.ModuloDeCargaPlanillaDeTurnosCortesLiquido)
                 {
                     turno = registroTurno.TurnoPuerto.Nombre;
                     fecha = turnosPlanilla.Fecha;

@@ -104,6 +104,8 @@
     <Build Include="dbo\Tables\LoteBiotecnologia.sql" />
     <None Include="Molinos_1.Scato.Database.publish.xml" />
     <None Include="Molinos.Scato.Database.GVICSQLTEST2016.Puerto.publish.xml" />
+    <None Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosCortesSolido.sql" />
+    <None Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolido.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
@@ -471,9 +473,9 @@
     <Build Include="dbo\Tables\ModuloDeCargaMangueraCarga.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeEmbarque.sql" />
     <Build Include="dbo\Tables\MotivosDeCorte.sql" />
-    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosTurnos.sql" />
-    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosTurnosDetalles.sql" />
-    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosTurnosCortes.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnos.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosCortesLiquido.sql" />
     <Build Include="dbo\Tables\TurnoPuerto.sql" />
     <Build Include="dbo\Tables\CubitacionDeTanques.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaBalanzas.sql" />
