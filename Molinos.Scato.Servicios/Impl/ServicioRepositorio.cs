@@ -10074,10 +10074,19 @@ resultado.Patente = rutaFoto.Patente;
                             totalTiempoCorte = (horas * 60) + minutos;
 
                         }
+                        if (minutosCargando != 0)
+                        {
                         ritmoAcumuladoNeto = (cantTotal * 60) / (minutosCargando - totalTiempoCorte);
-                    }else { ritmoAcumuladoNeto = ritmoAcumuladoLiquidos; }
+                        } else ritmoAcumuladoNeto = 0;
+
+                    }
+                    else ritmoAcumuladoNeto = ritmoAcumuladoLiquidos;
                 }
-                ritmoAcumuladoLiquidos = (cantTotal * 60) / minutosCargando;
+                if (minutosCargando != 0)
+                {
+                    ritmoAcumuladoLiquidos = (cantTotal * 60) / minutosCargando;
+                }
+                else ritmoAcumuladoLiquidos = 0;
             }
             else
             {
