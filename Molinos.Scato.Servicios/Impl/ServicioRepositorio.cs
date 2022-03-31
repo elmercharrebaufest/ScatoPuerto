@@ -9242,6 +9242,10 @@ resultado.Patente = rutaFoto.Patente;
         {
             try
             {
+                #if (DEBUG)
+                return "10000";
+                #endif
+
                 string mmABuscar = cm + "," + mm;
                 string mmABuscar1 = cm + "." + mm;
                 var request = new Z_SDMF_RFC_CONS_PP_TAB_CUB_TANRequest(
@@ -9260,6 +9264,8 @@ resultado.Patente = rutaFoto.Patente;
                        LlenadoMm = item.ZCANM3.ToString()
                    }).Where(x => x.Mm == mmABuscar || x.Mm == mmABuscar1).Select(y => y.LlenadoMm).FirstOrDefault();
                 return mm3;
+               
+          
             }
             catch (Exception ex)
             {
@@ -10297,7 +10303,7 @@ resultado.Patente = rutaFoto.Patente;
 
                 if (tipoVehiculo == (int)TipoVehiculo.Tren && !consultactg)
                 {
-                    #region FerroviarioCPE
+#region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -10318,7 +10324,7 @@ resultado.Patente = rutaFoto.Patente;
                         }
                     }
 
-                    #endregion FerroviarioCPE
+#endregion FerroviarioCPE
                 }
                 else
                 {
