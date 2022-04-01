@@ -2634,5 +2634,6 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
+
     }
 }

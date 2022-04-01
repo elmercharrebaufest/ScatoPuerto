@@ -1,6 +1,6 @@
 <ship-spinner [message]="'Cargando Line Up. Por favor, espere...'" *ngIf='mostrarSpinner'></ship-spinner>
-<div class="container-fluid mt-4" style="flex-direction: column;" *ngIf='mostrarContent'>
-    
+<div class="container-fluid mt-4" style="flex-direction: column;">
+
     <!-- Cabecera-->
 
     <div class="row m-lg-4">
@@ -45,13 +45,27 @@
     
     <!-- Contenido-->
     <div class="geolocalizacion">
+        
         <div class="geolocalizacion__mapa">
             <app-mapa-buque [listaPuntosInteres]="listaPuntosInteres" 
-                            *ngIf="listaPuntosInteres">
+                            [listaEmbarcacion]="listaBuquesGeolocalizacion"
+                            *ngIf="listaPuntosInteres && listaBuquesGeolocalizacion">
             </app-mapa-buque>
         </div>
+
         <div class="geolocalizacion__listado">
-            <app-lista-buques></app-lista-buques>
+          
+          <div class="d-flex justify-content-center" *ngIf="!mostrarListaBuque">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+
+            <app-lista-buques [listaBuquesGeolocalizacion]="listaBuquesGeolocalizacion" 
+                              (listaBuquesGeolocalizacionFiltro)="onChangeBuqueMapa($event)"
+                              (coordenadasBuqueSeleccionado)="onZoomBuqueSeleccionado($event)"
+                              *ngIf="listaBuquesGeolocalizacion && mostrarListaBuque">
+            </app-lista-buques>
         </div>
     </div>
 

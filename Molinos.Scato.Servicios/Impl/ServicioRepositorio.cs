@@ -10353,5 +10353,6 @@ resultado.Patente = rutaFoto.Patente;
         {
             return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
         }
+
     }
 }

@@ -4,6 +4,30 @@
     z-index: 10;
     background-color: #DADADA
 } 
+.header-geo-centrado {
+    display: flex;
+    justify-content: center;
+    border: none;   
+} 
 .tabla-listado{
     max-height: 300px
+}
+.custom-control-lg .custom-control-label::before,
+.custom-control-lg .custom-control-label::after {
+    top: 0.1rem !important;
+    left: -2rem !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+}
+
+.custom-control-lg .custom-control-label {
+    margin-left: 0.5rem !important;
+    font-size: 1rem !important;
+}
+
+input.largerCheckbox {
+    transform : scale(2);
+}
+.lista-buque-cursor {
+    cursor: pointer;
 }

@@ -21,6 +21,7 @@ export class MapaBuqueComponent implements AfterViewInit {
   private iconoUbicacion!:L.Icon;
   private markadorAncla!: L.Marker;
   private markadorUbicacion!: L.Marker;
+  private recargarMarkadores: boolean = false;
   constructor(private resolver: ComponentFactoryResolver,
               private appRef: ApplicationRef,
               private injector: Injector) {
@@ -38,40 +39,36 @@ export class MapaBuqueComponent implements AfterViewInit {
   async ngAfterViewInit() {
     await this.inicializarMapa();
     await this.cargarPuntosInteres();
-    //await this.cargarZonaRecalada();
     await this.cargarBuquesMapa();
-
     this.map.on('zoomend', this.handleMapZoomEnd.bind(this));
   }
 
-  private async cargarPuntosInteres() {
+
+  async cargarPuntosInteres() {
 
     if (this.listaPuntosInteres!=undefined) {
       if (this.listaPuntosInteres.length > 0) {
           this.listaPuntosInteres.forEach(punto => {
-              const latitud = punto.latitud;
-              const longitud = punto.longitud;
-              //const markerBuque = L.marker([latitud, longitud ],{icon: this.iconoBuque}).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
-              const mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${punto.nombre} </b><br> <span>${latitud} / ${longitud}</span></div>`;
-              const mensajeToolTipHTML = `${punto.nombre} [${punto.pais}]<br>Tipo: ${punto.tipoUbicacion}`;
+              
+            const mensajeToolTipHTML = `${punto.nombre} [${punto.pais}]<br>Tipo: ${punto.tipoUbicacion}`;
               
               let iconoPunto;
               switch(punto.imagen){
                 case 'ancla': {
                   iconoPunto = this.iconoAncla;
-                  this.markadorAncla = L.marker([latitud, longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
+                  this.markadorAncla = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
                   this.markadorAncla.addTo(this.map);
                   break;
                 }
                 case 'ubicacion':{
                   iconoPunto = this.iconoUbicacion;
-                  this.markadorUbicacion = L.marker([latitud, longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
+                  this.markadorUbicacion = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
                   this.markadorUbicacion.addTo(this.map);
                   break;
                 }
                 default:{
                   iconoPunto = this.iconoUbicacion;
-                  this.markadorAncla = L.marker([latitud, longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
+                  this.markadorAncla = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
                   this.markadorAncla.addTo(this.map);
                   break;
                 }
@@ -80,24 +77,9 @@ export class MapaBuqueComponent implements AfterViewInit {
 
       }   
     }
+  }
 
-}
-
-  private inicializarMapa() {
-
-    const treeAncla = L.icon({
-      iconUrl: '../../../../assets/ubicacion.svg',
-      iconSize: [32, 37],
-      iconAnchor: [16, 37],
-      popupAnchor: [0, -37]
-    });
-    
-    const treeUbicaciones = L.icon({
-      iconUrl: '../../../../assets/ancla.svg',
-      iconSize: [32, 37],
-      iconAnchor: [16, 37],
-      popupAnchor: [0, -37]
-    });
+  async inicializarMapa() {
 
     this.map = L.map('mapa', {
       center: [ -35.340, -56.577],
@@ -108,19 +90,7 @@ export class MapaBuqueComponent implements AfterViewInit {
     });
     tiles.addTo(this.map);
 
-    /*
-    var overlayMaps = {
-      "<img src='http://mollietaylor.com/skills/js/leaflet/train.png' height=24>Train": treeAncla,
-      "<img src='http://mollietaylor.com/skills/js/leaflet/arbol.png' height=24>Tree": treeUbicaciones
-    };
-    
-    
-    L.control.layers(null, {treeAncla, treeUbicaciones}, {
-      collapsed: false  
-    }).addTo(this.map);
-    */
   }
-
   
   handleMapZoomEnd(map: L.Map):void{
     console.log('onMapZoomEnd');
@@ -132,44 +102,75 @@ export class MapaBuqueComponent implements AfterViewInit {
             this.map.removeLayer(layer)
         }
       });
-
+      this.recargarMarkadores = true;
     }else {
-    
-      this.cargarPuntosInteres();
-    
-    }
-  }
-
-  private async cargarZonaRecalada() {
-    const polygon = L.polygon([
-        [-34.23498032825036, -58.27365815557011],
-        [-34.827796696564825, -54.40647067710693],
-        [-36.59978024064985, -56.297158448419516]
-    ],
-    {color: "#ff7800", weight: 1}).addTo(this.map);
-  }
-  
-  private async cargarBuquesMapa(){
-  
-    if (this.listaEmbarcacion!=undefined) {
-      if (this.listaEmbarcacion.length > 0) {
-          this.listaEmbarcacion.forEach(buque => {
-            const latitud: number = Number(buque.latitud);
-            const longitud: number = Number(buque.longitud);
-
-            let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent, 
-              (c: any) => {
-                c.instance.nombreBuque = buque.Nombre;
-            }, latitud, longitud);
-              const mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.Nombre} </b><br> <span>${latitud} / ${longitud}</span></div>`;
-              const markerBuque = L.marker([latitud, longitud ],{icon: this.iconoBuque}).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
-              markerBuque.addTo(this.map);
-          });
+      if (this.recargarMarkadores){
+          this.cargarPuntosInteres();
+          this.cargarBuquesMapa();
+          this.recargarMarkadores = false;
       }
     }
   }
-  
-  private cargarTarjetaBuque(component?: any, onAttach?: any, latitud?: number, longitud?: number){  
+
+  async cargarBuquesMapa(){
+
+    if (this.listaEmbarcacion!=undefined) {
+      if (this.listaEmbarcacion.length > 0) {
+          this.listaEmbarcacion.forEach(buque => {
+              if (buque.esSeleccionado){
+                  const latitud = buque.posicion.latitud;
+                  const longitud = buque.posicion.longitud;
+
+                  let buqueIconUrl = '';
+
+                  if (buque.sanBenito)
+                      buqueIconUrl = '../../../../assets/buque_san_benito.svg';
+                  
+                  if (buque.vicentin)
+                      buqueIconUrl = '../../../../assets/buque_vicentin.svg';
+                  
+                  if (buque.otrosMuelles)
+                      buqueIconUrl = '../../../../assets/buque_otro_muelle.svg';
+                  
+                  if (buque.noryon)
+                      buqueIconUrl = '../../../../assets/buque_nouryon.svg';
+                  
+                  this.iconoBuque = new L.Icon({
+                    iconUrl: buqueIconUrl,
+                    iconSize: [32, 37]
+                  });
+
+                  let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent, 
+                    (c: any) => {
+                      c.instance.nombreBuque = buque.nombreBuque;
+                  }, latitud, longitud);
+                    let mensajeToolTip  = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
+                        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
+                        mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
+                        mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
+                        mensajeToolTip += `</div>`;
+                    const markerBuque = L.marker([latitud, longitud ],{icon: this.iconoBuque}).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
+                    markerBuque.addTo(this.map);
+              }
+          });
+        }
+    }
+  }
+
+  async limpiarMarcadores(){
+    this.map.eachLayer((layer) => {
+      if (layer instanceof L.Marker){
+          this.map.removeLayer(layer)
+      }
+    });
+  }
+
+  async cargarBuquesPuntosInteres(){
+    this.cargarBuquesPuntosInteres();
+    this.cargarBuquesMapa();
+  }
+
+  private cargarTarjetaBuque(component?: any, onAttach?: any, latitud?: any, longitud?: any){  
     
     const lat = latitud != undefined ? latitud : 0;
     const lng = longitud != undefined ? longitud : 0;
@@ -186,6 +187,13 @@ export class MapaBuqueComponent implements AfterViewInit {
     div.appendChild(compRef.location.nativeElement);
     return div;
 
-  } 
+  }
+  
+  onZoomBuqueSeleccionado(event){
+    console.log('mapaaaaaaa')
+    const latitud = event.latitud;
+    const longitud = event.longitud;
+    this.map.setView([latitud, longitud], 13);
+  }
 
 }

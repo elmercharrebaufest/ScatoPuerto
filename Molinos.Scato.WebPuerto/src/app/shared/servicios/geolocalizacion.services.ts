@@ -21,4 +21,8 @@ export class GeolocalizacionService {
         return this.http.get(`${this.url}Geolocalizacion/ListarPuntosInteresGeolocalizacion?estado=${estado}`, { 'withCredentials': true });
     }
 
+    ListarEmbarqueLineUpGeolocalizacion(): Observable<any> {
+      return this.http.get(`${this.url}Geolocalizacion/ListarEmbarqueLineUpGeolocalizacion`, { 'withCredentials': true });
+    }
+    
 }
