@@ -24,7 +24,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   idModuloDeCarga: number;
   planillaDeEmbarque: PlanillaDeEmbarque[];
   mostrarbtnGuardar:boolean=true;
- // estadoEnviadoEmbarque:boolean=false;
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
@@ -54,7 +53,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   {
    
     this.mostrarbtnGuardar=false;
-  //  this.estadoEnviadoEmbarque=true;
   }
   newForm() {
     this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
