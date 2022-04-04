@@ -122,6 +122,8 @@ export class AltaEmbarqueComponent implements OnInit {
       puntal: [],
       fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
       horaLibrePlatica: [],
+      imo:[''],
+      cantidadBodegasTanques:[],
       // TODO: Revisar plano-content, porque posiblemente sea como viene el valor del campo filePathShipParticular
       // filePathShipParticular: [''],
       // shipParticularArchivoNombre: [''],

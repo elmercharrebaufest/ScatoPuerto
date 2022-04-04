@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, false, true);
 
             }
-            catch
+            catch(Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, $"Error al crear el embarque, verifique que exista el centro ${centro} y el workflow ${workflow}");
             }
