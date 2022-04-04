@@ -2,6 +2,10 @@
     <div class="alert alert-warning" role="alert">
         No hay barcos en estado operativo en este momento.
     </div>
+    <div class='btn-add-container ml-3' id='addButton' (click)='openModalAddBuque(addBuque)'>
+        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
+    </div>
 </div>
 
 <div class="row ml-1" *ngIf="muellesOperativos()">
@@ -47,3 +51,30 @@
         </div>
     </div>
 </div>
+
+<ng-template #addBuque let-modal>
+    <div class='modal-header'>
+        <h6 class='modal-title txt-center' id='add-buque-title'><b>Agregar buque para Control de Calidad</b></h6>
+    </div>
+    <div class='modal-body'>
+        <form>
+            <div class='form-group col-10 w-70 p-0'>
+                <label for='buque-select'><b>Buque</b></label>
+                <select class='form-control' id='buque-select' #selectBuque>
+                    <option value='0' selected>Seleccione buque que está cargando</option>
+                    <option *ngFor='let element of elementosSinPlano; let i = index' 
+                            [value]='element.id'>
+                            {{element.nombreBuque}}
+                    </option>
+                </select>
+                <div *ngIf='errorMessage' class='txt-red mt-2'>El embarque es <strong>requerido</strong></div>
+            </div>
+        </form>
+        <div class='flex-between w-100 pt-10'>
+            <button type='button' class='btn btn-outline-danger' 
+                    (click)="modal.dismiss('Cross click')">Cancelar</button>
+            <button type='button' class='btn btn-primary'
+                    (click)='agregarEmbarque(selectBuque.value)'>Agregar</button>
+        </div>
+    </div>
+</ng-template>

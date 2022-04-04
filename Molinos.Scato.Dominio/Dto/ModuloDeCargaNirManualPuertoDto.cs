@@ -15,6 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string Origen { get; set; }
         public string Mano { get; set; }
         public int? Material_id { get; set; }
-        public BodegaDto Bodega { get; set; }
+        //public BodegaDto Bodega { get; set; }
+        public string Bodega { get; set; }
     }
 }

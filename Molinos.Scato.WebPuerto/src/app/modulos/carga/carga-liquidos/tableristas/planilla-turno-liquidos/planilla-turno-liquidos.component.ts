@@ -11,7 +11,8 @@ import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 import { Workbook, Worksheet } from 'exceljs';
-import * as fs from 'file-saver';
+// import * as fs from 'file-saver';
+import { saveAs } from 'file-saver-es';
 import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Mail } from '@ScatoModels/mail';
@@ -1326,7 +1327,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
       
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        fs.saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
+        // fs.saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
+        saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
       });
   }
 

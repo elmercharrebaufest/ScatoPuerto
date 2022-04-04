@@ -225,6 +225,8 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
 
   showPlano(event: boolean) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+    if(!this.embarqueSelected)
+      this.mostrarSpinner = false;
   
     setTimeout(() => {
       this.mostrarPlano = event;

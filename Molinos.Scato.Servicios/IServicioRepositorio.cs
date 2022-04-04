@@ -2530,9 +2530,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
+
         [OperationContract]
         void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id);
-
 
         [OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
