@@ -436,9 +436,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     DatosEmbarqueGeolocalizacion embarqueLineUp = new DatosEmbarqueGeolocalizacion
                     {
                         NombreBuque = embarque.Embarque.NombreBuque,
-                        BanderaBuque = embarque.Embarque.shipParticularArchivoNombre,
+                        BanderaBuque = embarque.Embarque.Destino.Nombre,
                         TipoBuque = embarque.Embarque.TipoBuque,
-                        imo = null
+                        imo = embarque.Embarque.Imo
                     };
                     embarques.Add(embarqueLineUp);
 
@@ -461,7 +461,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public string NombreBuque;
             public string TipoBuque;
             public string BanderaBuque;
-            public int? imo;
+            public string imo;
         }
     }
 }
