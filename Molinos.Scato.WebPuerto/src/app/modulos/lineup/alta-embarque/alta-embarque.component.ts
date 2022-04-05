@@ -122,6 +122,8 @@ export class AltaEmbarqueComponent implements OnInit {
       puntal: [],
       fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
       horaLibrePlatica: [],
+      imo:[''],
+      cantidadBodegasTanques:[],
       // TODO: Revisar plano-content, porque posiblemente sea como viene el valor del campo filePathShipParticular
       // filePathShipParticular: [''],
       // shipParticularArchivoNombre: [''],
@@ -139,13 +141,13 @@ export class AltaEmbarqueComponent implements OnInit {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto(),
     this.planoDeCargaService.obtenerDestinos()
     ]).subscribe(([res1, res2, res3]) => {
-      this.tipoDeBuquePuerto = res1;
+      this.tipoDeBuquePuerto = res1.filter(a=>a.nombre=="Bulk Carrier" || a.nombre=="Oil Tanker" );
       this.ubicacionDeBuquePuerto = res2;
       this.destinoPuerto = res3;
       this.cargarListadoMateriales();
     }, err => { console.log(err); });
   }
-
+  
   cargarEmbarqueEditar() {
     if (!this.tipoDeBuquePuerto)
       this.embarqueService.obtenerListadoTipoDeBuquePuerto().subscribe(res => { this.tipoDeBuquePuerto = res; });
