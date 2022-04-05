@@ -75,7 +75,7 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
 
-    let planilla = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnosTurnos;
+    let planilla = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos;
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
     this.getDestinos();
     this.getProductos();
@@ -115,11 +115,11 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
   }
 
   getTurno(d, t): FormArray {
-    return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosTurnosDetalles as FormArray;
+    return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
   }
 
   getCorteTurnos(d, t): FormArray {
-    return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosTurnosCortes as FormArray;
+    return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosCortes as FormArray;
   }
 
   openModalCorte(modal, dia, turno) {
@@ -158,10 +158,10 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
   }
 
   getRowSpanTurno(turno: any) {
-    if (turno.controls.moduloDeCargaPlanillaDeTurnosTurnosCortes.length > 0)
-      return turno.controls['moduloDeCargaPlanillaDeTurnosTurnosDetalles'].controls.length + 1;
+    if (turno.controls.moduloDeCargaPlanillaDeTurnosCortes.length > 0)
+      return turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length + 1;
     else
-      return turno.controls['moduloDeCargaPlanillaDeTurnosTurnosDetalles'].controls.length;
+      return turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
   }
 
   getTurnoHorario(dia, turno) {
@@ -174,10 +174,10 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
 
   async enviarTurno(dia, turno) {
     let turnoAEnviar = new Object;
-    turnoAEnviar['moduloDeCargaPlanillaDeTurnosTurnos'] = this.getTurnos(dia)['controls'][turno].value;
+    turnoAEnviar['moduloDeCargaPlanillaDeTurnos'] = this.getTurnos(dia)['controls'][turno].value;
     turnoAEnviar['fecha'] = new Date();
     turnoAEnviar['id'] = null;
-    turnoAEnviar['moduloDeCargaPlanillaDeTurnosTurnos'].moduloDeCargaPlanillaDeTurnosTurnosDetalles = turnoAEnviar['moduloDeCargaPlanillaDeTurnosTurnos'].moduloDeCargaPlanillaDeTurnosTurnosDetalles.filter(m =>
+    turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido = turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido.filter(m =>
       m.exportador ||
       m.linea ||
       m.bodegaParcel ||
@@ -190,8 +190,8 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
       m.medicionFinalMM ||
       m.destino ||
       m.cantidad)
-    if (turnoAEnviar['moduloDeCargaPlanillaDeTurnosTurnos'].moduloDeCargaPlanillaDeTurnosTurnosDetalles.length > 0) {
-      // if (turnoAEnviar['moduloDeCargaPlanillaDeTurnosTurnos'].moduloDeCargaPlanillaDeTurnosTurnosDetalles.filter(m =>
+    if (turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0) {
+      // if (turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido.filter(m =>
       //   m.exportador &&
       //   m.linea &&
       //   m.bodegaParcel &&
@@ -235,7 +235,7 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
 
   getCantTurno(t) {
     let contador = 0;
-    for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosTurnosDetalles'].controls) {
+    for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
       contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
     }
     return contador;
@@ -267,9 +267,9 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
   initTurno(turnoPuerto?) {
     console.log(turnoPuerto);
     return this._builder.group({
-      moduloDeCargaPlanillaDeTurnosTurnosDetalles: this._builder.array([this.initLinea(), this.initLinea(), this.initLinea(), this.initLinea()]),
-      moduloDeCargaPlanillaDeTurnosTurnosCortes: this._builder.array([]),
-      moduloDeCargaPlanillaDeTurnosTurnosObservaciones: this._builder.array([]),
+      moduloDeCargaPlanillaDeTurnosDetalles: this._builder.array([this.initLinea(), this.initLinea(), this.initLinea(), this.initLinea()]),
+      moduloDeCargaPlanillaDeTurnosCortes: this._builder.array([]),
+      moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: this._builder.array([]),
       enviado: false,
       cerrado: false,
       turnoPuerto: turnoPuerto ?? null
@@ -300,7 +300,7 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
     let dia = this.getTurnos(d);
     let cantidad = 0;
     for (let turno of dia.controls) {
-      for (let linea of turno['controls']['moduloDeCargaPlanillaDeTurnosTurnosDetalles']['controls']) {
+      for (let linea of turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido']['controls']) {
         cantidad += (linea.controls.bodegaParcel.value == bodega ? Number(linea.controls.cantidad.value) : 0);
       }
     }
@@ -321,7 +321,7 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
     let contador = 0;
     this.diasTurno.controls.forEach(dia => {
       dia['controls']['turnos']['controls'].forEach(turno => {
-        turno['controls']['moduloDeCargaPlanillaDeTurnosTurnosDetalles']['controls'].forEach(linea => {
+        turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido']['controls'].forEach(linea => {
           contador += (linea.get('linea').value.toLowerCase() == value ? Number(linea.get('cantidad').value) : 0);
         })
       });

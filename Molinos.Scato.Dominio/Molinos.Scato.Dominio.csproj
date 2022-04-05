@@ -755,7 +755,7 @@
     <Compile Include="Dto\MotivosFallasBalanzaDto.cs" />
     <Compile Include="Dto\MotivosLimpiezaDto.cs" />
     <Compile Include="Dto\ModuloDeCargaNirManualPuertoDto.cs" />
-    <Compile Include="Dto\ObservacionesDeCalidadDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\NotificacionAplicacionDto.cs" />
     <Compile Include="Dto\NotificacionCpeDto.cs" />
     <Compile Include="Dto\NotificacionSemaforoVagonesAutomaticaDto.cs" />

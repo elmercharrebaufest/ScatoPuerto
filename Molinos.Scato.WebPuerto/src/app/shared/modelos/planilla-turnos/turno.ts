@@ -2,7 +2,7 @@ import { Destino } from "@ScatoModels/destino";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 
-export class Turno{
+export class TurnoDetalleLiquido{
     id?: number;
     exportador: Exportador;
     linea: string;

@@ -484,7 +484,7 @@
     <Build Include="dbo\Tables\DensidadPorTemperaturaDeMaterial.sql" />
     <Build Include="dbo\Tables\EstadoBuque.sql" />
     <Build Include="dbo\Tables\ConfiguracionMail.sql" />
-    <Build Include="dbo\Tables\ObservacionesDeCalidad.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaNirManualPuerto.sql" />
     <Build Include="dbo\Tables\BalanzasCorte.sql" />
     <Build Include="dbo\Tables\EmbarqueInformacion.sql" />

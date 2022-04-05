@@ -149,7 +149,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\bservacionesDeCalidadMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CargaComercialHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CeldaManoDeEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ConfiguracionMailMappingProfile.cs" />

@@ -450,7 +450,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return ++i;
         }
 
-        private static int InsertTableHeaderObservacionesDeCalidad(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, ICellStyle estiloRegionTurnos, ICellStyle estiloCabeceraCorte, ICellStyle estiloRegion, int i)
+        private static int InsertTableHeaderModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, ICellStyle estiloRegionTurnos, ICellStyle estiloCabeceraCorte, ICellStyle estiloRegion, int i)
         {
             var row1 = sheet.CreateRow(i);
             var celda1 = row1.CreateCell(0);
@@ -494,7 +494,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return ++i;
         }
 
-        private static int InsertTableHeaderObservacionesDeCalidad(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, ICellStyle estiloRegionTurnos, ICellStyle estiloCabeceraCorte, int i)
+        private static int InsertTableHeaderModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad(HSSFSheet sheet, ICellStyle cellBorderStyleColumnTitles, ICellStyle estiloRegionTurnos, ICellStyle estiloCabeceraCorte, int i)
         {
             var row1 = sheet.CreateRow(i - 1);
             var celda1 = row1.CreateCell(0);

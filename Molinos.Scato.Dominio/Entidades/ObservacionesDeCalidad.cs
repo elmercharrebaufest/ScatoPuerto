@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class ObservacionesDeCalidad : IIdentificable
+    public class ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad : IIdentificable
     {
         [Key]
         public virtual int Id { get; set; }
