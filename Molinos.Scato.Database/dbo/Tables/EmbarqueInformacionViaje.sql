@@ -11,7 +11,7 @@
     [ETA_Reportado]       NVARCHAR (40)  NULL,
     [Destino_Reportado]   NVARCHAR (80)  NULL,
     [Peso_Reportado]      NVARCHAR (50)  NULL,
-    [VelocidadRecorrido]  INT            NULL,
+    [VelocidadRecorrido]  VARCHAR(50)            NULL,
 	[FechaRegistro]       datetime       NULL,
 	CONSTRAINT [FK_dbo.EmbarqueInformacionViaje_dbo.Embarque_Embarque_Id] FOREIGN KEY ([Embarque_Id]) REFERENCES [dbo].[Embarque] ([Id]),
        CONSTRAINT [PK_dbo.EmbarqueInformacionViaje] PRIMARY KEY ([Id] ASC)

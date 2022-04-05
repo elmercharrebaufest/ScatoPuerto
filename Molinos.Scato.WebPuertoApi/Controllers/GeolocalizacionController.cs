@@ -25,10 +25,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/Geolocalizacion/ListarPuntosInteresGeolocalizacion")]
-        public HttpResponseMessage ListarPuntosInteresGeolocalizacion(short estado)
+        public HttpResponseMessage ListarPuntosInteresGeolocalizacion()
         {
             try
             {
+                short estado = 1;
                 return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarPuntosInteresGeolocalizacion(estado));
             }
             catch (Exception ex)
@@ -60,6 +61,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     embarcacionGeolocalizacionDto.OtrosMuelles = embarque.Embarque.OtrosMuelles;
                     embarcacionGeolocalizacionDto.Noryon = embarque.Embarque.Noryon;
                     embarcacionGeolocalizacionDto.SanBenito = embarque.Embarque.SanBenito;
+                    embarcacionGeolocalizacionDto.Vapor_Id = embarque.Embarque.Vapor.Id;
 
                     UbicacionDeBuquePuertoDto ubicacionDeBuquePuerto = listarUbicacionDeBuquePuerto.FirstOrDefault(ubicacion => ubicacion.Id == embarque.Embarque.Ubicacion);
                     embarcacionGeolocalizacionDto.UbicacionLineUp = string.Empty;
@@ -68,6 +70,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     {
                         embarcacionGeolocalizacionDto.UbicacionLineUp = ubicacionDeBuquePuerto.Nombre;
                     }
+
                     IList<EmbarqueInformacionDto> EmbarqueInformacion = embarque.Embarque.EmbarqueInformacion;
                     IList<EmbarqueInformacionViajeDto> EmbarqueInformacionViaje = embarque.Embarque.EmbarqueInformacionViaje;
                     IList<EmbarquePosicionDto> EmbarquePosicion = embarque.Embarque.EmbarquePosicion;
@@ -103,7 +106,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     listaEmbarcacionGeolocalizacion.Add(embarcacionGeolocalizacionDto);
         
                 }
-                //Embarque embarque = listaEmbarcaciones.Em
                 return Request.CreateResponse(HttpStatusCode.OK, listaEmbarcacionGeolocalizacion);
             }
             catch (Exception ex)

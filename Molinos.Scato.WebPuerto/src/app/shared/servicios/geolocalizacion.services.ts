@@ -17,8 +17,7 @@ export class GeolocalizacionService {
     }
 
     ListarPuntosInteresGeolocalizacion(): Observable<any> {
-        const estado = 1;
-        return this.http.get(`${this.url}Geolocalizacion/ListarPuntosInteresGeolocalizacion?estado=${estado}`, { 'withCredentials': true });
+        return this.http.get(`${this.url}Geolocalizacion/ListarPuntosInteresGeolocalizacion`, { 'withCredentials': true });
     }
 
     ListarEmbarqueLineUpGeolocalizacion(): Observable<any> {

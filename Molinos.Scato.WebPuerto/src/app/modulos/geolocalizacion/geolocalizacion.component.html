@@ -47,9 +47,7 @@
     <div class="geolocalizacion">
         
         <div class="geolocalizacion__mapa">
-            <app-mapa-buque [listaPuntosInteres]="listaPuntosInteres" 
-                            [listaEmbarcacion]="listaBuquesGeolocalizacion"
-                            *ngIf="listaPuntosInteres && listaBuquesGeolocalizacion">
+            <app-mapa-buque *ngIf="getListaPuntosInteres() && getListaBuquesGeolocalizacion()">
             </app-mapa-buque>
         </div>
 
@@ -61,10 +59,9 @@
             </div>
           </div>
 
-            <app-lista-buques [listaBuquesGeolocalizacion]="listaBuquesGeolocalizacion" 
-                              (listaBuquesGeolocalizacionFiltro)="onChangeBuqueMapa($event)"
+            <app-lista-buques (listaBuquesGeolocalizacionFiltro)="onChangeBuqueMapa($event)"
                               (coordenadasBuqueSeleccionado)="onZoomBuqueSeleccionado($event)"
-                              *ngIf="listaBuquesGeolocalizacion && mostrarListaBuque">
+                              *ngIf="getListaBuquesGeolocalizacion() && mostrarListaBuque">
             </app-lista-buques>
         </div>
     </div>

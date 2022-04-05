@@ -10,7 +10,7 @@
             <table class='table table-bordered'>
                 <thead class="header-geo-fijo" >
                     <tr>
-                        <th class="header-geo-fijo header-geo-centrado"> <i class="fa fa-map-marker fa-1x"></i> </th>
+                        <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
                         <th class="header-geo-fijo">Nombre de Buque</th>
                         <th class="header-geo-fijo">Puerto de Partida</th>
                         <th class="header-geo-fijo">Puerto de Destino</th>
@@ -25,7 +25,7 @@
                     </tr> 
                 </thead>
                 <tbody>
-                    <tr *ngFor="let geolocalizacion of listaBuquesGeolocalizacion">
+                    <tr *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
                         <td align="center" valign="center">
                             <input class="largerCheckbox" 
                                    id={{geolocalizacion.embarque_Id}} 

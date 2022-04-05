@@ -10,6 +10,7 @@ namespace Molinos.Scato.Dominio.Dto
     public class EmbarcacionGeolocalizacionDto
     {
         public int Embarque_Id { get; set; }
+        public int Vapor_Id { get; set; }
         public string NombreBuque { get; set; }
         public string UbicacionLineUp { get; set; }
         public bool Vicentin { get; set; }
