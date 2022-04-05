@@ -64,9 +64,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   direccionViento: string;
   valorCargado: number;
   pedidoPorPlano: number;
-  
-  
-
+  mostrarBtn:boolean=true;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -109,7 +107,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   {
     document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
   }
-
+  desabilitarTurno()
+  {
+    this.mostrarBtn=false;
+  }
   newForm() {
     this.formTurnos = this._builder.group({
       diasTurno: this._builder.array([this.initDia()]),
@@ -712,19 +713,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
 
   initLinea(line?: any, cerrado?: boolean) {
     return this._builder.group({
-      linea:[{value: line ? line.linea_Id : '', disabled: cerrado}] ,
-      exportador: [{value: line ? line.exportador : '', disabled: cerrado}] ,
-      bodegaParcel: [{value: line ? line.bodegaParcel : '',disabled: cerrado}] ,
-      materialPuerto: [{value: line ? line.materialPuerto :'',disabled: true}] ,
-      tk: [{value: line ? line.tk : '' , disabled: true}] ,
-      temperatura: [{value: line ? line.temperatura : '',disabled: cerrado}] ,
-      medidaInicialCM: [{value: line ? line.medidaInicialCM : '',disabled: cerrado}] ,
-      medidaInicialMM:  [{value: line ? line.medidaInicialMM :'',disabled: cerrado}] ,
-      medidaFinalCM: [{value: line ? line.medidaFinalCM : '',disabled: cerrado}] ,
-      medidaFinalMM: [{value: line ? line.medidaFinalMM : '',disabled: cerrado}] ,
-      destino: [{value: line ? line.destino.id : '',disabled: cerrado}] ,
-      cantidad: [{value: line ? line.cantidad : '',disabled: cerrado}] ,
-      id:  [{value: line ? line.id : null, disabled: cerrado}]
+      linea:[{value: line ? line.linea_Id : '', disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      exportador: [{value: line ? line.exportador : '', disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      bodegaParcel: [{value: line ? line.bodegaParcel : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      materialPuerto: [{value: line ? line.materialPuerto :'',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      tk: [{value: line ? line.tk : '' , disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      temperatura: [{value: line ? line.temperatura : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      medidaInicialCM: [{value: line ? line.medidaInicialCM : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      medidaInicialMM:  [{value: line ? line.medidaInicialMM :'',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      medidaFinalCM: [{value: line ? line.medidaFinalCM : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      medidaFinalMM: [{value: line ? line.medidaFinalMM : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      destino: [{value: line ? line.destino.id : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      cantidad: [{value: line ? line.cantidad : '',disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}] ,
+      id:  [{value: line ? line.id : null,disabled: localStorage.getItem('desabilitar')=='true'?true:cerrado}]
     })
   }
 

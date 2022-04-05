@@ -1,15 +1,16 @@
 
+    <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
     <app-collapse-button collapseSelectorId='collapsePlanillaTurnosLiquidos'></app-collapse-button>
     <div class="divHeaderRightLeft">
         <h4 class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos líquidos Tablerista</h4>
         <!-- <button class='btn btn-primary' (click)="fillPlanilla()">Cargar turnos </button> -->
     </div>
     <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
-    <button class='btn btn-success divHeaderRight' (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
+    <button class='btn btn-success divHeaderRight' *ngIf="mostrarBtn" (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
     <br>
     <br>
     
-    <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup" >
+    <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
         <div class='mt-4 px-4 pb-4' style="height: 800px;">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
@@ -58,7 +59,7 @@
                                             <!--<button class='btn bt-cerrar-turno' (click)='enviarTurno(d, t, addButton)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
                                                 {{!turno.value.enviado ? 'Enviar Turno' : 'Turno Enviado'}}
                                             </button>-->
-                                            <button class='btn bt-cerrar-turno' (click)='guardarTurnoGeneral(d,t)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
+                                            <button class='btn bt-cerrar-turno' *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
                                                 {{!turno.value.enviado ? 'Guardar Turno' : 'Turno Guardado'}}
                                             </button>
                                         </td>
@@ -123,7 +124,7 @@
                                     </ng-container>
                                     <tr class='table-active'>
                                         <td colspan="12" class='btn-add-cell'>
-                                            <div class='btn-add-container center-bt'  (click)='openModalCorte(addCorte, d, t)' #addButton>
+                                            <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                 <button type='button' class='btn btn-primary bt-circle'
                                                     style='margin-top: -5px;'>+</button>
                                                 <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
@@ -338,4 +339,5 @@
       </div>
     </div>
 </ng-template>
+</div>
 

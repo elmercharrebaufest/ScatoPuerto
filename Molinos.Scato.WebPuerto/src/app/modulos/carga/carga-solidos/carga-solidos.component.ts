@@ -158,6 +158,8 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   imprimir(imprimir: boolean = false) {
+    this.graficoCarga.expandir();
+    this.manosComponent.expandir();
     this.cargaPdf = true;
     let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
 
@@ -264,10 +266,10 @@ export class CargaSolidosComponent implements OnInit {
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
+            this.cargaPdf = false;
       }
 
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
-      this.cargaPdf = true;
     });
   }
 

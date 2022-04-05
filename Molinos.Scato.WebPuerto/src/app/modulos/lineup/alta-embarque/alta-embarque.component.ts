@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild, TemplateRef } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup,Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -20,8 +20,7 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { Destino } from '@ScatoModels/destino';
 import { MotivosLimpieza } from '@ScatoModels/motivo-limpieza';
 import { WorkflowService } from '@ScatoServicios/workflow.service'
-import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service'
-
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 @Component({
   selector: 'app-alta-embarque',
   templateUrl: './alta-embarque.component.html',
@@ -44,6 +43,7 @@ export class AltaEmbarqueComponent implements OnInit {
   pantallaSeleccionada: string;
   opcionABMSeleccionada: string;
   tituloABM: string;
+  nombreBuque:string;
   motivosLimpiezaList: MotivosLimpieza[];
   destinoPuerto: Destino[];
   PlanoDeCargaId: number;
@@ -331,13 +331,24 @@ export class AltaEmbarqueComponent implements OnInit {
 
   finalizarAlta() {
     this.submitted = true;
-    if (this.embarqueForm.invalid)
+     if (this.embarqueForm.invalid)
+     {
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      if (this.invalidRequiredMaterial()) 
+      {
+       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+      }
       return;
-    if (this.invalidRequiredMaterial()) {
-      this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-      return;
-    }
-
+     }
+     else
+     {
+      if (this.invalidRequiredMaterial()) 
+      {
+        this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+       return;
+      }
+     }
     this.mostrarSpinner = true;
 
     this.embarqueForm.get('fechaRecalada').setValue(
@@ -422,7 +433,6 @@ export class AltaEmbarqueComponent implements OnInit {
     var material = this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0);
     return material == null;
   }
-
   public openConfirmationDialog(titulo: string, texto: string, button1: string = 'OK', button2: string = 'Cancel') {
     if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, nos devuelve al mismo modulo
       this.confirmationDialogService.confirm(titulo, texto, button1, '')
@@ -488,11 +498,24 @@ export class AltaEmbarqueComponent implements OnInit {
   public modificarEmbarque() {
     this.submitted = true;
     if (this.embarqueForm.invalid)
+     {
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      if (this.invalidRequiredMaterial()) 
+      {
+       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+      }
       return;
-    if (this.invalidRequiredMaterial()) {
-      this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-      return;
-    }
+     }
+     else
+     {
+      if (this.invalidRequiredMaterial()) 
+      {
+        this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+       return;
+      }
+     }
+    
 
     this.mostrarSpinner = true;
     this.embarqueForm.get('fechaRecalada').setValue(
@@ -590,9 +613,14 @@ export class AltaEmbarqueComponent implements OnInit {
     materiales.forEach(element => {
       var control = this.materialesPuertoCantidadFormArray.controls.find(x => x.value.materialId == element.id);
       if (disabled)
+      {
         control.get('cantidad').disable();
+      }
       else
+      {
         control.get('cantidad').enable();
+      }
+        
     });
   }
 
