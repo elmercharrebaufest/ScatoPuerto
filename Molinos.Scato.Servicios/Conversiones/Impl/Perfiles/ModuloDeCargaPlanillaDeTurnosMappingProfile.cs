@@ -15,8 +15,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>()
                 .ForMember(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido,
                 x => x.MapFrom(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido))
-                .ForMember(x => x.ModuloDeCargaPlanillaDeTurnosCortesLiquido,
-                x => x.MapFrom(y => y.ModuloDeCargaPlanillaDeTurnosCortesLiquido));
+                .ForMember(x => x.ModuloDeCargaPlanillaDeTurnosCortes,
+                x => x.MapFrom(y => y.ModuloDeCargaPlanillaDeTurnosCortes));
             Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosDto, ModuloDeCargaPlanillaDeTurnos>();
         }
     }

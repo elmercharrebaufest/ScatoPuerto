@@ -10048,7 +10048,7 @@ resultado.Patente = rutaFoto.Patente;
                 foreach (var turn in planillaDeTurnosTurnos)
                 {
                     var idPlanilla = turn.Id;
-                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortesLiquido;
+                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
                     var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetallesLiquido;
 
                     foreach (var item in turnosDetalles)
@@ -10058,7 +10058,7 @@ resultado.Patente = rutaFoto.Patente;
                         cantTurnos++;
                     }
                     minutosCargando = (cantTurnos * 6) * 60;
-                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortesLiquido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
+                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
                     {
                         foreach (var cort in cortesTurnos)
                         {

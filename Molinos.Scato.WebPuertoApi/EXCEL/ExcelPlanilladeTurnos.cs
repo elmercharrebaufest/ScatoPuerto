@@ -293,7 +293,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 }
 
                 i = InsertTableHeaderCortes(sheet, estiloHeaderTabla,estiloRegionTurnos, estiloCabeceraCorte, estiloRegion, i);
-                foreach (var registroCortes in registroTurno.ModuloDeCargaPlanillaDeTurnosCortesLiquido)
+                foreach (var registroCortes in registroTurno.ModuloDeCargaPlanillaDeTurnosCortes)
                 {
                     turno = registroTurno.TurnoPuerto.Nombre;
                     fecha = turnosPlanilla.Fecha;

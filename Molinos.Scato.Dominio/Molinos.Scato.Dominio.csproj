@@ -744,7 +744,7 @@
     <Compile Include="Dto\ModuloDeCargaManosDeEmbarqueHistoricoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPeriodoDeCargaDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeEmbarqueDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosCortesLiquidoDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosCortesDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDto.cs" />
     <Compile Include="Dto\ModuloDeCargaRitmosEmbarqueDto.cs" />
@@ -982,7 +982,7 @@
     <Compile Include="Entidades\ModuloDeCargaPeriodoDeCarga.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnos.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortesLiquido.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortes.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.cs" />
     <Compile Include="Entidades\ModuloDeCargaRitmosEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarque.cs" />

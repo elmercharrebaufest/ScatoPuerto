@@ -186,7 +186,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaNirManualPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPeriodoDeCargaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeEmbarqueMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosCortesLiquidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosLiquidoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaRitmosEmbarqueMappingProfile.cs" />

@@ -92,13 +92,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 }
                             }
 
-                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortesLiquido != null)
+                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
                             {
-                                foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortesLiquido)
+                                foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
                                 {
                                     if (corte.Id > 0)
                                     {
-                                        var corte_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortesLiquido>(corte.Id);
+                                        var corte_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(corte.Id);
 
                                         corte_DB.HoraInicio = corte.HoraInicio;
                                         corte_DB.HoraFin = corte.HoraFin;
@@ -108,7 +108,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     }
                                     else
                                     {
-                                        var corte_DB = new ModuloDeCargaPlanillaDeTurnosCortesLiquido(){
+                                        var corte_DB = new ModuloDeCargaPlanillaDeTurnosCortes(){
                                             ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
                                             HoraInicio = corte.HoraInicio,
                                             HoraFin = corte.HoraFin,
@@ -166,14 +166,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 //Repositorio.GuardarCambios();
                             }
 
-                            var cortes = new List<ModuloDeCargaPlanillaDeTurnosCortesLiquido>();
-                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortesLiquido != null)
+                            var cortes = new List<ModuloDeCargaPlanillaDeTurnosCortes>();
+                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
                             {
 
-                                foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortesLiquido)
+                                foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
                                 {
 
-                                    var ModuloDeCargaPlanillaDeTurnosCortesLiquido = new ModuloDeCargaPlanillaDeTurnosCortesLiquido()
+                                    var ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
                                     {
                                         ModuloDeCargaPlanillaDeTurnos = turno_DB,
                                         HoraInicio = corte.HoraInicio,
@@ -184,13 +184,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                                     };
 
-                                    cortes.Add(ModuloDeCargaPlanillaDeTurnosCortesLiquido);
+                                    cortes.Add(ModuloDeCargaPlanillaDeTurnosCortes);
 
                                 }
 
                             }
 
-                            turno_DB.ModuloDeCargaPlanillaDeTurnosCortesLiquido = cortes;
+                            turno_DB.ModuloDeCargaPlanillaDeTurnosCortes = cortes;
                             turno_DB.ModuloDeCargaPlanillaDeTurnosDetallesLiquido = detalles;
 
                             Repositorio.Agregar(turno_DB);
