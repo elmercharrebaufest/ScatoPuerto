@@ -429,16 +429,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
+                var embarquesLineUp = workflows.ListarEmbarques("LineUp");
+
                 List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
 
-                DatosEmbarqueGeolocalizacion em = new DatosEmbarqueGeolocalizacion
+                foreach (var embarque in embarquesLineUp)
                 {
-                    NombreBuque = "Nombre Buque",
-                    BanderaBuque = "Argentina",
-                    TipoBuque = "liquido"
-                };
-                embarques.Add(em);
-                embarques.Add(em);
+                    DatosEmbarqueGeolocalizacion embarqueLineUp = new DatosEmbarqueGeolocalizacion
+                    {
+                        NombreBuque = embarque.Embarque.NombreBuque,
+                        BanderaBuque = embarque.Embarque.Destino.Nombre,
+                        TipoBuque = embarque.Embarque.TipoBuque,
+                        imo = embarque.Embarque.Imo
+                    };
+                    embarques.Add(embarqueLineUp);
+
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK, embarques);
 
             }
@@ -456,6 +463,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public string NombreBuque;
             public string TipoBuque;
             public string BanderaBuque;
+            public string imo;
         }
     }
 }

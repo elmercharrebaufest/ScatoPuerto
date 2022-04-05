@@ -107,6 +107,7 @@
     <None Include="dbo\Tables\EmbarcacionInformacion.sql" />
     <None Include="dbo\Tables\EmbarcacionViaje.sql" />
     <None Include="dbo\Tables\EmbarcacionPosicion.sql" />
+    <None Include="Molinos.Scato.Database.GVICSQLPROD2016.Puerto.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />

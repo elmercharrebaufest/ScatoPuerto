@@ -12,7 +12,7 @@
   </div>
 
   <div class="mt-5">
-    <form [formGroup]="embarqueForm" class="mt-4">
+    <form [formGroup]="embarqueForm" class="mt-4" (ngSubmit)="finalizarAlta()">
       <div class="col">
         <div class="row">
           <div class="col-md-8 shadow " style="background-color: white;">
@@ -23,13 +23,13 @@
               <div class="form-group col-md-6">
                 <label for="nombreBuque" class="font-weight-bold">Nombre Buque</label>
                 <input type="text" class="form-control" formControlName="nombreBuque"
-                      placeholder="Ingrese nombre buque" maxlength="50">
+                      placeholder="Ingrese nombre buque" maxlength="50"  [ngClass]="{'input-error': submitted && f.nombreBuque.invalid}" required>
               </div>
               <div class="form-group col-md-6">
                 <label for="tipoDeBuquePuerto" class="font-weight-bold">Tipo de Buque</label>
-                <select class="custom-select" formControlName="tipoDeBuque">
+                <select class="custom-select" formControlName="tipoDeBuque" [ngClass]="{'input-error': submitted && f.tipoDeBuque.invalid}" required>
                   <option value=""></option>
-                  <option *ngFor="let t of tipoDeBuquePuerto" [ngValue]="t">{{ t.nombre }}</option>
+                  <option *ngFor="let t of tipoDeBuquePuerto" [ngValue]="t" >{{ t.nombre }}</option>
                 </select>
               </div>
             </div>
@@ -339,8 +339,13 @@
                 <br>
                 <div class="form-row">
                   <div class="form-group col">
+                    <label for="Imo" class="font-weight-bold">IMO </label>
+                    <input type="text" class="form-control" formControlName="imo"
+                          placeholder=""  minLength="0" maxLength="7">
+                  </div>
+                  <div class="form-group col">
                     <label for="destinoPuerto" class="font-weight-bold">Bandera</label>
-                    <select class="custom-select" formControlName="destino">
+                    <select class="custom-select" formControlName="destino"  [ngClass]="{'input-error': submitted && f.destino.invalid}" required>
                       <option value=""></option>
                       <option *ngFor="let t of destinoPuerto" [ngValue]="t">{{ t.nombre }}</option>
                     </select>
@@ -378,6 +383,12 @@
                     <label for="puntal" class="font-weight-bold">Puntal</label>
                     <input type="text" class="form-control" formControlName="puntal"
                           placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                  </div>
+                  
+                  <div class="form-group col">
+                    <label for="cantidadBodegasTanques" class="font-weight-bold">CANTIDAD DE BODEGAS/TANQUES</label>
+                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
+                          placeholder=""  >
                   </div>
                 </div>
 
@@ -423,7 +434,7 @@
 
       <div class="d-flex justify-content-center my-5">
         <button type="button" class="btn btn-danger mx-5" [routerLink]="['/']">CANCELAR</button>
-        <button *ngIf="embarqueId == 0" type="button" class="btn btn-success" (click)="finalizarAlta()">FINALIZAR ALTA</button>
+        <button *ngIf="embarqueId == 0" type="submit"  class="btn btn-success">FINALIZAR ALTA</button>
         <button *ngIf="embarqueId != 0" type="button" class="btn btn-success" (click)="modificarEmbarque()">ACTUALIZAR</button>
       </div>
     </form>

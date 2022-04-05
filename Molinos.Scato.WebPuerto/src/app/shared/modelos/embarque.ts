@@ -54,6 +54,8 @@ export class Embarque {
   shipParticularArchivoNombre: string;
   fechaHoraInicioCarga: Date;
   usuarioInicioCarga: string;
+  imo:string;
+  cantidadBodegasTanques:number;
 }
 
 export class Vapor{

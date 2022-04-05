@@ -4,10 +4,10 @@ import { LineasDeEmbarque } from "./linea-embarque";
 import { ManosDeEmbarque } from "./mano-embarque";
 import { PlanillaDeTurnos } from "./planilla-turnos/planilla-de-turnos";
 import { TabiquesDeEmbarque } from "./tabique-embarque";
-// import { ModuloDeCargaBalanzasBack } from '@ScatoModels/balanzadas/balanza';
 import { PeriodoDeCarga } from "./periodo-carga";
 import { Umap } from "./umap";
 import { PlanillaDeEmbarque } from "./planilla-de-embarque";
+import { Nir } from './nir';
 
 export class ModuloDeCarga{
     id: number;

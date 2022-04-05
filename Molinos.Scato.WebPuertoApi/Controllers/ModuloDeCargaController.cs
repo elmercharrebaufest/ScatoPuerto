@@ -234,16 +234,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 foreach (string mail in destinatarios.Split(';'))
                     dest.Add(mail);
                 return Request.CreateResponse(HttpStatusCode.OK, dest);
-
             }
             catch (Exception ex)
             {
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-
-
-            
         }
 
         [HttpGet]
@@ -257,7 +252,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
 
@@ -360,9 +354,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-
-          
         }
+
         public class CortesRegistrados
         {
             public IList<BalanzasCortesDto> balanzas { get; set; }
@@ -384,8 +377,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-
-
         }
 
 
@@ -402,8 +393,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-
-
         }
 
         //[HttpGet]
@@ -425,12 +414,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //    }
         //    catch (Exception ex)
         //    {
-
         //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
         //    }
-
-
-
         //}
 
         [HttpPost]
@@ -504,6 +489,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //    servicio.GuardarObservacionesDeCalidad(idPlanillaDeTurnos, observacionesDeCalidadDto);
         //    return Request.CreateResponse(HttpStatusCode.OK);
         //}
+
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/ObtenerRitmosLiquidos")]
@@ -518,5 +504,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto")]
+        public HttpResponseMessage ObtenerModuloDeCargaNirManualPuerto(int moduloDeCarga_id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerModuloDeCargaNirManualPuerto(moduloDeCarga_id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
     }
 }

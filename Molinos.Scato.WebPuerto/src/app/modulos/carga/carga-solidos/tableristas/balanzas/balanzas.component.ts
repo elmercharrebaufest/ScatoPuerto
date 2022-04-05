@@ -387,7 +387,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     // let balanzadasDataOK = this.balanzas8.value.filter( x => x.material_id > 0 && x.tn > 0 && x.bodega_id > 0 );
     let balanzadasDataOK = this.balanzas8.value.filter( x => x.material_id > 0 && x.tn > 0);
     this.resultado8 = this.agruparProductos(balanzadasDataOK);
-    this.totalTnBodegas8 = this.agruparBodegas(balanzadasDataOK);
+    // this.totalTnBodegas8 = this.agruparBodegas(balanzadasDataOK);
 
     // this.verificarNombresBuque();
     console.log('---- FORM BAL8 ----', this.balanzas8.value);
@@ -407,7 +407,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     // Productos y toneladas, agrupado por producto
     let balanzadasDataOK = this.balanzas7.value.filter( x => x.material_id > 0 && x.tn > 0);
     this.resultado7 = this.agruparProductos(balanzadasDataOK);
-    this.totalTnBodegas7 = this.agruparBodegas(balanzadasDataOK);
+    // this.totalTnBodegas7 = this.agruparBodegas(balanzadasDataOK);
 
     // this.verificarNombresBuque();
     console.log('---- FORM BAL7 ----', this.balanzas7.value);

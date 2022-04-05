@@ -9242,6 +9242,10 @@ resultado.Patente = rutaFoto.Patente;
         {
             try
             {
+                #if (DEBUG)
+                return "10000";
+                #endif
+
                 string mmABuscar = cm + "," + mm;
                 string mmABuscar1 = cm + "." + mm;
                 var request = new Z_SDMF_RFC_CONS_PP_TAB_CUB_TANRequest(
@@ -9260,6 +9264,8 @@ resultado.Patente = rutaFoto.Patente;
                        LlenadoMm = item.ZCANM3.ToString()
                    }).Where(x => x.Mm == mmABuscar || x.Mm == mmABuscar1).Select(y => y.LlenadoMm).FirstOrDefault();
                 return mm3;
+               
+          
             }
             catch (Exception ex)
             {
@@ -9675,6 +9681,8 @@ resultado.Patente = rutaFoto.Patente;
             {
                 ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
 
+                Bodega bodega = repositorio.Obtener<Bodega>(x => x.Id == item.Bodega.Id);
+
                 if (moduloDeCargaNirManualPuerto_Db != null)
                 {
                     moduloDeCargaNirManualPuerto_Db.Fecha = item.Fecha;
@@ -9685,7 +9693,10 @@ resultado.Patente = rutaFoto.Patente;
                     moduloDeCargaNirManualPuerto_Db.Prot_BS = item.Prot_BS;
                     moduloDeCargaNirManualPuerto_Db.PH = item.PH;
                     moduloDeCargaNirManualPuerto_Db.Origen = item.Origen;
-                    moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
+                    //moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
+                    moduloDeCargaNirManualPuerto_Db.Mano = item.Mano;
+                    moduloDeCargaNirManualPuerto_Db.Material_id = item.Material_id;
+                    moduloDeCargaNirManualPuerto_Db.Bodega = bodega;
                 }
                 else
                 {
@@ -9700,7 +9711,10 @@ resultado.Patente = rutaFoto.Patente;
                         Prot_BS = item.Prot_BS,
                         PH = item.PH,
                         Origen = item.Origen,
-                        Bodega = item.Bodega
+                        //Bodega = item.Bodega,
+                        Mano = item.Mano,
+                        Material_id = item.Material_id,
+                        Bodega = bodega,
                     };
                 }
 
@@ -9724,7 +9738,6 @@ resultado.Patente = rutaFoto.Patente;
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -10049,10 +10062,19 @@ resultado.Patente = rutaFoto.Patente;
                             totalTiempoCorte = (horas * 60) + minutos;
 
                         }
+                        if (minutosCargando != 0)
+                        {
                         ritmoAcumuladoNeto = (cantTotal * 60) / (minutosCargando - totalTiempoCorte);
-                    }else { ritmoAcumuladoNeto = ritmoAcumuladoLiquidos; }
+                        } else ritmoAcumuladoNeto = 0;
+
+                    }
+                    else ritmoAcumuladoNeto = ritmoAcumuladoLiquidos;
                 }
-                ritmoAcumuladoLiquidos = (cantTotal * 60) / minutosCargando;
+                if (minutosCargando != 0)
+                {
+                    ritmoAcumuladoLiquidos = (cantTotal * 60) / minutosCargando;
+                }
+                else ritmoAcumuladoLiquidos = 0;
             }
             else
             {
@@ -10066,6 +10088,18 @@ resultado.Patente = rutaFoto.Patente;
             ritmosDeCargaLiquidos.Add("RitmoAcumulado", (int)ritmoAcumuladoLiquidos);
             ritmosDeCargaLiquidos.Add("RitmoAcumuladoNeto", (int)ritmoAcumuladoNeto);
             return ritmosDeCargaLiquidos;
+        }
+
+        public IList<ModuloDeCargaNirManualPuertoDto> ObtenerModuloDeCargaNirManualPuerto(int IdModuloDeCarga)
+        {
+            try
+            {
+                return Listar<ModuloDeCargaNirManualPuerto, ModuloDeCargaNirManualPuertoDto>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion)
@@ -10266,7 +10300,7 @@ resultado.Patente = rutaFoto.Patente;
 
                 if (tipoVehiculo == (int)TipoVehiculo.Tren && !consultactg)
                 {
-                    #region FerroviarioCPE
+#region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -10287,7 +10321,7 @@ resultado.Patente = rutaFoto.Patente;
                         }
                     }
 
-                    #endregion FerroviarioCPE
+#endregion FerroviarioCPE
                 }
                 else
                 {
