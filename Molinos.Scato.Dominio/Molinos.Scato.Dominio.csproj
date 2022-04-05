@@ -681,6 +681,7 @@
     <Compile Include="ConsultarImagenCpe.cs" />
     <Compile Include="Consultas\Expresiones.cs" />
     <Compile Include="Consultas\Paginacion.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaFiltroDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaResultadoDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaListadoDto.cs" />
@@ -983,6 +984,7 @@
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnos.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortes.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesSolido.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.cs" />
     <Compile Include="Entidades\ModuloDeCargaRitmosEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarque.cs" />

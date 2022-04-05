@@ -1,12 +1,12 @@
 ﻿CREATE TABLE [dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]
 (
 	[Id]                                        INT IDENTITY (1, 1) NOT NULL,
-    [ModuloDeCargaPlanillaDeTurnos_Id]          INT NOT NULL,
+    [ModuloDeCargaPlanillaDeTurnos_Id]    INT NOT NULL,
+    [Exportador_Id]                             INT NOT NULL,
+    [Linea_Id]                                     INT NOT NULL,
     [BodegaParcel]                              INT,
-    [ManoEmbarque_Id]                           INT,
     [MaterialPuerto_Id]                         INT NOT NULL,
     [Destino_Id]                                INT NOT NULL,
-    [Exportador_Id]                             INT NOT NULL,
     [Cantidad]                                  DECIMAL(18, 8),
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,

@@ -512,6 +512,7 @@
     <Build Include="dbo\Tables\RegistroStockOtrosPuertos.sql" />
     <Build Include="dbo\Tables\RegistroInactividad.sql" />
     <Build Include="dbo\Tables\TipoDeActividad.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolido.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
