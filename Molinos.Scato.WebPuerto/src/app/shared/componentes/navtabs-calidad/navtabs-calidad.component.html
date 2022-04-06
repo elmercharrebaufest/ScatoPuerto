@@ -8,13 +8,20 @@
     </div>
 </div>
 
+<div class="row" *ngIf="!buqueSanBenito && muellesOperativos()">
+    <div class='btn-add-container ml-3' id='addButton' (click)='openModalAddBuque(addBuque)'>
+        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
+    </div>
+</div>
+
 <div class="row ml-1" *ngIf="muellesOperativos()">
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle San Benito</div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
-                id="{{buqueSanBenito2.id}}" (click)="onClickHandlerClient(buqueSanBenito2)">
-                <!-- <img [src]="imgSolidoLiquido(buqueSanBenito)"> -->
+                    id="{{buqueSanBenito2.id}}" 
+                    (click)="onClickHandlerClient(buqueSanBenito2)">
                 <div class="icono-seleccionado" [ngClass]="imgSolidoLiquido(buqueSanBenito)" ></div>
                 {{estadoSanBenito()}}
             </button>
@@ -24,7 +31,6 @@
         <div class="row tituloMuelle mb-2">Muelle Vicentin </div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <!-- <img [src]="imgSolidoLiquido(buqueVicentin)"> -->
                 <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueVicentin)" ></div>
                 {{estadoVicentin()}}
             </button>
@@ -34,7 +40,6 @@
         <div class="row tituloMuelle mb-2">Muelle Nouryon </div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <!-- <img [src]="imgSolidoLiquido(buqueNoryon)"> -->
                 <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)" ></div>
                 {{estadoNoryon()}}
             </button>
@@ -44,7 +49,6 @@
         <div class="row tituloMuelle mb-2">Otro muelle </div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <!-- <img [src]="imgSolidoLiquido(buqueOtrosMuelles)"> -->
                 <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)" ></div>
                 {{estadoOtros()}}
             </button>

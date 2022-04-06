@@ -12,6 +12,7 @@ export class ProcesoCalidadService {
     private otrosMuelles: InstanciaWorkflowPuerto;
 
     @Output() sendObsCalidad = new EventEmitter<ObsCalidad>();
+    @Output() sendBuqueCambiaEstado = new EventEmitter<any>();
 
     getSanBenito() {
         return this.sanBenito;
@@ -41,6 +42,10 @@ export class ProcesoCalidadService {
 
     setObsCalidad(obsCalidad: ObsCalidad){
         this.sendObsCalidad.emit(obsCalidad);
+    }
+    
+    setBuqueCambiaEstado(buqueCambiaEstado: any){
+        this.sendBuqueCambiaEstado.emit(buqueCambiaEstado);
     }
     
 }

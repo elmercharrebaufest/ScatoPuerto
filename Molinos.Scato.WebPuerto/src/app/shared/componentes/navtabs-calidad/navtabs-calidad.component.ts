@@ -7,6 +7,9 @@ import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { Embarque } from '@ScatoModels/embarque';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navtabs-calidad',
@@ -44,7 +47,8 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     private procesoCalidadService: ProcesoCalidadService,
     private _procesoService: DatosEmbarquesProcesoService,
     private _modalService: NgbModal,
-    private embarqueService: EmbarqueService
+    private embarqueService: EmbarqueService,
+    private workflowService: WorkflowService,
   ) {
     this._unsubscribe = new Subject();
     this.elementos = new Array();
@@ -66,8 +70,6 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     this.embarqueId = this._procesoService.getEmbarqueId();
 
     this.buqueSanBenito2 = this.elementos[0];
-    this.elementosSinPlano = [{id: 1008, nombreBuque: 'nombrePrueba', nombreUbicacio: 'calada'}]
-
   }
 
   ngOnInit(): void {
@@ -108,9 +110,11 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     if (this.elementos.length > 0) {
       var elementoSeleccionado = document.getElementById(this.embarqueId.toString());
       if (elementoSeleccionado) elementoSeleccionado.classList.add("btn-seleccionado");
-
+      
+      // console.log('En ngAfterViewInit() del NAV, showPlano.emit(true)');
       this.showPlano.emit(true);
     } else {
+      // console.log('En ngAfterViewInit() del NAV, showPlano.emit(false)');
       this.showPlano.emit(false);
     }
 
@@ -125,6 +129,7 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     elementoSeleccionado.classList.add("btn-seleccionado");
     if (this._procesoService.getEmbarqueSelected() != elemento) {
       this._procesoService.setEmbarque(elemento.id);
+      // console.log('En onClickHandlerClient() del NAV, changeEmbarque.emit(true)');
       this.changeEmbarque.emit(true);
     }
   }
@@ -156,33 +161,72 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
   }
 
   openModalAddBuque(modal: any) {
+    this.obtenerBuquesCargando();
+
     this.errorMessage = false;
     this._modalService.open(modal);
+  }
+
+  obtenerBuquesCargando(){
+    this.elementosSinPlano = [];
+    let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes('Cargando'));
+
+    this.workflowService.obtenerListado().subscribe( res => {
+      this.listadoEmbarques = res;
+      let sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
+      let sanBenito2: InstanciaWorkflowPuerto[] = sanBenito ? sanBenito.filter( (i:InstanciaWorkflowPuerto) => i.embarque.estadoBuque?.id === estadoBuque.id ) : new Array();
+
+      for(let sb in sanBenito2){
+        this.elementosSinPlano.push(sanBenito2[sb].embarque);
+      }
+    });
   }
 
   agregarEmbarque(embarque: string) {
     this.errorMessage = false;
     if (embarque != '0') {
       let buque = this.elementosSinPlano.find(e => e.id.toString() === embarque);
-      // buque.cargado = true;
-
       let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes('PostOperativo'));
-      this.embarqueService.actualizarEstadoBuque(buque.id, estadoBuque.id).subscribe( res => {
-        console.log(res);
-        this.elementos.push(buque);
-        this.elementos.sort((a: any, b: any) => {
-          return a.orden-b.orden;
-        });
+      
+      this.embarqueService.actualizarEstadoBuque(buque.id, estadoBuque.id)
+        .pipe(finalize( () => {
+          // this.showPlano.emit(true);
+          
+          this.procesoCalidadService.setBuqueCambiaEstado(buque);
 
-        let index = this.elementosSinPlano.indexOf(buque);
-        this.elementosSinPlano.splice(index, 1);
+          // setTimeout(() => {
+          //   this.buqueSanBenito = this.procesoCalidadService.getSanBenito();
+          //   console.log('this.buqueSanBenito desde finalize()', this.buqueSanBenito);
 
-        // setTimeout(() => {
-        //   if (this.elementos.length == 1)
-        //     this.onClickHandlerClient(buque);
-        // }, 50);
+          //   this.buqueNoryon = this.procesoCalidadService.getNoryoun();
+          //   this.buqueVicentin = this.procesoCalidadService.getVicentin();
+          //   this.buqueOtrosMuelles = this.procesoCalidadService.getOtrosMuelles();
 
-      } );
+          //   if(this.buqueSanBenito){
+          //     this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
+          //   }
+
+          //   this.elementos = this._procesoService.getEmbarquesList();
+          //   this.embarqueId = this._procesoService.getEmbarqueId();
+
+          //   this.buqueSanBenito2 = this.elementos[0];
+
+          //   this.ngOnInit();
+          //   this.ngAfterViewInit();
+
+          // }, 2000);
+
+        }))
+        .subscribe( res => {
+          console.log(res);
+          this.elementos.push(buque);
+          this.elementos.sort((a: any, b: any) => {
+            return a.orden-b.orden;
+          });
+
+          let index = this.elementosSinPlano.indexOf(buque);
+          this.elementosSinPlano.splice(index, 1);
+        } );
 
       this._modalService.dismissAll();
     } else {

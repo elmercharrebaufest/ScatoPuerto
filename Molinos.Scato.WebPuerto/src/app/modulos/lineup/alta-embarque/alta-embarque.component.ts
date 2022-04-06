@@ -123,8 +123,8 @@ export class AltaEmbarqueComponent implements OnInit {
       fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
       horaLibrePlatica: [],
       // TODO: Revisar plano-content, porque posiblemente sea como viene el valor del campo filePathShipParticular
-      // filePathShipParticular: [''],
-      // shipParticularArchivoNombre: [''],
+      filePathShipParticular: [''],
+      shipParticularArchivoNombre: [''],
     });
 
     if (this.state === 'modulo-carga'){
@@ -618,9 +618,12 @@ export class AltaEmbarqueComponent implements OnInit {
     // const imageBlob = this.dataURItoBlob('');
     const imageBlob = this.dataURItoBlob(base64);
 
-    if (window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveBlob(imageBlob, imageName);
+    if ((window.navigator as any).msSaveOrOpenBlob) {
+      (window.navigator as any).msSaveBlob(imageBlob, imageName);
     }
+    // if (window.navigator.msSaveOrOpenBlob) {
+    //   window.navigator.msSaveBlob(imageBlob, imageName);
+    // }
     else {
       let elem = window.document.createElement('a');
       elem.href = window.URL.createObjectURL(imageBlob);
