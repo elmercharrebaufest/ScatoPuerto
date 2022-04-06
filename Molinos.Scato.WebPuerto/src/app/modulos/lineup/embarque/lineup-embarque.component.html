@@ -175,7 +175,10 @@
     <div class="form-group" style="text-align: left;">
     <label class="font-weight-bold">{{instanciaWorkflow.embarque.ubicacion > 0 ? "Recalada" : "ETA recalada"}}</label>
     <div class="row border rounded ml-1 mr-1" [ngClass]="'border-'+ fechaRecaladaCorrecta()">
-      <div class="col-1"><img src="assets/reloj.svg" class="icon clock" [ngClass]="'clock-'+ fechaRecaladaCorrecta()"></div>
+      <div class="col-1">
+          <img src="assets/reloj.svg" class="icon clock" [ngClass]="'clock-'+ fechaRecaladaCorrecta()">
+      </div>
+      
       <div class="col-9">
         <div class="row">
           <div class="col-12 font-weight-bold" [ngClass]="'text-'+ fechaRecaladaCorrecta()" style="font-size: 16px;">
@@ -186,6 +189,12 @@
             {{instanciaWorkflow.embarque.horaRecalada != null && instanciaWorkflow.embarque.horaRecalada.length > 3 ? 'Hrs' : ''}}&zwnj;
           </small>
         </div>
+      </div>
+    </div>
+    <div class="container">
+      <img src="assets/existImo.svg" class="imgImo">
+      <div class="feature">
+        <p class="color-text">No se encontro completar IMO</p>
       </div>
     </div>
   </div>
