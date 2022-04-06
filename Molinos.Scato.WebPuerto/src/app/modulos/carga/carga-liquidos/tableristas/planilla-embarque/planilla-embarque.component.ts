@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PlanillaDeEmbarque } from '@ScatoModels/planilla-de-embarque';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
@@ -6,12 +6,13 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Alert } from 'selenium-webdriver';
 @Component({
   selector: 'app-planilla-embarque',
   templateUrl: './planilla-embarque.component.html',
   styleUrls: ['./planilla-embarque.component.css']
 })
-export class PlanillaEmbarqueComponent implements OnInit {
+export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   lineasEmbarque: FormGroup;
   exportadores: any;
   bodegas: any[];
@@ -22,6 +23,7 @@ export class PlanillaEmbarqueComponent implements OnInit {
   tanquesAbordo: any[];
   idModuloDeCarga: number;
   planillaDeEmbarque: PlanillaDeEmbarque[];
+  mostrarbtnGuardar:boolean=true;
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
@@ -37,12 +39,20 @@ export class PlanillaEmbarqueComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+  }
   ngOnInit(): void {
     this.newForm();
   }
   expandir()
   {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
+  }
+
+  desabilitarEmbarque()
+  {
+   
+    this.mostrarbtnGuardar=false;
   }
   newForm() {
     this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
@@ -120,16 +130,17 @@ export class PlanillaEmbarqueComponent implements OnInit {
   }
 
   initLinea(planilla?: PlanillaDeEmbarque) {
+    var result= localStorage.getItem('desabilitar');
     return this.builder.group({
-      exportador: planilla?.exportador ? planilla.exportador :  null,
-      bodegaParcel: planilla?.bodegaParcel ? planilla.bodegaParcel : null,
+      exportador: {value:planilla?.exportador ? planilla.exportador :'',  disabled:result=='true'?true:false},
+      bodegaParcel: {value:planilla?.bodegaParcel ? planilla.bodegaParcel : '',  disabled:result=='true'?true:false},
       tanqueDeAbordo: { value: planilla?.tanqueDeAbordo ? planilla.tanqueDeAbordo : '', disabled: true },
       destino: { value: planilla?.destino ? planilla.destino : null, disabled: true },
-      tk: planilla?.tk ? planilla.tk : '',
+      tk: { value:planilla?.tk ? planilla.tk : '',  disabled:result=='true'?false:false},
       tn: { value: planilla?.tn ? planilla.tn : null, disabled: true },
       materialPuerto: { value: planilla?.materialPuerto ? planilla.materialPuerto : null, disabled: true },
-      fechaComienzoCarga: planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga: '',
-      fechaFinalizacionCarga: planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga: '',
+      fechaComienzoCarga: { value:planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga: '',disabled:result=='true'?true:false},
+      fechaFinalizacionCarga: { value:planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga: '',disabled:result=='true'?true:false},
       //fechaComienzoCarga: planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga.toString().split('T')[0] : '',
       //horaComienzoCarga: planilla?.horaComienzoCarga ? planilla.horaComienzoCarga : '',
       //fechaFinalizacionCarga: planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga.toString().split('T')[0] : '',
