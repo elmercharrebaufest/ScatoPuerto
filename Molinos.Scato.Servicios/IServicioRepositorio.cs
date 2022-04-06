@@ -2533,7 +2533,6 @@ namespace Molinos.Scato.Servicios
         //[OperationContract]
         //void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id);
 
-
         [OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
 
@@ -2636,5 +2635,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ModuloDeCargaNirManualPuertoDto> ObtenerModuloDeCargaNirManualPuerto(int IdModuloDeCarga);
+
+        [OperationContract]
+        IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
+
     }
 }

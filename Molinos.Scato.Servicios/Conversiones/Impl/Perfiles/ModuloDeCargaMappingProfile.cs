@@ -36,7 +36,9 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 .ForMember(x => x.ModuloDeCargaUmap,
                 x => x.MapFrom(y => y.ModuloDeCargaUmap))
                 .ForMember(x => x.ModuloDeCargaBalanzas,
-                x => x.MapFrom(y => y.ModuloDeCargaBalanzas));
+                x => x.MapFrom(y => y.ModuloDeCargaBalanzas))
+                .ForMember(x => x.ModuloDeCargaNirManualPuerto,
+                x => x.MapFrom(y => y.ModuloDeCargaNirManualPuerto));
             Mapper.CreateMap<ModuloDeCargaDto, ModuloDeCarga>();
         }
     }

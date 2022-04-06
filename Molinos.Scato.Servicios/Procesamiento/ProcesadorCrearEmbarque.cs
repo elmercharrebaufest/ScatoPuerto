@@ -94,6 +94,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Puntal = comando.Embarque.Puntal,
                         FechaLibrePlatica = comando.Embarque.FechaLibrePlatica,
                         HoraLibrePlatica = comando.Embarque.HoraLibrePlatica,
+                        Imo=comando.Embarque.Imo,
+                        CantidadBodegasTanques=comando.Embarque.CantidadBodegasTanques
                     };
                     foreach (var mat in comando.Embarque.MaterialesPuertoCantidad.Where(y => y.Cantidad > 0))
                     {

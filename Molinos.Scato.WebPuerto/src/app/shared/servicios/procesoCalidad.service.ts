@@ -16,6 +16,7 @@ export class ProcesoCalidadService {
 
     
     @Output() sendObsCalidad = new EventEmitter<ObsCalidad>();
+    @Output() sendBuqueCambiaEstado = new EventEmitter<any>();
 
     constructor(
         private http: HttpClient,
@@ -55,4 +56,8 @@ export class ProcesoCalidadService {
     guardarObservacionesDeCalidad(idPlanillaDeTurnos: number, observacionesDeCalidad: any){
         return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idPlanillaDeTurnos}`, ObsCalidad, { 'withCredentials': true});  
       }
+    setBuqueCambiaEstado(buqueCambiaEstado: any){
+        this.sendBuqueCambiaEstado.emit(buqueCambiaEstado);
+    }
+    
 }

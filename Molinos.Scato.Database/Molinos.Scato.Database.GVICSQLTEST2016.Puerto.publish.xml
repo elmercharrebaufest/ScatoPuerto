@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>MOASCATOPuerto </TargetDatabaseName>
     <DeployScriptFileName>Molinos.Scato.Database.sql</DeployScriptFileName>
-    <TargetConnectionString>Data Source=APPAGLQA.molinosagro.ad,1450;Integrated Security=True;Pooling=False</TargetConnectionString>
+    <TargetConnectionString>Data Source=SCATOAGLSQA.molinosagro.ad,1450;Integrated Security=True;Pooling=False</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <ScriptDatabaseOptions>False</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>

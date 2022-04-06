@@ -20,7 +20,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string ETA_Reportado { get; set; }
         public virtual string Destino_Reportado { get; set; }
         public virtual string Peso_Reportado { get; set; }
-        public virtual int VelocidadRecorrido { get; set; }
+        public virtual string VelocidadRecorrido { get; set; }
         public virtual DateTime FechaRegistro { get; set; }
     }
 }

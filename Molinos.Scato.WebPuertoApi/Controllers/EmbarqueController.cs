@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -51,8 +52,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, false, true);
 
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine("xxx" + ex.ToString());
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, $"Error al crear el embarque, verifique que exista el centro ${centro} y el workflow ${workflow}");
             }
             return Request.CreateResponse(HttpStatusCode.OK, datosEmbarque);
@@ -371,7 +373,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(!resultado.HayErrores ? true : false);
         }
 
-
+        /*
         [HttpGet]
         [Route("api/Embarque/ObtenerPuntosInteresGeolocalizacion")]
         public HttpResponseMessage ObtenerPuntosInteresGeolocalizacion()
@@ -380,6 +382,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerPuntosInteresGeolocalizacion()
             );
         }
+        */
 
         [HttpPost]
         [Route("api/Embarque/RegistrarEmbarqueGeolocalizacion")]
@@ -435,9 +438,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     DatosEmbarqueGeolocalizacion embarqueLineUp = new DatosEmbarqueGeolocalizacion
                     {
                         NombreBuque = embarque.Embarque.NombreBuque,
-                        BanderaBuque = embarque.Embarque.shipParticularArchivoNombre,
+                        BanderaBuque = embarque.Embarque.Destino.Nombre,
                         TipoBuque = embarque.Embarque.TipoBuque,
-                        imo = null
+                        imo = embarque.Embarque.Imo
                     };
                     embarques.Add(embarqueLineUp);
 
@@ -460,7 +463,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public string NombreBuque;
             public string TipoBuque;
             public string BanderaBuque;
-            public int? imo;
+            public string imo;
         }
     }
 }

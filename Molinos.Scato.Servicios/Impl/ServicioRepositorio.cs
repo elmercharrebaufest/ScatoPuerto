@@ -10397,5 +10397,10 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<EntidadTipoDeActividad, EntidadTipoDeActividadDto>(x => x.Entidad.Codigo == codigoEntidad);
         }
+        public IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado)
+        {
+            return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
+        }
+
     }
 }
