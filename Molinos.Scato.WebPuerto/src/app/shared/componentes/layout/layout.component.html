@@ -28,7 +28,16 @@
           <span>Buques</span>
         </div>
       </a> -->
-
+      <hr *ngIf='tienePermiso(600)'>
+      <a routerLink='/geolocalizacion' *ngIf='tienePermiso(600)'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
+        <!--
+          <div><i class="fa fa-map-marker fa-2x  c-celeste"></i></div>
+        -->
+          <div class='icon-geolocalizacion'></div>
+          <span *ngIf='opened'>Geolocalización</span>
+        </div>
+      </a>
       <hr *ngIf='tienePermiso(630)'>
       <a routerLink='/carga' *ngIf='tienePermiso(630)'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>

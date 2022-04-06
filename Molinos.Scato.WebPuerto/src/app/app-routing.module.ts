@@ -24,6 +24,11 @@ export const routeConfig: Routes = [
         loadChildren: () => import('./modulos/lineup/lineup.module').then(m => m.LineUpModule)
       },
       {
+        path: "geolocalizacion",
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/geolocalizacion/geolocalizacion.module').then(m => m.GeolocalizacionModule)
+      },
+      {
         path: "carga",
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/carga/carga.module').then(m => m.CargaModule)

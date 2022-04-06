@@ -13,12 +13,11 @@ import { SharedModule } from './shared/shared.module';
 import { RouterModule } from '@angular/router';
 import { SharedComponentModule } from './shared/componentes/shared-components.module';
 import { MessageService } from 'primeng/api';
-
 registerLocaleData(localeEsAr, 'es-Ar');
 
 @NgModule({
   declarations: [
-    AppComponent,
+    AppComponent
   ],
   imports: [
     CommonModule,

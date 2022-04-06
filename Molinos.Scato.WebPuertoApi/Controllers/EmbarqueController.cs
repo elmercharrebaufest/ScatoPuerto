@@ -54,6 +54,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch(Exception ex)
             {
+                Console.WriteLine("xxx" + ex.ToString());
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, $"Error al crear el embarque, verifique que exista el centro ${centro} y el workflow ${workflow}");
             }
             return Request.CreateResponse(HttpStatusCode.OK, datosEmbarque);
@@ -372,7 +373,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(!resultado.HayErrores ? true : false);
         }
 
-
+        /*
         [HttpGet]
         [Route("api/Embarque/ObtenerPuntosInteresGeolocalizacion")]
         public HttpResponseMessage ObtenerPuntosInteresGeolocalizacion()
@@ -381,6 +382,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerPuntosInteresGeolocalizacion()
             );
         }
+        */
 
         [HttpPost]
         [Route("api/Embarque/RegistrarEmbarqueGeolocalizacion")]
