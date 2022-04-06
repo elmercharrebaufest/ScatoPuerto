@@ -12,6 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboDeBuque } from '@ScatoModels/recibo-buque';
 import { PDFService } from '@ScatoServicios/pdf.service';
+import { Embarque } from '@ScatoModels/embarque';
 
 
 @Component({
@@ -29,7 +30,7 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
   unsubscribe: Subject<any>;
   errorMessage: boolean = false;
   reciboBuque: ReciboDeBuque;
-  
+
   embarquesEnLineUpSinFiltrar: EmbarqueNav[];
   listadoEmbarques: InstanciaWorkflowPuerto[];
 
@@ -39,6 +40,7 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
   buqueEnOtrosMuelles: InstanciaWorkflowPuerto | undefined;
 
   embarqueId: number;
+  nombreVapor: Embarque;
   barquitos: InstanciaWorkflowPuerto[];
   // barquitos: InstanciaWorkflowPuerto[] = [];
   vaporId: number = 0;
@@ -48,6 +50,7 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
   resultados: Balanzas[] = [];
   embarque: EmbarqueNav;
   moduloDeCarga_Id: number = 0;
+  reciboOK: boolean = false;
 
   constructor(
     private workflowService: WorkflowService,
@@ -62,8 +65,11 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     this.unsubscribe = new Subject();
 
     // TODO: lo nuevo para datos de balanzadas -----------------------------
-    // this.embarque = this._procesoService.getEmbarqueSelected();
-    // this.embarqueId = this._procesoService.getEmbarqueId();
+    setTimeout(() => {
+      this.embarque = this._procesoService.getEmbarqueSelected();
+      this.embarqueId = this._procesoService.getEmbarqueId();
+      embarqueService.obtenerEmbarque(this.embarqueId)
+    }, 4000);
 
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
@@ -83,7 +89,7 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.embarque = this._procesoService.getEmbarqueSelected();
+    // this.embarque = this._procesoService.getEmbarqueSelected();
     // this.embarqueId = this._procesoService.getEmbarqueId();
     // this.subscribeEmbarques();
     
@@ -249,13 +255,14 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
 
   inicializarReciboBuque(){
     this.reciboBuque = new ReciboDeBuque();
-    this.reciboBuque.nombrePuertoOrigen = 'hola';
-    this.reciboBuque.fechaRecibo = new Date(2021, 12, 3);
-    this.reciboBuque.nombreVapor = "titanic";
-    this.reciboBuque.nombreEmpresaRemitente = "molinos";
+    var converter = require('number-to-words');
+    this.reciboBuque.nombrePuertoOrigen = "San Lorenzo, ARGENTINA";
+    this.reciboBuque.fechaRecibo = new Date();
+    this.reciboBuque.nombreVapor = 'this.embarque?.nombreBuque ? this.embarque.nombreBuque';
+    this.reciboBuque.nombreEmpresaRemitente = "MOLINOS AGRO S.A";
     this.reciboBuque.nombrePuertoDestino = "chau";
-    this.reciboBuque.cantidad = 200;
-    this.reciboBuque.cantidadEnLetras = "Two Hundred";
+    this.reciboBuque.cantidad = 23000;
+    this.reciboBuque.cantidadEnLetras = converter.toWords(this.reciboBuque.cantidad);;
     this.reciboBuque.estibadoEnBodega = "1-4";
     this.reciboBuque.calidadYCantidadDesconocidas = "200tn";
     this.reciboBuque.incluirParaImpresion = true;

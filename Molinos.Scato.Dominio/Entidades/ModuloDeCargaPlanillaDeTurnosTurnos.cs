@@ -15,7 +15,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool Enviado { get; set; }
         public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
         public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
+        public virtual ICollection<ObservacionesDeCalidad> ObservacionesDeCalidad { get; set; }
 
-        // public virtual ObservacionesDeCalidad ObservacionesDeCalidad { get; set; }
     }
 }

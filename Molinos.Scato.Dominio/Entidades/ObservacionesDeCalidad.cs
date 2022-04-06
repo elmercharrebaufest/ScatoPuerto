@@ -7,11 +7,9 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
-        public virtual DateTime Fecha { get; set; }
-        public virtual DateTime Hora { get; set; }
+        public virtual DateTime FechaHoraObs { get; set; }
         public virtual string Observaciones { get; set; }
         public virtual ModuloDeCargaPlanillaDeTurnosTurnos ModuloDeCargaPlanillaDeTurnosTurnos { get; set; }
         public virtual bool ObservacionVisible { get; set; }
-
     }
 }

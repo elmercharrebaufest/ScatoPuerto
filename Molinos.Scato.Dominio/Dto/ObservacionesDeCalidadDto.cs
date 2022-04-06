@@ -9,9 +9,9 @@ namespace Molinos.Scato.Dominio.Dto
     public class ObservacionesDeCalidadDto
     {
         public int Id { get; set; }
-        public DateTime Fecha { get; set; }
-        public DateTime Hora { get; set; }
+        public DateTime FechaHoraObs { get; set; }
         public string Observaciones { get; set; }
         public bool ObservacionVisible { get; set; }
+
     }
 }

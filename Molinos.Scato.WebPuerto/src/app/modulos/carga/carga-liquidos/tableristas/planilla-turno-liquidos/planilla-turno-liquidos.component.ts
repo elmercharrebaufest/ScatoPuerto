@@ -1,4 +1,4 @@
-import { AfterViewInit,  Component, EventEmitter,  OnInit, Output, ViewChild} from '@angular/core';
+import { AfterViewInit,  Component, EventEmitter,  Input,  OnInit, Output, ViewChild} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -25,6 +25,11 @@ import { PlanoContentComponent } from 'app/modulos/lineup/plano-de-carga/plano-c
 import { style } from '@angular/animations';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { SessionService } from '@ScatoServicios/session.service';
+import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
+import { ObsCalidad } from '@ScatoModels/obs-calidad';
+
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -37,6 +42,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   formTurnos: FormGroup;
   formCorte: FormGroup;
   formNuevoTurno: FormGroup;
+  obsCalidadForm: FormGroup;
   formExportarExcel: FormGroup;
   moduloCarga: ModuloDeCarga;
   exportadores: any[];
@@ -56,6 +62,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   planillaDeTurnos: PlanillaDeTurnos[];
   nuevoTurno: PlanillaDeTurnos;
   cortesTurno: CorteTurno[] = [];
+  private user: Usuario
 
   
   embarqueId: number; 
@@ -64,14 +71,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   direccionViento: string;
   valorCargado: number;
   pedidoPorPlano: number;
-  
-  
+  @Input() tablerista: boolean;
 
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
     private _procesoService: DatosEmbarquesProcesoService,
     private datePipe: DatePipe,
+    private procesoCalidadService: ProcesoCalidadService,
+    private session: SessionService,
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
@@ -99,11 +107,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
+    this.initFormularioObs();
   }
   expandir()
   {
@@ -490,7 +500,58 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
     })
 
   }
+  initFormularioObs(){
+    this.obsCalidadForm = this._builder.group({
+      id: [''],
+      fecha: ['',[Validators.required]],
+      hora: ['',[Validators.required]],
+      observaciones: ['',[Validators.required]],
+      userCarga: this.user.username
  
+    })
+  }
+  openModalAgregarObsCalidad(modal){
+    this.formNuevoTurno.reset();
+
+    this._modalService.open(modal, {  windowClass: 'window-modal-corte', backdropClass: 'modal-corte', size: 'lg', centered:true }).result.then(() => {
+      
+    })
+  }
+  guardarObservacionesDeCalidad(){
+    if(this.obsCalidadForm.controls.observaciones.value === '' || this.obsCalidadForm.controls.fecha.value === '' || this.obsCalidadForm.controls.hora.value === '')
+      return;
+    
+    let { fecha, hora } = this.obsCalidadForm.getRawValue();
+    let fechaHora = `${this.obsCalidadForm.controls.fecha.value} ${this.obsCalidadForm.controls.hora.value}`
+    let fechaHoraIncorrecta = this.comparaFechaHoraObs(fecha, hora);
+    
+
+    
+    let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
+      "Desea guardar las observaciones de calidad?";
+
+    this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
+      .then((confirmed) => {
+        if (confirmed && !fechaHoraIncorrecta) {
+          
+          this.procesoCalidadService.setObsCalidad(this.obsCalidadForm.getRawValue());
+          this.obsCalidadForm.reset();
+          
+        }
+        else
+          return;
+      }).catch(() => window.location.reload());
+  }
+  comparaFechaHoraObs(fecha: any, hora: any): boolean{
+    let lFechaHoraObs = fecha + ' ' + hora;
+    let lFechaHoy = new Date();
+    let lFechaObs = new Date(lFechaHoraObs);
+    
+    if( lFechaHoy.getTime() < lFechaObs.getTime() ){
+      return true;
+    } else
+      return false;
+  }
 
   onLineaChange(result: any, dia: number, turno: number, index: number){
     const lineaFiltro = this.lineas.filter(linea => linea.id == result.value.linea);
@@ -505,6 +566,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
       controSel['controls'][index]['controls'].materialPuerto.setValue(valueMaterialPuerto);
     }
    }
+  // updateObsCalidad(obsCalidad){
+  //   this.obsCalidadForm.patchValue(obsCalidad);
+  // }
 
   openModalCorte(modal, dia, turno) {
     this.formCorte.reset();

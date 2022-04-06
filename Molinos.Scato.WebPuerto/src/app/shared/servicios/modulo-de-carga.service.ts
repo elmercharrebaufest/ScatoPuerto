@@ -9,6 +9,7 @@ import { ModuloDeCargaListado } from '@ScatoModels/modulo-carga-listado';
 import { MotivosDeCorte } from '@ScatoModels/planilla-turnos/motivo-de-corte';
 import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
 import { Nir } from '@ScatoModels/nir';
+import { FuncionesGeneralesService } from './funciones-generales.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class ModuloDeCargaService {
   url: string = environment.apiUrl;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private funcionesGeneralesService: FuncionesGeneralesService,
   ) {
 
   }

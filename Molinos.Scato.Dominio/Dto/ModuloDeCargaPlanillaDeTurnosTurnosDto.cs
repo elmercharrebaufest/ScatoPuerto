@@ -12,6 +12,6 @@ namespace Molinos.Scato.Dominio.Dto
         public bool Enviado { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosTurnosDetallesDto> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosTurnosCortesDto> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
-        //public ObservacionesDeCalidadDto ObservacionesDeCalidadDto { get; set; }
+        public IList<ObservacionesDeCalidadDto> ObservacionesDeCalidadDto { get; set; }
     }
 }

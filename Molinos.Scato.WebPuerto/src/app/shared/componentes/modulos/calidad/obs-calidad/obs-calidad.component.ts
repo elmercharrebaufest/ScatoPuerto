@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
@@ -21,8 +21,10 @@ export class ObsCalidadComponent implements OnInit {
     private session: SessionService,
     private procesoCalidadService: ProcesoCalidadService,
     confirmationDialogService: ConfirmationDialogService
+
   ) { 
     this.confirmationDialogService = confirmationDialogService;
+
   }
 
   ngOnInit(): void {
@@ -33,19 +35,20 @@ export class ObsCalidadComponent implements OnInit {
   initFormulario(){
     this.obsCalidadForm = this.formBuilder.group({
       id: [''],
-      fecha: [''],
-      hora: [''],
-      observaciones: [''],
+      fecha: ['',[Validators.required]],
+      hora: ['',[Validators.required]],
+      observaciones: ['',[Validators.required]],
       userCarga: this.user.username
+      
     })
   }
 
-  guardarObsCalidad(){
+  guardarObservacionesDeCalidad(){
     if(this.obsCalidadForm.controls.observaciones.value === '' || this.obsCalidadForm.controls.fecha.value === '' || this.obsCalidadForm.controls.hora.value === '')
       return;
     
     let { fecha, hora } = this.obsCalidadForm.getRawValue();
-
+    let fechaHora = `${this.obsCalidadForm.controls.fecha.value} ${this.obsCalidadForm.controls.hora.value}`
     let fechaHoraIncorrecta = this.comparaFechaHora(fecha, hora);
 
     let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
@@ -54,8 +57,10 @@ export class ObsCalidadComponent implements OnInit {
     this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed && !fechaHoraIncorrecta) {
+          
           this.procesoCalidadService.setObsCalidad(this.obsCalidadForm.getRawValue());
           this.obsCalidadForm.reset();
+          
         }
         else
           return;

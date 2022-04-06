@@ -46,7 +46,7 @@
         <div class="row">
             <div class="col">
                 <label for="recipient-name" class="col-form-label"><b>Port of</b><span class="Traduccion">(puerto de)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombrePuertoOrigen.toUpperCase()}}">
+                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombrePuertoOrigen}}">
             </div>
             <div class="col">
                 <label for="recipient-name" class="col-form-label"><b>Date</b><span class="Traduccion"> (fecha)</span></label>
@@ -61,7 +61,7 @@
         <div class="row">
             <div class="col">
                 <label for="recipient-name" class="col-form-label"><b>Recived, in board the M/V/</b><span class="Traduccion"> (Recibido a bordo del vapor)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombreVapor.toUpperCase()}}">
+                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombreVapor}}">
             </div>
             <div class="col">
                 
@@ -74,7 +74,7 @@
 
         <div class="row">
             <div class="col">
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombreEmpresaRemitente.toUpperCase()}}">
+                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombreEmpresaRemitente}}">
             </div>
             <div class="col">
                 
@@ -86,7 +86,7 @@
         <div class="row">
             <div class="col">
                 <label for="recipient-name" class="col-form-label"><b>for the Port of</b><span class="Traduccion"> (para el puerto de)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombrePuertoDestino.toUpperCase()}}">
+                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombrePuertoDestino}}">
             </div>
             <div class="col">
                 
@@ -107,7 +107,7 @@
             </div>
             <div class="col">
                 <label for="recipient-name" class="col-form-label"><b>QUANTITY IN WORDS AND CLASS OF CARGO</b><span class="Traduccion"> (CANTIDAD EN LETRAS Y CLASE DE CARGA)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.cantidadEnLetras.toUpperCase()}}">
+                <input type="text" class="form-control" disabled value="{{this.reciboBuque.cantidadEnLetras}}">
             </div>    
         </div>
 
@@ -116,7 +116,7 @@
         <div class="row">
             <div class="col">
                 <div><label for="recipient-name" class="col-form-label"><b>Stowed </b><span class="Traduccion">(Estibado en bodega)</span></label></div>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.estibadoEnBodega.toUpperCase()}}">
+                <input type="text" class="form-control" disabled value="{{this.reciboBuque.estibadoEnBodega}}">
             </div>
             <div class="col">
                 
@@ -125,7 +125,7 @@
 
         <div><label></label></div>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col">
                 <div><label for="recipient-name" class="col-form-label"><b>Quality and Quantity unknown Said to Weigh:</b><span class="Traduccion"> (Calidad y cantidad desconocidas que se dice pasar)</span></label></div>
                 <input type="text" class="form-control" disabled value="{{this.reciboBuque.calidadYCantidadDesconocidas.toUpperCase()}}">
@@ -136,7 +136,7 @@
                 <input type='checkbox' class='custom-control-input' id='customSwitch32' checked value="{{this.reciboBuque.incluirParaImpresion}}">
                 <label class='custom-control-label' for='customSwitch32'></label></div>
             </div>    
-        </div>
+        </div> -->
     </div>
     
     <div class='modal-footer'>
@@ -145,5 +145,5 @@
     </div>
 </ng-template>
 
-<app-testpdf [recibo]="reciboBuque"></app-testpdf>
+<app-recibodebuquepdf *ngIf="reciboOK" [recibo]="reciboBuque"></app-recibodebuquepdf>
 

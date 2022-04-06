@@ -9,7 +9,7 @@
     [Prot_BS] NVARCHAR(50) NULL, 
     [PH] NVARCHAR(50) NULL, 
     [Origen] NVARCHAR(50) NULL, 
-    [Bodega] NVARCHAR(50) NULL, 
+    --[Bodega] NVARCHAR(50) NULL, 
     [Mano] NVARCHAR(50) NULL,
     [ModuloDeCarga_Id] INT NOT NULL,
     [Material_id] INT NULL,
