@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, forkJoin } from 'rxjs';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
@@ -19,7 +19,7 @@ import { PDFService } from '@ScatoServicios/pdf.service';
   templateUrl: './calidad.component.html',
   styleUrls: ['./calidad.component.css']
 })
-export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
+export class CalidadComponent implements OnInit, OnDestroy {
   mostrarSpinner: boolean = true;
   mostrarTabs: boolean = false;
   mostrarPlano: boolean = false;
@@ -40,7 +40,6 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
 
   embarqueId: number;
   barquitos: InstanciaWorkflowPuerto[];
-  // barquitos: InstanciaWorkflowPuerto[] = [];
   vaporId: number = 0;
   materialesPuerto = [];
   startBalanza7: string = '';
@@ -68,6 +67,17 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
 
+    this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => {
+      console.log('sendBuqueCambiaEstado: ', res);
+      // if(!this.embarque){
+        // this.embarque = this._procesoService.getEmbarqueSelected();
+        this.trabajoOrdenado();
+        this.obtenerBalanzadasEnVivo();
+        this.inicializarReciboBuque();
+      // }
+      
+    });
+
     // this.workflowService.obtenerListado().subscribe((resp: any) => {
     //   this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
     //   this.vaporId = this.barquitos['embarque'].vapor.id;
@@ -78,9 +88,9 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     // finTODO: lo nuevo para datos de balanzadas --------------------------
   }
 
-  ngAfterViewInit(): void {
-    // this.obtenerBalanzadasEnVivo();
-  }
+  // ngAfterViewInit(): void {
+  //   this.obtenerBalanzadasEnVivo();
+  // }
 
   ngOnInit(): void {
     this.embarque = this._procesoService.getEmbarqueSelected();
@@ -88,28 +98,28 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     // this.subscribeEmbarques();
     
     // if( this.vaporId > 0 ){
-     this.trabajoOrdenado();
-     this.obtenerBalanzadasEnVivo();
-  //  }
+      this.trabajoOrdenado();
+      this.obtenerBalanzadasEnVivo();
+    // }
 
     this.inicializarReciboBuque();
   }
 
-  subscribeEmbarques(){
-    try {
-      this.workflowService.obtenerListado()
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe((resp: any) => {
-          this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
-          this.vaporId = this.barquitos['embarque'].vapor.id;
-          // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
-          this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
-        });
-    } catch (e) {
-      console.log(e);
-      console.log("Error en listarEmbarquesEnLineUp");
-    }
-  }
+  // subscribeEmbarques(){
+  //   try {
+  //     this.workflowService.obtenerListado()
+  //       .pipe(takeUntil(this.unsubscribe))
+  //       .subscribe((resp: any) => {
+  //         this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
+  //         this.vaporId = this.barquitos['embarque'].vapor.id;
+  //         // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
+  //         this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
+  //       });
+  //   } catch (e) {
+  //     console.log(e);
+  //     console.log("Error en listarEmbarquesEnLineUp");
+  //   }
+  // }
 
   trabajoOrdenado(){
     forkJoin({
@@ -121,9 +131,6 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filtrarMuelles();
 
       this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
-      // this.embarquesEnLineUp.push(this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id));
-
-
       
       let embEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
       if(embEnLineUp){
@@ -131,24 +138,21 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
       }
 
       this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
-
-      //---------
       this.embarque = this._procesoService.getEmbarqueSelected();
       this.embarqueId = this._procesoService.getEmbarqueId();
 
       if(this.embarqueId){
         this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
         this.vaporId = this.barquitos['embarque'].vapor.id;
-        // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
-        //this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
-        
+        // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.        
         // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
         const selLineUp = this.barquitos['lineUp'];
         const selModuloDeCarga = selLineUp['moduloDeCarga'];        
         this.moduloDeCarga_Id = selModuloDeCarga.id;
         this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
       }
-      //---------
+
+      // console.log('En trabajoOrdenado(), this.mostrarTabs = true');
       this.mostrarTabs = true;
     });
     
@@ -158,7 +162,6 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     // Hasta que el pasaje a produccion de recibidores, pasar de Cargando → Post operativo (ticket 293)
     // let idEstadoCargando = 3; // ControlCalidad
     let idEstadoCargando = 4; // PostOperativo
-    // let ubicacion = this.ubicacionDeBuquePuerto ? this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id : '';
 
     // Filtro los buques de cada muelle. Buque que esta cargando en el muelle
     this.buqueEnSanBenito = this.listadoEmbarques ? this.listadoEmbarques
@@ -183,7 +186,6 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
     this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.filtroBalanza8);
     
     this.balanzas78Service.sendDataBalanzadaAgrupada7
-    // this.balanzas78Service.sendDataBalanzada7
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( blzas7 => {
         if(blzas7.length>0){
@@ -193,7 +195,6 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
       } );
 
     this.balanzas78Service.sendDataBalanzadaAgrupada8
-    // this.balanzas78Service.sendDataBalanzada8
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( blzas8 => {
         if(blzas8.length>0){
@@ -201,11 +202,9 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
           this.balanzas78Service.setBalanzadaAgrupada8(blzas8);
         }
       } );
-      
   }
 
   getDate(fecha: Date): string{
-    // let date = fecha.toString().substr(0, 10);
     let fechaDate = new Date(fecha);
     let date = fechaDate.getDate()+"-"+fechaDate.getMonth()+"-"+fechaDate.getFullYear();
     return date;
@@ -225,23 +224,31 @@ export class CalidadComponent implements OnInit, OnDestroy, AfterViewInit {
 
   showPlano(event: boolean) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+    // console.log('En showPlano(), this.embarqueSelected: ', this.embarqueSelected);
   
     setTimeout(() => {
+      // console.log('En showPlano(), this.mostrarSpinner = false');
+      this.mostrarSpinner = false;
+      // console.log('En setTimeout() del showPlano(), this.mostrarPlano = ', event);
       this.mostrarPlano = event;
     }, 50);
   }
 
   showCargas(event) {
+    // console.log('En showCargas(), this.mostrarCargas = ', event);
     this.mostrarCargas = event;
   }
 
   hideSpinner(event) {
     setTimeout(() => {
+      // console.log('En hideSpinner(), this.mostrarSpinner = ', event);
       this.mostrarSpinner = event;
     }, 50);
   }
 
   changeEmbarque() {
+    // console.log('En changeEmbarque(), this.mostrarCargas = ', false);
+    // console.log('En changeEmbarque(), this.mostrarSpinner = ', true);
     this.mostrarCargas = false;
     this.mostrarSpinner = true;
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
