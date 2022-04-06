@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public class EmbarcacionGeolocalizacionDto
+    public class EmbarqueGeolocalizacionDto
     {
         public int Embarque_Id { get; set; }
         public int Vapor_Id { get; set; }

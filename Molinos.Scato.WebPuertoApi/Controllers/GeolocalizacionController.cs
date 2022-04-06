@@ -47,14 +47,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 var listaEmbarques = workflows.ListarEmbarques();
 
-                List<EmbarcacionGeolocalizacionDto> listaEmbarcacionGeolocalizacion = new List<EmbarcacionGeolocalizacionDto>();
-                EmbarcacionGeolocalizacionDto embarcacionGeolocalizacionDto;
+                List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion = new List<EmbarqueGeolocalizacionDto>();
+                EmbarqueGeolocalizacionDto embarcacionGeolocalizacionDto;
                 IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto = servicio.ListarUbicacionDeBuquePuerto();
 
                 foreach (var embarque in listaEmbarques)
                 {
                     
-                    embarcacionGeolocalizacionDto = new EmbarcacionGeolocalizacionDto();
+                    embarcacionGeolocalizacionDto = new EmbarqueGeolocalizacionDto();
                     embarcacionGeolocalizacionDto.Embarque_Id = embarque.Embarque.Id;
                     embarcacionGeolocalizacionDto.NombreBuque = embarque.Embarque.NombreBuque;
                     embarcacionGeolocalizacionDto.Vicentin = embarque.Embarque.Vicentin;
