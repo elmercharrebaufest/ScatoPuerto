@@ -9681,7 +9681,7 @@ resultado.Patente = rutaFoto.Patente;
             {
                 ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
 
-                Bodega bodega = repositorio.Obtener<Bodega>(x => x.Id == item.Bodega.Id);
+                //Bodega bodega = repositorio.Obtener<Bodega>(x => x.Id == item.Bodega.Id);
 
                 if (moduloDeCargaNirManualPuerto_Db != null)
                 {
@@ -9693,10 +9693,10 @@ resultado.Patente = rutaFoto.Patente;
                     moduloDeCargaNirManualPuerto_Db.Prot_BS = item.Prot_BS;
                     moduloDeCargaNirManualPuerto_Db.PH = item.PH;
                     moduloDeCargaNirManualPuerto_Db.Origen = item.Origen;
-                    //moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
+                    moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
                     moduloDeCargaNirManualPuerto_Db.Mano = item.Mano;
                     moduloDeCargaNirManualPuerto_Db.Material_id = item.Material_id;
-                    moduloDeCargaNirManualPuerto_Db.Bodega = bodega;
+                    //moduloDeCargaNirManualPuerto_Db.Bodega = bodega;
                 }
                 else
                 {
@@ -9711,14 +9711,12 @@ resultado.Patente = rutaFoto.Patente;
                         Prot_BS = item.Prot_BS,
                         PH = item.PH,
                         Origen = item.Origen,
-                        //Bodega = item.Bodega,
+                        Bodega = item.Bodega,
                         Mano = item.Mano,
                         Material_id = item.Material_id,
-                        Bodega = bodega,
+                        //Bodega = bodega,
                     };
                 }
-
-
                 moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(moduloDeCargaNirManualPuerto_Db);
             }
             repositorio.GuardarCambios();
@@ -9996,18 +9994,6 @@ resultado.Patente = rutaFoto.Patente;
 
         }
 
-        public IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion()
-        {
-            try
-            {
-                return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>().ToList();
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
         //public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
         //{
         //    ModuloDeCargaPlanillaDeTurnosTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.Id == idPlanillaDeTurnos);
@@ -10395,5 +10381,10 @@ resultado.Patente = rutaFoto.Patente;
         {
             return Listar<EntidadTipoDeActividad, EntidadTipoDeActividadDto>(x => x.Entidad.Codigo == codigoEntidad);
         }
+        public IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado)
+        {
+            return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
+        }
+
     }
 }

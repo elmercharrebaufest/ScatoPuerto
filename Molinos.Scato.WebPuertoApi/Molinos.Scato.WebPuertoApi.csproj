@@ -209,6 +209,7 @@
     <Compile Include="Atributos\AutorizacionAttribute.cs" />
     <Compile Include="Controllers\AutenticadorController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\GeolocalizacionController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />
     <Compile Include="Controllers\PlanoDeCargaController.cs" />
     <Compile Include="Controllers\WorkflowController.cs" />
@@ -294,6 +295,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="App_Readme\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\Geolocalizacion\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

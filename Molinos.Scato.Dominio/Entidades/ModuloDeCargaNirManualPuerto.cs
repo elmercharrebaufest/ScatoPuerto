@@ -18,6 +18,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Mano { get; set; }
         public virtual ModuloDeCarga ModuloDeCarga { get; set; }
         public virtual int? Material_id { get; set; }
-        public virtual Bodega Bodega { get; set; }
+        //public virtual Bodega Bodega { get; set; }
+        public virtual string Bodega { get; set; }
     }
 }

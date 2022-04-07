@@ -1,7 +1,7 @@
 <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
     <app-collapse-button collapseSelectorId="collapseLineasEmbarque"></app-collapse-button>
 
-    <h4 class="colorTitle pt-4">TRIGO</h4>
+    <!-- <h4 class="colorTitle pt-4">TRIGO</h4>
     <div id="collapseLineasEmbarque" class="collapse show">
 
       <div fxLayout='row wrap' class="mt-3">
@@ -51,21 +51,21 @@
               </div>
             </div>
           </div>
-    
+
           <div class='max-5vh'>
             <perfect-scrollbar>
               <form id="lineasDeEmbaque" [formGroup]="forms">
-                <ng-container formArrayName="trigo">
-                  <ng-container *ngFor="let l of forms.get('trigo')['controls']; let i = index" 
+                <ng-container formArrayName="trigoMano1">
+                  <ng-container *ngFor="let l of forms.get('trigoMano1')['controls']; let i = index"
                                 [formGroupName]="i" >
                     <div fxLayout='row wrap' class="distancia-filas" >
                       <div fxFlex='100'>
                         <div fxLayout='row wrap'>
-    
+
                           <tbody>
                             <tr class="claseTr">
                               <td>
-    
+
                                 <div class="form-group" fxFlex='15'>
                                     <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
                                 </div>
@@ -88,22 +88,16 @@
                                   <input type="text" class="inputLineasEmbarque" formControlName="origen" />
                                 </div>
                                 <div class="form-group" fxFlex='8'>
-                                  <select class="custom-select" 
-                                        formControlName="bodega"
-                                        [compareWith]="compareBodega">
-                                    <option value="" selected disabled>Selecciona una Bodega</option>
-                                    <option *ngFor="let b of bodegas" 
-                                            [ngValue]="b"> {{ b.nombre }} </option>
-                                  </select>
+                                  <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
                                 </div>
                                 <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
-                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i)">
+                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'trigoMano1')">
                                 </div>
-    
+
                               </td>
                             </tr>
                           </tbody>
-    
+
                         </div>
                       </div>
                       <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
@@ -163,21 +157,21 @@
               </div>
             </div>
           </div>
-    
+
           <div class='max-5vh'>
             <perfect-scrollbar>
               <form id="lineasDeEmbaque" [formGroup]="forms">
-                <ng-container formArrayName="trigo">
-                  <ng-container *ngFor="let l of forms.get('trigo')['controls']; let i = index" 
+                <ng-container formArrayName="trigoMano2">
+                  <ng-container *ngFor="let l of forms.get('trigoMano2')['controls']; let i = index"
                                 [formGroupName]="i" >
                     <div fxLayout='row wrap' class="distancia-filas" >
                       <div fxFlex='100'>
                         <div fxLayout='row wrap'>
-    
+
                           <tbody>
                             <tr class="claseTr">
                               <td>
-    
+
                                 <div class="form-group" fxFlex='15'>
                                     <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
                                 </div>
@@ -200,22 +194,16 @@
                                   <input type="text" class="inputLineasEmbarque" formControlName="origen" />
                                 </div>
                                 <div class="form-group" fxFlex='8'>
-                                  <select class="custom-select" 
-                                        formControlName="bodega"
-                                        [compareWith]="compareBodega">
-                                    <option value="" selected disabled>Selecciona una Bodega</option>
-                                    <option *ngFor="let b of bodegas" 
-                                            [ngValue]="b"> {{ b.nombre }} </option>
-                                  </select>
+                                  <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
                                 </div>
                                 <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
-                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i)">
+                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'trigoMano2')">
                                 </div>
-    
+
                               </td>
                             </tr>
                           </tbody>
-    
+
                         </div>
                       </div>
                       <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
@@ -228,7 +216,6 @@
         </table>
       </form>
 
-      <!-- MAIZ -->
       <div fxLayout='row wrap' class="mt-3">
         <div fxFlex='100'>
           <div class='btn-add-container pt-btn-add' (click)="agregarLineasEmbarqueMaiz(1)" >
@@ -267,21 +254,21 @@
               </div>
             </div>
           </div>
-    
+
           <div class='max-5vh'>
             <perfect-scrollbar>
               <form id="lineasDeEmbaque" [formGroup]="forms">
-                <ng-container formArrayName="maiz">
-                  <ng-container *ngFor="let l of forms.get('maiz')['controls']; let i = index" 
+                <ng-container formArrayName="maizMano1">
+                  <ng-container *ngFor="let l of forms.get('maizMano1')['controls']; let i = index"
                                 [formGroupName]="i" >
                     <div fxLayout='row wrap' class="distancia-filas" >
                       <div fxFlex='100'>
                         <div fxLayout='row wrap'>
-    
+
                           <tbody>
                             <tr class="claseTr">
                               <td>
-    
+
                                 <div class="form-group" fxFlex='15'>
                                     <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
                                 </div>
@@ -295,22 +282,16 @@
                                   <input type="text" class="inputLineasEmbarque" formControlName="origen" />
                                 </div>
                                 <div class="form-group" fxFlex='8'>
-                                  <select class="custom-select" 
-                                        formControlName="bodega"
-                                        [compareWith]="compareBodega">
-                                    <option value="" selected disabled>Selecciona una Bodega</option>
-                                    <option *ngFor="let b of bodegas" 
-                                            [ngValue]="b"> {{ b.nombre }} </option>
-                                  </select>
+                                  <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
                                 </div>
                                 <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
-                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i)">
+                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'maizMano1')">
                                 </div>
-    
+
                               </td>
                             </tr>
                           </tbody>
-    
+
                         </div>
                       </div>
                       <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
@@ -361,23 +342,21 @@
               </div>
             </div>
           </div>
-    
+
           <div class='max-5vh'>
             <perfect-scrollbar>
               <form id="lineasDeEmbaque" [formGroup]="forms">
-                <ng-container formArrayName="maiz">
-                  <ng-container *ngFor="let l of forms['controls']['maiz']['controls']; let i = index" 
+                <ng-container formArrayName="maizMano2">
+                  <ng-container *ngFor="let l of forms['controls']['maizMano2']['controls']; let i = index"
                                 [formGroupName]="i" >
-                  <!-- <ng-container *ngFor="let l of forms.get('maiz')['controls']; let i = index" 
-                                [formGroupName]="i" > -->
                     <div fxLayout='row wrap' class="distancia-filas" >
                       <div fxFlex='100'>
                         <div fxLayout='row wrap'>
-    
+
                           <tbody>
                             <tr class="claseTr">
                               <td>
-    
+
                                 <div class="form-group" fxFlex='15'>
                                     <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
                                 </div>
@@ -391,22 +370,16 @@
                                   <input type="text" class="inputLineasEmbarque" formControlName="origen" />
                                 </div>
                                 <div class="form-group" fxFlex='8'>
-                                  <select class="custom-select" 
-                                        formControlName="bodega"
-                                        [compareWith]="compareBodega">
-                                    <option value="" selected disabled>Selecciona una Bodega</option>
-                                    <option *ngFor="let b of bodegas" 
-                                            [ngValue]="b"> {{ b.nombre }} </option>
-                                  </select>
+                                  <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
                                 </div>
                                 <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
-                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i)">
+                                    <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'maizMano2')">
                                 </div>
-    
+
                               </td>
                             </tr>
                           </tbody>
-    
+
                         </div>
                       </div>
                       <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
@@ -423,244 +396,413 @@
       <div class="text-center">
         <button class="btn btn-primary" (click)="enviarNir()">ENVIAR NIR</button>
       </div>
-    </div>
-
-</div>
+    </div> -->
 
 
-
-<!-- <div class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
-
-    <div class="row">
+    <!-- INICIO NUEVO -->
+    <h4 class="colorTitle pt-4">NIR</h4>
+    <div id="collapseLineasEmbarque" class="collapse show">
+      <div class="row">
         <div class="col-7 pl-4">
-            <h4 class='colorTitle py-2'>NIR: Trigo </h4>
-            <form [formGroup]='forms'>
-        
-                <div class="row"><label class="font-weight-bold">Mano 1</label></div>
-                <div class="row textoChico">
-                    <table class='table table-bordered turnos'>
-                        <thead>
-                            <tr class='table-active'>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Ritmo Tn/h</th>
-                                <th>%HD</th>
-                                <th>Prot. Base 13;50</th>
-                                <th>Prot. B/S</th>
-                                <th>PH</th>
-                                <th>Origen</th>
-                                <th>Bodega</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container formArrayName='trigo'>
-                                <ng-container *ngFor="let l of forms.get('trigo')['controls']; let i = index" 
-                                            [formGroupName]='i'>
-                                    <tr>
-                                        <td>
-                                            <input type="date" formControlName='fecha'>
-                                        </td>
-                                        <td>
-                                            <div class='input_img'>
-                                                <input formControlName='hora' placeholder="00:00" [ngxTimepicker]='hora'
-                                                    [format]='24' class='w-100'>
-                                                <img src='assets/reloj.svg' class='imgClockInput1'>
-                                                <ngx-material-timepicker #hora></ngx-material-timepicker>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input formControlName='ritmo'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='hd'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='protBase'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='prot_BS'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='ph'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='origen'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='bodega'/>
-                                        </td>
-                                    </tr>
-                                </ng-container>
-                            </ng-container>
-                        </tbody>
-                    </table>
+          <h4 class='colorTitle py-2'>Trigo</h4>
+
+          <div class="row textoChico">
+            <div fxLayout='row wrap' class="mt-3">
+              <div fxFlex='100'>
+                <div class='btn-add-container pt-btn-add' (click)="agregarLineasEmbarqueTrigo(1)" >
+                  <span class="font-weight-bold mr-4">Mano 1</span>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
                 </div>
-        
-                <div class="row"><label class="font-weight-bold">Mano 2</label></div>
-                <div class="row textoChico">
-                    <table class='table table-bordered turnos'>
-                        <thead>
-                            <tr class='table-active'>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Ritmo Tn/h</th>
-                                <th>%HD</th>
-                                <th>Prot. Base 13;50</th>
-                                <th>Prot. B/S</th>
-                                <th>PH</th>
-                                <th>Origen</th>
-                                <th>Bodega</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container formArrayName='trigo'>
-                                <ng-container *ngFor="let l of forms.get('trigo')['controls']; let i = index" 
-                                            [formGroupName]='i'>
-                                    <tr>
-                                        <td>
-                                            <input type="date" formControlName='fecha'>
-                                        </td>
-                                        <td>
-                                            <div class='input_img'>
-                                                <input formControlName='hora' placeholder="00:00" [ngxTimepicker]='hora'
-                                                    [format]='24' class='w-100'>
-                                                <img src='assets/reloj.svg' class='imgClockInput1'>
-                                                <ngx-material-timepicker #hora></ngx-material-timepicker>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input formControlName='ritmo'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='hd'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='protBase'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='prot_BS'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='ph'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='origen'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='bodega'/>
-                                        </td>
-                                    </tr>
-                                </ng-container>
-                            </ng-container>
-                        </tbody>
-                    </table>
+              </div>
+            </div>
+            <table class="claseTable" >
+              <div fxLayout='row wrap' class="mt-4">
+                <div fxFlex='100'>
+                  <div fxLayout='row wrap' class="tituloCentrado" >
+                    <tr class="claseTr" >
+                      <th>
+                        <div class="form-group div-active pl-2" fxFlex='25'>
+                          <label>Fecha-Hora</label>
+                        </div>
+                        <div class="form-group div-active pl-2" fxFlex='8'>
+                          <label>Ritmo Tn/h</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>%HD</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Prot. Base 13;50</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Prot. B/S</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>PH</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Origen</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Bodega</label>
+                        </div>
+                          <div fxFlex='4' class='full-center' >
+                        </div>
+                      </th>
+                    </tr>
+                  </div>
                 </div>
-                
-            </form>
-            <div>Total Ponderado Prot. B/S:</div>
+              </div>
+    
+              <div class='max-5vh'>
+                <perfect-scrollbar>
+                  <form id="lineasDeEmbaque" [formGroup]="forms">
+                    <ng-container formArrayName="trigoMano1">
+                      <ng-container *ngFor="let l of forms.get('trigoMano1')['controls']; let i = index"
+                                    [formGroupName]="i" >
+                        <div fxLayout='row wrap' class="distancia-filas" >
+                          <div fxFlex='100'>
+                            <div fxLayout='row wrap'>
+    
+                              <tbody>
+                                <tr class="claseTr">
+                                  <td>
+    
+                                    <div class="form-group" fxFlex='25'>
+                                        <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="ritmo"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="hd"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="protBase"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="prot_BS" />
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="ph" />
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="origen" />
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
+                                    </div>
+                                    <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
+                                        <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'trigoMano1')">
+                                    </div>
+    
+                                  </td>
+                                </tr>
+                              </tbody>
+    
+                            </div>
+                          </div>
+                          <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </form>
+                </perfect-scrollbar>
+              </div>
+            </table>
+          </div>
+
+          <div class="row textoChico">
+            <div fxLayout='row wrap' class="mt-3">
+              <div fxFlex='100'>
+                <div class='btn-add-container pt-btn-add' (click)="agregarLineasEmbarqueTrigo(2)" >
+                  <span class="font-weight-bold mr-4">Mano 2</span>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
+                </div>
+              </div>
+            </div>
+            <table class="claseTable" >
+              <div fxLayout='row wrap' class="mt-4">
+                <div fxFlex='100'>
+                  <div fxLayout='row wrap' class="tituloCentrado" >
+                    <tr class="claseTr" >
+                      <th>
+                        <div class="form-group div-active pl-2" fxFlex='25'>
+                          <label>Fecha-Hora</label>
+                        </div>
+                        <div class="form-group div-active pl-2" fxFlex='8'>
+                          <label>Ritmo Tn/h</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>%HD</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Prot. Base 13;50</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Prot. B/S</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>PH</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Origen</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='8'>
+                          <label>Bodega</label>
+                        </div>
+                          <div fxFlex='4' class='full-center' >
+                        </div>
+                      </th>
+                    </tr>
+                  </div>
+                </div>
+              </div>
+    
+              <div class='max-5vh'>
+                <perfect-scrollbar>
+                  <form id="lineasDeEmbaque" [formGroup]="forms">
+                    <ng-container formArrayName="trigoMano2">
+                      <ng-container *ngFor="let l of forms.get('trigoMano2')['controls']; let i = index"
+                                    [formGroupName]="i" >
+                        <div fxLayout='row wrap' class="distancia-filas" >
+                          <div fxFlex='100'>
+                            <div fxLayout='row wrap'>
+    
+                              <tbody>
+                                <tr class="claseTr">
+                                  <td>
+    
+                                    <div class="form-group" fxFlex='25'>
+                                        <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="ritmo"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="hd"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="protBase"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="prot_BS" />
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="ph" />
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="origen" />
+                                    </div>
+                                    <div class="form-group" fxFlex='8'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
+                                    </div>
+                                    <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
+                                        <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'trigoMano2')">
+                                    </div>
+    
+                                  </td>
+                                </tr>
+                              </tbody>
+    
+                            </div>
+                          </div>
+                          <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </form>
+                </perfect-scrollbar>
+              </div>
+            </table>
+          </div>
+          <div>Total Ponderado Prot. B/S:</div>
         </div>
 
         <div class="col-4 ml-3 pr-4">
-            <h4 class='colorTitle py-2'>NIR: Maíz</h4>
-            <form [formGroup]='forms'>
-                <div class="row"> <label class="font-weight-bold">Mano 1</label> </div>
-                <div class="row textoChico">
-                    <table class='table table-bordered turnos'>
-                        <thead>
-                            <tr class='table-active'>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>%HD</th>
-                                <th>PH</th>
-                                <th>Origen</th>
-                                <th>Bodega</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container formArrayName='maiz'>
-                                <ng-container *ngFor="let l of forms.get('maiz')['controls']; let i = index" 
-                                            [formGroupName]='i'>
-                                    <tr>
-                                        <td>
-                                            <input type="date" formControlName='fecha'>
-                                        </td>
-                                        <td>
-                                            <div class='input_img'>
-                                                <input formControlName='hora' placeholder="00:00" [ngxTimepicker]='hora'
-                                                    [format]='24' class='w-100'>
-                                                <img src='assets/reloj.svg' class='imgClockInput1'>
-                                                <ngx-material-timepicker #hora></ngx-material-timepicker>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input formControlName='hd'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='ph'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='origen'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='bodega'/>
-                                        </td>
-                                    </tr>
-                                </ng-container>
-                            </ng-container>
-                        </tbody>
-                    </table>
-                </div>
-        
-                <div class="row"><label class="font-weight-bold">Mano 2</label></div>
-                <div class="row textoChico">
-                    <table class='table table-bordered turnos'>
-                        <thead>
-                            <tr class='table-active'>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>%HD</th>
-                                <th>PH</th>
-                                <th>Origen</th>
-                                <th>Bodega</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container formArrayName='maiz'>
-                                <ng-container *ngFor="let l of forms.get('maiz')['controls']; let i = index" 
-                                            [formGroupName]='i'>
-                                    <tr>
-                                        <td>
-                                            <input type="date" formControlName='fecha'>
-                                        </td>
-                                        <td>
-                                            <div class='input_img'>
-                                                <input formControlName='hora' placeholder="00:00" [ngxTimepicker]='hora'
-                                                    [format]='24' class='w-100'>
-                                                <img src='assets/reloj.svg' class='imgClockInput1'>
-                                                <ngx-material-timepicker #hora></ngx-material-timepicker>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <input formControlName='hd'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='ph'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='origen'/>
-                                        </td>
-                                        <td>
-                                            <input formControlName='bodega'/>
-                                        </td>
-                                    </tr>
-                                </ng-container>
-                            </ng-container>
-                        </tbody>
-                    </table>
-                </div>
-            </form>
-        </div>
-    </div>
+          <h4 class='colorTitle py-2'>Maíz</h4>
 
-    <button class="btn btn-primary" (click)="enviarNir()">ENVIAR NIR</button>
-</div> -->
+          <div class="row textoChico">
+            <div fxLayout='row wrap' class="mt-3">
+              <div fxFlex='100'>
+                <div class='btn-add-container pt-btn-add' (click)="agregarLineasEmbarqueMaiz(1)" >
+                  <span class="font-weight-bold mr-4">Mano 1</span>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
+                </div>
+              </div>
+            </div>
+            <table class="claseTable" >
+              <div fxLayout='row wrap' class="mt-4">
+                <div fxFlex='100'>
+                  <div fxLayout='row wrap' class="tituloCentrado" >
+                    <tr class="claseTr" >
+                      <th>
+                        <div class="form-group div-active pl-2" fxFlex='35'>
+                          <label>Fecha-Hora</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='10'>
+                          <label>%HD</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='10'>
+                          <label>PH</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='15'>
+                          <label>Origen</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='15'>
+                          <label>Bodega</label>
+                        </div>
+                          <div fxFlex='4' class='full-center' >
+                        </div>
+                      </th>
+                    </tr>
+                  </div>
+                </div>
+              </div>
+    
+              <div class='max-5vh'>
+                <perfect-scrollbar>
+                  <form id="lineasDeEmbaque" [formGroup]="forms">
+                    <ng-container formArrayName="maizMano1">
+                      <ng-container *ngFor="let l of forms.get('maizMano1')['controls']; let i = index"
+                                    [formGroupName]="i" >
+                        <div fxLayout='row wrap' class="distancia-filas" >
+                          <div fxFlex='100'>
+                            <div fxLayout='row wrap'>
+    
+                              <tbody>
+                                <tr class="claseTr">
+                                  <td>
+    
+                                    <div class="form-group" fxFlex='35'>
+                                        <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
+                                    </div>
+                                    <div class="form-group" fxFlex='10'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="hd"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='10'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="ph" />
+                                    </div>
+                                    <div class="form-group" fxFlex='15'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="origen" />
+                                    </div>
+                                    <div class="form-group" fxFlex='15'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
+                                    </div>
+                                    <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
+                                        <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'maizMano1')">
+                                    </div>
+    
+                                  </td>
+                                </tr>
+                              </tbody>
+    
+                            </div>
+                          </div>
+                          <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </form>
+                </perfect-scrollbar>
+              </div>
+            </table>
+          </div>
+
+          <div class="row textoChico">
+            <div fxLayout='row wrap' class="mt-3">
+              <div fxFlex='100'>
+                <div class='btn-add-container pt-btn-add' (click)="agregarLineasEmbarqueMaiz(2)" >
+                  <span class="font-weight-bold mr-4">Mano 2</span>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
+                </div>
+              </div>
+            </div>
+            <table class="claseTable" >
+              <div fxLayout='row wrap' class="mt-4">
+                <div fxFlex='100'>
+                  <div fxLayout='row wrap' class="tituloCentrado" >
+                    <tr class="claseTr" >
+                      <th>
+                        <div class="form-group div-active pl-2" fxFlex='35'>
+                          <label>Fecha-Hora</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='10'>
+                          <label>%HD</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='10'>
+                          <label>PH</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='15'>
+                          <label>Origen</label>
+                        </div>
+                        <div class="form-group div-active" fxFlex='15'>
+                          <label>Bodega</label>
+                        </div>
+                          <div fxFlex='4' class='full-center' >
+                        </div>
+                      </th>
+                    </tr>
+                  </div>
+                </div>
+              </div>
+    
+              <div class='max-5vh'>
+                <perfect-scrollbar>
+                  <form id="lineasDeEmbaque" [formGroup]="forms">
+                    <ng-container formArrayName="maizMano2">
+                      <ng-container *ngFor="let l of forms['controls']['maizMano2']['controls']; let i = index"
+                                    [formGroupName]="i" >
+                        <div fxLayout='row wrap' class="distancia-filas" >
+                          <div fxFlex='100'>
+                            <div fxLayout='row wrap'>
+    
+                              <tbody>
+                                <tr class="claseTr">
+                                  <td>
+    
+                                    <div class="form-group" fxFlex='35'>
+                                        <input type="datetime-local" class="inputLineasEmbarque" formControlName='fecha' [value]="fecha">
+                                    </div>
+                                    <div class="form-group" fxFlex='10'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="hd"/>
+                                    </div>
+                                    <div class="form-group" fxFlex='10'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="ph" />
+                                    </div>
+                                    <div class="form-group" fxFlex='15'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="origen" />
+                                    </div>
+                                    <div class="form-group" fxFlex='15'>
+                                      <input type="text" class="inputLineasEmbarque" formControlName="bodega" />
+                                    </div>
+                                    <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
+                                        <img src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i, 'maizMano2')">
+                                    </div>
+    
+                                  </td>
+                                </tr>
+                              </tbody>
+    
+                            </div>
+                          </div>
+                          <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </form>
+                </perfect-scrollbar>
+              </div>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" (click)="enviarNir()">ENVIAR NIR</button>
+    </div>
+    <!-- FIN NUEVO -->
+
+</div>

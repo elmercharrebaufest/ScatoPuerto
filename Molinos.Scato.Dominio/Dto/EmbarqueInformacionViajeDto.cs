@@ -15,7 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string ETA_Reportado { get; set; }
         public string Destino_Reportado { get; set; }
         public string Peso_Reportado { get; set; }
-        public int VelocidadRecorrido { get; set; }
+        public string VelocidadRecorrido { get; set; }
         public DateTime FechaRegistro { get; set; }
 
     }

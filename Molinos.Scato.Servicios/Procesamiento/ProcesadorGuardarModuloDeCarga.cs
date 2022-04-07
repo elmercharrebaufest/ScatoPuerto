@@ -476,13 +476,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
                 {
-                    var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
+                    //var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
 
                     moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
                     {
                         Id = Nir.Id,
                         ModuloDeCarga = moduloDeCarga,
-                        Bodega = bodega,
+                        //Bodega = bodega,
+                        Bodega = Nir.Bodega,
                         Fecha = Nir.Fecha,
                         HD = Nir.HD,
                         Hora = Nir.Hora,

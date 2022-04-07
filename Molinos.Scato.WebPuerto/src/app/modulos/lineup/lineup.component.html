@@ -47,6 +47,9 @@
       <button type="button" class="btn btn-light btn-circle " (click)="cambiarVista()">
         <i class="fa fa-calendar fa-2x c-celeste" [ngClass]="{'fa-calendar': !mostrarCalendario, 'fa-list-ul': mostrarCalendario}"></i>
       </button>
+      <button type="button" class="btn btn-light btn-circle" (click)="cambiarGeolocalizacion()">
+        <i class="fa fa-map-marker fa-2x c-celeste"></i>
+      </button>
       <!--<input class="form-control search" type="search" placeholder="&#xF002; Buscar" aria-label="Search">-->
     </div>
     <div class="col pr-0">
