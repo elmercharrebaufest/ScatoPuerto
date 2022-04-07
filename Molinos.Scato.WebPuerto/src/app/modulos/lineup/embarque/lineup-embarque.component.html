@@ -191,11 +191,12 @@
         </div>
       </div>
     </div>
-    <div class="container">
-      <img src="assets/existImo.svg" class="imgImo">
-      <div class="feature">
-        <p class="color-text">No se encontro completar IMO</p>
-      </div>
+    <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
+        <img   [src]="hayBuque?
+        'assets/verMapa.svg' : 'assets/exitImo.svg'" src="assets/exitImo.svg" class="imgImo">
+        <div class="feature">
+          <p [ngClass]="hayBuque?'color-text-mapa':'color-text-imo'">{{mensajeBuque}}</p>
+        </div>   
     </div>
   </div>
   </div>

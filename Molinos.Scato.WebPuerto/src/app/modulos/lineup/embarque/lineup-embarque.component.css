@@ -180,9 +180,14 @@ li{
     display: flex;
     flex-direction: column;
   }
-.color-text
+.color-text-imo
  {
    color:red;
+   font-size: 0.875rem;
+  }
+  .color-text-mapa
+ {
+   color:blue;
    font-size: 0.875rem;
   }
 @media (min-width: 768px) {
