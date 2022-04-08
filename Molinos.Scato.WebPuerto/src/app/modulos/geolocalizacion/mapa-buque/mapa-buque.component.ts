@@ -143,7 +143,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
         if (this.listaEmbarcacion!=undefined) {
           if (this.listaEmbarcacion.length > 0) {
               this.listaEmbarcacion.forEach(buque => {
-                  if (buque.esSeleccionado){
+                  if (buque.esSeleccionado && buque.esSeleccionadoPorMuelle){
                       const latitud = buque.posicion.latitud;
                       const longitud = buque.posicion.longitud;
 

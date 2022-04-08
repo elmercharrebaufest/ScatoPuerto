@@ -16,7 +16,6 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
-    [Autorizacion(PermisosScato.PreLineUp)]
     public class EmbarqueController : BaseController
     {
         private readonly IServicioActividadFactory<IIngresarEmbarqueService> factory;

@@ -107,6 +107,8 @@ export class GeolocalizacionComponent implements OnInit {
                     item.muelleCarga = muelleCarga;
                     item.esSeleccionado = true;
                     item.esCordenadaModificada = false;
+                    item.esSeleccionadoPorMuelle = true;
+                    item.numeroPaginado = 0;
                 });
                 this.setListaBuquesGeolocalizacion(data);
                 
@@ -116,56 +118,63 @@ export class GeolocalizacionComponent implements OnInit {
              },
       () => {
                 this.mostrarListaBuque = true;
-
-                this.listaBuquesGeolocalizacion.forEach((item) =>{
-                  
-                  if (!item.sanBenito){
-                    let embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito != true);
-                    let newEmbarqueSel = Object.assign({}, embarqueSel); // make a copy
-                    newEmbarqueSel.embarque_Id = newEmbarqueSel.embarque_Id + 19
-                    this.listaBuquesGeolocalizacion.push(JSON.parse(JSON.stringify(newEmbarqueSel)));
-                  }
-                })
-
-                this.listaBuquesGeolocalizacion.forEach((item) =>{
-                  
-                  if (!item.sanBenito){
-                    const embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito == true);
-
-                    if (embarqueSel != undefined){
-
-                          let maxEmbarque_Id;
-                          const embarqueIds = this.listaBuquesGeolocalizacion.find(data => data.vapor_Id == item.vapor_Id && data.esCordenadaModificada == true && data.embarque_Id != item.embarque_Id && item.sanBenito != true);
-
-                          if (embarqueIds!= undefined){
-                              maxEmbarque_Id = embarqueIds.embarque_Id;
-                          }
-                          const embarqueSelCord = this.listaBuquesGeolocalizacion.find(buque => buque.embarque_Id == maxEmbarque_Id);
-
-                          let latitudVal=null;
-                          let longitudVal=null;
-
-                          if (embarqueSelCord != undefined){
-                              latitudVal  = Number(embarqueSelCord.posicion.latitud) + 0.00879;
-                              longitudVal = Number(embarqueSelCord.posicion.longitud) + 0.00290;
-                              item.posicion.latitud = latitudVal;
-                              item.posicion.longitud =  longitudVal;
-                              item.esCordenadaModificada = true;
-                          }else{
-                              latitudVal  = Number(item.posicion.latitud) + 0.00879;
-                              longitudVal = Number(item.posicion.longitud) + 0.00290;
-                              item.posicion.latitud = latitudVal;
-                              item.posicion.longitud =  longitudVal;
-                              item.esCordenadaModificada = true;
-                          }
-                    }
-                  }
-                })
-
-                this.geolocalizacionSharingService.setBuquesLineUp(this.getListaBuquesGeolocalizacion());
+                this.cargarBuqueAdicionales();
 
             }
     );
+  }
+
+  private cargarBuqueAdicionales(){
+    if (this.listaBuquesGeolocalizacion != undefined){
+      if (this.listaBuquesGeolocalizacion.length > 0){
+          this.listaBuquesGeolocalizacion.forEach((item) =>{
+      
+            if (!item.sanBenito){
+              let embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito != true);
+              let newEmbarqueSel = Object.assign({}, embarqueSel); // make a copy
+              newEmbarqueSel.embarque_Id = newEmbarqueSel.embarque_Id + 19
+              this.listaBuquesGeolocalizacion.push(JSON.parse(JSON.stringify(newEmbarqueSel)));
+            }
+          })
+
+          this.listaBuquesGeolocalizacion.forEach((item) =>{
+            
+            if (!item.sanBenito){
+              const embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito == true);
+
+              if (embarqueSel != undefined){
+
+                    let maxEmbarque_Id;
+                    const embarqueIds = this.listaBuquesGeolocalizacion.find(data => data.vapor_Id == item.vapor_Id && data.esCordenadaModificada == true && data.embarque_Id != item.embarque_Id && item.sanBenito != true);
+
+                    if (embarqueIds!= undefined){
+                        maxEmbarque_Id = embarqueIds.embarque_Id;
+                    }
+                    const embarqueSelCord = this.listaBuquesGeolocalizacion.find(buque => buque.embarque_Id == maxEmbarque_Id);
+
+                    let latitudVal=null;
+                    let longitudVal=null;
+
+                    if (embarqueSelCord != undefined){
+                        latitudVal  = Number(embarqueSelCord.posicion.latitud) + 0.00879;
+                        longitudVal = Number(embarqueSelCord.posicion.longitud) + 0.00290;
+                        item.posicion.latitud = latitudVal;
+                        item.posicion.longitud =  longitudVal;
+                        item.esCordenadaModificada = true;
+                    }else{
+                        latitudVal  = Number(item.posicion.latitud) + 0.00879;
+                        longitudVal = Number(item.posicion.longitud) + 0.00290;
+                        item.posicion.latitud = latitudVal;
+                        item.posicion.longitud =  longitudVal;
+                        item.esCordenadaModificada = true;
+                    }
+              }
+            }
+          })
+
+          this.geolocalizacionSharingService.setBuquesLineUp(this.getListaBuquesGeolocalizacion());
+      }
+    }
   }
 
 }

@@ -81,7 +81,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                     if (EmbarqueInformacion != null)
                     {
-                        if (EmbarqueInformacion.Count > 0 )
+                        if (EmbarqueInformacion.Count > 0 ) 
                         {
                             embarcacionGeolocalizacionDto.Informacion = EmbarqueInformacion[0];
                         }
@@ -103,7 +103,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         }
                     }
 
-                    listaEmbarcacionGeolocalizacion.Add(embarcacionGeolocalizacionDto);
+                    if (EmbarqueInformacion.Count > 0 && EmbarqueInformacionViaje.Count > 0 && EmbarquePosicion.Count > 0)
+                    {
+                        listaEmbarcacionGeolocalizacion.Add(embarcacionGeolocalizacionDto);
+                    }
+                        
         
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, listaEmbarcacionGeolocalizacion);
