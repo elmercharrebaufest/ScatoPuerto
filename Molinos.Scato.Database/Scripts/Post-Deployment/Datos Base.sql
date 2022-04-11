@@ -1,5 +1,5 @@
 ﻿	-- Paises
-IF EXISTS (select 1 from pais where descripcion = 'Argentina') BEGIN update pais set descripcion = 'ARGENTINA' where id = (select id from pais where descripcion = 'Argentina') END
+IF EXISTS (select 1 from pais where descripcion = 'Argentina') BEGIN update pais set descripcion = 'ARGENTINA' where id = (select id from pais where descripcion = 'Argentina'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('ARGENTINA')) BEGIN insert into Pais(Descripcion) values ('ARGENTINA'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('BOLIVIA')) BEGIN insert into Pais(Descripcion) values ('BOLIVIA'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('BRASIL')) BEGIN insert into Pais(Descripcion) values ('BRASIL'); END
@@ -435,7 +435,7 @@ IF NOT EXISTS (select 1 from TipoComprobanteOncca where Descripcion = 'Otros') B
 --Tipo Vehículo
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión') BEGIN insert into TipoVehiculo(Id, Descripcion) values (0, 'Camión'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Tren') BEGIN insert into TipoVehiculo(Id, Descripcion) values (1, 'Tren'); END
-IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Bitren') BEGIN insert into TipoVehiculo(Id, Descripcion) values (2, 'Bitren'); END
+IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Bitren B(60)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (2, 'Bitren B(60)'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión C(55,5)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (3, 'Camión C(55,5)'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión D(52,5)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (4, 'Camión D(52,5)'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión E(49,5)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (5, 'Camión E(49,5)'); END
