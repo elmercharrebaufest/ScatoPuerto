@@ -19,6 +19,7 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
   numeroPagina: number = 0;
   totalPaginas: number = 0;
   listaPaginas;
+  
   constructor(private geolocalizacionSharingService : GeolocalizacionSharingService) {
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) =>{
 
@@ -106,6 +107,7 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
   paginaSeleccionada(pagina){
     this.paginaActual = pagina;
   }
+
   private marcarPaginas(){
     let numeroRegistro = 1;
     let numeroPagina = 1;
@@ -121,17 +123,19 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
         }
     });
   }
+
   seleccionaPagina(pagina){
     this.paginaActual = pagina;
   }
+
   cargarPaginas(){
-    const registros = this.getListaBuquesGeolocalizacion().length + 1;
+    
+    const registros = this.getListaBuquesGeolocalizacion().filter(d => d.esSeleccionadoPorMuelle == true).length + 1;
     this.totalPaginas = (registros / this.tamanioPagina);
     this.totalPaginas = Math.ceil(this.totalPaginas);
     this.listaPaginas = new Array(this.totalPaginas);
     this.marcarPaginas()
     this.paginaActual = 1;
   }
-
 
 }

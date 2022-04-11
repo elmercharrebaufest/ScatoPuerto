@@ -21,6 +21,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   private iconoUbicacion!:L.Icon;
   private markadorAncla!: L.Marker;
   private markadorUbicacion!: L.Marker;
+  private referenciaOverlay;
   private recargarMarkadores: boolean = false;
   private puntosInteresSubject$: any
   private embarcacionSubject$: any
@@ -72,9 +73,25 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     await this.cargarPuntosInteres();
     await this.cargarBuquesMapa();
     this.map.on('zoomend', this.handleMapZoomEnd.bind(this));
+    this.mostrarBuqueSeleccionado();
   }
-  
+
+  async mostrarBuqueSeleccionado(){
+    let embarqueSeleccionado;
+    this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuqueSeleccionado().subscribe((data) => {
+      embarqueSeleccionado = data;
+      if (embarqueSeleccionado.length > 0){
+        const embarque = embarqueSeleccionado[0];
+        const latitud = embarque.posicion.latitud;
+        const longitud = embarque.posicion.longitud;
+        this.map.setView([latitud, longitud], 13);
+      }
+    });
+  }
+
   async cargarPuntosInteres() {
+    let layerAncla = new L.LayerGroup();
+    let layerUbicacion = new L.LayerGroup();
       if (this.listaPuntosInteres!=undefined) {
         if (this.listaPuntosInteres.length > 0) {
             this.listaPuntosInteres.forEach(punto => {
@@ -86,19 +103,22 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                   case 'ancla': {
                     iconoPunto = this.iconoAncla;
                     this.markadorAncla = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
-                    this.markadorAncla.addTo(this.map);
+                    //this.markadorAncla.addTo(this.map);
+                    layerAncla.addLayer(this.markadorAncla);
                     break;
                   }
                   case 'ubicacion':{
                     iconoPunto = this.iconoUbicacion;
                     this.markadorUbicacion = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
-                    this.markadorUbicacion.addTo(this.map);
+                    //this.markadorUbicacion.addTo(this.map);
+                    layerUbicacion.addLayer(this.markadorUbicacion);
                     break;
                   }
                   default:{
                     iconoPunto = this.iconoUbicacion;
                     this.markadorAncla = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
-                    this.markadorAncla.addTo(this.map);
+                    //this.markadorAncla.addTo(this.map);
+                    layerAncla.addLayer(this.markadorAncla);
                     break;
                   }
                 }
@@ -106,7 +126,34 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
             });
         }   
       }
+      
+      await this.cargarReferenciasMapa(layerUbicacion, layerAncla);
   }
+
+  private async cargarReferenciasMapa(layerUbicacion, layerAncla){
+    var ubicaciones = L.layerGroup([layerUbicacion]);
+    var ancla = L.layerGroup([layerAncla]);
+
+    this.map.addLayer(ubicaciones);
+    this.map.addLayer(ancla);
+    var LayerGroup = L.layerGroup();
+
+    var overlayMaps = {
+        "Referencias": LayerGroup,
+        "<b> Muelles </b> <img src='../../../../assets/ubicacion.svg' width='21' height='21'>" : ubicaciones,
+        "<b> Fondeaderos y Puertos </b> <img src='../../../../assets/ancla.svg' width='21' height='21'>": ancla,
+        "<b> Buques </b> <img src='../../../../assets/buque_otro_muelle.svg' width='21' height='21'>": LayerGroup
+    };
+    this.referenciaOverlay = L.control.layers (
+                    null,
+                    overlayMaps, 
+                    {
+                      collapsed: false,
+                      position: "bottomleft",
+                    }
+                    ).addTo(this.map);
+              
+}
 
   async inicializarMapa() {
 
@@ -129,6 +176,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
             this.map.removeLayer(layer)
         }
       });
+      this.map.removeControl(this.referenciaOverlay)
       this.recargarMarkadores = true;
     }else {
       if (this.recargarMarkadores){
@@ -189,6 +237,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
           this.map.removeLayer(layer)
       }
     });
+    this.map.removeControl(this.referenciaOverlay)
   }
 
   private cargarTarjetaBuque(component?: any, onAttach?: any, latitud?: any, longitud?: any){  

@@ -1,6 +1,5 @@
 import { Component, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { PuntosInteres } from '@ScatoModels/geolocalizacion/puntos-interes';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
 
@@ -27,10 +26,12 @@ export class GeolocalizacionComponent implements OnInit {
   constructor(private session: SessionService,
               private geolocalizacionService: GeolocalizacionService,
               private geolocalizacionSharingService : GeolocalizacionSharingService,
-              private router: Router) { 
+              private router: Router,
+              private route: ActivatedRoute) { 
       this.user = this.session.getUser();
       this.cargarPuntosInteres();
       this.cargarBuquesGeolocalizacion();
+      
   }
 
   ngOnInit(){
@@ -119,7 +120,7 @@ export class GeolocalizacionComponent implements OnInit {
       () => {
                 this.mostrarListaBuque = true;
                 this.cargarBuqueAdicionales();
-
+                this.cargarBuqueSeleccionado();
             }
     );
   }
@@ -174,6 +175,22 @@ export class GeolocalizacionComponent implements OnInit {
 
           this.geolocalizacionSharingService.setBuquesLineUp(this.getListaBuquesGeolocalizacion());
       }
+    }
+  }
+
+  private cargarBuqueSeleccionado(){
+    let embarque_Id;
+    let tipo;
+    if (this.route.snapshot.queryParams.embarque_id != undefined){
+          embarque_Id = this.route.snapshot.queryParams.embarque_id
+          console.log(embarque_Id)
+    }
+    if (this.route.snapshot.queryParams.tipo != undefined){
+          tipo = this.route.snapshot.queryParams.tipo
+    }
+    if (this.listaBuquesGeolocalizacion != undefined){
+        const embarque = this.listaBuquesGeolocalizacion.filter(buque => buque.embarque_Id == embarque_Id);
+        this.geolocalizacionSharingService.setBuqueSeleccionado(embarque);
     }
   }
 
