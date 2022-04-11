@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="61" height="61" viewBox="0 0 61 61">
+<defs>
+<filter id="Elipse" x="0" y="0" width="61" height="61" filterUnits="userSpaceOnUse">
+<feOffset dy="3" input="SourceAlpha"/>
+<feGaussianBlur stdDeviation="3" result="blur"/>
+<feFlood flood-opacity="0.161"/>
+<feComposite operator="in" in2="blur"/>
+<feComposite in="SourceGraphic"/>
+</filter>
+</defs>
+<g id="Acceso_a_geolocalizacion" data-name="Acceso a geolocalizacion" transform="translate(9 6)">
+<g transform="matrix(1, 0, 0, 1, -9, -6)" filter="url(#Elipse)">
+<circle id="Elipse-2" data-name="Elipse" cx="21.5" cy="21.5" r="21.5" transform="translate(9 6)" fill="#fff"/>
+</g>
+<g id="icono_geo" transform="translate(12.601 8.601)">
+<path id="icono_geo-2" data-name="icono_geo" d="M7605.824,14307.25a.9.9,0,0,1-.637-.263h0c-.012-.012-.023-.024-.035-.037l-.43-.48a51.92,51.92,0,0,1-4.071-5.267c-2.787-4.127-4.2-7.619-4.2-10.377a9.375,9.375,0,1,1,18.75,0c0,2.757-1.413,6.249-4.2,10.378a51.533,51.533,0,0,1-4.074,5.269l-.433.48-.029.03a.9.9,0,0,1-.638.268Zm0-24a7.569,7.569,0,0,0-7.573,7.576c0,2.393,1.31,5.545,3.893,9.37a51.236,51.236,0,0,0,3.682,4.8,51.363,51.363,0,0,0,3.683-4.8c2.583-3.826,3.893-6.979,3.893-9.371a7.569,7.569,0,0,0-7.577-7.576Zm0,11.723a4.36,4.36,0,1,1,4.361-4.358A4.363,4.363,0,0,1,7605.823,14294.972Zm0-6.919a2.559,2.559,0,1,0,2.562,2.561A2.562,2.562,0,0,0,7605.823,14288.053Z" transform="translate(-7596.45 -14281.448)" fill="#999"/>
+</g>
+</g>
+</svg>

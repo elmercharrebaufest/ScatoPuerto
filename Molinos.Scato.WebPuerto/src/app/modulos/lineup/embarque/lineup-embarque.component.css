@@ -66,7 +66,6 @@ text-r {
   left: 0;
   top: 10%;
 }
-
 .clock-success{
   filter: invert(63%) sepia(62%) saturate(350%) hue-rotate(71deg) brightness(87%) contrast(98%);
 }
@@ -165,6 +164,38 @@ li{
   opacity: 0.65;
 }
 
+
+.container
+{
+  width: 105%;
+  display: flex;
+  float: left;
+}
+.imgImo{ 
+  padding: 0 1rem;
+  float: left;
+  }
+  .right
+  {
+    display: flex;
+    flex-direction: column;
+  }
+.color-text-imo
+ {
+   color:red;
+   font-size: 0.875rem;
+  }
+  .color-text-mapa
+ {
+   color:blue;
+   font-size: 0.875rem;
+  }
+
+  .color-text-espera
+ {
+   color:gray;
+   font-size: 0.875rem;
+  }
 @media (min-width: 768px) {
   .col-sm-15 {
     width: 9.09%;
