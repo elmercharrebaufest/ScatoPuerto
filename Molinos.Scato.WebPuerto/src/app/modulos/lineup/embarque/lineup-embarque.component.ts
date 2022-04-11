@@ -16,7 +16,8 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { MessageService } from 'primeng/api';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
-
+import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocalizacion.component';
+import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -38,7 +39,10 @@ export class LineupEmbarqueComponent implements OnInit {
   embarquesPuerto: InstanciaWorkflowPuerto[];
   hayBuque=true;
   mensajeBuque:string;
+  colorMapa:string='color-text-espera';
+  private listaBuquesGeolocalizacion;
   private user: Usuario;
+  ruta:string='assets/esperaBuque.svg';
   constructor(
     private lineUpService: LineupService,
     private workflowService: WorkflowService,
@@ -46,7 +50,8 @@ export class LineupEmbarqueComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
-    private session: SessionService
+    private session: SessionService,
+    private geolocalizacionService: GeolocalizacionService
   ) {
     this.user = this.session.getUser();
   }
@@ -56,7 +61,7 @@ export class LineupEmbarqueComponent implements OnInit {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
     }
-    this.mensajeBuque=this.hayBuque?"Ver en el mapa":"No se encontró. Completar IMO";
+    this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
@@ -68,6 +73,34 @@ export class LineupEmbarqueComponent implements OnInit {
       });
   }
 
+  cargarBuqueGeolocalizacion(id:any)
+  {
+    this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe( data => {
+      this.mensajeBuque=data.find(o=>o.embarque_Id==id)!=null?"Ver en el mapa":"No se encontró. Completar IMO";
+      this.hayBuque=data.find(o=>o.embarque_Id==id)!=null?true:false;
+      this.ruta= this.hayBuque?"assets/verMapa.svg":"assets/existImo.svg";
+      this.colorMapa=this.hayBuque?'color-text-mapa':'color-text-imo'
+    },
+      err => {
+            console.error('Observer got an error: ' + err)
+            },
+      () => {
+            }
+    );
+  }
+  setListaBuquesGeolocalizacion(BuquesGeolocalizacion){
+    this.listaBuquesGeolocalizacion = BuquesGeolocalizacion;
+  }
+  getListaBuquesGeolocalizacion(){
+    return this.listaBuquesGeolocalizacion;
+  }
+  verGeolocalizacion(flagVerGeo:any,embarque_Id:number)
+  {
+    if(flagVerGeo)
+    {
+      this.router.navigate(['/geolocalizacion'], { queryParams: {embarque_Id: embarque_Id, tipo: 'zoom'}});
+    }
+  }
   public modificarLineUp(campo: string) {
     if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
       switch (campo) {
@@ -312,3 +345,4 @@ export class LineupEmbarqueComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
   }
 }
+

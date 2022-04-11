@@ -192,10 +192,9 @@
       </div>
     </div>
     <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
-        <img   [src]="hayBuque?
-        'assets/verMapa.svg' : 'assets/exitImo.svg'" src="assets/exitImo.svg" class="imgImo">
+        <img   [src]="ruta" class="imgImo" (click)="verGeolocalizacion(hayBuque,instanciaWorkflow.embarque.id)">
         <div class="feature">
-          <p [ngClass]="hayBuque?'color-text-mapa':'color-text-imo'">{{mensajeBuque}}</p>
+          <p [ngClass]="colorMapa">{{mensajeBuque}}</p>
         </div>   
     </div>
   </div>

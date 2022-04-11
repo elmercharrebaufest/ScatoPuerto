@@ -190,6 +190,12 @@ li{
    color:blue;
    font-size: 0.875rem;
   }
+
+  .color-text-espera
+ {
+   color:gray;
+   font-size: 0.875rem;
+  }
 @media (min-width: 768px) {
   .col-sm-15 {
     width: 9.09%;
