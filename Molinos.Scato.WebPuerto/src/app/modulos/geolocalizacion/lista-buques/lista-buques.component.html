@@ -1,12 +1,22 @@
 <!--<app-collapse-button collapseSelectorId='collapseListadoBuqueGeolocalizacion'></app-collapse-button>-->
-<div class="divHeaderRightLeft">
-    <h4 class='colorTitle pt-4 divHeaderLeft'>Line Up - Buques</h4>
+<div *ngIf="!cargarListado">
+    <br><br>
+        No existe buques para mostrar en el listado de geolocalización
+    <br><br>
 </div>
+<div *ngIf="cargarListado">
+    <div class="divHeaderRightLeft"  *ngIf="getListaBuquesGeolocalizacion().length > 0">
+        <h4 class='colorTitle pt-4 divHeaderLeft'>Line Up - Buques en viaje</h4>
+    </div>
 
-<div id="collapseListadoBuqueGeolocalizacion" class="collapse show">
-    <div class='mt-4 px-4 pb-4' style="height: 500px;">
-        <!-- ACA VA LA SCROLLBAR -->
-        <perfect-scrollbar [config]="{suppressScrollX: true, wheelSpeed: 0.4}"> 
+    <div id="collapseListadoBuqueGeolocalizacion" class="collapse show" *ngIf="getListaBuquesGeolocalizacion().length > 0">
+        <div class="form-row">
+            <div class="form-group col-md-2">
+              <label for="tipoDeBuquePuerto" class="font-weight-bold">Muelle de carga</label>
+              <select class="custom-select" (change)="onChangeMuelleSeleccionado($event)">
+                <option *ngFor="let muelleCarga of getListadoMuelleCarga()" [value]="muelleCarga.codigo" >{{ muelleCarga.descripcion }}</option>
+              </select>
+            </div>
             <table class='table table-bordered'>
                 <thead class="header-geo-fijo" >
                     <tr>
@@ -24,24 +34,24 @@
                         <th class="header-geo-fijo">Ubicación del barco Line Up</th>
                     </tr> 
                 </thead>
-                <tbody>
-                    <tr *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
+                <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
+                    <tr *ngIf="geolocalizacion.esSeleccionadoPorMuelle &&  geolocalizacion.numeroPaginado == paginaActual">
                         <td align="center" valign="center">
                             <input class="largerCheckbox" 
-                                   id={{geolocalizacion.embarque_Id}} 
-                                   type="checkbox" 
-                                   [checked]="geolocalizacion.esSeleccionado"
-                                   [value]="geolocalizacion.embarque_Id"
-                                   (change)="onChangeBuqueSeleccionado($event)"
-                                   />
+                                id={{geolocalizacion.embarque_Id}} 
+                                type="checkbox" 
+                                [checked]="geolocalizacion.esSeleccionado"
+                                [value]="geolocalizacion.embarque_Id"
+                                (change)="onChangeBuqueSeleccionado($event)"
+                                />
                         </td>
                         <td>{{geolocalizacion.nombreBuque}} 
 
                                 <i class="fa fa-location-arrow fa-1x c-celeste lista-buque-cursor" 
-                                   data-toggle="tooltip" 
-                                   data-placement="top" 
-                                   title="Ir a la ubicación"   
-                                  (click)="onZoomBuqueSeleccionado(geolocalizacion.posicion)"></i>
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="Ir a la ubicación"   
+                                (click)="onZoomBuqueSeleccionado(geolocalizacion.posicion)"></i>
 
                         </td>
                         <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
@@ -57,6 +67,20 @@
                     </tr>
                 </tbody>
             </table>
-        </perfect-scrollbar>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                  <li [ngClass]="{'page-item disabled': paginaActual == 1 }">
+                    <a class="page-link" href="javascript:void(0);" (click)="seleccionaPagina(paginaActual - 1)">Previous</a>
+                  </li>
+                  <li *ngFor="let pagina of listaPaginas; let index = index" 
+                       [ngClass]="{'page-item disabled': paginaActual == (index + 1)}">
+                      <a class="page-link" href="javascript:void(0);" (click)="seleccionaPagina(index + 1)">{{index + 1}}</a>
+                  </li>
+                  <li [ngClass]="{'page-item disabled': paginaActual >= totalPaginas }">
+                    <a class="page-link" href="javascript:void(0);" (click)="seleccionaPagina(paginaActual + 1)">Next</a>
+                  </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>

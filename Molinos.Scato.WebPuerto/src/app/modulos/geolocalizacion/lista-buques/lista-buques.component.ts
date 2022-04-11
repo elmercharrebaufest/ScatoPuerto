@@ -6,18 +6,59 @@ import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.s
   templateUrl: './lista-buques.component.html',
   styleUrls: ['./lista-buques.component.css']
 })
-export class ListaBuquesComponent implements OnDestroy  {
+export class ListaBuquesComponent implements OnInit, OnDestroy  {
   
   private listaBuquesGeolocalizacion: any;
   @Output() listaBuquesGeolocalizacionFiltro = new EventEmitter();
   @Output() coordenadasBuqueSeleccionado = new EventEmitter();
   private embarcacionSubject$: any
-
+  private listadoMuelleCarga = [];
+  cargarListado = true;
+  private tamanioPagina =10;
+  paginaActual: number = 1;
+  numeroPagina: number = 0;
+  totalPaginas: number = 0;
+  listaPaginas;
+  
   constructor(private geolocalizacionSharingService : GeolocalizacionSharingService) {
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) =>{
-      this.setListaBuquesGeolocalizacion(data);
+
+      if (data != null){
+        this.setListaBuquesGeolocalizacion(data);
+        this.cargarListado = true;
+        this.cargarPaginas();
+      }else{
+        this.cargarListado = false;
+      }      
+
     });
   }
+
+  ngOnInit(){
+    this.setListadoMuelleCarga(this.getListaBuquesGeolocalizacion());
+  }
+  
+  setListadoMuelleCarga(listaBuques: any){
+    this.listadoMuelleCarga = [];
+    const listaMuelles = [...new Set( listaBuques.map(obj => obj.muelleCarga)) ];
+    let muelleCargaTodos = {
+      codigo: 'Todos',
+      descripcion: 'Todos los muelles'
+    }
+    this.listadoMuelleCarga.push(muelleCargaTodos);
+    
+    listaMuelles.forEach((muelle)=>{      
+      let muelleCarga = {
+        codigo: muelle,
+        descripcion: muelle
+      }
+      this.listadoMuelleCarga.push(muelleCarga);
+    });
+  }
+
+  getListadoMuelleCarga(){
+    return this.listadoMuelleCarga;
+  }  
 
   setListaBuquesGeolocalizacion(listaBuques: any){
     this.listaBuquesGeolocalizacion = listaBuques;
@@ -27,6 +68,25 @@ export class ListaBuquesComponent implements OnDestroy  {
     return this.listaBuquesGeolocalizacion;
   }
   
+  onChangeMuelleSeleccionado(event: any){
+    console.log(event.target.value)
+    const muelleSeleccionado = event.target.value;
+    if (muelleSeleccionado == 'Todos'){
+      this.listaBuquesGeolocalizacion.forEach((item)=>{
+        item.esSeleccionadoPorMuelle = true;
+      });
+    }else{
+      this.listaBuquesGeolocalizacion.forEach((item)=>{
+        item.esSeleccionadoPorMuelle = false;
+        if (item.muelleCarga == muelleSeleccionado){
+          item.esSeleccionadoPorMuelle = true;
+        }
+      });
+    }
+    this.listaBuquesGeolocalizacionFiltro.emit(this.listaBuquesGeolocalizacion)
+    this.geolocalizacionSharingService.setBuquesLineUp(this.listaBuquesGeolocalizacion);
+  }
+
   onChangeBuqueSeleccionado(event: any){
     const embarqueId = event.target?.defaultValue;
     const esSeleccionado = event.target?.checked;
@@ -42,6 +102,40 @@ export class ListaBuquesComponent implements OnDestroy  {
   
   ngOnDestroy() {
     this.embarcacionSubject$.unsubscribe();
+  }
+  
+  paginaSeleccionada(pagina){
+    this.paginaActual = pagina;
+  }
+
+  private marcarPaginas(){
+    let numeroRegistro = 1;
+    let numeroPagina = 1;
+    this.listaBuquesGeolocalizacion.forEach((item) =>{
+        if(item.esSeleccionadoPorMuelle){
+          
+           if(numeroRegistro > 10) {
+              numeroRegistro = 1;
+              numeroPagina++;
+           }
+           item.numeroPaginado = numeroPagina;
+           numeroRegistro++;
+        }
+    });
+  }
+
+  seleccionaPagina(pagina){
+    this.paginaActual = pagina;
+  }
+
+  cargarPaginas(){
+    
+    const registros = this.getListaBuquesGeolocalizacion().filter(d => d.esSeleccionadoPorMuelle == true).length + 1;
+    this.totalPaginas = (registros / this.tamanioPagina);
+    this.totalPaginas = Math.ceil(this.totalPaginas);
+    this.listaPaginas = new Array(this.totalPaginas);
+    this.marcarPaginas()
+    this.paginaActual = 1;
   }
 
 }
