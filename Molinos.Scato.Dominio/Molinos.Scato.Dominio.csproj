@@ -762,10 +762,6 @@
     <Compile Include="Dto\NotificacionCpeDto.cs" />
     <Compile Include="Dto\NotificacionSemaforoVagonesAutomaticaDto.cs" />
     <Compile Include="Dto\PinchazosPorCaladaDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaElementoGraficoDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaManosDeEmbarqueDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaTabiquesDeEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCargaAgenteControlPrivadoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCargaBodegaDto.cs" />
     <Compile Include="Dto\CargaComercialDto.cs" />
@@ -790,8 +786,6 @@
     <Compile Include="Dto\BuscarLoteAuditoriaDto.cs" />
     <Compile Include="Dto\CajaRequestDto.cs" />
     <Compile Include="Dto\CajaDto.cs" />
-    <Compile Include="Dto\NotificacionServicioDto.cs" />
-    <Compile Include="Dto\NotificacionPesadaAutomaticaDto.cs" />
     <Compile Include="Dto\CredencialMercadoPagoDto.cs" />
     <Compile Include="Dto\CaladorCantidadDto.cs" />
     <Compile Include="Dto\EmbarqueDto.cs" />
@@ -832,7 +826,6 @@
     <Compile Include="Dto\EntradaDto.cs" />
     <Compile Include="Dto\SectorCantidadCamionesDto.cs" />
     <Compile Include="Dto\SentidoManoDeEmbarqueDto.cs" />
-    <Compile Include="Dto\EntradaDto.cs" />
     <Compile Include="Dto\TipoDeActividadDto.cs" />
     <Compile Include="Dto\TipoDeBuquePuertoDto.cs" />
     <Compile Include="Dto\TransmisionASapManualDto.cs" />
