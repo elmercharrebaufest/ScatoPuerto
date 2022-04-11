@@ -22,6 +22,8 @@ export class NIRComponent implements OnInit {
   moduloDeCarga_Id: number;
   confirmationDialogService: any;
   bodegas: Bodega[];
+  conTrigo: boolean = false;
+  conMaiz: boolean = false;
   
   constructor(
     private fb: FormBuilder,
@@ -32,9 +34,12 @@ export class NIRComponent implements OnInit {
     this.confirmationDialogService = confirmationDialogService;
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
     this.datosEmbarque = this._procesoService.getDatosGrafico();
-    this.materialesPuerto = this.datosEmbarque.listaMateriales;    
+    this.materialesPuerto = this.datosEmbarque.listaMateriales;
     this.materialTrigo = this.materialesPuerto.find(m => m.descripcionCorta.includes('TRIGO'));
+    if(this.materialTrigo) this.conTrigo = true;
     this.materialMaiz = this.materialesPuerto.find(m => m.descripcionCorta.includes('MAIZ'));
+    if(this.materialMaiz) this.conMaiz = true;
+
   }
 
   ngOnInit(): void {
@@ -66,7 +71,7 @@ export class NIRComponent implements OnInit {
       bodega: x?.bodega ?? '',
       mano: x?.mano ?? this.asignarMano(numeroMano),
       moduloDeCargaId: x?.moduloDeCargaId ?? 0,
-      material_id: x?.material_id ?? this.materialMaiz.id
+      material_id: x?.material_id ?? this.materialMaiz?.id
     });
   }
 
@@ -84,7 +89,7 @@ export class NIRComponent implements OnInit {
       bodega: x?.bodega ?? '',
       mano: x?.mano ?? this.asignarMano(numeroMano),
       moduloDeCargaId: x?.moduloDeCargaId ?? 0,
-      material_id: x?.material_id ?? this.materialTrigo.id
+      material_id: x?.material_id ?? this.materialTrigo?.id
     });
   }
 
@@ -104,10 +109,10 @@ export class NIRComponent implements OnInit {
     this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe( nir => {
       console.log('obtenerNir NIR: ', nir);
       
-      let trigoMano1 = nir.filter(n => n.material_id === this.materialTrigo.id && n.mano=='mano1');
-      let trigoMano2 = nir.filter(n => n.material_id === this.materialTrigo.id && n.mano=='mano2');
-      let maizMano1 = nir.filter(n => n.material_id === this.materialMaiz.id && n.mano=='mano1');
-      let maizMano2 = nir.filter(n => n.material_id === this.materialMaiz.id && n.mano=='mano2');
+      let trigoMano1 = nir.filter(n => n.material_id === this.materialTrigo?.id && n.mano=='mano1');
+      let trigoMano2 = nir.filter(n => n.material_id === this.materialTrigo?.id && n.mano=='mano2');
+      let maizMano1 = nir.filter(n => n.material_id === this.materialMaiz?.id && n.mano=='mano1');
+      let maizMano2 = nir.filter(n => n.material_id === this.materialMaiz?.id && n.mano=='mano2');
 
       this.trigoMano1.clear();
       trigoMano1.forEach( x => this.trigoMano1.push( this.initTrigo(x, 1) ));

@@ -68,14 +68,9 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
 
     this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => {
-      console.log('sendBuqueCambiaEstado: ', res);
-      // if(!this.embarque){
-        // this.embarque = this._procesoService.getEmbarqueSelected();
-        this.trabajoOrdenado();
-        this.obtenerBalanzadasEnVivo();
-        this.inicializarReciboBuque();
-      // }
-      
+      this.trabajoOrdenado();
+      this.obtenerBalanzadasEnVivo();
+      this.inicializarReciboBuque();
     });
 
     // this.workflowService.obtenerListado().subscribe((resp: any) => {
@@ -93,6 +88,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   // }
 
   ngOnInit(): void {
+    // this._procesoService.disposeData();
     this.embarque = this._procesoService.getEmbarqueSelected();
     // this.embarqueId = this._procesoService.getEmbarqueId();
     // this.subscribeEmbarques();
@@ -105,54 +101,60 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.inicializarReciboBuque();
   }
 
-  // subscribeEmbarques(){
-  //   try {
-  //     this.workflowService.obtenerListado()
-  //       .pipe(takeUntil(this.unsubscribe))
-  //       .subscribe((resp: any) => {
-  //         this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
-  //         this.vaporId = this.barquitos['embarque'].vapor.id;
-  //         // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
-  //         this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
-  //       });
-  //   } catch (e) {
-  //     console.log(e);
-  //     console.log("Error en listarEmbarquesEnLineUp");
-  //   }
-  // }
+  subscribeEmbarques(){
+    try {
+      this.workflowService.obtenerListado()
+        .pipe(takeUntil(this.unsubscribe))
+        .subscribe((resp: any) => {
+          this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
+          this.vaporId = this.barquitos['embarque'].vapor.id;
+          // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
+          this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
+        });
+    } catch (e) {
+      console.log(e);
+      console.log("Error en listarEmbarquesEnLineUp");
+    }
+  }
 
   trabajoOrdenado(){
     forkJoin({
       obtenerListado: this.workflowService.obtenerListado(),
       listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
     })
-    .subscribe( (res:any) => {
+    // .subscribe( (res: any) => {
+    .subscribe( (res: {
+                        obtenerListado: InstanciaWorkflowPuerto[], 
+                        listarEmbarquesEnLineUp: EmbarqueNav[]
+                      }) => {
       this.listadoEmbarques = res.obtenerListado;
       this.filtrarMuelles();
-
       this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
       
       let embEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
-      if(embEnLineUp){
-        this.embarquesEnLineUp.push(embEnLineUp);
-      }
+      
+      if(embEnLineUp) this.embarquesEnLineUp.push(embEnLineUp);
 
       this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
       this.embarque = this._procesoService.getEmbarqueSelected();
       this.embarqueId = this._procesoService.getEmbarqueId();
 
       if(this.embarqueId){
-        this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
-        this.vaporId = this.barquitos['embarque'].vapor.id;
-        // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.        
-        // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-        const selLineUp = this.barquitos['lineUp'];
-        const selModuloDeCarga = selLineUp['moduloDeCarga'];        
-        this.moduloDeCarga_Id = selModuloDeCarga.id;
-        this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+        // this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
+        res.obtenerListado.forEach( x => x.embarque.id === this.embarqueId ?? this.barquitos.push(x) );
+        if(this.barquitos){
+          // this.vaporId = this.barquitos['embarque'].vapor.id;
+          this.vaporId = this.barquitos[0]['embarque'].vapor.id;
+          // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.        
+          // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
+          // const selLineUp = this.barquitos['lineUp'];
+          const selLineUp = this.barquitos[0].lineUp;
+          const selModuloDeCarga = selLineUp['moduloDeCarga'];
+          this.moduloDeCarga_Id = selModuloDeCarga.id;
+          this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+        }
       }
 
-      // console.log('En trabajoOrdenado(), this.mostrarTabs = true');
       this.mostrarTabs = true;
     });
     
@@ -224,31 +226,24 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   showPlano(event: boolean) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-    // console.log('En showPlano(), this.embarqueSelected: ', this.embarqueSelected);
   
     setTimeout(() => {
-      // console.log('En showPlano(), this.mostrarSpinner = false');
       this.mostrarSpinner = false;
-      // console.log('En setTimeout() del showPlano(), this.mostrarPlano = ', event);
       this.mostrarPlano = event;
     }, 50);
   }
 
   showCargas(event) {
-    // console.log('En showCargas(), this.mostrarCargas = ', event);
     this.mostrarCargas = event;
   }
 
   hideSpinner(event) {
     setTimeout(() => {
-      // console.log('En hideSpinner(), this.mostrarSpinner = ', event);
       this.mostrarSpinner = event;
     }, 50);
   }
 
   changeEmbarque() {
-    // console.log('En changeEmbarque(), this.mostrarCargas = ', false);
-    // console.log('En changeEmbarque(), this.mostrarSpinner = ', true);
     this.mostrarCargas = false;
     this.mostrarSpinner = true;
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
