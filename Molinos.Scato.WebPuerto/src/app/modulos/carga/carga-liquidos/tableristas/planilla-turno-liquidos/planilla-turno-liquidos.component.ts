@@ -1,7 +1,7 @@
 import { AfterViewInit,  Component, EventEmitter,  OnInit, Output, ViewChild} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
@@ -26,6 +26,8 @@ import { PlanoContentComponent } from 'app/modulos/lineup/plano-de-carga/plano-c
 import { style } from '@angular/animations';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { Destino } from '@ScatoModels/destino';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -39,6 +41,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   formCorte: FormGroup;
   formNuevoTurno: FormGroup;
   formExportarExcel: FormGroup;
+  formShipParticular: FormGroup;
   moduloCarga: ModuloDeCarga;
   exportadores: any[];
   lineas: any[];
@@ -65,6 +68,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   direccionViento: string;
   valorCargado: number;
   pedidoPorPlano: number;
+  destinoPuerto: Destino[];
   
   
 
@@ -80,12 +84,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
+    private planoDeCargaService: PlanoDeCargaService,
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
+    this.planoDeCargaService.obtenerDestinos().subscribe( res => this.destinoPuerto = res );
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
-    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => this.embarque = res); 
+    
+    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
+      this.embarque = res;
+      this.cargarShipParticular(res);
+    });
+
     this._turnosService.sendBodega.subscribe(res => {
       this.bodegas = res;
       if(this.formExportarExcel) this.addParcelChecks();
@@ -93,7 +104,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
 
       this.getDestinos();
     });
-
   }
 
   ngAfterViewInit(): void {
@@ -105,10 +115,41 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
+
+    this.initShipParticular();
   }
+
   expandir()
   {
     document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
+  }
+
+  initShipParticular(){
+    this.formShipParticular = this._builder.group({
+      destino: [''],
+      porteNeto: [],
+      porteBruto: [],
+      eslora: [],
+      manga: [],
+      puntal: [],
+      fechaLibrePlatica: [''],
+      horaLibrePlatica: [],
+    })
+  }
+
+  cargarShipParticular(embarque: Embarque){
+    this.formShipParticular.patchValue(embarque);
+
+    if (embarque.fechaLibrePlatica != null)
+      this.formShipParticular.get('fechaLibrePlatica').setValue(new Date(embarque.fechaLibrePlatica).toISOString().slice(0, 10));
+    else
+      this.formShipParticular.get('fechaLibrePlatica').setValue('');
+
+    this.formShipParticular.get('destino').setValue( this.destinoPuerto.find(x => x.id == embarque.destino?.id) );
+  }
+
+  isInvalidDate(date: Date): boolean {
+    return date.getFullYear() < 2000 || date.getFullYear() > 2100;
   }
 
   newForm() {
@@ -247,9 +288,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
     }else{
       this.confirmationDialogService.confirm('¡Atención!', 'Debes elegir una fecha para el turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
-    
-    
   }
+
   fillPlanilla(){
     this.planillaDeTurnos = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnosTurnos;
     this.diasTurno.clear();
@@ -347,7 +387,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
     }else{
       this.setTurnoODia();
     }
-
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number){

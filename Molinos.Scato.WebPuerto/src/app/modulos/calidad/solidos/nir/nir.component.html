@@ -403,7 +403,7 @@
     <h4 class="colorTitle pt-4">NIR</h4>
     <div id="collapseLineasEmbarque" class="collapse show">
       <div class="row">
-        <div class="col-7 pl-4">
+        <div class="col-7 pl-4" *ngIf="conTrigo">
           <h4 class='colorTitle py-2'>Trigo</h4>
 
           <div class="row textoChico">
@@ -620,7 +620,7 @@
           <div>Total Ponderado Prot. B/S:</div>
         </div>
 
-        <div class="col-4 ml-3 pr-4">
+        <div class="col-4 ml-3 pr-4" *ngIf="conMaiz">
           <h4 class='colorTitle py-2'>Maíz</h4>
 
           <div class="row textoChico">

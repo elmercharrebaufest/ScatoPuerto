@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
@@ -8,7 +8,6 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
-import { Embarque } from '@ScatoModels/embarque';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -21,13 +20,14 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
   @Output() changeEmbarque = new EventEmitter<any>();
   @ViewChildren('listadoBotones') listadoBotones: QueryList<any>;
   elementos: EmbarqueNav[];
-  elementosSinPlano: any;
+  elementosSinPlano: EmbarqueNav[];
   embarqueId: number;
   _unsubscribe: Subject<any>;
   errorMessage: boolean = false;
 
   ningunBuqueOperativo: boolean = false;
   listadoEmbarques: InstanciaWorkflowPuerto[];
+  embarquesEnLineUpSinFiltrar: EmbarqueNav[];
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
 
   buqueSanBenito: InstanciaWorkflowPuerto | undefined;
@@ -53,14 +53,10 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     this._unsubscribe = new Subject();
     this.elementos = new Array();
     this.elementosSinPlano = new Array();
-
     this.buqueSanBenito = this.procesoCalidadService.getSanBenito();
-    
     this.buqueNoryon = this.procesoCalidadService.getNoryoun();
     this.buqueVicentin = this.procesoCalidadService.getVicentin();
     this.buqueOtrosMuelles = this.procesoCalidadService.getOtrosMuelles();
-
-    // this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
 
     if(this.buqueSanBenito){
       this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
@@ -68,22 +64,15 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
 
     this.elementos = this._procesoService.getEmbarquesList();
     this.embarqueId = this._procesoService.getEmbarqueId();
-
     this.buqueSanBenito2 = this.elementos[0];
   }
 
   ngOnInit(): void {
     this.ordenarEmbarques();
-
-    // this.embarqueSanBenito();
   }
 
   ngOnChanges(change: SimpleChanges) {
-    if (change.elementos) {
-      if (this.elementos) {
-        this.embarqueSanBenito();
-      }
-    }
+    if(change.elementos && this.elementos) this.embarqueSanBenito();
   }
 
   ordenarEmbarques(){
@@ -91,19 +80,15 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
       e.orden = this.elementos.indexOf(e) + 1;
       return e;
     });
+
     this.embarqueSanBenito();
   }
 
   embarqueSanBenito() {
-    if (this.elementos.length > 0) {
-      if (!this.embarqueId) {
-        this.embarqueId = this.elementos[0].id;
-        this._procesoService.setEmbarque(this.elementos[0].id);
-      }
-    } 
-    // else {
-    //   this.cargado = false;
-    // }
+    if (this.elementos.length > 0 && !this.embarqueId) {
+      this.embarqueId = this.elementos[0].id;
+      this._procesoService.setEmbarque(this.elementos[0].id);
+    }
   }
 
   ngAfterViewInit() {
@@ -111,10 +96,8 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
       var elementoSeleccionado = document.getElementById(this.embarqueId.toString());
       if (elementoSeleccionado) elementoSeleccionado.classList.add("btn-seleccionado");
       
-      // console.log('En ngAfterViewInit() del NAV, showPlano.emit(true)');
       this.showPlano.emit(true);
     } else {
-      // console.log('En ngAfterViewInit() del NAV, showPlano.emit(false)');
       this.showPlano.emit(false);
     }
 
@@ -122,6 +105,8 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
   }
 
   onClickHandlerClient(elemento: EmbarqueNav) {
+    console.log('elemento: ', elemento);
+    
     var elementoDeseleccionado = document.getElementsByClassName("btn-seleccionado")[0];
     if (elementoDeseleccionado != null)
       elementoDeseleccionado.classList.remove("btn-seleccionado")
@@ -129,7 +114,6 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     elementoSeleccionado.classList.add("btn-seleccionado");
     if (this._procesoService.getEmbarqueSelected() != elemento) {
       this._procesoService.setEmbarque(elemento.id);
-      // console.log('En onClickHandlerClient() del NAV, changeEmbarque.emit(true)');
       this.changeEmbarque.emit(true);
     }
   }
@@ -162,7 +146,6 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
 
   openModalAddBuque(modal: any) {
     this.obtenerBuquesCargando();
-
     this.errorMessage = false;
     this._modalService.open(modal);
   }
@@ -171,13 +154,26 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     this.elementosSinPlano = [];
     let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes('Cargando'));
 
-    this.workflowService.obtenerListado().subscribe( res => {
-      this.listadoEmbarques = res;
-      let sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
-      let sanBenito2: InstanciaWorkflowPuerto[] = sanBenito ? sanBenito.filter( (i:InstanciaWorkflowPuerto) => i.embarque.estadoBuque?.id === estadoBuque.id ) : new Array();
+    forkJoin({
+      obtenerListado: this.workflowService.obtenerListado(),
+      listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
+    })
+    .subscribe( (res: {
+                        obtenerListado: InstanciaWorkflowPuerto[], 
+                        listarEmbarquesEnLineUp: EmbarqueNav[]
+                      }) => {
+      this.listadoEmbarques = res.obtenerListado;
+      this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
 
-      for(let sb in sanBenito2){
-        this.elementosSinPlano.push(sanBenito2[sb].embarque);
+      let sanBenito: InstanciaWorkflowPuerto[] = this.listadoEmbarques ? this.listadoEmbarques.filter(i => 
+        (i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) && 
+        i.embarque.estadoBuque?.id === estadoBuque.id) : new Array();
+      
+      // sanBenito.forEach( x => this.embarquesEnLineUpSinFiltrar.forEach( y => y.id === x.embarque.id ?? this.elementosSinPlano.push(y) ) );
+      for(let a of sanBenito){
+        for(let b of this.embarquesEnLineUpSinFiltrar){
+          if(a.embarque.id == b.id) this.elementosSinPlano.push(b);
+        }
       }
     });
   }
@@ -190,32 +186,28 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
       
       this.embarqueService.actualizarEstadoBuque(buque.id, estadoBuque.id)
         .pipe(finalize( () => {
-          // this.showPlano.emit(true);
-          
           this.procesoCalidadService.setBuqueCambiaEstado(buque);
 
-          // setTimeout(() => {
-          //   this.buqueSanBenito = this.procesoCalidadService.getSanBenito();
-          //   console.log('this.buqueSanBenito desde finalize()', this.buqueSanBenito);
+          setTimeout(() => {
+            this.buqueSanBenito = this.procesoCalidadService.getSanBenito();
+            console.log('this.buqueSanBenito desde finalize()', this.buqueSanBenito);
 
-          //   this.buqueNoryon = this.procesoCalidadService.getNoryoun();
-          //   this.buqueVicentin = this.procesoCalidadService.getVicentin();
-          //   this.buqueOtrosMuelles = this.procesoCalidadService.getOtrosMuelles();
+            this.buqueNoryon = this.procesoCalidadService.getNoryoun();
+            this.buqueVicentin = this.procesoCalidadService.getVicentin();
+            this.buqueOtrosMuelles = this.procesoCalidadService.getOtrosMuelles();
 
-          //   if(this.buqueSanBenito){
-          //     this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
-          //   }
+            if(this.buqueSanBenito) this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
 
-          //   this.elementos = this._procesoService.getEmbarquesList();
-          //   this.embarqueId = this._procesoService.getEmbarqueId();
+            this.elementos = this._procesoService.getEmbarquesList();
+            this.embarqueId = this._procesoService.getEmbarqueId();
+            this.buqueSanBenito2 = this.elementos[0];
 
-          //   this.buqueSanBenito2 = this.elementos[0];
-
-          //   this.ngOnInit();
-          //   this.ngAfterViewInit();
-
-          // }, 2000);
-
+            this.ngOnInit();
+            this.ngAfterViewInit();
+            setTimeout(() => {
+              this.onClickHandlerClient(this.buqueSanBenito2);
+            }, 1000);
+          }, 1000);
         }))
         .subscribe( res => {
           console.log(res);
