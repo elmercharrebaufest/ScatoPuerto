@@ -17,7 +17,6 @@ export class GeolocalizacionComponent implements OnInit {
   mostrarMapa: boolean = false;
   mostrarListaBuque: boolean = false;
 
-  fechaActualizacion: Date;
   user: any;
   private listaPuntosInteres;
   private listaBuquesGeolocalizacion;
@@ -35,7 +34,6 @@ export class GeolocalizacionComponent implements OnInit {
   }
 
   ngOnInit(){
-    this.fechaActualizacion = new Date(Date.now());
     this.mostrarSpinner = false;
   }
 
@@ -70,7 +68,12 @@ export class GeolocalizacionComponent implements OnInit {
   tienePermiso(permiso: number) {
     return this.user.permisos.find(x => x === permiso);
   }
-  
+
+  getUltimaActualizacion(){
+    const fechaActualizacion = Math.max.apply(Math, this.listaBuquesGeolocalizacion.map(function(item) { return new Date(item.posicion.fechaRegistro); }));
+    return fechaActualizacion;
+  }
+
   cambiarLineUp() {
     this.router.navigate(['lineup']);
 
@@ -189,8 +192,10 @@ export class GeolocalizacionComponent implements OnInit {
           tipo = this.route.snapshot.queryParams.tipo
     }
     if (this.listaBuquesGeolocalizacion != undefined){
-        const embarque = this.listaBuquesGeolocalizacion.filter(buque => buque.embarque_Id == embarque_Id);
-        this.geolocalizacionSharingService.setBuqueSeleccionado(embarque);
+        if (tipo == 'zoom'){
+           const embarque = this.listaBuquesGeolocalizacion.filter(buque => buque.embarque_Id == embarque_Id);
+           this.geolocalizacionSharingService.setBuqueSeleccionado(embarque);
+        }
     }
   }
 
