@@ -40,6 +40,8 @@
     [shipParticularArchivoNombre] NVARCHAR(MAX) NULL, 
     [FechaHoraInicioCarga] DATETIME NULL , 
     [UsuarioInicioCarga] NVARCHAR(50) NULL, 
+    [Imo] VARCHAR(50) NULL, 
+    [CantidadBodegasTanques] INT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_Embarque] PRIMARY KEY ([Id]),
 	CONSTRAINT [FK_dbo.Embarque_dbo.Vapor_Vapor_Id] FOREIGN KEY ([Vapor_Id]) REFERENCES [dbo].[Vapor] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Recorrido_Recorrido_Id] FOREIGN KEY ([Recorrido_Id]) REFERENCES [dbo].[Recorrido] ([Id]) ON DELETE CASCADE,

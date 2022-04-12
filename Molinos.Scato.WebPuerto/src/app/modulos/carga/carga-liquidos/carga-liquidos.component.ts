@@ -38,7 +38,7 @@ export class CargaLiquidosComponent implements OnInit {
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
   @ViewChild(TanquesComponent) tanquesComponent: TanquesComponent;
-  @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent:PlanillaEmbarqueComponent;
+  @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent:PlanillaTurnoLiquidosComponent;
   datatanks: any;
   enviado: boolean;
   usuarioFinalizacion: string;
@@ -114,6 +114,13 @@ export class CargaLiquidosComponent implements OnInit {
   obtenerModuloDeCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe(resp => {
       this.enviado = resp.enviado;
+      localStorage.setItem("desabilitar","");
+      if(this.enviado)
+      {
+        this.planillaTurnoLiquidosComponent.desabilitarTurno();
+        this.planillaEmbarqueComponent.desabilitarEmbarque();
+        localStorage.setItem("desabilitar","true");
+      }
       if (resp.moduloDeCargaPeriodoDeCarga){
         // console.log('resp.moduloDeCargaPeriodoDeCarga[0]: ', resp.moduloDeCargaPeriodoDeCarga[0]);
         if(!resp.moduloDeCargaPeriodoDeCarga[0])
@@ -171,7 +178,11 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   guardar(finalizar: boolean) {
-
+       if(finalizar)
+       {
+        this.planillaTurnoLiquidosComponent.desabilitarTurno();
+        this.planillaEmbarqueComponent.desabilitarEmbarque();
+       }
     let fechasHorasOK = this.validarFechas();
     if(!fechasHorasOK)
       return;
