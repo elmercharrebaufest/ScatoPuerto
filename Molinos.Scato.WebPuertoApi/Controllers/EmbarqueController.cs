@@ -428,7 +428,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var embarquesLineUp = workflows.ListarEmbarques("LineUp");
-
+   
                 List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
 
                 foreach (var embarque in embarquesLineUp)
@@ -438,7 +438,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         NombreBuque = embarque.Embarque.NombreBuque,
                         BanderaBuque = embarque.Embarque.Destino.Nombre,
                         TipoBuque = embarque.Embarque.TipoBuque,
-                        imo = embarque.Embarque.Imo
+                        imo =  string.IsNullOrEmpty(embarque.Embarque.Imo)?"": embarque.Embarque.Imo
                     };
                     embarques.Add(embarqueLineUp);
 
