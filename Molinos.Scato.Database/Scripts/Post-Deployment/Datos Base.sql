@@ -16,12 +16,14 @@ IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('VENEZUELA')) B
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('GUAYANA FRANCESA')) BEGIN insert into Pais(Descripcion) values ('GUAYANA FRANCESA'); END
 */
 -- Documentos
+
+/*
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'DNI') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Documento Nacional de Identidad','DNI', ''); END
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'LC') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Libreta Civica','LC', '90'); END
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'LE') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Libreta de Enrolamiento','LE', '12'); END
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'CI') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Cédula de Identidad','CI', '00'); END
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'PP') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Pasaporte','PP', '13'); END
-
+*/
 --Tipo Balanza
 IF NOT EXISTS (select 1 from TipoBalanza where Descripcion = 'Vehículo') BEGIN insert into TipoBalanza(Descripcion) values ('Vehículo'); END
 IF NOT EXISTS (select 1 from TipoBalanza where Descripcion = 'Piso') BEGIN insert into TipoBalanza(Descripcion) values ('Piso'); END
