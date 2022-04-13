@@ -95,7 +95,7 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
                 catch (Exception ex)
                 {
 
-                    throw ex.InnerException;
+                    throw ex;
                     // identity.AddClaim(new Claim("UserComputerName", RequestIP));
                     // log.Info("Nombre de pc detectada: no se pudo detectar para el usuario {0}", nombreUsuario);
                 }
@@ -108,8 +108,8 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
             }
             catch (Exception ex)
             {
-                
-                throw ex.InnerException;
+
+                throw ex;
             }
             
         }
