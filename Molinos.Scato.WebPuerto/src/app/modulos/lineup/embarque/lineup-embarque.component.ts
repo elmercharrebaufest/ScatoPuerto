@@ -98,7 +98,7 @@ export class LineupEmbarqueComponent implements OnInit {
   {
     if(flagVerGeo)
     {
-      this.router.navigate(['/geolocalizacion'], { queryParams: {embarque_Id: embarque_Id, tipo: 'zoom'}});
+      this.router.navigate(['/geolocalizacion'], { queryParams: {embarque_id: embarque_Id, tipo: 'zoom'}});
     }
   }
   public modificarLineUp(campo: string) {
@@ -211,7 +211,7 @@ export class LineupEmbarqueComponent implements OnInit {
       }
       /**Zarpó**/
       else if (accion == 1) {
-        this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
+        this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up y geolocalización`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
           .then((confirmed) => {
             if (confirmed) {
               this.showSpinner.emit(true)
@@ -305,11 +305,11 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   nombreUbicacionDeBuquePuerto(numero): string {
-    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
+    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.id == numero)!=undefined ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
   }
 
   numeroUbicacionDeBuquePuerto(nombre): number {
-    return nombre.length > 0 && nombre != null && this.ubicacionDeBuquePuerto != null ? this.ubicacionDeBuquePuerto.find(x => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()).id : 0;
+    return nombre.length > 0 && nombre != null && this.ubicacionDeBuquePuerto != null ? this.ubicacionDeBuquePuerto.find(x => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()).orden : 0;
   }
 
   extraeNombre(objeto): string {
