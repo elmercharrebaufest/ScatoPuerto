@@ -83,12 +83,10 @@ export class GeolocalizacionComponent implements OnInit {
     this.mostrarMapa = false;
     this.geolocalizacionService.ListarPuntosInteresGeolocalizacion().subscribe(
       data => {
-        console.log(data)
         this.setListaPuntosInteres(data);
         this.geolocalizacionSharingService.setPuntosInteres(this.getListaPuntosInteres());
       },
       err => {
-            console.error('Observer got an error: ' + err)
             this.mostrarMapa = true;  
             },
       () => {
@@ -131,16 +129,7 @@ export class GeolocalizacionComponent implements OnInit {
   private cargarBuqueAdicionales(){
     if (this.listaBuquesGeolocalizacion != undefined){
       if (this.listaBuquesGeolocalizacion.length > 0){
-          this.listaBuquesGeolocalizacion.forEach((item) =>{
-      
-            if (!item.sanBenito){
-              let embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito != true);
-              let newEmbarqueSel = Object.assign({}, embarqueSel); // make a copy
-              newEmbarqueSel.embarque_Id = newEmbarqueSel.embarque_Id + 19
-              this.listaBuquesGeolocalizacion.push(JSON.parse(JSON.stringify(newEmbarqueSel)));
-            }
-          })
-
+          
           this.listaBuquesGeolocalizacion.forEach((item) =>{
             
             if (!item.sanBenito){
@@ -186,7 +175,6 @@ export class GeolocalizacionComponent implements OnInit {
     let tipo;
     if (this.route.snapshot.queryParams.embarque_id != undefined){
           embarque_Id = this.route.snapshot.queryParams.embarque_id
-          console.log(embarque_Id)
     }
     if (this.route.snapshot.queryParams.tipo != undefined){
           tipo = this.route.snapshot.queryParams.tipo

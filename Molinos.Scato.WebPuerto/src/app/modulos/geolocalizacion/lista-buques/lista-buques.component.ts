@@ -19,7 +19,7 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
   numeroPagina: number = 0;
   totalPaginas: number = 0;
   listaPaginas;
-  
+
   constructor(private geolocalizacionSharingService : GeolocalizacionSharingService) {
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) =>{
 
@@ -97,7 +97,11 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
   }
   
   onZoomBuqueSeleccionado(event) {
-    this.coordenadasBuqueSeleccionado.emit(event);
+    const esSeleccionado = event.esSeleccionado;
+    if(esSeleccionado){
+      const ubicacionPosicion = event.posicion;
+      this.coordenadasBuqueSeleccionado.emit(ubicacionPosicion);
+    }
   }
   
   ngOnDestroy() {

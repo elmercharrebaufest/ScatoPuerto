@@ -4,7 +4,6 @@ import { UbicacionEmbarcacion } from '@ScatoModels/geolocalizacion/ubicacion-emb
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
 import * as L from 'leaflet';
 import { TarjetaBuqueComponent } from '../tarjeta-buque/tarjeta-buque.component';
-
 @Component({
   selector: 'app-mapa-buque',
   templateUrl: './mapa-buque.component.html',
@@ -81,11 +80,16 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     let embarqueSeleccionado;
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuqueSeleccionado().subscribe((data) => {
       embarqueSeleccionado = data;
-      if (embarqueSeleccionado.length > 0){
-        const embarque = embarqueSeleccionado[0];
-        const latitud = embarque.posicion.latitud;
-        const longitud = embarque.posicion.longitud;
-        this.map.setView([latitud, longitud], 13);
+      if(embarqueSeleccionado != undefined) {
+        if (embarqueSeleccionado.length > 0){
+          const embarque = embarqueSeleccionado[0];
+          const latitud = embarque.posicion.latitud;
+          const longitud = embarque.posicion.longitud;
+          this.map.setView([latitud, longitud], 13);
+        }
+      }else{
+        // sino hay buque seleccionado muestra por defecto la vista general del map
+        this.map.setView([ -35.340, -56.577]);
       }
     });
   }
@@ -140,10 +144,10 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     var LayerGroup = L.layerGroup();
 
     var overlayMaps = {
-        "<b> Referencias </b>": LayerGroup,
-        "<b> Muelles </b> <img src='../../../../assets/ubicacion.svg' width='21' height='21' >" : ubicaciones,
-        "<b> Fondeaderos y Puertos </b> <img src='../../../../assets/ancla.svg' width='21' height='21' >": ancla,
-        "<b> Buques </b> <img src='../../../../assets/buque.svg' width='21' height='21'>": LayerGroup
+        "<b style='font-family:roboto;font-size:14px'> Referencias </b>": LayerGroup,
+        " <img src='../../../../assets/ubicacion.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'> Muelles </label> " : ubicaciones,
+        " <img src='../../../../assets/ancla.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Fondeaderos y Puertos </label> ": ancla,
+        " <img src='../../../../assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup
     };
     this.referenciaOverlay = L.control.layers (
                     null,
@@ -154,7 +158,13 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                     }
                     ).addTo(this.map);
     
+    let divsCuadroReferencia = document.getElementsByClassName("leaflet-control-layers leaflet-control-layers-expanded leaflet-control");                
     let divsOverlayChilds = document.getElementsByClassName("leaflet-control-layers-overlays");
+
+    if (divsCuadroReferencia !=undefined) {
+        this.rederer.setStyle(divsCuadroReferencia[0], 'border','none');
+    }
+
     if(divsOverlayChilds != undefined){
       if(divsOverlayChilds.length > 0){
           let divChildsNodes = divsOverlayChilds[0].childNodes;
@@ -191,12 +201,13 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     this.map = L.map('mapa', {
       center: [ -35.340, -56.577],
       zoom: this.zoom
+      
     });
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: ''
     });
     tiles.addTo(this.map);
-
+    
   }
   
   handleMapZoomEnd(map: L.Map):void{
@@ -249,7 +260,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                         (c: any) => {
                           c.instance.nombreBuque = buque.nombreBuque;
                       }, latitud, longitud);
-                        let mensajeToolTip  = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
+                        let mensajeToolTip  = `<div style='border-width: 1px; border-color:#666666;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
                             mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
                             mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
                             mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
