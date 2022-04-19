@@ -64,7 +64,7 @@
                                             </button>
                                         </td>
                                     </tr>
-                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosDetalles'>
+                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesLiquido'>
                                         <ng-container *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
                                             [formGroupName]='i'>
                                             <tr>
@@ -144,7 +144,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosCortes'>
+                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
                                                             <tr>
                                                                 <td colspan="4">
@@ -317,7 +317,7 @@
                       
                     <div class="row mt-3">
                         <div class="col flex-between">
-                            <button class='btn btn-primary m-2 ' (click)='addTurno(1)'>
+                            <button class='btn btn-primary m-2 '(click)='addTurno(1)'>
                                 00-06
                             </button>
                             <button class='btn btn-primary m-2' (click)="addTurno(2)">

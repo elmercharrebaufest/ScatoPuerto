@@ -39,7 +39,7 @@ namespace Molinos.Scato.Dominio.Entidades
             // LÍQUIDO //
                 public virtual  ICollection<ModuloDeCargaMangueraCarga> ModuloDeCargaMangueraCarga { get; set; }
                 public virtual ICollection<ModuloDeCargaPlanillaDeEmbarque> ModuloDeCargaPlanillaDeEmbarque { get; set; }
-                public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnos> ModuloDeCargaPlanillaDeTurnosTurnos { get; set; }
+                public virtual ICollection<ModuloDeCargaPlanillaDeTurnos> ModuloDeCargaPlanillaDeTurnos { get; set; }
             // LÍQUIDO //
 
             public virtual ICollection<ModuloDeCargaPeriodoDeCarga> ModuloDeCargaPeriodoDeCarga { get; set; } //LÍQUIDO Y SÓLIDO

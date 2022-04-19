@@ -16,7 +16,7 @@ export class ModuloDeCarga{
     moduloDeCargaTabiquesDeEmbarque: TabiquesDeEmbarque[];
     moduloDeCargaHabilitacionDeTanques: ModuloDeCargaHabilitacionDeTanques;
     moduloDeCargaLineasDeEmbarque: LineasDeEmbarque[];
-    moduloDeCargaPlanillaDeTurnosTurnos: PlanillaDeTurnos[];
+    moduloDeCargaPlanillaDeTurnos: PlanillaDeTurnos[];
     moduloDeCargaPlanillaDeEmbarque: PlanillaDeEmbarque[];
     // moduloDeCargaBalanzas: ModuloDeCargaBalanzasBack[];
     moduloDeCargaPeriodoDeCarga: PeriodoDeCarga[];

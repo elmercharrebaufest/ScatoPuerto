@@ -243,12 +243,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
-        [Route("api/ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnosTurnos")]
-        public HttpResponseMessage ObtenerModuloDeCargaPlanillaDeTurnosTurnos(int turnoPuerto_id, int moduloDeCarga_id)
+        [Route("api/ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos")]
+        public HttpResponseMessage ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerModuloDeCargaPlanillaDeTurnosTurnos(turnoPuerto_id, moduloDeCarga_id));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerModuloDeCargaPlanillaDeTurnos(turnoPuerto_id, moduloDeCarga_id));
             }
             catch (Exception ex)
             {
@@ -263,7 +263,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
-        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosTurnosDto turnos)
+        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos)
         {
             try
             {
@@ -295,7 +295,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var docFile = "Planilla de turnos" + fechaTurno + ".xls";
             
                 var generadorExcel = new ExcelLiquido();
-                List<ModuloDeCargaPlanillaDeTurnosTurnosDto> moduloDeCargaPlanillaDeTurnosTurnosDtos = new List<ModuloDeCargaPlanillaDeTurnosTurnosDto>();
+                List<ModuloDeCargaPlanillaDeTurnosDto> moduloDeCargaPlanillaDeTurnosTurnosDtos = new List<ModuloDeCargaPlanillaDeTurnosDto>();
                 moduloDeCargaPlanillaDeTurnosTurnosDtos.Add(ObjetoMail.planillaDeTurnos);
 
                 generadorExcel.GenerarArchivo(resultado, moduloDeCargaPlanillaDeTurnosTurnosDtos, IdModuloDeCarga);
@@ -325,7 +325,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         public class ObjetoMail
         {
-           public ModuloDeCargaPlanillaDeTurnosTurnosDto planillaDeTurnos;
+           public ModuloDeCargaPlanillaDeTurnosDto planillaDeTurnos;
                   
             public MailDto mail;
 
