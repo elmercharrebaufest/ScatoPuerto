@@ -12,7 +12,9 @@ namespace Molinos.Scato.Dominio.Dto
         public bool Enviado { get; set; }
         public virtual bool EsLiquido { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto> ModuloDeCargaPlanillaDeTurnosDetallesLiquido { get; set; }
+        public IList<ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto> ModuloDeCargaPlanillaDeTurnosDetallesSolido { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosCortesDto> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
+        public IList<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad { get; set; }
         //public ObservacionesDeCalidadDto ObservacionesDeCalidadDto { get; set; }
     }
 }
