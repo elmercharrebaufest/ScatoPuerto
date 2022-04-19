@@ -17,57 +17,61 @@
                 <option *ngFor="let muelleCarga of getListadoMuelleCarga()" [value]="muelleCarga.codigo" >{{ muelleCarga.descripcion }}</option>
               </select>
             </div>
-            <table class='table table-bordered'>
-                <thead class="header-geo-fijo" >
-                    <tr>
-                        <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
-                        <th class="header-geo-fijo">Nombre de Buque</th>
-                        <th class="header-geo-fijo">Puerto de Partida</th>
-                        <th class="header-geo-fijo">Puerto de Destino</th>
-                        <th class="header-geo-fijo">Eta Reportada</th>
-                        <th class="header-geo-fijo">Arribó</th>
-                        <th class="header-geo-fijo">Última posición recibida</th>
-                        <th class="header-geo-fijo">Área</th>
-                        <th class="header-geo-fijo">Puerto actual</th>
-                        <th class="header-geo-fijo">Estado</th>
-                        <th class="header-geo-fijo">Muelle de carga</th>
-                        <th class="header-geo-fijo">Ubicación del barco Line Up</th>
-                    </tr> 
-                </thead>
-                <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
-                    <tr *ngIf="geolocalizacion.esSeleccionadoPorMuelle &&  geolocalizacion.numeroPaginado == paginaActual">
-                        <td align="center" valign="center">
-                            <input class="largerCheckbox" 
-                                id={{geolocalizacion.embarque_Id}} 
-                                type="checkbox" 
-                                [checked]="geolocalizacion.esSeleccionado"
-                                [value]="geolocalizacion.embarque_Id"
-                                (change)="onChangeBuqueSeleccionado($event)"
-                                />
-                        </td>
-                        <td>{{geolocalizacion.nombreBuque}} 
-
+            <div style="overflow-x:auto;">
+                <table class='table table-bordered'>
+                    <thead class="header-geo-fijo" >
+                        <tr>
+                            <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
+                            <th class="header-geo-fijo sticky-head">Nombre de Buque</th>
+                            <th class="header-geo-fijo">Puerto de Partida</th>
+                            <th class="header-geo-fijo">Puerto de Destino</th>
+                            <th class="header-geo-fijo">Eta Reportada</th>
+                            <th class="header-geo-fijo">Arribó</th>
+                            <th class="header-geo-fijo">Última posición recibida</th>
+                            <th class="header-geo-fijo">Área</th>
+                            <th class="header-geo-fijo">Puerto actual</th>
+                            <th class="header-geo-fijo">Estado</th>
+                            <th class="header-geo-fijo">Muelle de carga</th>
+                            <th class="header-geo-fijo">Ubicación del barco Line Up</th>
+                        </tr> 
+                    </thead>
+                    <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
+                        <tr *ngIf="geolocalizacion.esSeleccionadoPorMuelle &&  geolocalizacion.numeroPaginado == paginaActual">
+                            <td align="center" valign="center">
+                                <input class="largerCheckbox" 
+                                    id={{geolocalizacion.embarque_Id}} 
+                                    type="checkbox" 
+                                    [checked]="geolocalizacion.esSeleccionado"
+                                    [value]="geolocalizacion.embarque_Id"
+                                    (change)="onChangeBuqueSeleccionado($event)"
+                                    />
+                            </td>
+                            <td class="sticky">
+                                <i (click)='openModalGeo(addGeo, geolocalizacion)'
+                                    style="cursor:pointer;">{{geolocalizacion.nombreBuque}} </i>
+    
                                 <i class="fa fa-location-arrow fa-1x c-celeste lista-buque-cursor" 
                                 data-toggle="tooltip" 
                                 data-placement="top" 
                                 title="Ir a la ubicación"   
                                 (click)="onZoomBuqueSeleccionado(geolocalizacion.posicion)"></i>
-
-                        </td>
-                        <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
-                        <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
-                        <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.etA_Reportado : ''}}</td>
-                        <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.ata : ''}}</td>
-                        <td>{{geolocalizacion.posicion != null? geolocalizacion.posicion.horaUTCPosicionRecibida : ''}}</td>
-                        <td>{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
-                        <td>{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
-                        <td>{{geolocalizacion.posicion.estado}}</td>
-                        <td>{{geolocalizacion.muelleCarga}}</td>
-                        <td>{{geolocalizacion.ubicacionLineUp}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <nav aria-label="Page navigation example">
+    
+                            </td>
+                            <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
+                            <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
+                            <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.etA_Reportado : ''}}</td>
+                            <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.ata : ''}}</td>
+                            <td>{{geolocalizacion.posicion != null? geolocalizacion.posicion.horaUTCPosicionRecibida : ''}}</td>
+                            <td>{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
+                            <td>{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
+                            <td>{{geolocalizacion.posicion.estado}}</td>
+                            <td>{{geolocalizacion.muelleCarga}}</td>
+                            <td>{{geolocalizacion.ubicacionLineUp}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav aria-label="Page navigation example" class="centrado">
                 <ul class="pagination justify-content-center">
                   <li [ngClass]="{'page-item disabled': paginaActual == 1 }">
                     <a class="page-link" href="javascript:void(0);" (click)="seleccionaPagina(paginaActual - 1)">Previous</a>
@@ -84,3 +88,7 @@
         </div>
     </div>
 </div>
+
+<ng-template #addGeo let-modal>
+    <app-card-buque [buque]="buque" (cerrar)="modal.dismiss()" class="card-buque"></app-card-buque>
+</ng-template>

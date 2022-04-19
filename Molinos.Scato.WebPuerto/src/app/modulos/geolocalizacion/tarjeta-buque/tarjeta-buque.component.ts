@@ -18,6 +18,15 @@ export class TarjetaBuqueComponent implements OnInit {
   @Input() estado!: string
   @Input() velocidadCurso!: string
   @Input() cargaBuque!: string
+
+  @Input() imo!: string
+  @Input() bandera!: string
+  @Input() porteNeto!: string
+  @Input() puntal!: string
+  @Input() freeboard!: string
+  @Input() cantidadBodegas!: string
+  @Input() eslora!: string
+
   constructor() { }
 
   ngOnInit(): void {

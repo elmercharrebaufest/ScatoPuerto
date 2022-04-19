@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
+import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-lista-buques',
@@ -19,8 +20,17 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
   numeroPagina: number = 0;
   totalPaginas: number = 0;
   listaPaginas;
+  @Input() cerrar: boolean;
+  buque: any;
   
-  constructor(private geolocalizacionSharingService : GeolocalizacionSharingService) {
+  constructor(private geolocalizacionSharingService : GeolocalizacionSharingService,
+              private _modalService: NgbModal,
+              config: NgbModalConfig,) {
+    
+    // customize default values of modals used by this component tree
+    config.backdrop = 'static';
+    config.keyboard = false;
+
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) =>{
 
       if (data != null){
@@ -136,6 +146,16 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
     this.listaPaginas = new Array(this.totalPaginas);
     this.marcarPaginas()
     this.paginaActual = 1;
+  }
+
+  openModalGeo(modal, geolocalizacion: any) {
+    this.buque = geolocalizacion;
+    
+    this._modalService.open(modal, { windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
+    .then(() => {
+      console.log('_modalService.open');
+    })
+    .catch((res) => { console.log(res) });
   }
 
 }
