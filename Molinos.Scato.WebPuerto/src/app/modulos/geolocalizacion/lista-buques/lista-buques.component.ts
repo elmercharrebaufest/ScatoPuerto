@@ -107,7 +107,11 @@ export class ListaBuquesComponent implements OnInit, OnDestroy  {
   }
   
   onZoomBuqueSeleccionado(event) {
-    this.coordenadasBuqueSeleccionado.emit(event);
+    const esSeleccionado = event.esSeleccionado;
+    if(esSeleccionado){
+      const ubicacionPosicion = event.posicion;
+      this.coordenadasBuqueSeleccionado.emit(ubicacionPosicion);
+    }
   }
   
   ngOnDestroy() {
