@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, ApplicationRef, Component, ComponentFactoryResolver, Injector, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ApplicationRef, Component, ComponentFactoryResolver, Injector, OnDestroy, Renderer2 } from '@angular/core';
 import { PuntosInteres } from '@ScatoModels/geolocalizacion/puntos-interes';
 import { UbicacionEmbarcacion } from '@ScatoModels/geolocalizacion/ubicacion-embarcacion';
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
@@ -33,6 +33,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
               private appRef: ApplicationRef,
               private injector: Injector,
               private geolocalizacionSharingService : GeolocalizacionSharingService,
+              private rederer: Renderer2
               private workflowService: WorkflowService
               ) {
 
@@ -143,10 +144,10 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     var LayerGroup = L.layerGroup();
 
     var overlayMaps = {
-        "Referencias": LayerGroup,
-        "<b> Muelles </b> <img src='../../../../assets/ubicacion.svg' width='21' height='21'>" : ubicaciones,
-        "<b> Fondeaderos y Puertos </b> <img src='../../../../assets/ancla.svg' width='21' height='21'>": ancla,
-        "<b> Buques </b> <img src='../../../../assets/buque_otro_muelle.svg' width='21' height='21'>": LayerGroup
+        "<b> Referencias </b>": LayerGroup,
+        "<b> Muelles </b> <img src='../../../../assets/ubicacion.svg' width='21' height='21' >" : ubicaciones,
+        "<b> Fondeaderos y Puertos </b> <img src='../../../../assets/ancla.svg' width='21' height='21' >": ancla,
+        "<b> Buques </b> <img src='../../../../assets/buque.svg' width='21' height='21'>": LayerGroup
     };
     this.referenciaOverlay = L.control.layers (
                     null,
@@ -156,7 +157,37 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                       position: "bottomleft",
                     }
                     ).addTo(this.map);
+    
+    let divsOverlayChilds = document.getElementsByClassName("leaflet-control-layers-overlays");
+    if(divsOverlayChilds != undefined){
+      if(divsOverlayChilds.length > 0){
+          let divChildsNodes = divsOverlayChilds[0].childNodes;
+          let itemIndex = 1;
+          divChildsNodes.forEach((item)=>{
+            // Se retira el checkbox para las referencias y buques
+            if (itemIndex == 1 || itemIndex == 4){ 
+                item.childNodes[0].childNodes[0].remove()
+            }else{
+
+              // Cambia la posicion de los check hacia la derecha
+              const checkBoxReference = item.childNodes[0].childNodes[0];
+              const spanReference = item.childNodes[0].childNodes[1];
+              item.childNodes[0].appendChild(spanReference)
+              item.childNodes[0].appendChild(checkBoxReference);
               
+              // Se establece la separacion de los controles para mejorar el diseño
+              this.rederer.setStyle(item.childNodes[0],'display','flex');
+              this.rederer.setStyle(item.childNodes[0],'list-style-type','none');
+              this.rederer.setStyle(item.childNodes[0],'padding','0');
+              this.rederer.setStyle(item.childNodes[0],'justify-content','flex-end');
+              this.rederer.setStyle(item.childNodes[0].childNodes[0],'margin-right','auto');
+              this.rederer.setStyle(item.childNodes[0].childNodes[0],'padding-right','10px');
+              
+            }
+            itemIndex++;
+          })
+      }
+    }
 }
 
   async inicializarMapa() {
