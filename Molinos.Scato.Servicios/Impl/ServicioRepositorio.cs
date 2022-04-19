@@ -10386,5 +10386,40 @@ resultado.Patente = rutaFoto.Patente;
             return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
         }
 
+        public IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga)
+        {
+            try
+            {
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return null;
+
+
+                int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarqueBase.Id).Vapor.Id;
+
+                CargaFiltroDto filtro = new CargaFiltroDto();
+             
+                
+                Expression<Func<Carga, bool>> expresionFiltro = null;
+
+
+                expresionFiltro = x => 
+                       (vapor_id == x.Vapor.Id) &&
+                       (x.FechaInicio > embarqueBase.FechaHoraInicioCarga) &&
+                        (x.CargaOpuesta_Id > 0);
+
+                return Listar<Carga, CargaDto>(expresionFiltro);
+
+               
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
+        }
+
     }
 }
