@@ -1114,7 +1114,8 @@ IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Handy-sized') BEG
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Handy-max') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Handy-max'); END
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Wood-chip carriers') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Wood-chip carriers'); END
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'WPanamax') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('WPanamax'); END
-
+IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Bulk Carrier') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Bulk Carrier'); END
+IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Oil Tanker') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Oil Tanker'); END
 GO
 
 --Ubicación de Buque Puerto

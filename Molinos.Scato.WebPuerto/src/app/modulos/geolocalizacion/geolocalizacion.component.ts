@@ -131,15 +131,6 @@ export class GeolocalizacionComponent implements OnInit {
   private cargarBuqueAdicionales(){
     if (this.listaBuquesGeolocalizacion != undefined){
       if (this.listaBuquesGeolocalizacion.length > 0){
-          this.listaBuquesGeolocalizacion.forEach((item) =>{
-      
-            if (!item.sanBenito){
-              let embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito != true);
-              let newEmbarqueSel = Object.assign({}, embarqueSel); // make a copy
-              newEmbarqueSel.embarque_Id = newEmbarqueSel.embarque_Id + 19
-              this.listaBuquesGeolocalizacion.push(JSON.parse(JSON.stringify(newEmbarqueSel)));
-            }
-          })
 
           this.listaBuquesGeolocalizacion.forEach((item) =>{
             
