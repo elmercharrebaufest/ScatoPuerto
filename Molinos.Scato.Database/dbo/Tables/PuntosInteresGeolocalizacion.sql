@@ -8,6 +8,8 @@
 	[HorasSanBenito] [decimal](18, 8) NULL,
 	[Latitud] [nvarchar](80) NULL,
 	[Longitud] [nvarchar](80) NULL,
+	[DistanciaKm] [decimal](18,8) NULL,
+	[RadioPunto] [decimal](18,8) NULL,
 	[Estado] [smallint] NULL,
 	[FechaRegistro] [datetime] NULL,
     CONSTRAINT [PK_dbo.PuntoInteresGeolocalizacion] PRIMARY KEY CLUSTERED ([Id] ASC),

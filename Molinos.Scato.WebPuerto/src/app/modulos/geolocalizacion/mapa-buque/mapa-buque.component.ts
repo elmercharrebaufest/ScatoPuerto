@@ -23,7 +23,9 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   private iconoAncla!:L.Icon;
   private iconoUbicacion!:L.Icon;
   private markadorAncla!: L.Marker;
+  private markadorAnclaCirculo!: L.Circle;
   private markadorUbicacion!: L.Marker;
+  private markadorUbicacionCirculo!: L.Circle;
   private referenciaOverlay;
   private recargarMarkadores: boolean = false;
   private puntosInteresSubject$: any
@@ -102,6 +104,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   async cargarPuntosInteres() {
     let layerAncla = new L.LayerGroup();
     let layerUbicacion = new L.LayerGroup();
+    let layerZona01 = new L.LayerGroup();
+    let layerZona02 = new L.LayerGroup();
       if (this.listaPuntosInteres!=undefined) {
         if (this.listaPuntosInteres.length > 0) {
             this.listaPuntosInteres.forEach(punto => {
@@ -115,6 +119,19 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                     this.markadorAncla = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
                     //this.markadorAncla.addTo(this.map);
                     layerAncla.addLayer(this.markadorAncla);
+
+                    if (punto.distanciaKM != 0 && punto.radioPunto != 0){
+                      this.markadorAnclaCirculo = L.circle([ punto.latitud, punto.longitud ], 
+                                                           { color: '#FF9D4A',
+                                                             fillColor: '#FF9D4A',
+                                                             fillOpacity: 0.40,
+                                                             radius: punto.radioPunto,
+                                                             weight: 0.2
+                                                           }).addTo(this.map);
+                      layerZona01.addLayer(this.markadorAnclaCirculo);
+
+                    }
+
                     break;
                   }
                   case 'ubicacion':{
@@ -122,12 +139,22 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                     this.markadorUbicacion = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
                     //this.markadorUbicacion.addTo(this.map);
                     layerUbicacion.addLayer(this.markadorUbicacion);
+                    if (punto.distanciaKM != 0 && punto.radioPunto != 0){
+                      this.markadorUbicacionCirculo = L.circle([ punto.latitud, punto.longitud ], 
+                                                           { color: '#B26FFF',
+                                                             fillColor: '#B26FFF',
+                                                             fillOpacity: 0.40,
+                                                             radius: 500,
+                                                             weight: 0.2
+                                                           }).addTo(this.map);
+                      layerZona02.addLayer(this.markadorUbicacionCirculo);
+
+                    }
                     break;
                   }
                   default:{
                     iconoPunto = this.iconoUbicacion;
                     this.markadorAncla = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
-                    //this.markadorAncla.addTo(this.map);
                     layerAncla.addLayer(this.markadorAncla);
                     break;
                   }
@@ -137,22 +164,29 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
         }   
       }
       
-      await this.cargarReferenciasMapa(layerUbicacion, layerAncla);
+      await this.cargarReferenciasMapa(layerUbicacion, layerAncla, layerZona01,layerZona02);
   }
 
-  private async cargarReferenciasMapa(layerUbicacion, layerAncla){
+  private async cargarReferenciasMapa(layerUbicacion, layerAncla, layerZona01, layerZona02){
     var ubicaciones = L.layerGroup([layerUbicacion]);
     var ancla = L.layerGroup([layerAncla]);
+    var zona01 = L.layerGroup([layerZona01]);
+    var zona02 = L.layerGroup([layerZona02]);
 
     this.map.addLayer(ubicaciones);
     this.map.addLayer(ancla);
+    this.map.addLayer(zona01);
+    this.map.addLayer(zona02);
     var LayerGroup = L.layerGroup();
 
     var overlayMaps = {
         "<b style='font-family:roboto;font-size:14px'> Referencias </b>": LayerGroup,
         " <img src='../../../../assets/ubicacion.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'> Muelles </label> " : ubicaciones,
         " <img src='../../../../assets/ancla.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Fondeaderos y Puertos </label> ": ancla,
-        " <img src='../../../../assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup
+        " <img src='../../../../assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup,
+        " <img src='../../../../assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 01 </label> ": zona01,
+        " <img src='../../../../assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 02 </label> ": zona02
+
     };
     this.referenciaOverlay = L.control.layers (
                     null,
@@ -193,7 +227,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
               this.rederer.setStyle(item.childNodes[0],'justify-content','flex-end');
               this.rederer.setStyle(item.childNodes[0].childNodes[0],'margin-right','auto');
               this.rederer.setStyle(item.childNodes[0].childNodes[0],'padding-right','10px');
-              
+
             }
             itemIndex++;
           })
@@ -219,7 +253,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     if (this.map.getZoom() <= 5){
       
       this.map.eachLayer((layer) => {
-        if (layer instanceof L.Marker){
+        if (layer instanceof L.Marker || layer instanceof L.Circle){
             this.map.removeLayer(layer)
         }
       });
@@ -239,8 +273,6 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
           if (this.listaEmbarcacion.length > 0) {
               await this.agregarEmbarque();
               // await this.cargarBuqueEnMapa();
-
-              
             }
         }
   }

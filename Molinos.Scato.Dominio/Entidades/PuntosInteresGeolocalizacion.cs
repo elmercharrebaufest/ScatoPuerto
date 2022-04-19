@@ -18,6 +18,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual decimal HorasSanBenito { get; set; }
         public virtual string Latitud { get; set; }
         public virtual string Longitud { get; set; }
+        public virtual decimal DistanciaKM { get; set; }
+        public virtual decimal RadioPunto { get; set; }
         public virtual short Estado { get; set; }
         public virtual DateTime FechaRegistro { get; set; }
     }

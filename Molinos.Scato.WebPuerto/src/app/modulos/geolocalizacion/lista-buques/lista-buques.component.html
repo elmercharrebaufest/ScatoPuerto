@@ -10,7 +10,6 @@
         <div class="divHeaderRightLeft"  *ngIf="getListaBuquesGeolocalizacion().length > 0">
             <h4 class='titulo-listado-geo-letra'>Line Up - Buques en viaje</h4>
         </div>
-        <div class="form-row">
             <div class="form-group col-md-2">
               <label for="tipoDeBuquePuerto" class="subtitulo-listado-geo-letra">Muelle de carga</label>
               <select class="custom-select" (change)="onChangeMuelleSeleccionado($event)">
@@ -22,7 +21,7 @@
                     <thead class="header-geo-fijo" >
                         <tr>
                             <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
-                            <th class="header-geo-fijo sticky-head">Nombre de Buque</th>
+                            <th class="header-geo-fijo sticky-head">Nombre Buque</th>
                             <th class="header-geo-fijo">Puerto de Partida</th>
                             <th class="header-geo-fijo">Puerto de Destino</th>
                             <th class="header-geo-fijo">Eta Reportada</th>
@@ -53,9 +52,8 @@
                                    style="margin-left:15px"
                                    ></i>
                             </td>
-                            <td class="sticky">
-                                <i (click)='openModalGeo(addGeo, geolocalizacion)'
-                                    style="cursor:pointer;">{{geolocalizacion.nombreBuque}} </i>
+                            <td class="sticky lista-nombre-buque" (click)='openModalGeo(addGeo, geolocalizacion)'>
+                                {{geolocalizacion.nombreBuque}}
                             </td>
                             <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
                             <td>{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
@@ -85,7 +83,6 @@
                   </li>
                 </ul>
             </nav>
-        </div>
     </div>
 </div>
 
