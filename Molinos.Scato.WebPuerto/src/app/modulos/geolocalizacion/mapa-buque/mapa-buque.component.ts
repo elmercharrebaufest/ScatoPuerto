@@ -33,7 +33,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
               private appRef: ApplicationRef,
               private injector: Injector,
               private geolocalizacionSharingService : GeolocalizacionSharingService,
-              private rederer: Renderer2
+              private rederer: Renderer2,
               private workflowService: WorkflowService
               ) {
 
