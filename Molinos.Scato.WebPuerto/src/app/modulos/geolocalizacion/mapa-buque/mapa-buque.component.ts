@@ -4,6 +4,9 @@ import { UbicacionEmbarcacion } from '@ScatoModels/geolocalizacion/ubicacion-emb
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
 import * as L from 'leaflet';
 import { TarjetaBuqueComponent } from '../tarjeta-buque/tarjeta-buque.component';
+import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+
 @Component({
   selector: 'app-mapa-buque',
   templateUrl: './mapa-buque.component.html',
@@ -12,6 +15,7 @@ import { TarjetaBuqueComponent } from '../tarjeta-buque/tarjeta-buque.component'
 export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
 
   private listaEmbarcacion: any;
+  private listadoEmbarques: any[];
   private listaPuntosInteres: any;
   private zoom = 8;
   private map!: L.Map;
@@ -29,7 +33,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
               private appRef: ApplicationRef,
               private injector: Injector,
               private geolocalizacionSharingService : GeolocalizacionSharingService,
-              private rederer: Renderer2
+              private rederer: Renderer2,
+              private workflowService: WorkflowService
               ) {
 
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) =>{
@@ -232,45 +237,76 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   async cargarBuquesMapa(){
         if (this.listaEmbarcacion!=undefined) {
           if (this.listaEmbarcacion.length > 0) {
-              this.listaEmbarcacion.forEach(buque => {
-                  if (buque.esSeleccionado && buque.esSeleccionadoPorMuelle){
-                      const latitud = buque.posicion.latitud;
-                      const longitud = buque.posicion.longitud;
+              await this.agregarEmbarque();
+              // await this.cargarBuqueEnMapa();
 
-                      let buqueIconUrl = '';
-
-                      if (buque.sanBenito)
-                          buqueIconUrl = '../../../../assets/buque_san_benito.svg';
-                      
-                      if (buque.vicentin)
-                          buqueIconUrl = '../../../../assets/buque_vicentin.svg';
-                      
-                      if (buque.otrosMuelles)
-                          buqueIconUrl = '../../../../assets/buque_otro_muelle.svg';
-                      
-                      if (buque.noryon)
-                          buqueIconUrl = '../../../../assets/buque_nouryon.svg';
-                      
-                      this.iconoBuque = new L.Icon({
-                        iconUrl: buqueIconUrl,
-                        iconSize: [32, 37]
-                      });
-
-                      let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent, 
-                        (c: any) => {
-                          c.instance.nombreBuque = buque.nombreBuque;
-                      }, latitud, longitud);
-                        let mensajeToolTip  = `<div style='border-width: 1px; border-color:#666666;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
-                            mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
-                            mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
-                            mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
-                            mensajeToolTip += `</div>`;
-                        const markerBuque = L.marker([latitud, longitud ],{icon: this.iconoBuque}).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
-                        markerBuque.addTo(this.map);
-                  }
-              });
+              
             }
         }
+  }
+
+  private async agregarEmbarque(){
+    this.workflowService.obtenerListado().subscribe(
+      data => this.listadoEmbarques = data,
+      err => console.log(err),
+      () => this.dibujarBuqueEnMapa()
+    );
+  }
+
+  private dibujarBuqueEnMapa(){
+    this.listaEmbarcacion.forEach(buque => {
+
+      if(this.listadoEmbarques){
+        let encontrado: InstanciaWorkflowPuerto[] = this.listadoEmbarques.filter( x => x.embarque.id == buque.embarque_Id );
+        if(encontrado.length>0) buque.embarque = encontrado[0].embarque;
+      }
+
+      if (buque.esSeleccionado && buque.esSeleccionadoPorMuelle){
+          const latitud = buque.posicion.latitud;
+          const longitud = buque.posicion.longitud;
+
+          let buqueIconUrl = '';
+
+          if (buque.sanBenito)
+              buqueIconUrl = '../../../../assets/buque_san_benito.svg';
+          
+          if (buque.vicentin)
+              buqueIconUrl = '../../../../assets/buque_vicentin.svg';
+          
+          if (buque.otrosMuelles)
+              buqueIconUrl = '../../../../assets/buque_otro_muelle.svg';
+          
+          if (buque.noryon)
+              buqueIconUrl = '../../../../assets/buque_nouryon.svg';
+          
+          this.iconoBuque = new L.Icon({
+            iconUrl: buqueIconUrl,
+            iconSize: [32, 37]
+          });
+
+          let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent, 
+            (c: any) => {
+              c.instance.nombreBuque = buque.nombreBuque;
+              c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '';
+              // c.instance.imo = buque.informacion.imo;
+              c.instance.imo = buque.embarque ? buque.embarque.imo : '';
+              // c.instance.bandera = buque.informacion.bandera;
+              c.instance.bandera = buque.embarque ? buque.embarque.destino ? buque.embarque.destino.nombre : '' : '';
+              c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '';
+              c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
+              c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
+              c.instance.cantidadBodegas = '';
+              c.instance.eslora = buque.embarque ? buque.embarque.eslora : '';
+          }, latitud, longitud);
+            let mensajeToolTip  = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
+                mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
+                mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
+                mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
+                mensajeToolTip += `</div>`;
+            const markerBuque = L.marker([latitud, longitud ],{icon: this.iconoBuque}).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
+            markerBuque.addTo(this.map);
+      }
+    });
   }
 
   async limpiarMarcadores(){

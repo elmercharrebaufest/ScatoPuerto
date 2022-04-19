@@ -203,6 +203,8 @@
     <Content Include="src\app\shared\componentes\modulos\carga\periodo-carga\periodo-carga.component.css" />
     <Content Include="src\app\shared\componentes\modulos\carga\amarre\amarre.component.html" />
     <Content Include="src\app\shared\componentes\modulos\carga\amarre\amarre.component.css" />
+    <Content Include="src\app\shared\componentes\modulos\geo\card-buque\card-buque.component.html" />
+    <Content Include="src\app\shared\componentes\modulos\geo\card-buque\card-buque.component.css" />
     <!-- Lineup HTML/CSS -->
     <Content Include="src\app\modulos\lineup\calendario\lineup-calendario.component.css" />
     <Content Include="src\app\modulos\lineup\calendario\lineup-calendario.component.html" />
@@ -354,6 +356,7 @@
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\graficos-ritmos\graficos-ritmos.component.ts" />
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\amarre\amarre.component.ts" />
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\periodo-carga\periodo-carga.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\componentes\modulos\geo\card-buque\card-buque.component.ts" />
     <!-- servicios TS -->
     <TypeScriptCompile Include="src\app\shared\servicios\alert.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\autenticador.service.ts" />

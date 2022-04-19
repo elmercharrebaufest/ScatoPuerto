@@ -48,6 +48,7 @@ export class BalanzasRitmosComponent implements OnInit, OnDestroy {
           this.ultimaActualizacion7 = '';
         }
       } );
+      
     this.balanzas78Service.sendDataBalanzadaAgrupada8
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( res => {
@@ -63,6 +64,7 @@ export class BalanzasRitmosComponent implements OnInit, OnDestroy {
           this.ultimaActualizacion8 = '';
         }
       } );
+
     this.balanzas78Service.sendDataBalanzada7Kilos
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( res => this.TnCargadasHastaAhora7 = res );

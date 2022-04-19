@@ -191,12 +191,15 @@
         </div>
       </div>
     </div>
-    <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
-        <img   [src]="ruta" class="imgImo" (click)="verGeolocalizacion(hayBuque,instanciaWorkflow.embarque.id)">
-        <div class="feature">
-          <p [ngClass]="colorMapa">{{mensajeBuque}}</p>
+    <div class="row">
+      <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
+        <img  id="imgLineup" [ngStyle]="{'cursor': hayBuque ? 'pointer' : 'default'}"  [src]="ruta" class="float-left" (click)="verGeolocalizacion(hayBuque,instanciaWorkflow.embarque.id)">
+        <div class="right">
+          <p [ngClass]="colorMapa" class="float-left">{{mensajeBuque}}</p>
         </div>   
     </div>
+    </div>
+    
   </div>
   </div>
   <div class="col-md-3 col-xs-12 my-auto text-left">

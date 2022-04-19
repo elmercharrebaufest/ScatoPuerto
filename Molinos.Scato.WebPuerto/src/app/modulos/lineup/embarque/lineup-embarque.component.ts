@@ -79,7 +79,7 @@ export class LineupEmbarqueComponent implements OnInit {
       this.mensajeBuque=data.find(o=>o.embarque_Id==id)!=null?"Ver en el mapa":"No se encontró. Completar IMO";
       this.hayBuque=data.find(o=>o.embarque_Id==id)!=null?true:false;
       this.ruta= this.hayBuque?"assets/verMapa.svg":"assets/existImo.svg";
-      this.colorMapa=this.hayBuque?'color-text-mapa':'color-text-imo'
+      this.colorMapa=this.hayBuque?'color-text-mapa':'color-text-imo';
     },
       err => {
             console.error('Observer got an error: ' + err)
