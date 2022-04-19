@@ -2637,6 +2637,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
+      
+        [OperationContract]
+        IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
 
     }
 }
