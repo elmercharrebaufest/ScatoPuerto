@@ -335,6 +335,7 @@ export class AltaEmbarqueComponent implements OnInit {
   finalizarAlta() {
     this.submitted = true;
 
+    console.log(this.embarqueForm);
 
     if (this.embarqueId == 0) {
       if (this.embarqueForm.invalid) {
