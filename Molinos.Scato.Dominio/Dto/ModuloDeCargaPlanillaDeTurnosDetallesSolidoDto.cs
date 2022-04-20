@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Entidades;
+using System;
 
 namespace Molinos.Scato.Dominio.Dto
 {
@@ -12,5 +13,6 @@ namespace Molinos.Scato.Dominio.Dto
         public ExportadorDto Exportador { get; set; }
         
         public decimal Cantidad { get; set; }
+        public virtual DateTime? FechaCarga { get; set; }
     }
 }
