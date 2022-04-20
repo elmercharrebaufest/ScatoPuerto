@@ -1,5 +1,6 @@
 ﻿	-- Paises
-IF EXISTS (select 1 from pais where descripcion = 'Argentina') BEGIN update pais set descripcion = 'ARGENTINA' where id = (select id from pais where descripcion = 'Argentina') END
+	/*
+IF EXISTS (select 1 from pais where descripcion = 'Argentina') BEGIN update pais set descripcion = 'ARGENTINA' where id = (select id from pais where descripcion = 'Argentina'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('ARGENTINA')) BEGIN insert into Pais(Descripcion) values ('ARGENTINA'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('BOLIVIA')) BEGIN insert into Pais(Descripcion) values ('BOLIVIA'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('BRASIL')) BEGIN insert into Pais(Descripcion) values ('BRASIL'); END
@@ -13,7 +14,7 @@ IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('SURINAM')) BEG
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('URUGUAY')) BEGIN insert into Pais(Descripcion) values ('URUGUAY'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('VENEZUELA')) BEGIN insert into Pais(Descripcion) values ('VENEZUELA'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('GUAYANA FRANCESA')) BEGIN insert into Pais(Descripcion) values ('GUAYANA FRANCESA'); END
-
+*/
 -- Documentos
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'DNI') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Documento Nacional de Identidad','DNI', ''); END
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'LC') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodigoSap) values ('Libreta Civica','LC', '90'); END
@@ -435,7 +436,7 @@ IF NOT EXISTS (select 1 from TipoComprobanteOncca where Descripcion = 'Otros') B
 --Tipo Vehículo
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión') BEGIN insert into TipoVehiculo(Id, Descripcion) values (0, 'Camión'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Tren') BEGIN insert into TipoVehiculo(Id, Descripcion) values (1, 'Tren'); END
-IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Bitren') BEGIN insert into TipoVehiculo(Id, Descripcion) values (2, 'Bitren'); END
+IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Bitren B(60)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (2, 'Bitren B(60)'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión C(55,5)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (3, 'Camión C(55,5)'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión D(52,5)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (4, 'Camión D(52,5)'); END
 IF NOT EXISTS (select 1 from TipoVehiculo where Descripcion = 'Camión E(49,5)') BEGIN insert into TipoVehiculo(Id, Descripcion) values (5, 'Camión E(49,5)'); END
@@ -1207,6 +1208,7 @@ IF NOT EXISTS (select 1 from TurnoPuerto where Nombre = '18-24') BEGIN insert in
 GO
 
  --Material puerto
+ /*
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE GIRASOL' and CodigoSap = '19908018') BEGIN insert into MaterialPuerto(Descripcion, CodigoSap, Almacen_Id,EsLiquido) values ('SEMILLA DE GIRASOL','19908018', null, 0); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'POROTO DE SOJA' and CodigoSap = '19908017' and Almacen_Id = 1 and DescripcionCorta = 'PDS') BEGIN insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, Almacen_Id, EsLiquido) values ('POROTO DE SOJA','PDS', '19908017', 1, 0); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE GIRASOL OLEICO' and CodigoSap = '19908019') BEGIN insert into MaterialPuerto(Descripcion, CodigoSap, Almacen_Id, EsLiquido) values ('SEMILLA DE GIRASOL OLEICO','19908019', null, 1); END
@@ -1214,7 +1216,7 @@ IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE MAIZ
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'MAIZ' and DescripcionCorta = 'MAIZ' and CodigoSap = '99108' and Almacen_Id = 251 and EsLiquido = 0) BEGIN insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, Almacen_Id, EsLiquido) values ('MAIZ','MAIZ','99108', 251, 0); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'BIODIESEL' and DescripcionCorta = 'BIODIESEL' and CodigoSap = '99319' and Almacen_Id = 328 and EsLiquido = 1) BEGIN insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, Almacen_Id, EsLiquido) values ('BIODIESEL','BIODIESEL','99319', 328, 1); END
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SEMILLA DE TRIGO' and CodigoSap = '19908027') BEGIN insert into MaterialPuerto(Descripcion, CodigoSap, Almacen_Id, EsLiquido) values ('SEMILLA DE TRIGO','19908027', null, 0); END
-GO
+GO*/
 GO
 
 --Estados del buque

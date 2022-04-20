@@ -199,7 +199,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             if (!b.EnviadoASap && b.CargaInicial != null)
             {
-                servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = b.Id, NumeroBalanza = b.NumeroBalanza });
+            //    servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = b.Id, NumeroBalanza = b.NumeroBalanza });
             }
         }
 

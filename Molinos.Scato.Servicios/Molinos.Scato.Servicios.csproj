@@ -494,6 +494,8 @@
     <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
+    <Compile Include="Procesamiento\ProcesadorCrearConfiguracionGeneral.cs" />
+    <Compile Include="Procesamiento\ProcesadorEliminarConfiguracionGeneral.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloBalanza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeEmbarque.cs" />
@@ -567,6 +569,7 @@
     <Compile Include="Procesamiento\ProcesadorModificarATAPuerto.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarCargadoPlanoDeCarga.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarCategoriaVehiculo.cs" />
+    <Compile Include="Procesamiento\ProcesadorModificarConfiguracionGeneral.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarCoordinadorPuerto.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearEstadoPuerto.cs" />
