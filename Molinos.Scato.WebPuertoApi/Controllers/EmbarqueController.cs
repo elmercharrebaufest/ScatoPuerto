@@ -384,6 +384,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/Embarque/RegistrarEmbarqueGeolocalizacion")]
+        [System.Web.Mvc.AllowAnonymous]
         public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> EmbarquesGeolocalizacion)
         {
             try
@@ -422,6 +423,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
+        [System.Web.Mvc.AllowAnonymous]
         [Route("api/Embarque/ObtenerEmbarquesGeolocalizacion")]
         public HttpResponseMessage ObtenerEmbarquesGeolocalizacion()
         {
