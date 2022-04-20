@@ -168,7 +168,6 @@ export class LineupEmbarqueComponent implements OnInit {
   public onSelectAction(accion) {
     if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacion)) {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
-     
       /**Muelle de Carga**/
       if (accion == 2) {
         this.workflowService.obtenerListado().subscribe(
@@ -204,8 +203,6 @@ export class LineupEmbarqueComponent implements OnInit {
           .catch(() => window.location.reload());
       }
       else
-         console.log(accion);
-         console.log("actualizar");
         this.actualizarUbicacion(accion);
     }
   }
@@ -285,7 +282,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   numeroUbicacionDeBuquePuerto(nombre): number {
-    return nombre.length > 0 && nombre != null && this.ubicacionDeBuquePuerto != null ? this.ubicacionDeBuquePuerto.find(x => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()).orden : 0;
+    return nombre.length > 0 && nombre != null && this.ubicacionDeBuquePuerto != null ? this.ubicacionDeBuquePuerto.find(x => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()).id : 0;
   }
 
   extraeNombre(objeto): string {
