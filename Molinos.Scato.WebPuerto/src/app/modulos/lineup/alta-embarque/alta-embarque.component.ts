@@ -121,7 +121,7 @@ export class AltaEmbarqueComponent implements OnInit {
       eslora: [],
       manga: [],
       puntal: [],
-      fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
+     // fechaLibrePlatica: ['', [this.dateValidator.bind(this)]],
       horaLibrePlatica: [],
       imo: [''],
       cantidadBodegasTanques: [],
