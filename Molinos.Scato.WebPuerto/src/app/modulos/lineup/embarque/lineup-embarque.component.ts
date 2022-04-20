@@ -22,6 +22,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
   templateUrl: './lineup-embarque.component.html',
   styleUrls: ['./lineup-embarque.component.css']
 })
+
 export class LineupEmbarqueComponent implements OnInit {
   @Input() index: number;
   @Input() instanciaWorkflow: InstanciaWorkflowPuerto;
@@ -36,7 +37,12 @@ export class LineupEmbarqueComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
   posicionesDeLineUps: number[];
   embarquesPuerto: InstanciaWorkflowPuerto[];
+  hayBuque = true;
+  mensajeBuque: string;
+  colorMapa: string = 'color-text-espera';
+  
   private user: Usuario;
+  ruta: string = 'assets/esperaBuque.svg';
   constructor(
     private lineUpService: LineupService,
     private workflowService: WorkflowService,
@@ -45,6 +51,7 @@ export class LineupEmbarqueComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private session: SessionService
+  
   ) {
     this.user = this.session.getUser();
   }
@@ -54,6 +61,7 @@ export class LineupEmbarqueComponent implements OnInit {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
     }
+
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
@@ -65,6 +73,7 @@ export class LineupEmbarqueComponent implements OnInit {
       });
   }
 
+  
   public modificarLineUp(campo: string) {
     if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
       switch (campo) {
@@ -175,7 +184,7 @@ export class LineupEmbarqueComponent implements OnInit {
       }
       /**Zarpó**/
       else if (accion == 1) {
-        this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
+        this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up y geolocalización`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
           .then((confirmed) => {
             if (confirmed) {
               this.showSpinner.emit(true)
@@ -269,7 +278,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   nombreUbicacionDeBuquePuerto(numero): string {
-    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
+    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.id == numero) != undefined ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
   }
 
   numeroUbicacionDeBuquePuerto(nombre): number {
@@ -309,3 +318,4 @@ export class LineupEmbarqueComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
   }
 }
+

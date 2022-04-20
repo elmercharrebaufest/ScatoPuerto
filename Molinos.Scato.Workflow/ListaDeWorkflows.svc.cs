@@ -146,93 +146,110 @@ namespace Molinos.Scato.Workflow
         /// <returns>Una lista de <see cref="InstanciaWorkflowDto"/></returns>
         public ListarWorkFlowsDto ListarWorkFlows(Paginacion paginacion, FiltroListaDeWorkflowsDto filtro)
         {
-            var resultado = ObtenerWorkFlows();
-            if (filtro.MostrarCamionesPendientes && filtro.MostrarCamionesPendientesNoGranos)
+            try
             {
-                var pendientes = servicioRepositorio.ListarDatosDeWorkflowsPendientes(filtro.CentroId ?? 0, 0);
-                if (filtro.MostrarCamionesPendientes)
+                var resultado = ObtenerWorkFlows();
+                if (filtro.MostrarCamionesPendientes && filtro.MostrarCamionesPendientesNoGranos)
                 {
-                    resultado = resultado.Union(pendientes.Where(x=>x.ProximaAccion == PermisosScato.CamionesPendientesMesa.Text()));
+                    var pendientes = servicioRepositorio.ListarDatosDeWorkflowsPendientes(filtro.CentroId ?? 0, 0);
+                    if (filtro.MostrarCamionesPendientes)
+                    {
+                        resultado = resultado.Union(pendientes.Where(x => x.ProximaAccion == PermisosScato.CamionesPendientesMesa.Text()));
+                    }
+                    if (filtro.MostrarCamionesPendientesNoGranos)
+                    {
+                        resultado = resultado.Union(pendientes.Where(x => x.ProximaAccion == PermisosScato.CamionesPendientesNoGranos.ToString()));
+                    }
                 }
-                if (filtro.MostrarCamionesPendientesNoGranos)
+                var resultadoWorkflows = FiltrarWorkFlows(resultado, filtro);
+                resultadoWorkflows = servicioRepositorio.ConsultarEstadoWorkflow(resultadoWorkflows);
+                var listarWorkflows = new ListarWorkFlowsDto
                 {
-                    resultado = resultado.Union(pendientes.Where(x => x.ProximaAccion == PermisosScato.CamionesPendientesNoGranos.ToString()));
-                }
-            }
-            var resultadoWorkflows = FiltrarWorkFlows(resultado, filtro);
-            resultadoWorkflows = servicioRepositorio.ConsultarEstadoWorkflow(resultadoWorkflows);
-            var listarWorkflows = new ListarWorkFlowsDto
-            {
-                InstanciasWorkflowDto = ListarWorkFlows(resultadoWorkflows.InstanciasWorkflowDto, filtro, paginacion),
-                ProximasAcciones = resultadoWorkflows.InstanciasWorkflowDto.Where(w => w.ProximaAccion != null).Select(s => s.ProximaAccion).Distinct().OrderBy(x => x).ToList(),
-            };
+                    InstanciasWorkflowDto = ListarWorkFlows(resultadoWorkflows.InstanciasWorkflowDto, filtro, paginacion),
+                    ProximasAcciones = resultadoWorkflows.InstanciasWorkflowDto.Where(w => w.ProximaAccion != null).Select(s => s.ProximaAccion).Distinct().OrderBy(x => x).ToList(),
+                };
 
-            var datos = servicioRepositorio.ListarDatosDeWorkflows(listarWorkflows.InstanciasWorkflowDto.Select(x => x.Id).Distinct().ToList());
+                var datos = servicioRepositorio.ListarDatosDeWorkflows(listarWorkflows.InstanciasWorkflowDto.Select(x => x.Id).Distinct().ToList());
 
-            foreach (var instanciaWorkflowDto in listarWorkflows.InstanciasWorkflowDto)
-            {
-                var dato = datos.FirstOrDefault(x => x.Id == instanciaWorkflowDto.Id);
-                if (dato != null)
+                foreach (var instanciaWorkflowDto in listarWorkflows.InstanciasWorkflowDto)
                 {
-                    instanciaWorkflowDto.RecorridoId = dato.RecorridoId;
-                    instanciaWorkflowDto.Material = dato.Material;
-                    instanciaWorkflowDto.MaterialId = dato.MaterialId;
-                    instanciaWorkflowDto.MaterialCodigoSap = dato.MaterialCodigoSap;
-                    instanciaWorkflowDto.Transportista = dato.Transportista;
-                    instanciaWorkflowDto.TransportistaId = dato.TransportistaId;
-                    instanciaWorkflowDto.Cuit = dato.Cuit;
-                    instanciaWorkflowDto.Patente = dato.Patente;
-                    instanciaWorkflowDto.Rechazado = dato.Rechazado;
-                    instanciaWorkflowDto.Workflow = dato.Workflow;
-                    instanciaWorkflowDto.ChoferDNI = dato.ChoferDNI;
-                    instanciaWorkflowDto.ChoferNombre = dato.ChoferNombre;
-                    instanciaWorkflowDto.NumeroDeTarjeta = dato.NumeroDeTarjeta;
-                    instanciaWorkflowDto.Sustentable = dato.Sustentable;
-                    instanciaWorkflowDto.Entregador = dato.Entregador;
-                    instanciaWorkflowDto.EsEspecial = dato.EsEspecial;
-                    instanciaWorkflowDto.CaracteristicasNoCorrenspodenEspecial = dato.CaracteristicasNoCorrenspodenEspecial;
-                    instanciaWorkflowDto.AnalisisObligatorio = dato.AnalisisObligatorio && instanciaWorkflowDto.ProximaAccion == "Calado";
-                    instanciaWorkflowDto.VehiculoDemorado = dato.VehiculoDemorado;
-                    instanciaWorkflowDto.LlegoEnHorario = dato.LlegoEnHorario;
-                    instanciaWorkflowDto.Proteina = dato.Proteina;
-                    instanciaWorkflowDto.AlmacenDestino = dato.AlmacenDestino;
-                    instanciaWorkflowDto.DiferenciaPesoNeto = dato.DiferenciaPesoNeto.HasValue? dato.DiferenciaPesoNeto.ToString():"";
+                    var dato = datos.FirstOrDefault(x => x.Id == instanciaWorkflowDto.Id);
+                    if (dato != null)
+                    {
+                        instanciaWorkflowDto.RecorridoId = dato.RecorridoId;
+                        instanciaWorkflowDto.Material = dato.Material;
+                        instanciaWorkflowDto.MaterialId = dato.MaterialId;
+                        instanciaWorkflowDto.MaterialCodigoSap = dato.MaterialCodigoSap;
+                        instanciaWorkflowDto.Transportista = dato.Transportista;
+                        instanciaWorkflowDto.TransportistaId = dato.TransportistaId;
+                        instanciaWorkflowDto.Cuit = dato.Cuit;
+                        instanciaWorkflowDto.Patente = dato.Patente;
+                        instanciaWorkflowDto.Rechazado = dato.Rechazado;
+                        instanciaWorkflowDto.Workflow = dato.Workflow;
+                        instanciaWorkflowDto.ChoferDNI = dato.ChoferDNI;
+                        instanciaWorkflowDto.ChoferNombre = dato.ChoferNombre;
+                        instanciaWorkflowDto.NumeroDeTarjeta = dato.NumeroDeTarjeta;
+                        instanciaWorkflowDto.Sustentable = dato.Sustentable;
+                        instanciaWorkflowDto.Entregador = dato.Entregador;
+                        instanciaWorkflowDto.EsEspecial = dato.EsEspecial;
+                        instanciaWorkflowDto.CaracteristicasNoCorrenspodenEspecial = dato.CaracteristicasNoCorrenspodenEspecial;
+                        instanciaWorkflowDto.AnalisisObligatorio = dato.AnalisisObligatorio && instanciaWorkflowDto.ProximaAccion == "Calado";
+                        instanciaWorkflowDto.VehiculoDemorado = dato.VehiculoDemorado;
+                        instanciaWorkflowDto.LlegoEnHorario = dato.LlegoEnHorario;
+                        instanciaWorkflowDto.Proteina = dato.Proteina;
+                        instanciaWorkflowDto.AlmacenDestino = dato.AlmacenDestino;
+                        instanciaWorkflowDto.DiferenciaPesoNeto = dato.DiferenciaPesoNeto.HasValue ? dato.DiferenciaPesoNeto.ToString() : "";
+                    }
+                    instanciaWorkflowDto.NumeroDocumentoDeIngreso = instanciaWorkflowDto.NumeroDocumentoDeIngreso is null ? instanciaWorkflowDto.CTG : instanciaWorkflowDto.NumeroDocumentoDeIngreso;
                 }
-                instanciaWorkflowDto.NumeroDocumentoDeIngreso = instanciaWorkflowDto.NumeroDocumentoDeIngreso is null ? instanciaWorkflowDto.CTG : instanciaWorkflowDto.NumeroDocumentoDeIngreso;
+                return listarWorkflows;
             }
-            return listarWorkflows;
+            catch (Exception e)
+            {
+                log.Error(e, "Error al listarWorkflows");
+                throw;
+            }
+
         }
 
         public IList<InstanciaWorkflowPuertoDto> ListarEmbarques(string filtroProximaAccion = null)
         {
-
-            //var resultado = ObtenerTotalWorkflows().Where(x => x.TipoVehiculo == TipoVehiculo.Vapor && (string.IsNullOrEmpty(filtroProximaAccion) || x.ProximaAccion == filtroProximaAccion))
-            
-            var resultado = ObtenerWorkFlows().Where(x => x.TipoVehiculo == TipoVehiculo.Vapor && (string.IsNullOrEmpty(filtroProximaAccion) || x.ProximaAccion == filtroProximaAccion))
-                    .Select(x => new InstanciaWorkflowPuertoDto
-                    {
-                        Id = x.Id,
-                        FechaUltimaModificacion = x.FechaUltimaModificacion,
-                        ProximaAccion = x.ProximaAccion
-                    }).ToList();
-            //
-            var ids = resultado.Select(x => x.Id).Distinct().ToList();
-            var datos = servicioRepositorio.ListarDatosDeWorkflowsPuerto(ids);
-            //
-            foreach (var instanciaWorkflowDto in resultado)
+            try
             {
-                var embarque = datos.Embarques.FirstOrDefault(x => x.InstanciaWorkflow == instanciaWorkflowDto.Id);
-                var lineup = datos.LineUps.FirstOrDefault(x => x.InstanciaWorkflow == instanciaWorkflowDto.Id);
-                instanciaWorkflowDto.Embarque = embarque;
-                instanciaWorkflowDto.LineUp = lineup;
-                if(embarque != null && lineup != null)
-                {
-                    lineup.Ubicacion = embarque.Ubicacion;
-                }
-            }
+                //var resultado = ObtenerTotalWorkflows().Where(x => x.TipoVehiculo == TipoVehiculo.Vapor && (string.IsNullOrEmpty(filtroProximaAccion) || x.ProximaAccion == filtroProximaAccion))
 
-            return resultado.FindAll(x=>x.Embarque !=null && x.Embarque.Ubicacion !=1).OrderBy(x => x.LineUp != null ? x.LineUp.Orden : int.MaxValue).ToList();
-            //return resultado.OrderBy(x => x.LineUp != null ? x.LineUp.Orden : int.MaxValue).ToList();
+                var resultado = ObtenerWorkFlows().Where(x => x.TipoVehiculo == TipoVehiculo.Vapor && (string.IsNullOrEmpty(filtroProximaAccion) || x.ProximaAccion == filtroProximaAccion))
+                        .Select(x => new InstanciaWorkflowPuertoDto
+                        {
+                            Id = x.Id,
+                            FechaUltimaModificacion = x.FechaUltimaModificacion,
+                            ProximaAccion = x.ProximaAccion
+                        }).ToList();
+                //
+                var ids = resultado.Select(x => x.Id).Distinct().ToList();
+                var datos = servicioRepositorio.ListarDatosDeWorkflowsPuerto(ids);
+                //
+                foreach (var instanciaWorkflowDto in resultado)
+                {
+                    var embarque = datos.Embarques.FirstOrDefault(x => x.InstanciaWorkflow == instanciaWorkflowDto.Id);
+                    var lineup = datos.LineUps.FirstOrDefault(x => x.InstanciaWorkflow == instanciaWorkflowDto.Id);
+                    instanciaWorkflowDto.Embarque = embarque;
+                    instanciaWorkflowDto.LineUp = lineup;
+                    if (embarque != null && lineup != null)
+                    {
+                        lineup.Ubicacion = embarque.Ubicacion;
+                    }
+                }
+
+                return resultado.FindAll(x => x.Embarque != null && x.Embarque.Ubicacion != 1).OrderBy(x => x.LineUp != null ? x.LineUp.Orden : int.MaxValue).ToList();
+                //return resultado.OrderBy(x => x.LineUp != null ? x.LineUp.Orden : int.MaxValue).ToList();
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "Error al ListarEmbarques");
+                throw;
+            }
+           
         }
 
         public ListarWorkFlowsDto ListarTotalWorkFlows(Paginacion paginacion, FiltroListaDeWorkflowsDto filtro)
