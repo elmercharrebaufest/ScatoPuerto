@@ -25,7 +25,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   private markadorAncla!: L.Marker;
   private markadorAnclaCirculo!: L.Circle;
   private markadorUbicacion!: L.Marker;
-  private markadorUbicacionCirculo!: L.Circle;
+  private markadorUbicacionPolygon!: L.Polygon;
   private referenciaOverlay;
   private recargarMarkadores: boolean = false;
   private puntosInteresSubject$: any
@@ -106,10 +106,16 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     let layerUbicacion = new L.LayerGroup();
     let layerZona01 = new L.LayerGroup();
     let layerZona02 = new L.LayerGroup();
+
       if (this.listaPuntosInteres!=undefined) {
         if (this.listaPuntosInteres.length > 0) {
+
+            // creando puntos de interes
             this.listaPuntosInteres.forEach(punto => {
-                
+                if (punto.tipoUbicacion == 'Zona'){
+                  return;
+                }
+                  
                 const mensajeToolTipHTML = `${punto.nombre} [${punto.pais}]<br>Tipo: ${punto.tipoUbicacion}`;
                 
                 let iconoPunto;
@@ -135,10 +141,12 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                     break;
                   }
                   case 'ubicacion':{
+                    
                     iconoPunto = this.iconoUbicacion;
                     this.markadorUbicacion = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
                     //this.markadorUbicacion.addTo(this.map);
                     layerUbicacion.addLayer(this.markadorUbicacion);
+                    /*
                     if (punto.distanciaKM != 0 && punto.radioPunto != 0){
                       this.markadorUbicacionCirculo = L.circle([ punto.latitud, punto.longitud ], 
                                                            { color: '#B26FFF',
@@ -150,6 +158,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                       layerZona02.addLayer(this.markadorUbicacionCirculo);
 
                     }
+                    */
                     break;
                   }
                   default:{
@@ -161,6 +170,60 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                 }
 
             });
+
+            // creando zonas (cuadrados o triangulos)
+            
+            const filtroZonas     = this.listaPuntosInteres.filter( item => item.tipoUbicacion =='Zona');
+            const filtroCuadrados = filtroZonas.filter( item => item.tipoZona =='Cuadrado').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
+            const gruposCuadrados = [...new Set(filtroCuadrados.map(item => item.agrupadorZona))];
+            const filtroTriangulo = filtroZonas.filter( item => item.tipoZona =='Triangulo').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
+            const gruposTriangulo = [...new Set(filtroTriangulo.map(item => item.agrupadorZona))]
+
+            if (gruposCuadrados !== undefined){
+              if (gruposCuadrados.length > 0 ){
+                  gruposCuadrados.forEach(zona => {
+                      console.log(zona)
+                      const grupo = filtroCuadrados.filter( item => item.agrupadorZona == zona);
+                      if (grupo.length == 4){
+                        this.markadorUbicacionPolygon = L.polygon (
+                          [
+                            [grupo[0].latitud , grupo[0].longitud],
+                            [grupo[1].latitud , grupo[1].longitud],
+                            [grupo[2].latitud , grupo[2].longitud],             
+                            [grupo[3].latitud , grupo[3].longitud],
+                          ],
+                          { 
+                            fillColor: '#B26FFF', 
+                            color: '#B26FFF'
+                            
+                          }
+                          ).addTo(this.map);
+                          layerZona02.addLayer(this.markadorUbicacionPolygon);
+    
+                      }
+                });
+              }
+            }
+  
+            if (gruposTriangulo !== undefined){
+              if (gruposTriangulo.length > 0 ){
+                  gruposTriangulo.forEach(zona => {
+                      const grupo = filtroTriangulo.filter( item => item.agrupadorZona == zona);
+                      if (grupo.length == 3){
+                        this.markadorUbicacionPolygon = L.polygon (
+                          [
+                            [grupo[0].latitud , grupo[0].longitud],
+                            [grupo[1].latitud , grupo[1].longitud],
+                            [grupo[2].latitud , grupo[2].longitud],             
+                          ]
+                          ).addTo(this.map);
+                          layerZona02.addLayer(this.markadorUbicacionPolygon);
+    
+                      }
+                });
+              }
+            }
+
         }   
       }
       
