@@ -338,7 +338,7 @@ export class AltaEmbarqueComponent implements OnInit {
     console.log(this.embarqueForm);
 
     if (this.embarqueId == 0) {
-      if (this.embarqueForm.invalid) {
+   /*   if (this.embarqueForm.invalid) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
         if (this.invalidRequiredMaterial()) {
           this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
@@ -351,7 +351,7 @@ export class AltaEmbarqueComponent implements OnInit {
           this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
           return;
         }
-      }
+      }*/
       this.mostrarSpinner = true;
 
       this.embarqueForm.get('fechaRecalada').setValue(
@@ -432,7 +432,7 @@ export class AltaEmbarqueComponent implements OnInit {
           });
     }
     else {
-      if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['destino'].invalid) {
+   /*   if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['destino'].invalid) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
         if (this.invalidRequiredMaterial()) {
           this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
@@ -445,7 +445,7 @@ export class AltaEmbarqueComponent implements OnInit {
           this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
           return;
         }
-      }
+      }*/
 
       this.mostrarSpinner = true;
       this.embarqueForm.get('fechaRecalada').setValue(
@@ -578,7 +578,7 @@ export class AltaEmbarqueComponent implements OnInit {
 
   public modificarEmbarque() {
     this.submitted = true;
-    if (this.embarqueForm.invalid) {
+  /*  if (this.embarqueForm.invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
@@ -591,7 +591,7 @@ export class AltaEmbarqueComponent implements OnInit {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
         return;
       }
-    }
+    }*/
 
 
     this.mostrarSpinner = true;
