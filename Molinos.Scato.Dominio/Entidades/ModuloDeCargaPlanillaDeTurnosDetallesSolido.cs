@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -13,5 +14,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Destino Destino { get; set; }
         public virtual Exportador Exportador { get; set; }
         public virtual decimal Cantidad { get; set; }
+        public virtual DateTime? FechaCarga { get; set; }
     }
 }
