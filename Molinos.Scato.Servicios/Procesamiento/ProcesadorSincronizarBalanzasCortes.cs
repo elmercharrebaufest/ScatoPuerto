@@ -23,6 +23,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             try
             {
+
                 var ultima = new DateTime();
 
                 List<BalanzasCortes> lista = new List<BalanzasCortes>();
@@ -43,7 +44,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
 
 
-
+               
 
 
                 ObtenerBalanzadasCargas(cargasBalanza);
@@ -53,7 +54,42 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 ValidarBajaCarga(comando.IdModuloDeCarga, cargasBalanza);
 
+                ProcesarCargasPlanillaSolidos(vapor_id, comando.IdModuloDeCarga, embarqueBase.FechaHoraInicioCarga);
 
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public void ProcesarCargasPlanillaSolidos(int vapor_id, int IdModuloDeCarga, DateTime? fechaInicio)
+        {
+            try
+            {
+                var planilla = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == IdModuloDeCarga);
+
+                var planillaturnosdetalle = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == IdModuloDeCarga).LastOrDefault();
+
+                var cargaPlanilla = Repositorio.Listar<Carga>(x=>vapor_id == x.Vapor.Id && x.FechaInicio > fechaInicio && x.CargaOpuesta_Id > 0 && x.FechaInicio> planillaturnosdetalle.FechaCarga);
+
+                foreach (var cargaSolido in cargaPlanilla)
+                {
+                    ModuloDeCargaPlanillaDeTurnosDetallesSolido moduloSolido = new ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                    {
+                        //int Id { get; set; }
+                        ModuloDeCargaPlanillaDeTurnos = planilla,
+                        BodegaParcel = cargaSolido.Bodega.Id,
+                        MaterialPuerto = cargaSolido.Material,
+                        Destino = cargaSolido.Destino,
+                        Exportador = cargaSolido.Exportador,
+                        Cantidad = cargaSolido.ToneladasAW,
+                        FechaCarga = cargaSolido.FechaInicio
+                    };
+                    Repositorio.Agregar(moduloSolido);
+                    Repositorio.GuardarCambios();
+                }
 
             }
             catch (Exception ex)

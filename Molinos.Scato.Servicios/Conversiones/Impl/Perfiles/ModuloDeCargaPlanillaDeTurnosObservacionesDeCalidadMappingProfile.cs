@@ -12,8 +12,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         }
         protected override void Configure()
         {
-            Mapper.CreateMap<ObservacionesDeCalidad, ObservacionesDeCalidadDto>();
-            Mapper.CreateMap<ObservacionesDeCalidadDto, ObservacionesDeCalidad>();
+            Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad, ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto>();
+            Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto, ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>();
         }
     }
 }

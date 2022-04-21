@@ -3,5 +3,4 @@ export class ObsCalidad {
     fecha: Date;
     hora: string;
     observaciones: string;
-    userCarga: string;
 }

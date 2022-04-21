@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public class ObservacionesDeCalidadDto
+    public class ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto
     {
         public int Id { get; set; }
         public DateTime Fecha { get; set; }

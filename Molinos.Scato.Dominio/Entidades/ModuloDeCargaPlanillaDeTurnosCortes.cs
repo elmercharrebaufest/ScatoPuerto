@@ -2,11 +2,11 @@
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class ModuloDeCargaPlanillaDeTurnosTurnosCortes : IIdentificable
+    public class ModuloDeCargaPlanillaDeTurnosCortes : IIdentificable
     {
         [Key]
         public virtual int Id { get; set; }
-        public virtual ModuloDeCargaPlanillaDeTurnosTurnos ModuloDeCargaPlanillaDeTurnosTurnos { get; set; }
+        public virtual ModuloDeCargaPlanillaDeTurnos ModuloDeCargaPlanillaDeTurnos{ get; set; }
         public virtual MotivosDeCorte MotivosDeCorte { get; set; }
         public virtual string HoraInicio { get; set; }
         public virtual string HoraFin { get; set; }

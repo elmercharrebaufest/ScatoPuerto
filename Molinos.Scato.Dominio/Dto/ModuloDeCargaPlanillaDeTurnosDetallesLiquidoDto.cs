@@ -2,12 +2,11 @@
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public class ModuloDeCargaPlanillaDeTurnosTurnosDetallesDto
+    public class ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto
     {
         public int Id { get; set; }
         public ExportadorDto Exportador { get; set; }
         public int Linea_Id { get; set; }
-        //public ModuloDeCargaLineasDeEmbarque Linea { get; set; }
         public int BodegaParcel { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public string Tk { get; set; }

@@ -149,7 +149,8 @@
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\bservacionesDeCalidadMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CargaComercialHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CeldaManoDeEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ConfiguracionMailMappingProfile.cs" />
@@ -186,9 +187,9 @@
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaNirManualPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPeriodoDeCargaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeEmbarqueMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosTurnosCortesMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosTurnosDetallesMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosTurnosMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosLiquidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaRitmosEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaTabiquesDeEmbarqueHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaTabiquesDeEmbarqueMappingProfile.cs" />
@@ -467,7 +468,6 @@
     <Compile Include="Conversiones\Impl\Perfiles\MuestraDeHumedadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NotifiacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\OrdenCargaInternaMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ObservacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RecorridoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RolMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SuplenciaMappingProfile.cs" />
@@ -557,7 +557,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarMotivosLimpieza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloDeCarga.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeTurnos.cs" />
-    <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeTurnosTurnos.cs" />
     <Compile Include="Procesamiento\ProcesadorImprimirEtiquetaAuditoriaCamara.cs" />
     <Compile Include="Procesamiento\ProcesadorLeerNumeroCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanoDeCarga.cs" />
