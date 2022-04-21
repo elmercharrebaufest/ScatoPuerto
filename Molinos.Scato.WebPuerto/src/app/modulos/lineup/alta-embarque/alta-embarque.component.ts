@@ -335,9 +335,10 @@ export class AltaEmbarqueComponent implements OnInit {
   finalizarAlta() {
     this.submitted = true;
 
+    console.log(this.embarqueForm);
 
     if (this.embarqueId == 0) {
-      if (this.embarqueForm.invalid) {
+     if (this.embarqueForm.invalid) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
         if (this.invalidRequiredMaterial()) {
           this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });

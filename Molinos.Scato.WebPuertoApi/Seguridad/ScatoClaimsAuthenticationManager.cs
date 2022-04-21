@@ -77,18 +77,18 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
 
                 try
                 {
-                    var ips = (HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] ?? "");
-                    var RequestIP = ips.Split(',').Last().Trim().Split(':').First();
-                    //log.Info($"Ips detectados: {ips} para el usuario {nombreUsuario}");
-                    IPAddress IP = IPAddress.Parse(RequestIP);
-                    IPHostEntry GetIPHost = Dns.GetHostEntry(IP);
+                    //var ips = (HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] ?? "");
+                    //var RequestIP = ips.Split(',').Last().Trim().Split(':').First();
+                    ////log.Info($"Ips detectados: {ips} para el usuario {nombreUsuario}");
+                    //IPAddress IP = IPAddress.Parse(RequestIP);
+                    //IPHostEntry GetIPHost = Dns.GetHostEntry(IP);
 
-                    List<string> hostName = GetIPHost.HostName.ToString().Split('.').ToList();
-                    string ComputerName = hostName.First();
-                    string MachineName1 = Environment.MachineName;
-                    string MachineName2 = System.Net.Dns.GetHostName();
-                    string MachineName3 = HttpContext.Current.Request.ServerVariables["REMOTE_HOST"].ToString();
-                    string MachineName4 = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
+                    //List<string> hostName = GetIPHost.HostName.ToString().Split('.').ToList();
+                    //string ComputerName = hostName.First();
+                    //string MachineName1 = Environment.MachineName;
+                    //string MachineName2 = System.Net.Dns.GetHostName();
+                    //string MachineName3 = HttpContext.Current.Request.ServerVariables["REMOTE_HOST"].ToString();
+                    //string MachineName4 = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
                     //identity.AddClaim(new Claim("UserComputerName", ComputerName));
                     //log.Info("Nombre de pc detectada: {0} para el usuario {1}", String.Join(",", ComputerName, Dns.GetHostName(),MachineName1,MachineName2,MachineName3,MachineName4, RequestIP), nombreUsuario);
                 }
