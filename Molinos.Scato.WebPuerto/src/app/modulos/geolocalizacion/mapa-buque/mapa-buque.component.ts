@@ -112,7 +112,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
 
             // creando puntos de interes
             this.listaPuntosInteres.forEach(punto => {
-                if (punto.tipoUbicacion == 'Zona'){
+                if (punto.tipoUbicacion == 'Zona 01' || punto.tipoUbicacion == 'Zona 02'){
                   return;
                 }
                   
@@ -144,21 +144,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                     
                     iconoPunto = this.iconoUbicacion;
                     this.markadorUbicacion = L.marker([punto.latitud, punto.longitud ], {icon: iconoPunto}).bindTooltip(mensajeToolTipHTML);
-                    //this.markadorUbicacion.addTo(this.map);
                     layerUbicacion.addLayer(this.markadorUbicacion);
-                    /*
-                    if (punto.distanciaKM != 0 && punto.radioPunto != 0){
-                      this.markadorUbicacionCirculo = L.circle([ punto.latitud, punto.longitud ], 
-                                                           { color: '#B26FFF',
-                                                             fillColor: '#B26FFF',
-                                                             fillOpacity: 0.40,
-                                                             radius: 500,
-                                                             weight: 0.2
-                                                           }).addTo(this.map);
-                      layerZona02.addLayer(this.markadorUbicacionCirculo);
-
-                    }
-                    */
                     break;
                   }
                   default:{
@@ -173,55 +159,114 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
 
             // creando zonas (cuadrados o triangulos)
             
-            const filtroZonas     = this.listaPuntosInteres.filter( item => item.tipoUbicacion =='Zona');
-            const filtroCuadrados = filtroZonas.filter( item => item.tipoZona =='Cuadrado').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
-            const gruposCuadrados = [...new Set(filtroCuadrados.map(item => item.agrupadorZona))];
-            const filtroTriangulo = filtroZonas.filter( item => item.tipoZona =='Triangulo').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
-            const gruposTriangulo = [...new Set(filtroTriangulo.map(item => item.agrupadorZona))]
+            const filtroZona01 = this.listaPuntosInteres.filter( item => item.tipoUbicacion =='Zona 01');
+            const filtroZona02 = this.listaPuntosInteres.filter( item => item.tipoUbicacion =='Zona 02');
+            
+            if (filtroZona01 != undefined){
+                
+                const filtroCuadrados = filtroZona01.filter( item => item.tipoZona =='Cuadrado').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
+                const gruposCuadrados = [...new Set(filtroCuadrados.map(item => item.agrupadorZona))];
+                const filtroTriangulo = filtroZona01.filter( item => item.tipoZona =='Triangulo').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
+                const gruposTriangulo = [...new Set(filtroTriangulo.map(item => item.agrupadorZona))]
 
-            if (gruposCuadrados !== undefined){
-              if (gruposCuadrados.length > 0 ){
-                  gruposCuadrados.forEach(zona => {
-                      console.log(zona)
-                      const grupo = filtroCuadrados.filter( item => item.agrupadorZona == zona);
-                      if (grupo.length == 4){
-                        this.markadorUbicacionPolygon = L.polygon (
-                          [
-                            [grupo[0].latitud , grupo[0].longitud],
-                            [grupo[1].latitud , grupo[1].longitud],
-                            [grupo[2].latitud , grupo[2].longitud],             
-                            [grupo[3].latitud , grupo[3].longitud],
-                          ],
-                          { 
-                            fillColor: '#B26FFF', 
-                            color: '#B26FFF'
-                            
+                if (gruposCuadrados !== undefined){
+                  if (gruposCuadrados.length > 0 ){
+                      gruposCuadrados.forEach(zona => {
+                          console.log(zona)
+                          const grupo = filtroCuadrados.filter( item => item.agrupadorZona == zona);
+                          if (grupo.length == 4){
+                            this.markadorUbicacionPolygon = L.polygon (
+                              [
+                                [grupo[0].latitud , grupo[0].longitud],
+                                [grupo[1].latitud , grupo[1].longitud],
+                                [grupo[2].latitud , grupo[2].longitud],             
+                                [grupo[3].latitud , grupo[3].longitud],
+                              ],
+                              { 
+                                fillColor: '#B26FFF', 
+                                color: '#B26FFF'
+                                
+                              }
+                              ).addTo(this.map);
+                              layerZona01.addLayer(this.markadorUbicacionPolygon);
+        
                           }
-                          ).addTo(this.map);
-                          layerZona02.addLayer(this.markadorUbicacionPolygon);
-    
-                      }
-                });
-              }
+                    });
+                  }
+                }
+      
+                if (gruposTriangulo !== undefined){
+                  if (gruposTriangulo.length > 0 ){
+                      gruposTriangulo.forEach(zona => {
+                          const grupo = filtroTriangulo.filter( item => item.agrupadorZona == zona);
+                          if (grupo.length == 3){
+                            this.markadorUbicacionPolygon = L.polygon (
+                              [
+                                [grupo[0].latitud , grupo[0].longitud],
+                                [grupo[1].latitud , grupo[1].longitud],
+                                [grupo[2].latitud , grupo[2].longitud],             
+                              ]
+                              ).addTo(this.map);
+                              layerZona01.addLayer(this.markadorUbicacionPolygon);
+                          }
+                    });
+                  }
+                }
+
             }
-  
-            if (gruposTriangulo !== undefined){
-              if (gruposTriangulo.length > 0 ){
-                  gruposTriangulo.forEach(zona => {
-                      const grupo = filtroTriangulo.filter( item => item.agrupadorZona == zona);
-                      if (grupo.length == 3){
-                        this.markadorUbicacionPolygon = L.polygon (
-                          [
-                            [grupo[0].latitud , grupo[0].longitud],
-                            [grupo[1].latitud , grupo[1].longitud],
-                            [grupo[2].latitud , grupo[2].longitud],             
-                          ]
-                          ).addTo(this.map);
-                          layerZona02.addLayer(this.markadorUbicacionPolygon);
-    
-                      }
-                });
+
+            if (filtroZona02 != undefined){
+                
+              const filtroCuadrados = filtroZona02.filter( item => item.tipoZona =='Cuadrado').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
+              const gruposCuadrados = [...new Set(filtroCuadrados.map(item => item.agrupadorZona))];
+              const filtroTriangulo = filtroZona02.filter( item => item.tipoZona =='Triangulo').sort((a, b) => (a.agrupadorZona > b.agrupadorZona) ? 1 : (a.agrupadorZona === b.agrupadorZona) ? ((a.posicionZona > b.posicionZona) ? 1 : -1) : -1 )
+              const gruposTriangulo = [...new Set(filtroTriangulo.map(item => item.agrupadorZona))]
+
+              if (gruposCuadrados !== undefined){
+                if (gruposCuadrados.length > 0 ){
+                    gruposCuadrados.forEach(zona => {
+                        console.log(zona)
+                        const grupo = filtroCuadrados.filter( item => item.agrupadorZona == zona);
+                        if (grupo.length == 4){
+                          this.markadorUbicacionPolygon = L.polygon (
+                            [
+                              [grupo[0].latitud , grupo[0].longitud],
+                              [grupo[1].latitud , grupo[1].longitud],
+                              [grupo[2].latitud , grupo[2].longitud],             
+                              [grupo[3].latitud , grupo[3].longitud],
+                            ],
+                            { 
+                              fillColor: '#B26FFF', 
+                              color: '#B26FFF'
+                              
+                            }
+                            ).addTo(this.map);
+                            layerZona02.addLayer(this.markadorUbicacionPolygon);
+      
+                        }
+                  });
+                }
               }
+    
+              if (gruposTriangulo !== undefined){
+                if (gruposTriangulo.length > 0 ){
+                    gruposTriangulo.forEach(zona => {
+                        const grupo = filtroTriangulo.filter( item => item.agrupadorZona == zona);
+                        if (grupo.length == 3){
+                          this.markadorUbicacionPolygon = L.polygon (
+                            [
+                              [grupo[0].latitud , grupo[0].longitud],
+                              [grupo[1].latitud , grupo[1].longitud],
+                              [grupo[2].latitud , grupo[2].longitud],             
+                            ]
+                            ).addTo(this.map);
+                            layerZona02.addLayer(this.markadorUbicacionPolygon);
+      
+                        }
+                  });
+                }
+              }
+            
             }
 
         }   
