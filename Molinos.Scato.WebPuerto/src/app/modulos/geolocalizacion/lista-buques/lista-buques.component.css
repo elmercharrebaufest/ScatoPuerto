@@ -45,7 +45,7 @@
 }
 
 .custom-control-lg .custom-control-label {
-    margin-left: 0.5rem !important;
+    margin-left: 0.1rem !important;
     font-size: 1rem !important;
 }
 
@@ -54,6 +54,11 @@ input.largerCheckbox {
 }
 .lista-buque-cursor {
     cursor: pointer;
+}
+.lista-nombre-buque {
+    cursor: pointer;
+    color: #4D60A8;
+    font-weight: bold;
 }
 .listado-buque-fondo-blanco{
     background-color:#FFFFFF;
@@ -138,9 +143,6 @@ input.largerCheckbox {
     background: #DADADA;
 }
 
-.paginado-buque-fondo{
-    border: 1px solid #DDDDDD;
-}
 .paginado-buque-letra{
     font-family: roboto;
     font-size: 16px;
