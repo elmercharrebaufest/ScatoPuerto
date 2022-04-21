@@ -616,4 +616,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Latitud" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="49a7373e-5887-4088-a1c0-21a0123b7ef6" ChangeDateTime="04/21/2022 14:34:25">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido].[Fecha]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FechaCarga" />
+  </Operation>
 </Operations>
