@@ -38,10 +38,13 @@ export class BalanzaService {
     }
 
   obtenerRitmos(vapor_id: number, modulodecarga_id: number): Observable<Ritmos>{
-    console.log('Metodo obtenerRitmos: Parametros=> vapor: ' + vapor_id + 'modulodecarga_id: ' + modulodecarga_id);
-      return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+    console.log('obtenerRitmos', modulodecarga_id);
+     // return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+    return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
-    obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
-      return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+  obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
+    console.log('obtenerRitmosLiquidos', modulodecarga_id);
+      //return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+      return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 }
