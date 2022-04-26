@@ -2549,7 +2549,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarCorteBalanza(int idCorteBalanza);
         [OperationContract]
-        Dictionary<string, int> ObtenerRitmos(int vapor_id, int modulodecarga_id);
+        Dictionary<string, int> ObtenerRitmos(int modulodecarga_id);
 
         [OperationContract]
         IList<BodegaDto> ListadoBodegas();
