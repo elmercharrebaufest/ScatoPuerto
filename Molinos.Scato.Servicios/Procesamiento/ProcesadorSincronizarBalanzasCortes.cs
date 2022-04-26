@@ -70,27 +70,70 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var planilla = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == IdModuloDeCarga);
 
-                var planillaturnosdetalle = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == IdModuloDeCarga).LastOrDefault();
+                var moduloCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == IdModuloDeCarga);
 
-                var cargaPlanilla = Repositorio.Listar<Carga>(x=>vapor_id == x.Vapor.Id && x.FechaInicio > fechaInicio && x.CargaOpuesta_Id > 0 && x.FechaInicio> planillaturnosdetalle.FechaCarga);
-
-                foreach (var cargaSolido in cargaPlanilla)
+                if (planilla == null)
                 {
-                    ModuloDeCargaPlanillaDeTurnosDetallesSolido moduloSolido = new ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                    var turnos = Repositorio.Listar<TurnoPuerto>();
+                    var turnoPlanilla = new TurnoPuerto();
+
+                    foreach (var item in turnos)
                     {
-                        //int Id { get; set; }
-                        ModuloDeCargaPlanillaDeTurnos = planilla,
-                        BodegaParcel = cargaSolido.Bodega.Id,
-                        MaterialPuerto = cargaSolido.Material,
-                        Destino = cargaSolido.Destino,
-                        Exportador = cargaSolido.Exportador,
-                        Cantidad = cargaSolido.ToneladasAW,
-                        FechaCarga = cargaSolido.FechaInicio
+                        var horas = item.Nombre.Split('-');
+
+                        int horaInicio = Convert.ToInt32(horas[0]);
+                        int horaFin = Convert.ToInt32(horas[1]);
+
+                        if (fechaInicio.Value.Hour >= horaInicio && fechaInicio.Value.Hour <= horaFin)
+                        {
+                            turnoPlanilla = item;
+                        }
+                    }
+
+
+                    planilla = new ModuloDeCargaPlanillaDeTurnos
+                    {
+                        ModuloDeCarga = moduloCarga,
+                        EsLiquido = false,
+                        Fecha = fechaInicio,
+                        Enviado = false,
+                        Cerrado = false,
+                        TurnoPuerto = turnoPlanilla
                     };
-                    Repositorio.Agregar(moduloSolido);
+
+                    Repositorio.Agregar(planilla);
                     Repositorio.GuardarCambios();
                 }
 
+                var planillaturnosdetalle = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == IdModuloDeCarga).LastOrDefault();
+                IList<Carga> cargaPlanilla = new List<Carga>();
+
+                if (planillaturnosdetalle == null)
+                {
+                    cargaPlanilla = Repositorio.Listar<Carga>(x => vapor_id == x.Vapor.Id && x.FechaInicio > fechaInicio && x.CargaOpuesta_Id > 0);
+
+                }
+                else
+                {
+                    cargaPlanilla = Repositorio.Listar<Carga>(x => vapor_id == x.Vapor.Id && x.FechaInicio > fechaInicio && x.CargaOpuesta_Id > 0 && x.ToneladasAW >0 && x.FechaInicio > planillaturnosdetalle.FechaCarga);
+                }
+
+                    foreach (var cargaSolido in cargaPlanilla)
+                    {
+                        ModuloDeCargaPlanillaDeTurnosDetallesSolido moduloSolido = new ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                        {
+                            //int Id { get; set; }
+                            ModuloDeCargaPlanillaDeTurnos = planilla,
+                            BodegaParcel = cargaSolido.Bodega.Id,
+                            MaterialPuerto = cargaSolido.Material,
+                            Destino = cargaSolido.Destino,
+                            Exportador = cargaSolido.Exportador,
+                            Cantidad = cargaSolido.ToneladasAW,
+                            FechaCarga = cargaSolido.FechaInicio
+                        };
+                        Repositorio.Agregar(moduloSolido);
+                        Repositorio.GuardarCambios();
+                    }       
             }
             catch (Exception ex)
             {
