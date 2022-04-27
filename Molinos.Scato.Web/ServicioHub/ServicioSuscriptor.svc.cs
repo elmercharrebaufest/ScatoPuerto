@@ -59,137 +59,137 @@ namespace Molinos.Scato.Web.ServicioHub
         {
             if (notificacion.CodigoEvento == "LecturaTarjetaRecibida")
             {
-                try
-                {
-                    var lectura = notificacion.Datos["Tarjeta"].ToString(CultureInfo.InvariantCulture);
-                    log.Debug("Iniciando - Notificacion de dispositivo: {0}", notificacion.CodigoDispositivo);
-                    var resultado = (ResultadoActualizarLecturaDeTarjeta)comandos.Ejecutar(new ActualizarLecturaDeTarjeta { Dto = new LecturaDeTarjetaDto { Lectura = lectura, CodigoDispositivo = notificacion.CodigoDispositivo } });
-                    log.Debug("Fin - Actualizando lectura para el dispositivo: {0}", notificacion.CodigoDispositivo);
+                //try
+                //{
+                //    var lectura = notificacion.Datos["Tarjeta"].ToString(CultureInfo.InvariantCulture);
+                //    log.Debug("Iniciando - Notificacion de dispositivo: {0}", notificacion.CodigoDispositivo);
+                //    var resultado = (ResultadoActualizarLecturaDeTarjeta)comandos.Ejecutar(new ActualizarLecturaDeTarjeta { Dto = new LecturaDeTarjetaDto { Lectura = lectura, CodigoDispositivo = notificacion.CodigoDispositivo } });
+                //    log.Debug("Fin - Actualizando lectura para el dispositivo: {0}", notificacion.CodigoDispositivo);
 
-                    if (!resultado.LecturaPuestosDeTrabajo.Any())
-                    {
-                        throw new Exception(String.Format("Fin - No se encontraron puestos de trabajo para el dispositivo: {0}", notificacion.CodigoDispositivo));
-                    }
+                //    if (!resultado.LecturaPuestosDeTrabajo.Any())
+                //    {
+                //        throw new Exception(String.Format("Fin - No se encontraron puestos de trabajo para el dispositivo: {0}", notificacion.CodigoDispositivo));
+                //    }
 
-                    foreach (var lecturaPuestoDeTrabajo in resultado.LecturaPuestosDeTrabajo)
-                    {
-                        if (!string.IsNullOrEmpty(lecturaPuestoDeTrabajo.Firmware))
-                        {
-                            var firmware = firmwareFactory.Firmware<IFirmware>(lecturaPuestoDeTrabajo.Firmware);
-                            if (firmware != null)
-                            {
-                                log.Debug($"Ejecutando firmware: {firmware}");
-                                firmware.Ejecutar(lecturaPuestoDeTrabajo);
-                                continue;
-                            }
-                        }
-                        log.Debug($"Sin Firmware puesto {lecturaPuestoDeTrabajo.PuestoDeTrabajoId}");
-                        //Deprecado, estamos migrando a un esquema de firmwares:
-                        if (lecturaPuestoDeTrabajo.EsTarjetaSupervisor)
-                        {
-                            NotificarPuestoConPatentePorSignalR(notificacion, lecturaPuestoDeTrabajo);
-                            EjecutarPuestoTarjetaSupervisor(lecturaPuestoDeTrabajo);
-                            if (lecturaPuestoDeTrabajo.PuestoDeTrabajoImprimeTarjetaDeAcceso)
-                            {
-                                lecturaPuestoDeTrabajo.MensajeError = string.Format(Textos.Error_TarjetaSupervisor, lecturaPuestoDeTrabajo.NumeroDeTarjeta,
-                                    lecturaPuestoDeTrabajo.PuestoDeTrabajoId, notificacion.CodigoDispositivo);
-                                NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
-                            }
+                //    foreach (var lecturaPuestoDeTrabajo in resultado.LecturaPuestosDeTrabajo)
+                //    {
+                //        if (!string.IsNullOrEmpty(lecturaPuestoDeTrabajo.Firmware))
+                //        {
+                //            var firmware = firmwareFactory.Firmware<IFirmware>(lecturaPuestoDeTrabajo.Firmware);
+                //            if (firmware != null)
+                //            {
+                //                log.Debug($"Ejecutando firmware: {firmware}");
+                //                firmware.Ejecutar(lecturaPuestoDeTrabajo);
+                //                continue;
+                //            }
+                //        }
+                //        log.Debug($"Sin Firmware puesto {lecturaPuestoDeTrabajo.PuestoDeTrabajoId}");
+                //        //Deprecado, estamos migrando a un esquema de firmwares:
+                //        if (lecturaPuestoDeTrabajo.EsTarjetaSupervisor)
+                //        {
+                //            NotificarPuestoConPatentePorSignalR(notificacion, lecturaPuestoDeTrabajo);
+                //            EjecutarPuestoTarjetaSupervisor(lecturaPuestoDeTrabajo);
+                //            if (lecturaPuestoDeTrabajo.PuestoDeTrabajoImprimeTarjetaDeAcceso)
+                //            {
+                //                lecturaPuestoDeTrabajo.MensajeError = string.Format(Textos.Error_TarjetaSupervisor, lecturaPuestoDeTrabajo.NumeroDeTarjeta,
+                //                    lecturaPuestoDeTrabajo.PuestoDeTrabajoId, notificacion.CodigoDispositivo);
+                //                NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
+                //            }
 
-                            comandos.Ejecutar(new CrearLogTarjetaSupervisor { PuestoDeTrabajoId = lecturaPuestoDeTrabajo.PuestoDeTrabajoId, NumeroTarjeta = lecturaPuestoDeTrabajo.NumeroDeTarjeta });
-                        }
-                        //Deprecado desde que se escanea la CP en garita de entrada
-                        else if (!lecturaPuestoDeTrabajo.PuestoDeTrabajoPidePantente && lecturaPuestoDeTrabajo.PuestoDeTrabajoImprimeTarjetaDeAcceso)
-                        {
-                            if (!lecturaPuestoDeTrabajo.TarjetaValida)
-                            {
-                                NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
-                            }
-                            else
-                            {
-                                var resultadoImpresion = comandos.Ejecutar(new ImprimirTarjetaDeAcceso
-                                {
-                                    Dto = new ImpTarjetaDeAccesoDto
-                                    {
-                                        Codigo = "ImpresionTarjetaDeAcceso",
-                                        Numero = lecturaPuestoDeTrabajo.NumeroDeTarjeta,
-                                        Fecha = DateTime.Now.Formatted(),
-                                        CentroId = lecturaPuestoDeTrabajo.CentroId,
-                                        PuestoDeTrabajoId = lecturaPuestoDeTrabajo.PuestoDeTrabajoId
-                                    },
-                                    OrigenImpresion = "ServicioSuscriptor"
-                                });
-                                if (resultadoImpresion.HayErrores)
-                                {
-                                    lecturaPuestoDeTrabajo.MensajeError = Textos.ErrorImpresionTarjetaDeAcceso;
-                                    NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
-                                }
-                                else
-                                {
-                                    comandos.Ejecutar(new CrearCargaDeCupo
-                                    {
-                                        Dto = new CargaDeCupoDto
-                                        {
-                                            CentroId = lecturaPuestoDeTrabajo.CentroId,
-                                            PuestoDeTrabajoId = lecturaPuestoDeTrabajo.PuestoDeTrabajoId,
-                                            Fecha = DateTime.Now,
-                                            Numero = lecturaPuestoDeTrabajo.NumeroDeTarjeta,
-                                            EstuvoPendiente = true
-                                        }
-                                    });
-                                    EjecutarDispositivosDeEntrada(lecturaPuestoDeTrabajo);
-                                }
-                            }
-                        }
-                        //
-                        else if (lecturaPuestoDeTrabajo.PuestoDeTrabajoPidePantente && lecturaPuestoDeTrabajo.Automatizado)
-                        {
-                            if (lecturaPuestoDeTrabajo.TarjetaValida && lecturaPuestoDeTrabajo.VideoCamaras.Any())
-                            {
-                                EjecutarDispositivosConPatente(lecturaPuestoDeTrabajo);
-                            }
-                            if (lecturaPuestoDeTrabajo.TarjetaValida)
-                            {
-                                EjecutarPuestoConPatente(lecturaPuestoDeTrabajo);
-                            }
-                            else
-                            {
-                                lecturaPuestoDeTrabajo.MensajeError = $"Tarjeta no válida: {lecturaPuestoDeTrabajo.NumeroDeTarjeta}";
-                                NotificarBalanzadaPorSignalR(lecturaPuestoDeTrabajo, new DatosRecorridoDto(), "En Espera");
-                            }
-                        }
-                        else if (lecturaPuestoDeTrabajo.PuestoDeTrabajoPidePantente)
-                        {
-                            if (lecturaPuestoDeTrabajo.TarjetaValida && lecturaPuestoDeTrabajo.VideoCamaras.Any())
-                            {
-                                EjecutarDispositivosConPatente(lecturaPuestoDeTrabajo);
-                            }
-                            if (!lecturaPuestoDeTrabajo.TarjetaValida || (lecturaPuestoDeTrabajo.PrimerNumeroDeTarjeta == lecturaPuestoDeTrabajo.NumeroDeTarjeta))
-                            {
-                                NotificarPuestoConPatentePorSignalR(notificacion, lecturaPuestoDeTrabajo);
-                            }
-                        }
-                        else
-                        {
-                            if (!lecturaPuestoDeTrabajo.TarjetaValida)
-                            {
-                                NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
-                                log.Info("Fin - La tarjeta: {0} no es valida: {1}",
-                                         lecturaPuestoDeTrabajo.NumeroDeTarjeta,
-                                         lecturaPuestoDeTrabajo.MensajeError);
-                            }
-                            else
-                            {
-                                EjecutarPuestoSinPatente(lecturaPuestoDeTrabajo);
-                            }
-                            NotificarPuestoConPatentePorSignalR(notificacion, lecturaPuestoDeTrabajo);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    log.Error(e, "Error al enviar notificación del dispositivo: {0}", notificacion.CodigoDispositivo);
-                }
+                //            comandos.Ejecutar(new CrearLogTarjetaSupervisor { PuestoDeTrabajoId = lecturaPuestoDeTrabajo.PuestoDeTrabajoId, NumeroTarjeta = lecturaPuestoDeTrabajo.NumeroDeTarjeta });
+                //        }
+                //        //Deprecado desde que se escanea la CP en garita de entrada
+                //        else if (!lecturaPuestoDeTrabajo.PuestoDeTrabajoPidePantente && lecturaPuestoDeTrabajo.PuestoDeTrabajoImprimeTarjetaDeAcceso)
+                //        {
+                //            if (!lecturaPuestoDeTrabajo.TarjetaValida)
+                //            {
+                //                NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
+                //            }
+                //            else
+                //            {
+                //                var resultadoImpresion = comandos.Ejecutar(new ImprimirTarjetaDeAcceso
+                //                {
+                //                    Dto = new ImpTarjetaDeAccesoDto
+                //                    {
+                //                        Codigo = "ImpresionTarjetaDeAcceso",
+                //                        Numero = lecturaPuestoDeTrabajo.NumeroDeTarjeta,
+                //                        Fecha = DateTime.Now.Formatted(),
+                //                        CentroId = lecturaPuestoDeTrabajo.CentroId,
+                //                        PuestoDeTrabajoId = lecturaPuestoDeTrabajo.PuestoDeTrabajoId
+                //                    },
+                //                    OrigenImpresion = "ServicioSuscriptor"
+                //                });
+                //                if (resultadoImpresion.HayErrores)
+                //                {
+                //                    lecturaPuestoDeTrabajo.MensajeError = Textos.ErrorImpresionTarjetaDeAcceso;
+                //                    NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
+                //                }
+                //                else
+                //                {
+                //                    comandos.Ejecutar(new CrearCargaDeCupo
+                //                    {
+                //                        Dto = new CargaDeCupoDto
+                //                        {
+                //                            CentroId = lecturaPuestoDeTrabajo.CentroId,
+                //                            PuestoDeTrabajoId = lecturaPuestoDeTrabajo.PuestoDeTrabajoId,
+                //                            Fecha = DateTime.Now,
+                //                            Numero = lecturaPuestoDeTrabajo.NumeroDeTarjeta,
+                //                            EstuvoPendiente = true
+                //                        }
+                //                    });
+                //                    EjecutarDispositivosDeEntrada(lecturaPuestoDeTrabajo);
+                //                }
+                //            }
+                //        }
+                //        //
+                //        else if (lecturaPuestoDeTrabajo.PuestoDeTrabajoPidePantente && lecturaPuestoDeTrabajo.Automatizado)
+                //        {
+                //            if (lecturaPuestoDeTrabajo.TarjetaValida && lecturaPuestoDeTrabajo.VideoCamaras.Any())
+                //            {
+                //                EjecutarDispositivosConPatente(lecturaPuestoDeTrabajo);
+                //            }
+                //            if (lecturaPuestoDeTrabajo.TarjetaValida)
+                //            {
+                //                EjecutarPuestoConPatente(lecturaPuestoDeTrabajo);
+                //            }
+                //            else
+                //            {
+                //                lecturaPuestoDeTrabajo.MensajeError = $"Tarjeta no válida: {lecturaPuestoDeTrabajo.NumeroDeTarjeta}";
+                //                NotificarBalanzadaPorSignalR(lecturaPuestoDeTrabajo, new DatosRecorridoDto(), "En Espera");
+                //            }
+                //        }
+                //        else if (lecturaPuestoDeTrabajo.PuestoDeTrabajoPidePantente)
+                //        {
+                //            if (lecturaPuestoDeTrabajo.TarjetaValida && lecturaPuestoDeTrabajo.VideoCamaras.Any())
+                //            {
+                //                EjecutarDispositivosConPatente(lecturaPuestoDeTrabajo);
+                //            }
+                //            if (!lecturaPuestoDeTrabajo.TarjetaValida || (lecturaPuestoDeTrabajo.PrimerNumeroDeTarjeta == lecturaPuestoDeTrabajo.NumeroDeTarjeta))
+                //            {
+                //                NotificarPuestoConPatentePorSignalR(notificacion, lecturaPuestoDeTrabajo);
+                //            }
+                //        }
+                //        else
+                //        {
+                //            if (!lecturaPuestoDeTrabajo.TarjetaValida)
+                //            {
+                //                NotificarUsuarioErrorPorSignalR(lecturaPuestoDeTrabajo);
+                //                log.Info("Fin - La tarjeta: {0} no es valida: {1}",
+                //                         lecturaPuestoDeTrabajo.NumeroDeTarjeta,
+                //                         lecturaPuestoDeTrabajo.MensajeError);
+                //            }
+                //            else
+                //            {
+                //                EjecutarPuestoSinPatente(lecturaPuestoDeTrabajo);
+                //            }
+                //            NotificarPuestoConPatentePorSignalR(notificacion, lecturaPuestoDeTrabajo);
+                //        }
+                //    }
+                //}
+                //catch (Exception e)
+                //{
+                //    log.Error(e, "Error al enviar notificación del dispositivo: {0}", notificacion.CodigoDispositivo);
+                //}
             }
             else if (notificacion.CodigoEvento == "ErrorConexionDispositivo" || notificacion.CodigoEvento == "ConexionDispositivoCorrecta")
             {
@@ -209,21 +209,21 @@ namespace Molinos.Scato.Web.ServicioHub
 
                 foreach (var estado in resultado.EstadoConexionDto)
                 {
-                    NotificarEstadoConexionPorSignalR(notificacion, estado);
+                 //   NotificarEstadoConexionPorSignalR(notificacion, estado);
                 }
             }
-            else if (notificacion.CodigoEvento == "LecturaQr")
-            {
-                NotificarQRSignalR(notificacion);
-            }
-            else if (notificacion.CodigoEvento == "EntradaActivada" || notificacion.CodigoEvento == "EntradaDesactivada")
-            {
-                NotificarSensorVagonesSinalR(notificacion);
-            }
-            else if (notificacion.CodigoEvento == "CambioEstadoIntercomunicador")
-            {
-                NotificarIntercomunicadorEstadoSignalR(notificacion);
-            }
+            //else if (notificacion.CodigoEvento == "LecturaQr")
+            //{
+            //    NotificarQRSignalR(notificacion);
+            //}
+            //else if (notificacion.CodigoEvento == "EntradaActivada" || notificacion.CodigoEvento == "EntradaDesactivada")
+            //{
+            //    NotificarSensorVagonesSinalR(notificacion);
+            //}
+            //else if (notificacion.CodigoEvento == "CambioEstadoIntercomunicador")
+            //{
+            //    NotificarIntercomunicadorEstadoSignalR(notificacion);
+            //}
         }
 
         private void NotificarUsuarioErrorPorSignalR(LecturaPuestoDeTrabajoDto lecturaPuestoDeTrabajo, TipoAlerta tipo = TipoAlerta.Error)
