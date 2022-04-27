@@ -22,17 +22,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
-            ///////////////////////////
-            ///// PROCESO PARA EL HISTORICO /////
-            if (moduloDeCarga.FechaDeCreacion == null)
-                moduloDeCarga.FechaDeCreacion = DateTime.Now;
-            else
-            {
-                ///// OPERACIONES/TABLERISTAS /////
-                moduloDeCarga.FechaDeModificacion = DateTime.Now;
+            
                 foreach (var item in comando.Dto)
                 {
-                    ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = Repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
+                     ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = Repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
 
                     //Bodega bodega = Repositorio.Obtener<Bodega>(x => x.Id == item.Id);
 
@@ -75,7 +68,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(moduloDeCargaNirManualPuerto_Db);
                 }
                 Repositorio.GuardarCambios();
-            }
+            
         }
 
 

@@ -2638,6 +2638,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
+        [OperationContract]
+        Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id);
+
 
     }
 }

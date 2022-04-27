@@ -30,12 +30,16 @@
         <app-liquidos *ngIf='embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)' ></app-liquidos>
     </ng-container>
 
-    <!-- <app-obs-calidad></app-obs-calidad> -->
+    <app-obs-calidad></app-obs-calidad> -->
 
     <div class="col text-center" *ngIf='mostrarPlano'>
         <button (click)='openModalEmitirRecibo(emitirRecibo)' class="btn btn-primary m-4" >EMITIR RECIBO</button>
     </div>
 </div>
+
+
+<!-- ----------------=================RECIBO DE BUQUE=================----------------  -->
+
 
 <ng-template #emitirRecibo let-modal>
         
@@ -45,14 +49,13 @@
     <div class='modal-body '>
         <div class="row">
             <div class="col">
-                <label for="recipient-name" class="col-form-label"><b>Port of</b><span class="Traduccion">(puerto de)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombrePuertoOrigen}}">
+                <label for="recipient-name" class="col-form-label"><b>Port of</b><br><span class="Traduccion">puerto de</span></label>
+                <input type="text" class="form-control" uppercase [(ngModel)]="this.reciboBuque.nombrePuertoOrigen">
             </div>
             <div class="col">
-                <label for="recipient-name" class="col-form-label"><b>Date</b><span class="Traduccion"> (fecha)</span></label>
-                <input type="text" class="form-control" disabled value="{{
-                    this.reciboBuque.fechaRecibo.toDateString().split(' ')[1] + ' ' + this.reciboBuque.fechaRecibo.toDateString().split(' ')[2] + ' ' + this.reciboBuque.fechaRecibo.toDateString().split(' ')[3] 
-                }}">
+                <label for="recipient-name" class="col-form-label"><b>Date</b><br><span class="Traduccion"> fecha </span></label>
+                <input type="text" class="form-control" uppercase [(ngModel)]="this.reciboBuque.fechaRecibo">
+                   
             </div>    
         </div>
 
@@ -60,8 +63,8 @@
 
         <div class="row">
             <div class="col">
-                <label for="recipient-name" class="col-form-label"><b>Recived, in board the M/V/</b><span class="Traduccion"> (Recibido a bordo del vapor)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombreVapor}}">
+                <label for="recipient-name" class="col-form-label"><b>Recived, in board the M/V/</b><br><span class="Traduccion"> Recibido a bordo del vapor</span></label>
+                <input type="text" class="form-control"  value="{{this.reciboBuque.nombreVapor}}">
             </div>
             <div class="col">
                 
@@ -70,11 +73,11 @@
 
         <div><label></label></div>
 
-        <div><label for="recipient-name" ><b>the under noted goods in apparent good order and confition form/</b><span class="Traduccion"> (las mercaderías abajo mencionadas en aparente buen orden y condcion de)</span></label></div>
+        <div><label for="recipient-name" ><b>the under noted goods in apparent good order and confition form/</b><br><span class="Traduccion"> las mercaderías abajo mencionadas en aparente buen orden y condcion de</span></label></div>
 
         <div class="row">
             <div class="col">
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombreEmpresaRemitente}}">
+                <input type="text" class="form-control" uppercase [(ngModel)]="this.reciboBuque.nombreEmpresaRemitente">
             </div>
             <div class="col">
                 
@@ -85,58 +88,68 @@
         
         <div class="row">
             <div class="col">
-                <label for="recipient-name" class="col-form-label"><b>for the Port of</b><span class="Traduccion"> (para el puerto de)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.nombrePuertoDestino}}">
-            </div>
-            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>for the Port of</b><br><span class="Traduccion"> para el puerto de</span></label>
                 
-            </div>    
-        </div>
-
-        <div><label></label></div>
-
-        <div><label for="recipient-name" class="col-form-label"><small>(Quantity to be stated ind Figures and also in Words).(Cantidades establecidas en números y tambien en letras)</small></label></div>
-
-        <div><label></label></div>
-
-        <div class="row">
-            <div class="col">
-                <label for="recipient-name" class="col-form-label"><b>QUANTITY</b><span class="Traduccion"><br> (CANTIDAD)</span></label>
-                
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.cantidad}}">
-            </div>
-            <div class="col">
-                <label for="recipient-name" class="col-form-label"><b>QUANTITY IN WORDS AND CLASS OF CARGO</b><span class="Traduccion"> (CANTIDAD EN LETRAS Y CLASE DE CARGA)</span></label>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.cantidadEnLetras}}">
-            </div>    
-        </div>
-
-        <div><label></label></div>
-
-        <div class="row">
-            <div class="col">
-                <div><label for="recipient-name" class="col-form-label"><b>Stowed </b><span class="Traduccion">(Estibado en bodega)</span></label></div>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.estibadoEnBodega}}">
-            </div>
-            <div class="col">
-                
-            </div>    
-        </div>
-
-        <div><label></label></div>
-
-        <!-- <div class="row">
-            <div class="col">
-                <div><label for="recipient-name" class="col-form-label"><b>Quality and Quantity unknown Said to Weigh:</b><span class="Traduccion"> (Calidad y cantidad desconocidas que se dice pasar)</span></label></div>
-                <input type="text" class="form-control" disabled value="{{this.reciboBuque.calidadYCantidadDesconocidas.toUpperCase()}}">
+                <input type="text" class="form-control" [(ngModel)]="this.reciboBuque.nombrePuertoDestino">
             </div>
             <div class="col">
                 <div><label for="recipient-name" class="col-form-label"><b>Incluir para impresión</b></label></div>
                 <div class='custom-control custom-switch'>
-                <input type='checkbox' class='custom-control-input' id='customSwitch32' checked value="{{this.reciboBuque.incluirParaImpresion}}">
-                <label class='custom-control-label' for='customSwitch32'></label></div>
+                <input type='checkbox' class='custom-control-input' id='customSwitchDestino' checked [(ngModel)]="this.reciboBuque.incluirParaImpresionDestino"/>
+                <label class='custom-control-label' for='customSwitchDestino'></label></div>
             </div>    
-        </div> -->
+        </div>
+
+        <div><label></label></div>
+
+        <div><label for="recipient-name" class="col-form-label"><small>(Quantity to be stated in Figures and also in Words).(Cantidades establecidas en números y tambien en letras)</small></label></div>
+
+        <!-- <div><label></label></div> -->
+
+        <div class="row">
+            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>QUANTITY</b><span class="Traduccion"><br> CANTIDAD</span></label>
+                
+                <input type="number" class="form-control inputCantidad" [(ngModel)]="this.reciboBuque.cantidad" (change)="onChangeCantidadEnLetras(this.reciboBuque.cantidad)">
+            </div>
+            <div class="col cantidadLetras">
+                <label for="recipient-name" class="col-form-label"><b>QUANTITY IN WORDS AND CLASS OF CARGO</b><br><span class="Traduccion"> CANTIDAD EN LETRAS Y CLASE DE CARGA</span></label>
+                <textarea class="form-control resizeArea" rows="2" cols="50" [(ngModel)]="this.reciboBuque.cantidadEnLetras"></textarea>
+                
+                <!-- <input type="text" class="form-control inputCantidadLetras" [(ngModel)]="this.reciboBuque.cantidadEnLetras"> -->
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div class="row">
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Stowed </b><br><span class="Traduccion">Estibado en bodega</span></label></div>
+                <input type="text" class="form-control"  [(ngModel)]="this.reciboBuque.estibadoEnBodega">
+
+            </div>
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Incluir para impresión</b></label></div>
+                <div class='custom-control custom-switch'>
+                <input type='checkbox' class='custom-control-input' id='customSwitchBodega' checked [(ngModel)]="this.reciboBuque.incluirParaImpresionBodega">
+                <label class='custom-control-label' for='customSwitchBodega'></label></div>
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div class="row">
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Quality and Quantity unknown Said to Weigh:</b><br><span class="Traduccion"> Calidad y cantidad desconocidas que se dice pasar</span></label></div>
+                <input type="text" class="form-control"  [(ngModel)]="this.reciboBuque.calidadYCantidadDesconocidas">
+            </div>
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Incluir para impresión</b></label></div>
+                <div class='custom-control custom-switch'>
+                <input type='checkbox' class='custom-control-input' id='customSwitchCalidad' checked [(ngModel)]="this.reciboBuque.incluirParaImpresionDesconocida">
+                <label class='custom-control-label' for='customSwitchCalidad'></label></div>
+            </div>    
+        </div>
     </div>
     
     <div class='modal-footer'>
@@ -145,5 +158,5 @@
     </div>
 </ng-template>
 
-<app-recibodebuquepdf *ngIf="reciboOK" [recibo]="reciboBuque"></app-recibodebuquepdf>
+<app-recibodebuquepdf [recibo]="reciboBuque"></app-recibodebuquepdf>
 

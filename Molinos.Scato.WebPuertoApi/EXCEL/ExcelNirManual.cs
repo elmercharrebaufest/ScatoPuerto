@@ -35,7 +35,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             cellBorderStyle.BorderLeft = BorderStyle.Thin;
             cellBorderStyle.BorderTop = BorderStyle.Thin;
             cellBorderStyle.BorderRight = BorderStyle.Thin;
-
+            var i = 2;
             foreach (var mod in moduloDeCargaNirsManualPuerto)
             {
                 var Bodega_id = mod.Bodega_id;
@@ -48,73 +48,75 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var portBase = mod.ProtBase;
                 var portBS = mod.Prot_BS;
                 var ritmo = mod.Ritmo;
+                
+                var row2 = sheet.CreateRow(i);
 
-                var row2 = sheet.CreateRow(2);
-
-                var cel = row2.CreateCell(1);
-                cel.SetCellValue((double)Bodega_id);
-
-                var cel2 = row2.CreateCell(2);
-                cel.SetCellValue(fecha);
-
-                var cel3 = row2.CreateCell(3);
-                cel.SetCellValue(hd);
-
-                var cel4 = row2.CreateCell(4);
-                cel.SetCellValue(hora);
-
-                var cel5 = row2.CreateCell(5);
+                var cel = row2.CreateCell(0);
                 cel.SetCellValue(mano);
 
-                var cel6 = row2.CreateCell(6);
-                cel.SetCellValue(origen);
+                var cel2 = row2.CreateCell(1);
+                cel2.SetCellValue(fecha.ToString());
 
-                var cel7 = row2.CreateCell(7);
-                cel.SetCellValue(ph);
+                var cel3 = row2.CreateCell(2);
+                cel3.SetCellValue(hd);
 
-                var cel8 = row2.CreateCell(8);
-                cel.SetCellValue(portBase);
+                var cel4 = row2.CreateCell(3);
+                cel4.SetCellValue(hora);
 
-                var cel9 = row2.CreateCell(9);
-                cel.SetCellValue(portBS);
+                var cel5 = row2.CreateCell(4);
+                cel5.SetCellValue((double)Bodega_id);
 
-                var cel10 = row2.CreateCell(10);
-                cel.SetCellValue(ritmo);
+                var cel6 = row2.CreateCell(5);
+                cel6.SetCellValue(origen);
+
+                var cel7 = row2.CreateCell(6);
+                cel7.SetCellValue(ph);
+
+                var cel8 = row2.CreateCell(7);
+                cel8.SetCellValue(portBase);
+
+                var cel9 = row2.CreateCell(8);
+                cel9.SetCellValue(portBS);
+
+                var cel10 = row2.CreateCell(9);
+                cel10.SetCellValue(ritmo);
+                
+                i++;
             }
             var row = sheet.CreateRow(0);
-            var celda1 = row.CreateCell(1);
-            celda1.SetCellValue("Bodega");
+            var celda1 = row.CreateCell(0);
+            celda1.SetCellValue("Mano");
             celda1.CellStyle = styleBold;
 
-            var celda2 = row.CreateCell(2);
+            var celda2 = row.CreateCell(1);
             celda2.SetCellValue("Fecha");
             celda2.CellStyle = styleBold;
 
-            var celda3 = row.CreateCell(3);
+            var celda3 = row.CreateCell(2);
             celda3.SetCellValue("HD");
             celda3.CellStyle = styleBold;
 
-            var celda4 = row.CreateCell(4);
+            var celda4 = row.CreateCell(3);
             celda4.SetCellValue("Hora");
             celda4.CellStyle = styleBold;
 
-            var celda5 = row.CreateCell(5);
-            celda5.SetCellValue("Mano");
+            var celda5 = row.CreateCell(4);
+            celda5.SetCellValue("Bodega");
             celda5.CellStyle = styleBold;
 
-            var celda6 = row.CreateCell(6);
+            var celda6 = row.CreateCell(5);
             celda6.SetCellValue("Origen");
             celda6.CellStyle = styleBold;
 
-            var celda7 = row.CreateCell(7);
+            var celda7 = row.CreateCell(6);
             celda7.SetCellValue("PH");
             celda7.CellStyle = styleBold;
 
-            var celda8 = row.CreateCell(8);
+            var celda8 = row.CreateCell(7);
             celda8.SetCellValue("PortBase");
             celda8.CellStyle = styleBold;
 
-            var celda9 = row.CreateCell(9);
+            var celda9 = row.CreateCell(8);
             celda9.SetCellValue("Port BS");
             celda9.CellStyle = styleBold;
 

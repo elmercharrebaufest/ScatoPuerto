@@ -122,7 +122,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 if (tanqueNum.Length > 2)
                     tanqueNum = tanqueNum.Substring(1, 2);
 
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerLlenadoMilimetroPorTanque(cm.ToString(), mm.ToString(), "TQ"+tanqueNum));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerLlenadoMilimetroPorTanque(cm.ToString(), mm.ToString(), "TQ" + tanqueNum));
             }
             catch (Exception ex)
             {
@@ -144,7 +144,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
-            
+
         }
 
         [HttpPost]
@@ -159,7 +159,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaUmap")]
-        public HttpResponseMessage GuardarModuloDeCargaUmap(List <ModuloDeCargaUmapDto> moduloDeCargaUmaps, int ModuloDeCarga_Id)
+        public HttpResponseMessage GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmaps, int ModuloDeCarga_Id)
         {
             servicio.GuardarModuloDeCargaUmap(moduloDeCargaUmaps, ModuloDeCarga_Id);
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -170,7 +170,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/GuardarPeriodoDeCarga")]
         public HttpResponseMessage GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
         {
-            
+
             servicio.GuardarPeriodoDeCarga(moduloDeCargaPeriodoDeCargaDto, moduloDeCarga_Id);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -216,40 +216,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto")]
-            public HttpResponseMessage GuardarModuloDeCargaNirManualPuerto(int IdModuloDeCarga, ObjetoMailNir ObjetoMailNir)
+        public HttpResponseMessage GuardarModuloDeCargaNirManualPuerto(int IdModuloDeCarga, ObjetoMailNir ObjetoMailNir)
+        {
+            try
             {
-                try
+                var resultado = new ResultadoPrevisualizar();
+                comandos.Ejecutar(new GuardarNirManual { Dto = ObjetoMailNir.nirManualPuerto, IdModuloDeCarga = IdModuloDeCarga });
+
+                var docFile = "Nir.xls";
+
+                var generadorExcel = new ExcelNirManual();
+
+                generadorExcel.GenerarArchivo(resultado, ObjetoMailNir.nirManualPuerto, IdModuloDeCarga);
+                List<string> Emails = new List<string>();
+                Emails = ObjetoMailNir.mail.Destinatarios;
+
+
+                comandos.Ejecutar(new EnvioMail
                 {
-                    var resultado = new ResultadoPrevisualizar();
-                    comandos.Ejecutar(new GuardarNirManual { Dto = ObjetoMailNir.nirManualPuerto, IdModuloDeCarga = IdModuloDeCarga });
+                    Cuerpo = ObjetoMailNir.mail.Body,
+                    Destinatarios = Emails,
+                    Titulo = $"NIR" + IdModuloDeCarga,
+                    Attachment = resultado.Archivo,
+                    AttachmentName = docFile
+                });
 
-                    var docFile = "Nir.xls";
-
-                    var generadorExcel = new ExcelNirManual();
-                    List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuerto = new List<ModuloDeCargaNirManualPuertoDto>();
-                    //moduloDeCargaNirsManualPuerto.Add(ObjetoMailNir.nirManualPuerto);
-
-                generadorExcel.GenerarArchivo(resultado, moduloDeCargaNirsManualPuerto, IdModuloDeCarga);
-                    List<string> Emails = new List<string>();
-                    Emails = ObjetoMailNir.mail.Destinatarios;
-                    
-
-                    comandos.Ejecutar(new EnvioMail
-                    {
-                        Cuerpo = ObjetoMailNir.mail.Body,
-                        Destinatarios = Emails,
-                        Titulo = $"NIR" + IdModuloDeCarga,
-                        Attachment = resultado.Archivo,
-                        AttachmentName = docFile
-                    });
-
-                    return Request.CreateResponse(HttpStatusCode.OK);
-                }
-                catch (Exception e)
-                {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-                }
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
 
         public class ObjetoMailNir
         {
@@ -297,7 +295,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
 
-        }       
+        }
 
 
         [HttpPost]
@@ -321,19 +319,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosMail")]
-        public HttpResponseMessage GuardarPlanillaDeTurnosMail(int IdModuloDeCarga,  ObjetoMail ObjetoMail)
+        public HttpResponseMessage GuardarPlanillaDeTurnosMail(int IdModuloDeCarga, ObjetoMail ObjetoMail)
         {
             try
             {
-             var resultado = new ResultadoPrevisualizar();
-            comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = ObjetoMail.planillaDeTurnos, IdModuloDeCarga = IdModuloDeCarga });
+                var resultado = new ResultadoPrevisualizar();
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = ObjetoMail.planillaDeTurnos, IdModuloDeCarga = IdModuloDeCarga });
 
-            string fechaTurno = ObjetoMail.planillaDeTurnos.Fecha.Value.ToString("yyyyMMdd");
+                string fechaTurno = ObjetoMail.planillaDeTurnos.Fecha.Value.ToString("yyyyMMdd");
 
 
-            
-            var docFile = "Planilla de turnos" + fechaTurno + ".xls";
-            
+
+                var docFile = "Planilla de turnos" + fechaTurno + ".xls";
+
                 var generadorExcel = new ExcelLiquido();
                 List<ModuloDeCargaPlanillaDeTurnosTurnosDto> moduloDeCargaPlanillaDeTurnosTurnosDtos = new List<ModuloDeCargaPlanillaDeTurnosTurnosDto>();
                 moduloDeCargaPlanillaDeTurnosTurnosDtos.Add(ObjetoMail.planillaDeTurnos);
@@ -365,7 +363,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         public class ObjetoMail
         {
-           public ModuloDeCargaPlanillaDeTurnosTurnosDto planillaDeTurnos;
+            public ModuloDeCargaPlanillaDeTurnosTurnosDto planillaDeTurnos;
             public MailDto mail;
 
         }
@@ -378,7 +376,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                 comandos.Ejecutar(new SincronizarBalanzasCortes { IdModuloDeCarga = IdModuloDeCarga });
+                comandos.Ejecutar(new SincronizarBalanzasCortes { IdModuloDeCarga = IdModuloDeCarga });
 
                 CortesRegistrados cor = new CortesRegistrados()
                 {
@@ -386,10 +384,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     informacionAdicional = servicio.ObtenerInformacionCortesBalanzas(IdModuloDeCarga)
 
                 };
-         
+
                 return Request.CreateResponse(HttpStatusCode.OK, cor);
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
@@ -516,8 +514,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/GuardarObservacionesDeCalidad")]
         public HttpResponseMessage GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
         {
+
+            foreach (var item in observacionesDeCalidadDto)
+            {
+                item.FechaHoraObs.ToOADate();
+            }
             servicio.GuardarObservacionesDeCalidad(idPlanillaDeTurnos, observacionesDeCalidadDto);
             return Request.CreateResponse(HttpStatusCode.OK);
+
         }
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
@@ -548,6 +552,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ObtenerRitmosDeEmbarque")]
+        public HttpResponseMessage ObtenerRitmosDeEmbarque(int vapor_id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerRitmosDeEmbarque(vapor_id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        
     }
 }

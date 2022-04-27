@@ -13,6 +13,7 @@
     [Mano] NVARCHAR(50) NULL,
     [ModuloDeCarga_Id] INT NOT NULL,
     [Material_id] INT NULL,
+    [Bodega_id] INT NULL, 
     --[Bodega_id] INT NULL,
     CONSTRAINT [PK_dbo.ModuloDeCargaNirManualPuerto] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaNirManualPuerto_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade,

@@ -12,7 +12,6 @@ import { takeUntil } from 'rxjs/operators';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboDeBuque } from '@ScatoModels/recibo-buque';
 import { PDFService } from '@ScatoServicios/pdf.service';
-import { Embarque } from '@ScatoModels/embarque';
 
 
 @Component({
@@ -30,7 +29,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   unsubscribe: Subject<any>;
   errorMessage: boolean = false;
   reciboBuque: ReciboDeBuque;
-
+  
   embarquesEnLineUpSinFiltrar: EmbarqueNav[];
   listadoEmbarques: InstanciaWorkflowPuerto[];
 
@@ -40,7 +39,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
   buqueEnOtrosMuelles: InstanciaWorkflowPuerto | undefined;
 
   embarqueId: number;
-  nombreVapor: Embarque;
   barquitos: InstanciaWorkflowPuerto[];
   vaporId: number = 0;
   materialesPuerto = [];
@@ -49,7 +47,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
   resultados: Balanzas[] = [];
   embarque: EmbarqueNav;
   moduloDeCarga_Id: number = 0;
-  reciboOK: boolean = false;
 
   constructor(
     private workflowService: WorkflowService,
@@ -64,11 +61,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.unsubscribe = new Subject();
 
     // TODO: lo nuevo para datos de balanzadas -----------------------------
-    setTimeout(() => {
-      this.embarque = this._procesoService.getEmbarqueSelected();
-      this.embarqueId = this._procesoService.getEmbarqueId();
-      embarqueService.obtenerEmbarque(this.embarqueId)
-    }, 4000);
+    // this.embarque = this._procesoService.getEmbarqueSelected();
+    // this.embarqueId = this._procesoService.getEmbarqueId();
 
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
@@ -99,7 +93,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
   // }
 
   ngOnInit(): void {
-    // this.embarque = this._procesoService.getEmbarqueSelected();
+    // this._procesoService.disposeData();
+    this.embarque = this._procesoService.getEmbarqueSelected();
     // this.embarqueId = this._procesoService.getEmbarqueId();
     // this.subscribeEmbarques();
     
@@ -132,27 +127,50 @@ export class CalidadComponent implements OnInit, OnDestroy {
       obtenerListado: this.workflowService.obtenerListado(),
       listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
     })
-    .subscribe( (res:any) => {
+    // .subscribe( (res: any) => {
+    .subscribe( (res: {
+                        obtenerListado: InstanciaWorkflowPuerto[], 
+                        listarEmbarquesEnLineUp: EmbarqueNav[]
+                      }) => {
       this.listadoEmbarques = res.obtenerListado;
       this.filtrarMuelles();
-
+      
       this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
+
+      console.log('res.obtenerListado: ', res.obtenerListado);
+      console.log('res.listarEmbarquesEnLineUp: ', res.listarEmbarquesEnLineUp);
       
       let embEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
+      console.log('Desde CALIDAD (embEnLineUp): ', embEnLineUp);
+      
       if(embEnLineUp){
         this.embarquesEnLineUp.push(embEnLineUp);
       }
 
       this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
+      console.log('Desde CALIDAD: ', this.embarquesEnLineUp);
       this.embarque = this._procesoService.getEmbarqueSelected();
       this.embarqueId = this._procesoService.getEmbarqueId();
 
+      // if(this.embarqueId){
+      //   this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
+      //   this.vaporId = this.barquitos['embarque'].vapor.id;
+      //   // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.        
+      //   // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
+      //   const selLineUp = this.barquitos['lineUp'];
+      //   const selModuloDeCarga = selLineUp['moduloDeCarga'];        
+      //   this.moduloDeCarga_Id = selModuloDeCarga.id;
+      //   this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+      // }
+
       if(this.embarqueId){
-        this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
-        this.vaporId = this.barquitos['embarque'].vapor.id;
+        res.obtenerListado.forEach( x => x.embarque.id === this.embarqueId ?? this.barquitos.push(x) );
+        console.log('MUCHAS BARQUITOS?: ', this.barquitos);
+        
+        this.vaporId = this.barquitos[0]['embarque'].vapor.id;
         // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.        
         // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-        const selLineUp = this.barquitos['lineUp'];
+        const selLineUp = this.barquitos[0].lineUp;
         const selModuloDeCarga = selLineUp['moduloDeCarga'];        
         this.moduloDeCarga_Id = selModuloDeCarga.id;
         this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
@@ -264,15 +282,24 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.reciboBuque = new ReciboDeBuque();
     var converter = require('number-to-words');
     this.reciboBuque.nombrePuertoOrigen = "San Lorenzo, ARGENTINA";
-    this.reciboBuque.fechaRecibo = new Date();
-    this.reciboBuque.nombreVapor = 'this.embarque?.nombreBuque ? this.embarque.nombreBuque';
+    // this.reciboBuque.fechaRecibo = new Date();
+    this.reciboBuque.nombreVapor = "";
     this.reciboBuque.nombreEmpresaRemitente = "MOLINOS AGRO S.A";
-    this.reciboBuque.nombrePuertoDestino = "chau";
-    this.reciboBuque.cantidad = 23000;
-    this.reciboBuque.cantidadEnLetras = converter.toWords(this.reciboBuque.cantidad);;
-    this.reciboBuque.estibadoEnBodega = "1-4";
-    this.reciboBuque.calidadYCantidadDesconocidas = "200tn";
-    this.reciboBuque.incluirParaImpresion = true;
+    this.reciboBuque.nombrePuertoDestino = "";
+    this.reciboBuque.cantidad = 0;
+    this.reciboBuque.cantidadEnLetras = converter.toWords(this.reciboBuque.cantidad).toUpperCase();
+    this.reciboBuque.estibadoEnBodega = "";
+    this.reciboBuque.calidadYCantidadDesconocidas = "";
+    this.reciboBuque.incluirParaImpresionDesconocida = true
+    this.reciboBuque.incluirParaImpresionBodega = true
+    this.reciboBuque.incluirParaImpresionDesconocida = true
+  }
+
+  onChangeCantidadEnLetras(cantidad: number){
+    var converter = require('number-to-words');
+     this.reciboBuque.cantidadEnLetras = converter.toWords(cantidad).toUpperCase();
+    // let cantstr = cantidadLetras.toString();
+    // this.reciboBuque.cantidadEnLetras = converter.toWords(cantidad);
   }
 
   openModalEmitirRecibo(modal: any) {

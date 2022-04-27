@@ -64,7 +64,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
   nuevoTurno: PlanillaDeTurnos;
   cortesTurno: CorteTurno[] = [];
   private user: Usuario
-
+  mostrarBtn:boolean=true;
   
   embarqueId: number; 
   embarque: Embarque;
@@ -511,6 +511,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
       fecha: ['',[Validators.required]],
       hora: ['',[Validators.required]],
       observaciones: ['',[Validators.required]],
+      observacionVisible: true,
       userCarga: this.user.username
  
     })
@@ -527,10 +528,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
       return;
     
     let { fecha, hora } = this.obsCalidadForm.getRawValue();
+    let {observaciones, observacionVisible} = this.obsCalidadForm.getRawValue()
     let fechaHora = `${this.obsCalidadForm.controls.fecha.value} ${this.obsCalidadForm.controls.hora.value}`
     let fechaHoraIncorrecta = this.comparaFechaHoraObs(fecha, hora);
     
-
     
     let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
       "Desea guardar las observaciones de calidad?";
@@ -540,8 +541,24 @@ export class PlanillaTurnoLiquidosComponent implements OnInit, AfterViewInit {
         if (confirmed && !fechaHoraIncorrecta) {
           
           this.procesoCalidadService.setObsCalidad(this.obsCalidadForm.getRawValue());
-          this.obsCalidadForm.reset();
+          // this.obsCalidadForm.reset();
           
+          // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
+          //obtengo el turno en el que tengo que guardar
+          let horaDate = new Date(fechaHora)
+          let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
+          //me traigo todos los turnos de la fecha seleccionada
+          let idPlanillaDeTurnos = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto)[0].id;
+          
+          let Observaciones: ObsCalidad = {
+            fechaHoraObs: fechaHora,
+            observaciones: observaciones,
+            observacionVisible: observacionVisible
+          };
+          this.procesoCalidadService.guardarObservacionesDeCalidad(idPlanillaDeTurnos, [Observaciones]).subscribe(res =>{
+            console.log("::::ObsDeCalidad RES:::::", res);
+          });
+          this.obsCalidadForm.reset();
         }
         else
           return;
