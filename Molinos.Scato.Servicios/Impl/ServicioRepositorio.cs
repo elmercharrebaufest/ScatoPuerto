@@ -9225,16 +9225,16 @@ namespace Molinos.Scato.Servicios.Impl
             return 0;
         }
 
-        public ModuloDeCargaPlanillaDeTurnosTurnosDto ObtenerModuloDeCargaPlanillaDeTurnosTurnos(int turnoPuerto_id, int moduloDeCarga_id)
+        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id)
         {
-            ModuloDeCargaPlanillaDeTurnosTurnosDto moduloDeCargaPlanillaDeTurnosTurnosDto = new ModuloDeCargaPlanillaDeTurnosTurnosDto();
+            ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
             DateTime dateWithoutHours = new DateTime();
             dateWithoutHours = DateTime.Now.Date;
-            moduloDeCargaPlanillaDeTurnosTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnosTurnos, ModuloDeCargaPlanillaDeTurnosTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id);
+            moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id);
 
-            if (moduloDeCargaPlanillaDeTurnosTurnosDto != null)
+            if (moduloDeCargaPlanillaDeTurnosDto != null)
             {
-                return moduloDeCargaPlanillaDeTurnosTurnosDto;
+                return moduloDeCargaPlanillaDeTurnosDto;
             }
             return null;
 
@@ -9910,101 +9910,101 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
         }
-        public Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id)
-        {
-            DateTime fechainicioBalanza7 = new DateTime();
-            DateTime fechainicioBalanza8 = new DateTime();
-            DateTime actualizacionRitmosBalanza7 = new DateTime();
-            DateTime actualizacionRitmosBalanza8 = new DateTime();
+        //public Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id)
+        //{
+        //    DateTime fechainicioBalanza7 = new DateTime();
+        //    DateTime fechainicioBalanza8 = new DateTime();
+        //    DateTime actualizacionRitmosBalanza7 = new DateTime();
+        //    DateTime actualizacionRitmosBalanza8 = new DateTime();
 
 
-            var totalCargadoBalanza7 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
-            var tnCargadasBalanza7 = totalCargadoBalanza7 / 1000;
-            DateTime ultimaBalanzadaBalanza7 = DateTime.Now;
-            var totalCargadoBalanza8 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
-            var tnCargadasBalanza8 = totalCargadoBalanza8 / 1000;
-            DateTime ultimaBalanzadaBalanza8 = DateTime.Now;
+        //    var totalCargadoBalanza7 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
+        //    var tnCargadasBalanza7 = totalCargadoBalanza7 / 1000;
+        //    DateTime ultimaBalanzadaBalanza7 = DateTime.Now;
+        //    var totalCargadoBalanza8 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
+        //    var tnCargadasBalanza8 = totalCargadoBalanza8 / 1000;
+        //    DateTime ultimaBalanzadaBalanza8 = DateTime.Now;
             
-            var registroFinCargaVaporBalanza7 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
-            var registroFinCargaVaporBalanza8 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
-            double tiempoCargaNetoBalanza7 = 0;
-            double tiempoCargaNetoBalanza8 = 0;
+        //    var registroFinCargaVaporBalanza7 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
+        //    var registroFinCargaVaporBalanza8 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
+        //    double tiempoCargaNetoBalanza7 = 0;
+        //    double tiempoCargaNetoBalanza8 = 0;
 
 
-            if (registroFinCargaVaporBalanza7 != null)
-            {
-                foreach (var carg in registroFinCargaVaporBalanza7)
-                {
-                    var inicioCargaBalanza7id = carg.CargaOpuesta_Id;
-                    var finCargaBalanza7id = carg.Id;
+        //    if (registroFinCargaVaporBalanza7 != null)
+        //    {
+        //        foreach (var carg in registroFinCargaVaporBalanza7)
+        //        {
+        //            var inicioCargaBalanza7id = carg.CargaOpuesta_Id;
+        //            var finCargaBalanza7id = carg.Id;
 
-                    fechainicioBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaBalanza7id && x.NumeroBalanza == "7").Fecha;
-                    var fechaFinBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaBalanza7id && x.NumeroBalanza == "7").Fecha;
+        //            fechainicioBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaBalanza7id && x.NumeroBalanza == "7").Fecha;
+        //            var fechaFinBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaBalanza7id && x.NumeroBalanza == "7").Fecha;
 
-                    tiempoCargaNetoBalanza7 += (fechaFinBalanza7 - fechainicioBalanza7).TotalMinutes;
-                }
-            }
-            else
-            {
-                tiempoCargaNetoBalanza7 = 0;
-                totalCargadoBalanza7 = 0;
-            }
+        //            tiempoCargaNetoBalanza7 += (fechaFinBalanza7 - fechainicioBalanza7).TotalMinutes;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        tiempoCargaNetoBalanza7 = 0;
+        //        totalCargadoBalanza7 = 0;
+        //    }
 
-            if (registroFinCargaVaporBalanza8 != null)
-            {
-                foreach (var carg in registroFinCargaVaporBalanza8)
-                {
-                    var inicioCargaBalanza8id = carg.CargaOpuesta_Id;
-                    var finCargaBalanza8id = carg.Id;
+        //    if (registroFinCargaVaporBalanza8 != null)
+        //    {
+        //        foreach (var carg in registroFinCargaVaporBalanza8)
+        //        {
+        //            var inicioCargaBalanza8id = carg.CargaOpuesta_Id;
+        //            var finCargaBalanza8id = carg.Id;
 
-                    fechainicioBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaBalanza8id && x.NumeroBalanza == "8").Fecha;
-                    var fechaFinBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaBalanza8id && x.NumeroBalanza == "8").Fecha;
+        //            fechainicioBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaBalanza8id && x.NumeroBalanza == "8").Fecha;
+        //            var fechaFinBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaBalanza8id && x.NumeroBalanza == "8").Fecha;
 
-                    tiempoCargaNetoBalanza8 += (fechaFinBalanza8 - fechainicioBalanza8).TotalMinutes;
-                }
-            }
-            else
-            {
-                tiempoCargaNetoBalanza8 = 0;
-                totalCargadoBalanza8 = 0;
-            }
-            double ritmoDeCargaBalanza7 = 0;
-            double ritmoDeCargaBalanza8 = 0;
-            if (tiempoCargaNetoBalanza7 != 0)
-            {
-                ritmoDeCargaBalanza7 = (tnCargadasBalanza7 * 60) / tiempoCargaNetoBalanza7;
-                actualizacionRitmosBalanza7 = DateTime.Now;
-            }
-            else ritmoDeCargaBalanza7 = 0;
+        //            tiempoCargaNetoBalanza8 += (fechaFinBalanza8 - fechainicioBalanza8).TotalMinutes;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        tiempoCargaNetoBalanza8 = 0;
+        //        totalCargadoBalanza8 = 0;
+        //    }
+        //    double ritmoDeCargaBalanza7 = 0;
+        //    double ritmoDeCargaBalanza8 = 0;
+        //    if (tiempoCargaNetoBalanza7 != 0)
+        //    {
+        //        ritmoDeCargaBalanza7 = (tnCargadasBalanza7 * 60) / tiempoCargaNetoBalanza7;
+        //        actualizacionRitmosBalanza7 = DateTime.Now;
+        //    }
+        //    else ritmoDeCargaBalanza7 = 0;
 
-            if (tiempoCargaNetoBalanza8 != 0)
-            {
-                ritmoDeCargaBalanza8 = (tnCargadasBalanza8 * 60) / tiempoCargaNetoBalanza8;
-                actualizacionRitmosBalanza8 = DateTime.Now;
-
-
-            }
-            else ritmoDeCargaBalanza8 = 0;
-
-            var ritmoDeCargaBalanza7int = (int)ritmoDeCargaBalanza7;
-            var ritmoDeCargaBalanza8int = (int)ritmoDeCargaBalanza8;
-
-            Dictionary<string, string> ritmosDeEmbarque = new Dictionary<string, string>();
-
-            ritmosDeEmbarque.Add("totalCargadoBalanza7", tnCargadasBalanza7.ToString());
-            ritmosDeEmbarque.Add("ritmoDeCargaBalanza7", ritmoDeCargaBalanza7int.ToString());
-            ritmosDeEmbarque.Add("ArrancóBalanza7", fechainicioBalanza7.ToString());
-            ritmosDeEmbarque.Add("UltimaBalanzadaBalanza7", ultimaBalanzadaBalanza7.ToString());
-            ritmosDeEmbarque.Add("actualizacionRitmosBalanza7", actualizacionRitmosBalanza7.ToString());
-            ritmosDeEmbarque.Add("totalCargadoBalanza8", tnCargadasBalanza8.ToString());
-            ritmosDeEmbarque.Add("ritmoDeCargaBalanza8", ritmoDeCargaBalanza8int.ToString());
-            ritmosDeEmbarque.Add("ArrancóBalanza8", fechainicioBalanza8.ToString());
-            ritmosDeEmbarque.Add("UltimaBalanzadaBalanza8", ultimaBalanzadaBalanza8.ToString());
-            ritmosDeEmbarque.Add("actualizacionRitmosBalanza8", actualizacionRitmosBalanza8.ToString());
+        //    if (tiempoCargaNetoBalanza8 != 0)
+        //    {
+        //        ritmoDeCargaBalanza8 = (tnCargadasBalanza8 * 60) / tiempoCargaNetoBalanza8;
+        //        actualizacionRitmosBalanza8 = DateTime.Now;
 
 
-            return ritmosDeEmbarque;
-        }
+        //    }
+        //    else ritmoDeCargaBalanza8 = 0;
+
+        //    var ritmoDeCargaBalanza7int = (int)ritmoDeCargaBalanza7;
+        //    var ritmoDeCargaBalanza8int = (int)ritmoDeCargaBalanza8;
+
+        //    Dictionary<string, string> ritmosDeEmbarque = new Dictionary<string, string>();
+
+        //    ritmosDeEmbarque.Add("totalCargadoBalanza7", tnCargadasBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("ritmoDeCargaBalanza7", ritmoDeCargaBalanza7int.ToString());
+        //    ritmosDeEmbarque.Add("ArrancóBalanza7", fechainicioBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("UltimaBalanzadaBalanza7", ultimaBalanzadaBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("actualizacionRitmosBalanza7", actualizacionRitmosBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("totalCargadoBalanza8", tnCargadasBalanza8.ToString());
+        //    ritmosDeEmbarque.Add("ritmoDeCargaBalanza8", ritmoDeCargaBalanza8int.ToString());
+        //    ritmosDeEmbarque.Add("ArrancóBalanza8", fechainicioBalanza8.ToString());
+        //    ritmosDeEmbarque.Add("UltimaBalanzadaBalanza8", ultimaBalanzadaBalanza8.ToString());
+        //    ritmosDeEmbarque.Add("actualizacionRitmosBalanza8", actualizacionRitmosBalanza8.ToString());
+
+
+        //    return ritmosDeEmbarque;
+        //}
 
         public Dictionary<string, int> ObtenerRitmos(int vapor_id, int modulodecarga_id)
         {
@@ -10106,30 +10106,30 @@ namespace Molinos.Scato.Servicios.Impl
                 throw;
             }
         }
-        public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
+        public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto)
         {
-            ModuloDeCargaPlanillaDeTurnosTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.Id == idPlanillaDeTurnos);
+            ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
 
             foreach (var item in observacionesDeCalidadDto)
             {
-                ObservacionesDeCalidad observacionesDeCalidad_db = repositorio.Obtener<ObservacionesDeCalidad>(x => x.Id == item.Id);
+                ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad observacionesDeCalidad_db = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == item.Id);
                 if (observacionesDeCalidad_db != null)
                 {
-                    observacionesDeCalidad_db.FechaHoraObs = item.FechaHoraObs;
+                    observacionesDeCalidad_db.FechaHora = item.FechaHora;
                     observacionesDeCalidad_db.Observaciones = item.Observaciones;
                     observacionesDeCalidad_db.ObservacionVisible = item.ObservacionVisible;
                     
                 }
                 else
                 {
-                    observacionesDeCalidad_db = new ObservacionesDeCalidad()
+                    observacionesDeCalidad_db = new ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad()
                     {
-                        ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnosTurnos,
-                        FechaHoraObs = item.FechaHoraObs,
+                        ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos,
+                        FechaHora = item.FechaHora,
                         Observaciones = item.Observaciones,
                         ObservacionVisible = item.ObservacionVisible,
                     };
-                    moduloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidad.Add(observacionesDeCalidad_db);
+                    moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.Add(observacionesDeCalidad_db);
 
                 }
             }
@@ -10143,17 +10143,17 @@ namespace Molinos.Scato.Servicios.Impl
             var ritmoAcumuladoLiquidos = 0;
             var totalTiempoCorte = 0;
             var ritmoAcumuladoNeto = 0;
-            var planillaDeTurnosTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
-            if (planillaDeTurnosTurnos != null)
+            var planillaDeTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
+            if (planillaDeTurnos != null)
             {
                 var cantTurnos = 0;
 
 
-                foreach (var turn in planillaDeTurnosTurnos)
+                foreach (var turn in planillaDeTurnos)
                 {
                     var idPlanilla = turn.Id;
-                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosTurnosCortes;
-                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosTurnosDetalles;
+                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
+                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetalles;
 
                     foreach (var item in turnosDetalles)
                     {
@@ -10162,7 +10162,7 @@ namespace Molinos.Scato.Servicios.Impl
                         cantTurnos++;
                     }
                     minutosCargando = (cantTurnos * 6) * 60;
-                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnosTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
+                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
                     {
                         foreach (var cort in cortesTurnos)
                         {

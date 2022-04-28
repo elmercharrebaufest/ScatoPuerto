@@ -31,18 +31,18 @@
 //                ///// OPERACIONES/TABLERISTAS /////
 //                moduloDeCarga.FechaDeModificacion = DateTime.Now;
 
-//                moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos = new List<ModuloDeCargaPlanillaDeTurnosTurnos>();
+//                moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos = new List<ModuloDeCargaPlanillaDeTurnos>();
 
 
-//                foreach (var ModuloDeCargaPlanillaDeTurnosTurnos in comando.Dto.ModuloDeCargaPlanillaDeTurnosTurnos)
+//                foreach (var ModuloDeCargaPlanillaDeTurnos in comando.Dto.ModuloDeCargaPlanillaDeTurnos)
 //                {
 
 //                    //   Repositorio.GuardarCambios();
 
-//                    var detalles = new List<ModuloDeCargaPlanillaDeTurnosTurnosDetalles>();
-//                    foreach (var modulodetalle in ModuloDeCargaPlanillaDeTurnosTurnos.ModuloDeCargaPlanillaDeTurnosTurnosDetalles)
+//                    var detalles = new List<ModuloDeCargaPlanillaDeTurnosDetalles>();
+//                    foreach (var modulodetalle in ModuloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetalles)
 //                    {
-//                        var ModuloDeCargaPlanillaDeTurnosTurnosDetalles = new ModuloDeCargaPlanillaDeTurnosTurnosDetalles()
+//                        var ModuloDeCargaPlanillaDeTurnosDetalles = new ModuloDeCargaPlanillaDeTurnosDetalles()
 //                        {
 //                            Exportador = Repositorio.Obtener<Exportador>(modulodetalle.Exportador.Id),
 //                            Linea = modulodetalle.Linea.ToString(),
@@ -56,16 +56,16 @@
 //                            MedidaFinalMM = modulodetalle.MedidaFinalMM,
 //                            Destino = Repositorio.Obtener<Destino>(modulodetalle.Destino.Id),
 //                            Cantidad = modulodetalle.Cantidad
-//                            //  ModuloDeCargaPlanillaDeTurnosTurnos = turnosturnos
+//                            //  ModuloDeCargaPlanillaDeTurnos = Turnos
 //                        };
-//                        detalles.Add(ModuloDeCargaPlanillaDeTurnosTurnosDetalles);
+//                        detalles.Add(ModuloDeCargaPlanillaDeTurnosDetalles);
 //                    }
 
-//                    var corte = new List<ModuloDeCargaPlanillaDeTurnosTurnosCortes>();
+//                    var corte = new List<ModuloDeCargaPlanillaDeTurnosCortes>();
 
-//                    foreach (var moduloCortes in ModuloDeCargaPlanillaDeTurnosTurnos.ModuloDeCargaPlanillaDeTurnosTurnosCortes)
+//                    foreach (var moduloCortes in ModuloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosCortes)
 //                    {
-//                        var ModuloDeCargaPlanillaDeTurnosTurnosCortes = new ModuloDeCargaPlanillaDeTurnosTurnosCortes()
+//                        var ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
 //                        {
 //                            HoraInicio = moduloCortes.HoraInicio.ToString(),
 //                            HoraFin = moduloCortes.HoraFin.ToString(),
@@ -73,32 +73,32 @@
 //                            Observaciones = moduloCortes.Observaciones,
 //                            TiempoTotal = moduloCortes.TiempoTotal
 
-//                            //    ModuloDeCargaPlanillaDeTurnosTurnos = turnosturnos
+//                            //    ModuloDeCargaPlanillaDeTurnos = Turnos
 //                        };
-//                        corte.Add(ModuloDeCargaPlanillaDeTurnosTurnosCortes);
+//                        corte.Add(ModuloDeCargaPlanillaDeTurnosCortes);
 //                    }
 
 //                    //var ObservacionesDeCalidad = new ObservacionesDeCalidad();
-//                    //if(ModuloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidadDto != null)
+//                    //if(ModuloDeCargaPlanillaDeTurnos.ObservacionesDeCalidadDto != null)
 //                    //{
-//                    //    ObservacionesDeCalidad.Fecha = ModuloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidadDto.Fecha;
-//                    //    ObservacionesDeCalidad.Observaciones = ModuloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidadDto.Observaciones;
-//                    //    ObservacionesDeCalidad.Hora = ModuloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidadDto.Hora;
+//                    //    ObservacionesDeCalidad.Fecha = ModuloDeCargaPlanillaDeTurnos.ObservacionesDeCalidadDto.Fecha;
+//                    //    ObservacionesDeCalidad.Observaciones = ModuloDeCargaPlanillaDeTurnos.ObservacionesDeCalidadDto.Observaciones;
+//                    //    ObservacionesDeCalidad.Hora = ModuloDeCargaPlanillaDeTurnos.ObservacionesDeCalidadDto.Hora;
 //                    //}
 
-//                    var turnosturnos = new ModuloDeCargaPlanillaDeTurnosTurnos
+//                    var Turnos = new ModuloDeCargaPlanillaDeTurnos
 //                    {
-//                        TurnoPuerto = ModuloDeCargaPlanillaDeTurnosTurnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(ModuloDeCargaPlanillaDeTurnosTurnos.TurnoPuerto.Id) : null,
-//                        Cerrado = ModuloDeCargaPlanillaDeTurnosTurnos.Cerrado,
-//                        Enviado = ModuloDeCargaPlanillaDeTurnosTurnos.Enviado,
+//                        TurnoPuerto = ModuloDeCargaPlanillaDeTurnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(ModuloDeCargaPlanillaDeTurnos.TurnoPuerto.Id) : null,
+//                        Cerrado = ModuloDeCargaPlanillaDeTurnos.Cerrado,
+//                        Enviado = ModuloDeCargaPlanillaDeTurnos.Enviado,
 //                        //     ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos,
-//                        ModuloDeCargaPlanillaDeTurnosTurnosDetalles = detalles,
-//                        ModuloDeCargaPlanillaDeTurnosTurnosCortes = corte,
+//                        ModuloDeCargaPlanillaDeTurnosDetalles = detalles,
+//                        ModuloDeCargaPlanillaDeTurnosCortes = corte,
 //                        //   ObservacionesDeCalidad = ObservacionesDeCalidad;
 
 //                    };
 
-//                    moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos.Add(turnosturnos);
+//                    moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos.Add(Turnos);
 
 //                    moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(moduloDeCargaPlanillaDeTurnos);
 //                }

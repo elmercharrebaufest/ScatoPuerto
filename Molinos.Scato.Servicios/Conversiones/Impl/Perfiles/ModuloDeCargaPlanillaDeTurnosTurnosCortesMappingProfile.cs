@@ -4,16 +4,16 @@ using Molinos.Scato.Dominio.Entidades;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
-    public class ModuloDeCargaPlanillaDeTurnosTurnosCortesMappingProfile : Profile
+    public class ModuloDeCargaPlanillaDeTurnosCortesMappingProfile : Profile
     {
         public override string ProfileName
         {
-            get { return "ModuloDeCargaPlanillaDeTurnosTurnosCortesMappingProfile"; }
+            get { return "ModuloDeCargaPlanillaDeTurnosCortesMappingProfile"; }
         }
         protected override void Configure()
         {
-            Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosTurnosCortes, ModuloDeCargaPlanillaDeTurnosTurnosCortesDto>();
-            Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosTurnosCortesDto, ModuloDeCargaPlanillaDeTurnosTurnosCortes>();
+            Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosCortes, ModuloDeCargaPlanillaDeTurnosCortesDto>();
+            Mapper.CreateMap<ModuloDeCargaPlanillaDeTurnosCortesDto, ModuloDeCargaPlanillaDeTurnosCortes>();
         }
     }
 }

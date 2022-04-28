@@ -683,6 +683,7 @@
     <Compile Include="Consultas\Expresiones.cs" />
     <Compile Include="Consultas\Paginacion.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaFiltroDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaResultadoDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaListadoDto.cs" />
@@ -757,7 +758,6 @@
     <Compile Include="Dto\MotivosFallasBalanzaDto.cs" />
     <Compile Include="Dto\MotivosLimpiezaDto.cs" />
     <Compile Include="Dto\ModuloDeCargaNirManualPuertoDto.cs" />
-    <Compile Include="Dto\ObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\NotificacionAplicacionDto.cs" />
     <Compile Include="Dto\NotificacionCpeDto.cs" />
     <Compile Include="Dto\NotificacionSemaforoVagonesAutomaticaDto.cs" />
@@ -983,9 +983,10 @@
     <Compile Include="Entidades\ModuloDeCargaManosDeEmbarqueHistorico.cs" />
     <Compile Include="Entidades\ModuloDeCargaPeriodoDeCarga.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeEmbarque.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosTurnos.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosTurnosCortes.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosTurnosDetalles.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnos.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortes.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetalles.cs" />
     <Compile Include="Entidades\ModuloDeCargaRitmosEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarqueHistorico.cs" />
@@ -998,7 +999,6 @@
     <Compile Include="Entidades\NotificacionAplicacion.cs" />
     <Compile Include="Entidades\PinchazosPorCalada.cs" />
     <Compile Include="Entidades\ModuloDeCargaNirManualPuerto.cs" />
-    <Compile Include="Entidades\ObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\PlanoDeCargaAgenteControlPrivadoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodega.cs" />
     <Compile Include="Entidades\CargaComercial.cs" />

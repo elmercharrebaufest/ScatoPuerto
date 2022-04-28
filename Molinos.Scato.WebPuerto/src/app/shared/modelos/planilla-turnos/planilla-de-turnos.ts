@@ -9,8 +9,8 @@ export class PlanillaDeTurnos{
     turnoPuerto: TurnoPuerto;
     cerrado: boolean;
     enviado: boolean
-    moduloDeCargaPlanillaDeTurnosTurnosDetalles: Turno[];
-    moduloDeCargaPlanillaDeTurnosTurnosCortes: CorteTurno[];
+    moduloDeCargaPlanillaDeTurnosDetalles: Turno[];
+    moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[];
     indexDia: number;
 }
 

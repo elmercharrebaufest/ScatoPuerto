@@ -81,8 +81,8 @@ export class ModuloDeCargaService {
       mail:mail
     }
     console.log("PLANILLA: ", ObjetoMail)
-    // ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosTurnosCortes = undefined;
-    //ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosTurnosDetalles = undefined;
+    // ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosCortes = undefined;
+    //ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetalles = undefined;
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosMail?idModuloDeCarga=${idModuloDeCarga}`, ObjetoMail, { 'withCredentials': true});
    // return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`,  planillaDeTurnos, { 'withCredentials': true});
   }
@@ -100,8 +100,8 @@ export class ModuloDeCargaService {
    * @returns {Observable<any>} Observable<any>
    */
 
-   obtenerModuloDeCargaPlanillaDeTurnosTurnos(turnoPuerto_id, moduloDeCarga_id) {
-    return this.http.get(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnosTurnos?turnoPuerto_id=${turnoPuerto_id}&moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true });
+   obtenerModuloDeCargaPlanillaDeTurnos(turnoPuerto_id, moduloDeCarga_id) {
+    return this.http.get(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos?turnoPuerto_id=${turnoPuerto_id}&moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true });
   }
   obtenerTurnoPuerto(): Observable<any>{
     return this.http.get(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, {'withCredentials': true});

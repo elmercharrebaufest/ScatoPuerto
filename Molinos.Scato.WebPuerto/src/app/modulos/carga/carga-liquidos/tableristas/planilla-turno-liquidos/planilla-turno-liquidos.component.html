@@ -68,7 +68,7 @@
                                             </button>
                                         </td>
                                     </tr>
-                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosDetalles'>
+                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetalles'>
                                         <ng-container *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
                                             [formGroupName]='i'>
                                             <tr>
@@ -148,7 +148,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosTurnosCortes'>
+                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
                                                             <tr>
                                                                 <td colspan="4">

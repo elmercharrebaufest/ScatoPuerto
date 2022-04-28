@@ -75,7 +75,7 @@ export class PlanillaTurnosSolidosComponent implements OnInit {
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
 
-    let planilla = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnosTurnos;
+    let planilla = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos;
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
     this.getDestinos();
     this.getProductos();
