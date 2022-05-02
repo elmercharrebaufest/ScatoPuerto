@@ -115,6 +115,7 @@
     <Compile Include="Comandos\EnviarMensajesAsincronoCartelLed.cs" />
     <Compile Include="Comandos\GuardarEtiquetaPuerto.cs" />
     <Compile Include="Comandos\GuardarModuloDeCarga.cs" />
+    <Compile Include="Comandos\GuardarNirManual.cs" />
     <Compile Include="Comandos\GuardarPlanillaDeTurnos.cs" />
     <Compile Include="Comandos\ImprimirEtiquetaPuerto.cs" />
     <Compile Include="Comandos\ImprimirFileGenerico.cs" />
@@ -683,6 +684,7 @@
     <Compile Include="Consultas\Paginacion.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaFiltroDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaResultadoDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaListadoDto.cs" />
@@ -987,6 +989,7 @@
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortes.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesSolido.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\ModuloDeCargaRitmosEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarqueHistorico.cs" />

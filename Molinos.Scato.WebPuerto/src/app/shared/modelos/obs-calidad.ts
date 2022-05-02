@@ -1,6 +1,9 @@
 export class ObsCalidad {
-    id: number;
-    fecha: Date;
-    hora: string;
+    id?: number;
+    fechaHoraObs: string;
+    fecha?: Date;
+    hora?: string;
     observaciones: string;
+    userCarga?: string;
+    observacionVisible: boolean;
 }

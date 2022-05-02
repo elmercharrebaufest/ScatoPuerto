@@ -2530,9 +2530,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
-
-        [OperationContract]
-        void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id);
+        //[OperationContract]
+        //void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id);
 
         [OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
@@ -2562,8 +2561,13 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id);
 
-        //[OperationContract]
-        //void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto);
+        [OperationContract]
+        IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion();
+        [OperationContract]
+        ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id);
+
+        [OperationContract]
+        void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto);
 
         [OperationContract]
         Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id);
@@ -2638,8 +2642,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
       
+        //[OperationContract]
+        //Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id);
         [OperationContract]
         IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
+
 
     }
 }

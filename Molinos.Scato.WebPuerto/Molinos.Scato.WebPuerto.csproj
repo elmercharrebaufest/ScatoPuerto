@@ -316,6 +316,7 @@
     <Content Include="src\assets\sidebar\Logo_Molinos_M.png" />
     <Content Include="src\assets\sidebar-icons\administracion.svg" />
     <Content Include="src\assets\sidebar-icons\buques.svg" />
+    <Content Include="src\assets\sidebar-icons\historialDeBuques.svg" />
     <Content Include="src\assets\sidebar-icons\comex.svg" />
     <Content Include="src\assets\sidebar-icons\lineup.svg" />
     <Content Include="src\assets\sidebar-icons\operaciones.svg" />
@@ -450,9 +451,9 @@
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque-routing.module.ts" />
     <!-- Componente PDF ReciboBuque -->
-    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.ts" />
-    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.css" />
-    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\recibo-de-buque\recibodebuquepdf.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\recibo-de-buque\recibodebuquepdf.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\recibo-de-buque\recibodebuquepdf.component.css" />
     <!-- lineup TS -->
     <TypeScriptCompile Include="src\app\modulos\lineup\embarque\lineup-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\lineup.component.ts" />

@@ -471,32 +471,31 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
-            if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
-            {
-                foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
-                {
-                    //var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
+            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
+            //if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
+            //{
+            //    foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
+            //    {
+            //        var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
 
-                    moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
-                    {
-                        Id = Nir.Id,
-                        ModuloDeCarga = moduloDeCarga,
-                        //Bodega = bodega,
-                        Bodega = Nir.Bodega,
-                        Fecha = Nir.Fecha,
-                        HD = Nir.HD,
-                        Hora = Nir.Hora,
-                        Origen = Nir.Origen,
-                        PH = Nir.PH,
-                        ProtBase = Nir.ProtBase,
-                        Prot_BS = Nir.Prot_BS,
-                        Ritmo = Nir.Ritmo,
-                        Material_id = Nir.Material_id,
-                        Mano = Nir.Mano
-                    });
-                }
-            }
+            //        moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
+            //        {
+            //            Id = Nir.Id,
+            //            ModuloDeCarga = moduloDeCarga,
+            //            Bodega = bodega,
+            //            Fecha = Nir.Fecha,
+            //            HD = Nir.HD,
+            //            Hora = Nir.Hora,
+            //            Origen = Nir.Origen,
+            //            PH = Nir.PH,
+            //            ProtBase = Nir.ProtBase,
+            //            Prot_BS = Nir.Prot_BS,
+            //            Ritmo = Nir.Ritmo,
+            //            Material_id = Nir.Material_id,
+            //            Mano = Nir.Mano
+            //        });
+            //    }
+            //}
             // LÍQUIDOS / SÓLIDOS
             /////////////////////////
 

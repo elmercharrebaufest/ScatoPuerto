@@ -475,6 +475,9 @@
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnos.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosCortes.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnos.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetalles.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosCortes.sql" />
     <Build Include="dbo\Tables\TurnoPuerto.sql" />
     <Build Include="dbo\Tables\CubitacionDeTanques.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaBalanzas.sql" />
@@ -513,6 +516,7 @@
     <Build Include="dbo\Tables\RegistroInactividad.sql" />
     <Build Include="dbo\Tables\TipoDeActividad.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolido.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

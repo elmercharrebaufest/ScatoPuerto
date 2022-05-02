@@ -129,15 +129,17 @@ export class CalidadComponent implements OnInit, OnDestroy {
                       }) => {
       this.listadoEmbarques = res.obtenerListado;
       this.filtrarMuelles();
+      
       this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
+
       
       let embEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
-      
       if(embEnLineUp) this.embarquesEnLineUp.push(embEnLineUp);
 
       this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
       this.embarque = this._procesoService.getEmbarqueSelected();
       this.embarqueId = this._procesoService.getEmbarqueId();
+
 
       if(this.embarqueId){
         // this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
@@ -251,16 +253,26 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   inicializarReciboBuque(){
     this.reciboBuque = new ReciboDeBuque();
-    this.reciboBuque.nombrePuertoOrigen = 'hola';
-    this.reciboBuque.fechaRecibo = new Date(2021, 12, 3);
-    this.reciboBuque.nombreVapor = "titanic";
-    this.reciboBuque.nombreEmpresaRemitente = "molinos";
-    this.reciboBuque.nombrePuertoDestino = "chau";
-    this.reciboBuque.cantidad = 200;
-    this.reciboBuque.cantidadEnLetras = "Two Hundred";
-    this.reciboBuque.estibadoEnBodega = "1-4";
-    this.reciboBuque.calidadYCantidadDesconocidas = "200tn";
-    this.reciboBuque.incluirParaImpresion = true;
+    var converter = require('number-to-words');
+    this.reciboBuque.nombrePuertoOrigen = "San Lorenzo, ARGENTINA";
+    // this.reciboBuque.fechaRecibo = new Date();
+    this.reciboBuque.nombreVapor = "";
+    this.reciboBuque.nombreEmpresaRemitente = "MOLINOS AGRO S.A";
+    this.reciboBuque.nombrePuertoDestino = "";
+    this.reciboBuque.cantidad = 0;
+    this.reciboBuque.cantidadEnLetras = converter.toWords(this.reciboBuque.cantidad).toUpperCase();
+    this.reciboBuque.estibadoEnBodega = "";
+    this.reciboBuque.calidadYCantidadDesconocidas = "";
+    this.reciboBuque.incluirParaImpresionDesconocida = true
+    this.reciboBuque.incluirParaImpresionBodega = true
+    this.reciboBuque.incluirParaImpresionDesconocida = true
+  }
+
+  onChangeCantidadEnLetras(cantidad: number){
+    var converter = require('number-to-words');
+     this.reciboBuque.cantidadEnLetras = converter.toWords(cantidad).toUpperCase();
+    // let cantstr = cantidadLetras.toString();
+    // this.reciboBuque.cantidadEnLetras = converter.toWords(cantidad);
   }
 
   openModalEmitirRecibo(modal: any) {

@@ -216,6 +216,7 @@
     <Compile Include="Controllers\LineUpController.cs" />
     <Compile Include="Controllers\EmbarqueController.cs" />
     <Compile Include="EXCEL\ExcelLineUp.cs" />
+    <Compile Include="EXCEL\ExcelNirManual.cs" />
     <Compile Include="EXCEL\ExcelPlanilladeTurnos.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
