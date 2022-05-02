@@ -340,44 +340,64 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private string ExisteExportador(CrearLecturaBalanzada comando)
         {
-            var resultado = string.Empty;
-            if (comando.Informacion.ContainsKey("exportador"))
+            try
             {
-                resultado = comando.Informacion["exportador"];
-                if (!Repositorio.Existe<Exportador>(e => e.Nombre == resultado))
+                var resultado = string.Empty;
+                if (comando.Informacion.ContainsKey("exportador"))
                 {
-                    var nuevoExportador = new Exportador
+                    resultado = comando.Informacion["exportador"];
+                    if (!Repositorio.Existe<Exportador>(e => e.Nombre == resultado))
                     {
-                        Nombre = resultado
-                    };
-                    Repositorio.Agregar(nuevoExportador);
-                    Repositorio.GuardarCambios();
+                        Log.Info("Creando Exportador", resultado);
+                        var nuevoExportador = new Exportador
+                        {
+                            Nombre = resultado
+                        };
+                        Repositorio.Agregar(nuevoExportador);
+                        Repositorio.GuardarCambios();
+                    }
                 }
+                return resultado;
             }
-            return resultado;
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+         
         }
 
         private string ExisteMaterial(CrearLecturaBalanzada comando)
         {
-           
-            var resultado = string.Empty;
-            if (comando.Informacion.ContainsKey("commodity"))
+            try
             {
-                resultado = comando.Informacion["commodity"];
-                Log.Info("Validar si existe el material => " + resultado);
-                if (!Repositorio.Existe<MaterialPuerto>(e => e.Descripcion == resultado))
+                var resultado = string.Empty;
+                if (comando.Informacion.ContainsKey("commodity"))
                 {
-                    var nuevoMaterial = new MaterialPuerto
+                    resultado = comando.Informacion["commodity"];
+                    Log.Info("Validar si existe el material => " + resultado);
+                    if (!Repositorio.Existe<MaterialPuerto>(e => e.Descripcion == resultado))
                     {
-                        Descripcion = resultado,
-                        CodigoSAP = "Nuevo",
-                        Almacen = null
-                    };
-                    Repositorio.Agregar(nuevoMaterial);
-                    Repositorio.GuardarCambios();
+                        Log.Info("Creando Material", resultado);
+                        var nuevoMaterial = new MaterialPuerto
+                        {
+                            Descripcion = resultado,
+                            CodigoSAP = "Nuevo",
+                            Almacen = null,
+                            Color = "#000000"
+                        };
+                        Repositorio.Agregar(nuevoMaterial);
+                        Repositorio.GuardarCambios();
+                    }
                 }
+                return resultado;
             }
-            return resultado;
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+          
         }
     }
 }
