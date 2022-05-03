@@ -9,6 +9,7 @@ import { ModuloDeCargaListado } from '@ScatoModels/modulo-carga-listado';
 import { MotivosDeCorte } from '@ScatoModels/planilla-turnos/motivo-de-corte';
 import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
 import { Nir } from '@ScatoModels/nir';
+import { FuncionesGeneralesService } from './funciones-generales.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class ModuloDeCargaService {
   url: string = environment.apiUrl;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private funcionesGeneralesService: FuncionesGeneralesService,
   ) {
 
   }
@@ -79,8 +81,8 @@ export class ModuloDeCargaService {
       mail:mail
     }
     console.log("PLANILLA: ", ObjetoMail)
-    // ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosTurnosCortes = undefined;
-    //ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosTurnosDetalles = undefined;
+    // ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosCortes = undefined;
+    //ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesLiquido = undefined;
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosMail?idModuloDeCarga=${idModuloDeCarga}`, ObjetoMail, { 'withCredentials': true});
    // return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`,  planillaDeTurnos, { 'withCredentials': true});
   }
@@ -96,10 +98,10 @@ export class ModuloDeCargaService {
   /**
    * 
    * @returns {Observable<any>} Observable<any>
-   */
+   */ 
 
-   obtenerModuloDeCargaPlanillaDeTurnosTurnos(turnoPuerto_id, moduloDeCarga_id) {
-    return this.http.get(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnosTurnos?turnoPuerto_id=${turnoPuerto_id}&moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true });
+   obtenerModuloDeCargaPlanillaDeTurnos(turnoPuerto_id, moduloDeCarga_id, esliquido: boolean) {
+    return this.http.get(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos?turnoPuerto_id=${turnoPuerto_id}&moduloDeCarga_id=${moduloDeCarga_id}&esliquido=${esliquido}`, { 'withCredentials': true });
   }
   obtenerTurnoPuerto(): Observable<any>{
     return this.http.get(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, {'withCredentials': true});
@@ -124,6 +126,10 @@ export class ModuloDeCargaService {
   obtenerNir(moduloDeCarga_id: number): Observable<Nir[]>{
     return this.http.get<Nir[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
   }
+  guardarModuloDeCargaNirManualPuerto(moduloDeCargaNirManualPuerto: Nir[], moduloDeCarga_Id: number, ){
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?ModuloDeCarga_Id=${moduloDeCarga_Id}`, moduloDeCargaNirManualPuerto, { 'withCredentials': true});  
+  }
+
   obtenerListadoBodegas(): Observable<Bodega[]>{
     return this.http.get<Bodega[]>(`${this.url}ModuloDeCarga/ListadoBodegas`, { 'withCredentials' : true});
   }

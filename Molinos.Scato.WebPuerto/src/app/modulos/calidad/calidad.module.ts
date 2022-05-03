@@ -7,9 +7,10 @@ import { CalidadComponent } from "./calidad.component";
 import { LiquidosComponent } from "./liquidos/liquidos.component";
 import { NIRComponent } from "./solidos/nir/nir.component";
 import { SolidosComponent } from "./solidos/solidos.component";
-import { PlanillaTurnosSolidosComponent } from './solidos/planilla-turnos-solidos/planilla-turnos-solidos.component';
 import { PlanillaTurnosLiquidosCalidadComponent } from './liquidos/planilla-turnos-liquidos-calidad/planilla-turnos-liquidos-calidad.component';
-import { TestpdfComponent } from "../testpdf/testpdf.component";
+import { PlanillaTurnosSolidoComponent } from "./solidos/planilla-turnos-solido/planilla-turnos-solido.component";
+import { RecibodebuquepdfComponent } from "./recibo-de-buque/recibodebuquepdf.component";
+
 
 @NgModule({
     imports: [
@@ -23,9 +24,9 @@ import { TestpdfComponent } from "../testpdf/testpdf.component";
         NIRComponent,
         SolidosComponent,
         LiquidosComponent,
-        PlanillaTurnosSolidosComponent,
+        PlanillaTurnosSolidoComponent,
         PlanillaTurnosLiquidosCalidadComponent,
-        TestpdfComponent
+        RecibodebuquepdfComponent
     ],
 })
 

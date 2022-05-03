@@ -2,7 +2,7 @@ import { Destino } from "@ScatoModels/destino";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 
-export class Turno{
+export class TurnoDetalleLiquido{
     id?: number;
     exportador: Exportador;
     linea: string;
@@ -10,14 +10,21 @@ export class Turno{
     materialPuerto: MaterialPuerto;
     tk: string;
     temperatura: number;
-    //medidaInicial: number;
-    //medidaFinal: number;
-     medidaInicialCM: number;
-     medidaInicialMM: number;
-     medidaFinalCM: number;
-     medidaFinalMM: number;
+    medidaInicialCM: number;
+    medidaInicialMM: number;
+    medidaFinalCM: number;
+    medidaFinalMM: number;
+    destino: Destino;
+    cantidad: number;
+}
 
 
+export class TurnoDetalleSolido{
+    id?: number;
+    exportador: Exportador;
+    linea: string;
+    bodegaParcel: number;
+    materialPuerto: MaterialPuerto;
     destino: Destino;
     cantidad: number;
 }

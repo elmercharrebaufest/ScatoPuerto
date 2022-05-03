@@ -28,6 +28,7 @@ import { AmarreComponent } from "./modulos/carga/amarre/amarre.component";
 import { ToastModule } from 'primeng/toast';
 import { IniciarSesionComponent } from './iniciar-sesion/iniciar-sesion.component';
 import { NavtabsCalidadComponent } from "./navtabs-calidad/navtabs-calidad.component";
+import { CardBuqueComponent } from './modulos/geo/card-buque/card-buque.component';
 
 const components = [
     AlertComponent,
@@ -46,7 +47,7 @@ const components = [
     PeriodoCargaComponent,
     AmarreComponent,
     NavtabsCalidadComponent,
-
+    CardBuqueComponent
 ]
 const libs = [
     CommonModule,
@@ -70,7 +71,7 @@ const libs = [
     ],
     declarations: [
         components,
-        IniciarSesionComponent
+        IniciarSesionComponent,
     ],
     exports: [
         components,

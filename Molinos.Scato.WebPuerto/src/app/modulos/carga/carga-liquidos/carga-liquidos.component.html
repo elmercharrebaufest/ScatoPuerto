@@ -22,8 +22,8 @@
   <div class='shadow' id="planilla-embarque" style="background-color: white; min-height: 5rem;">
       <app-planilla-embarque></app-planilla-embarque>
   </div>
-  <div class='shadow' id="turno-liquidos" style="background-color: white; min-height: 5rem;">
-      <app-planilla-turno-liquidos></app-planilla-turno-liquidos>
+  <div class='bg-white px-4 min-h5 shadow mt-4' id="turno-liquidos">
+      <app-planilla-turno-liquidos [tablerista]='true'></app-planilla-turno-liquidos>
   </div>
   <div class='mt-5' style='margin-left: 25%; width: 50%;'>
       <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
