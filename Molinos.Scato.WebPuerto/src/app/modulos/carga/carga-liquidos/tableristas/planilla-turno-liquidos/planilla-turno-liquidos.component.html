@@ -205,7 +205,7 @@
         </div>
     </div>
 
-    <div fxLayout='row wrap' class='px-4 pb-4'>
+    <div fxLayout='row wrap' class='px-4 pb-4' *ngIf='turnoPuerto' >
         <form [formGroup]="formShipParticular">
             <div class="form-row">
                 <div class="form-group col" fxFlex='20'>
@@ -307,7 +307,7 @@
                     <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button>
                 </div>
             </form>
-        </div>
+        </div> 
     </ng-template>
 
 

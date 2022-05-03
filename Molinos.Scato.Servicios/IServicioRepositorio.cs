@@ -2554,17 +2554,15 @@ namespace Molinos.Scato.Servicios
         IList<BodegaDto> ListadoBodegas();
 
         [OperationContract]
-       Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
+        Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
 
 
 
         [OperationContract]
-        ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id);
+        ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido);
 
         [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion();
-        [OperationContract]
-        ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id);
 
         [OperationContract]
         void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto);
