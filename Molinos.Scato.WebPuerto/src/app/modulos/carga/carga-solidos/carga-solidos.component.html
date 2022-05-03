@@ -16,7 +16,7 @@
 <app-bodegas></app-bodegas>
 
 <div class="row mt-3">
-    <div class="col">
+    <div class="col espacio-izq">
         <app-graficos-ritmos></app-graficos-ritmos>
     </div>
     <div class="col">
@@ -29,4 +29,5 @@
     <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
     <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
     <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+    <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
 </div>

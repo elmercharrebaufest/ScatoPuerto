@@ -387,22 +387,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
             //            Fecha = planilla.Fecha
             //        };
 
-            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos = new List<ModuloDeCargaPlanillaDeTurnosTurnos>();
-            //        planilla.ModuloDeCargaPlanillaDeTurnosTurnos.ToList()
-            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos.Add(new ModuloDeCargaPlanillaDeTurnosTurnos
+            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos = new List<ModuloDeCargaPlanillaDeTurnos>();
+            //        planilla.ModuloDeCargaPlanillaDeTurnos.ToList()
+            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
             //        {
             //            TurnoPuerto = turnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(turnos.TurnoPuerto.Id) : null,
             //            Cerrado = turnos.Cerrado,
             //            Enviado = turnos.Enviado
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetalles> ModuloDeCargaPlanillaDeTurnosDetalles { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortes> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
             //        }));
 
             //        moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
             //        {
             //            ModuloDeCarga = moduloDeCarga,
             //            Fecha = planilla.Fecha,
-            //            ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos
+            //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos
             //        });
             //    }
             //}
@@ -471,31 +471,31 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
-            if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
-            {
-                foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
-                {
-                    var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
+            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
+            //if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
+            //{
+            //    foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
+            //    {
+            //        var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
 
-                    moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
-                    {
-                        Id = Nir.Id,
-                        ModuloDeCarga = moduloDeCarga,
-                        Bodega = bodega,
-                        Fecha = Nir.Fecha,
-                        HD = Nir.HD,
-                        Hora = Nir.Hora,
-                        Origen = Nir.Origen,
-                        PH = Nir.PH,
-                        ProtBase = Nir.ProtBase,
-                        Prot_BS = Nir.Prot_BS,
-                        Ritmo = Nir.Ritmo,
-                        Material_id = Nir.Material_id,
-                        Mano = Nir.Mano
-                    });
-                }
-            }
+            //        moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
+            //        {
+            //            Id = Nir.Id,
+            //            ModuloDeCarga = moduloDeCarga,
+            //            Bodega = bodega,
+            //            Fecha = Nir.Fecha,
+            //            HD = Nir.HD,
+            //            Hora = Nir.Hora,
+            //            Origen = Nir.Origen,
+            //            PH = Nir.PH,
+            //            ProtBase = Nir.ProtBase,
+            //            Prot_BS = Nir.Prot_BS,
+            //            Ritmo = Nir.Ritmo,
+            //            Material_id = Nir.Material_id,
+            //            Mano = Nir.Mano
+            //        });
+            //    }
+            //}
             // LÍQUIDOS / SÓLIDOS
             /////////////////////////
 

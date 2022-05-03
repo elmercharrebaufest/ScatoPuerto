@@ -1,0 +1,30 @@
+export class UbicacionEmbarcacion {
+    Embarque_Id: number;
+    IMO: string;
+    Nombre: string;
+    TipoEmbarcacion: string;
+    MMSI: string;
+    Bandera: string;
+    Tonelaje: string;
+    TonelajePesoMuerto: string;
+    LargoxAnchoExtremo: string;
+    FotoEmbarque: string;
+	PaisOrigen: string;
+	PuertoOrigen : string;
+	PaisDestino : string;
+	PuertoDestino : string;
+    ATD : string;
+    ATA : string;
+    ETA_Reportado: string;
+    Destino_Reportado: string;
+    Peso_Reportado: string;
+    VelocidadRecorrido: number;
+    PosicionRecibida: string; 
+    HoraLocalBarco: string;   
+    Area: string;             
+    PuertoActual: string;     
+    Latitud: string;          
+	Longitud: string;         
+    Estado: string;           
+	VelocidadCurso: string;
+}

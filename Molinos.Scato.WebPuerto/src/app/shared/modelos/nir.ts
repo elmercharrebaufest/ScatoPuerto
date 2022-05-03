@@ -2,7 +2,7 @@ import { MaterialPuerto } from "./material-puerto";
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 
 export class Nir{
-    id?: number;
+    id: number;
     fecha: Date;
     hora: string;
     ritmo: string; // ritmoTnH
@@ -11,8 +11,8 @@ export class Nir{
     prot_BS: string; // protBS
     ph: string;
     origen: string;
-    // bodega: string;
-    bodega: Bodega[];
+    bodega: string;
+    // bodega: Bodega[];
     mano: string;
     material_id: number;
     moduloDeCargaId: number;
@@ -20,7 +20,7 @@ export class Nir{
 }
 
 export class Maiz{
-    id?: number;
+    id: number;
     fecha: Date;
     hora: string;
     hd: string;
@@ -32,7 +32,7 @@ export class Maiz{
 }
 
 export class Trigo{
-    id?: number;
+    id: number;
     fecha: Date;
     hora: string;
     ritmo: string;

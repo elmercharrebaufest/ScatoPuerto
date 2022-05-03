@@ -116,6 +116,7 @@
     <Compile Include="Comandos\EnviarMensajesAsincronoCartelLed.cs" />
     <Compile Include="Comandos\GuardarEtiquetaPuerto.cs" />
     <Compile Include="Comandos\GuardarModuloDeCarga.cs" />
+    <Compile Include="Comandos\GuardarNirManual.cs" />
     <Compile Include="Comandos\GuardarPlanillaDeTurnos.cs" />
     <Compile Include="Comandos\ImprimirEtiquetaPuerto.cs" />
     <Compile Include="Comandos\ImprimirFileGenerico.cs" />
@@ -681,6 +682,8 @@
     <Compile Include="Consultas\Expresiones.cs" />
     <Compile Include="Consultas\Paginacion.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\ConfiguracionKeyValueDto.cs" />
     <Compile Include="Dto\EficienciaCalado\ConfiguracionHorarioDto.cs" />
     <Compile Include="Dto\EficienciaCalado\EficienciaCaladoDatosGraficosDto.cs" />
@@ -746,9 +749,9 @@
     <Compile Include="Dto\ModuloDeCargaManosDeEmbarqueHistoricoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPeriodoDeCargaDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeEmbarqueDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosTurnosCortesDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosTurnosDetallesDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosTurnosDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosCortesDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDto.cs" />
     <Compile Include="Dto\ModuloDeCargaRitmosEmbarqueDto.cs" />
     <Compile Include="Dto\ModuloDeCargaTabiquesDeEmbarqueDto.cs" />
     <Compile Include="Dto\ModuloDeCargaTabiquesDeEmbarqueHistoricoDto.cs" />
@@ -757,7 +760,7 @@
     <Compile Include="Dto\MotivosFallasBalanzaDto.cs" />
     <Compile Include="Dto\MotivosLimpiezaDto.cs" />
     <Compile Include="Dto\ModuloDeCargaNirManualPuertoDto.cs" />
-    <Compile Include="Dto\ObservacionesDeCalidadDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\NotificacionAplicacionDto.cs" />
     <Compile Include="Dto\NotificacionCpeDto.cs" />
     <Compile Include="Dto\NotificacionSemaforoVagonesAutomaticaDto.cs" />
@@ -980,9 +983,11 @@
     <Compile Include="Entidades\ModuloDeCargaManosDeEmbarqueHistorico.cs" />
     <Compile Include="Entidades\ModuloDeCargaPeriodoDeCarga.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeEmbarque.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosTurnos.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosTurnosCortes.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosTurnosDetalles.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnos.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortes.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesSolido.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\ModuloDeCargaRitmosEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarque.cs" />
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarqueHistorico.cs" />
@@ -995,7 +1000,7 @@
     <Compile Include="Entidades\NotificacionAplicacion.cs" />
     <Compile Include="Entidades\PinchazosPorCalada.cs" />
     <Compile Include="Entidades\ModuloDeCargaNirManualPuerto.cs" />
-    <Compile Include="Entidades\ObservacionesDeCalidad.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\PlanoDeCargaAgenteControlPrivadoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodega.cs" />
     <Compile Include="Entidades\CargaComercial.cs" />

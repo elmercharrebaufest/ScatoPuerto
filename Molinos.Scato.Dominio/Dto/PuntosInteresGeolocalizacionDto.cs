@@ -12,6 +12,11 @@ namespace Molinos.Scato.Dominio.Dto
         public double HorasSanBenito { get; set; }
         public string Latitud { get; set; }
         public string Longitud { get; set; }
+        public decimal DistanciaKM { get; set; }
+        public decimal RadioPunto { get; set; }
+        public string TipoZona { get; set; }
+        public string AgrupadorZona { get; set; }
+        public short PosicionZona { get; set; }
         public short Estado { get; set; }
         public DateTime FechaRegistro { get; set; }
 

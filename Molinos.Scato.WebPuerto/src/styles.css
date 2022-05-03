@@ -259,6 +259,13 @@ body {
     z-index: 997 !important;
 }
 
+.modal-geo{
+    z-index: 5001 !important;
+}
+.window-modal-geo{
+    z-index: 5002 !important;
+}
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button{
     -webkit-appearance: none;
