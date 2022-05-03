@@ -331,8 +331,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit, AfterViewInit {
        turno.enviado = false;
        turno.fecha = new Date();
        turno.fechaMiliseconds = new Date().getTime();
-       
-       this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id).subscribe((turnoDb: PlanillaDeTurnos) => {
+       const esLiquido: boolean=  false; 
+       this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido).subscribe((turnoDb: PlanillaDeTurnos) => {
 
          if (turnoDb == null){
 

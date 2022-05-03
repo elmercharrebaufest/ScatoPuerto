@@ -9225,12 +9225,12 @@ namespace Molinos.Scato.Servicios.Impl
             return 0;
         }
 
-        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id)
+        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido)
         {
             ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
             DateTime dateWithoutHours = new DateTime();
             dateWithoutHours = DateTime.Now.Date;
-            moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id);
+            moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
 
             if (moduloDeCargaPlanillaDeTurnosDto != null)
             {
@@ -10174,8 +10174,7 @@ namespace Molinos.Scato.Servicios.Impl
             var ritmoAcumuladoLiquidos = 0;
             var totalTiempoCorte = 0;
             var ritmoAcumuladoNeto = 0;
-           var planillaDeTurnosTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
-            if (planillaDeTurnosTurnos !=null)
+
             var planillaDeTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
             if (planillaDeTurnos != null)
             {
@@ -10187,8 +10186,8 @@ namespace Molinos.Scato.Servicios.Impl
                     var idPlanilla = turn.Id;
                     var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
                     var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetallesLiquido;
-                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
-                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetalles;
+                    //var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
+                    //var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetalles;
 
                     foreach (var item in turnosDetalles)
                     {
