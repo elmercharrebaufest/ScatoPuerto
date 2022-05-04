@@ -132,6 +132,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   initLinea(planilla?: PlanillaDeEmbarque) {
     var result= localStorage.getItem('desabilitar');
     return this.builder.group({
+      id: {value:planilla?.id ? planilla.id :'',  disabled:result=='true'?true:false},
       exportador: {value:planilla?.exportador ? planilla.exportador :'',  disabled:result=='true'?true:false},
       bodegaParcel: {value:planilla?.bodegaParcel ? planilla.bodegaParcel : '',  disabled:result=='true'?true:false},
       tanqueDeAbordo: { value: planilla?.tanqueDeAbordo ? planilla.tanqueDeAbordo : '', disabled: true },
@@ -193,10 +194,16 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
   guardar() {
 
-      this.moduloCargaService.guardarPlanillaDeEmbarque(this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto != null && x.exportador != null && x.destino != null) , this.idModuloDeCarga).subscribe( res => {
+      this.moduloCargaService.guardarPlanillaDeEmbarque(this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto != null && x.exportador != null && x.destino != null) , this.idModuloDeCarga).subscribe( 
+      res => {
       console.log(res);
       let texto = "Se guardo la planilla de embarque correctamente";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-    } );
+      
+    },
+    err =>{},
+    () => {
+      this.newForm();
+    });
   }
 }
