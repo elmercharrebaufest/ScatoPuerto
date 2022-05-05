@@ -221,73 +221,63 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.confirmationDialogService.confirm('¡Atención!', 'Debes elegir una fecha para el turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
   }
+  
   addTurnoFechaSeleccionada (turno, exitFunction, diaTurnoToAdd, fechaSeleccionada){
 
-        //Si la fecha es válida tengo que revisar que el turno en esa fecha esté disponible.
+    //Si la fecha es válida tengo que revisar que el turno en esa fecha esté disponible.
 
-        this.formTurnos.get('diasTurno')['controls'].forEach((dia, diaIndex) => {
-          // //Si el día ya está agregado
-          if (new Date(dia.controls.diaTurno.value).getFullYear()  == fechaSeleccionada.getFullYear() &&
-          new Date(dia.controls.diaTurno.value).getMonth()  == fechaSeleccionada.getMonth() &&
-          new Date(dia.controls.diaTurno.value).getDate()  == fechaSeleccionada.getDate()){
-            dia.controls.turnos.controls.forEach(turnoLista => {
-              if (turnoLista.value.turnoPuerto.turnoPuerto.id == turno){
-                this.confirmationDialogService.confirm('¡Atención!', 'El turno que deseas agregar no se encuentra disponible.', 'Cerrar', '', null, null, Tipoalerta.Warning)
-                exitFunction = true;
-              }
-            });
-            //El día ya existe en la lista
-            diaTurnoToAdd = diaIndex;
+    this.formTurnos.get('diasTurno')['controls'].forEach((dia, diaIndex) => {
+      // //Si el día ya está agregado
+      if (new Date(dia.controls.diaTurno.value).getFullYear()  == fechaSeleccionada.getFullYear() &&
+      new Date(dia.controls.diaTurno.value).getMonth()  == fechaSeleccionada.getMonth() &&
+      new Date(dia.controls.diaTurno.value).getDate()  == fechaSeleccionada.getDate()){
+        dia.controls.turnos.controls.forEach(turnoLista => {
+          if (turnoLista.value.turnoPuerto.turnoPuerto.id == turno){
+            this.confirmationDialogService.confirm('¡Atención!', 'El turno que deseas agregar no se encuentra disponible.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+            exitFunction = true;
           }
         });
+        //El día ya existe en la lista
+        diaTurnoToAdd = diaIndex;
+      }
+    });
 
-        if (exitFunction){
-          return;
-        }
-        this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar el turno seleccionado?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
-          .then((confirmed) => {
-            if (confirmed) {
-                //Si llegamos hasta aca es porque tenemos que crear el turno.
-                let turnoNuevo: PlanillaDeTurnos = new PlanillaDeTurnos();
+    if (exitFunction){
+      return;
+    }
+    this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar el turno seleccionado?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      .then((confirmed) => {
+        if (confirmed) {
+            //Si llegamos hasta aca es porque tenemos que crear el turno.
+            let turnoNuevo: PlanillaDeTurnos = new PlanillaDeTurnos();
             turnoNuevo.guardadoPorTablerista = false;
+            turnoNuevo.fecha = fechaSeleccionada;
+            turnoNuevo.fechaMiliseconds = fechaSeleccionada.getTime();
+            this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
+              res.forEach((turnoPuerto: TurnoPuerto) => {
+                if (turnoPuerto.id == turno){
+                    turnoNuevo.turnoPuerto = turnoPuerto;
 
-                turnoNuevo.fecha = fechaSeleccionada;
-                turnoNuevo.fechaMiliseconds = fechaSeleccionada.getTime();
-                this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
-                  res.forEach((turnoPuerto: TurnoPuerto) => {
-                    if (turnoPuerto.id == turno){
-                        turnoNuevo.turnoPuerto = turnoPuerto;
-
-                        //Si diaTurnoToAdd > -1 es porque el turno pertenecea un día existente y simplemente tengo que agregar el turno en ese día.
-                        if (diaTurnoToAdd > -1){
-                            this.setTurno(diaTurnoToAdd,turnoNuevo, true);
-                            //Y ordenar el array del día correspondiente
-                            this.formTurnos.get('diasTurno')['controls'][diaTurnoToAdd].controls.turnos;
-                        }else{
-                            diaTurnoToAdd = 0;
-
-                            this.setDia(null, turnoNuevo, fechaSeleccionada);
-                        }
-
-                  }
-
+                    //Si diaTurnoToAdd > -1 es porque el turno pertenecea un día existente y simplemente tengo que agregar el turno en ese día.
+                    if (diaTurnoToAdd > -1){
+                        this.setTurno(diaTurnoToAdd,turnoNuevo, true);
+                        //Y ordenar el array del día correspondiente
+                        this.formTurnos.get('diasTurno')['controls'][diaTurnoToAdd].controls.turnos;
+                    }else{
+                        diaTurnoToAdd = 0;
+                        this.setDia(null, turnoNuevo, fechaSeleccionada);
                     }
-            }
-
-                  })
-
+                }
               })
-
-                });
-                this._modalService.dismissAll();
-            }
-          }).catch(() => {
-            this._modalService.dismissAll()
-
-          });
+            });
+            this._modalService.dismissAll();
+        }
+      }).catch(() => {
+        this._modalService.dismissAll()
+      });
 
 
-  }
+}
 
   fillPlanilla(){
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
@@ -1381,7 +1371,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<AUTO GENERATED BY CONFLICT EXTENSION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEV
         // fs.saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
         saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
       });
@@ -1393,7 +1382,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     return (restaEmbarcar >= 0 ? restaEmbarcar : 0 );
   }
 
-   enviarPlanillaTurno(dia, turno, mail) {
+  enviarPlanillaTurno(dia, turno, mail) {
   
     // async enviarPlanillaTurno(dia, turno, mail) {
         // this.enviarMail();
@@ -1452,9 +1441,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
                       }
                     }).catch((
                       ) => window.location.reload());
-        fs.saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
-      });
-  }
+                  });
+        }
+        else 
+        this.messageService.add({ severity: 'warn', detail: 'Error de Datos', summary: 'No hay datos a enviar', key: 'enviar-turno' });
+
+   }
 
    guardarTurno(Turno: PlanillaDeTurnos, reload: boolean = false){
      Turno.fecha =  new Date();
@@ -1462,6 +1454,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
        this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos.push(Turno);
        this.fillPlanilla();
      }, error => {
+       console.log(error);
       this.confirmationDialogService.confirm('¡Error!', 'No se ha podido guardar el turno.', 'Cerrar', '', null, null, Tipoalerta.Error)
      })
    };

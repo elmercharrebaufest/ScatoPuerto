@@ -124,7 +124,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         {
                             //int Id { get; set; }
                             ModuloDeCargaPlanillaDeTurnos = planilla,
-                            BodegaParcel = cargaSolido.Bodega.Id,
                             MaterialPuerto = cargaSolido.Material,
                             Destino = cargaSolido.Destino,
                             Exportador = cargaSolido.Exportador,
