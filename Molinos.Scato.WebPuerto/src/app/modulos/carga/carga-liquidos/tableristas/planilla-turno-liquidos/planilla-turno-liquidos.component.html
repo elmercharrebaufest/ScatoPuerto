@@ -15,7 +15,8 @@
     <br>
     
     <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
-        <div class='mt-4 px-4 pb-4' style="height: 800px;">
+        
+        <div class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
             <table class='table table-bordered turnos'>
@@ -126,7 +127,7 @@
                                             </tr>
                                         </ng-container>
                                     </ng-container>
-                                    <tr class='table-active'>
+                                    <tr>
                                         <td colspan="12" class='btn-add-cell'>
                                             <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                 <button type='button' class='btn btn-primary bt-circle'
@@ -150,7 +151,7 @@
                                                 <tbody>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
-                                                            <tr>
+                                                            <tr class='tabla-fila-corte'>
                                                                 <td colspan="4">
                                                                     {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                 </td>
