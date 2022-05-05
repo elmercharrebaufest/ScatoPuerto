@@ -611,17 +611,28 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   // updateObsCalidad(obsCalidad){
   //   this.obsCalidadForm.patchValue(obsCalidad);
   // }
-
+  
+  agregarCorteLiquido(dia, turno){
+    this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar un corte en la hora indicada?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      .then((confirmed) => {
+        if (confirmed) {
+            this.getCorteTurnos(dia, turno).push(this.initCorte(this.formCorte.getRawValue()));
+        }
+      }).catch(() => {
+      });
+  }
   openModalCorte(modal, dia, turno) {
+    
     this.formCorte.reset();
 
     if (!this.getTurnos(dia)['controls'][turno]['controls'].guardadoPorTablerista.value) {
       this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result.then(() => {
-        this.getCorteTurnos(dia, turno).push(this.initCorte(this.formCorte.getRawValue()));
+        this.agregarCorteLiquido(dia, turno);
       })
     }else{
       this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un corte a un turno cerrado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
+
   }
 
   //Calcula el total de tiempo de los cortes

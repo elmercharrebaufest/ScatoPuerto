@@ -20,6 +20,7 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { Embarque } from '@ScatoModels/embarque';
 import { PlanoContentComponent } from 'app/modulos/lineup/plano-de-carga/plano-content/plano-content.component';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
+import { Mail } from '@ScatoModels/mail';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -716,19 +717,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return buffer;
   }
 
-  async generarExcelPorParcel(){
+  async generarExcelPorParcel(bEnviarPlanilla: boolean){
     let fname = "parcels";
-    let header = ["Exportador","Partida","Tks de abordo",,"Destino","Tks Tierra",,"TN","Producto"];
-    let headerDetalles = ["Exportador","Línea","Partida", "Producto", "Tk" , "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.","Med. fin. Cm.", "Destino", "Cant."];
-    let headerCortes = ["Motivo","Inicio","Fin","Tiempo total","Observaciones"];
-    let headerObservacionesDeCalidad = ["Observaciones","Fecha","Hora"];
-    let referencias = ["REFERENCIAS",
-      "CSBO = ACTE CRUDO DE SOJA",
-      "CSFO = ACTE CRUDO DE GSOL.",
-      "RSBO = ACTE REFINADO DE SOJA",
-      "RSFO = ACTE REFINADO DE GSOL.",
-      "FAME = BIODIESEL"];
+    const headerDetalles = ["Exportador","Bodega", "Producto", "Destino", "Cant."];
+    const headerCortes = ["Motivo","Inicio","Fin","Tiempo total","Observaciones"];
+    const headerObservaciones = ["Fecha","Hora","Observación de calidad"];
     
+    // let datosModal = this.obtenerDatosExportarParcel();
     const imgMolinos = await this.getImgMolinos();
     // datosModal.parcelSeleccionados.forEach((element, i) => {
       let workbook = new Workbook();
@@ -796,82 +791,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       });
       worksheet.getCell('C1').value = "Código: F-XXXX";
       worksheet.getCell('I1').value = "Revisión: 01";
-      worksheet.getCell('C4').value = "Título: Planilla Embarque de Líquidos";
+      worksheet.getCell('C4').value = "Título: Planilla Embarque de Solidos";
       worksheet.getCell('A5').alignment = { vertical: 'middle', horizontal: 'right' };
       worksheet.getCell('A5').value = "Buque:";
       worksheet.getCell('C5').value = this.procesoService.getEmbarqueSelected().nombreBuque;
 
-      /* Planilla de embarque */
-      //Martín: revisar
-      [8,9,10,11,12,13,14,15,16,17].forEach((x)=>{
-        worksheet.mergeCells(`C${x}:D${x}`);
-        worksheet.mergeCells(`F${x}:G${x}`);
-      });
-
-      // worksheet.getCell('A9').value = "PEPE"
-
-      
-      let headerInserted1 = worksheet.getRow(8);
-      header.forEach((text, index)=>{
-        let currentCell = headerInserted1.getCell(index + 1);
-        if(text){
-          currentCell.value = text;
-          currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
-          currentCell.fill = {
-            type: 'pattern',
-            pattern:'solid',
-            fgColor:{argb:'FFCCFFCC'}
-          }
-          currentCell.border = {
-            top: {style:'thin'},
-            left: {style:'thin'},
-            bottom: {style:'thin'},
-            right: {style:'thin'}
-          }
-          currentCell.font = {
-            name: 'Arial',
-            family: 2,
-            size: 11,
-            bold: true
-          }
-        }
-      });
-
-      
-      let rowOffset = 9;
-      let planillaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeEmbarque;
-      let PlanillaEmbarqueData = worksheet.getRows(rowOffset, planillaDeEmbarque.length)
-      PlanillaEmbarqueData.forEach((row, i) => {
-        let currentRow = worksheet.getRow(rowOffset + i);
-        currentRow.getCell('A').value = planillaDeEmbarque[i].exportador.nombre;
-        // currentRow.getCell('B').value =  planillaDeEmbarque[i].bodega;
-        currentRow.getCell('C').value = planillaDeEmbarque[i].tanqueDeAbordo;
-        currentRow.getCell('E').value = planillaDeEmbarque[i].destino.nombre;
-        currentRow.getCell('F').value = planillaDeEmbarque[i].tk;
-        currentRow.getCell('H').value = planillaDeEmbarque[i].tn;
-        currentRow.getCell('I').value = planillaDeEmbarque[i].materialPuerto.descripcion;
-
-      });
-
-      let rowsTable1 = worksheet.getRows(9, planillaDeEmbarque.length);
-      rowsTable1.forEach((row)=>{
-        [1,2,3,4,5,6,7,8,9].forEach((number)=>{
-          let currentCell = row.getCell(number);
-          currentCell.border = {
-            top: {style:'thin'},
-            left: {style:'thin'},
-            bottom: {style:'thin'},
-            right: {style:'thin'}
-          }
-        });
-      });
-
-
-      referencias.forEach((ref, index)=>{
-        let numCelda = index + 8;
-        let currentCell = worksheet.getCell(`K${numCelda}`);
-        currentCell.value = ref;
-      });
       //Ordeno por turno
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
         if (a.turnoPuerto.id > b.turnoPuerto.id) return 1;
@@ -903,8 +827,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         }
         });
 
+
+        console.log('modulo de carga')
+        console.log(this._procesoService.getModuloDeCarga())
         
-      let baseCell = 20;//37
+      let baseCell = 9;//37
 
       let offset = baseCell;
       //Calculo la cantidad de rows que va a ocupar la planilla
@@ -931,27 +858,44 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0){
            /* Planilla de turnos */
           headerDetalles.forEach((text, index)=>{
+            
+            let currentCellDiv = worksheet.getRow(offset).getCell(index + 1);
+                currentCellDiv.fill = {
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{argb:'FFCCFFCC'}
+                }
+                currentCellDiv.border = {
+                  top: {style:'thin'},
+                  left: {style:'thin'},
+                  bottom: {style:'thin'},
+                  right: {style:'thin'}
+                }
+
             let currentCell = worksheet.getRow(offset).getCell(index + 3);
+            
             if(text){
-              currentCell.value = text;
-              currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
-              currentCell.fill = {
-                type: 'pattern',
-                pattern:'solid',
-                fgColor:{argb:'FFCCFFCC'}
-              }
-              currentCell.border = {
-                top: {style:'thin'},
-                left: {style:'thin'},
-                bottom: {style:'thin'},
-                right: {style:'thin'}
-              }
-              currentCell.font = {
-                name: 'Arial',
-                family: 2,
-                size: 11,
-                bold: true
-              }
+               
+               currentCell.value = text;
+               currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
+               currentCell.fill = {
+                 type: 'pattern',
+                 pattern:'solid',
+                 fgColor:{argb:'FFCCFFCC'}
+               }
+               currentCell.border = {
+                 top: {style:'thin'},
+                 left: {style:'thin'},
+                 bottom: {style:'thin'},
+                 right: {style:'thin'}
+               }
+               currentCell.font = {
+                 name: 'Arial',
+                 family: 2,
+                 size: 11,
+                 bold: true
+               }
+
             }
           });
 
@@ -968,44 +912,15 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
               registrosTurno += registroCorte;
               
           }
+          if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0){
+              const numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length ;
+              registrosTurno += numeroObservaciones + 1; 
+          }
           const inicioTurnoMerge = offset; 
           const finTurnoMerge = offset + registrosTurno;
           worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
           worksheet.getCell(`B${inicioTurnoMerge}`).value = nombreTurno;
           worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center'}
-
-          if (turno.moduloDeCargaPlanillaDeTurnosCortes.length == 0){
-              if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0 ){
-                if (numeroTurno != totalNumeroTurnos){
-                const filaRellenoTurno = inicioTurnoMerge + numRegistroTurno;
-                worksheet.getCell(`B${filaRellenoTurno}`).fill = {
-                  type: 'pattern',
-                  pattern:'solid',
-                  fgColor:{argb:'FFCCFFCC'}
-                };
-                };
-            }
-          }
-          if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0){
-            if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0 ){
-              let filaRellenoTurno = finTurnoMerge;
-              if (numeroTurno != totalNumeroTurnos){
-                  filaRellenoTurno = finTurnoMerge + 1;
-                  worksheet.getCell(`B${filaRellenoTurno}`).fill = {
-                    type: 'pattern',
-                    pattern:'solid',
-                    fgColor:{argb:'FFCCFFCC'}
-                  };
-              }
-          }
-        }
-
-          worksheet.getCell(`B${offset}`).border = {
-            top: {style:'thin'},
-            left: {style:'thin'},
-            bottom: {style:'thin'},
-            right: {style:'thin'}
-          }
 
           turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach((turno: any, index) => {
 
@@ -1016,14 +931,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
             }
             
             worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
-            worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
-            worksheet.getRow(offset).getCell(5).value = turno.bodega;
-            worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
-            worksheet.getRow(offset).getCell(13).value = turno.destino.nombre;
-            worksheet.getRow(offset).getCell(14).value = turno.cantidad;
+            worksheet.getRow(offset).getCell(4).value = turno.bodegaParcel;
+            worksheet.getRow(offset).getCell(5).value = turno.materialPuerto.descripcion;
+            worksheet.getRow(offset).getCell(6).value = turno.destino.nombre;
+            worksheet.getRow(offset).getCell(7).value = turno.cantidad;
             
-            let celdaDetalle = 3
-            for (let indexCell = 1; indexCell<=12; indexCell++) {
+            let celdaDetalle = 2
+            for (let indexCell = 1; indexCell<=6; indexCell++) {
                  worksheet.getRow(offset).getCell(celdaDetalle).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }  
                  celdaDetalle+=1;
             }            
@@ -1034,14 +948,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
         if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0){
           
-          worksheet.mergeCells(`C${offset}:D${offset}`);
-          worksheet.mergeCells(`E${offset}:F${offset}`);
-          worksheet.mergeCells(`G${offset}:H${offset}`);
-          worksheet.mergeCells(`I${offset}:J${offset}`);
-          worksheet.mergeCells(`K${offset}:N${offset}`);
-
           headerCortes.forEach((text, index)=>{
-          let currentCell = worksheet.getRow(offset).getCell(3 + (2 * index));
+          let currentCell = worksheet.getRow(offset).getCell(3 + (index));
 
           if(text){
             currentCell.value = text;
@@ -1069,29 +977,73 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
          offset = offset + 1;
          turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((turno: CorteTurno, index) => {
 
-            worksheet.mergeCells(`C${offset}:D${offset}`);
-            worksheet.mergeCells(`E${offset}:F${offset}`);
-            worksheet.mergeCells(`G${offset}:H${offset}`);
-            worksheet.mergeCells(`I${offset}:J${offset}`);
-            worksheet.mergeCells(`K${offset}:N${offset}`);
-
             worksheet.getRow(offset).getCell(3).value = turno.motivosDeCorte.nombre;
-            worksheet.getRow(offset).getCell(5).value = turno.horaInicio;
-            worksheet.getRow(offset).getCell(7).value = turno.horaFin;
-            worksheet.getRow(offset).getCell(9).value = turno.tiempoTotal;
-            worksheet.getRow(offset).getCell(11).value = turno.observaciones;
+            worksheet.getRow(offset).getCell(4).value = turno.horaInicio;
+            worksheet.getRow(offset).getCell(5).value = turno.horaFin;
+            worksheet.getRow(offset).getCell(6).value = turno.tiempoTotal;
+            worksheet.getRow(offset).getCell(7).value = turno.observaciones;
             
             let celdaCorte = 3
             for (let indexCell = 1; indexCell<=5; indexCell++) {
                  worksheet.getRow(offset).getCell(celdaCorte).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }
-                 celdaCorte += 2; 
+                 celdaCorte += 1; 
             }
             
             offset = offset + 1;
           });
 
        }
-        
+       if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0){
+            headerObservaciones.forEach((text, index)=>{
+              let currentCell = worksheet.getRow(offset).getCell(3 + (index));
+
+              if (index == 2){
+                 worksheet.mergeCells(`E${offset}:G${(offset)}`);
+              }
+
+              if(text){
+                currentCell.value = text;
+                currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
+                currentCell.fill = {
+                  type: 'pattern',
+                  pattern:'solid',
+                  fgColor:{argb:'FFC5101A'}
+                }
+                currentCell.border = {
+                  top: {style:'thin'},
+                  left: {style:'thin'},
+                  bottom: {style:'thin'},
+                  right: {style:'thin'}
+                }
+                currentCell.font = {
+                  name: 'Arial',
+                  family: 2,
+                  size: 11,
+                  bold: true
+                }
+              }
+            });
+
+            offset = offset + 1;
+            turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.forEach((observacion, index) => {
+              //if (index == 2){
+                worksheet.mergeCells(`E${offset}:G${(offset)}`);
+              //}
+              worksheet.getRow(offset).getCell(3).value = observacion.fecha;
+              worksheet.getRow(offset).getCell(4).value = observacion.hora;
+              worksheet.getRow(offset).getCell(5).value = observacion.observaciones;
+              
+              let celdaCorte = 3
+              for (let indexCell = 1; indexCell<=5; indexCell++) {
+                   worksheet.getRow(offset).getCell(celdaCorte).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }
+                   celdaCorte += 1; 
+              }
+              
+              offset = offset + 1;
+            });
+            
+       }
+       
       });
 
 
@@ -1111,8 +1063,14 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
               if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0){
                 CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosCortes?.length + 1);
               }
+              if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0){
+                CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad?.length + 1);
+              }
             }
           });
+          console.log('CantRows--->')
+          console.log(CantRows)
+          if(CantRows == 0 ) continue;
           
           const diaTurno = `${(fechaDia.getDate())}`.padStart(2,'0');
           const mesTurno = `${(fechaDia.getMonth()+1)}`.padStart(2,'0');
@@ -1173,10 +1131,54 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
      
         }
       
-      workbook.xlsx.writeBuffer().then((data) => {
-        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        fs.saveAs(blob, fname + /*'-' + i +*/ '.xlsx');
+        workbook.xlsx.writeBuffer().then((data) => {
+          let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          
+          
+          if (bEnviarPlanilla){
+              this.enviarPlanillaSolido(blob);
+          }else{
+            fs.saveAs(blob, fname + '.xlsx');
+          }
+        });
+  }
+  private enviarPlanillaSolido(blob){ 
+
+    const titulo = "Enviar Planilla de Turno Solido";
+    const text = "Cuerpo del Mail:"
+    const textoCuerpoMail = `Se enviara la planilla de turnos. \n
+      Buque: ${this.embarque.nombreBuque}`;
+      const inputTitle = "Destinatarios";
+      const mail = new Mail(`Planilla de turnos.`,`${textoCuerpoMail}`);
+    this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosSolido').subscribe(x => mail.destinatarios = x);
+    const button1 = 'Enviar';
+    const button2 = 'Cancelar';
+
+    this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mail, null, inputTitle, true)
+      .then(async (confirmed) => {
+        if (confirmed) {
+            this.hideSpinner.emit(true);
+            
+          const convertBlobToBase64 = (blob) => new Promise((resolve, reject) => {
+              const reader = new FileReader;
+              reader.onerror = reject;
+              reader.onload = () => {
+                  resolve(reader.result);
+              };
+              reader.readAsDataURL(blob);
+          });
+          
+          const base64String = await convertBlobToBase64(blob);
+          this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(this.idModuloDeCarga, mail, base64String).subscribe(resp =>{});
+        }
+      })
+      .catch((e) => {
+
+          this.hideSpinner.emit(false)
+          return
+        this.hideSpinner.emit(false);
       });
+
   }
 
   calcularRestaEmbarcar(): number{

@@ -75,16 +75,21 @@ export class ModuloDeCargaService {
   }
 
    guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail:any): Observable<any>{
-
     var ObjetoMail = {
       planillaDeTurnos : planillaDeTurnos,
       mail:mail
     }
-    console.log("PLANILLA: ", ObjetoMail)
-    // ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosCortes = undefined;
-    //ObjetoMail.planillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesLiquido = undefined;
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosMail?idModuloDeCarga=${idModuloDeCarga}`, ObjetoMail, { 'withCredentials': true});
-   // return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`,  planillaDeTurnos, { 'withCredentials': true});
+  }
+
+  guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga: number, mail:any, data: any): Observable<any>{
+
+    var objetoEnvioPlanillaTurno = {
+      mail : mail,
+      archivo: data
+    }
+
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosEnviarMail?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
   }
 
   /**
@@ -111,8 +116,8 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga`, {'withCredentials': true});
   }
 
-   obtenerDestinatariosPlanillaTurnos() {
-    return this.http.get<string[]>(`${this.url}ModuloDeCarga/ObtenerDestinatariosPlanillaTurnos`, { 'withCredentials' : true});
+  obtenerDestinatariosPlanillaTurnos(templateMail) {
+    return this.http.get<string[]>(`${this.url}ModuloDeCarga/ObtenerDestinatariosPlanillaTurnos?templateMail=${templateMail}`, { 'withCredentials' : true});
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number){
