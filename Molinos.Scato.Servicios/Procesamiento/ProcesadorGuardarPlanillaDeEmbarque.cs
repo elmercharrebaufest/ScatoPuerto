@@ -36,6 +36,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     planillaDeEmbarque.FechaFinalizacionCarga = comando.Dto.FechaFinalizacionCarga;
                     planillaDeEmbarque.TanqueDeAbordo = comando.Dto.TanqueDeAbordo;
                     planillaDeEmbarque.Tk = comando.Dto.Tk;
+                    planillaDeEmbarque.Tn = comando.Dto.Tn;
                     planillaDeEmbarque.Cantidad = comando.Dto.Cantidad;
                     planillaDeEmbarque.BodegaParcel = comando.Dto.BodegaParcel;
                 }
@@ -55,6 +56,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         FechaFinalizacionCarga = comando.Dto.FechaFinalizacionCarga,
                         TanqueDeAbordo = comando.Dto.TanqueDeAbordo,
                         Tk = comando.Dto.Tk,
+                        Tn = comando.Dto.Tn,
                         Cantidad = comando.Dto.Cantidad,
                         BodegaParcel = comando.Dto.BodegaParcel
                     };
