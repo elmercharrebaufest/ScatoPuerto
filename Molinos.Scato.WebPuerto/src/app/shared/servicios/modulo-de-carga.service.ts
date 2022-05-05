@@ -68,8 +68,8 @@ export class ModuloDeCargaService {
    * @returns {Observable<any>}
    */
 
-  guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`, planillaDeTurnos, { 'withCredentials': true});  
+  guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false){
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}?enviado=${enviado}`, planillaDeTurnos, { 'withCredentials': true});  
   }
 
    guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail:any): Observable<any>{
@@ -126,5 +126,9 @@ export class ModuloDeCargaService {
   }
   obtenerListadoBodegas(): Observable<Bodega[]>{
     return this.http.get<Bodega[]>(`${this.url}ModuloDeCarga/ListadoBodegas`, { 'withCredentials' : true});
+  }
+
+  eliminarObservacionDeCalidad( observacion_id: number ){
+    return this.http.post(`${this.url}ModuloDeCarga/EliminarObservacionDeCalidad?observacion_id=${observacion_id}`, { 'withCredentials': true });
   }
 }

@@ -9996,6 +9996,41 @@ resultado.Patente = rutaFoto.Patente;
 
         }
 
+
+        public IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga)
+        {
+            try
+            {
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return null;
+
+
+                int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarqueBase.Id).Vapor.Id;
+
+                CargaFiltroDto filtro = new CargaFiltroDto();
+
+
+                Expression<Func<Carga, bool>> expresionFiltro = null;
+
+
+                expresionFiltro = x =>
+                       (vapor_id == x.Vapor.Id) &&
+                       (x.FechaInicio > embarqueBase.FechaHoraInicioCarga) &&
+                        (x.CargaOpuesta_Id > 0);
+
+                return Listar<Carga, CargaDto>(expresionFiltro);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
         public IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion()
         {
             try
@@ -10394,6 +10429,13 @@ resultado.Patente = rutaFoto.Patente;
         public IList<EntidadTipoDeActividadDto> ListarActividadesPorEntidad(string codigoEntidad)
         {
             return Listar<EntidadTipoDeActividad, EntidadTipoDeActividadDto>(x => x.Entidad.Codigo == codigoEntidad);
+        }
+        public void EliminarObservacionDeCalidad(int observacion_id)
+        {
+            ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
+            repositorio.Remover(obs);
+            repositorio.GuardarCambios();
+
         }
     }
 }

@@ -2636,5 +2636,12 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ModuloDeCargaNirManualPuertoDto> ObtenerModuloDeCargaNirManualPuerto(int IdModuloDeCarga);
+
+        [OperationContract]
+        IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
+
+
+        [OperationContract]
+        void EliminarObservacionDeCalidad(int observacion_id);
     }
 }

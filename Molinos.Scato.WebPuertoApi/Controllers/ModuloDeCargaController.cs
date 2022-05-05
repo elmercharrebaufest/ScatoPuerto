@@ -263,12 +263,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
-        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos)
+        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false)
         {
             try
             {
                 var resultado = new ResultadoPrevisualizar();
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga });
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado});
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -513,6 +513,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerModuloDeCargaNirManualPuerto(moduloDeCarga_id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ObtenerCargasPlanillaDeTurnosSolido")]
+        public HttpResponseMessage ObtenerCargasPlanillaDeTurnosSolido(int moduloDeCarga_id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerCargasPlanillaDeTurnosSolido(moduloDeCarga_id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/EliminarObservacionDeCalidad")]
+        public HttpResponseMessage EliminarObservacionDeCalidad(int observacion_id)
+        { 
+            try
+            {
+                servicio.EliminarObservacionDeCalidad(observacion_id);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {

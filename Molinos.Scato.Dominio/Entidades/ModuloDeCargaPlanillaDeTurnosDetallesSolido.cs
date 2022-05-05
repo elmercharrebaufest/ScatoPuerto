@@ -7,8 +7,7 @@ namespace Molinos.Scato.Dominio.Entidades
         [Key]
         public virtual int Id { get; set; }
         public virtual ModuloDeCargaPlanillaDeTurnos ModuloDeCargaPlanillaDeTurnos{ get; set; }
-        public virtual int BodegaParcel { get; set; }
-        public virtual int Linea_Id { get; set; }
+        public virtual Bodega Bodega { get; set; }
         public virtual MaterialPuerto MaterialPuerto { get; set; }
         public virtual Destino Destino { get; set; }
         public virtual Exportador Exportador { get; set; }
