@@ -684,7 +684,6 @@
     <Compile Include="Consultas\Paginacion.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaFiltroDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaResultadoDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaListadoDto.cs" />
@@ -1002,7 +1001,6 @@
     <Compile Include="Entidades\NotificacionAplicacion.cs" />
     <Compile Include="Entidades\PinchazosPorCalada.cs" />
     <Compile Include="Entidades\ModuloDeCargaNirManualPuerto.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\PlanoDeCargaAgenteControlPrivadoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodega.cs" />
     <Compile Include="Entidades\CargaComercial.cs" />
