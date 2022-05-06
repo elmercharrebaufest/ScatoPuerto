@@ -15,7 +15,8 @@
     <br>
     
     <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
-        <div class='mt-4 px-4 pb-4' style="height: 800px;">
+        
+        <div class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
             <table class='table table-bordered turnos'>
@@ -59,13 +60,13 @@
                                                 <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
                                                 <span class='turno'>por turno</span>
                                                 <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span><br>
+                                                <button class='btn btn btn-success' style="margin-top: 5px; margin-bottom: 5px" *ngIf="!turno.value.guardadoPorTablerista" (click)='guardarTurnoGeneral(d,t)'>
+                                                    {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Turno guardado'}}
+                                                </button>
+                                                <button  *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t,true)' [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
+                                                    {{!turno.value.guardadoPorTablerista ? 'Enviar turno' : 'Turno enviado'}}
+                                                </button>
                                             </div>
-                                            <!--<button class='btn bt-cerrar-turno' (click)='enviarTurno(d, t, addButton)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
-                                                {{!turno.value.enviado ? 'Enviar Turno' : 'Turno Enviado'}}
-                                            </button>-->
-                                            <button class='btn bt-cerrar-turno' *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t)' [ngClass]='!turno.value.enviado ? "btn-success" : "btn-outline-success"'>
-                                                {{!turno.value.enviado ? 'Guardar Turno' : 'Turno Guardado'}}
-                                            </button>
                                         </td>
                                     </tr>
                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesLiquido'>
@@ -126,7 +127,7 @@
                                             </tr>
                                         </ng-container>
                                     </ng-container>
-                                    <tr class='table-active'>
+                                    <tr>
                                         <td colspan="12" class='btn-add-cell'>
                                             <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                 <button type='button' class='btn btn-primary bt-circle'
@@ -150,7 +151,7 @@
                                                 <tbody>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
-                                                            <tr>
+                                                            <tr class='tabla-fila-corte'>
                                                                 <td colspan="4">
                                                                     {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                 </td>
@@ -395,7 +396,6 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <!-- <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='openModalExportarParcel(exportarParcel)' #exportarParcelButton>Exportar parcel</button> -->
         <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel()'>Exportar planilla</button>
     </div>
     </div>

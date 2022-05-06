@@ -48,12 +48,12 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     });
 
     this.iconoUbicacion = new L.Icon({
-      iconUrl: '../../../../assets/ubicacion.svg',
+      iconUrl: './assets/ubicacion.svg',
       iconSize: [24, 40]
     });
 
     this.iconoAncla = new L.Icon({
-      iconUrl: '../../../../assets/ancla.svg',
+      iconUrl: './assets/ancla.svg',
       iconSize: [24, 40]
     });
 
@@ -289,11 +289,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
 
     var overlayMaps = {
         "<b style='font-family:roboto;font-size:14px'> Referencias </b>": LayerGroup,
-        " <img src='../../../../assets/ubicacion.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'> Muelles </label> " : ubicaciones,
-        " <img src='../../../../assets/ancla.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Fondeaderos y Puertos </label> ": ancla,
-        " <img src='../../../../assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup,
-        " <img src='../../../../assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 01 </label> ": zona01,
-        " <img src='../../../../assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 02 </label> ": zona02
+        " <img src='./assets/ubicacion.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'> Muelles </label> " : ubicaciones,
+        " <img src='./assets/ancla.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Fondeaderos y Puertos </label> ": ancla,
+        " <img src='./assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup,
+        " <img src='./assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 01 </label> ": zona01,
+        " <img src='./assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 02 </label> ": zona02
 
     };
     this.referenciaOverlay = L.control.layers (
@@ -344,11 +344,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
 }
 
   async inicializarMapa() {
-
+    //const mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+    //const grayscale = L.tileLayer(mbUrl, {id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1});
     this.map = L.map('mapa', {
       center: [ -35.340, -56.577],
       zoom: this.zoom
-      
     });
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: ''
@@ -408,16 +408,16 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
           let buqueIconUrl = '';
 
           if (buque.sanBenito)
-              buqueIconUrl = '../../../../assets/buque_san_benito.svg';
+              buqueIconUrl = './assets/buque_san_benito.svg';
           
           if (buque.vicentin)
-              buqueIconUrl = '../../../../assets/buque_vicentin.svg';
+              buqueIconUrl = './assets/buque_vicentin.svg';
           
           if (buque.otrosMuelles)
-              buqueIconUrl = '../../../../assets/buque_otro_muelle.svg';
+              buqueIconUrl = './assets/buque_otro_muelle.svg';
           
           if (buque.noryon)
-              buqueIconUrl = '../../../../assets/buque_nouryon.svg';
+              buqueIconUrl = './assets/buque_nouryon.svg';
           
           this.iconoBuque = new L.Icon({
             iconUrl: buqueIconUrl,

@@ -2645,6 +2645,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
 
-
+        [OperationContract]
+        void EliminarObservacionDeCalidad(int observacion_id);
     }
 }
