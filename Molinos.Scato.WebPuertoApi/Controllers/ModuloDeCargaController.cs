@@ -369,6 +369,43 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         }
 
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosEnviarMail")]
+        public HttpResponseMessage GuardarPlanillaDeTurnosEnviarMail(int IdModuloDeCarga, ObjetoEnvioPlanillaTurno objetoEnvioPlanillaTurno)
+        {
+            try
+            {
+                var resultado = new ResultadoPrevisualizar();
+                var fechaTurno = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+                var docFile = "Planilla de turnos" + fechaTurno + ".xls";
+                List<string> Emails = new List<string>();
+                Emails = objetoEnvioPlanillaTurno.mail.Destinatarios;
+
+
+                byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+                comandos.Ejecutar(new EnvioMail
+                {
+                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body,// "Planilla del dia " + planillaDeTurnosDto.Fecha,
+                    Destinatarios = Emails,
+                    Titulo = $"Planilla de turnos Liquido Modulo de carga " + IdModuloDeCarga,
+                    Attachment = archivoPlanilla,
+                    AttachmentName = docFile
+                });
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        public class ObjetoEnvioPlanillaTurno
+        {
+            public MailDto mail;
+            public string archivo;
+        }
 
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]

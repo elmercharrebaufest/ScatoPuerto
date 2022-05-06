@@ -60,7 +60,7 @@
                                                 <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
                                                 <span class='turno'>por turno</span>
                                                 <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span><br>
-                                                <button class='btn btn btn-success' style="margin-top: 5px;" *ngIf="!turno.value.guardadoPorTablerista" (click)='guardarTurnoGeneral(d,t)'>
+                                                <button class='btn btn btn-success' style="margin-top: 5px; margin-bottom: 5px" *ngIf="!turno.value.guardadoPorTablerista" (click)='guardarTurnoGeneral(d,t)'>
                                                     {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Turno guardado'}}
                                                 </button>
                                                 <button  *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t,true)' [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
