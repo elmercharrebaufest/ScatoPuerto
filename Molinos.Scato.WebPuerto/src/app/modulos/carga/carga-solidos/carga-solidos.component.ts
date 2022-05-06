@@ -56,7 +56,7 @@ export class CargaSolidosComponent implements OnInit {
   materialesPuerto: MaterialPuerto[];
   adjunto: any;
   cargaPdf: boolean = false;
-  
+  inicioCarga: boolean = false;
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
@@ -281,6 +281,10 @@ export class CargaSolidosComponent implements OnInit {
       let texto = "Se envió a Tableristas correctamente";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
+  }
+  
+  obtenerInicioCarga(inicioCarga){
+    this.inicioCarga = inicioCarga;
   }
 
   enviarMail() {

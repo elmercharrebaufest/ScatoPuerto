@@ -40,10 +40,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         {
                             var ModuloDeCargaPlanillaDeTurnos_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
 
-                            ModuloDeCargaPlanillaDeTurnos_DB.Cerrado = comando.Dto.Cerrado;
-                            ModuloDeCargaPlanillaDeTurnos_DB.Enviado = comando.Dto.Enviado;
+                            if(comando.Enviado)
+                                ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
                             ModuloDeCargaPlanillaDeTurnos_DB.EsLiquido = true;
-
+                            
                             if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
                             {
                                 foreach (var detalle in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
@@ -132,9 +132,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             
                             turno_DB.ModuloDeCarga = moduloDeCarga;
                             turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
-                            turno_DB.Cerrado = comando.Dto.Cerrado;
-                            turno_DB.Enviado = comando.Dto.Enviado;
                             turno_DB.EsLiquido = comando.Dto.EsLiquido;
+                            if (comando.Enviado)
+                                turno_DB.GuardadoPorTablerista = true;
 
                         var detalles = new List<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();   
                             if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)

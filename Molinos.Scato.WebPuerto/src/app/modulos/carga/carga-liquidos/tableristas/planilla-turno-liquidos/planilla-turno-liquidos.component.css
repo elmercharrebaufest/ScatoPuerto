@@ -3,6 +3,9 @@
     margin: 0;
     padding: 0;
 }
+.tabla-fila-corte{
+    background-color: #F4F4F4;
+}
 .center-bt{
     margin: auto !important;
 }
