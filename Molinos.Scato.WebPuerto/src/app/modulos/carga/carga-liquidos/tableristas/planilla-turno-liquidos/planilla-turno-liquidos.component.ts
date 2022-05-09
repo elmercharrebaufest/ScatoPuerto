@@ -101,11 +101,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
     
-    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
-      this.embarque = res;
-      this.cargarShipParticular(res);
-    });
-
     this._turnosService.sendBodega.subscribe(res => {
       this.bodegas = res;
       if(this.formExportarExcel) this.addParcelChecks();
@@ -113,6 +108,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
       this.getDestinos();
     });
+
+    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
+      this.embarque = res;
+      this.cargarShipParticular(res);
+    });
+
   }
  ngOnInit(): void {
     this.user = this.session.getUser();
@@ -729,16 +730,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   initTurnoDetalle(detalle:TurnoDetalleLiquido [], turno: PlanillaDeTurnos, turnoIndex?: number){
     let planillaTurnoDetalles = turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'];
     
-    
+     console.log(turno)
+     console.log(detalle)
      if (detalle != null){
         if(detalle.length > 0){
           detalle.forEach(element => {      
-            (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][0]['controls'].guardadoPorTablerista.value));
+            (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][turnoIndex]['controls'].guardadoPorTablerista.value));
           });
 
           //HAGO ESTO PARA COMPLETAR CON LINEAS VACÝAS HASTA LLEGAR A 4.
           for(let i=detalle.length; i<4; i++){
-            (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null,turno['controls'][0]['controls'].guardadoPorTablerista.value));
+            (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null,turno['controls'][turnoIndex]['controls'].guardadoPorTablerista.value));
           }
         }
     //Si no hay detalles completo con 4 lineas vacías.
@@ -757,6 +759,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   initTurno(turnoPuerto?: PlanillaDeTurnos, esNuevoTurno?: boolean) {
     let fg: FormGroup;
+    
+    console.log('turnoPuerto---->>')
+    console.log(turnoPuerto)
 
     if(!esNuevoTurno){
       fg = this._builder.group({      
@@ -787,21 +792,23 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   initLinea(line?: any, guardado?: boolean) {
     return this._builder.group({
-      linea:[{value: line ? line.linea_Id : '', disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      exportador: [{value: line ? line.exportador : '', disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      bodegaParcel: [{value: line ? line.bodegaParcel : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      materialPuerto: [{value: line ? line.materialPuerto :'',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      tk: [{value: line ? line.tk : '' , disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      temperatura: [{value: line ? line.temperatura : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      medidaInicialCM: [{value: line ? line.medidaInicialCM : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      medidaInicialMM:  [{value: line ? line.medidaInicialMM :'',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      medidaFinalCM: [{value: line ? line.medidaFinalCM : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      medidaFinalMM: [{value: line ? line.medidaFinalMM : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      destino: [{value: line ? line.destino.id : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      cantidad: [{value: line ? line.cantidad : '',disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}] ,
-      id:  [{value: line ? line.id : null,disabled: localStorage.getItem('desabilitar')=='true'?true:guardado}]
+      linea:[{value: line ? line.linea_Id : '', disabled: guardado},] ,
+      exportador: [{value: line ? line.exportador : '', disabled: guardado}] ,
+      bodegaParcel: [{value: line ? line.bodegaParcel : '', disabled: guardado}] ,
+      materialPuerto: [{value: line ? line.materialPuerto :'',disabled: guardado}] ,
+      tk: [{value: line ? line.tk : '' , disabled: guardado}] ,
+      temperatura: [{value: line ? line.temperatura : '',disabled: guardado}] ,
+      medidaInicialCM: [{value: line ? line.medidaInicialCM : '',disabled: guardado}] ,
+      medidaInicialMM:  [{value: line ? line.medidaInicialMM :'',disabled: guardado}] ,
+      medidaFinalCM: [{value: line ? line.medidaFinalCM : '',disabled: guardado}] ,
+      medidaFinalMM: [{value: line ? line.medidaFinalMM : '',disabled: guardado}] ,
+      destino: [{value: line ? line.destino.id : '',disabled: guardado}] ,
+      cantidad: [{value: line ? line.cantidad : '',disabled: guardado}] ,
+      id:  [{value: line ? line.id : null,disabled: guardado}]
     })
   }
+
+  
 
   initCorte(corte?: any, guardado?: boolean) {
     if(corte != null){
@@ -1538,6 +1545,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               else
                 return;
             }).catch();
+
       }else if (planillaTurno.guardadoPorTablerista == true) {
         var texto = "El turno ya ha sido guardado anteriormente.";
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
@@ -1548,8 +1556,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               return;
           }).catch();
       }else{
-        this.confirmationDialogService.confirm( enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " +  enviado ? "enviar" : "guardar" + " el turno?", "Aceptar", "Cancelar")
+        this.confirmationDialogService.confirm( enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " +  (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
         .then((confirmed) => {
+          if (confirmed){
             this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
 
               this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
@@ -1566,6 +1575,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               console.log(error);
               this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado? "enviar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
             })       
+          }
         })
         .catch((e) => {
           this.hideSpinner.emit(false)
