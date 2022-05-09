@@ -1,8 +1,6 @@
 ﻿CREATE TABLE [dbo].[ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad]
 (
 	 [Id]     INT            IDENTITY (1, 1) NOT NULL PRIMARY KEY,
-    [Fecha] DATETIME NULL, 
-    [Hora] DATETIME NULL, 
     [FechaHora] DATETIME NULL, 
     [Observaciones] NVARCHAR(200) NULL, 
     [ModuloDeCargaPlanillaDeTurnos_Id] INT NOT NULL

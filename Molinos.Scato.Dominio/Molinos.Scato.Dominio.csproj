@@ -1000,7 +1000,6 @@
     <Compile Include="Entidades\NotificacionAplicacion.cs" />
     <Compile Include="Entidades\PinchazosPorCalada.cs" />
     <Compile Include="Entidades\ModuloDeCargaNirManualPuerto.cs" />
-    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\PlanoDeCargaAgenteControlPrivadoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodega.cs" />
     <Compile Include="Entidades\CargaComercial.cs" />
