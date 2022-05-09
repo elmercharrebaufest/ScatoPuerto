@@ -472,23 +472,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         }
 
-        //[HttpPost]
-        //[Autorizacion(PermisosScato.LineUp)]
-        //[Route("api/ModuloDeCarga/GuardarObservacionesDeCalidad")]
-        //public HttpResponseMessage GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
-        //{
-        //    foreach (var dat in observacionesDeCalidadDto)
-        //    {
-        //        var fecha = dat.Fecha;
-        //        var fechaString = fecha.ToString("YYMMDD");
-        //        var hora = dat.Hora;
-        //        var horaString = hora.ToString("HHMM");
-        //        string fechaHoraString = fechaString + " " + horaString;
-        //        DateTime fechaHora = DateTime.ParseExact(fechaHoraString, "yyyy-MM-dd HH:mm", null);
-        //    }
-        //    servicio.GuardarObservacionesDeCalidad(idPlanillaDeTurnos, observacionesDeCalidadDto);
-        //    return Request.CreateResponse(HttpStatusCode.OK);
-        //}
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/GuardarObservacionesDeCalidad")]
+        public HttpResponseMessage GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto)
+        {
+            servicio.GuardarObservacionesDeCalidad(idPlanillaDeTurnos, observacionesDeCalidadDto);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
