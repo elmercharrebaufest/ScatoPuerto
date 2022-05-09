@@ -290,7 +290,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!materialId) return '';
 
     let materialesPuerto = this.materialesPuerto.find( x => x.id == materialId );
-    let descripcionCorta = materialesPuerto.descripcionCorta;
+    // TODO: La siguiente linea es para cuando el id del material del corte no está en plano de carga
+    let descripcionCorta = materialesPuerto?.descripcionCorta ? materialesPuerto.descripcionCorta : '';
     return descripcionCorta;
   }
 
