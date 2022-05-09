@@ -399,6 +399,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
        turno.fechaMiliseconds = new Date().getTime();
        const esLiquido: boolean=  true;
        this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido).subscribe((turnoDb: PlanillaDeTurnos) => {
+         
+         if (turnoDb != null){
+           const fechaTurnoActual = new Date(turnoDb.fecha);
+           const fechaActual = new Date();
+           
+           if(!this.getValidaFecha(fechaActual, fechaTurnoActual)){
+               turnoDb = null;
+           }
+         }
          if (turnoDb == null){
 
           this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
@@ -420,7 +429,23 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
        }); 
   }
 
+getValidaFecha(fechaTurno: Date, fechaActual: Date){
+    let bFechaValida: boolean = false;
+    const anioTurno: number = fechaTurno.getFullYear();
+    const mesTurno: number = fechaTurno.getMonth() + 1;
+    const diaTurno: number = fechaTurno.getDay();
 
+    const anioActual: number = fechaActual.getFullYear();
+    const mesActual: number = fechaActual.getMonth() + 1;
+    const diaActual: number = fechaActual.getDay();
+
+    if (anioTurno == anioActual &&
+        mesTurno == mesActual &&
+        diaTurno == diaActual){
+        bFechaValida = true;
+    }
+    return bFechaValida;
+}
 
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean){
     (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno,esNuevoTurno)); 
