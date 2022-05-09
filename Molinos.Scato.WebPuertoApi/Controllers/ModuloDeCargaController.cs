@@ -546,7 +546,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         }
-
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarObservacionesDeCalidad")]
@@ -560,6 +559,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             servicio.GuardarObservacionesDeCalidad(idPlanillaDeTurnos, observacionesDeCalidadDto);
             return Request.CreateResponse(HttpStatusCode.OK);
 
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/GuardarObservacionesDeCalidad")]
+        public HttpResponseMessage GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto)
+        {
+            servicio.GuardarObservacionesDeCalidad(idPlanillaDeTurnos, observacionesDeCalidadDto);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
