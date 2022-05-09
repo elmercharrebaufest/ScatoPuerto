@@ -222,7 +222,9 @@ export class CalidadComponent implements OnInit, OnDestroy {
   getDescripcionCortaMaterial(materialId: number): string{
     if (!materialId) return '';
 
-    let {descripcionCorta} = this.materialesPuerto.find( x => x.id == materialId );
+    let materialesPuerto = this.materialesPuerto.find( x => x.id == materialId );
+    // TODO: La siguiente linea es para cuando el id del material del corte no está en plano de carga
+    let descripcionCorta = materialesPuerto?.descripcionCorta ? materialesPuerto.descripcionCorta : '';
     return descripcionCorta;
   }
 
