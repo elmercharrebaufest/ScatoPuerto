@@ -42,6 +42,8 @@ export class InicioCargaComponent implements OnInit {
     
     if(fechaHoraInicioCarga[0] != 'null'){
       this.cargaIniciada = true;
+      this.inicioCarga.emit(true);
+      
       document.getElementById("FIC").setAttribute("disabled", "true");
     }
 
