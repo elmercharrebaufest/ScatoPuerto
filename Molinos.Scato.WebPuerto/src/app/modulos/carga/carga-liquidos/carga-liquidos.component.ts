@@ -96,7 +96,8 @@ export class CargaLiquidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
-        // this.mostrarTableristaOperando = res.estadoBuque.descripcion == "Operando";
+        let estado = res.estadoBuque.descripcion.trim();
+        this.mostrarTableristaOperando = (estado != "PreOperativo")
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
           descripcionCorta: m.descripcionCorta,
@@ -296,6 +297,7 @@ export class CargaLiquidosComponent implements OnInit {
     this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
 
       let texto = "Se envió a Tableristas correctamente";
+      this.mostrarTableristaOperando = true;
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }
