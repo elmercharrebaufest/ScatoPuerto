@@ -401,15 +401,18 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
        turno.fechaMiliseconds = new Date().getTime();
        const esLiquido: boolean=  true;
        this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido).subscribe((turnoDb: PlanillaDeTurnos) => {
-         
+
          if (turnoDb != null){
+          console.log('entro')
            const fechaTurnoActual = new Date(turnoDb.fecha);
            const fechaActual = new Date();
-           
-           if(!this.getValidaFecha(fechaActual, fechaTurnoActual)){
+           const validacionFecha = this.getValidaFecha(fechaTurnoActual, fechaActual);
+
+           if (!validacionFecha){
                turnoDb = null;
            }
          }
+         console.log(turnoDb)
          if (turnoDb == null){
 
           this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
@@ -435,11 +438,11 @@ getValidaFecha(fechaTurno: Date, fechaActual: Date){
     let bFechaValida: boolean = false;
     const anioTurno: number = fechaTurno.getFullYear();
     const mesTurno: number = fechaTurno.getMonth() + 1;
-    const diaTurno: number = fechaTurno.getDay();
+    const diaTurno: number = fechaTurno.getDate();
 
     const anioActual: number = fechaActual.getFullYear();
     const mesActual: number = fechaActual.getMonth() + 1;
-    const diaActual: number = fechaActual.getDay();
+    const diaActual: number = fechaActual.getDate();
 
     if (anioTurno == anioActual &&
         mesTurno == mesActual &&
