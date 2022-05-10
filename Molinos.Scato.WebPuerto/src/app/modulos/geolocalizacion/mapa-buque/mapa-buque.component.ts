@@ -17,7 +17,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   private listaEmbarcacion: any;
   private listadoEmbarques: any[];
   private listaPuntosInteres: any;
-  private zoom = 8;
+  private zoom = 16;
   private map!: L.Map;
   private iconoBuque!:L.Icon;
   private iconoAncla!:L.Icon;
@@ -350,8 +350,9 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
       center: [ -35.340, -56.577],
       zoom: this.zoom
     });
-    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: ''
+    const tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '',
+      
     });
     tiles.addTo(this.map);
     
