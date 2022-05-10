@@ -57,6 +57,8 @@ export class CargaSolidosComponent implements OnInit {
   adjunto: any;
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
+  mostrarTableristaOperando: boolean = false;
+  
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
@@ -90,6 +92,8 @@ export class CargaSolidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
+        let estado = res.estadoBuque.descripcion.trim();
+        this.mostrarTableristaOperando = (estado != "PreOperativo")
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
           descripcionCorta: m.descripcionCorta,
@@ -279,6 +283,8 @@ export class CargaSolidosComponent implements OnInit {
       console.log(res);
 
       let texto = "Se envió a Tableristas correctamente";
+      this.mostrarTableristaOperando = true;
+
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }
