@@ -30,7 +30,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                      EmbarqueInformacion inf= new EmbarqueInformacion
                     {
-                        Id=0,
                         Embarque = embarque,
                         IMO = comando.DtoInformacion.IMO,
                         MMSI = comando.DtoInformacion.MMSI,
