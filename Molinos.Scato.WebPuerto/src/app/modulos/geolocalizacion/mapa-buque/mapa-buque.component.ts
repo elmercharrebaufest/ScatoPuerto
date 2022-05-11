@@ -17,7 +17,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   private listaEmbarcacion: any;
   private listadoEmbarques: any[];
   private listaPuntosInteres: any;
-  private zoom = 16;
+  private zoom = 8;
   private map!: L.Map;
   private iconoBuque!:L.Icon;
   private iconoAncla!:L.Icon;
@@ -172,7 +172,6 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
                 if (gruposCuadrados !== undefined){
                   if (gruposCuadrados.length > 0 ){
                       gruposCuadrados.forEach(zona => {
-                          console.log(zona)
                           const grupo = filtroCuadrados.filter( item => item.agrupadorZona == zona);
                           if (grupo.length == 4){
                             this.markadorUbicacionPolygon = L.polygon (
@@ -225,7 +224,6 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
               if (gruposCuadrados !== undefined){
                 if (gruposCuadrados.length > 0 ){
                     gruposCuadrados.forEach(zona => {
-                        console.log(zona)
                         const grupo = filtroCuadrados.filter( item => item.agrupadorZona == zona);
                         if (grupo.length == 4){
                           this.markadorUbicacionPolygon = L.polygon (
@@ -352,10 +350,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
     });
     const tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: '',
+      maxZoom: 16,
+      minZoom: 4
       
     });
     tiles.addTo(this.map);
-    
   }
   
   handleMapZoomEnd(map: L.Map):void{
@@ -481,7 +480,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   onZoomBuqueSeleccionado(event){
     const latitud = event.latitud;
     const longitud = event.longitud;
-    this.map.setView([latitud, longitud], 13);
+    this.map.setView([latitud, longitud], 12);
   }
 
   ngOnDestroy(): void {

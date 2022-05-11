@@ -127,7 +127,8 @@ export class CargaLiquidosComponent implements OnInit {
         if(!resp.moduloDeCargaPeriodoDeCarga[0])
           return
         else
-          this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
+          if (this.mostrarTableristaOperando)
+            this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
       }
     });
   }
@@ -184,8 +185,9 @@ export class CargaLiquidosComponent implements OnInit {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
         this.planillaEmbarqueComponent.desabilitarEmbarque();
        }
-    let fechasHorasOK = this.validarFechas();
-    if(!fechasHorasOK)
+    
+    let fechasHorasOK = this.mostrarTableristaOperando ? this.validarFechas() : false;
+    if(!fechasHorasOK && this.mostrarTableristaOperando)
       return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     //CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
@@ -264,12 +266,8 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let lineasEmbarque = this.lineasComponent.obtenerLineasEmbarque();
-    let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
-    let planillaDeEmbarque = this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque();
-
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
-      null, null, [this.tanquesValue], lineasEmbarque, [periodoCarga], planillaDeEmbarque);
+      null, null, [this.tanquesValue], this.lineasComponent ?  this.lineasComponent?.obtenerLineasEmbarque() : null, this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null, this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null);
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
     //   null, null, [this.tanquesValue], null, [periodoCarga]);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
@@ -298,6 +296,7 @@ export class CargaLiquidosComponent implements OnInit {
 
       let texto = "Se envió a Tableristas correctamente";
       this.mostrarTableristaOperando = true;
+      this.obtenerModuloDeCarga();
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }

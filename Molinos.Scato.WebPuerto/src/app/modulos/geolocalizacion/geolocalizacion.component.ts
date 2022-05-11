@@ -70,6 +70,8 @@ export class GeolocalizacionComponent implements OnInit {
   }
 
   getUltimaActualizacion(){
+
+    if (this.listaBuquesGeolocalizacion.length == 0) return null;
     const fechaActualizacion = Math.max.apply(Math, this.listaBuquesGeolocalizacion.map(function(item) { return new Date(item.posicion.fechaRegistro); }));
     return fechaActualizacion;
   }
