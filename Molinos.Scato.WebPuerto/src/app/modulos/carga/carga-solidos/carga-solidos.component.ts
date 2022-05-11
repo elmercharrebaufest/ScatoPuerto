@@ -152,10 +152,10 @@ export class CargaSolidosComponent implements OnInit {
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
-        if (res.moduloDeCargaUmap.length > 0) {
+        if (res.moduloDeCargaUmap.length > 0 && this.mostrarTableristaOperando) {
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
-        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0 && this.mostrarTableristaOperando){
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
@@ -250,12 +250,12 @@ export class CargaSolidosComponent implements OnInit {
 
     // this.balanzadasEmbarque = this.balanzasComponent.obtenerBalanzadas78();
     // console.log('balanzasEmbarque a guardar: ', this.balanzadasEmbarque);
-    console.log('obtenerAmarre: ', this.umapComponent.obtenerAmarre());
-    console.log('obtenerUmap: ', this.umapComponent.obtenerUmap());
+    //console.log('obtenerAmarre: ', this.umapComponent.obtenerAmarre());
+    //console.log('obtenerUmap: ', this.umapComponent.obtenerUmap());
 
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
-      [this.umapComponent.obtenerAmarre()], this.umapComponent.obtenerUmap());
+      this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
 
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
@@ -284,6 +284,7 @@ export class CargaSolidosComponent implements OnInit {
 
       let texto = "Se envió a Tableristas correctamente";
       this.mostrarTableristaOperando = true;
+      this.cargarModuloCarga();
 
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
