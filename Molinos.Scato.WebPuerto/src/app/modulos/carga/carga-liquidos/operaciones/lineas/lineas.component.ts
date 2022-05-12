@@ -266,13 +266,20 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   obtenerLineasEmbarque() {
-    let lineas = this.lineasDeEmbarqueForm.getRawValue().lineasEmbarque;
+    let lineas = this.lineasDeEmbarqueForm ? this.lineasDeEmbarqueForm.getRawValue().lineasEmbarque : null;
 
-    lineas.forEach( l => {
-      l.tkInicial = l.tkInicial.value;
-    });
-    
+    if (lineas != null){
+      lineas.forEach( (l,index) => {
+        if (l.tkInicial.value == undefined){
+          lineas.splice(index, 1);
+        }else{
+          l.tkInicial = l.tkInicial.value;
+        }
+      });
+    }
     return lineas;
+
+
   }
 
   onFocusOutEvent(index:number){

@@ -97,6 +97,9 @@ export class CargaLiquidosComponent implements OnInit {
       res => {
         this.embarque = res;
         // this.mostrarTableristaOperando = res.estadoBuque.descripcion == "Operando";
+        //Lo dejo como PreOperativo si no trae estado.
+        let estado = res.estadoBuque ? res.estadoBuque.descripcion.trim() : "PreOperativo";
+        this.mostrarTableristaOperando = (estado != "PreOperativo")
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
           descripcionCorta: m.descripcionCorta,
@@ -263,12 +266,10 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let lineasEmbarque = this.lineasComponent.obtenerLineasEmbarque();
-    let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
-    let planillaDeEmbarque = this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque();
-
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
-      null, null, [this.tanquesValue], lineasEmbarque, [periodoCarga], planillaDeEmbarque);
+      null, null, [this.tanquesValue], this.lineasComponent ?  this.lineasComponent.obtenerLineasEmbarque() : null,
+      this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
+      this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
     //   null, null, [this.tanquesValue], null, [periodoCarga]);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
