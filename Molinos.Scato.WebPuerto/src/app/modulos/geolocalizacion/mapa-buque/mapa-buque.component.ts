@@ -358,6 +358,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
   }
   
   handleMapZoomEnd(map: L.Map):void{
+    /*
     if (this.map.getZoom() <= 5){
       
       this.map.eachLayer((layer) => {
@@ -366,14 +367,18 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy{
         }
       });
       this.map.removeControl(this.referenciaOverlay)
+      
       this.recargarMarkadores = true;
     }else {
       if (this.recargarMarkadores){
+          
+          this.map.removeControl(this.referenciaOverlay)
           this.cargarPuntosInteres();
           this.cargarBuquesMapa();
           this.recargarMarkadores = false;
       }
     }
+    */
   }
 
   async cargarBuquesMapa(){
