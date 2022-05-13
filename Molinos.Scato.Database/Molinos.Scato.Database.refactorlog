@@ -609,4 +609,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ErrorCacheoAfipCPE" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="46a264c9-c8b6-46c7-9220-589f636a00ac" ChangeDateTime="03/29/2022 14:51:40">
+    <Property Name="ElementName" Value="[dbo].[PuntosInteresGeolocalizacion].[Altitud]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PuntosInteresGeolocalizacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Latitud" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="49a7373e-5887-4088-a1c0-21a0123b7ef6" ChangeDateTime="04/21/2022 14:34:25">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido].[Fecha]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FechaCarga" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="95e39bf9-09fd-427f-b0a3-45bb1584db81" ChangeDateTime="04/28/2022 13:23:14">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad].[Fecha]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FechaHora" />
+  </Operation>
 </Operations>

@@ -33,6 +33,14 @@ export class RoleGuard implements CanActivateChild{
                     }
                     break;
                 }
+                case "geolocalizacion": {
+                    if (permisos.find(x => x === 600)){
+                        return true;
+                    }else{
+                        this.navigate(permisos);
+                    }
+                    break;
+                }
                 case 'alta-embarque': {
                     if (permisos.find(x => x === 610) && route.params.state){
                         return true;

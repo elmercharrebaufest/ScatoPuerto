@@ -7,7 +7,8 @@ namespace Molinos.Scato.Dominio.Comandos
     public class GuardarPlanillaDeTurnos : Comando
     {
         public int IdModuloDeCarga { get; set; }
-        public ModuloDeCargaPlanillaDeTurnosTurnosDto Dto { get; set; }
+        public bool Enviado { get; set; }
+        public ModuloDeCargaPlanillaDeTurnosDto Dto { get; set; }
         public DateTime? Fecha { get; set; }
     }
 }

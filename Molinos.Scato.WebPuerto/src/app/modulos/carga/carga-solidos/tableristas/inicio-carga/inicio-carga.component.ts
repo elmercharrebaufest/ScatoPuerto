@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -19,6 +19,7 @@ export class InicioCargaComponent implements OnInit {
   fechaHoraInicioCarga: string[];
   cargaIniciada: boolean = false;
   editandoFecha: boolean = false;
+  @Output() inicioCarga = new EventEmitter<boolean>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -41,6 +42,8 @@ export class InicioCargaComponent implements OnInit {
     
     if(fechaHoraInicioCarga[0] != 'null'){
       this.cargaIniciada = true;
+      this.inicioCarga.emit(true);
+      
       document.getElementById("FIC").setAttribute("disabled", "true");
     }
 
@@ -65,15 +68,17 @@ export class InicioCargaComponent implements OnInit {
       let texto = "Se perderán los datos ingresados manualmente, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
-          if (confirmed)
+          if (confirmed){
             this.guardarFechaHoraInicioCarga();
-          else {
+            this.inicioCarga.emit(true);
+          }else {
             this.initInicioCarga();
             return;
           }
         });
     }else{
       this.guardarFechaHoraInicioCarga();
+      this.inicioCarga.emit(true);
     }
   }
 

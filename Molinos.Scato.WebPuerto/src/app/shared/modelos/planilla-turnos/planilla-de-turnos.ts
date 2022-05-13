@@ -1,5 +1,5 @@
 import { CorteTurno } from "./corte-turno";
-import { Turno } from "./turno";
+import { TurnoDetalleLiquido, TurnoDetalleSolido } from "./turno";
 import { ObsCalidad } from "../obs-calidad";
 
 export class PlanillaDeTurnos{
@@ -8,10 +8,14 @@ export class PlanillaDeTurnos{
     id?: number;
     turnoPuerto: TurnoPuerto;
     cerrado: boolean;
-    enviado: boolean
-    moduloDeCargaPlanillaDeTurnosTurnosDetalles: Turno[];
-    moduloDeCargaPlanillaDeTurnosTurnosCortes: CorteTurno[];
+    guardadoPorRecibidor: boolean
+    guardadoPorTablerista: boolean
+    moduloDeCargaPlanillaDeTurnosDetallesLiquido: TurnoDetalleLiquido[];
+    moduloDeCargaPlanillaDeTurnosDetallesSolido: TurnoDetalleSolido[];
+    moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[];
+    moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: ObsCalidad[];
     indexDia: number;
+    esLiquido: boolean;
 }
 
 export class TurnoPuerto{

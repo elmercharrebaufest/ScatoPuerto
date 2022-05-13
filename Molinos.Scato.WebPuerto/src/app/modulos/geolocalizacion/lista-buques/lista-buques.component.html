@@ -1,0 +1,91 @@
+<!--<app-collapse-button collapseSelectorId='collapseListadoBuqueGeolocalizacion'></app-collapse-button>-->
+<div *ngIf="!cargarListado">
+    <br><br>
+        No existe buques para mostrar en el listado de geolocalización
+    <br><br>
+</div>
+<div *ngIf="cargarListado">
+
+    <div id="collapseListadoBuqueGeolocalizacion" class="collapse show listado-buque-fondo-blanco" *ngIf="getListaBuquesGeolocalizacion().length > 0">
+        <div class="divHeaderRightLeft"  *ngIf="getListaBuquesGeolocalizacion().length > 0">
+            <h4 class='titulo-listado-geo-letra'>Line Up - Buques en viaje</h4>
+        </div>
+            <div class="form-group col-md-2">
+              <label for="tipoDeBuquePuerto" class="subtitulo-listado-geo-letra">Muelle de carga</label>
+              <select class="custom-select" (change)="onChangeMuelleSeleccionado($event)">
+                <option *ngFor="let muelleCarga of getListadoMuelleCarga()" [value]="muelleCarga.codigo" >{{ muelleCarga.descripcion }}</option>
+              </select>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class='table table-bordered'>
+                    <thead class="header-geo-fijo" >
+                        <tr>
+                            <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
+                            <th class="header-geo-fijo sticky-head header-geo-letra">Nombre Buque</th>
+                            <th class="header-geo-fijo header-geo-letra">Puerto de Partida</th>
+                            <th class="header-geo-fijo header-geo-letra">Puerto de Destino</th>
+                            <th class="header-geo-fijo header-geo-letra">Eta Reportada</th>
+                            <th class="header-geo-fijo header-geo-letra">Arribó</th>
+                            <th class="header-geo-fijo header-geo-letra">Última posición recibida</th>
+                            <th class="header-geo-fijo header-geo-letra">Área</th>
+                            <th class="header-geo-fijo header-geo-letra">Puerto actual</th>
+                            <th class="header-geo-fijo header-geo-letra">Estado</th>
+                            <th class="header-geo-fijo header-geo-letra">Muelle de carga</th>
+                            <th class="header-geo-fijo header-geo-letra">Ubicación del barco Line Up</th>
+                        </tr> 
+                    </thead>
+                    <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
+                        <tr *ngIf="geolocalizacion.esSeleccionadoPorMuelle &&  geolocalizacion.numeroPaginado == paginaActual">
+                            <td align="center" valign="center" style="width: 5%">
+                                <input class="largerCheckbox" 
+                                    id={{geolocalizacion.embarque_Id}} 
+                                    type="checkbox" 
+                                    [checked]="geolocalizacion.esSeleccionado"
+                                    [value]="geolocalizacion.embarque_Id"
+                                    (change)="onChangeBuqueSeleccionado($event)"
+                                    />
+                                <i class="fa fa-map-marker fa-1x c-celeste lista-buque-cursor" 
+                                   data-toggle="tooltip" 
+                                   data-placement="top" 
+                                   title="Ir a la ubicación"   
+                                   (click)="onZoomBuqueSeleccionado(geolocalizacion)"
+                                   style="margin-left:15px"
+                                   ></i>
+                            </td>
+                            <td class="sticky lista-nombre-buque row-geo-letra" (click)='openModalGeo(addGeo, geolocalizacion)'>
+                                {{geolocalizacion.nombreBuque}}
+                            </td>
+                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.etA_Reportado : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.ata : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.horaUTCPosicionRecibida : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.posicion.estado}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.muelleCarga}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.ubicacionLineUp}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav aria-label="Page navigation example" class="centrado">
+                <ul class="pagination justify-content-center paginado-buque-fondo">
+                  <li [ngClass]="{'page-item disabled': paginaActual == 1 }">
+                    <a class="page-link" href="javascript:void(0);" (click)="seleccionaPagina(paginaActual - 1)"> << </a>
+                  </li>
+                  <li *ngFor="let pagina of listaPaginas; let index = index" 
+                       [ngClass]="{'page-item disabled': paginaActual == (index + 1)}">
+                      <a class="page-link" [ngClass]="{'paginado-buque-activo': paginaActual == (index + 1)}" href="javascript:void(0);" (click)="seleccionaPagina(index + 1)">{{index + 1}}</a>
+                  </li>
+                  <li [ngClass]="{'page-item disabled': paginaActual >= totalPaginas }">
+                    <a class="page-link" href="javascript:void(0);" (click)="seleccionaPagina(paginaActual + 1)"> >> </a>
+                  </li>
+                </ul>
+            </nav>
+    </div>
+</div>
+
+<ng-template #addGeo let-modal>
+    <app-card-buque [buque]="buque" (cerrar)="modal.dismiss()" class="card-buque"></app-card-buque>
+</ng-template>

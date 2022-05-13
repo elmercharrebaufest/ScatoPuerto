@@ -563,10 +563,13 @@ export class PlanoContentComponent implements OnInit {
       var imageName = this.fileNamePlano;
     }
     const imageBlob = this.dataURItoBlob(base64);
-
-    if (window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveBlob(imageBlob, imageName);
+    
+    if ((window.navigator as any).msSaveOrOpenBlob) {
+      (window.navigator as any).msSaveBlob(imageBlob, imageName);
     }
+    // if (window.navigator.msSaveOrOpenBlob) {
+    //   window.navigator.msSaveBlob(imageBlob, imageName);
+    // }
     else {
       var elem = window.document.createElement('a');
       elem.href = window.URL.createObjectURL(imageBlob);

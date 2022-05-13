@@ -1,0 +1,14 @@
+.map{
+    height: 100vh;
+}
+
+.mapa-referencia {
+    display:flex;
+    list-style-type:none;
+    padding:0;
+    justify-content:flex-end;
+}
+
+.mapa-referencia-left {
+    margin-right:auto;
+}

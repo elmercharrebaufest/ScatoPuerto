@@ -15,6 +15,8 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Data.Objects;
@@ -230,7 +232,7 @@ namespace Molinos.Scato.Servicios.Impl
             var balanza = repositorio.Obtener<Balanza>(id);
             return balanza != null ? balanza.Nombre : "";
         }
-public IList<BalanzaDto> ListarTodasLasBalanzasActivas(int centroId)
+        public IList<BalanzaDto> ListarTodasLasBalanzasActivas(int centroId)
         {
             return Listar<Balanza, BalanzaDto>(x => x.Centro.Id == centroId && x.Desactivado == false, 20);
         }
@@ -1037,7 +1039,7 @@ public IList<BalanzaDto> ListarTodasLasBalanzasActivas(int centroId)
         {
             return Obtener<Chofer, ChoferDto>(id);
         }
-        
+
         public CategoriaVehiculoDto ObtenerCategoriaVehiculo(int id)
         {
             return Obtener<CategoriaVehiculo, CategoriaVehiculoDto>(id);
@@ -1426,7 +1428,7 @@ public IList<BalanzaDto> ListarTodasLasBalanzasActivas(int centroId)
             return repositorio.ObtenerProyeccion<Recorrido, string>(x => x.InstanciaWorkflow == guid, x => x.Patente);
         }
 
-public string ObtenerNumeroCartaPortePorGuid(Guid guid)
+        public string ObtenerNumeroCartaPortePorGuid(Guid guid)
         {
             return repositorio.ObtenerProyeccion<Recorrido, string>(x => x.InstanciaWorkflow == guid, x => x.NumeroDocumentoIngreso);
         }
@@ -2141,7 +2143,7 @@ public string ObtenerNumeroCartaPortePorGuid(Guid guid)
             return Listar<Recorrido, RecorridoDto>(expresionFiltro);
         }
 
-public DatosRecorridoDto RecorridoPorTarjetaDeAcceso(string tarjetaDeAcceso)
+        public DatosRecorridoDto RecorridoPorTarjetaDeAcceso(string tarjetaDeAcceso)
         {
             return repositorio.ObtenerProyeccion<Recorrido, DatosRecorridoDto>(
                 x =>
@@ -3155,20 +3157,20 @@ public DatosRecorridoDto RecorridoPorTarjetaDeAcceso(string tarjetaDeAcceso)
                 throw;
             }
         }
-               
 
-                
-                    
 
-                    
 
-               
-                       
 
-                
-                    
-                        
-                
+
+
+
+
+
+
+
+
+
+
 
         public CartaPorteDto ObtenerCartaPorteVacia(int centroId, string workflowCodigo,
                                                     string destinatarioCodigoSap = "", string titularCodigoSap = "", string centroDestino = "", string rtteComercial = "")
@@ -4169,12 +4171,12 @@ public DatosRecorridoDto RecorridoPorTarjetaDeAcceso(string tarjetaDeAcceso)
                                                              string patente, TipoImpresion? tipoImpresion,
                                                              Paginacion paginacion)
         {
-             try
+            try
             {
                 return
                 repositorio.ListarConsultaPaginada(new ListarImpresiones(tipo, numeroDocumentoIngreso, patente, tipoImpresion,
                                                                          paginacion));
-}
+            }
             catch (Exception e)
             {
                 log.Error(e, "Error ListarImpresiones DocumentoConsultado : {0}", numeroDocumentoIngreso);
@@ -5979,7 +5981,7 @@ public DatosRecorridoDto RecorridoPorTarjetaDeAcceso(string tarjetaDeAcceso)
                             ? reciboMunicipal.Monto.ToString(CultureInfo.InvariantCulture)
                             : string.Empty,
                 TipoDocumentoIngreso = recorrido.TipoDocumentoIngreso,
-TipoVehiculo = recorrido.TipoVehiculo,
+                TipoVehiculo = recorrido.TipoVehiculo,
                 Patente = recorrido.Patente,
                 RecorridoId = recorrido.Id,
                 NombreTransportista = recorrido.Transportista.RazonSocial,
@@ -7348,7 +7350,7 @@ TipoVehiculo = recorrido.TipoVehiculo,
             var centro = repositorio.Obtener<Centro>(datosCamion.CentroId);
             var retorno = new FotosDto { Fotos = new List<FotoDto>(), Material = datosCamion.Material, NumeroDocumentoIngreso = datosCamion.NumeroDocumentoIngreso, Patente = datosCamion.Patente, FechaInicio = datosCamion.FechaInicio, RecorridoId = datosCamion.Id };
 
-            return ListarFotos(fileName, retorno, fotosPath:centro?.FotosPath);
+            return ListarFotos(fileName, retorno, fotosPath: centro?.FotosPath);
         }
 
         public FotosDto ListarFotosCamion(Guid instanciaWorkflow, string actividad)
@@ -7540,7 +7542,7 @@ TipoVehiculo = recorrido.TipoVehiculo,
         {
             try
             {
-                foreach (FileData foundFile in BuscarFotos(fileName, retorno.FechaInicio, obtenerPrimera, fotosPath:fotosPath).OrderByDescending(x => x.CreationTime))
+                foreach (FileData foundFile in BuscarFotos(fileName, retorno.FechaInicio, obtenerPrimera, fotosPath: fotosPath).OrderByDescending(x => x.CreationTime))
                 {
                     var nombre = foundFile.Name.Split('.')[0].Split('-');
                     var actividad = nombre.Count() >= 4 ? nombre[3] : string.Empty;
@@ -8365,10 +8367,10 @@ TipoVehiculo = recorrido.TipoVehiculo,
             var patente = repositorio.ObtenerProyeccion<Recorrido, string>(x => x.InstanciaWorkflow == id,
                 f => f.Patente);
             var recorridoTerminado = repositorio.ObtenerMayor<Recorrido, int>(x => x.Patente == patente, f => f.Id);
-var controlRecorrido = repositorio.Listar<ControlRecorrido>(x => x.WorkflowInstanceId == recorridoTerminado.InstanciaWorkflow).ToList();
+            var controlRecorrido = repositorio.Listar<ControlRecorrido>(x => x.WorkflowInstanceId == recorridoTerminado.InstanciaWorkflow).ToList();
             if (recorridoTerminado != null && recorridoTerminado.Rechazado)
             {
-                
+
 
                 var mensajes = controlRecorrido.Select(x => x.Mensaje).ToList();
                 var selectMotivo = repositorio.ObtenerMayor<Motivo, int>(x => mensajes.Contains(x.Descripcion), f => f.Id);
@@ -8554,7 +8556,7 @@ var controlRecorrido = repositorio.Listar<ControlRecorrido>(x => x.WorkflowInsta
 
         public IList<PuestosDeCargaDescargaDto> ListarHidraulicasPorCriterioSustentable(int centroId, bool esSustentable, bool sustentableMixta, bool excluirEspeciales = false)
         {
-            return (excluirEspeciales) 
+            return (excluirEspeciales)
                 ? Listar<PuestosDeCargaDescarga, PuestosDeCargaDescargaDto>(
                     x => x.Centro.Id == centroId && (x.EsSojaSustentable == esSustentable || sustentableMixta) && (x.EsEspecial != excluirEspeciales || x.EsEspecial == null))
                 : Listar<PuestosDeCargaDescarga, PuestosDeCargaDescargaDto>(
@@ -8621,7 +8623,7 @@ var controlRecorrido = repositorio.Listar<ControlRecorrido>(x => x.WorkflowInsta
             try
             {
                 var rutaFoto = repositorio.ObtenerProyeccion((Recorrido x) => x.InstanciaWorkflow == id, x => new { x.Vehiculo.CartaPorte.FotoRutaDestino, x.Patente, x.NumeroDocumentoIngreso, x.FechaInicio, x.Id });
-resultado.Patente = rutaFoto.Patente;
+                resultado.Patente = rutaFoto.Patente;
                 resultado.NumeroDocumentoIngreso = rutaFoto.NumeroDocumentoIngreso;
                 if (!string.IsNullOrEmpty(rutaFoto.FotoRutaDestino))
                 {
@@ -9223,28 +9225,28 @@ resultado.Patente = rutaFoto.Patente;
             return 0;
         }
 
-        public ModuloDeCargaPlanillaDeTurnosTurnosDto ObtenerModuloDeCargaPlanillaDeTurnosTurnos(int turnoPuerto_id, int moduloDeCarga_id)
+        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido)
         {
-            ModuloDeCargaPlanillaDeTurnosTurnosDto moduloDeCargaPlanillaDeTurnosTurnosDto = new ModuloDeCargaPlanillaDeTurnosTurnosDto();
+            ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
             DateTime dateWithoutHours = new DateTime();
             dateWithoutHours = DateTime.Now.Date;
-            moduloDeCargaPlanillaDeTurnosTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnosTurnos, ModuloDeCargaPlanillaDeTurnosTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id);
+            moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
 
-            if (moduloDeCargaPlanillaDeTurnosTurnosDto != null)
+            if (moduloDeCargaPlanillaDeTurnosDto != null)
             {
-                return moduloDeCargaPlanillaDeTurnosTurnosDto;
+                return moduloDeCargaPlanillaDeTurnosDto;
             }
             return null;
 
-        }       
+        }
 
         public string ObtenerLlenadoMilimetroPorTanque(string cm, string mm, string tanqueNum)
         {
             try
             {
-                #if (DEBUG)
+#if (DEBUG)
                 return "10000";
-                #endif
+#endif
 
                 string mmABuscar = cm + "," + mm;
                 string mmABuscar1 = cm + "." + mm;
@@ -9264,8 +9266,8 @@ resultado.Patente = rutaFoto.Patente;
                        LlenadoMm = item.ZCANM3.ToString()
                    }).Where(x => x.Mm == mmABuscar || x.Mm == mmABuscar1).Select(y => y.LlenadoMm).FirstOrDefault();
                 return mm3;
-               
-          
+
+
             }
             catch (Exception ex)
             {
@@ -9430,7 +9432,8 @@ resultado.Patente = rutaFoto.Patente;
                                 balanzadaBajaCarga.NombreBuque = Listar<Vapor, VaporDto>(x => x.Id == buque).First().Nombre;
                                 balanzadaBajaCarga.Kilos = balanzadaBajaCarga.listadoTotalBalanzadas.Balanzadas.Sum(x => x.PesoNeto);
                                 balanzadaBajaCarga.Toneladas = Math.Round(Convert.ToDecimal(balanzadaBajaCarga.Kilos) / 1000, 2);
-                                if (balanzadaBajaCarga.listadoTotalBalanzadas.Balanzadas[0].ModuloDeCargaBalanzas != null) {
+                                if (balanzadaBajaCarga.listadoTotalBalanzadas.Balanzadas[0].ModuloDeCargaBalanzas != null)
+                                {
                                     balanzadaBajaCarga.listadoTotalBalanzadas.MotivosFallasBalanza = new MotivosFallasBalanzaDto();
                                     balanzadaBajaCarga.listadoTotalBalanzadas.MotivosFallasBalanza = balanzadaBajaCarga.listadoTotalBalanzadas.Balanzadas[0].ModuloDeCargaBalanzas.MotivosFallasBalanza;
                                     balanzadaBajaCarga.listadoTotalBalanzadas.Observaciones = balanzadaBajaCarga.listadoTotalBalanzadas.Balanzadas[0].ModuloDeCargaBalanzas.Observaciones;
@@ -9674,55 +9677,55 @@ resultado.Patente = rutaFoto.Patente;
             repositorio.GuardarCambios();
         }
 
-        public void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id)
-        {
-            ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
-            foreach (var item in moduloDeCargaNirsManualPuertoDto)
-            {
-                ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
+        //public void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id)
+        //{
+        //    ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
+        //    foreach (var item in moduloDeCargaNirsManualPuertoDto)
+        //    {
+        //        ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
 
-                Bodega bodega = repositorio.Obtener<Bodega>(x => x.Id == item.Bodega.Id);
+        //        Bodega bodega = repositorio.Obtener<Bodega>(x => x.Id == item.Bodega.Id);
 
-                if (moduloDeCargaNirManualPuerto_Db != null)
-                {
-                    moduloDeCargaNirManualPuerto_Db.Fecha = item.Fecha;
-                    moduloDeCargaNirManualPuerto_Db.Hora = item.Hora;
-                    moduloDeCargaNirManualPuerto_Db.Ritmo = item.Ritmo;
-                    moduloDeCargaNirManualPuerto_Db.HD = item.HD;
-                    moduloDeCargaNirManualPuerto_Db.ProtBase = item.ProtBase;
-                    moduloDeCargaNirManualPuerto_Db.Prot_BS = item.Prot_BS;
-                    moduloDeCargaNirManualPuerto_Db.PH = item.PH;
-                    moduloDeCargaNirManualPuerto_Db.Origen = item.Origen;
-                    //moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
-                    moduloDeCargaNirManualPuerto_Db.Mano = item.Mano;
-                    moduloDeCargaNirManualPuerto_Db.Material_id = item.Material_id;
-                    moduloDeCargaNirManualPuerto_Db.Bodega = bodega;
-                }
-                else
-                {
-                    moduloDeCargaNirManualPuerto_Db = new ModuloDeCargaNirManualPuerto()
-                    {
-                        ModuloDeCarga = moduloDeCarga,
-                        Fecha = item.Fecha,
-                        Hora = item.Hora,
-                        Ritmo = item.Ritmo,
-                        HD = item.HD,
-                        ProtBase = item.ProtBase,
-                        Prot_BS = item.Prot_BS,
-                        PH = item.PH,
-                        Origen = item.Origen,
-                        //Bodega = item.Bodega,
-                        Mano = item.Mano,
-                        Material_id = item.Material_id,
-                        Bodega = bodega,
-                    };
-                }
+        //        if (moduloDeCargaNirManualPuerto_Db != null)
+        //        {
+        //            moduloDeCargaNirManualPuerto_Db.Fecha = item.Fecha;
+        //            moduloDeCargaNirManualPuerto_Db.Hora = item.Hora;
+        //            moduloDeCargaNirManualPuerto_Db.Ritmo = item.Ritmo;
+        //            moduloDeCargaNirManualPuerto_Db.HD = item.HD;
+        //            moduloDeCargaNirManualPuerto_Db.ProtBase = item.ProtBase;
+        //            moduloDeCargaNirManualPuerto_Db.Prot_BS = item.Prot_BS;
+        //            moduloDeCargaNirManualPuerto_Db.PH = item.PH;
+        //            moduloDeCargaNirManualPuerto_Db.Origen = item.Origen;
+        //            //moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
+        //            moduloDeCargaNirManualPuerto_Db.Mano = item.Mano;
+        //            moduloDeCargaNirManualPuerto_Db.Material_id = item.Material_id;
+        //            moduloDeCargaNirManualPuerto_Db.Bodega = bodega;
+        //        }
+        //        else
+        //        {
+        //            moduloDeCargaNirManualPuerto_Db = new ModuloDeCargaNirManualPuerto()
+        //            {
+        //                ModuloDeCarga = moduloDeCarga,
+        //                Fecha = item.Fecha,
+        //                Hora = item.Hora,
+        //                Ritmo = item.Ritmo,
+        //                HD = item.HD,
+        //                ProtBase = item.ProtBase,
+        //                Prot_BS = item.Prot_BS,
+        //                PH = item.PH,
+        //                Origen = item.Origen,
+        //                //Bodega = item.Bodega,
+        //                Mano = item.Mano,
+        //                Material_id = item.Material_id,
+        //                Bodega = bodega,
+        //            };
+        //        }
 
 
-                moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(moduloDeCargaNirManualPuerto_Db);
-            }
-            repositorio.GuardarCambios();
-        }
+        //        moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(moduloDeCargaNirManualPuerto_Db);
+        //    }
+        //    repositorio.GuardarCambios();
+        //}
 
         public List<string> ObtenerDestinatariosPlanillaTurnos()
         {
@@ -9734,7 +9737,7 @@ resultado.Patente = rutaFoto.Patente;
         {
             try
             {
-                return Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == IdModuloDeCarga).OrderByDescending(x=>x.Fecha_Inicio).ToList();
+                return Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == IdModuloDeCarga).OrderByDescending(x => x.Fecha_Inicio).ToList();
             }
             catch (Exception ex)
             {
@@ -9880,20 +9883,20 @@ resultado.Patente = rutaFoto.Patente;
                 if (tnBc == 0)
                 {
                     porcen = 0;
-                }                    
+                }
                 else
                 {
-                    if(totalCargado == 0)
+                    if (totalCargado == 0)
                         porcen = 0;
                     else
                         porcen = tnBc * 100 / totalCargado;
-                    
+
                 }
-                   
+
                 informacionParada.Add("porcBC", Convert.ToString(porcen));
 
 
-                if (tnBc ==0 || minutoBc == 0)
+                if (tnBc == 0 || minutoBc == 0)
                     informacionParada.Add("ritmoBc", "0");
                 else
                     informacionParada.Add("ritmoBc", Convert.ToString(((60 * tnBc) / minutoBc) * 60));
@@ -9905,8 +9908,103 @@ resultado.Patente = rutaFoto.Patente;
 
                 throw ex;
             }
-           
+
         }
+        //public Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id)
+        //{
+        //    DateTime fechainicioBalanza7 = new DateTime();
+        //    DateTime fechainicioBalanza8 = new DateTime();
+        //    DateTime actualizacionRitmosBalanza7 = new DateTime();
+        //    DateTime actualizacionRitmosBalanza8 = new DateTime();
+
+
+        //    var totalCargadoBalanza7 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
+        //    var tnCargadasBalanza7 = totalCargadoBalanza7 / 1000;
+        //    DateTime ultimaBalanzadaBalanza7 = DateTime.Now;
+        //    var totalCargadoBalanza8 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
+        //    var tnCargadasBalanza8 = totalCargadoBalanza8 / 1000;
+        //    DateTime ultimaBalanzadaBalanza8 = DateTime.Now;
+            
+        //    var registroFinCargaVaporBalanza7 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
+        //    var registroFinCargaVaporBalanza8 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
+        //    double tiempoCargaNetoBalanza7 = 0;
+        //    double tiempoCargaNetoBalanza8 = 0;
+
+
+        //    if (registroFinCargaVaporBalanza7 != null)
+        //    {
+        //        foreach (var carg in registroFinCargaVaporBalanza7)
+        //        {
+        //            var inicioCargaBalanza7id = carg.CargaOpuesta_Id;
+        //            var finCargaBalanza7id = carg.Id;
+
+        //            fechainicioBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaBalanza7id && x.NumeroBalanza == "7").Fecha;
+        //            var fechaFinBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaBalanza7id && x.NumeroBalanza == "7").Fecha;
+
+        //            tiempoCargaNetoBalanza7 += (fechaFinBalanza7 - fechainicioBalanza7).TotalMinutes;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        tiempoCargaNetoBalanza7 = 0;
+        //        totalCargadoBalanza7 = 0;
+        //    }
+
+        //    if (registroFinCargaVaporBalanza8 != null)
+        //    {
+        //        foreach (var carg in registroFinCargaVaporBalanza8)
+        //        {
+        //            var inicioCargaBalanza8id = carg.CargaOpuesta_Id;
+        //            var finCargaBalanza8id = carg.Id;
+
+        //            fechainicioBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaBalanza8id && x.NumeroBalanza == "8").Fecha;
+        //            var fechaFinBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaBalanza8id && x.NumeroBalanza == "8").Fecha;
+
+        //            tiempoCargaNetoBalanza8 += (fechaFinBalanza8 - fechainicioBalanza8).TotalMinutes;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        tiempoCargaNetoBalanza8 = 0;
+        //        totalCargadoBalanza8 = 0;
+        //    }
+        //    double ritmoDeCargaBalanza7 = 0;
+        //    double ritmoDeCargaBalanza8 = 0;
+        //    if (tiempoCargaNetoBalanza7 != 0)
+        //    {
+        //        ritmoDeCargaBalanza7 = (tnCargadasBalanza7 * 60) / tiempoCargaNetoBalanza7;
+        //        actualizacionRitmosBalanza7 = DateTime.Now;
+        //    }
+        //    else ritmoDeCargaBalanza7 = 0;
+
+        //    if (tiempoCargaNetoBalanza8 != 0)
+        //    {
+        //        ritmoDeCargaBalanza8 = (tnCargadasBalanza8 * 60) / tiempoCargaNetoBalanza8;
+        //        actualizacionRitmosBalanza8 = DateTime.Now;
+
+
+        //    }
+        //    else ritmoDeCargaBalanza8 = 0;
+
+        //    var ritmoDeCargaBalanza7int = (int)ritmoDeCargaBalanza7;
+        //    var ritmoDeCargaBalanza8int = (int)ritmoDeCargaBalanza8;
+
+        //    Dictionary<string, string> ritmosDeEmbarque = new Dictionary<string, string>();
+
+        //    ritmosDeEmbarque.Add("totalCargadoBalanza7", tnCargadasBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("ritmoDeCargaBalanza7", ritmoDeCargaBalanza7int.ToString());
+        //    ritmosDeEmbarque.Add("ArrancóBalanza7", fechainicioBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("UltimaBalanzadaBalanza7", ultimaBalanzadaBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("actualizacionRitmosBalanza7", actualizacionRitmosBalanza7.ToString());
+        //    ritmosDeEmbarque.Add("totalCargadoBalanza8", tnCargadasBalanza8.ToString());
+        //    ritmosDeEmbarque.Add("ritmoDeCargaBalanza8", ritmoDeCargaBalanza8int.ToString());
+        //    ritmosDeEmbarque.Add("ArrancóBalanza8", fechainicioBalanza8.ToString());
+        //    ritmosDeEmbarque.Add("UltimaBalanzadaBalanza8", ultimaBalanzadaBalanza8.ToString());
+        //    ritmosDeEmbarque.Add("actualizacionRitmosBalanza8", actualizacionRitmosBalanza8.ToString());
+
+
+        //    return ritmosDeEmbarque;
+        //}
 
         public Dictionary<string, int> ObtenerRitmos( int modulodecarga_id)
         {
@@ -10007,6 +10105,41 @@ resultado.Patente = rutaFoto.Patente;
           
         }
 
+
+        public IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga)
+        {
+            try
+            {
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return null;
+
+
+                int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarqueBase.Id).Vapor.Id;
+
+                CargaFiltroDto filtro = new CargaFiltroDto();
+
+
+                Expression<Func<Carga, bool>> expresionFiltro = null;
+
+
+                expresionFiltro = x =>
+                       (vapor_id == x.Vapor.Id) &&
+                       (x.FechaInicio > embarqueBase.FechaHoraInicioCarga) &&
+                        (x.CargaOpuesta_Id > 0);
+
+                return Listar<Carga, CargaDto>(expresionFiltro);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
         public IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion()
         {
             try
@@ -10019,9 +10152,39 @@ resultado.Patente = rutaFoto.Patente;
                 throw;
             }
         }
+        public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto)
+        {
+            ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
+
+            foreach (var item in observacionesDeCalidadDto)
+            {
+                ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad observacionesDeCalidad_db = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == item.Id);
+                if (observacionesDeCalidad_db != null)
+                {
+                    observacionesDeCalidad_db.FechaHora = item.FechaHora;
+                    observacionesDeCalidad_db.Observaciones = item.Observaciones;
+                    observacionesDeCalidad_db.ObservacionVisible = item.ObservacionVisible;
+                    
+                }
+                else
+                {
+                    observacionesDeCalidad_db = new ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad()
+                    {
+                        ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos,
+                        FechaHora = item.FechaHora,
+                        Observaciones = item.Observaciones,
+                        ObservacionVisible = item.ObservacionVisible,
+                    };
+                    moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.Add(observacionesDeCalidad_db);
+
+                }
+            }
+            repositorio.GuardarCambios();
+        }
+
         //public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
         //{
-        //    ModuloDeCargaPlanillaDeTurnosTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.Id == idPlanillaDeTurnos);
+        //    ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
 
         //    foreach (var item in observacionesDeCalidadDto)
         //    {
@@ -10037,7 +10200,7 @@ resultado.Patente = rutaFoto.Patente;
         //        {
         //            observacionesDeCalidad_db = new ObservacionesDeCalidad()
         //            {
-        //            ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnosTurnos,
+        //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnosTurnos,
         //            Fecha = item.Fecha,
         //            //Hora = item.Hora,
         //            Observaciones = item.Observaciones,
@@ -10049,6 +10212,7 @@ resultado.Patente = rutaFoto.Patente;
         //    }
         //    repositorio.GuardarCambios();
         //}
+
         public Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id)
         {
 
@@ -10058,17 +10222,20 @@ resultado.Patente = rutaFoto.Patente;
             var ritmoAcumuladoLiquidos = 0;
             var totalTiempoCorte = 0;
             var ritmoAcumuladoNeto = 0;
-           var planillaDeTurnosTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnosTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
-            if (planillaDeTurnosTurnos !=null)
+
+            var planillaDeTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
+            if (planillaDeTurnos != null)
             {
                 var cantTurnos = 0;
-                
 
-                foreach (var turn in planillaDeTurnosTurnos)
+
+                foreach (var turn in planillaDeTurnos)
                 {
                     var idPlanilla = turn.Id;
-                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosTurnosCortes;
-                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosTurnosDetalles;
+                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
+                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetallesLiquido;
+                    //var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
+                    //var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetalles;
 
                     foreach (var item in turnosDetalles)
                     {
@@ -10077,7 +10244,7 @@ resultado.Patente = rutaFoto.Patente;
                         cantTurnos++;
                     }
                     minutosCargando = (cantTurnos * 6) * 60;
-                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnosTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
+                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
                     {
                         foreach (var cort in cortesTurnos)
                         {
@@ -10089,8 +10256,9 @@ resultado.Patente = rutaFoto.Patente;
                         }
                         if (minutosCargando != 0)
                         {
-                        ritmoAcumuladoNeto = (cantTotal * 60) / (minutosCargando - totalTiempoCorte);
-                        } else ritmoAcumuladoNeto = 0;
+                            ritmoAcumuladoNeto = (cantTotal * 60) / (minutosCargando - totalTiempoCorte);
+                        }
+                        else ritmoAcumuladoNeto = 0;
 
                     }
                     else ritmoAcumuladoNeto = ritmoAcumuladoLiquidos;
@@ -10168,7 +10336,7 @@ resultado.Patente = rutaFoto.Patente;
                 x => x.Id == puestoId,
                 x => x.Entrada);
         }
-        
+
         public ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion)
         {
             return Listar<ImpEtiquetaPuerto, ImpEtiquetaPuertoDto>(x => x.Usuario_Id == usuarioId, paginacion);
@@ -10325,7 +10493,7 @@ resultado.Patente = rutaFoto.Patente;
 
                 if (tipoVehiculo == (int)TipoVehiculo.Tren && !consultactg)
                 {
-#region FerroviarioCPE
+                    #region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -10346,7 +10514,7 @@ resultado.Patente = rutaFoto.Patente;
                         }
                     }
 
-#endregion FerroviarioCPE
+                    #endregion FerroviarioCPE
                 }
                 else
                 {
@@ -10408,5 +10576,19 @@ resultado.Patente = rutaFoto.Patente;
         {
             return Listar<EntidadTipoDeActividad, EntidadTipoDeActividadDto>(x => x.Entidad.Codigo == codigoEntidad);
         }
+        public IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado)
+        {
+            return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
+        }
+
+        
+        public void EliminarObservacionDeCalidad(int observacion_id)
+        {
+            ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
+            repositorio.Remover(obs);
+            repositorio.GuardarCambios();
+        }
+        
+        
     }
 }

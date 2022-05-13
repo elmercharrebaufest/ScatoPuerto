@@ -181,9 +181,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
             ///// OPERACIONES /////
             /////////////////////////
             // LÍQUIDOS
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaHabilitacionDeTanques.ToList());
             if (comando.Dto.ModuloDeCargaHabilitacionDeTanques != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaHabilitacionDeTanques.ToList());
                 foreach (var tanques in comando.Dto.ModuloDeCargaHabilitacionDeTanques)
                 {
                     moduloDeCarga.ModuloDeCargaHabilitacionDeTanques.Add(new ModuloDeCargaHabilitacionDeTanques
@@ -209,9 +209,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
             //OPERACIONES Y TABLERISTAS
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaLineasDeEmbarque.ToList());
             if (comando.Dto.ModuloDeCargaLineasDeEmbarque != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaLineasDeEmbarque.ToList());
                 foreach (var lineas in comando.Dto.ModuloDeCargaLineasDeEmbarque)
                 {
                     var materialPuerto = lineas.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(lineas.MaterialPuerto.Id) : null;
@@ -242,9 +242,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             /////////////////////////
             //MODULO DE CARGA SÓLIDOS
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaElementoGrafico.ToList());
             if (comando.Dto.ModuloDeCargaElementoGrafico != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaElementoGrafico.ToList());
                 foreach (var elementos in comando.Dto.ModuloDeCargaElementoGrafico)
                 {
                     var celdasManoDeEmbarque = elementos.CeldaManoDeEmbarque != null ? Repositorio.Obtener<CeldaManoDeEmbarque>(elementos.CeldaManoDeEmbarque.Id) : null;
@@ -267,9 +267,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaManosDeEmbarque.ToList());
             if (comando.Dto.ModuloDeCargaManosDeEmbarque != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaManosDeEmbarque.ToList());
                 foreach (var manos in comando.Dto.ModuloDeCargaManosDeEmbarque)
                 {
                     var moduloDeCargaManosDeEmbarque = new ModuloDeCargaManosDeEmbarque
@@ -301,9 +301,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaTabiquesDeEmbarque.ToList());
             if (comando.Dto.ModuloDeCargaTabiquesDeEmbarque != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaTabiquesDeEmbarque.ToList());
                 foreach (var tabiques in comando.Dto.ModuloDeCargaTabiquesDeEmbarque)
                 {
                     moduloDeCarga.ModuloDeCargaTabiquesDeEmbarque.Add(new ModuloDeCargaTabiquesDeEmbarque
@@ -325,9 +325,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
             moduloDeCarga.IniciarCarga = comando.Dto.IniciarCarga;
             /////////////////////////
             // LÍQUIDOS
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaMangueraCarga.ToList()); 
             if (comando.Dto.ModuloDeCargaMangueraCarga != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaMangueraCarga.ToList());
                 foreach (var magueras in comando.Dto.ModuloDeCargaMangueraCarga)
                 {
                     moduloDeCarga.ModuloDeCargaMangueraCarga.Add(new ModuloDeCargaMangueraCarga
@@ -345,9 +345,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPlanillaDeEmbarque.ToList());
             if (comando.Dto.ModuloDeCargaPlanillaDeEmbarque != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPlanillaDeEmbarque.ToList());
                 foreach (var planilla in comando.Dto.ModuloDeCargaPlanillaDeEmbarque)
                 {
                     var exportador = planilla.Exportador != null ? Repositorio.Obtener<Exportador>(planilla.Exportador.Id) : null;
@@ -387,22 +387,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
             //            Fecha = planilla.Fecha
             //        };
 
-            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos = new List<ModuloDeCargaPlanillaDeTurnosTurnos>();
-            //        planilla.ModuloDeCargaPlanillaDeTurnosTurnos.ToList()
-            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos.Add(new ModuloDeCargaPlanillaDeTurnosTurnos
+            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos = new List<ModuloDeCargaPlanillaDeTurnos>();
+            //        planilla.ModuloDeCargaPlanillaDeTurnos.ToList()
+            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
             //        {
             //            TurnoPuerto = turnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(turnos.TurnoPuerto.Id) : null,
             //            Cerrado = turnos.Cerrado,
             //            Enviado = turnos.Enviado
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosDetalles> ModuloDeCargaPlanillaDeTurnosTurnosDetalles { get; set; }
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnosCortes> ModuloDeCargaPlanillaDeTurnosTurnosCortes { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetalles> ModuloDeCargaPlanillaDeTurnosDetalles { get; set; }
+            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortes> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
             //        }));
 
             //        moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
             //        {
             //            ModuloDeCarga = moduloDeCarga,
             //            Fecha = planilla.Fecha,
-            //            ModuloDeCargaPlanillaDeTurnosTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosTurnos
+            //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos
             //        });
             //    }
             //}
@@ -412,9 +412,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             /////////////////////////
             // LÍQUIDOS / SÓLIDOS
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPeriodoDeCarga.ToList());
             if (comando.Dto.ModuloDeCargaPeriodoDeCarga != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPeriodoDeCarga.ToList());
                 var moduloDeCargaPeriodoDeCarga_DB = Repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(comando.Dto.ModuloDeCargaPeriodoDeCarga[0].Id);
 
                 if (moduloDeCargaPeriodoDeCarga_DB != null)
@@ -471,40 +471,40 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             }
 
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
-            if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
-            {
-                foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
-                {
-                    var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
+            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
+            //if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
+            //{
+            //    foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
+            //    {
+            //        var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
 
-                    moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
-                    {
-                        Id = Nir.Id,
-                        ModuloDeCarga = moduloDeCarga,
-                        Bodega = bodega,
-                        Fecha = Nir.Fecha,
-                        HD = Nir.HD,
-                        Hora = Nir.Hora,
-                        Origen = Nir.Origen,
-                        PH = Nir.PH,
-                        ProtBase = Nir.ProtBase,
-                        Prot_BS = Nir.Prot_BS,
-                        Ritmo = Nir.Ritmo,
-                        Material_id = Nir.Material_id,
-                        Mano = Nir.Mano
-                    });
-                }
-            }
+            //        moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
+            //        {
+            //            Id = Nir.Id,
+            //            ModuloDeCarga = moduloDeCarga,
+            //            Bodega = bodega,
+            //            Fecha = Nir.Fecha,
+            //            HD = Nir.HD,
+            //            Hora = Nir.Hora,
+            //            Origen = Nir.Origen,
+            //            PH = Nir.PH,
+            //            ProtBase = Nir.ProtBase,
+            //            Prot_BS = Nir.Prot_BS,
+            //            Ritmo = Nir.Ritmo,
+            //            Material_id = Nir.Material_id,
+            //            Mano = Nir.Mano
+            //        });
+            //    }
+            //}
             // LÍQUIDOS / SÓLIDOS
             /////////////////////////
 
 
             /////////////////////////
             // SÓLIDOS
-            Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaUmap.ToList());
             if (comando.Dto.ModuloDeCargaUmap != null)
             {
+                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaUmap.ToList());
                 foreach (var umap in comando.Dto.ModuloDeCargaUmap)
                 {
                     moduloDeCarga.ModuloDeCargaUmap.Add(new ModuloDeCargaUmap

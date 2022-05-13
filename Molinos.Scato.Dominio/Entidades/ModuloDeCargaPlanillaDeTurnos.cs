@@ -8,8 +8,19 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
-        public virtual ModuloDeCarga ModuloDeCarga { get; set; }
         public virtual DateTime? Fecha { get; set; }
-        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosTurnos> ModuloDeCargaPlanillaDeTurnosTurnos { get; set; }
+        public virtual ModuloDeCarga ModuloDeCarga { get; set; }
+        public virtual TurnoPuerto TurnoPuerto { get; set; }
+        public virtual bool Cerrado { get; set; }
+        public virtual bool Enviado { get; set; }
+        public virtual bool GuardadoPorTablerista { get; set; }
+        public virtual bool GuardadoPorRecibidor { get; set; }
+        public virtual bool EsLiquido { get; set; }
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetallesLiquido> ModuloDeCargaPlanillaDeTurnosDetallesLiquido { get; set; }
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetallesSolido> ModuloDeCargaPlanillaDeTurnosDetallesSolido { get; set; }
+        //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetalles> ModuloDeCargaPlanillaDeTurnosDetalles { get; set; }
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortes> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad> ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad { get; set; }
+
     }
 }
