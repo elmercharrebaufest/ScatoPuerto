@@ -290,7 +290,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!materialId) return '';
 
     let materialesPuerto = this.materialesPuerto.find( x => x.id == materialId );
-    let descripcionCorta = materialesPuerto.descripcionCorta;
+    // TODO: La siguiente linea es para cuando el id del material del corte no está en plano de carga
+    let descripcionCorta = materialesPuerto?.descripcionCorta ? materialesPuerto.descripcionCorta : '';
     return descripcionCorta;
   }
 
@@ -500,24 +501,20 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     let cortes = [];
     let bc = this.corteManualForm.value;
     // console.log('this.corteManualForm.value: ', this.corteManualForm.value);
-    
     let fechaHoraInicioInicial1 = new Date(bc.fecha_Inicio_Inicial+' '+bc.hora_Inicio_Inicial);
     let fechaHoraInicioInicial2 = fechaHoraInicioInicial1.getTime();
     let fechaHoraCorteInicial1 = new Date(bc.fecha_Corte_Inicial+' '+bc.hora_Corte_Inicial);
     let fechaHoraCorteInicial2 = fechaHoraCorteInicial1.getTime();
-
-    if( bc.observaciones == '' || !bc.listadoTotalBalanzadas.motivosFallasBalanza.id || bc.fecha_Inicio_Inicial == '' || 
-        bc.hora_Inicio_Inicial == '' || bc.fecha_Corte_Inicial == '' || bc.hora_Corte_Inicial == '' || !bc.listadoTotalBalanzadas.materialCorteManual.id || 
-        !bc.listadoTotalBalanzadas.bodegaCorteManual.id ){
+    if( bc.observaciones == '' || !bc.listadoTotalBalanzadas.motivosFallasBalanza.id || bc.fecha_Inicio_Inicial == '' ||
+        bc.hora_Inicio_Inicial == '' || bc.fecha_Corte_Inicial == '' || bc.hora_Corte_Inicial == '' ){
+        // !bc.listadoTotalBalanzadas.materialCorteManual.id || !bc.listadoTotalBalanzadas.bodegaCorteManual.id
       this.mensajeGenerico('Por favor, completar todos los datos.');
       return;
     }
-
     if( fechaHoraInicioInicial2 > fechaHoraCorteInicial2 ){
       this.mensajeGenerico('La fecha-hora de inicio es menor a la fecha-hora de corte.');
       return;
     }
-
     objetoNuevo = {
       ...this.corteManualForm.value,
       bodega_id: bc.listadoTotalBalanzadas.bodegaCorteManual.id,
@@ -535,18 +532,14 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       observaciones: bc.observaciones,
     }
-
     if(balanzaCorteManual == 7){
       this.balanzas7.push( this.initBalanzas7( objetoNuevo ) )
     }else{
       this.balanzas8.push( this.initBalanzas8( objetoNuevo ) )
     }
-
     cortes.push(objetoNuevo);
-
     this._balanzaService.guardarBalanzaCorte( cortes )
         .subscribe( res => this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id) );
-
     this.initCorteManualForm();
     this._modalService.dismissAll(modal);
   }

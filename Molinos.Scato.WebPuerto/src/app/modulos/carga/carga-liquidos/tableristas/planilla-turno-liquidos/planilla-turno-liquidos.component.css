@@ -3,6 +3,9 @@
     margin: 0;
     padding: 0;
 }
+.tabla-fila-corte{
+    background-color: #F4F4F4;
+}
 .center-bt{
     margin: auto !important;
 }
@@ -195,4 +198,21 @@ table.turnos table.tabla-embebida th{
     z-index: 1;
     cursor: pointer;
     margin-top: 5px;
+}
+.user{
+    display: block;
+    flex: auto;
+    height: 1rem;
+    color: grey;
+    
+}
+.color-user{
+    font-size: .9rem;
+}
+
+.custom-select{
+    text-align: center;
+}
+.bandera{
+    height: 38px;
 }

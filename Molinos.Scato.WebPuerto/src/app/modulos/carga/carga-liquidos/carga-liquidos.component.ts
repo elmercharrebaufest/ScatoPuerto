@@ -96,7 +96,12 @@ export class CargaLiquidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
+
         // this.mostrarTableristaOperando = res.estadoBuque.descripcion == "Operando";
+        //Lo dejo como PreOperativo si no trae estado.
+        let estado = res.estadoBuque ? res.estadoBuque.descripcion.trim() : "PreOperativo";
+        this.mostrarTableristaOperando = (estado != "PreOperativo")
+
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
           descripcionCorta: m.descripcionCorta,
@@ -126,7 +131,8 @@ export class CargaLiquidosComponent implements OnInit {
         if(!resp.moduloDeCargaPeriodoDeCarga[0])
           return
         else
-          this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
+          if (this.mostrarTableristaOperando)
+            this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
       }
     });
   }
@@ -183,11 +189,12 @@ export class CargaLiquidosComponent implements OnInit {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
         this.planillaEmbarqueComponent.desabilitarEmbarque();
        }
-    let fechasHorasOK = this.validarFechas();
-    if(!fechasHorasOK)
+    
+    let fechasHorasOK = this.mostrarTableristaOperando ? this.validarFechas() : false;
+    if(!fechasHorasOK && this.mostrarTableristaOperando)
       return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
-    //CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
+    //CAMBIOS, POR LO QUE DEBERÝA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     this.hideSpinner.emit(true);
     if (this.enviado && !finalizar) {
       var texto = "Se ha modificado con éxito la carga. Si desea informar los cambios, haga click en FINALIZAR.";
@@ -263,12 +270,11 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let lineasEmbarque = this.lineasComponent.obtenerLineasEmbarque();
-    let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
-    let planillaDeEmbarque = this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque();
-
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
-      null, null, [this.tanquesValue], lineasEmbarque, [periodoCarga], planillaDeEmbarque);
+     null, null, [this.tanquesValue], this.lineasComponent ?  this.lineasComponent.obtenerLineasEmbarque() : null,
+      this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
+      this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
+
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
     //   null, null, [this.tanquesValue], null, [periodoCarga]);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
@@ -296,6 +302,8 @@ export class CargaLiquidosComponent implements OnInit {
     this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
 
       let texto = "Se envió a Tableristas correctamente";
+      this.mostrarTableristaOperando = true;
+      this.obtenerModuloDeCarga();
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }

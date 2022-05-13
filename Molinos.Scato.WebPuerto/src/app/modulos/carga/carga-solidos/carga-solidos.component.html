@@ -3,30 +3,39 @@
     class='bg-white'></app-grafico-carga>
 <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"></app-manos>
 
-<div id="umap" class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
-    <app-umap></app-umap>
-</div>
-
-<app-inicio-carga></app-inicio-carga>
-
-<app-balanzas></app-balanzas>
-
-<app-balanzas-ritmos></app-balanzas-ritmos>
-
-<app-bodegas></app-bodegas>
-
-<div class="row mt-3">
-    <div class="col">
-        <app-graficos-ritmos></app-graficos-ritmos>
-    </div>
-    <div class="col">
-        <app-info-adicional></app-info-adicional>
-    </div>
-</div>
-
-<div class="d-flex justify-content-center my-5">
+<div class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
     <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
     <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
     <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
     <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+    <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
+</div>
+<div  *ngIf="mostrarTableristaOperando">    
+    <div id="umap" class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
+        <app-umap></app-umap>
+    </div>
+
+    <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
+
+    <app-balanzas *ngIf="inicioCarga"></app-balanzas>
+
+    <app-balanzas-ritmos *ngIf="inicioCarga"></app-balanzas-ritmos>
+
+    <app-bodegas *ngIf="inicioCarga"></app-bodegas>
+
+    <div class="row mt-3" *ngIf="inicioCarga">
+        <div class="col espacio-izq">
+            <app-graficos-ritmos></app-graficos-ritmos>
+        </div>
+        <div class="col">
+            <app-info-adicional></app-info-adicional>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center my-5">
+        <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+        <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+        <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
+        <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+    </div>
 </div>

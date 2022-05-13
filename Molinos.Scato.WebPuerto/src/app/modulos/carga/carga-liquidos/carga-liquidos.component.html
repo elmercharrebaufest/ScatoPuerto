@@ -15,6 +15,14 @@
   </div>
 </div>
 
+<div class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
+  <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+  <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+  <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
+  <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+  <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
+</div>
+
 <!-- Rol Tablerista -->
 <!-- <ng-container *ngIf='embarqueSelected.nombreUbicacion.toLowerCase() == "muelle de carga"'> -->
 
@@ -22,15 +30,15 @@
   <div class='shadow' id="planilla-embarque" style="background-color: white; min-height: 5rem;">
       <app-planilla-embarque></app-planilla-embarque>
   </div>
-  <div class='shadow' id="turno-liquidos" style="background-color: white; min-height: 5rem;">
-      <app-planilla-turno-liquidos></app-planilla-turno-liquidos>
+  <div class='bg-white px-4 min-h5 shadow mt-4' id="turno-liquidos">
+      <app-planilla-turno-liquidos [tablerista]='true'></app-planilla-turno-liquidos>
   </div>
   <div class='mt-5' style='margin-left: 25%; width: 50%;'>
       <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
   </div>
 </ng-container>
 
-<div class="d-flex justify-content-center my-5">
+<div class="d-flex justify-content-center my-5" *ngIf="mostrarTableristaOperando">
   <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
   <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
   <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>

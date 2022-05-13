@@ -35,7 +35,7 @@ namespace Molinos.Scato.Dominio.Dto
             // LÍQUIDO //
                 public IList<ModuloDeCargaMangueraCargaDto> ModuloDeCargaMangueraCarga { get; set; }
                 public IList<ModuloDeCargaPlanillaDeEmbarqueDto> ModuloDeCargaPlanillaDeEmbarque { get; set; }
-                public IList<ModuloDeCargaPlanillaDeTurnosTurnosDto> ModuloDeCargaPlanillaDeTurnosTurnos { get; set; }
+                public IList<ModuloDeCargaPlanillaDeTurnosDto> ModuloDeCargaPlanillaDeTurnos { get; set; }
             // LÍQUIDO //
 
             public IList<ModuloDeCargaPeriodoDeCargaDto> ModuloDeCargaPeriodoDeCarga { get; set; } //LÍQUIDO Y SÓLIDO

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -202,6 +203,8 @@
     <Content Include="src\app\shared\componentes\modulos\carga\periodo-carga\periodo-carga.component.css" />
     <Content Include="src\app\shared\componentes\modulos\carga\amarre\amarre.component.html" />
     <Content Include="src\app\shared\componentes\modulos\carga\amarre\amarre.component.css" />
+    <Content Include="src\app\shared\componentes\modulos\geo\card-buque\card-buque.component.html" />
+    <Content Include="src\app\shared\componentes\modulos\geo\card-buque\card-buque.component.css" />
     <!-- Lineup HTML/CSS -->
     <Content Include="src\app\modulos\lineup\calendario\lineup-calendario.component.css" />
     <Content Include="src\app\modulos\lineup\calendario\lineup-calendario.component.html" />
@@ -313,6 +316,7 @@
     <Content Include="src\assets\sidebar\Logo_Molinos_M.png" />
     <Content Include="src\assets\sidebar-icons\administracion.svg" />
     <Content Include="src\assets\sidebar-icons\buques.svg" />
+    <Content Include="src\assets\sidebar-icons\historialDeBuques.svg" />
     <Content Include="src\assets\sidebar-icons\comex.svg" />
     <Content Include="src\assets\sidebar-icons\lineup.svg" />
     <Content Include="src\assets\sidebar-icons\operaciones.svg" />
@@ -353,6 +357,7 @@
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\graficos-ritmos\graficos-ritmos.component.ts" />
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\amarre\amarre.component.ts" />
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\periodo-carga\periodo-carga.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\componentes\modulos\geo\card-buque\card-buque.component.ts" />
     <!-- servicios TS -->
     <TypeScriptCompile Include="src\app\shared\servicios\alert.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\autenticador.service.ts" />
@@ -421,6 +426,7 @@
     <TypeScriptCompile Include="src\app\shared\modelos\umap.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\recibo-buque.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\nir.ts" />
     <!-- enums TS -->
     <TypeScriptCompile Include="src\app\shared\enums\permisos-scato.ts" />
     <TypeScriptCompile Include="src\app\shared\enums\tipo-alerta.ts" />
@@ -445,9 +451,9 @@
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\alta-embarque\alta-embarque-routing.module.ts" />
     <!-- Componente PDF ReciboBuque -->
-    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.ts" />
-    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.css" />
-    <TypeScriptCompile Include="src\app\modulos\testpdf\testpdf.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\recibo-de-buque\recibodebuquepdf.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\recibo-de-buque\recibodebuquepdf.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\recibo-de-buque\recibodebuquepdf.component.css" />
     <!-- lineup TS -->
     <TypeScriptCompile Include="src\app\modulos\lineup\embarque\lineup-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\lineup\lineup.component.ts" />
@@ -616,6 +622,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
 </Project>

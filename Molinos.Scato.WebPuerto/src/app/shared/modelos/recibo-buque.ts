@@ -1,6 +1,6 @@
 export class ReciboDeBuque {
   nombrePuertoOrigen: string;
-  fechaRecibo: Date;
+  fechaRecibo: string;
   nombreVapor: string;
   nombreEmpresaRemitente: string;
   nombrePuertoDestino: string;
@@ -8,8 +8,10 @@ export class ReciboDeBuque {
   cantidadEnLetras: string;
   estibadoEnBodega: string;
   calidadYCantidadDesconocidas: string;
-  incluirParaImpresion: boolean;
   idModuloDeCarga: number;
   userImpresion: string 
   fechaImpresion: Date;
+  incluirParaImpresionDesconocida: boolean;
+  incluirParaImpresionBodega: boolean;
+  incluirParaImpresionDestino: boolean; 
 }
