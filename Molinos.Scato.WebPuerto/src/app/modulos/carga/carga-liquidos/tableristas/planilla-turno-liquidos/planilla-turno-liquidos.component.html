@@ -7,10 +7,6 @@
     </div>
     <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
     <button *ngIf="tablerista" class='btn btn-success divHeaderRight' (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
-    <div style="margin-left: 1rem;">
-        <h5 *ngIf="!tablerista">Observaciones De Calidad</h5>
-        <button *ngIf="!tablerista" class='btn btn-primary' (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
-    </div>
     <br>
     <br>
     
@@ -311,53 +307,7 @@
             </form>
         </div> 
     </ng-template>
-
-
-
-
-
-
-    <ng-template #agregarObs let-modal>
-        <div class='modal-header'>
-            <h4>Agregar Observacion de Calidad</h4>
-        </div>
-        <div class='modal-body'>
-            <form [formGroup]='obsCalidadForm'>|
-                <div class="form-row">
-                    <div class="form-group col-4">
-                        <label class="font-weight-bold">Fecha</label>
-                        <input type="date" max="3000-12-31" min="1000-01-01" class="form-control" formControlName="fecha" />
-                        <div class="input_img mt-2 w-70">
-                            <input class="form-control" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
-                                [format]="24" formControlName="hora" >
-                            <img src="assets/reloj.svg" class="imgClockInput1">
-                        </div>
-                        <ngx-material-timepicker #fullTimeAmarro>
-                        </ngx-material-timepicker>
-                       
-                    </div>
-                    <div class="form-group col-8 d-flex flex-column">
-                        <label class="font-weight-bold">Observaciones</label>
-                        <textarea class="form-control flex-grow-1" formControlName="observaciones" required></textarea>
-                    </div>
-                </div>
-                <div class='modal-footer' >
-                    <div class="user">
-                        <b><p class="color-user">Observacion cargada por: {{userCarga}}</p></b>
-                    </div>
-                    <button class="btn btn-danger" (click)='modal.dismiss("Cross click")'>Cancelar</button>
-                    <button class="btn btn-primary" [disabled]="obsCalidadForm.invalid" (click)="guardarObservacionesDeCalidad()">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </ng-template>
-
-
-
-    
-    
-
-
+       
     <ng-template #agregarTurno let-modal>
         <div class='modal-body' style="height: 230px; z-index: 200">
             <form [formGroup]='formNuevoTurno' fxLayout='row wrap'>|
