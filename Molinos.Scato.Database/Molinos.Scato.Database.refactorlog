@@ -630,4 +630,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FechaHora" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="9caae7b9-f6af-4ba2-a234-10145c65d7d4" ChangeDateTime="05/16/2022 12:34:14">
+    <Property Name="ElementName" Value="[dbo].[EmbarqueInformacion].[Bandera]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[EmbarqueInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Bandera_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d94aa974-88f0-46ec-acc8-f3edc906c189" ChangeDateTime="05/16/2022 18:09:52">
+    <Property Name="ElementName" Value="[dbo].[Bandera].[Descripcion]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Bandera]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Nombre" />
+  </Operation>
 </Operations>

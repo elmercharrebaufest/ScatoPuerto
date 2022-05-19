@@ -49,11 +49,11 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string filePathShipParticular { get; set; }
         public virtual DateTime? FechaHoraInicioCarga { get; set; }
         public virtual string UsuarioInicioCarga { get; set; }
-        public virtual string Imo { get; set; }
+       // public virtual string Imo { get; set; }
         public virtual int CantidadBodegasTanques { get; set; }
+       // public Bandera Bandera { get; set; }
         public virtual ICollection<EmbarqueInformacion> EmbarqueInformacion { get; set; }
         public virtual ICollection<EmbarqueInformacionViaje> EmbarqueInformacionViaje { get; set; }
         public virtual ICollection<EmbarquePosicion> EmbarquePosicion { get; set; }
-
     }
 }

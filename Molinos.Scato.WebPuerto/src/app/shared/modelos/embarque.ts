@@ -2,10 +2,12 @@ import { AgenciaMaritimaPuerto } from './agencia-maritima-puerto';
 import { ATAPuerto } from './ata-puerto';
 import { CoordinadorPuerto } from './coordinador-puerto';
 import { Destino } from './destino';
+import { EmbarqueInformacion } from './embarque-Informacion';
 import { MaterialPuertoCantidad } from './material-puerto-cantidad';
 import { MotivosLimpieza } from './motivo-limpieza';
 import { TipoDeBuquePuerto } from './tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from './ubicacion-de-buque-puerto';
+
 
 export class Embarque {
   id: number;

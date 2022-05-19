@@ -372,6 +372,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(!resultado.HayErrores ? true : false);
         }
 
+        [HttpGet]
+        [Route("api/Embarque/ObtenerBanderas")]
+        public HttpResponseMessage ObtenerBanderas()
+        {
+            return Request.CreateResponse(HttpStatusCode.OK,
+                servicio.ObtenerBanderas()
+            );
+        }
+        
+
         /*
         [HttpGet]
         [Route("api/Embarque/ObtenerPuntosInteresGeolocalizacion")]
@@ -383,88 +393,88 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
         */
 
-        [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
-        [Route("api/Embarque/RegistrarEmbarqueGeolocalizacion")]
-        public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> EmbarquesGeolocalizacion)
-        {
-            try
-            {
-                foreach (var EmbarqueGeolocalizacion in EmbarquesGeolocalizacion)
-                {
-                    comandos.Ejecutar(new ModificarEmbarqueGeolocalizacion
-                    {
-                        DtoInformacion = EmbarqueGeolocalizacion.informacion,
-                        DtoPosicion = EmbarqueGeolocalizacion.posicion,
-                        DtoViaje = EmbarqueGeolocalizacion.informacionViaje,
-                        BanderaBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.BanderaBuque,
-                        NombreBuque =  EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque,
-                        TipoBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.TipoBuque
-                    });
-                }
-
-             
-                return Request.CreateResponse(HttpStatusCode.OK);
-
-            }
-            catch (System.Exception ex)
-            {
-
-                return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
-            }
-            
-            
-        }
-        public class ObjetoGeolocalizacion
-        {
-            public DatosEmbarqueGeolocalizacion DatosEmbarqueGeolocalizacion;         
-            public EmbarqueInformacionDto informacion;
-            public EmbarqueInformacionViajeDto informacionViaje;
-            public EmbarquePosicionDto posicion;
-        }
-
-        [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
-        [Route("api/Embarque/ObtenerEmbarquesGeolocalizacion")]
-        public HttpResponseMessage ObtenerEmbarquesGeolocalizacion()
-        {
-            try
-            {
-                var embarquesLineUp = workflows.ListarEmbarques("LineUp");
-
-                List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
-
-                foreach (var embarque in embarquesLineUp)
-                {
-                    DatosEmbarqueGeolocalizacion embarqueLineUp = new DatosEmbarqueGeolocalizacion
-                    {
-                        NombreBuque = embarque.Embarque.NombreBuque,
-                        BanderaBuque = embarque.Embarque.Destino.Nombre,
-                        TipoBuque = embarque.Embarque.TipoBuque,
-                        imo = embarque.Embarque.Imo
-                    };
-                    embarques.Add(embarqueLineUp);
-
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK, embarques);
-
-            }
-            catch (System.Exception ex)
-            {
-
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
+        //[HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        //[Route("api/Embarque/RegistrarEmbarqueGeolocalizacion")]
+        //public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> EmbarquesGeolocalizacion)
+        //{
+        //    try
+        //    {
+        //        foreach (var EmbarqueGeolocalizacion in EmbarquesGeolocalizacion)
+        //        {
+        //            comandos.Ejecutar(new ModificarEmbarqueGeolocalizacion
+        //            {
+        //                DtoInformacion = EmbarqueGeolocalizacion.informacion,
+        //                DtoPosicion = EmbarqueGeolocalizacion.posicion,
+        //                DtoViaje = EmbarqueGeolocalizacion.informacionViaje,
+        //                BanderaBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.BanderaBuque,
+        //                NombreBuque =  EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque,
+        //                TipoBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.TipoBuque
+        //            });
+        //        }
 
 
-        }
+        //        return Request.CreateResponse(HttpStatusCode.OK);
 
-        public class DatosEmbarqueGeolocalizacion
-        {
-            public string NombreBuque;
-            public string TipoBuque;
-            public string BanderaBuque;
-            public string imo;
-        }
+        //    }
+        //    catch (System.Exception ex)
+        //    {
+
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
+        //    }
+
+
+        //}
+        //public class ObjetoGeolocalizacion
+        //{
+        //    public DatosEmbarqueGeolocalizacion DatosEmbarqueGeolocalizacion;         
+        //    public EmbarqueInformacionDto informacion;
+        //    public EmbarqueInformacionViajeDto informacionViaje;
+        //    public EmbarquePosicionDto posicion;
+        //}
+
+        //[HttpGet]
+        //[Autorizacion(PermisosScato.LineUp)]
+        //[Route("api/Embarque/ObtenerEmbarquesGeolocalizacion")]
+        //public HttpResponseMessage ObtenerEmbarquesGeolocalizacion()
+        //{
+        //    try
+        //    {
+        //        var embarquesLineUp = workflows.ListarEmbarques("LineUp");
+
+        //        List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
+
+        //        foreach (var embarque in embarquesLineUp)
+        //        {
+        //            DatosEmbarqueGeolocalizacion embarqueLineUp = new DatosEmbarqueGeolocalizacion
+        //            {
+        //                NombreBuque = embarque.Embarque.NombreBuque,
+        //                BanderaBuque = embarque.Embarque.Destino.Nombre,
+        //                TipoBuque = embarque.Embarque.TipoBuque,
+        //                imo = embarque.Embarque.Imo
+        //            };
+        //            embarques.Add(embarqueLineUp);
+
+        //        }
+
+        //        return Request.CreateResponse(HttpStatusCode.OK, embarques);
+
+        //    }
+        //    catch (System.Exception ex)
+        //    {
+
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+
+
+        //}
+
+        //public class DatosEmbarqueGeolocalizacion
+        //{
+        //    public string NombreBuque;
+        //    public string TipoBuque;
+        //    public string BanderaBuque;
+        //    public string imo;
+        //}
     }
 }
