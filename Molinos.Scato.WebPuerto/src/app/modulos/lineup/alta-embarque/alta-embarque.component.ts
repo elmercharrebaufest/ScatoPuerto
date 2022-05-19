@@ -295,9 +295,6 @@ export class AltaEmbarqueComponent implements OnInit {
                 res1.filter(x => x.id == this.embarqueForm.value['motivosLimpieza'].id).map(x => new MotivosLimpieza(x.id, x.nombre)));
             });
           }
-
-          
-
           this.mostrarSpinner = false;
         },
         errmess => {
@@ -347,6 +344,12 @@ export class AltaEmbarqueComponent implements OnInit {
   isInvalidDate(date: Date): boolean {
     return date.getFullYear() < 2000 || date.getFullYear() > 2100;
   }
+
+  invalidRequiredMaterial() {
+    var material = this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0);
+    return material == null;
+  }
+
 
   finalizarAlta() {
     this.submitted = true;
@@ -622,10 +625,7 @@ this.embarqueForm.value
           });
     }
   }
-
-  invalidRequiredMaterial() {
-    var material = this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0);
-    return material == null;
+ 
   }
   public openConfirmationDialog(titulo: string, texto: string, button1: string = 'OK', button2: string = 'Cancel') {
     if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, nos devuelve al mismo modulo
