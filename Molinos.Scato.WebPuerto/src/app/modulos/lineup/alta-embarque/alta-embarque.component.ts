@@ -627,6 +627,8 @@ this.embarqueForm.value
   }
  
   }
+
+  
   public openConfirmationDialog(titulo: string, texto: string, button1: string = 'OK', button2: string = 'Cancel') {
     if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, nos devuelve al mismo modulo
       this.confirmationDialogService.confirm(titulo, texto, button1, '')
