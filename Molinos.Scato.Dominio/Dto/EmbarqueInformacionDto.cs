@@ -10,10 +10,9 @@ namespace Molinos.Scato.Dominio.Dto
     public class EmbarqueInformacionDto
     {
         public int Id { get; set; }
-     //   public EmbarqueDto EmbarqueId { get; set; }
         public  string IMO { get; set; }
         public  string MMSI { get; set; }
-        public  string Bandera { get; set; }
+        public virtual BanderaDto Bandera { get; set; }
         public int Tonelaje { get; set; }
         public int TonelajePesoMuerto { get; set; }
         public string LargoxAnchoExtremo { get; set; }

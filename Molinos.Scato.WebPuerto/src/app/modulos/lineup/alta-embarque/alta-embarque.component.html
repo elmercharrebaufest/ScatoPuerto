@@ -344,11 +344,47 @@
                           placeholder=""  minLength="0" maxLength="7">
                   </div>
                   <div class="form-group col">
-                    <label for="destinoPuerto" class="font-weight-bold">Bandera</label>
-                    <select class="custom-select" formControlName="destino"  [ngClass]="{'input-error': submitted && f.destino.invalid}" required>
+                    <label for="banderaBuque" class="font-weight-bold">Bandera</label>
+                    <select class="custom-select" formControlName="bandera"  [ngClass]="{'input-error': submitted && f.bandera.invalid}" required>
+                      <option value=""></option>
+                      <option *ngFor="let t of banderaBuque" [ngValue]="t">{{ t.nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+               <!-- <div class="form-row">
+                  <div class="form-group col">
+                <div class="input-group">
+                  <tag-input formControlName="banderaList"
+                            [placeholder]="'Bandera'"
+                            [secondaryPlaceholder]="'Ingrese la Bandera'"
+                            [identifyBy]="'id'"
+                            [displayBy]="'nombre'"
+                            [maxItems]="1"
+                            (onSelect)="ABM('Bandera', 'Eliminar')">
+                    <tag-input-dropdown [showDropdownIfEmpty]="true"
+                                        [autocompleteItems]="banderaList"
+                                        [identifyBy]="'id'"
+                                        [displayBy]="'nombre'">
+                    </tag-input-dropdown>
+                  </tag-input>
+                  </div>
+                </div></div>
+              -->
+
+
+                <div class="form-row">
+                  <div class="form-group col">
+                    <label for="destinoPuerto" class="font-weight-bold">Destino</label>
+                    <select class="custom-select" formControlName="destino"  [ngClass]="{'input-error': submitted && f.destino.invalid}">
                       <option value=""></option>
                       <option *ngFor="let t of destinoPuerto" [ngValue]="t">{{ t.nombre }}</option>
                     </select>
+                  </div>
+
+                  <div class="form-group col">
+                    <label for="cantidadBodegasTanques" class="font-weight-bold">Cant Bodegas/TKS</label>
+                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
+                          placeholder=""  >
                   </div>
                 </div>
 
@@ -385,11 +421,7 @@
                           placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
                   </div>
                   
-                  <div class="form-group col">
-                    <label for="cantidadBodegasTanques" class="font-weight-bold">CANTIDAD DE BODEGAS/TANQUES</label>
-                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
-                          placeholder=""  >
-                  </div>
+               
                 </div>
 
                 <!-- <div class="row">

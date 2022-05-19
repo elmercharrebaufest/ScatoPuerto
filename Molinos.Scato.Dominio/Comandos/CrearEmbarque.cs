@@ -9,5 +9,7 @@ namespace Molinos.Scato.Dominio.Comandos
         public string NombreWorkflow { get; set; }
         public int WorkflowDefinicionId { get; set; }
         public Guid InstanciaWorkflowId { get; set; }
+
+        public string Bandera { get; set; }
     }
 }

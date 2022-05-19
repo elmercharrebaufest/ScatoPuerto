@@ -90,6 +90,7 @@
     <Folder Include="Scripts\20151030" />
     <Folder Include="Scripts\20160524 - Configuracion de Workflows" />
     <Folder Include="Scripts\20200512 - Credenciales MercadoPago" />
+    <Folder Include="Scripts\bkp16052022" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -517,6 +518,8 @@
     <Build Include="dbo\Tables\TipoDeActividad.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolido.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.sql" />
+    <Build Include="dbo\Tables\Bandera.sql" />
+    <Build Include="Scripts\bkp16052022\Datos Base.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
