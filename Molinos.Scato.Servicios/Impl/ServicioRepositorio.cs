@@ -9924,7 +9924,7 @@ namespace Molinos.Scato.Servicios.Impl
         //    var totalCargadoBalanza8 = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
         //    var tnCargadasBalanza8 = totalCargadoBalanza8 / 1000;
         //    DateTime ultimaBalanzadaBalanza8 = DateTime.Now;
-            
+
         //    var registroFinCargaVaporBalanza7 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "7");
         //    var registroFinCargaVaporBalanza8 = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id && x.NumeroBalanza == "8");
         //    double tiempoCargaNetoBalanza7 = 0;
@@ -10164,7 +10164,7 @@ namespace Molinos.Scato.Servicios.Impl
                     observacionesDeCalidad_db.FechaHora = item.FechaHora;
                     observacionesDeCalidad_db.Observaciones = item.Observaciones;
                     observacionesDeCalidad_db.ObservacionVisible = item.ObservacionVisible;
-                    
+
                 }
                 else
                 {
@@ -10207,7 +10207,7 @@ namespace Molinos.Scato.Servicios.Impl
         //            ObservacionVisible = item.ObservacionVisible,
         //            };
         //            moduloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidad.Add(observacionesDeCalidad_db);
-                    
+
         //        }
         //    }
         //    repositorio.GuardarCambios();
@@ -10578,17 +10578,21 @@ namespace Molinos.Scato.Servicios.Impl
         }
         public IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado)
         {
-            return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado ).ToList();
+            return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado).ToList();
         }
 
-        
+
         public void EliminarObservacionDeCalidad(int observacion_id)
         {
             ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
             repositorio.Remover(obs);
             repositorio.GuardarCambios();
         }
-        
-        
+
+        public IList<BanderaDto> ObtenerBanderas()
+        {
+            return Listar<Bandera, BanderaDto>();
+        }
+
     }
 }

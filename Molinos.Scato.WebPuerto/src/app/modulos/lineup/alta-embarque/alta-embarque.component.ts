@@ -21,6 +21,8 @@ import { Destino } from '@ScatoModels/destino';
 import { MotivosLimpieza } from '@ScatoModels/motivo-limpieza';
 import { WorkflowService } from '@ScatoServicios/workflow.service'
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { Bandera } from '@ScatoModels/bandera';
+import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
 @Component({
   selector: 'app-alta-embarque',
   templateUrl: './alta-embarque.component.html',
@@ -47,12 +49,12 @@ export class AltaEmbarqueComponent implements OnInit {
   motivosLimpiezaList: MotivosLimpieza[];
   destinoPuerto: Destino[];
   PlanoDeCargaId: number;
+  banderaBuque: Bandera[];
   private state: string;
   totalHorasLimpieza: number = 0;
-
   fileShipParticular: string | ArrayBuffer;
   fileNameShipParticular: string = 'Ningun archivo elegido';
-
+  embarqueInformacion : EmbarqueInformacion[] =[];
   @ViewChild('horaRecalada') horaRecalada: ElementRef;
   @ViewChild('horaDesdeLimpieza') horaDesdeLimpieza: ElementRef;
   @ViewChild('horaHastaLimpieza') horaHastaLimpieza: ElementRef;
@@ -94,7 +96,7 @@ export class AltaEmbarqueComponent implements OnInit {
       freeboard: [],
       ubicacion: [''],
       ubicacionDeBuque: [''],
-      materialesPuertoCantidad: this.formBuilder.array([]),
+      materialesPuertoCantidad:  this.formBuilder.array([]),
       meridiemRecalada: [],
       horaREcalada: [],
       agencias: [],
@@ -114,7 +116,7 @@ export class AltaEmbarqueComponent implements OnInit {
       motivosLimpiezaList: [],
       observacionesLimpieza: [],
       destinoBuque: [''],
-      destino: ['', Validators.required],
+    //  destino: ['',Validators.required],
       destinoPuerto: [],
       porteNeto: [],
       porteBruto: [],
@@ -128,6 +130,10 @@ export class AltaEmbarqueComponent implements OnInit {
       // TODO: Revisar plano-content, porque posiblemente sea como viene el valor del campo filePathShipParticular
       filePathShipParticular: [''],
       shipParticularArchivoNombre: [''],
+      banderaBuque: [''],
+      bandera: ['',Validators.required],
+      //embarqueInformacion:  [],
+      embarqueInformacion:  this.formBuilder.array([]),
     });
 
     if (this.state === 'modulo-carga') {
@@ -148,6 +154,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.cargarListadoMateriales();
     }, err => { console.log(err); });
   }
+  
 
   cargarEmbarqueEditar() {
     if (!this.tipoDeBuquePuerto)
@@ -289,6 +296,8 @@ export class AltaEmbarqueComponent implements OnInit {
             });
           }
 
+          
+
           this.mostrarSpinner = false;
         },
         errmess => {
@@ -302,6 +311,12 @@ export class AltaEmbarqueComponent implements OnInit {
     }
   }
 
+  get embarqueInformacionFormArray(): FormArray {
+    return this.embarqueForm.get("embarqueInformacion") as FormArray
+  }
+
+
+
   calcularHorasLimpieza(fechaDesde, horaDesde, fechaHasta, horaHasta): number {
     let horas = 0;
     if (fechaDesde != '' && horaDesde != '' && fechaHasta != '' && horaHasta != '') {
@@ -313,6 +328,7 @@ export class AltaEmbarqueComponent implements OnInit {
     }
     return horas;
   }
+
 
   get materialesPuertoCantidadFormArray(): FormArray {
     return this.embarqueForm.get("materialesPuertoCantidad") as FormArray
@@ -345,12 +361,109 @@ export class AltaEmbarqueComponent implements OnInit {
         }
         return;
       }
-      else {
-        if (this.invalidRequiredMaterial()) {
-          this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-          this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-          return;
-        }
+     this.mostrarSpinner = true;
+ 
+         this.embarqueForm.get('fechaRecalada').setValue(
+       this.embarqueForm.value.fechaRecalada + ' ' + this.horaRecalada.nativeElement.value);
+ 
+     this.embarqueForm.get('horaREcalada').setValue(
+       this.horaRecalada.nativeElement.value ?
+         this.horaRecalada.nativeElement.value :
+         this.embarqueForm.value.meridiemRecalada);
+ 
+     this.embarqueForm.get('fechaDesdeLimpieza').setValue(
+       this.embarqueForm.value.fechaDesdeLimpieza + ' ' + this.horaDesdeLimpieza.nativeElement.value);
+ 
+     this.embarqueForm.get('horaDesdeLimpieza').setValue(
+       this.horaDesdeLimpieza.nativeElement.value ?
+         this.horaDesdeLimpieza.nativeElement.value : '');
+ 
+     this.embarqueForm.get('fechaHastaLimpieza').setValue(
+       this.embarqueForm.value.fechaHastaLimpieza + ' ' + this.horaHastaLimpieza.nativeElement.value);
+ 
+     this.embarqueForm.get('horaHastaLimpieza').setValue(
+       this.horaHastaLimpieza.nativeElement.value ?
+         this.horaHastaLimpieza.nativeElement.value : '');
+ 
+     // this.embarqueForm.get('fechaLibrePlatica').setValue(
+     //   this.embarqueForm.value.fechaLibrePlatica + ' ' + this.horaLibrePlatica.nativeElement.value);
+ 
+     // this.embarqueForm.get('horaLibrePlatica').setValue(
+     //   this.horaLibrePlatica.nativeElement.value ?
+     //     this.horaLibrePlatica.nativeElement.value : '');
+ 
+     this.embarqueForm.value.filePathShipParticular = this.fileShipParticular;
+     this.embarqueForm.value.shipParticularArchivoNombre = this.fileNameShipParticular;
+ 
+     this.embarqueForm.value.agencias =
+       this.embarqueForm.value.agenciasList != null && this.embarqueForm.value.agenciasList.length > 0 ?
+         this.agenciasList.find(x => x.id == this.embarqueForm.value.agenciasList[0].id) : '';
+ 
+     this.embarqueForm.value.motivosLimpieza =
+       this.embarqueForm.value.motivosLimpiezaList != null && this.embarqueForm.value.motivosLimpiezaList.length > 0 ?
+         this.motivosLimpiezaList.find(x => x.id == this.embarqueForm.value.motivosLimpiezaList[0].id) : '';
+ 
+     this.embarqueForm.value.coordinadores =
+       this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
+         this.coordinadoresList.find(x => x.id == this.embarqueForm.value.coordinadoresList[0].id) : '';
+ 
+     this.embarqueForm.value.ata =
+       this.embarqueForm.value.ataList != null && this.embarqueForm.value.ataList.length > 0 ?
+         this.ataList.find(x => x.id == this.embarqueForm.value.ataList[0].id) : '';
+
+         this.embarqueForm.get('horaDesdeLimpieza').setValue(
+          this.horaDesdeLimpieza.nativeElement.value ? this.horaDesdeLimpieza.nativeElement.value : '');
+
+//  this.embarqueForm.value.get('embarqueInformacion').setValue(new EmbarqueInformacion(0,0,this.embarqueForm.value.imo,0, this.embarqueForm.value.bandera,0,0,0,0,0))
+
+//this.embarqueForm.value.embarqueInformacion.push(new EmbarqueInformacion(0,0,this.embarqueForm.value.imo,0, this.embarqueForm.value.bandera,0,0,0,0,0))
+
+this.embarqueInformacionFormArray.push(this.formBuilder.group({
+  imo:this.embarqueForm.value.imo,
+  bandera : this.embarqueForm.value.bandera,
+}));
+
+
+//this.embarqueForm.value.embarqueInformacion[0] = new EmbarqueInformacion(0,0,this.embarqueForm.value.imo,0, this.embarqueForm.value.bandera,0,0,0,0,0);
+
+this.embarqueForm.value
+     this.embarqueForm.value.esLiquido = this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido;
+     this.state === 'modulo-carga' ? this.embarqueForm.value['sanBenito'] = true : '';
+     this.embarqueService.altaEmbarque(this.embarqueForm.value)
+       .subscribe((res: any) => {
+         if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, mostramos el confirm solo con el boton volver
+           setTimeout(() => {
+             this.workflowService.listarEmbarquesEnLineUp().subscribe(listado => {
+               this.PlanoDeCargaId = listado.find(x => x.id == res).planoDeCargaId;
+               this.mostrarSpinner = false;
+               this.moduloCargaService.modificarCargadoPlanoDeCarga(this.PlanoDeCargaId).subscribe(y => {
+                 this.openConfirmationDialog('¡Felicitaciones!',
+                   'Ha cargado con éxito un nuevo Buque al Line UP',
+                   'Volver a Modulo de Carga')
+               });
+             });
+           }, 1000);
+         } else {
+           this.mostrarSpinner = false;
+           this.openConfirmationDialog('¡Felicitaciones!',
+             'Ha cargado con éxito un nuevo Buque al Line UP',
+             'Ver line up',
+             'Cargar otro buque');
+         }
+       },
+         errmess => {
+           this.confirmationDialogService.confirm('¡Error!', 'Error al crear el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+           this.mostrarSpinner = false;
+         });
+    }
+    else
+    {
+     if(this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid)
+     {
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      if (this.invalidRequiredMaterial()) 
+      {
+       this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
       }
       this.mostrarSpinner = true;
 
@@ -570,6 +683,14 @@ export class AltaEmbarqueComponent implements OnInit {
     this.embarqueService.obtenerListadoMotivosLimpieza().subscribe(res => {
       this.motivosLimpiezaList = res.map(x => new MotivosLimpieza(x.id, x.nombre));
     });
+    
+    this.embarqueService.obtenerBanderas().subscribe(res => {
+      this.banderaBuque = res.map(x => new Bandera(x.id, x.abreviatura, x.nombre));
+   // this.banderaList = res.map(x => new Bandera(x.id, x.abreviatura, x.nombre));
+    });
+
+
+    
   }
 
   public isEditing() {
