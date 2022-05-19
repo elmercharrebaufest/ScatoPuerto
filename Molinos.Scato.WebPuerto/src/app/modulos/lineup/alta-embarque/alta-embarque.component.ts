@@ -143,6 +143,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.get('otrosMuelles').disable();
     }
 
+
     forkJoin([
       this.embarqueService.obtenerListadoTipoDeBuquePuerto(),
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto(),
@@ -348,6 +349,7 @@ export class AltaEmbarqueComponent implements OnInit {
     return date.getFullYear() < 2000 || date.getFullYear() > 2100;
   }
 
+  //#region Finalizar Alta
   finalizarAlta() {
     this.submitted = true;
    
@@ -551,6 +553,8 @@ this.embarqueForm.value
     }
   }
 
+  //#endregion
+
   invalidRequiredMaterial() {
     var material = this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0);
     return material == null;
@@ -627,6 +631,7 @@ this.embarqueForm.value
     return this.route.snapshot.queryParamMap.get('id') != null;
   }
 
+  //#region Modificar embarque
   public modificarEmbarque() {
     this.submitted = true;
     if (this.embarqueForm.invalid)
@@ -711,6 +716,8 @@ this.embarqueForm.value
         });
   }
 
+  //#endregion
+  
   public trackByFn(index: any, item: any) {
     return index;
     
