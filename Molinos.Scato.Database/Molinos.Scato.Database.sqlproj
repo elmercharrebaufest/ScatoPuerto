@@ -503,6 +503,8 @@
     <Build Include="dbo\Tables\CategoriaVehiculo.sql" />
     <Build Include="dbo\Tables\ConfiguracionAutomatizacionEtapas.sql" />
     <Build Include="dbo\Tables\Entidad.sql" />
+    <Build Include="dbo\Tables\RegistroInactividad.sql" />
+    <Build Include="dbo\Tables\TipoDeActividad.sql" />
     <Build Include="dbo\Tables\EntidadTipoDeActividad.sql" />
     <Build Include="dbo\Tables\EquivalenciasCaracteristicasCpOtrosPuertos.sql" />
     <Build Include="dbo\Tables\ImpEtiquetaPuerto.sql" />
@@ -510,6 +512,9 @@
     <Build Include="dbo\Tables\LogCambioDeModalidadCalle.sql" />
     <Build Include="dbo\Tables\MensajeCartelLed.sql" />
     <Build Include="dbo\Tables\MotivoInactividad.sql" />
+    <Build Include="dbo\Tables\RegistroInactividad.sql" />
+    <Build Include="dbo\Tables\RegistroStockOtrosPuertos.sql" />
+    <Build Include="dbo\Tables\ConfiguracionGeneral.sql" />
     <Build Include="dbo\Tables\NotificacionAplicacion.sql" />
     <Build Include="dbo\Tables\PinchazosPorCalada.sql" />
     <Build Include="dbo\Tables\RamalFerroviario.sql" />
@@ -519,7 +524,6 @@
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolido.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.sql" />
     <Build Include="dbo\Tables\Bandera.sql" />
-    <Build Include="Scripts\bkp16052022\Datos Base.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
