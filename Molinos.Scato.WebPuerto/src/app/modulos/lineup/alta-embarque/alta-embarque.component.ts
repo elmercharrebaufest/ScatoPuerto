@@ -779,6 +779,7 @@ this.embarqueForm.value
 
   public trackByFn(index: any, item: any) {
     return index;
+    
   }
 
   public checkLiquidOrSolid(materialCantidad) {
