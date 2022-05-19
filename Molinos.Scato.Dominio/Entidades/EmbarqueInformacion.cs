@@ -15,7 +15,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Embarque Embarque { get; set; }
         public virtual  string IMO { get; set; }
         public virtual  string MMSI { get; set; }
-        public virtual  string Bandera { get; set; }
+        public virtual Bandera Bandera { get; set; }
         public virtual  int Tonelaje { get; set; }
         public virtual  int TonelajePesoMuerto { get; set; }
         public virtual  string LargoxAnchoExtremo { get; set; }
