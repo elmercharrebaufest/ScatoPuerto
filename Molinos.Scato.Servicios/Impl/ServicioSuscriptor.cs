@@ -31,26 +31,26 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 switch (notificacion.CodigoEvento)
                 {
-                    //case "EntradaActivada":
-                    //    var resultadoApertura = servicioComandos.Ejecutar(new CrearMotivoQuiebreBarrera { CodigoDispositivo = notificacion.CodigoDispositivo, Apertura = true });
-                    //    EnviarMail(Textos.MailQuiebreBarrera, resultadoApertura, notificacion);
-                    //    break;
-                    //case "EntradaDesactivada":
-                    //    var resultadoCierre = servicioComandos.Ejecutar(new CrearMotivoQuiebreBarrera { CodigoDispositivo = notificacion.CodigoDispositivo, Apertura = false });
-                    //    EnviarMail(Textos.MailCierreBarrera, resultadoCierre, notificacion);
-                    //    break;
+                    case "EntradaActivada":
+                        var resultadoApertura = servicioComandos.Ejecutar(new CrearMotivoQuiebreBarrera { CodigoDispositivo = notificacion.CodigoDispositivo, Apertura = true });
+                        EnviarMail(Textos.MailQuiebreBarrera, resultadoApertura, notificacion);
+                        break;
+                    case "EntradaDesactivada":
+                        var resultadoCierre = servicioComandos.Ejecutar(new CrearMotivoQuiebreBarrera { CodigoDispositivo = notificacion.CodigoDispositivo, Apertura = false });
+                        EnviarMail(Textos.MailCierreBarrera, resultadoCierre, notificacion);
+                        break;
                     case "BalanzadaRecibida":
                         if (notificacion.Datos["tipoBalanzada"] == "fin")
                         {
                             servicioComandos.Ejecutar(new ValidarConsistenciaBalanzadas { Balanza = notificacion.CodigoDispositivo, CodigoDispositivo = notificacion.CodigoDispositivo, Hasta = Int32.Parse(notificacion.Datos["id"]) });
                         }
                         break;
-                    //case "CambioEstadoSensor":
-                    //    estadoPuesto.NotificarCambioDeEstado(notificacion.CodigoDispositivo, notificacion.Datos["Mensaje"]);
-                    //    break;
-                    //case "LecturaCPE":
-                    //    LecturaCartaPorteElectronica(notificacion.CodigoDispositivo, int.Parse(notificacion.Datos["QR"]));
-                    //    break;
+                    case "CambioEstadoSensor":
+                        estadoPuesto.NotificarCambioDeEstado(notificacion.CodigoDispositivo, notificacion.Datos["Mensaje"]);
+                        break;
+                    case "LecturaCPE":
+                        LecturaCartaPorteElectronica(notificacion.CodigoDispositivo, int.Parse(notificacion.Datos["QR"]));
+                        break;
                 }
             }
             catch (Exception e)

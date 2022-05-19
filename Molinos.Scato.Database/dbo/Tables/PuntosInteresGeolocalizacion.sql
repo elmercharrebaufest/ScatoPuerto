@@ -15,5 +15,5 @@
 	[PosicionZona] smallint NULL,
 	[Estado] [smallint] NULL,
 	[FechaRegistro] [datetime] NULL,
-    CONSTRAINT [PK_dbo.PuntosInteresGeolocalizacion] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [PK_dbo.PuntoInteresGeolocalizacion] PRIMARY KEY CLUSTERED ([Id] ASC),
 );

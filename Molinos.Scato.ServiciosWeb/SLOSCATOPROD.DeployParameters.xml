@@ -19,8 +19,8 @@
   <setParameter name="CertificadoWsCtg Config" value="CertificadosProd\alias.p12" />
 
   <!--Nunca hacer esto por localhost. Se pierde el balanceo de las notificaciones, esto dificulta el deploy en caliente ya que la capa nunca sale realmente del farm -->
-  <setParameter name="UrlNotificaciones Config" value="http://scatopuerto.molinosagro.com.ar/Scato.serviciosWeb/ServicioSuscriptor.svc" />
-  <setParameter name="UrlNotificacionesWeb Config" value="http://scatopuerto.molinosagro.com.ar/Scato.web/ServicioHub/ServicioSuscriptor.svc" />
+  <setParameter name="UrlNotificaciones Config" value="http://scato.molinosagro.com.ar/Scato.serviciosWeb/ServicioSuscriptor.svc" />
+  <setParameter name="UrlNotificacionesWeb Config" value="http://scato.molinosagro.com.ar/Scato.web/ServicioHub/ServicioSuscriptor.svc" />
 
   <setParameter name="MonsantoServiceUsername Config" value="ws_molinos" />
   <setParameter name="MonsantoServicePassword Config" value="n41TwPC/D/iYU4ye1PAF7Q==" />
