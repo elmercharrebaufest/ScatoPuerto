@@ -137,51 +137,53 @@ export class CargaLiquidosComponent implements OnInit {
     });
   }
 
-  imprimir(imprimir: boolean = false) {
+
+
+  // imprimir(imprimir: boolean = false) {
     
-    this.lineasComponent.expandir();
-    this.planillaEmbarqueComponent.expandir();
-    this.planillaTurnoLiquidosComponent.expandir();
-    this.cargaPdf = true;
-    let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
-    //graficos
-    html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas) => {
-      canvas.style.backgroundColor = 'white';
-      let img = canvas.toDataURL('image/jpg');
-      doc.addImage(img, 'JPG', 15, 15, 260, 160);
-      html2canvas(document.getElementById('planilla-embarque'), { backgroundColor: '#fff' }).then((canvas2) => {
-        doc.addPage('a4', 'l')
-        canvas.style.backgroundColor = 'white';
-        let img2 = canvas2.toDataURL('image/jpg');
-        doc.addImage(img2, 'JPG', 15, 15, 270, 130);
-        html2canvas(document.getElementById('turno-liquidos'), { backgroundColor: '#fff' }).then((canvas3) => {
-          doc.addPage('a4', 'l')
-          canvas.style.backgroundColor = 'white';
-          let img3 = canvas3.toDataURL('image/jpg');
-          doc.addImage(img3, 'JPG', 15, 15, 270, 100);
-        if (!imprimir) {
-          this.cargaPdf = false;
-          doc.output('pdfobjectnewwindow');
-        } else {
-          let file = doc.output('blob');
-          this.cargarPDF(file);
-        }
-      })
-    })
-  })
-  }
+  //   this.lineasComponent.expandir();
+  //   this.planillaEmbarqueComponent.expandir();
+  //   this.planillaTurnoLiquidosComponent.expandir();
+  //   this.cargaPdf = true;
+  //   let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
+  //   //graficos
+  //   html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas) => {
+  //     canvas.style.backgroundColor = 'white';
+  //     let img = canvas.toDataURL('image/jpg');
+  //     doc.addImage(img, 'JPG', 15, 15, 260, 160);
+  //     html2canvas(document.getElementById('planilla-embarque'), { backgroundColor: '#fff' }).then((canvas2) => {
+  //       doc.addPage('a4', 'l')
+  //       canvas.style.backgroundColor = 'white';
+  //       let img2 = canvas2.toDataURL('image/jpg');
+  //       doc.addImage(img2, 'JPG', 15, 15, 270, 130);
+  //       html2canvas(document.getElementById('turno-liquidos'), { backgroundColor: '#fff' }).then((canvas3) => {
+  //         doc.addPage('a4', 'l')
+  //         canvas.style.backgroundColor = 'white';
+  //         let img3 = canvas3.toDataURL('image/jpg');
+  //         doc.addImage(img3, 'JPG', 15, 15, 270, 100);
+  //       if (!imprimir) {
+  //         this.cargaPdf = false;
+  //         doc.output('pdfobjectnewwindow');
+  //       } else {
+  //         let file = doc.output('blob');
+  //         this.cargarPDF(file);
+  //       }
+  //     })
+  //   })
+  // })
+  // }
 
 
-  cargarPDF(file) {
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.adjunto = reader.result
-        this.enviarMail();
-      }
-    }
-  }
+  // cargarPDF(file) {
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+  //     reader.onload = () => {
+  //       this.adjunto = reader.result
+  //       this.enviarMail();
+  //     }
+  //   }
+  // }
 
   guardar(finalizar: boolean) {
        if(finalizar)
@@ -278,7 +280,8 @@ export class CargaLiquidosComponent implements OnInit {
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
       this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(finalizar)},
+          // .then(() => {this.imprimir(finalizar)},
+          .then(() => {},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
