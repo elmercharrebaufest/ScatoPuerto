@@ -13,7 +13,7 @@ IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('SURINAM')) BEG
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('URUGUAY')) BEGIN insert into Pais(Descripcion) values ('URUGUAY'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('VENEZUELA')) BEGIN insert into Pais(Descripcion) values ('VENEZUELA'); END
 IF NOT EXISTS (select Descripcion from Pais where Descripcion = ('GUAYANA FRANCESA')) BEGIN insert into Pais(Descripcion) values ('GUAYANA FRANCESA'); END
-go
+
 -- Documentos
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'DNI') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodiSap) values ('Documento Nacional de Identidad','DNI', ''); END
 IF NOT EXISTS (select 1 from TipoDocumentoIdentidad where descripcionCorta = 'LC') BEGIN insert into TipoDocumentoIdentidad (Descripcion,DescripcionCorta, CodiSap) values ('Libreta Civica','LC', '90'); END
