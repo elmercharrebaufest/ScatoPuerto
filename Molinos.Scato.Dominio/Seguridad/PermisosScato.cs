@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.CodeDom;
+using System.ComponentModel.DataAnnotations;
 using Molinos.Scato.Dominio.Recursos;
 
 namespace Molinos.Scato.Dominio.Seguridad
@@ -410,7 +411,7 @@ namespace Molinos.Scato.Dominio.Seguridad
         [Display(ResourceType = typeof(Textos), Name = "CamionDemorado")]
         CamionDemorado = 198,
         [Display(ResourceType = typeof(Textos), Name = "ActEnEsperaHB4")]
-        EnEsperaHB4 = 199,
+        EnEsperaHB4= 199,
 
         //Permisos Generales
         [Display(ResourceType = typeof(Textos), Name = "IniciarWorkflow")]
@@ -555,8 +556,8 @@ namespace Molinos.Scato.Dominio.Seguridad
         [Display(ResourceType = typeof(Textos), Name = "NotificacionAplicacion")]
         NotificacionAplicacion = 305,
 
-        //Permisos Reportes
-        [Display(ResourceType = typeof(Textos), Name = "ListadoDeArribosAPlanta")]
+         //Permisos Reportes
+         [Display(ResourceType = typeof(Textos), Name = "ListadoDeArribosAPlanta")]
         ListadoDeArribosAPlanta = 400,
         [Display(ResourceType = typeof(Textos), Name = "PlanillaF515")]
         PlanillaF515 = 401,

@@ -10006,103 +10006,92 @@ namespace Molinos.Scato.Servicios.Impl
         //    return ritmosDeEmbarque;
         //}
 
-        public Dictionary<string, int> ObtenerRitmos( int modulodecarga_id)
+        public Dictionary<string, int> ObtenerRitmos(int vapor_id, int modulodecarga_id)
         {
-            try
+            //obtengo las toneladas cargadas y los registros de balanzas segun el vapor y el nro de balanza
+            var totalCargado = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id);
+            totalCargado /= 1000;
+            var registroFinCargaVapor = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id);
+            double tiempoCargaNeto = 0;
+
+            //obtengo los datos necesarios para el calculo de Ritmo carga NETO(Fechas y tn totales)
+
+            if (registroFinCargaVapor != null)
             {
-                int embarque = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == modulodecarga_id).Embarque.Id;
-
-                int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarque).Vapor.Id;
-                //obtengo las toneladas cargadas y los registros de balanzas segun el vapor y el nro de balanza
-                var totalCargado = (int)repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id);
-                totalCargado /= 1000;
-                var registroFinCargaVapor = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id);
-                double tiempoCargaNeto = 0;
-
-                //obtengo los datos necesarios para el calculo de Ritmo carga NETO(Fechas y tn totales)
-
-                if (registroFinCargaVapor != null)
+                foreach (var carg in registroFinCargaVapor)
                 {
-                    foreach (var carg in registroFinCargaVapor)
+                    var inicioCargaid = carg.CargaOpuesta_Id;
+                    var finCargaid = carg.Id;
+                    var numeroBalanza = carg.NumeroBalanza;
+
+                    var fechainicio = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaid && x.NumeroBalanza == numeroBalanza).Fecha;
+                    var fechaFin = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaid && x.NumeroBalanza == numeroBalanza).Fecha;
+
+                    tiempoCargaNeto += (fechaFin - fechainicio).TotalMinutes;
+                }
+            }
+            else
+            {
+                tiempoCargaNeto = 0;
+                totalCargado = 0;
+            }
+
+            int ritmoCargaNeto = 0;
+            var tnBcTotales = 0;
+            double tiempoCargaNetoBc = 0;
+            double ritmoDeCarga = 0;
+
+            if (tiempoCargaNeto != 0)
+            {
+
+                ritmoDeCarga = (totalCargado * 60) / tiempoCargaNeto;
+
+                //como ritmo carga NETO no contempla bajas nargas ni fuleos hago un if que comprueba si hay un corte, en casode no haber retorna el ritmo si cortes 
+                //en caso de haber un corte, me traigo los datos del corte cuando sea == a BCB(Baja carga Buque) o F(Fuleos) y retorno el valor restandolo a el Ritmo neto
+
+                if (repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == modulodecarga_id && x.MotivosFallasBalanza_id == 10 || x.MotivosFallasBalanza_id == 14) == null)
+                {
+                    if (tiempoCargaNeto != 0)
                     {
-                        var inicioCargaid = carg.CargaOpuesta_Id;
-                        var finCargaid = carg.Id;
-                        var numeroBalanza = carg.NumeroBalanza;
-
-                        var fechainicio = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaid && x.NumeroBalanza == numeroBalanza).Fecha;
-                        var fechaFin = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaid && x.NumeroBalanza == numeroBalanza).Fecha;
-
-                        tiempoCargaNeto += (fechaFin - fechainicio).TotalMinutes;
+                        ritmoCargaNeto = (totalCargado * 60) / (int)tiempoCargaNeto;
                     }
+                    else { ritmoCargaNeto = (int)ritmoDeCarga; }
                 }
                 else
                 {
-                    tiempoCargaNeto = 0;
-                    totalCargado = 0;
-                }
+                    string[] listaBC = new string[] { "BCB", "F" };
+                    var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
+                    var bajaCargas = repositorio.Listar<BalanzasCortes>(y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == modulodecarga_id);
 
-                int ritmoCargaNeto = 0;
-                var tnBcTotales = 0;
-                double tiempoCargaNetoBc = 0;
-                double ritmoDeCarga = 0;
-
-                if (tiempoCargaNeto != 0)
-                {
-
-                    ritmoDeCarga = (totalCargado * 60) / tiempoCargaNeto;
-
-                    //como ritmo carga NETO no contempla bajas nargas ni fuleos hago un if que comprueba si hay un corte, en casode no haber retorna el ritmo si cortes 
-                    //en caso de haber un corte, me traigo los datos del corte cuando sea == a BCB(Baja carga Buque) o F(Fuleos) y retorno el valor restandolo a el Ritmo neto
-
-                    if (repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == modulodecarga_id && x.MotivosFallasBalanza_id == 10 || x.MotivosFallasBalanza_id == 14) == null)
+                    foreach (var bc in bajaCargas)
                     {
-                        if (tiempoCargaNeto != 0)
-                        {
-                            ritmoCargaNeto = (totalCargado * 60) / (int)tiempoCargaNeto;
-                        }
-                        else { ritmoCargaNeto = (int)ritmoDeCarga; }
+                        var tnBc = bc.Tn;
+                        var fechaInicioCOrte = bc.Fecha_Inicio;
+                        var fechaCorte = bc.Fecha_Corte;
+
+                        tnBcTotales += (int)tnBc;
+                        tiempoCargaNetoBc += (fechaCorte - fechaInicioCOrte).GetValueOrDefault().TotalMinutes;
+
                     }
-                    else
-                    {
-                        string[] listaBC = new string[] { "BCB", "F" };
-                        var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
-                        var bajaCargas = repositorio.Listar<BalanzasCortes>(y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == modulodecarga_id);
-
-                        foreach (var bc in bajaCargas)
-                        {
-                            var tnBc = bc.Tn;
-                            var fechaInicioCOrte = bc.Fecha_Inicio;
-                            var fechaCorte = bc.Fecha_Corte;
-
-                            tnBcTotales += (int)tnBc;
-                            tiempoCargaNetoBc += (fechaCorte - fechaInicioCOrte).GetValueOrDefault().TotalMinutes;
-
-                        }
-                        ritmoCargaNeto = ((totalCargado - tnBcTotales) * 60) / (int)(tiempoCargaNeto - tiempoCargaNetoBc);
-                    }
+                    ritmoCargaNeto = ((totalCargado - tnBcTotales) * 60) / (int)(tiempoCargaNeto - tiempoCargaNetoBc);
                 }
-                else
-                {
-                    ritmoDeCarga = 0;
-                    ritmoCargaNeto = 0;
-                }
-
-                Dictionary<string, int> ritmosDeCarga = new Dictionary<string, int>();
-
-                ritmosDeCarga.Add("totalCargado", (int)totalCargado);
-                ritmosDeCarga.Add("ritmoDeCarga", (int)ritmoDeCarga);
-                ritmosDeCarga.Add("ritmoCargaNeto", ritmoCargaNeto);
-
-
-
-                return ritmosDeCarga;
             }
-            catch (Exception ex)
+            else
             {
-
-                throw ex;
+                ritmoDeCarga = 0;
+                ritmoCargaNeto = 0;
             }
-          
+
+            Dictionary<string, int> ritmosDeCarga = new Dictionary<string, int>();
+
+            ritmosDeCarga.Add("totalCargado", (int)totalCargado);
+            ritmosDeCarga.Add("ritmoDeCarga", (int)ritmoDeCarga);
+            ritmosDeCarga.Add("ritmoCargaNeto", ritmoCargaNeto);
+
+
+
+            return ritmosDeCarga;
+
         }
 
 
@@ -10215,8 +10204,6 @@ namespace Molinos.Scato.Servicios.Impl
 
         public Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id)
         {
-
-
             var cantTotal = 0;
             var minutosCargando = 0;
             var ritmoAcumuladoLiquidos = 0;

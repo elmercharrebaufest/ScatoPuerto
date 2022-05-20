@@ -672,7 +672,7 @@ namespace Molinos.Scato.Web.Controllers
             {
                 UniqueId = uniqueId,
                 Codigo = codigoIntercomunicador,
-                //AudioPort = (puertoAudio.HasValue) ? puertoAudio.Value.ToString() : string.Empty,
+                AudioPort = (puertoAudio.HasValue) ? puertoAudio.Value.ToString() : string.Empty,
                 ICPCConfig = ConfigurationManager.AppSettings["ICPCConfig"],
                 ICWebServerUrl = ConfigurationManager.AppSettings["ICWebServerUrl"],
                 ICWSServerUrl = ConfigurationManager.AppSettings["ICWSServerUrl"],

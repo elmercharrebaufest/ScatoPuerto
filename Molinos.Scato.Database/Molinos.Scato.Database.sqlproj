@@ -106,7 +106,6 @@
     <None Include="Molinos_1.Scato.Database.publish.xml" />
     <None Include="Molinos.Scato.Database.GVICSQLTEST2016.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.GVICSQLPROD2016.Puerto.publish.xml" />
-    <Build Include="dbo\Tables\ConfiguracionAutomatizacionEtapas.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
@@ -444,12 +443,9 @@
     <Build Include="dbo\Tables\AgenteControlPrivado.sql" />
     <Build Include="dbo\Tables\PlanoDeCargaBodega.sql" />
     <Build Include="dbo\Tables\PlanoDeCargaAgenteControlPrivado.sql" />
-    <Build Include="dbo\Tables\CallePorRecorrido.sql" />
-    <Build Include="dbo\Tables\PinchazosPorCalada.sql" />
     <Build Include="dbo\Tables\ATAPuerto.sql" />
     <Build Include="dbo\Tables\TipoDeBuquePuerto.sql" />
     <Build Include="dbo\Tables\UbicacionDeBuquePuerto.sql" />
-    <Build Include="dbo\Tables\MensajeCartelLed.sql" />
     <Build Include="dbo\Tables\CargaComercialHistorico.sql" />
     <Build Include="dbo\Tables\PlanoDeCargaAgenteControlPrivadoHistorico.sql" />
     <Build Include="dbo\Tables\PlanoDeCargaBodegaHistorico.sql" />
@@ -504,21 +500,12 @@
     <Build Include="dbo\Tables\CaracteristicasCartaPorteOtrosPuertos.sql" />
     <Build Include="dbo\Tables\CartaPorteElectronica.sql" />
     <Build Include="dbo\Tables\CartaPorteOtrosPuertos.sql" />
-    <Build Include="dbo\Tables\CartaPorteElectronica.sql" />
-    <Build Include="dbo\Tables\LogAfipCpe.sql" />
-    <Build Include="dbo\Tables\NotificacionAplicacion.sql" />
-    <Build Include="dbo\Tables\AlmacenReporteDeMovimientos.sql" />
-    <Build Include="dbo\Tables\NotificacionAplicacion.sql" />
-    <Build Include="dbo\Tables\ImpEtiquetaPuerto.sql" />
-    <Build Include="dbo\Tables\RamalFerroviario.sql" />
-    <Build Include="dbo\Tables\LogCambioDeModalidadCalle.sql" />
     <Build Include="dbo\Tables\CategoriaVehiculo.sql" />
     <Build Include="dbo\Tables\ConfiguracionAutomatizacionEtapas.sql" />
     <Build Include="dbo\Tables\Entidad.sql" />
     <Build Include="dbo\Tables\RegistroInactividad.sql" />
     <Build Include="dbo\Tables\TipoDeActividad.sql" />
     <Build Include="dbo\Tables\EntidadTipoDeActividad.sql" />
-    <Build Include="dbo\Tables\MotivoInactividad.sql" />
     <Build Include="dbo\Tables\EquivalenciasCaracteristicasCpOtrosPuertos.sql" />
     <Build Include="dbo\Tables\ImpEtiquetaPuerto.sql" />
     <Build Include="dbo\Tables\LogAfipCpe.sql" />

@@ -516,11 +516,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/ObtenerRitmos")]
-        public HttpResponseMessage ObtenerRitmos(int modulodecarga_id)
+        public HttpResponseMessage ObtenerRitmos(int vapor_id, int modulodecarga_id)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerRitmos( modulodecarga_id));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerRitmos(vapor_id, modulodecarga_id));
             }
             catch (Exception ex)
             {
