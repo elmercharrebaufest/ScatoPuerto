@@ -39,29 +39,16 @@ export class NIRComponent implements OnInit {
     this.materialesPuerto = this.datosEmbarque.listaMateriales;
     this.materialTrigo = this.materialesPuerto.find(m => m.descripcionCorta.includes('TRIGO'));
     if(this.materialTrigo) this.conTrigo = true;
-    // this.materialTrigo = this.materialesPuerto.find(m => m.descripcionCorta.includes('TRIGO'));
-    this.materialTrigo = {
-      color:'#F58920',
-      descripcionCorta:'TRIGO',
-      id:11,
-      codigoSAP: 'TRIGO',
-      descripcion: 'TRIGO',
-      almacenId: 9,
-      almacenDesc: 'lala',
-      esLiquido: false,
-    }
     this.materialMaiz = this.materialesPuerto.find(m => m.descripcionCorta.includes('MAIZ'));
     if(this.materialMaiz) this.conMaiz = true;
-
   }
 
   ngOnInit(): void {
     this.initFormulario();
 
-    // this.moduloDeCargaService.obtenerListadoBodegas()
-    //   .pipe( finalize( () => this.obtenerNir() ) )
-    //   .subscribe( bod => this.bodegas = bod );
-    // this.obtenerNir()
+    this.moduloDeCargaService.obtenerListadoBodegas()
+      .pipe( finalize( () => this.obtenerNir() ) )
+      .subscribe( bod => this.bodegas = bod );
   }
   
   initFormulario(){
@@ -195,7 +182,6 @@ export class NIRComponent implements OnInit {
   }
   
   eliminarLineasEmbarque(pos: number, productoMano: string) {
-    // this.trigoMano1.removeAt(pos);
     this[productoMano].removeAt(pos);
   }
 
@@ -212,18 +198,16 @@ export class NIRComponent implements OnInit {
     for(let m2 of maizMano2){ nir.push(m2); }
     for(let t1 of trigoMano1){ nir.push(t1); }
     for(let t2 of trigoMano2){ nir.push(t2); }
-
-    console.log('obtenerNirCompleto(): ', nir);
     
     return nir;
   }
 
   enviarNir(){
     let nir: Nir[] = this.obtenerNirCompleto();
-    console.log('.:: NIR: ::.', nir );
-    
+
     this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( nir, this.moduloDeCarga_Id )
       .subscribe( res => console.log(res) );
+
     this.enviarMail(nir);
   }
 
@@ -233,8 +217,8 @@ export class NIRComponent implements OnInit {
   compareBodega(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
+
   enviarMail(nir) {
-    
     console.log('********NIR********', nir)
     var titulo = "Enviar turno por mail";
     var text = "Cuerpo del Mail:"
@@ -248,9 +232,7 @@ export class NIRComponent implements OnInit {
       .then((confirmed) => {
         if (confirmed) {
           this.hideSpinner.emit(true);
-          
           }
-         
       })
       .catch((e) => {
        /*  this.confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
@@ -262,7 +244,6 @@ export class NIRComponent implements OnInit {
           this.hideSpinner.emit(false)
           return
       //  }).catch(() => window.location.reload());
-      
 
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.hideSpinner.emit(false);
