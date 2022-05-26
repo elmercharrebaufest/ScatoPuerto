@@ -9677,56 +9677,6 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        //public void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id)
-        //{
-        //    ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
-        //    foreach (var item in moduloDeCargaNirsManualPuertoDto)
-        //    {
-        //        ModuloDeCargaNirManualPuerto moduloDeCargaNirManualPuerto_Db = repositorio.Obtener<ModuloDeCargaNirManualPuerto>(x => x.Id == item.Id);
-
-        //        Bodega bodega = repositorio.Obtener<Bodega>(x => x.Id == item.Bodega.Id);
-
-        //        if (moduloDeCargaNirManualPuerto_Db != null)
-        //        {
-        //            moduloDeCargaNirManualPuerto_Db.Fecha = item.Fecha;
-        //            moduloDeCargaNirManualPuerto_Db.Hora = item.Hora;
-        //            moduloDeCargaNirManualPuerto_Db.Ritmo = item.Ritmo;
-        //            moduloDeCargaNirManualPuerto_Db.HD = item.HD;
-        //            moduloDeCargaNirManualPuerto_Db.ProtBase = item.ProtBase;
-        //            moduloDeCargaNirManualPuerto_Db.Prot_BS = item.Prot_BS;
-        //            moduloDeCargaNirManualPuerto_Db.PH = item.PH;
-        //            moduloDeCargaNirManualPuerto_Db.Origen = item.Origen;
-        //            //moduloDeCargaNirManualPuerto_Db.Bodega = item.Bodega;
-        //            moduloDeCargaNirManualPuerto_Db.Mano = item.Mano;
-        //            moduloDeCargaNirManualPuerto_Db.Material_id = item.Material_id;
-        //            moduloDeCargaNirManualPuerto_Db.Bodega = bodega;
-        //        }
-        //        else
-        //        {
-        //            moduloDeCargaNirManualPuerto_Db = new ModuloDeCargaNirManualPuerto()
-        //            {
-        //                ModuloDeCarga = moduloDeCarga,
-        //                Fecha = item.Fecha,
-        //                Hora = item.Hora,
-        //                Ritmo = item.Ritmo,
-        //                HD = item.HD,
-        //                ProtBase = item.ProtBase,
-        //                Prot_BS = item.Prot_BS,
-        //                PH = item.PH,
-        //                Origen = item.Origen,
-        //                //Bodega = item.Bodega,
-        //                Mano = item.Mano,
-        //                Material_id = item.Material_id,
-        //                Bodega = bodega,
-        //            };
-        //        }
-
-
-        //        moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(moduloDeCargaNirManualPuerto_Db);
-        //    }
-        //    repositorio.GuardarCambios();
-        //}
-
         public List<string> ObtenerDestinatariosPlanillaTurnos()
         {
             return repositorio.Listar<Usuario, string>(x => x.Email,

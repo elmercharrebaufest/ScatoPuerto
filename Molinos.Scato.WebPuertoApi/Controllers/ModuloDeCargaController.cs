@@ -231,7 +231,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 List<string> Emails = new List<string>();
                 Emails = ObjetoMailNir.mail.Destinatarios;
 
-
                 comandos.Ejecutar(new EnvioMail
                 {
                     Cuerpo = ObjetoMailNir.mail.Body,
@@ -253,12 +252,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             public List<ModuloDeCargaNirManualPuertoDto> nirManualPuerto;
             public MailDto mail;
-
         }
-
-        //servicio.GuardarModuloDeCargaNirManualPuerto(moduloDeCargaNirsManualPuerto, ModuloDeCarga_Id);
-        //return Request.CreateResponse(HttpStatusCode.OK);
-
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
@@ -316,7 +310,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-[HttpPost]
+        [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosMail")]
         public HttpResponseMessage GuardarPlanillaDeTurnosMail(int IdModuloDeCarga,  ObjetoMail ObjetoMail)
