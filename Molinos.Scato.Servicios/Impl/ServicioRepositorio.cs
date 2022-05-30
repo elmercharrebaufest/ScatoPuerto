@@ -9230,13 +9230,21 @@ namespace Molinos.Scato.Servicios.Impl
             ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
             DateTime dateWithoutHours = new DateTime();
             dateWithoutHours = DateTime.Now.Date;
-            moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
+            try {
+                moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
+            }
+            catch (Exception ex)
+            {
+                moduloDeCargaPlanillaDeTurnosDto = null;
+            }
+           
+            /*moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
 
             if (moduloDeCargaPlanillaDeTurnosDto != null)
             {
                 return moduloDeCargaPlanillaDeTurnosDto;
-            }
-            return null;
+            }*/
+            return moduloDeCargaPlanillaDeTurnosDto;
 
         }
 

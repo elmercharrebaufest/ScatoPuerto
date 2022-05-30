@@ -42,7 +42,7 @@
                     <ng-container formArrayName='diasTurno'>
                         <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
                             <tr>
-                                <td [attr.rowspan]='getRowSpan(dia) + 1'>
+                                <td [attr.rowspan]='getRowSpan(dia)'>
                                     
                                     <div class='column-center'>
                                         <span><b>{{getDia(d)}}</b></span>
@@ -55,7 +55,7 @@
                             <ng-container formArrayName='turnos'>
                                 <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index' [formGroupName]='t'>
                                     <tr disabled="true"> 
-                                        <td [attr.rowspan]='getRowSpanTurno(turno) + 2'>
+                                        <td [attr.rowspan]='getRowSpanTurno(turno)'>
                                             <div class="column-center">
                                                 <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
                                                 <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
@@ -176,7 +176,7 @@
                                         <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                     </tr>
                                     <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).controls.length > 0 : false'>
-                                        <td colspan="6" class='p-0'>
+                                        <td colspan="12" class='p-0'>
                                             <table class='tabla table-bordered tabla-embebida'>
                                                 <thead>
                                                     <tr class='table-active'>
@@ -199,10 +199,10 @@
                                                                     {{observacion.controls.observaciones.value}}
                                                                 </td>
                                                                 <td colspan="3">
-                                                                    {{observacion.controls.fecha.value}}hs
+                                                                    {{observacion.controls.fecha.value}}
                                                                 </td>
                                                                 <td colspan="2">
-                                                                    {{observacion.controls.hora.value}}hs
+                                                                    {{observacion.controls.hora.value}}
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
@@ -350,6 +350,7 @@
             </form>
         </div> 
     </ng-template>
+
     <ng-template #agregarObs let-modal>
         <div class='modal-header'>
             <h4>Agregar Observación de Calidad</h4>
@@ -430,7 +431,8 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel()'>Exportar planilla</button>
+        <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='generarExcelPorParcel(false)'>Exportar planilla</button>
+        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel(true)'>Enviar planilla</button>        
     </div>
     </div>
 
