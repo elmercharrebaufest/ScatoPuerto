@@ -1,10 +1,12 @@
 <div id="imprimirCargaSolidos">
-    <ship-spinner *ngIf='cargaPdf' [src]='"pdf"'></ship-spinner>
+    <div id="element-to-hide" data-html2canvas-ignore="true">
+        <ship-spinner *ngIf='cargaPdf' [src]='"pdf"'></ship-spinner>
+    </div>
     <app-grafico-carga id='graficoCargaCanva'
         class='bg-white'></app-grafico-carga>
     <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"></app-manos>
 
-    <div class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
+    <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
         <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
         <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
         <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
@@ -21,13 +23,19 @@
 
         <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
 
-        <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
+        <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
         
-        <app-balanzas *ngIf="inicioCarga"></app-balanzas>
+        <app-balanzas *ngIf="inicioCarga" [imprimir]="imprimir"></app-balanzas>
+
+        <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
         <app-balanzas-ritmos *ngIf="inicioCarga"></app-balanzas-ritmos>
 
+        
+
         <app-bodegas *ngIf="inicioCarga"></app-bodegas>
+
+        <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
         <div class="row mt-3" *ngIf="inicioCarga">
             <div class="col espacio-izq">
@@ -39,7 +47,7 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-center my-5">
+        <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
             <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
             <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
             <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>

@@ -60,6 +60,7 @@ export class CargaSolidosComponent implements OnInit {
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
   mostrarTableristaOperando: boolean = false;
+  terminaImprimir: boolean = false;
   
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
@@ -165,71 +166,64 @@ export class CargaSolidosComponent implements OnInit {
 
   imprimir(imprimir: boolean = false){
     
+    this.ocultarBotonesImpresion();
+
+    if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+      document.getElementById('balanza7-scroll').classList.remove('max-5vh');
+      document.getElementById('balanza8-scroll').classList.remove('max-5vh');
+    }
+
     this.cargaPdf = true;
 
     let element = document.getElementById('imprimirCargaSolidos');
     let opt = {
-      margin:       0,
+      margin:       [.1, 0],
       filename:     'Pantalla Operaciones.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE LIQUIDOS USANDO LIBRERIA JS2PDF, SETEANDO
+      html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
+
     html2pdf().from(element).set(opt).outputPdf()
-    .then(() => {if (!imprimir) this.cargaPdf = false}).save();
-    
-    
-    
+    .then(() => {
+      if (!imprimir){ this.cargaPdf = false
+        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+            document.getElementById('balanza7-scroll').classList.add('max-5vh');
+            document.getElementById('balanza8-scroll').classList.add('max-5vh');
+        }
+        this.terminaImprimir = true;
+      }
+    }).save();
+     
   }
 
-  // imprimir(imprimir: boolean = false) {
-  //   this.graficoCarga.expandir();
-  //   this.manosComponent.expandir();
-  //   this.cargaPdf = true;
-  //   let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
+  ocultarBotonesImpresion(){
 
-  //   let textareas: HTMLCollection = document.getElementsByClassName('replaceToDiv');
-  //   while(textareas.length){
-  //     let div = document.createElement('div');
-  //     div.setAttribute("contenteditable","true");
-  //     let text = document.createTextNode((<HTMLInputElement>textareas[0]).value);
-  //     div.appendChild(text);
-  //     textareas[0].replaceWith(div);
-  // }
+    let botonCorteManualBalanzasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementsByName('ocultarImpresionTableristaSolido') : null;
+    let botonTerminarYExportarPLanillasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementById('btn-terminar-exportar-planillas') : null;
+    let valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display
+
+    if (botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    botonCorteManualBalanzasSolidos.forEach(btns => {
+      btns.style.display = 'none'
+    });
+      
+      setTimeout(() => {
+        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+        
+          botonCorteManualBalanzasSolidos.forEach(btns => {
+            btns.style.display = 'block'
+          });
   
-  //   html2canvas(document.getElementById('graficoCargaCanva'), { backgroundColor: '#fff' }).then((canvas) => {
-  //     canvas.style.backgroundColor = 'white';
-  //     canvas.style.whiteSpace = 'normal'; 
-  //     let img = canvas.toDataURL('image/jpg');
-  //     doc.addImage(img, 'JPG', 15, 15, 260, 160);
-  //     html2canvas(document.getElementById('manosDeEmbarque'), { backgroundColor: '#fff' }).then((canvas2) => {
-  //       doc.addPage('a4', 'l');
-  //       canvas.style.backgroundColor = 'white';
-  //       canvas2.style.wordBreak = "break-all"
-  //       let img2 = canvas2.toDataURL('image/jpg');
-  //       doc.addImage(img2, 'JPG', 15, 15, 270, 130);
+          botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
+        }
+  
+        botonTerminarYExportarPLanillasSolidos.style.display = 'none';
 
-  //       if (!imprimir) {
-  //         this.cargaPdf = false;
-  //         doc.output('pdfobjectnewwindow');
-  //       } else {
-  //         let file = doc.output('blob');
-  //         this.cargarPDF(file);
-  //       }
-  //     })
-  //   })
-  // }
+      },6500);
+      
+  }
 
-  // cargarPDF(file) {
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => {
-  //       this.adjunto = reader.result;
-  //       this.enviarMail();
-  //     }
-  //   }
-  // }
 
   guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON

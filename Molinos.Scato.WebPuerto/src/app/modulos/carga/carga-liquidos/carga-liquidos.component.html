@@ -24,11 +24,11 @@
   </div>
 
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
-    <button name="botonesOperacionesLiquidos" id="btn-cancelar-operaciones" type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
-    <button name="botonesOperacionesLiquidos" id="btn-guardar-operaciones" type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-    <button name="botonesOperacionesLiquidos" id="btn-imprimir-operaciones" id="btnCrearPdf" class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
-    <button name="botonesOperacionesLiquidos" id="btn-finalizar-operaciones" type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
-    <button name="botonesOperacionesLiquidos" id="btn-enviar-a-tablerista" type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
+    <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+    <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+    <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
+    <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+    <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
   </div>
 
 

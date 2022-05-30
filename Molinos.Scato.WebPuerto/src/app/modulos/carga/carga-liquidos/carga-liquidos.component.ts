@@ -149,7 +149,9 @@ export class CargaLiquidosComponent implements OnInit {
     let botonGuardarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-guardar-turno-liquidos") : null;
     let botonTurnoEnviadoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-turno-enviado-liquidos") : null;
     let botonExportarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-exportar-planilla-liquidos") : null;
+    let valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
     let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
+    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
     let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null; 
     let iconosRelojes = document.getElementsByName('relojPeriodo');
   // #endregion
@@ -178,14 +180,14 @@ export class CargaLiquidosComponent implements OnInit {
     setTimeout(() =>{
       iconosRelojes.forEach(reloj => reloj.style.display = 'block');
       
-      btonConformacionLineasEmbarque.style.display = 'block';
+      btonConformacionLineasEmbarque.style.display = valueGuardarLieasEmbarque;
       if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'block';
   
       if (this.mostrarTableristaOperando == true){
         botonAgregarTurnosLiquidos.style.display = 'block';
         botonGuardarTurnoLiquidos.style.display = 'block';
         if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
-        botonExportarTurnoLiquidos.style.display = 'block';
+        botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
         scrollTurnosLiquidos.style.height = scrollValue;
       } 
   },5000);
