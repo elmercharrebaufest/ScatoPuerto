@@ -10018,8 +10018,8 @@ namespace Molinos.Scato.Servicios.Impl
                 var idCargaInicialBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.FechaInicio == null && x.NumeroBalanza == "7").Id;
                 var idCargaInicialBalanza8 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.FechaInicio == null && x.NumeroBalanza == "8").Id;
 
-                var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7).Id;
-                var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8).Id;
+                var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.NumeroBalanza == "7").Id;
+                var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.NumeroBalanza == "8").Id;
 
                 var fechaInicialBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroPrimeraCargaBalanza7 && x.NumeroBalanza == "7").Fecha;
                 var fechaInicialBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroPrimeraCargaBalanza8 && x.NumeroBalanza == "8").Fecha;
