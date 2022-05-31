@@ -2554,7 +2554,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
 
-
+        [OperationContract]
+        Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza);
 
         [OperationContract]
         ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido);

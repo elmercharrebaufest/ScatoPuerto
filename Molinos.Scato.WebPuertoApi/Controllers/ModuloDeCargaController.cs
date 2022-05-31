@@ -433,6 +433,35 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/SincronizarRitmosBalanzas")]
+        public HttpResponseMessage SincronizarRitmosBalanzas(int IdModuloDeCarga)
+        {
+            try
+            {
+                RitmosBalanzas78 ritmosBalanzas78 = new RitmosBalanzas78()
+                {
+                    idModuloDeCarga = IdModuloDeCarga,
+                    ritmosBalanza7 = servicio.ObtenerRitmosBalanzas78(IdModuloDeCarga, 7),
+                    ritmosBalanza8 = servicio.ObtenerRitmosBalanzas78(IdModuloDeCarga, 8)
+                };
+
+                return Request.CreateResponse(HttpStatusCode.OK, ritmosBalanzas78);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        public class RitmosBalanzas78
+        {
+            public int idModuloDeCarga;
+            public Dictionary<string, string> ritmosBalanza7 { get; set; }
+            public Dictionary<string, string> ritmosBalanza8 { get; set; }
+        }
+
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/EliminarCorteBalanza")]
         public HttpResponseMessage EliminarCorteBalanza(int idCorteBalanza)
         {
