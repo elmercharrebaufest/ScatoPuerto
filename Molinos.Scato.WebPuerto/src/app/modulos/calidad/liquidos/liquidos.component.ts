@@ -45,20 +45,16 @@ export class LiquidosComponent implements OnInit {
    // #region Ocultar Botones Para Impresion
     let scrollBarPlanilla = document.getElementById('scrollbar-planilla-recibidores-liquido');
     let valueScrollBarPlanilla = scrollBarPlanilla.style.height;
-    let botonExportarPLanilla = document.getElementById('planillaLiquidosRecibidores');
-    let valueBotonExportarPLanilla = botonExportarPLanilla.style.display;
     let botonLineasDeEmbarque = document.getElementById('guardar-conformacion-lineas-embarque');
     let valueBotonLineasDeEmbarque = botonLineasDeEmbarque.style.display;
 
     scrollBarPlanilla.style.height = 'auto';
-    botonExportarPLanilla.style.display = 'none';
     botonLineasDeEmbarque.style.display = 'none';
    // #endregion
 
    //#region Mostrar Botones 
     setTimeout(() => {
       scrollBarPlanilla.style.height = valueScrollBarPlanilla;
-      botonExportarPLanilla.style.display = valueBotonExportarPLanilla;
       botonLineasDeEmbarque.style.display = valueBotonLineasDeEmbarque;
     },5000)
 
