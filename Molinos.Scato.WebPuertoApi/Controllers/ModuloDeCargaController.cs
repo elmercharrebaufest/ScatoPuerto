@@ -275,6 +275,25 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ObtenerDestinatariosNirManual")]
+        public HttpResponseMessage ObtenerDestinatariosNirManual()
+        {
+            try
+            {
+                string destinatarios = servicio.obtenerDireccionesDeMail("NirManual");
+                System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
+                foreach (string mail in destinatarios.Split(';'))
+                    dest.Add(mail);
+                return Request.CreateResponse(HttpStatusCode.OK, dest);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos")]
         public HttpResponseMessage ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido)
         {

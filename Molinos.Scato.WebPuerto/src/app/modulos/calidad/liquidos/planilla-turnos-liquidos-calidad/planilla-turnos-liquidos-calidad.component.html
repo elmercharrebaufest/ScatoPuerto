@@ -16,7 +16,7 @@
     
     <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
         
-        <div class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
+        <div id="scrollbar-planilla-recibidores-liquido" class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
             <table class='table table-bordered turnos'>
@@ -433,6 +433,7 @@
     <div class="mt-4 text-center">
         <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='generarExcelPorParcel(false)'>Exportar planilla</button>
         <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel(true)'>Enviar planilla</button>        
+        <button id="planillaLiquidosRecibidores" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel()'>Exportar planilla</button>
     </div>
     </div>
 

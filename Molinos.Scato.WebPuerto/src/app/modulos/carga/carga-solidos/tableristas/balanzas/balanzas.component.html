@@ -12,7 +12,7 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
           </div>
           <div class="col">
-            <button class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7)'>Corte Manual</button>
+            <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7)'>Corte Manual</button>
           </div>
         </div>
   
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <div class='max-5vh'>
+          <div id="balanza7-scroll" class='max-5vh'>
             <perfect-scrollbar id="scrollbar7">
               <form [formGroup]="balanza7Form">
                 <ng-container formArrayName="balanzas7" >
@@ -142,7 +142,7 @@
 
                                   <!-- NUEVO MODAL -->
                                   <!-- <i class="fas fa-angle-down" (click)='openModalCorte(addCorte7)'></i> -->
-                                  <svg xmlns="http://www.w3.org/2000/svg" 
+                                  <svg 
                                       *ngIf="balanza.value.tn>0"
                                       width="28" height="28" viewBox="0 0 28 28" 
                                       (click)='openModalCorte(addCorte7)' 
@@ -156,7 +156,7 @@
                                     </g>
                                   </svg>
 
-                                  <svg xmlns="http://www.w3.org/2000/svg" 
+                                  <svg 
                                       *ngIf="balanza.value.tn==0"
                                       width="28" height="28" viewBox="0 0 28 28" 
                                       (click)='openModalCorte(addCorte7)' 
@@ -328,7 +328,7 @@
                                         <div class="row mt-3">
                                           <div class="col flex-between">
                                             <button class='btn btn-outline-danger' (click)='modal.dismiss(cerrarModal())'>Cancelar</button>
-                                            <button class='btn btn-danger' 
+                                            <button name ="ocultarImpresionTableristaSolido" class='btn btn-danger' 
                                                     (click)="eliminarCorteManual(i, balanza.value.numeroBalanza, addCorte7)"
                                                     *ngIf="balanza.value.corteManual">Eliminar Corte Manual</button>
                                             <!-- <button class='btn btn-primary' (click)='modal.close(guardarModal(i, balanza.value.numeroBalanza))'>Guardar</button> -->
@@ -418,7 +418,7 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
           </div>
           <div class="col">
-            <button class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8)'>Corte Manual</button>
+            <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8)'>Corte Manual</button>
           </div>
         </div>
   
@@ -457,7 +457,7 @@
             </div>
           </div>
 
-          <div class='max-5vh'>
+          <div id="balanza8-scroll" class='max-5vh'>
             <perfect-scrollbar id="scrollbar8">
               <form [formGroup]="balanza8Form">
                 <ng-container formArrayName="balanzas8" >
@@ -734,7 +734,7 @@
                                         <div class="row mt-3">
                                           <div class="col flex-between">
                                             <button class='btn btn-outline-danger' (click)='modal.dismiss(cerrarModal())'>Cancelar</button>
-                                            <button class='btn btn-danger' 
+                                            <button name ="ocultarImpresionTableristaSolido" class='btn btn-danger' 
                                                     (click)="eliminarCorteManual(i, balanza.value.numeroBalanza, addCorte8)"
                                                     *ngIf="balanza.value.corteManual">Eliminar Corte Manual</button>
                                             <!-- <button class='btn btn-primary' (click)='modal.close(guardarModal(i, balanza.value.numeroBalanza))'>Guardar</button> -->
@@ -809,7 +809,7 @@
 </div>
 
 <div class="col text-center">
-  <button class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR CARGA Y EXPORTAR PLANILLAS</button>
+  <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR CARGA Y EXPORTAR PLANILLAS</button>
 </div>
 
 <ng-template #addCorteManual let-modal>

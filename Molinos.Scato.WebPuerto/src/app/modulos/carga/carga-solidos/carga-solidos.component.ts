@@ -3,6 +3,8 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, View
 import { forkJoin } from 'rxjs';
 import jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
+import * as html2pdf from 'html2pdf.js';
+
 // MODELOS
 import { Alerta } from '@ScatoModels/alerta';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
@@ -58,6 +60,7 @@ export class CargaSolidosComponent implements OnInit {
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
   mostrarTableristaOperando: boolean = false;
+  terminaImprimir: boolean = false;
   
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
@@ -161,54 +164,66 @@ export class CargaSolidosComponent implements OnInit {
       });
   }
 
-  imprimir(imprimir: boolean = false) {
-    this.graficoCarga.expandir();
-    this.manosComponent.expandir();
-    this.cargaPdf = true;
-    let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
+  imprimir(imprimir: boolean = false){
+    
+    this.ocultarBotonesImpresion();
 
-    let textareas: HTMLCollection = document.getElementsByClassName('replaceToDiv');
-    while(textareas.length){
-      let div = document.createElement('div');
-      div.setAttribute("contenteditable","true");
-      let text = document.createTextNode((<HTMLInputElement>textareas[0]).value);
-      div.appendChild(text);
-      textareas[0].replaceWith(div);
-  }
-  
-    html2canvas(document.getElementById('graficoCargaCanva'), { backgroundColor: '#fff' }).then((canvas) => {
-      canvas.style.backgroundColor = 'white';
-      canvas.style.whiteSpace = 'normal'; 
-      let img = canvas.toDataURL('image/jpg');
-      doc.addImage(img, 'JPG', 15, 15, 260, 160);
-      html2canvas(document.getElementById('manosDeEmbarque'), { backgroundColor: '#fff' }).then((canvas2) => {
-        doc.addPage('a4', 'l');
-        canvas.style.backgroundColor = 'white';
-        canvas2.style.wordBreak = "break-all"
-        let img2 = canvas2.toDataURL('image/jpg');
-        doc.addImage(img2, 'JPG', 15, 15, 270, 130);
-
-        if (!imprimir) {
-          this.cargaPdf = false;
-          doc.output('pdfobjectnewwindow');
-        } else {
-          let file = doc.output('blob');
-          this.cargarPDF(file);
-        }
-      })
-    })
-  }
-
-  cargarPDF(file) {
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.adjunto = reader.result;
-        this.enviarMail();
-      }
+    if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+      document.getElementById('balanza7-scroll').classList.remove('max-5vh');
+      document.getElementById('balanza8-scroll').classList.remove('max-5vh');
     }
+
+    this.cargaPdf = true;
+
+    let element = document.getElementById('imprimirCargaSolidos');
+    let opt = {
+      margin:       [.1, 0],
+      filename:     'Pantalla Operaciones.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+    };
+
+    html2pdf().from(element).set(opt).outputPdf()
+    .then(() => {
+      if (!imprimir){ this.cargaPdf = false
+        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+            document.getElementById('balanza7-scroll').classList.add('max-5vh');
+            document.getElementById('balanza8-scroll').classList.add('max-5vh');
+        }
+        this.terminaImprimir = true;
+      }
+    }).save();
+     
   }
+
+  ocultarBotonesImpresion(){
+
+    let botonCorteManualBalanzasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementsByName('ocultarImpresionTableristaSolido') : null;
+    let botonTerminarYExportarPLanillasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementById('btn-terminar-exportar-planillas') : null;
+    let valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display
+
+    if (botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    botonCorteManualBalanzasSolidos.forEach(btns => {
+      btns.style.display = 'none'
+    });
+      
+      setTimeout(() => {
+        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+        
+          botonCorteManualBalanzasSolidos.forEach(btns => {
+            btns.style.display = 'block'
+          });
+  
+          botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
+        }
+  
+        botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+
+      },6500);
+      
+  }
+
 
   guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
@@ -260,7 +275,7 @@ export class CargaSolidosComponent implements OnInit {
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(finalizar)},
+          .then(() => {},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
