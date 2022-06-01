@@ -10,7 +10,7 @@
     [LargoxAnchoExtremo]  NVARCHAR (50)  NULL,
 	[FotoEmbarque]        VARCHAR (max) NULL,
 	[FechaRegistro]       datetime       NULL,
-	 CONSTRAINT [FK_dbo.EmbarqueInformacion_dbo.Embarque_Embarque_Id] FOREIGN KEY ([Embarque_Id]) REFERENCES [dbo].[Embarque] ([Id]),
-     CONSTRAINT [FK_dbo.EmbarqueInformacion_dbo.Embarque_Bandera_Id] FOREIGN KEY ([Bandera_Id]) REFERENCES [dbo].[bandera] ([Id]),
+	CONSTRAINT [FK_dbo.EmbarqueInformacion_dbo.Embarque_Embarque_Id] FOREIGN KEY ([Embarque_Id]) REFERENCES [dbo].[Embarque] ([Id]),
+    CONSTRAINT [FK_dbo.EmbarqueInformacion_dbo.Embarque_Bandera_Id] FOREIGN KEY ([Bandera_Id]) REFERENCES [dbo].[Bandera] ([Id]),
     CONSTRAINT [PK_dbo.EmbarqueInformacion] PRIMARY KEY ([Id] ASC)
 )

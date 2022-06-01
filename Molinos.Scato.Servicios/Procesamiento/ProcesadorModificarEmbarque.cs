@@ -67,7 +67,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 });
             }
 
-            LimpiarCarpetaDeArchivosDeEmbarques(comando.Dto.Id);
+
+
+                LimpiarCarpetaDeArchivosDeEmbarques(comando.Dto.Id);
             if (comando.Dto.filePathShipParticular != null)
                 Embarque.filePathShipParticular = GuardarArchivoEmbarque(comando.Dto.filePathShipParticular, comando.Dto.shipParticularArchivoNombre, comando.Dto.Id);
             else 
