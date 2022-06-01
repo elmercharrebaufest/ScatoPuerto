@@ -519,7 +519,7 @@
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolido.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.sql" />
     <Build Include="dbo\Tables\Bandera.sql" />
-    <Build Include="Scripts\bkp16052022\baseBkp.sql" />
+    <None Include="Scripts\bkp16052022\baseBkp.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
