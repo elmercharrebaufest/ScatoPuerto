@@ -8,6 +8,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { finalize } from 'rxjs/operators';
 import { Mail } from '@ScatoModels/mail';
+import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 
 @Component({
   selector: 'app-nir',
@@ -32,6 +33,7 @@ export class NIRComponent implements OnInit {
     private moduloDeCargaService: ModuloDeCargaService,
     private _procesoService: DatosEmbarquesProcesoService,
     confirmationDialogService: ConfirmationDialogService,
+    private procesoCalidadService: ProcesoCalidadService,
   ) {
     this.confirmationDialogService = confirmationDialogService;
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
@@ -233,6 +235,8 @@ export class NIRComponent implements OnInit {
   compareBodega(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
+
+
   enviarMail(nir) {
     
     console.log('********NIR********', nir)
@@ -241,6 +245,8 @@ export class NIRComponent implements OnInit {
     var textoCuerpoMail = 'Cuerpo del mail';
     var inputTitle = "Destinatarios";
     var mail = new Mail(`NIR.`,`${textoCuerpoMail}`);
+    this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual').subscribe( res => mail.destinatarios = res)
+
     var button1 = 'Enviar';
     var button2 = 'Cancelar';
 

@@ -60,4 +60,8 @@ export class ProcesoCalidadService {
         this.sendBuqueCambiaEstado.emit(buqueCambiaEstado);
     }
     
+    obtenerDestinatariosNirManual(templateMail) {
+        return this.http.get<string[]>(`${this.url}ModuloDeCarga/ObtenerDestinatariosNirManual?templateMail=${templateMail}`, { 'withCredentials' : true});
+    }
+    
 }
