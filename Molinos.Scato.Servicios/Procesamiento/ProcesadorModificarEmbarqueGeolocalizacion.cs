@@ -1,6 +1,4 @@
-﻿
-
-    using Molinos.Scato.Dominio.Comandos;
+﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
@@ -24,16 +22,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             try
             {
-                Bandera banderaBase = Repositorio.Obtener<Bandera>(x => x.Abreviatura == comando.BanderaBuque);
+               
+                Bandera banderaBase = Repositorio.Obtener<Bandera>(x => x.Abreviatura.ToLower() == comando.BanderaBuque.ToLower());
 
-
+               
                 Embarque embarque = Repositorio.Obtener<Embarque>(x => x.EmbarqueInformacion.FirstOrDefault().Bandera.Id == banderaBase.Id && x.Patente == comando.NombreBuque && x.TipoBuque == comando.TipoBuque);
 
                 if (embarque != null)
                 {
                     if (embarque.EmbarqueInformacion.Count == 0 && comando.DtoInformacion != null)
                     {
-
+                        
                     
                         EmbarqueInformacion inf = new EmbarqueInformacion
                         {
@@ -53,12 +52,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     else
                     {
                         var embInf = embarque.EmbarqueInformacion.FirstOrDefault();
-
+                        embInf.Bandera = banderaBase;
                         embInf.IMO = comando.DtoInformacion.IMO;
                         embInf.MMSI = comando.DtoInformacion.MMSI;
                         embInf.Tonelaje = comando.DtoInformacion.Tonelaje;
                         embInf.TonelajePesoMuerto = comando.DtoInformacion.TonelajePesoMuerto;
                         embInf.LargoxAnchoExtremo = comando.DtoInformacion.LargoxAnchoExtremo;
+
+                        Repositorio.GuardarCambios();
                     }
 
                     if (embarque.EmbarqueInformacionViaje.Count == 0 && comando.DtoViaje != null)
