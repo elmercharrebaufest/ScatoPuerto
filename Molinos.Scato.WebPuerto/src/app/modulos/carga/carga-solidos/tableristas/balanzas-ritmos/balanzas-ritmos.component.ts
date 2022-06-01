@@ -13,16 +13,16 @@ import { takeUntil } from 'rxjs/operators';
 export class BalanzasRitmosComponent implements OnInit, OnDestroy {
 
   unsubscribe: Subject<any>;
-  startBalanza7: string = '';
-  startBalanza8: string = '';
+  startBalanza7: Date;
+  startBalanza8: Date;
   TnCargadasHastaAhora7: number = 0;
   TnCargadasHastaAhora8: number = 0;
   ritmoEmbarque7: number = 0;
   ritmoEmbarque8: number = 0;
-  fechaHoraUltimaBal7: string = '';
-  fechaHoraUltimaBal8: string = '';
-  ultimaActualizacion7: string = '';
-  ultimaActualizacion8: string = '';
+  fechaHoraUltimaBal7: Date;
+  fechaHoraUltimaBal8: Date;
+  ultimaActualizacion7: Date;
+  ultimaActualizacion8: Date;
 
   constructor( private balanzas78Service: Balanzas78Service,
                private funcionesGeneralesService: FuncionesGeneralesService ) {
@@ -32,46 +32,31 @@ export class BalanzasRitmosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.filtroBalanza7);
     this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.filtroBalanza8);
-    this.balanzas78Service.sendDataBalanzadaAgrupada7
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe( 
-        res => {
-        if(res.length>0){
-          this.startBalanza7 = this.startBalanza(res);
-          this.fechaHoraUltimaBal7 = this.fechaHoraUltimaBalanzada(res);
-          this.ritmoEmbarque7 = this.calculoRitmoEmbarque(res);
-          this.ultimaActualizacion7 = this.funcionesGeneralesService.getFechaHora( new Date() );
-        } else {
-          this.startBalanza7 = '';
-          this.fechaHoraUltimaBal7 = '';
-          this.ritmoEmbarque7 = 0;
-          this.ultimaActualizacion7 = '';
-        }
-      } );
-      
-    this.balanzas78Service.sendDataBalanzadaAgrupada8
+
+    this.balanzas78Service.sendRitmosBalanzas78
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( res => {
-        if(res.length>0){
-          this.startBalanza8 = this.startBalanza(res);
-          this.fechaHoraUltimaBal8 = this.fechaHoraUltimaBalanzada(res);
-          this.ritmoEmbarque8 = this.calculoRitmoEmbarque(res);
-          this.ultimaActualizacion8 = this.funcionesGeneralesService.getFechaHora( new Date() );
-        } else {
-          this.startBalanza8 = '';
-          this.fechaHoraUltimaBal8 = '';
-          this.ritmoEmbarque8 = 0;
-          this.ultimaActualizacion8 = '';
-        }
-      } );
+        console.log('===== sendRitmosBalanzas78 =====', res);
+        this.startBalanza7 = res.ritmosBalanza7.arranco;
+        this.fechaHoraUltimaBal7 = res.ritmosBalanza7.ultimaBalanzada;
+        this.ritmoEmbarque7 = res.ritmosBalanza7.ritmoDeEmbarque;
+        this.ultimaActualizacion7 = res.ritmosBalanza7.ultimaActualizacion;
+        this.TnCargadasHastaAhora7 = res.ritmosBalanza7.cargoHastaAhora;
 
-    this.balanzas78Service.sendDataBalanzada7Kilos
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe( res => this.TnCargadasHastaAhora7 = res );
+        this.startBalanza8 = res.ritmosBalanza8.arranco;
+        this.fechaHoraUltimaBal8 = res.ritmosBalanza8.ultimaBalanzada;
+        this.ritmoEmbarque8 = res.ritmosBalanza8.ritmoDeEmbarque;
+        this.ultimaActualizacion8 = res.ritmosBalanza8.ultimaActualizacion;
+        this.TnCargadasHastaAhora8 = res.ritmosBalanza8.cargoHastaAhora;
+      });
 
-    this.balanzas78Service.sendDataBalanzada8Kilos
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe( res => this.TnCargadasHastaAhora8 = res );
+    // this.balanzas78Service.sendDataBalanzada7Kilos
+    //   .pipe(takeUntil(this.unsubscribe))
+    //   .subscribe( res => this.TnCargadasHastaAhora7 = res );
+
+    // this.balanzas78Service.sendDataBalanzada8Kilos
+    //   .pipe(takeUntil(this.unsubscribe))
+    //   .subscribe( res => this.TnCargadasHastaAhora8 = res );
 
   }
 

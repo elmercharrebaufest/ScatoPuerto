@@ -421,12 +421,12 @@
     <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\turno.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\obs-calidad.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\balanza.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\balanza78.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\periodo-carga.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\umap.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\recibo-buque.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\nir.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos-balanzas78.ts" />
     <!-- enums TS -->
     <TypeScriptCompile Include="src\app\shared\enums\permisos-scato.ts" />
     <TypeScriptCompile Include="src\app\shared\enums\tipo-alerta.ts" />

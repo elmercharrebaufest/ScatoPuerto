@@ -9868,6 +9868,81 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
         }
+
+        #region ObtenerRitmosBalanzas78
+        public Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza)
+        {
+            try
+            {
+                Dictionary<string, string> ritmosBalanzas78 = new Dictionary<string, string>();
+
+                DateTime? arranco = null, ultimaBalanzada = null, ultimaActualizacion = null;
+                decimal cargoHastaAhora = 0, ritmoDeEmbarque = 0;
+                string numeroBalanzaStr = numeroBalanza.ToString();
+                double tiempoDeCarga = 0;
+
+                var  embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return ritmosBalanzas78;
+
+                int idEmbarque = embarqueBase.Id;
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
+
+                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
+                                                            x.FechaInicio == null &&
+                                                            x.NumeroBalanza == numeroBalanzaStr);
+                // Sumatoria de peso neto
+                int totalPesoNeto = 0;
+                foreach (Carga carga in cargas)
+                {
+                    totalPesoNeto += repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.Id).Sum(x => x.PesoNeto);
+                }
+
+                // Busco primer y último ID de Carga
+                int idPrimeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor && 
+                                                                            x.FechaInicio == null &&
+                                                                            x.NumeroBalanza == numeroBalanzaStr).Id;
+
+                int idUltimaCarga = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
+                                                                   x.FechaInicio == null &&
+                                                                   x.NumeroBalanza == numeroBalanzaStr).Last().Id;
+
+                // Busco primer y último ID de Balanzada dentro de la Carga
+                int idPrimeraBalanzada = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idPrimeraCarga &&
+                                                                                    x.NumeroBalanza == numeroBalanzaStr).Id;
+
+                int idUltimaBalanzada = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idUltimaCarga &&
+                                                                           x.NumeroBalanza == numeroBalanzaStr).Last().Id;
+                // Busco fecha de inicio y fin
+                DateTime fechaInicialBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idPrimeraBalanzada &&
+                                                                                          x.NumeroBalanza == numeroBalanzaStr).Fecha;
+
+                DateTime fechafinalBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idUltimaBalanzada &&
+                                                                                        x.NumeroBalanza == numeroBalanzaStr).Fecha;
+
+                tiempoDeCarga = (fechafinalBalanza - fechaInicialBalanza).TotalMinutes;
+
+                arranco = fechaInicialBalanza;
+                ultimaBalanzada = fechafinalBalanza;
+                cargoHastaAhora = totalPesoNeto/1000;
+                ritmoDeEmbarque = (decimal)(Decimal.ToDouble(cargoHastaAhora) / tiempoDeCarga);
+                ultimaActualizacion = DateTime.Now;
+
+                ritmosBalanzas78.Add("arranco", Convert.ToString(arranco));
+                ritmosBalanzas78.Add("ultimaBalanzada", Convert.ToString(ultimaBalanzada));
+                ritmosBalanzas78.Add("cargoHastaAhora", Convert.ToString(cargoHastaAhora));
+                ritmosBalanzas78.Add("ritmoDeEmbarque", Convert.ToString(ritmoDeEmbarque));
+                ritmosBalanzas78.Add("ultimaActualizacion", Convert.ToString(ultimaActualizacion));
+
+                return ritmosBalanzas78;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion ObtenerRitmosBalanzas78
+
         //public Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id)
         //{
         //    DateTime fechainicioBalanza7 = new DateTime();

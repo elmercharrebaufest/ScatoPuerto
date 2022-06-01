@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
 import { Balanzas, Bodega, InfoTableristas } from '@ScatoModels/balanzadas/balanza';
 import { Ritmos, RitmosLiquido } from '@ScatoModels/balanzadas/ritmos';
+import { RitmosBalanzas78 } from '@ScatoModels/balanzadas/ritmos-balanzas78';
 
 @Injectable({
   providedIn: 'root'
@@ -42,5 +43,9 @@ export class BalanzaService {
     }
     obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
       return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?vapor_id=${vapor_id}&modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+    }
+
+    sincronizarRitmosBalanzas(IdModuloDeCarga: number): Observable<RitmosBalanzas78>{
+      return this.http.post<RitmosBalanzas78>(`${this.url}ModuloDeCarga/SincronizarRitmosBalanzas?IdModuloDeCarga=${IdModuloDeCarga}`, { 'withCredentials': true });
     }
 }
