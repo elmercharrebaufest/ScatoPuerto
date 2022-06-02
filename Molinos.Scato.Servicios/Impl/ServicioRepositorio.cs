@@ -9832,10 +9832,11 @@ namespace Molinos.Scato.Servicios.Impl
 
                 int embarque = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque.Id;
 
-                int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarque).Vapor.Id;
+                var  ObjetoEmbarque = repositorio.Obtener<Embarque>(x => x.Id == embarque);
+                int vapor_id = ObjetoEmbarque.Vapor.Id;
 
+                var totalCargado = (int)repositorio.Sumar<Carga>(y => (int)y.ToneladasAW, y => y.Vapor.Id == vapor_id && y.FechaInicio> ObjetoEmbarque.FechaHoraInicioCarga);
 
-                var totalCargado = (int)repositorio.Sumar<Carga>(y => (int)y.ToneladasAW, y => y.Vapor.Id == vapor_id);
                 var porcen = 0;
 
                 if (tnBc == 0)
@@ -9847,7 +9848,7 @@ namespace Molinos.Scato.Servicios.Impl
                     if (totalCargado == 0)
                         porcen = 0;
                     else
-                        porcen = tnBc * 100 / totalCargado;
+                        porcen = (tnBc * 100) / (totalCargado/1000);
 
                 }
 
@@ -9857,7 +9858,11 @@ namespace Molinos.Scato.Servicios.Impl
                 if (tnBc == 0 || minutoBc == 0)
                     informacionParada.Add("ritmoBc", "0");
                 else
-                    informacionParada.Add("ritmoBc", Convert.ToString(((60 * tnBc) / minutoBc) * 60));
+               //     informacionParada.Add("ritmoBc", Convert.ToString(Math.Round((60 * tnBc) / minutoBc),2));
+                informacionParada.Add("ritmoBc", Convert.ToString(Math.Round((Double)(60 * tnBc) / minutoBc, 2)));
+                
+
+
 
                 return informacionParada;
             }

@@ -40,7 +40,7 @@ export class Balanzas {
 }
 
 export class InformacionAdicional {
-  bcB_BCP_F: string;
+  BCB_BCP_F: string;
   op: string;
   ob: string;
   e: string;
