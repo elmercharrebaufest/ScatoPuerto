@@ -514,7 +514,7 @@
     <Build Include="dbo\Tables\MotivoInactividad.sql" />
     <Build Include="dbo\Tables\RegistroInactividad.sql" />
     <Build Include="dbo\Tables\RegistroStockOtrosPuertos.sql" />
-    <Build Include="dbo\Tables\ConfiguracionGeneral.sql" />
+    <!-- <Build Include="dbo\Tables\ConfiguracionGeneral.sql" /> --> 
     <Build Include="dbo\Tables\NotificacionAplicacion.sql" />
     <Build Include="dbo\Tables\PinchazosPorCalada.sql" />
     <Build Include="dbo\Tables\RamalFerroviario.sql" />
