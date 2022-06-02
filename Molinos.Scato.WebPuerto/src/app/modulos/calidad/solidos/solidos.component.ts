@@ -11,6 +11,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { GraficoCargaComponent } from 'app/modulos/carga/carga-solidos/operaciones/grafico-carga/grafico-carga.component';
 import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/manos/manos.component';
 import { forkJoin } from 'rxjs';
+import * as html2pdf from 'html2pdf.js';
 
 @Component({
   selector: 'app-solidos',
@@ -29,7 +30,7 @@ export class SolidosComponent implements OnInit {
   materialesPuerto: MaterialPuerto[];
   enviado: boolean;
   usuarioFinalizacion: string;
-
+  RecibidoresPdf: boolean = false;
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
@@ -115,5 +116,50 @@ export class SolidosComponent implements OnInit {
         }
       });
   }
+
+  imprimir(imprimir: boolean = false){
+     // #region Imprimir Recibidores Liquido
+      this.ocultarBotonesImprimir();
+     
+     this.RecibidoresPdf = true;
+ 
+     
+     let element = document.getElementById('imprimirRecibidoresSolido');
+     let opt = {
+       margin:       0,
+       filename:     'Pantalla Recibidores.pdf',
+       image:        { type: 'jpeg', quality: 0.98 },
+       html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
+       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+     };
+ 
+     html2pdf().from(element).set(opt).outputPdf()
+     .then(() => {
+       if (!imprimir) this.RecibidoresPdf = false
+     }).save();
+     // #endregion
+  }
+
+  private ocultarBotonesImprimir(){
+    let botonExpPlanillaSolido = document.getElementById('expPlanillaSolidoCalidad');
+    let valueBotonExpPlanillaSolido = botonExpPlanillaSolido.style.display;
+    let botonEnvPlanillaSolido = document.getElementById('envPlanillaSolidoCalidad');
+    let valueBotonEnvPlanillaSolido = botonEnvPlanillaSolido.style.display;
+    let botonEnviarNir = document.getElementById('btn-enviar-nir');
+
+    botonExpPlanillaSolido.style.display = 'none';
+    botonEnvPlanillaSolido.style.display = 'none';
+    botonEnviarNir.style.display = 'none';
+
+    setTimeout(() => {
+      
+      botonExpPlanillaSolido.style.display = valueBotonExpPlanillaSolido;
+      botonEnvPlanillaSolido.style.display = valueBotonEnvPlanillaSolido;
+      botonEnviarNir.style.display = 'block';
+
+    },5000)
+
+  }
+
 
 }

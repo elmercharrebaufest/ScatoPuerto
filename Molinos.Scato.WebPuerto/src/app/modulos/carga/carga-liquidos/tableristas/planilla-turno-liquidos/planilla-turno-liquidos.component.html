@@ -6,13 +6,13 @@
         <!-- <button class='btn btn-primary' (click)="fillPlanilla()">Cargar turnos </button> -->
     </div>
     <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
-    <button *ngIf="tablerista" class='btn btn-success divHeaderRight' (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
+    <button *ngIf="tablerista" id="btn-agregar-turnos-liquidos" class='btn btn-success divHeaderRight' (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
     <br>
     <br>
     
     <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
         
-        <div class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
+        <div id="scroll-bar-turnos-liquidos" class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
             <table class='table table-bordered turnos'>
@@ -57,10 +57,10 @@
                                                 <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
                                                 <span class='turno'>por turno</span>
                                                 <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span><br>
-                                                <button class='btn btn btn-success' style="margin-top: 5px; margin-bottom: 5px" *ngIf="!turno.value.guardadoPorTablerista" (click)='guardarTurnoGeneral(d,t)'>
+                                                <button id="btn-guardar-turno-liquidos" class='btn btn btn-success' style="margin-top: 5px; margin-bottom: 5px" *ngIf="!turno.value.guardadoPorTablerista" (click)='guardarTurnoGeneral(d,t)'>
                                                     {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Turno guardado'}}
                                                 </button>
-                                                <button  *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t,true)' [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
+                                                <button  id="btn-turno-enviado-liquidos" *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t,true)' [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
                                                     {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' : 'Turno enviado'}}
                                                 </button>
                                             </div>
@@ -347,7 +347,7 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel()'>Exportar planilla</button>
+        <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel()'>Exportar planilla</button>
     </div>
     </div>
 

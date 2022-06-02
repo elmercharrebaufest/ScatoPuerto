@@ -52,7 +52,7 @@
                                    style="margin-left:15px"
                                    ></i>
                             </td>
-                            <td class="sticky lista-nombre-buque row-geo-letra" (click)='openModalGeo(addGeo, geolocalizacion)'>
+                            <td class="sticky lista-nombre-buque row-geo-letra" (click)='onOpenModalGeo(addGeo, geolocalizacion)'>
                                 {{geolocalizacion.nombreBuque}}
                             </td>
                             <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>

@@ -53,11 +53,15 @@ export class ProcesoCalidadService {
         this.sendObsCalidad.emit(obsCalidad);
     }
     
-    guardarObservacionesDeCalidad(idPlanillaDeTurnos: number, Observaciones: ObsCalidad[]){
-        return this.http.post(`${this.url}ModuloDeCarga/GuardarObservacionesDeCalidad?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, Observaciones, { 'withCredentials': true});  
+    guardarObservacionesDeCalidad(idPlanillaDeTurnos: number, observacionesCalidad: any){
+        return this.http.post(`${this.url}ModuloDeCarga/GuardarObservacionesDeCalidad?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, observacionesCalidad, { 'withCredentials': true});  
       }
     setBuqueCambiaEstado(buqueCambiaEstado: any){
         this.sendBuqueCambiaEstado.emit(buqueCambiaEstado);
+    }
+    
+    obtenerDestinatariosNirManual(templateMail) {
+        return this.http.get<string[]>(`${this.url}ModuloDeCarga/ObtenerDestinatariosNirManual?templateMail=${templateMail}`, { 'withCredentials' : true});
     }
     
 }

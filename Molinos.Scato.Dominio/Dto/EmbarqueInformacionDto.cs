@@ -1,4 +1,5 @@
-﻿using Molinos.Scato.Dominio.Enums;
+﻿using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

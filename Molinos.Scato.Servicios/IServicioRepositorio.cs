@@ -2530,8 +2530,6 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
-        //[OperationContract]
-        //void GuardarModuloDeCargaNirManualPuerto(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuertoDto, int ModuloDeCarga_Id);
 
         [OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
@@ -2556,7 +2554,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
 
-
+        [OperationContract]
+        Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza);
 
         [OperationContract]
         ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido);

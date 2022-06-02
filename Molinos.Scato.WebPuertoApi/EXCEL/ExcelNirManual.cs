@@ -38,7 +38,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var i = 2;
             foreach (var mod in moduloDeCargaNirsManualPuerto)
             {
-                var Bodega_id = mod.Bodega_id;
+                var Bodega_id = mod.Bodega.Id;
                 var fecha = mod.Fecha;
                 var hd = mod.HD;
                 var hora = mod.Hora;
