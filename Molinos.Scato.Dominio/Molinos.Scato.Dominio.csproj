@@ -109,14 +109,12 @@
     <Compile Include="Comandos\EliminarCategoriaVehiculo.cs" />
     <Compile Include="Comandos\CrearRegistroInactividad.cs" />
     <Compile Include="Comandos\EliminarEtiquetaPuerto.cs" />
-    <Compile Include="Comandos\EliminarMotivosLimpieza.cs" />
     <Compile Include="Comandos\EnviarMensajeAsincronoCartelLed.cs" />
     <Compile Include="Comandos\EnviarMensajeCamioneroCircular.cs" />
     <Compile Include="Comandos\EnviarMensajesAsincronoCartelLed.cs" />
     <Compile Include="Comandos\GuardarEtiquetaPuerto.cs" />
     <Compile Include="Comandos\GuardarModuloDeCarga.cs" />
     <Compile Include="Comandos\GuardarNirManual.cs" />
-    <Compile Include="Comandos\GuardarPlanillaDeTurnos.cs" />
     <Compile Include="Comandos\ImprimirEtiquetaPuerto.cs" />
     <Compile Include="Comandos\ImprimirFileGenerico.cs" />
     <Compile Include="Comandos\InformarArriboCircular.cs" />
@@ -140,7 +138,6 @@
     <Compile Include="Comandos\EliminarMotivosLimpieza.cs" />
     <Compile Include="Comandos\GuardarBalanzadas.cs" />
     <Compile Include="Comandos\GuardarLineasDeEmbarque.cs" />
-    <Compile Include="Comandos\GuardarModuloDeCarga.cs" />
     <Compile Include="Comandos\GuardarPlanillaDeEmbarque.cs" />
     <Compile Include="Comandos\GuardarPlanillaDeTurnos.cs" />
     <Compile Include="Comandos\ModificarAgenciaControlPrivado.cs" />
@@ -697,10 +694,8 @@
     <Compile Include="Dto\ArriboCircularResponseDto.cs" />
     <Compile Include="Dto\CategoriaVehiculoDto.cs" />
     <Compile Include="Dto\ConfiguracionAutomatizacionEtapasDto.cs" />
-    <Compile Include="Dto\ConfiguracionMailDto.cs" />
     <Compile Include="Dto\ControlDto.cs" />
     <Compile Include="Dto\CubitacionDeTanquesDto.cs" />
-    <Compile Include="Dto\DensidadPorTemperaturaDeMaterialDto.cs" />
     <Compile Include="Dto\DSEgresoDto.cs" />
     <Compile Include="Dto\DSIngresoDto.cs" />
     <Compile Include="Dto\CaracteristicasCartaPorteOtrosPuertosDto.cs" />
@@ -722,7 +717,6 @@
     <Compile Include="Dto\CargaComercialHistoricoDto.cs" />
     <Compile Include="Dto\CeldaManoDeEmbarqueDto.cs" />
     <Compile Include="Dto\ConfiguracionMailDto.cs" />
-    <Compile Include="Dto\CubitacionDeTanquesDto.cs" />
     <Compile Include="Dto\DensidadPorTemperaturaDeMaterialDto.cs" />
     <Compile Include="Dto\EmbarqueInformacionDto.cs" />
     <Compile Include="Dto\EmbarqueInformacionViajeDto.cs" />
@@ -733,10 +727,8 @@
     <Compile Include="Dto\LlenadoMilimetroPorTanqueDto.cs" />
     <Compile Include="Dto\LogCambioDeModalidadCalleDto.cs" />
     <Compile Include="Dto\MensajeCartelLedDto.cs" />
-    <Compile Include="Dto\EstadoBuqueDto.cs" />
     <Compile Include="Dto\ModuloDeCargaBalanzasDto.cs" />
     <Compile Include="Dto\ModuloDeCargaDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaElementoGraficoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaElementoGraficoHistoricoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaHabilitacionDeTanquesDto.cs" />
     <Compile Include="Dto\ModuloDeCargaHabilitacionDeTanquesHistoricoDto.cs" />
@@ -755,7 +747,6 @@
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDto.cs" />
     <Compile Include="Dto\ModuloDeCargaRitmosEmbarqueDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaTabiquesDeEmbarqueDto.cs" />
     <Compile Include="Dto\ModuloDeCargaTabiquesDeEmbarqueHistoricoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaUmapDto.cs" />
     <Compile Include="Dto\MotivosDeCorteDto.cs" />
@@ -767,9 +758,7 @@
     <Compile Include="Dto\NotificacionCpeDto.cs" />
     <Compile Include="Dto\NotificacionSemaforoVagonesAutomaticaDto.cs" />
     <Compile Include="Dto\PinchazosPorCaladaDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaDto.cs" />
     <Compile Include="Dto\ModuloDeCargaElementoGraficoDto.cs" />
-    <Compile Include="Dto\ModuloDeCargaManosDeEmbarqueDto.cs" />
     <Compile Include="Dto\ModuloDeCargaTabiquesDeEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCargaAgenteControlPrivadoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCargaBodegaDto.cs" />
