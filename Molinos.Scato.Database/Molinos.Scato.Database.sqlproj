@@ -521,6 +521,11 @@
     <Build Include="dbo\Tables\Bandera.sql" />
     <None Include="Scripts\bkp16052022\baseBkp.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosUltimaActualizacion.sql" />
+    <Build Include="dbo\Tables\ADPuertoGruposRoles.sql" />
+    <Build Include="dbo\Tables\ADPuertoGruposAd.sql" />
+    <Build Include="dbo\Tables\ADPuertoRoles.sql" />
+    <Build Include="dbo\Tables\ADPuertoRolesPermisos.sql" />
+    <Build Include="dbo\Tables\ADPuertoPermisos.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

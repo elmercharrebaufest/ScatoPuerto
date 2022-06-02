@@ -145,6 +145,9 @@
   <ItemGroup>
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ADPuertoGruposAdMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ADPuertoPermisosMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ADPuertoRolesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
