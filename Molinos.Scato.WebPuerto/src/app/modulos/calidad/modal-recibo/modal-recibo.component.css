@@ -1,0 +1,19 @@
+.Traduccion{
+    color: grey;
+    font-size: 12px;
+}
+
+.inputCantidad{
+    max-width: 200px;
+}
+.cantidadLetras{
+    position: sticky;
+    
+}
+.inputCantidadLetras{
+    height:50px;
+}
+
+.resizeArea{
+    height: 60px;
+}

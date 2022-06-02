@@ -644,4 +644,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Nombre" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="55a6e00c-4b20-4c88-9e58-74fa69d30788" ChangeDateTime="06/02/2022 13:03:33">
+    <Property Name="ElementName" Value="[dbo].[ReciboDeBuqueDetalles].[CalidadYClaseDeCarga]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ReciboDeBuqueDetalles]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CantidadLetrasYClaseCarga" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4c2d5d71-8f03-4023-832c-5057aa0fabb8" ChangeDateTime="06/02/2022 13:18:35">
+    <Property Name="ElementName" Value="[dbo].[ReciboDeBuqueDetalles].[Destino]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ReciboDeBuqueDetalles]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PuertoDestino" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c85f5a10-a794-4351-8b65-037f895f32b2" ChangeDateTime="06/02/2022 14:04:55">
+    <Property Name="ElementName" Value="[dbo].[ReciboDeBuqueDetalles].[Origen]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ReciboDeBuqueDetalles]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PuertoOrigen" />
+  </Operation>
 </Operations>

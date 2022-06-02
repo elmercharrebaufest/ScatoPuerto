@@ -2655,6 +2655,9 @@ namespace Molinos.Scato.Servicios
         void EliminarObservacionDeCalidad(int observacion_id);
 
         [OperationContract]
-        IList<BanderaDto> ObtenerBanderas(); 
+        IList<BanderaDto> ObtenerBanderas();
+
+        [OperationContract]
+        void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDtoDetallesDto reciboDeBuqueDtoDetalles);
     }
 }

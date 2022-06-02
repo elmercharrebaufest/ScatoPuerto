@@ -479,6 +479,15 @@
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-embarque\planilla-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-turno-liquidos\planilla-turno-liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\mangueras-carga\mangueras-carga.component.ts" />
+    <!-- Modal Recibo -->
+    <TypeScriptCompile Include="src\app\modulos\calidad\modal-recibo\modal-recibo.component.css" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\modal-recibo\modal-recibo.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\modal-recibo\modal-recibo.component.ts" />
+    <!-- Registro Recibos -->
+    <TypeScriptCompile Include="src\app\modulos\calidad\registro-recibos\registro-recibos.component.css" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\registro-recibos\registro-recibos.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\registro-recibos\registro-recibos.component.ts" />
+
     <!-- carga solido TS -->
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\carga-solidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\operaciones\grafico-carga\grafico-carga.component.ts" />

@@ -5,13 +5,11 @@ import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { takeUntil } from 'rxjs/operators';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboDeBuque } from '@ScatoModels/recibo-buque';
-import { PDFService } from '@ScatoServicios/pdf.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 
@@ -51,12 +49,10 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   constructor(
     private workflowService: WorkflowService,
-    private _modalService: NgbModal,
     private procesoCalidadService: ProcesoCalidadService,
     private _procesoService: DatosEmbarquesProcesoService,
     private balanzas78Service: Balanzas78Service,
     private embarqueService: EmbarqueService,
-    private _PDFService: PDFService,
     private parametrosService: ParametrosService,
     ) {
     this.unsubscribe = new Subject();
@@ -67,7 +63,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => {
       this.trabajoOrdenado();
       // this.obtenerBalanzadasEnVivo();
-      this.inicializarReciboBuque();
     });
   }
 
@@ -75,7 +70,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.embarque = this._procesoService.getEmbarqueSelected();
     this.trabajoOrdenado();
     // this.obtenerBalanzadasEnVivo();
-    this.inicializarReciboBuque();
   }
 
   // subscribeEmbarques(){
@@ -232,39 +226,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.mostrarCargas = false;
     this.mostrarSpinner = true;
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-  }
-
-  inicializarReciboBuque(){
-    this.reciboBuque = new ReciboDeBuque();
-    var converter = require('number-to-words');
-    this.reciboBuque.nombrePuertoOrigen = "San Lorenzo, ARGENTINA";
-    // this.reciboBuque.fechaRecibo = new Date();
-    this.reciboBuque.nombreVapor = "";
-    this.reciboBuque.nombreEmpresaRemitente = "MOLINOS AGRO S.A";
-    this.reciboBuque.nombrePuertoDestino = "";
-    this.reciboBuque.cantidad = 0;
-    this.reciboBuque.cantidadEnLetras = converter.toWords(this.reciboBuque.cantidad).toUpperCase();
-    this.reciboBuque.estibadoEnBodega = "";
-    this.reciboBuque.calidadYCantidadDesconocidas = "";
-    this.reciboBuque.incluirParaImpresionDesconocida = true
-    this.reciboBuque.incluirParaImpresionBodega = true
-    this.reciboBuque.incluirParaImpresionDesconocida = true
-  }
-
-  onChangeCantidadEnLetras(cantidad: number){
-    var converter = require('number-to-words');
-     this.reciboBuque.cantidadEnLetras = converter.toWords(cantidad).toUpperCase();
-    // let cantstr = cantidadLetras.toString();
-    // this.reciboBuque.cantidadEnLetras = converter.toWords(cantidad);
-  }
-
-  openModalEmitirRecibo(modal: any) {
-    this.errorMessage = false;
-    this._modalService.open(modal, { size: 'lg'});
-  }
-
-  generarPDF(){
-    this._PDFService.sendGenerarPDF.emit();
   }
 
   ngOnDestroy() {

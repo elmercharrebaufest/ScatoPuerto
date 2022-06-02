@@ -10627,5 +10627,30 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<Bandera, BanderaDto>();
         }
 
+        public void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDtoDetallesDto reciboDeBuqueDtoDetalles)
+        {
+            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == reciboDeBuque.Embarque.id);
+            ReciboDeBuque reciboDB = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDeBuque.Id);
+            if (reciboDB != null)
+            {
+                reciboDB.Embarque = reciboDeBuque.Embarque;
+                reciboDB.NumeroRecibo = reciboDeBuque.NumeroRecibo;
+                reciboDB.Estado = reciboDeBuque.Estado;
+                reciboDB.Usuario = reciboDeBuque.Usuario;
+                reciboDB.UltimaActualizacion = reciboDeBuque.UltimaActualizacion;
+            }
+            else
+            {
+                reciboDB = new ReciboDeBuque()
+                {
+                    Embarque_Id = reciboDeBuque.Embarque_Id,
+                    NumeroRecibo = reciboDeBuque.NumeroRecibo,
+                    Estado = reciboDeBuque.Estado,
+                    Usuario = reciboDeBuque.Usuario,
+                    UltimaActualizacion = reciboDeBuque.UltimaActualizacion,
+                };
+            }
+        }
+
     }
 }

@@ -1,0 +1,122 @@
+<button (click)='openModalEmitirRecibo(emitirRecibo)' class="btn btn-primary m-4" >EMITIR RECIBO</button>
+
+
+<ng-template #emitirRecibo let-modal>
+        
+    <div class='modal-header'>
+        <label><b>Por favor, verifique los datos del recibo.</b></label>
+    </div>
+    <div class='modal-body '>
+        <div class="row">
+            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>Port of</b><br><span class="Traduccion">puerto de</span></label>
+                <input type="text" class="form-control" uppercase [(ngModel)]="this.reciboBuque.nombrePuertoOrigen">
+            </div>
+            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>Date</b><br><span class="Traduccion"> fecha </span></label>
+                <input type="text" class="form-control" uppercase [(ngModel)]="this.reciboBuque.fechaRecibo">
+                   
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div class="row">
+            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>Recived, in board the M/V/</b><br><span class="Traduccion"> Recibido a bordo del vapor</span></label>
+                <input type="text" class="form-control"  value="{{this.reciboBuque.nombreVapor}}">
+            </div>
+            <div class="col">
+                
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div><label for="recipient-name" ><b>the under noted goods in apparent good order and confition form/</b><br><span class="Traduccion"> las mercaderías abajo mencionadas en aparente buen orden y condcion de</span></label></div>
+
+        <div class="row">
+            <div class="col">
+                <input type="text" class="form-control" uppercase [(ngModel)]="this.reciboBuque.nombreEmpresaRemitente">
+            </div>
+            <div class="col">
+                
+            </div>    
+        </div>
+
+        <div><label></label></div>
+        
+        <div class="row">
+            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>for the Port of</b><br><span class="Traduccion"> para el puerto de</span></label>
+                
+                <input type="text" class="form-control" [(ngModel)]="this.reciboBuque.nombrePuertoDestino">
+            </div>
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Incluir para impresión</b></label></div>
+                <div class='custom-control custom-switch'>
+                <input type='checkbox' class='custom-control-input' id='customSwitchDestino' checked [(ngModel)]="this.reciboBuque.incluirParaImpresionDestino"/>
+                <label class='custom-control-label' for='customSwitchDestino'></label></div>
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div><label for="recipient-name" class="col-form-label"><small>(Quantity to be stated in Figures and also in Words).(Cantidades establecidas en números y tambien en letras)</small></label></div>
+
+        <!-- <div><label></label></div> -->
+
+        <div class="row">
+            <div class="col">
+                <label for="recipient-name" class="col-form-label"><b>QUANTITY</b><span class="Traduccion"><br> CANTIDAD</span></label>
+                
+                <input type="number" class="form-control inputCantidad" [(ngModel)]="this.reciboBuque.cantidad" (change)="onChangeCantidadEnLetras(this.reciboBuque.cantidad)">
+            </div>
+            <div class="col cantidadLetras">
+                <label for="recipient-name" class="col-form-label"><b>QUANTITY IN WORDS AND CLASS OF CARGO</b><br><span class="Traduccion"> CANTIDAD EN LETRAS Y CLASE DE CARGA</span></label>
+                <textarea class="form-control resizeArea" rows="2" cols="50" [(ngModel)]="this.reciboBuque.cantidadEnLetras"></textarea>
+                
+                <!-- <input type="text" class="form-control inputCantidadLetras" [(ngModel)]="this.reciboBuque.cantidadEnLetras"> -->
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div class="row">
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Stowed </b><br><span class="Traduccion">Estibado en bodega</span></label></div>
+                <input type="text" class="form-control"  [(ngModel)]="this.reciboBuque.estibadoEnBodega">
+
+            </div>
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Incluir para impresión</b></label></div>
+                <div class='custom-control custom-switch'>
+                <input type='checkbox' class='custom-control-input' id='customSwitchBodega' checked [(ngModel)]="this.reciboBuque.incluirParaImpresionBodega">
+                <label class='custom-control-label' for='customSwitchBodega'></label></div>
+            </div>    
+        </div>
+
+        <div><label></label></div>
+
+        <div class="row">
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Quality and Quantity unknown Said to Weigh:</b><br><span class="Traduccion"> Calidad y cantidad desconocidas que se dice pasar</span></label></div>
+                <input type="text" class="form-control"  [(ngModel)]="this.reciboBuque.calidadYCantidadDesconocidas">
+            </div>
+            <div class="col">
+                <div><label for="recipient-name" class="col-form-label"><b>Incluir para impresión</b></label></div>
+                <div class='custom-control custom-switch'>
+                <input type='checkbox' class='custom-control-input' id='customSwitchCalidad' checked [(ngModel)]="this.reciboBuque.incluirParaImpresionDesconocida">
+                <label class='custom-control-label' for='customSwitchCalidad'></label></div>
+            </div>    
+        </div>
+    </div>
+    
+    <div class='modal-footer'>
+        <button type='button' class='btn btn-danger mx-5' (click)="modal.dismiss('Cross click')" >CANCELAR</button>
+        <button type="button" class="btn btn-success" (click)="generarPDF()" (click)="modal.dismiss('Cross click')">ENVIAR A SUPERVISOR</button>
+    </div>
+</ng-template>
+
+<app-recibodebuquepdf [recibo]="reciboBuque"></app-recibodebuquepdf>
+
