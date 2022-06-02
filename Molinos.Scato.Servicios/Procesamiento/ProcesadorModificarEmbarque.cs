@@ -43,6 +43,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
             else
                 Embarque.Destino = null;
 
+            foreach (var informacion in comando.Dto.EmbarqueInformacion)
+            {
+                informacion.FechaRegistro = DateTime.Now;
+            }
             Conversor.Convertir(comando.Dto, Embarque);
 
             Embarque.TipoBuque = comando.Dto.TipoDeBuque != null ? comando.Dto.TipoDeBuque.Nombre.ToString() : "";
@@ -54,6 +58,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Nombre = comando.Dto.NombreBuque
             };
 
+            
             Repositorio.RemoverTodos(Embarque.MaterialPuertoCantidad.ToList());
 
             foreach (var mat in comando.Dto.MaterialesPuertoCantidad.Where(y => y.Cantidad > 0))
