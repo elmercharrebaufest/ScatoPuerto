@@ -427,6 +427,7 @@
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\nir.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos-balanzas78.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\ad.ts" />
     <!-- enums TS -->
     <TypeScriptCompile Include="src\app\shared\enums\permisos-scato.ts" />
     <TypeScriptCompile Include="src\app\shared\enums\tipo-alerta.ts" />

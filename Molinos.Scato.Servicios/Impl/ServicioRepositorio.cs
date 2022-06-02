@@ -9891,9 +9891,17 @@ namespace Molinos.Scato.Servicios.Impl
                 }
 
                 // Busco primer y último ID de Carga
-                int idPrimeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor && 
-                                                                            x.FechaInicio == null &&
-                                                                            x.NumeroBalanza == numeroBalanzaStr).Id;
+
+                //int idPrimeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor && 
+                //                                                            x.FechaInicio == null &&
+                //                                                            x.NumeroBalanza == numeroBalanzaStr).Id;
+
+                var primeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor &&
+                                                                          x.FechaInicio == null &&
+                                                                          x.NumeroBalanza == numeroBalanzaStr);
+
+                if (primeraCarga == null) return ritmosBalanzas78;
+                int idPrimeraCarga = primeraCarga.Id;
 
                 int idUltimaCarga = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
                                                                    x.FechaInicio == null &&
@@ -9907,10 +9915,10 @@ namespace Molinos.Scato.Servicios.Impl
                                                                            x.NumeroBalanza == numeroBalanzaStr).Last().Id;
                 // Busco fecha de inicio y fin
                 DateTime fechaInicialBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idPrimeraBalanzada &&
-                                                                                          x.NumeroBalanza == numeroBalanzaStr).Fecha;
+                                                                                               x.NumeroBalanza == numeroBalanzaStr).Fecha;
 
                 DateTime fechafinalBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idUltimaBalanzada &&
-                                                                                        x.NumeroBalanza == numeroBalanzaStr).Fecha;
+                                                                                             x.NumeroBalanza == numeroBalanzaStr).Fecha;
 
                 tiempoDeCarga = (fechafinalBalanza - fechaInicialBalanza).TotalMinutes;
 
