@@ -581,7 +581,6 @@
     <Compile Include="Procesamiento\ProcesadorModificarDocumentoExterno.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMaterialPorCentro.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMotivosLimpieza.cs" />
-    <Compile Include="Procesamiento\ProcesadorModificarRecorridoCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorAgregarMarcaSustentable.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoEstablecimientoDemorado.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoMuestraAuditoriaCamara.cs" />
