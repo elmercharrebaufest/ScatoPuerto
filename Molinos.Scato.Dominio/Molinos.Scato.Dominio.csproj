@@ -128,7 +128,6 @@
     <Compile Include="Comandos\CrearCallePorRecorrido.cs" />
     <Compile Include="Comandos\CrearContingencia.cs" />
     <Compile Include="Comandos\CrearEmbarque.cs" />
-    <Compile Include="Comandos\CrearMotivosLimpieza.cs" />
     <Compile Include="Comandos\DesactivarContingenciaIngresoPlanta.cs" />
     <Compile Include="Comandos\CrearLoteAuditoria.cs" />
     <Compile Include="Comandos\EliminarAgenciaControlPrivado.cs" />
