@@ -12,76 +12,63 @@ import { MapaBuqueComponent } from './mapa-buque/mapa-buque.component';
   styleUrls: ['./geolocalizacion.component.css']
 })
 export class GeolocalizacionComponent implements OnInit {
-  
+
+  // #region Variables
   mostrarSpinner: boolean = true;
   mostrarMapa: boolean = false;
   mostrarListaBuque: boolean = false;
-
   user: any;
   private listaPuntosInteres;
   private listaBuquesGeolocalizacion;
   @ViewChild(MapaBuqueComponent) mapaBuqueComponent: MapaBuqueComponent;
+  // #endregion
 
+  // #region Constructor
   constructor(private session: SessionService,
-              private geolocalizacionService: GeolocalizacionService,
-              private geolocalizacionSharingService : GeolocalizacionSharingService,
-              private router: Router,
-              private route: ActivatedRoute) { 
-      this.user = this.session.getUser();
-      this.cargarPuntosInteres();
-      this.cargarBuquesGeolocalizacion();
-      
+    private geolocalizacionService: GeolocalizacionService,
+    private geolocalizacionSharingService: GeolocalizacionSharingService,
+    private router: Router,
+    private route: ActivatedRoute) {
+    this.user = this.session.getUser();
+    this.cargarPuntosInteres();
+    this.cargarBuquesGeolocalizacion();
   }
+  // #endregion
 
-  ngOnInit(){
+  // #region Eventos del Componente  
+  ngOnInit() {
     this.mostrarSpinner = false;
   }
+  // #endregion
 
-  async onChangeBuqueMapa(event){
-    this.geolocalizacionSharingService.setBuquesLineUp(event);   
-    await this.mapaBuqueComponent.limpiarMarcadores();
-    await this.mapaBuqueComponent.cargarPuntosInteres();
-    await this.mapaBuqueComponent.cargarBuquesMapa();
-    
-  }
-
-  async onZoomBuqueSeleccionado(event){
-    await this.mapaBuqueComponent.onZoomBuqueSeleccionado(event);
-  }
-
-  setListaPuntosInteres(puntosInteres){
+  // #region Metodos 
+  private setListaPuntosInteres(puntosInteres) {
     this.listaPuntosInteres = puntosInteres;
   }
-  
-  setListaBuquesGeolocalizacion(BuquesGeolocalizacion){
+
+  private setListaBuquesGeolocalizacion(BuquesGeolocalizacion) {
     this.listaBuquesGeolocalizacion = BuquesGeolocalizacion;
   }
-  
-  getListaPuntosInteres(){
+
+  public getListaPuntosInteres() {
     return this.listaPuntosInteres;
   }
 
-  getListaBuquesGeolocalizacion(){
+  public getListaBuquesGeolocalizacion() {
     return this.listaBuquesGeolocalizacion;
   }
 
-  tienePermiso(permiso: number) {
+  public tienePermiso(permiso: number) {
     return this.user.permisos.find(x => x === permiso);
   }
 
-  getUltimaActualizacion(){
-
+  public getUltimaActualizacion() {
     if (this.listaBuquesGeolocalizacion.length == 0) return null;
-    const fechaActualizacion = Math.max.apply(Math, this.listaBuquesGeolocalizacion.map(function(item) { return new Date(item.posicion.fechaRegistro); }));
+    const fechaActualizacion = Math.max.apply(Math, this.listaBuquesGeolocalizacion.map(function (item) { return new Date(item.posicion.fechaRegistro); }));
     return fechaActualizacion;
   }
 
-  cambiarLineUp() {
-    this.router.navigate(['lineup']);
-
-  }
-
-  cargarPuntosInteres(){
+  private cargarPuntosInteres() {
     this.mostrarMapa = false;
     this.geolocalizacionService.ListarPuntosInteresGeolocalizacion().subscribe(
       data => {
@@ -89,105 +76,121 @@ export class GeolocalizacionComponent implements OnInit {
         this.geolocalizacionSharingService.setPuntosInteres(this.getListaPuntosInteres());
       },
       err => {
-            this.mostrarMapa = true;  
-            },
+        this.mostrarMapa = true;
+      },
       () => {
-            this.mostrarMapa = true;
-            }
+        this.mostrarMapa = true;
+      }
     );
   }
-  
-  cargarBuquesGeolocalizacion(){
+
+  private cargarBuquesGeolocalizacion() {
     this.mostrarListaBuque = false;
     this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(
       data => {
-                let muelleCarga = '';
-                data.forEach((item) => {
-                    if (item.sanBenito) muelleCarga = 'San Benito';
-                    if (item.vicentin) muelleCarga = 'Vicentin';
-                    if (item.otrosMuelles) muelleCarga = 'Otros Muelles';
-                    if (item.noryon) muelleCarga = 'Nouryon';
+        let muelleCarga = '';
+        data.forEach((item) => {
+          if (item.sanBenito) muelleCarga = 'San Benito';
+          if (item.vicentin) muelleCarga = 'Vicentin';
+          if (item.otrosMuelles) muelleCarga = 'Otros Muelles';
+          if (item.noryon) muelleCarga = 'Nouryon';
 
-                    item.muelleCarga = muelleCarga;
-                    item.esSeleccionado = true;
-                    item.esCordenadaModificada = false;
-                    item.esSeleccionadoPorMuelle = true;
-                    item.numeroPaginado = 0;
-                });
-                this.setListaBuquesGeolocalizacion(data);
-                
-             },
+          item.muelleCarga = muelleCarga;
+          item.esSeleccionado = true;
+          item.esCordenadaModificada = false;
+          item.esSeleccionadoPorMuelle = true;
+          item.numeroPaginado = 0;
+        });
+        this.setListaBuquesGeolocalizacion(data);
+
+      },
       err => {
-                this.mostrarListaBuque = false;
-             },
+        this.mostrarListaBuque = false;
+      },
       () => {
-                this.mostrarListaBuque = true;
-                this.cargarBuqueAdicionales();
-                this.cargarBuqueSeleccionado();
-            }
+        this.mostrarListaBuque = true;
+        this.cargarBuqueAdicionales();
+        this.cargarBuqueSeleccionado();
+      }
     );
   }
 
-  private cargarBuqueAdicionales(){
-    if (this.listaBuquesGeolocalizacion != undefined){
-      if (this.listaBuquesGeolocalizacion.length > 0){
-          
-          this.listaBuquesGeolocalizacion.forEach((item) =>{
-            
-            if (!item.sanBenito){
-              const embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito == true);
+  private cargarBuqueAdicionales() {
+    if (this.listaBuquesGeolocalizacion != undefined) {
+      if (this.listaBuquesGeolocalizacion.length > 0) {
 
-              if (embarqueSel != undefined){
+        this.listaBuquesGeolocalizacion.forEach((item) => {
 
-                    let maxEmbarque_Id;
-                    const embarqueIds = this.listaBuquesGeolocalizacion.find(data => data.vapor_Id == item.vapor_Id && data.esCordenadaModificada == true && data.embarque_Id != item.embarque_Id && item.sanBenito != true);
+          if (!item.sanBenito) {
+            const embarqueSel = this.listaBuquesGeolocalizacion.find(buque => buque.vapor_Id == item.vapor_Id && buque.sanBenito == true);
 
-                    if (embarqueIds!= undefined){
-                        maxEmbarque_Id = embarqueIds.embarque_Id;
-                    }
-                    const embarqueSelCord = this.listaBuquesGeolocalizacion.find(buque => buque.embarque_Id == maxEmbarque_Id);
+            if (embarqueSel != undefined) {
+              let maxEmbarque_Id;
+              const embarqueIds = this.listaBuquesGeolocalizacion.find(data => data.vapor_Id == item.vapor_Id && data.esCordenadaModificada == true && data.embarque_Id != item.embarque_Id && item.sanBenito != true);
 
-                    let latitudVal=null;
-                    let longitudVal=null;
+              if (embarqueIds != undefined) {
+                maxEmbarque_Id = embarqueIds.embarque_Id;
+              }
+              const embarqueSelCord = this.listaBuquesGeolocalizacion.find(buque => buque.embarque_Id == maxEmbarque_Id);
 
-                    if (embarqueSelCord != undefined){
-                        latitudVal  = Number(embarqueSelCord.posicion.latitud) + 0.00879;
-                        longitudVal = Number(embarqueSelCord.posicion.longitud) + 0.00290;
-                        item.posicion.latitud = latitudVal;
-                        item.posicion.longitud =  longitudVal;
-                        item.esCordenadaModificada = true;
-                    }else{
-                        latitudVal  = Number(item.posicion.latitud) + 0.00879;
-                        longitudVal = Number(item.posicion.longitud) + 0.00290;
-                        item.posicion.latitud = latitudVal;
-                        item.posicion.longitud =  longitudVal;
-                        item.esCordenadaModificada = true;
-                    }
+              let latitudVal = null;
+              let longitudVal = null;
+
+              if (embarqueSelCord != undefined) {
+                latitudVal = Number(embarqueSelCord.posicion.latitud) + 0.00879;
+                longitudVal = Number(embarqueSelCord.posicion.longitud) + 0.00290;
+                item.posicion.latitud = latitudVal;
+                item.posicion.longitud = longitudVal;
+                item.esCordenadaModificada = true;
+              } else {
+                latitudVal = Number(item.posicion.latitud) + 0.00879;
+                longitudVal = Number(item.posicion.longitud) + 0.00290;
+                item.posicion.latitud = latitudVal;
+                item.posicion.longitud = longitudVal;
+                item.esCordenadaModificada = true;
               }
             }
-          })
+          }
+        })
 
-          this.geolocalizacionSharingService.setBuquesLineUp(this.getListaBuquesGeolocalizacion());
+        this.geolocalizacionSharingService.setBuquesLineUp(this.getListaBuquesGeolocalizacion());
       }
     }
   }
 
-  private cargarBuqueSeleccionado(){
+  private cargarBuqueSeleccionado() {
     let embarque_Id;
     let tipo;
-    if (this.route.snapshot.queryParams.embarque_id != undefined){
-          embarque_Id = this.route.snapshot.queryParams.embarque_id
+    if (this.route.snapshot.queryParams.embarque_id != undefined) {
+      embarque_Id = this.route.snapshot.queryParams.embarque_id
     }
-    if (this.route.snapshot.queryParams.tipo != undefined){
-          tipo = this.route.snapshot.queryParams.tipo
+    if (this.route.snapshot.queryParams.tipo != undefined) {
+      tipo = this.route.snapshot.queryParams.tipo
     }
-    if (this.listaBuquesGeolocalizacion != undefined){
-        if (tipo == 'zoom'){
-           const embarque = this.listaBuquesGeolocalizacion.filter(buque => buque.embarque_Id == embarque_Id);
-           this.geolocalizacionSharingService.setBuqueSeleccionado(embarque);
-        }
+    if (this.listaBuquesGeolocalizacion != undefined) {
+      if (tipo == 'zoom') {
+        const embarque = this.listaBuquesGeolocalizacion.filter(buque => buque.embarque_Id == embarque_Id);
+        this.geolocalizacionSharingService.setBuqueSeleccionado(embarque);
+      }
     }
   }
+  // #endregion
+
+  // #region Eventos Controles
+  public async onChangeBuqueMapa(event) {
+    this.geolocalizacionSharingService.setBuquesLineUp(event);
+    await this.mapaBuqueComponent.limpiarMarcadores();
+    await this.mapaBuqueComponent.cargarPuntosInteres();
+    await this.mapaBuqueComponent.cargarBuquesMapa();
+  }
+
+  public async onZoomBuqueSeleccionado(event) {
+    await this.mapaBuqueComponent.onZoomBuqueSeleccionado(event);
+  }
+
+  public onCambiarLineUp() {
+    this.router.navigate(['lineup']);
+  }
+  // #endregion
 
 }
-

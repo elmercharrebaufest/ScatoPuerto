@@ -6,7 +6,7 @@
     [Bodega_Id]                              INT,
     [MaterialPuerto_Id]                         INT NOT NULL,
     [Destino_Id]                                INT NOT NULL,
-    [Cantidad]                                  DECIMAL(18, 8),
+    [Cantidad]                                  INT,
     [FechaCarga] DATETIME NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,

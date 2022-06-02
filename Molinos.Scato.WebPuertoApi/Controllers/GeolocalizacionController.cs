@@ -28,11 +28,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/Geolocalizacion/RegistrarEmbarqueGeolocalizacion")]
-        public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> EmbarquesGeolocalizacion)
+        public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> listaEmbarquesGeolocalizacion)
         {
             try
             {
-                foreach (var EmbarqueGeolocalizacion in EmbarquesGeolocalizacion)
+                foreach (var EmbarqueGeolocalizacion in listaEmbarquesGeolocalizacion)
                 {
                     comandos.Ejecutar(new ModificarEmbarqueGeolocalizacion
                     {

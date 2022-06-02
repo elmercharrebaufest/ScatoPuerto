@@ -2,6 +2,7 @@ import { EventEmitter, Injectable, Output } from '@angular/core';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas, InformacionAdicional } from '@ScatoModels/balanzadas/balanza';
 import { EmbarqueService } from './embarque.service';
+import { RitmosBalanzas78 } from '@ScatoModels/balanzadas/ritmos-balanzas78';
 
 //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
   /**
@@ -17,6 +18,7 @@ export class Balanzas78Service {
   filtroBalanza7: Balanzas[] = [];
   filtroBalanza8: Balanzas[] = [];
   private interval: any;
+  private intervalRitmosBalanzas78: NodeJS.Timeout;
 
   @Output() sendDataBalanza7 = new EventEmitter<any>();
   @Output() sendDataBalanza8 = new EventEmitter<any>();
@@ -32,6 +34,7 @@ export class Balanzas78Service {
   @Output() sendDataBalanzadaAgrupada8 = new EventEmitter<Balanzas[]>();
 
   @Output() informacionAdicional = new EventEmitter<InformacionAdicional>();
+  @Output() sendRitmosBalanzas78 = new EventEmitter<RitmosBalanzas78>();
 
   materialesPuerto = [];
 
@@ -58,22 +61,6 @@ export class Balanzas78Service {
     //   this.balanzadasArray = res;
     // })
 
-    // this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
-    //   .subscribe(resp => {
-    //     this.balanzadasArray = resp.balanzas;
-
-    //     this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
-    //     this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
-        
-    //    this.setBalanzada7y8(this.balanzadasArray);
-    //    this.setBalanzada7(this.filtroBalanza7);
-    //    this.setBalanzada8(this.filtroBalanza8);
-    //    this.setBalanzada7y8Completas(resp.balanzas);
-    //    this.setBalanzada7Kilos(resp.balanzas);
-    //    this.setBalanzada8Kilos(resp.balanzas);
-    //    this.setInfoAdicional(resp.informacionAdicional);
-    //  });
-
     this.interval = setInterval(() => {
       this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
         .subscribe(resp => {
@@ -95,19 +82,17 @@ export class Balanzas78Service {
         })
     }, 15000);
 
+    this.intervalRitmosBalanzas78 = setInterval(() => {
+      this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
+        .subscribe(resp => this.setSincRitmosBalanzas78(resp) )
+    }, 15000);
 
   }
 
   limpiarInterval(){
     clearInterval(this.interval);
+    clearInterval(this.intervalRitmosBalanzas78);
   }
-
-  // setBalanza7(form: any){
-  //   this.sendDataBalanza7.emit(form);
-  // }
-  // setBalanza8(form: any){
-  //   this.sendDataBalanza8.emit(form);
-  // }
 
   // TODO: Gonzalo - Nuevos emitter para consumir balanzadas en los componentes
   setBalanzada7y8(balanzadas: Balanzas[]){
@@ -157,11 +142,8 @@ export class Balanzas78Service {
     this.informacionAdicional.emit(informacionAdicional);
   }
 
-
-
-  //OBTIENE LAS BALANZADAS
-  // getBalanzadas(){
-  //   return this.balanzadasArray;
-  // }
+  setSincRitmosBalanzas78(ritmosBalanzas78: RitmosBalanzas78){
+    this.sendRitmosBalanzas78.emit(ritmosBalanzas78);
+  }
 
 }

@@ -1,6 +1,4 @@
-﻿
-
-    using Molinos.Scato.Dominio.Comandos;
+﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
@@ -14,7 +12,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
     public class ProcesadorModificarEmbarqueGeolocalizacion : ProcesadorModificar<ModificarEmbarqueGeolocalizacion>
     {
-       
+
         public ProcesadorModificarEmbarqueGeolocalizacion(IRepositorio repositorio, IConversor conversor, ILogger log)
             : base(repositorio, conversor, log)
         {
@@ -24,8 +22,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             try
             {
-                Bandera banderaBase = Repositorio.Obtener<Bandera>(x => x.Abreviatura == comando.BanderaBuque);
 
+                Bandera banderaBase = Repositorio.Obtener<Bandera>(x => x.Abreviatura.ToLower() == comando.BanderaBuque.ToLower());
+
+                DateTime fechaMinima = (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
 
                 Embarque embarque = Repositorio.Obtener<Embarque>(x => x.EmbarqueInformacion.FirstOrDefault().Bandera.Id == banderaBase.Id && x.Patente == comando.NombreBuque && x.TipoBuque == comando.TipoBuque);
 
@@ -34,7 +34,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     if (embarque.EmbarqueInformacion.Count == 0 && comando.DtoInformacion != null)
                     {
 
-                    
+
                         EmbarqueInformacion inf = new EmbarqueInformacion
                         {
                             Embarque = embarque,
@@ -53,12 +53,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     else
                     {
                         var embInf = embarque.EmbarqueInformacion.FirstOrDefault();
-
+                        embInf.Bandera = banderaBase;
                         embInf.IMO = comando.DtoInformacion.IMO;
                         embInf.MMSI = comando.DtoInformacion.MMSI;
                         embInf.Tonelaje = comando.DtoInformacion.Tonelaje;
                         embInf.TonelajePesoMuerto = comando.DtoInformacion.TonelajePesoMuerto;
                         embInf.LargoxAnchoExtremo = comando.DtoInformacion.LargoxAnchoExtremo;
+                        embInf.FechaRegistro = DateTime.Now;
+                        if (embInf.FotoEmbarque == null) embInf.FotoEmbarque = comando.DtoInformacion.FotoEmbarque;
+                        Repositorio.GuardarCambios();
                     }
 
                     if (embarque.EmbarqueInformacionViaje.Count == 0 && comando.DtoViaje != null)
@@ -80,6 +83,23 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         };
                         embarque.EmbarqueInformacionViaje.Add(viaje);
                     }
+                    else
+                    {
+                        var embInfViaje = embarque.EmbarqueInformacionViaje.FirstOrDefault();
+                        embInfViaje.Embarque = embarque;
+                        embInfViaje.PaisOrigen = comando.DtoViaje.PaisOrigen;
+                        embInfViaje.PuertoOrigen = comando.DtoViaje.PuertoOrigen;
+                        embInfViaje.PaisDestino = comando.DtoViaje.PaisDestino;
+                        embInfViaje.PuertoDestino = comando.DtoViaje.PuertoDestino;
+                        embInfViaje.ATD = comando.DtoViaje.ATD;
+                        embInfViaje.ATA = comando.DtoViaje.ATA;
+                        embInfViaje.ETA_Reportado = comando.DtoViaje.ETA_Reportado;
+                        embInfViaje.Destino_Reportado = comando.DtoViaje.Destino_Reportado;
+                        embInfViaje.Peso_Reportado = comando.DtoViaje.Peso_Reportado;
+                        embInfViaje.VelocidadRecorrido = comando.DtoViaje.VelocidadRecorrido;
+                        embInfViaje.FechaRegistro = DateTime.Now;
+                        Repositorio.GuardarCambios();
+                    }
 
                     if (embarque.EmbarquePosicion.Count > 0 && comando.DtoPosicion != null)
                     {
@@ -88,49 +108,51 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         EmbarquePosicionHistorico posicionHist = new EmbarquePosicionHistorico
                         {
                             Embarque_id = embarqPos.Embarque.Id,
-                            HoraUTCPosicionRecibida = embarqPos.HoraUTCPosicionRecibida,
-                            HoraLocalBarco = embarqPos.HoraLocalBarco,
+                            HoraUTCPosicionRecibida = embarqPos.HoraUTCPosicionRecibida < fechaMinima ? fechaMinima : embarqPos.HoraUTCPosicionRecibida,
+                            HoraLocalBarco = embarqPos.HoraLocalBarco < fechaMinima ? fechaMinima : embarqPos.HoraLocalBarco,
                             Area = embarqPos.Area,
                             PuertoActual = embarqPos.PuertoActual,
                             Latitud = embarqPos.Latitud,
                             Longitud = embarqPos.Longitud,
                             Estado = embarqPos.Estado,
                             VelocidadCurso = embarqPos.VelocidadCurso,
-                            FechaRegistro = embarqPos.FechaRegistro,
+                            FechaRegistro = embarqPos.FechaRegistro < fechaMinima ? fechaMinima : embarqPos.FechaRegistro,
                         };
                         //   embarque.EmbarquePosicion.Add(embarqPos);
                         Repositorio.Agregar(posicionHist);
 
-                        embarqPos.HoraUTCPosicionRecibida = comando.DtoPosicion.HoraUTCPosicionRecibida;
-                        embarqPos.HoraLocalBarco = comando.DtoPosicion.HoraLocalBarco;
+                        embarqPos.HoraUTCPosicionRecibida = comando.DtoPosicion.HoraUTCPosicionRecibida < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraUTCPosicionRecibida;
+                        embarqPos.HoraLocalBarco = comando.DtoPosicion.HoraLocalBarco < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraLocalBarco;
                         embarqPos.Area = comando.DtoPosicion.Area;
                         embarqPos.PuertoActual = comando.DtoPosicion.PuertoActual;
                         embarqPos.Latitud = comando.DtoPosicion.Latitud;
                         embarqPos.Longitud = comando.DtoPosicion.Longitud;
                         embarqPos.Estado = comando.DtoPosicion.Estado;
                         embarqPos.VelocidadCurso = comando.DtoPosicion.VelocidadCurso;
-                        embarqPos.FechaRegistro = comando.DtoPosicion.FechaRegistro;
-                        //  Repositorio.GuardarCambios();
+                        embarqPos.FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : embarqPos.FechaRegistro;
+                        Repositorio.GuardarCambios();
 
                     }
                     else if (comando.DtoPosicion != null)
                     {
+
                         EmbarquePosicion posicion = new EmbarquePosicion
                         {
                             Embarque = embarque,
-                            HoraUTCPosicionRecibida = comando.DtoPosicion.HoraUTCPosicionRecibida,
-                            HoraLocalBarco = comando.DtoPosicion.HoraLocalBarco,
+                            HoraUTCPosicionRecibida = comando.DtoPosicion.HoraUTCPosicionRecibida < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraUTCPosicionRecibida,
+                            HoraLocalBarco = comando.DtoPosicion.HoraLocalBarco < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraLocalBarco,
                             Area = comando.DtoPosicion.Area,
                             PuertoActual = comando.DtoPosicion.PuertoActual,
                             Latitud = comando.DtoPosicion.Latitud,
                             Longitud = comando.DtoPosicion.Longitud,
                             Estado = comando.DtoPosicion.Estado,
                             VelocidadCurso = comando.DtoPosicion.VelocidadCurso,
-                            FechaRegistro = comando.DtoPosicion.FechaRegistro,
+                            FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : comando.DtoPosicion.FechaRegistro,
                         };
                         embarque.EmbarquePosicion.Add(posicion);
+                        Repositorio.Agregar(embarque);
                     }
-                    Repositorio.GuardarCambios();
+
                 }
             }
             catch (Exception ex)
@@ -139,7 +161,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 throw ex;
             }
         }
-        
+
 
         protected override void Validar(ModificarEmbarqueGeolocalizacion comando, Resultado resultado)
         {

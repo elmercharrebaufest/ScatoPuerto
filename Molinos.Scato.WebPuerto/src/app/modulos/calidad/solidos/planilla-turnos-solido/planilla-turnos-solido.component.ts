@@ -236,6 +236,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         }
         
         //Agrego detalles
+        console.log('dia---->><')
+        console.log(dia)
+        console.log(this.diasTurno['controls'])
         if(dia.moduloDeCargaPlanillaDeTurnosDetallesSolido?.length > 0){
           this.initTurnoDetalle(dia.moduloDeCargaPlanillaDeTurnosDetallesSolido,
                                 this.diasTurno['controls'][dayIndex]['controls'].turnos, 
@@ -471,16 +474,22 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurno(turnos);
-      contador += 2;
+      //contador += 1;
     }
     return contador;
   }
 
   getRowSpanTurno(turno: any) {
-    if (turno.controls.moduloDeCargaPlanillaDeTurnosCortes.length > 0)
-      return turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length + 1;
-    else
-      return turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
+    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
+    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
+    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
+
+    registroLiquido = registroLiquido > 0 ? 5 : 0; // tamaño del detalle de cada turno
+    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+
+    let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
+    return numeroRegistros;
   }
 
   getTurnoHorario(dia, turno) {
@@ -566,16 +575,17 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   initTurnoDetalle(detalle: TurnoDetalleSolido[], turno: PlanillaDeTurnos, turnoIndex?: number){
     let planillaTurnoDetalles = turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'];
     
-    
+      console.log('turno[controls] --->>')
+      console.log(turno['controls'])
      if (detalle != null){
         if(detalle.length > 0){
           detalle.forEach(element => {      
-            (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][0]['controls'].cerrado.value));
+            (planillaTurnoDetalles as FormArray).push(this.initLinea(element, true));
           });
 
           //HAGO ESTO PARA COMPLETAR CON LINEAS VACÍAS HASTA LLEGAR A 4.
           for(let i=detalle.length; i<4; i++){
-            (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'] as FormArray).push(this.initLinea(null,turno['controls'][0]['controls'].cerrado.value));
+            (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'] as FormArray).push(this.initLinea(null,true));
           }
         }
     //Si no hay detalles completo con 4 lineas vacías.
@@ -654,16 +664,37 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   initObservacion(observacion?: any, cerrado?: boolean) {
-    if(observacion != null){
+    let fechaObs = '';
+    let horaObs = '';
+
+    if (observacion.fechaHora != undefined) {
+      if (observacion.fechaHora != null) {
+        fechaObs = this.formatoFechaHora(true, observacion.fechaHora)
+        horaObs = this.formatoFechaHora(false, observacion.fechaHora)
+      }
+    }
+    if (observacion != null) {
       return this._builder.group({
-        fecha: [{value: observacion.fecha, disabled: true }, Validators.required],
-        hora: [{value: observacion.hora, disabled: true },  Validators.required],
-        observaciones: [{value: observacion.observaciones, disabled: true }, Validators.required],
-        id: [{value: observacion.id, disabled: true }, Validators.required]
+        fecha: [{ value: fechaObs, disabled: true }, Validators.required],
+        hora: [{ value: horaObs, disabled: true }, Validators.required],
+        observaciones: [{ value: observacion.observaciones, disabled: true }, Validators.required],
+        id: [{ value: observacion.id, disabled: true }, Validators.required]
       })
     }
   }
-
+  private formatoFechaHora(esFecha, fecha) {
+    let formatoFecha = '';
+    const fechaHora = new Date(fecha);
+    if (esFecha) {
+      formatoFecha = ("00" + fechaHora.getDate()).slice(-2) + '/' +
+        ("00" + (fechaHora.getMonth() + 1)).slice(-2) + '/' +
+        fechaHora.getFullYear().toString();
+    } else {
+      formatoFecha = ("00" + fechaHora.getHours()).slice(-2) + ':' +
+        ("00" + fechaHora.getMinutes()).slice(-2)
+    }
+    return formatoFecha;
+  }
   getToneladasParcelDia(bodega: number, d: number) {
     let dia = this.getTurnos(d);
     let cantidad = 0;

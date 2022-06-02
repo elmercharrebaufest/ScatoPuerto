@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, Input } from '@angular/core';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -66,6 +66,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   unsubscribe: Subject<any>;
   vaporId: number = 0;
   yaCargoModal: boolean = false;
+  @Input() imprimir : boolean = false; 
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
