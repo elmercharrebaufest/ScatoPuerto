@@ -10058,37 +10058,71 @@ namespace Molinos.Scato.Servicios.Impl
             double tiempoDeCarga7 = 0;
             double tiempoDeCarga8 = 0;
             double tiempoCargaNeto = 0;
+            decimal kgNetosBalanza7 = 0;
+            decimal kgNetosBalanza8 = 0;
 
             if (repositorio.Obtener<Embarque>(x => x.Vapor.Id == vapor_id).FechaHoraInicioCarga != null)
             {
-                var idCargaInicialBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.FechaInicio == null && x.NumeroBalanza == "7").Id;
-                var idCargaInicialBalanza8 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.FechaInicio == null && x.NumeroBalanza == "8").Id;
-
-                var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.NumeroBalanza == "7").Id;
-                var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.NumeroBalanza == "8").Id;
-
-                var fechaInicialBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroPrimeraCargaBalanza7 && x.NumeroBalanza == "7").Fecha;
-                var fechaInicialBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroPrimeraCargaBalanza8 && x.NumeroBalanza == "8").Fecha;
-
-                var registroUltimaCargaBalanza7 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7).Last().Id;
-                var registroUltimaCargaBalanza8 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8).Last().Id;
-
-                var fechafinalBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroUltimaCargaBalanza7 && x.NumeroBalanza == "7").Fecha;
-                var fechafinalBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroUltimaCargaBalanza8 && x.NumeroBalanza == "8").Fecha;
-
-                var kgNetosBalanza7 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.CargaInicial_NumeroBalanza == "7");
-                var kgNetosBalanza8 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.CargaInicial_NumeroBalanza == "8");
-
-                totalCargado = (kgNetosBalanza7 + kgNetosBalanza8) / 1000;
-                tiempoDeCarga7 = (fechafinalBalanza7 - fechaInicialBalanza7).TotalMinutes;
-                tiempoDeCarga8 = (fechafinalBalanza8 - fechaInicialBalanza8).TotalMinutes;
-
-                if (tiempoDeCarga7 >= tiempoDeCarga8)
+                if (repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7").Count() > 0)
                 {
-                    tiempoCargaNeto = tiempoDeCarga7;
+                    var idCargaInicialBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.FechaInicio == null && x.NumeroBalanza == "7").Id;
+                    var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.NumeroBalanza == "7").Id;
+                    //var fechaInicialBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroPrimeraCargaBalanza7 && x.NumeroBalanza == "7").Fecha;
+                    var registroUltimaCargaBalanza7 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7).Last().Id;
+                    //var fechafinalBalanza7 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroUltimaCargaBalanza7 && x.NumeroBalanza == "7").Fecha;
+                    kgNetosBalanza7 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.CargaInicial_NumeroBalanza == "7");
+                    //tiempoDeCarga7 = (fechafinalBalanza7 - fechaInicialBalanza7).TotalMinutes;
 
                 }
-                else tiempoCargaNeto = tiempoDeCarga8;
+
+                if (repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8").Count() > 0)
+                {
+                    var idCargaInicialBalanza8 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.FechaInicio == null && x.NumeroBalanza == "8").Id;
+                    var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.NumeroBalanza == "8").Id;
+                    //var fechaInicialBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroPrimeraCargaBalanza8 && x.NumeroBalanza == "8").Fecha;
+                    var registroUltimaCargaBalanza8 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8).Last().Id;
+                    //var fechafinalBalanza8 = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == registroUltimaCargaBalanza8 && x.NumeroBalanza == "8").Fecha;
+                    kgNetosBalanza8 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.CargaInicial_NumeroBalanza == "8");
+                    //tiempoDeCarga8 = (fechafinalBalanza8 - fechaInicialBalanza8).TotalMinutes;
+                }
+
+                if(kgNetosBalanza7 != 0 && kgNetosBalanza8 != 0)
+                {
+                    totalCargado = (kgNetosBalanza7 + kgNetosBalanza8) / 1000;
+                }
+
+                var registroFinCargaVapor = repositorio.Listar<Carga>(x => x.FechaInicio != null && x.Vapor.Id == vapor_id);
+
+                if (registroFinCargaVapor != null)
+                {
+                    foreach (var carg in registroFinCargaVapor)
+                    {
+                        var inicioCargaid = carg.CargaOpuesta_Id;
+                        var finCargaid = carg.Id;
+                        var numeroBalanza = carg.NumeroBalanza;
+
+                        var fechainicio = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == inicioCargaid && x.NumeroBalanza == numeroBalanza).Fecha;
+                        var fechaFin = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == finCargaid && x.NumeroBalanza == numeroBalanza).Fecha;
+
+                        tiempoCargaNeto += (fechaFin - fechainicio).TotalMinutes;
+                    }
+                }
+                else
+                {
+                    tiempoCargaNeto = 0;
+                    totalCargado = 0;
+                }
+
+                //if (tiempoDeCarga7 != 0 && tiempoDeCarga8 != 0)
+                //{
+                //    if (tiempoDeCarga7 >= tiempoDeCarga8)
+                //    {
+                //        tiempoCargaNeto = tiempoDeCarga7;
+
+                //    }
+                //    else tiempoCargaNeto = tiempoDeCarga8;
+                //}
+
             }
 
             int ritmoCargaNeto = 0;
