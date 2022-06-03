@@ -526,6 +526,7 @@
     <Build Include="dbo\Tables\ADPuertoRoles.sql" />
     <Build Include="dbo\Tables\ADPuertoRolesPermisos.sql" />
     <Build Include="dbo\Tables\ADPuertoPermisos.sql" />
+    <Build Include="dbo\Tables\Parametros.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

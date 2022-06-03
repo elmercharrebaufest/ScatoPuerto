@@ -2637,6 +2637,9 @@ namespace Molinos.Scato.Servicios
         IList<ModuloDeCargaNirManualPuertoDto> ObtenerModuloDeCargaNirManualPuerto(int IdModuloDeCarga);
 
         [OperationContract]
+        IList<ParametrosDto> ObtenerParametros();
+
+        [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
       
         //[OperationContract]

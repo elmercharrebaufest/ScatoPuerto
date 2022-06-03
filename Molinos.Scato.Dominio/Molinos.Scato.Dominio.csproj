@@ -693,6 +693,7 @@
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaListadoDto.cs" />
     <Compile Include="Dto\EstadoIntercomunicadorDto.cs" />
     <Compile Include="Dto\BanderaDto.cs" />
+    <Compile Include="Dto\ParametrosDto.cs" />
     <Compile Include="Dto\RegistroInactividadDto.cs" />
     <Compile Include="Dto\MotivoInactividadDto.cs" />
     <Compile Include="Dto\ArriboCircularResponseDto.cs" />
@@ -1003,6 +1004,7 @@
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarqueHistorico.cs" />
     <Compile Include="Entidades\ModuloDeCargaUmap.cs" />
     <Compile Include="Entidades\Bandera.cs" />
+    <Compile Include="Entidades\Parametros.cs" />
     <Compile Include="Entidades\RegistroInactividad.cs" />
     <Compile Include="Entidades\MotivoInactividad.cs" />
     <Compile Include="Entidades\MotivosDeCorte.cs" />
