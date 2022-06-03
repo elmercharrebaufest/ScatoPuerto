@@ -2,7 +2,7 @@
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public class ReciboDeBuqueDtoDetallesDto
+    public class ReciboDeBuqueDetallesDto
     {
         public int Id { get; set; }
         public string Exportador { get; set; }

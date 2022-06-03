@@ -10627,13 +10627,13 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<Bandera, BanderaDto>();
         }
 
-        public void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDtoDetallesDto reciboDeBuqueDtoDetalles)
+        public void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDetallesDto reciboDeBuqueDetallesDto)
         {
-            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == reciboDeBuque.Embarque.id);
             ReciboDeBuque reciboDB = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDeBuque.Id);
+            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == reciboDB.Embarque.Id);
             if (reciboDB != null)
             {
-                reciboDB.Embarque = reciboDeBuque.Embarque;
+                reciboDB.Embarque = embarque;
                 reciboDB.NumeroRecibo = reciboDeBuque.NumeroRecibo;
                 reciboDB.Estado = reciboDeBuque.Estado;
                 reciboDB.Usuario = reciboDeBuque.Usuario;
@@ -10643,13 +10643,21 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 reciboDB = new ReciboDeBuque()
                 {
-                    Embarque_Id = reciboDeBuque.Embarque_Id,
+                    Embarque = embarque,
                     NumeroRecibo = reciboDeBuque.NumeroRecibo,
                     Estado = reciboDeBuque.Estado,
                     Usuario = reciboDeBuque.Usuario,
                     UltimaActualizacion = reciboDeBuque.UltimaActualizacion,
                 };
+                repositorio.Agregar(reciboDB);
             }
+            repositorio.GuardarCambios();
+
+            //ReciboDeBuqueDetalles reciboDetallesDB = repositorio.Obtener<ReciboDeBuqueDetalles>(x => x.Id == reciboDeBuqueDetallesDto.Id);
+            //ReciboDeBuque recibo = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDetallesDB.ReciboDeBuque.Id);
+
+            //recibo
+
         }
 
     }

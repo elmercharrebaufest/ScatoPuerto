@@ -687,11 +687,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]
-        public HttpResponseMessage GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDtoDetallesDto reciboDeBuqueDtoDetalles)
+        public HttpResponseMessage GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDetallesDto reciboDeBuqueDetallesDto)
         {
             try
             {
-                servicio.GuardarReciboDeBuque(reciboDeBuque, reciboDeBuqueDtoDetalles);
+                servicio.GuardarReciboDeBuque(reciboDeBuque, reciboDeBuqueDetallesDto);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

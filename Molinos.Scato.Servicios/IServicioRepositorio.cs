@@ -2658,6 +2658,6 @@ namespace Molinos.Scato.Servicios
         IList<BanderaDto> ObtenerBanderas();
 
         [OperationContract]
-        void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDtoDetallesDto reciboDeBuqueDtoDetalles);
+        void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDetallesDto reciboDeBuqueDetallesDto);
     }
 }
