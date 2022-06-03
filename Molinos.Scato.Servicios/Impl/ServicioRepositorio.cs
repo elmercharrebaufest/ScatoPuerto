@@ -10055,8 +10055,6 @@ namespace Molinos.Scato.Servicios.Impl
         public Dictionary<string, int> ObtenerRitmos(int vapor_id, int modulodecarga_id)
         {
             decimal totalCargado = 0;
-            double tiempoDeCarga7 = 0;
-            double tiempoDeCarga8 = 0;
             double tiempoCargaNeto = 0;
             decimal kgNetosBalanza7 = 0;
             decimal kgNetosBalanza8 = 0;
