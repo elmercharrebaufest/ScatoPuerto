@@ -202,6 +202,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\MotivosFallasBalanzaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\MotivosLimpiezaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BanderaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ParametrosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaHistoricoMappingProfile.cs" />

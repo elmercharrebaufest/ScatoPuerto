@@ -626,6 +626,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ObtenerParametros")]
+        public HttpResponseMessage ObtenerParametros()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerParametros());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         //[HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         //[Route("api/ModuloDeCarga/ObtenerRitmosDeEmbarque")]
@@ -640,7 +656,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
         //    }
         //}
-        
+
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]

@@ -10331,6 +10331,18 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<ParametrosDto> ObtenerParametros()
+        {
+            try
+            {
+                return Listar<Parametros, ParametrosDto>().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion)
         {
             var consulta = new MonitorCPEsCacheadasConsulta(filtro, paginacion);
