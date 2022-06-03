@@ -9230,14 +9230,23 @@ namespace Molinos.Scato.Servicios.Impl
             ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
             DateTime dateWithoutHours = new DateTime();
             dateWithoutHours = DateTime.Now.Date;
-            try {
-                moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
+            try
+            {
+                var listarModuloDeCargaPlanillaDeTurnos = Listar<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido && (x.Fecha.Value.Year == dateWithoutHours.Year && x.Fecha.Value.Month == dateWithoutHours.Month && x.Fecha.Value.Day == dateWithoutHours.Day));
+                if (listarModuloDeCargaPlanillaDeTurnos != null)
+                {
+                    if (listarModuloDeCargaPlanillaDeTurnos.Count > 0)
+                    {
+                        moduloDeCargaPlanillaDeTurnosDto = listarModuloDeCargaPlanillaDeTurnos[0];
+                    }
+                }
+
             }
             catch (Exception ex)
             {
                 moduloDeCargaPlanillaDeTurnosDto = null;
             }
-           
+
             /*moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
 
             if (moduloDeCargaPlanillaDeTurnosDto != null)

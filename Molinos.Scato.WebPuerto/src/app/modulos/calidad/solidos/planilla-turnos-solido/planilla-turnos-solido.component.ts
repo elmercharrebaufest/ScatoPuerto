@@ -306,6 +306,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number){
+      return;
        //Si entro aca creo el turno del día actual en hora actual.
 
        //Calculo el turnoPuerto actual así lo traigo de la DB
@@ -474,7 +475,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurno(turnos);
-      //contador += 1;
     }
     return contador;
   }
@@ -485,8 +485,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroLiquido = registroLiquido > 0 ? 5 : 0; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
 
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -535,6 +535,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
       contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
     }
+    contador = contador > 0? contador/1000 : 0;
     return contador;
   }
 
@@ -544,6 +545,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turno of d['controls']['turnos']['controls']) {
       contador += this.getCantTurno(turno);
     }
+    contador = contador > 0? contador/1000 : 0;
     return contador;
   }
 
@@ -553,6 +555,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
       contador += this.getCantDia(dia);
     }
+    contador = contador > 0? contador/1000 : 0;
     return contador;
   }
 
@@ -639,12 +642,14 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   initLinea(line?: any, cerrado?: boolean) {
+    console.log('linexxxxx')
+    console.log(line)
     return this._builder.group({
       linea:[{value: line ? line.linea_Id : '', disabled: true}] ,
       exportador: [{value: line ? line.exportador : '', disabled:  true}] ,
       bodega: [{value: line ? line.bodega : '',disabled: true}] ,
       materialPuerto: [{value: line ? line.materialPuerto :'',disabled: true}] ,
-      destino: [{value: line ? line.destino.id : '',disabled: true}] ,
+      destino: [{value: line ? line.destino.nombre : '',disabled: true}] ,
       cantidad: [{value: line ? line.cantidad : '',disabled: true}] ,
       id:  [{value: line ? line.id : null,disabled: true}]
     })

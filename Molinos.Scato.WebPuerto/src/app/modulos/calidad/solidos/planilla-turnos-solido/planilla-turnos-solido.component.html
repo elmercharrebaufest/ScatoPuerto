@@ -29,7 +29,7 @@
                         <ng-container formArrayName='diasTurno'>
                             <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
                                 <tr>
-                                    <td [attr.rowspan]='getRowSpan(dia) + 2'>
+                                    <td [attr.rowspan]='getRowSpan(dia)'>
                                         <div class='column-center'>
                                             <span><b>{{getDia(d)}}</b></span>
                                             <span class='toneladas'>{{getCantDia(dia) | number: '1.0-0'}}</span>
@@ -70,9 +70,10 @@
                                                     <!-- DESTINO -->
                                                     <td>
                                                         {{result.controls.destino.value}}
-                                                      
                                                     </td>
-                                                    <td><input type="number" formControlName='cantidad'></td>
+                                                    <td>
+                                                        {{result.controls.cantidad.value / 1000}}
+                                                    </td>
                                                 </tr>
                                             </ng-container>
                                         </ng-container>
