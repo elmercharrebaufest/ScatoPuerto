@@ -9882,7 +9882,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Dictionary<string, string> ritmosBalanzas78 = new Dictionary<string, string>();
 
                 DateTime? arranco = null, ultimaBalanzada = null, ultimaActualizacion = null;
-                decimal cargoHastaAhora = 0, ritmoDeEmbarque = 0;
+                int cargoHastaAhora = 0, ritmoDeEmbarque = 0;
                 string numeroBalanzaStr = numeroBalanza.ToString();
                 double tiempoDeCarga = 0;
 
@@ -9904,11 +9904,6 @@ namespace Molinos.Scato.Servicios.Impl
                 }
 
                 // Busco primer y último ID de Carga
-
-                //int idPrimeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor && 
-                //                                                            x.FechaInicio == null &&
-                //                                                            x.NumeroBalanza == numeroBalanzaStr).Id;
-
                 var primeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor &&
                                                                           x.FechaInicio == null &&
                                                                           x.NumeroBalanza == numeroBalanzaStr);
@@ -9933,12 +9928,12 @@ namespace Molinos.Scato.Servicios.Impl
                 DateTime fechafinalBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idUltimaBalanzada &&
                                                                                              x.NumeroBalanza == numeroBalanzaStr).Fecha;
 
-                tiempoDeCarga = (fechafinalBalanza - fechaInicialBalanza).TotalMinutes;
+                tiempoDeCarga = ((fechafinalBalanza - fechaInicialBalanza).TotalMinutes) / 60;
 
                 arranco = fechaInicialBalanza;
                 ultimaBalanzada = fechafinalBalanza;
-                cargoHastaAhora = totalPesoNeto/1000;
-                ritmoDeEmbarque = (decimal)(Decimal.ToDouble(cargoHastaAhora) / tiempoDeCarga);
+                cargoHastaAhora = totalPesoNeto / 1000;
+                if (tiempoDeCarga > 0) ritmoDeEmbarque = (int)(cargoHastaAhora / tiempoDeCarga);
                 ultimaActualizacion = DateTime.Now;
 
                 ritmosBalanzas78.Add("arranco", Convert.ToString(arranco));
