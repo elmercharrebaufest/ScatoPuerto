@@ -106,6 +106,9 @@ IF NOT EXISTS (select 1 from EstadoBuque where Descripcion = 'ControlCalidad' an
 IF NOT EXISTS (select 1 from EstadoBuque where Descripcion = 'PostOperativo' and Id = 4) BEGIN insert into EstadoBuque(Descripcion, Id) values ('PostOperativo',4); END
 GO
 
+--Parámetros
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConsoleLog' and Id = 1) BEGIN insert into Parametros(Id, Descripcion, Activo) values (1, 'ConsoleLog', 0); END
+GO
 
 --Correo Planilla de Turnos
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaDeTurnos') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaDeTurnos','SupervisoresPuertosanLorenzo@molinosagro.com.ar;sebastian.bolger@molinosagro.com.ar,fabricio.herrera@molinosagro.com.ar;jose.luis.gomez@molinosagro.com.ar;marcelo.gustavo.lopez@molinosagro.com.ar;sebastian.muniz@molinosagro.com.ar;german.turcutto@molinosagro.com.ar;Pablo.Yturres@molinosagro.com.ar;mauro.mir@molinosagro.com.ar;nestor.abalos@molinosagro.com.ar'); END
