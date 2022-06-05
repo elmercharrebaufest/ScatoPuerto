@@ -57,8 +57,11 @@ namespace Molinos.Scato.Dominio.Dto
         public string shipParticularArchivoNombre { get; set; }
         public DateTime? FechaHoraInicioCarga { get; set; }
         public string UsuarioInicioCarga { get; set; }
-        public string Imo { get; set; }
+  //      public string Imo { get; set; }
         public int CantidadBodegasTanques { get; set; }
+
+      //  public BanderaDto Bandera { get; set; }
+        
         public IList<EmbarqueInformacionDto> EmbarqueInformacion { get; set; }
         public IList<EmbarqueInformacionViajeDto> EmbarqueInformacionViaje { get; set; }
         public IList<EmbarquePosicionDto> EmbarquePosicion { get; set; }

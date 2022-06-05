@@ -94,8 +94,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Puntal = comando.Embarque.Puntal,
                         FechaLibrePlatica = comando.Embarque.FechaLibrePlatica,
                         HoraLibrePlatica = comando.Embarque.HoraLibrePlatica,
-                        Imo=comando.Embarque.Imo,
-                        CantidadBodegasTanques=comando.Embarque.CantidadBodegasTanques
+                        //Imo = comando.Embarque.Imo,
+                        CantidadBodegasTanques = comando.Embarque.CantidadBodegasTanques,
+                        //embarque bandera
                     };
                     foreach (var mat in comando.Embarque.MaterialesPuertoCantidad.Where(y => y.Cantidad > 0))
                     {
@@ -107,11 +108,27 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Color = mat.Color
                         });
                     }
+
                     Repositorio.Agregar(embarque);
                     Repositorio.GuardarCambios();
                     resultado.Id = (int)embarque.GetType().GetProperty("Id").GetValue(embarque, null);
                     recorrido.NumeroDocumentoIngreso = resultado.Id.ToString();
                     Repositorio.GuardarCambios();
+
+                    var embarqueInfor = comando.Embarque.EmbarqueInformacion.SingleOrDefault();
+
+                   
+                        Bandera band = Repositorio.Obtener<Bandera>(x => x.Id == embarqueInfor.Bandera.Id);
+                        Repositorio.Agregar(new EmbarqueInformacion
+                        {
+                            Embarque = embarque,
+                            IMO = embarqueInfor.IMO,
+                            Bandera = band, 
+                            FechaRegistro = DateTime.Now
+                        });
+                        Repositorio.GuardarCambios();
+                   
+                
                 }
             }
             catch (Exception e)

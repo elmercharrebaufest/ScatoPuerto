@@ -11,7 +11,7 @@ namespace Molinos.Scato.Dominio.Dto
         public BodegaDto Bodega{ get; set; }
         public ExportadorDto Exportador { get; set; }
         
-        public decimal Cantidad { get; set; }
-        public virtual DateTime? FechaCarga { get; set; }
+        public int Cantidad { get; set; }
+     //   public virtual DateTime? FechaCarga { get; set; }
     }
 }

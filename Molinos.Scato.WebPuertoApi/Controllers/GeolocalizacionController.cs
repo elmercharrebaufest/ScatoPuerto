@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
@@ -15,12 +16,99 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class GeolocalizacionController : BaseController
     {
+        private readonly IServicioComandos comandos;
         private readonly IListaDeWorkflows workflows;
 
-        public GeolocalizacionController(IServicioRepositorio servicio, IListaDeWorkflows workflows) : base(servicio)
+        public GeolocalizacionController(IServicioRepositorio servicio, IListaDeWorkflows workflows, IServicioComandos comandos) : base(servicio)
         {
             this.workflows = workflows;
+            this.comandos = comandos;
         }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Geolocalizacion/RegistrarEmbarqueGeolocalizacion")]
+        public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> listaEmbarquesGeolocalizacion)
+        {
+            try
+            {
+                foreach (var EmbarqueGeolocalizacion in listaEmbarquesGeolocalizacion)
+                {
+                    comandos.Ejecutar(new ModificarEmbarqueGeolocalizacion
+                    {
+                        DtoInformacion = EmbarqueGeolocalizacion.informacion,
+                        DtoPosicion = EmbarqueGeolocalizacion.posicion,
+                        DtoViaje = EmbarqueGeolocalizacion.informacionViaje,
+                        BanderaBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.BanderaBuque,
+                        NombreBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque,
+                        TipoBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.TipoBuque
+                    });
+                }
+
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            }
+            catch (System.Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+
+        }
+        public class ObjetoGeolocalizacion
+        {
+            public DatosEmbarqueGeolocalizacion DatosEmbarqueGeolocalizacion;
+            public EmbarqueInformacionDto informacion;
+            public EmbarqueInformacionViajeDto informacionViaje;
+            public EmbarquePosicionDto posicion;
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Geolocalizacion/ObtenerEmbarquesGeolocalizacion")]
+        public HttpResponseMessage ObtenerEmbarquesGeolocalizacion()
+        {
+            try
+            {
+                var embarquesLineUp = workflows.ListarEmbarques("LineUp");
+
+                List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
+
+                foreach (var embarque in embarquesLineUp)
+                {
+                    DatosEmbarqueGeolocalizacion embarqueLineUp = new DatosEmbarqueGeolocalizacion
+                    {
+                        NombreBuque = embarque.Embarque.NombreBuque,
+                        BanderaBuque = embarque.Embarque.EmbarqueInformacion.Count()>0 ? embarque.Embarque.EmbarqueInformacion[0].Bandera.Abreviatura:null,
+                        TipoBuque = embarque.Embarque.TipoBuque,
+                        imo = embarque.Embarque.EmbarqueInformacion.Count() > 0 ? embarque.Embarque.EmbarqueInformacion[0].IMO:""
+                    };
+                    embarques.Add(embarqueLineUp);
+
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, embarques);
+
+            }
+            catch (System.Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+
+        }
+
+        public class DatosEmbarqueGeolocalizacion
+        {
+            public string NombreBuque;
+            public string TipoBuque;
+            public string BanderaBuque;
+            public string imo;
+        }
+
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]

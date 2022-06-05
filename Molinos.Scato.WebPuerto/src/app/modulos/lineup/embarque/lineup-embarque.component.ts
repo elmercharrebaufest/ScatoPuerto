@@ -23,7 +23,6 @@ import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services
   templateUrl: './lineup-embarque.component.html',
   styleUrls: ['./lineup-embarque.component.css']
 })
-
 export class LineupEmbarqueComponent implements OnInit {
   @Input() index: number;
   @Input() instanciaWorkflow: InstanciaWorkflowPuerto;

@@ -55,8 +55,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             NumeroBalanza = numeroBalanza,
                             Tipo = "inicioError"
                         });
-
-                        Log.Info("obteniendoCargaInicio: Material=> "+ comando.Informacion["commodity"]);
                         var actualizarCargaInicio = Repositorio.ObtenerMayor<Carga, int>(x => 
                             x.Id < id && 
                             x.NumeroBalanza == numeroBalanza && 
@@ -75,7 +73,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                     else
                     {
-                        Log.Info("Obteniendo la carga");
                         var fin = Repositorio.ObtenerMayor<Carga, int>(x => x.NumeroBalanza == numeroBalanza && x.Tipo == "fin" && x.FechaInicio == fecha && x.Id > id && !x.CargaOpuesta_Id.HasValue, x => x.Id);
                         var carga = CrearCarga(comando, id, numeroBalanza, fecha, tipoBalanzada, fin);
                         if (carga != null)
@@ -129,8 +126,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         var fin = Repositorio.ObtenerMayor<Carga, int>(x => x.Id > inicio.Id  && x.NumeroBalanza == numeroBalanza && x.Tipo == "fin" && x.Id < id, x => x.Id);
                         inicio = fin == null ? inicio : null;
                     }
-
-                    Log.Info("generando la balanzada");
+                    
                     var balanzada = new Balanzada
                     {
                         Id = id,
@@ -203,7 +199,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             if (!b.EnviadoASap && b.CargaInicial != null)
             {
-            //    servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = b.Id, NumeroBalanza = b.NumeroBalanza });
+                servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = b.Id, NumeroBalanza = b.NumeroBalanza });
             }
         }
 
@@ -214,71 +210,61 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private Carga CrearCarga(CrearLecturaBalanzada comando, int id, string numeroBalanza, DateTime fecha, string tipoBalanzada, Carga cargaOpuesta)
         {
-            try
-            {
-                Log.Info("Creando la carga");
-                var nombreVapor = ExisteVapor(comando);
-                var nombreBodega = ExisteBodega(comando);
-                var nombreDestino = ExisteDestino(comando);
-                var nombreExportador = ExisteExportador(comando);
-                var nombreCommodity = ExisteMaterial(comando);
-                var parseFechaInicio = comando.Informacion.ContainsKey("fechaInicio") && !string.IsNullOrEmpty(comando.Informacion["fechaInicio"]) ?
-                                            DateTime.ParseExact(comando.Informacion["fechaInicio"], "dd-MM-yyyyHH:mm", CultureInfo.InvariantCulture) :
-                                            (DateTime?)null;
-                var pesoProgramado = string.IsNullOrEmpty(comando.Informacion["pesoProgramado"]) ? 0 : int.Parse(comando.Informacion["pesoProgramado"]);
+            var nombreVapor = ExisteVapor(comando);
+            var nombreBodega = ExisteBodega(comando);
+            var nombreDestino = ExisteDestino(comando);
+            var nombreExportador = ExisteExportador(comando);
+            var nombreCommodity = ExisteMaterial(comando);
+            var parseFechaInicio = comando.Informacion.ContainsKey("fechaInicio") && !string.IsNullOrEmpty(comando.Informacion["fechaInicio"]) ?
+                                        DateTime.ParseExact(comando.Informacion["fechaInicio"], "dd-MM-yyyyHH:mm", CultureInfo.InvariantCulture) :
+                                        (DateTime?)null;
+            var pesoProgramado = string.IsNullOrEmpty(comando.Informacion["pesoProgramado"]) ? 0 : int.Parse(comando.Informacion["pesoProgramado"]);
 
-                if (tipoBalanzada == "inicio")
-                {
-                    //si encontramos un inicio que cumpla estas condiciones, entonces este inicio se trata de una actualización de ese
-                    var inicioAActualizar = Repositorio.ObtenerMayor<Carga, int>(x =>
-                            x.NumeroBalanza == numeroBalanza &&
-                            x.Tipo == "inicio" &&
-                            !x.CargaOpuesta_Id.HasValue &&
-                            x.Destino.Nombre == nombreBodega &&
-                            x.Exportador.Nombre == nombreExportador &&
-                            x.Material.Descripcion == nombreCommodity &&
-                            x.Vapor.Nombre == nombreVapor &&
-                            x.Id < id, x => x.Id);
-                    if (inicioAActualizar != null)
-                    {
-                        inicioAActualizar.PesoProgramado = pesoProgramado;
-                        return null;
-                    }
-                }
-                var esPatron = false;
-                if (nombreVapor == string.Empty &&
-                    nombreBodega == string.Empty &&
-                    nombreDestino == string.Empty &&
-                    nombreExportador == string.Empty &&
-                    nombreCommodity == string.Empty)
-                {
-                    esPatron = true;
-                }
-
-                return new Carga
-                {
-                    Id = id,
-                    NumeroBalanza = numeroBalanza,
-                    Fecha = fecha,
-                    Tipo = tipoBalanzada,
-                    Vapor = Repositorio.Obtener<Vapor>(e => e.Nombre == nombreVapor),
-                    Bodega = Repositorio.Obtener<Bodega>(e => e.Nombre == nombreBodega),
-                    Destino = Repositorio.Obtener<Destino>(e => e.Nombre == nombreDestino),
-                    Exportador = Repositorio.Obtener<Exportador>(e => e.Nombre == nombreExportador),
-                    Material = !esPatron ? Repositorio.Obtener<MaterialPuerto>(e => e.Descripcion == nombreCommodity) :
-                        Repositorio.ObtenerMenor<MaterialPuerto, int>(e => e.Descripcion.Contains("patron"), x => x.Id),
-                    PesoProgramado = pesoProgramado,
-                    ToneladasAW = string.IsNullOrEmpty(comando.Informacion["toneladasaw"]) ? 0 : int.Parse(comando.Informacion["toneladasaw"]),
-                    FechaInicio = parseFechaInicio,
-                    CargaOpuesta = cargaOpuesta
-                };
-            }
-            catch (Exception ex)
+            if (tipoBalanzada == "inicio")
             {
-                Log.Info("Creando la carga", ex.Message);
-                throw ex;
+                //si encontramos un inicio que cumpla estas condiciones, entonces este inicio se trata de una actualización de ese
+                var inicioAActualizar = Repositorio.ObtenerMayor<Carga, int>(x =>
+                        x.NumeroBalanza == numeroBalanza &&
+                        x.Tipo == "inicio" &&
+                        !x.CargaOpuesta_Id.HasValue &&
+                        x.Destino.Nombre == nombreBodega &&
+                        x.Exportador.Nombre == nombreExportador &&
+                        x.Material.Descripcion == nombreCommodity &&
+                        x.Vapor.Nombre == nombreVapor &&
+                        x.Id < id, x => x.Id);
+                if (inicioAActualizar != null)
+                {
+                    inicioAActualizar.PesoProgramado = pesoProgramado;
+                    return null;
+                }
             }
-        
+            var esPatron = false;
+            if(nombreVapor == string.Empty && 
+                nombreBodega == string.Empty && 
+                nombreDestino == string.Empty && 
+                nombreExportador == string.Empty &&
+                nombreCommodity == string.Empty)
+            {
+                esPatron = true;
+            }
+
+            return new Carga
+            {
+                Id = id,
+                NumeroBalanza = numeroBalanza,
+                Fecha = fecha,
+                Tipo = tipoBalanzada,
+                Vapor = Repositorio.Obtener<Vapor>(e => e.Nombre == nombreVapor),
+                Bodega = Repositorio.Obtener<Bodega>(e => e.Nombre == nombreBodega),
+                Destino = Repositorio.Obtener<Destino>(e => e.Nombre == nombreDestino),
+                Exportador = Repositorio.Obtener<Exportador>(e => e.Nombre == nombreExportador),
+                Material = !esPatron ? Repositorio.Obtener<MaterialPuerto>(e => e.Descripcion == nombreCommodity) :
+                    Repositorio.ObtenerMenor<MaterialPuerto, int>(e => e.Descripcion.Contains("patron"), x => x.Id),
+                PesoProgramado = pesoProgramado,
+                ToneladasAW = string.IsNullOrEmpty(comando.Informacion["toneladasaw"]) ? 0 : int.Parse(comando.Informacion["toneladasaw"]),
+                FechaInicio = parseFechaInicio,
+                CargaOpuesta = cargaOpuesta
+            };
         }
 
         private string ExisteVapor(CrearLecturaBalanzada comando)
@@ -340,64 +326,42 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private string ExisteExportador(CrearLecturaBalanzada comando)
         {
-            try
+            var resultado = string.Empty;
+            if (comando.Informacion.ContainsKey("exportador"))
             {
-                var resultado = string.Empty;
-                if (comando.Informacion.ContainsKey("exportador"))
+                resultado = comando.Informacion["exportador"];
+                if (!Repositorio.Existe<Exportador>(e => e.Nombre == resultado))
                 {
-                    resultado = comando.Informacion["exportador"];
-                    if (!Repositorio.Existe<Exportador>(e => e.Nombre == resultado))
+                    var nuevoExportador = new Exportador
                     {
-                        Log.Info("Creando Exportador", resultado);
-                        var nuevoExportador = new Exportador
-                        {
-                            Nombre = resultado
-                        };
-                        Repositorio.Agregar(nuevoExportador);
-                        Repositorio.GuardarCambios();
-                    }
+                        Nombre = resultado
+                    };
+                    Repositorio.Agregar(nuevoExportador);
+                    Repositorio.GuardarCambios();
                 }
-                return resultado;
             }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-         
+            return resultado;
         }
 
         private string ExisteMaterial(CrearLecturaBalanzada comando)
         {
-            try
+            var resultado = string.Empty;
+            if (comando.Informacion.ContainsKey("commodity"))
             {
-                var resultado = string.Empty;
-                if (comando.Informacion.ContainsKey("commodity"))
+                resultado = comando.Informacion["commodity"];
+                if (!Repositorio.Existe<MaterialPuerto>(e => e.Descripcion == resultado))
                 {
-                    resultado = comando.Informacion["commodity"];
-                    Log.Info("Validar si existe el material => " + resultado);
-                    if (!Repositorio.Existe<MaterialPuerto>(e => e.Descripcion == resultado))
+                    var nuevoMaterial = new MaterialPuerto
                     {
-                        Log.Info("Creando Material", resultado);
-                        var nuevoMaterial = new MaterialPuerto
-                        {
-                            Descripcion = resultado,
-                            CodigoSAP = "Nuevo",
-                            Almacen = null,
-                            Color = "#000000"
-                        };
-                        Repositorio.Agregar(nuevoMaterial);
-                        Repositorio.GuardarCambios();
-                    }
+                        Descripcion = resultado,
+                        CodigoSAP = "Nuevo",
+                        Almacen = null
+                    };
+                    Repositorio.Agregar(nuevoMaterial);
+                    Repositorio.GuardarCambios();
                 }
-                return resultado;
             }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-          
+            return resultado;
         }
     }
 }

@@ -145,6 +145,9 @@
   <ItemGroup>
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ADPuertoGruposAdMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ADPuertoPermisosMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ADPuertoRolesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
@@ -190,6 +193,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosLiquidoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesLiquidoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosUltimaActualizacionMappingProfile .cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaRitmosEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaTabiquesDeEmbarqueHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaTabiquesDeEmbarqueMappingProfile.cs" />
@@ -197,6 +201,8 @@
     <Compile Include="Conversiones\Impl\Perfiles\MotivosDeCorteMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\MotivosFallasBalanzaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\MotivosLimpiezaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\BanderaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ParametrosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaHistoricoMappingProfile.cs" />
@@ -320,7 +326,6 @@
     <Compile Include="Impl\ServicioEstadoPuesto.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
-    <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="MercadoLibreException.cs" />
     <Compile Include="FormattingHtmlHelper.cs" />
     <Compile Include="IFirmaProvider.cs" />
@@ -492,10 +497,9 @@
     <Compile Include="Impl\ServicioSapAsincronico.cs" />
     <Compile Include="IServicioSapAsincronico.cs" />
     <Compile Include="Impl\ServicioComandos.cs" />
+    <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
-    <Compile Include="Procesamiento\ProcesadorCrearConfiguracionGeneral.cs" />
-    <Compile Include="Procesamiento\ProcesadorEliminarConfiguracionGeneral.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloBalanza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />
@@ -569,7 +573,6 @@
     <Compile Include="Procesamiento\ProcesadorModificarATAPuerto.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarCargadoPlanoDeCarga.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarCategoriaVehiculo.cs" />
-    <Compile Include="Procesamiento\ProcesadorModificarConfiguracionGeneral.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarCoordinadorPuerto.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearEstadoPuerto.cs" />
@@ -579,7 +582,6 @@
     <Compile Include="Procesamiento\ProcesadorModificarDocumentoExterno.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMaterialPorCentro.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMotivosLimpieza.cs" />
-    <Compile Include="Procesamiento\ProcesadorModificarRecorridoCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorAgregarMarcaSustentable.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoEstablecimientoDemorado.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoMuestraAuditoriaCamara.cs" />
@@ -1005,6 +1007,7 @@
     <Compile Include="Procesamiento\ProcesadorEliminarAlmacen.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarBalanzaEstaEnCero.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarPermiso.cs" />
+    <Compile Include="Procesamiento\ProcesadorModificarRecorridoCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoDemora.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarRecorridoDestino.cs" />
     <Compile Include="Procesamiento\ProcesadorAlmacenarObservacion.cs" />

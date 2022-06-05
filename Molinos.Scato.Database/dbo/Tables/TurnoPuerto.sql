@@ -1,10 +1,8 @@
 ﻿CREATE TABLE [dbo].[TurnoPuerto] (
-    [Id]     INT           IDENTITY (1, 1) NOT NULL,
+    [Id]     INT IDENTITY (1, 1) NOT NULL,
     [Nombre] NVARCHAR (60) NOT NULL,
-    [Orden]  INT           NOT NULL,
-    CONSTRAINT [PK_dbo.TurnoPuerto] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (STATISTICS_NORECOMPUTE = ON),
-    CONSTRAINT [UK_TurnoPuerto_Nombre] UNIQUE NONCLUSTERED ([Nombre] ASC) WITH (STATISTICS_NORECOMPUTE = ON)
+    [Orden] int not NULL,
+    CONSTRAINT [PK_dbo.TurnoPuerto] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [UK_TurnoPuerto_Nombre] UNIQUE (Nombre)
 );
-
-
 GO

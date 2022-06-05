@@ -17,10 +17,6 @@ namespace Molinos.Scato.Dominio.Dto
         [Required(ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_Requerido")]
         public string NumeroDocumentoIngreso { get; set; }
 
-        [Display(ResourceType = typeof(Textos), Name = "CTG")]
-        [Required(ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_Requerido")]
-        public string NumeroCTG { get; set; }
-
         [Display(ResourceType = typeof(Textos), Name = "Fecha")]
         [Required(ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_Requerido")]
         public DateTime Fecha { get; set; }

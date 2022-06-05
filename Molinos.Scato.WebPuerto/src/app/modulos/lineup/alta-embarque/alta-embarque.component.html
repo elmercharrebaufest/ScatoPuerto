@@ -344,11 +344,26 @@
                           placeholder=""  minLength="0" maxLength="7">
                   </div>
                   <div class="form-group col">
-                    <label for="destinoPuerto" class="font-weight-bold">Bandera</label>
-                    <select class="custom-select" formControlName="destino"  [ngClass]="{'input-error': submitted && f.destino.invalid}" required>
+                    <label for="bandera" class="font-weight-bold">Bandera</label>
+                    <select class="custom-select" formControlName="bandera"  [ngClass]="{'input-error': submitted && f.bandera.invalid}" required>
+                      <option *ngFor="let t of banderaBuque" [ngValue]="t">{{ t.nombre }}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col">
+                    <label for="destino" class="font-weight-bold">Destino</label>
+                    <select class="custom-select" formControlName="destino">
                       <option value=""></option>
                       <option *ngFor="let t of destinoPuerto" [ngValue]="t">{{ t.nombre }}</option>
                     </select>
+                  </div>
+
+                  <div class="form-group col">
+                    <label for="cantidadBodegasTanques" class="font-weight-bold">Cant Bodegas/TKS</label>
+                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
+                          placeholder=""  >
                   </div>
                 </div>
 
@@ -385,11 +400,7 @@
                           placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
                   </div>
                   
-                  <div class="form-group col">
-                    <label for="cantidadBodegasTanques" class="font-weight-bold">CANTIDAD DE BODEGAS/TANQUES</label>
-                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
-                          placeholder=""  >
-                  </div>
+               
                 </div>
 
                 <!-- <div class="row">
@@ -434,6 +445,7 @@
       <div class="d-flex justify-content-center my-5">
         <button type="button" class="btn btn-danger mx-5" [routerLink]="['/']">CANCELAR</button>
         <button  type="submit"  class="btn btn-success">{{tituloBoton}}</button>
+
       </div>
     </form>
   </div>

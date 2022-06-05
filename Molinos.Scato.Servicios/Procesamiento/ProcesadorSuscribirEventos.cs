@@ -26,42 +26,42 @@ namespace Molinos.Scato.Servicios.Procesamiento
             var resultadoComando = new Resultado();
             var urlNotificaciones = config.AppSettings["UrlNotificaciones"];
             var urlNotificacionesWeb = config.AppSettings["UrlNotificacionesWeb"];
-            //var puestosDeTrabajo = Repositorio.Listar<PuestoDeTrabajo>();
+            var puestosDeTrabajo = Repositorio.Listar<PuestoDeTrabajo>();
 
-            //foreach (var puestoDeTrabajo in puestosDeTrabajo)
-            //{
-            //    Log.Debug("Suscribiendo dispositivos de puesto {0}", puestoDeTrabajo.NombrePuesto);
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Lector, "LecturaTarjetaRecibida",
-            //                urlNotificacionesWeb, resultadoComando);
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.SensorQuiebre, "EntradaActivada",
-            //                urlNotificaciones, resultadoComando);
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.SensorQuiebre, "EntradaDesactivada",
-            //                urlNotificaciones, resultadoComando);
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Lector, "ErrorConexionDispositivo",
-            //                urlNotificacionesWeb, resultadoComando);
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Lector, "ConexionDispositivoCorrecta",
-            //                urlNotificacionesWeb, resultadoComando);
-            //    if (!string.IsNullOrEmpty(puestoDeTrabajo.Concentrador))
-            //    {
-            //        if (puestoDeTrabajo.Concentrador.ToUpper().Trim().Contains("SEMAFOROVAGONES"))
-            //        {
-            //            SuscribirSemaforoVagones(puestoDeTrabajo.Id, puestoDeTrabajo.Concentrador, "EntradaActivada",
-            //                    urlNotificacionesWeb, resultadoComando);
-            //            SuscribirSemaforoVagones(puestoDeTrabajo.Id, puestoDeTrabajo.Concentrador, "EntradaDesactivada",
-            //                    urlNotificacionesWeb, resultadoComando);
-            //        } 
-            //        else
-            //        {
-            //            Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Concentrador, "CambioEstadoSensor",
-            //                    urlNotificaciones, resultadoComando);
-            //        }                    
-            //    }
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.LectorQr, "LecturaQr",
-            //                urlNotificacionesWeb, resultadoComando);
+            foreach (var puestoDeTrabajo in puestosDeTrabajo)
+            {
+                Log.Debug("Suscribiendo dispositivos de puesto {0}", puestoDeTrabajo.NombrePuesto);
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Lector, "LecturaTarjetaRecibida",
+                            urlNotificacionesWeb, resultadoComando);
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.SensorQuiebre, "EntradaActivada",
+                            urlNotificaciones, resultadoComando);
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.SensorQuiebre, "EntradaDesactivada",
+                            urlNotificaciones, resultadoComando);
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Lector, "ErrorConexionDispositivo",
+                            urlNotificacionesWeb, resultadoComando);
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Lector, "ConexionDispositivoCorrecta",
+                            urlNotificacionesWeb, resultadoComando);
+                if (!string.IsNullOrEmpty(puestoDeTrabajo.Concentrador))
+                {
+                    if (puestoDeTrabajo.Concentrador.ToUpper().Trim().Contains("SEMAFOROVAGONES"))
+                    {
+                        SuscribirSemaforoVagones(puestoDeTrabajo.Id, puestoDeTrabajo.Concentrador, "EntradaActivada",
+                                urlNotificacionesWeb, resultadoComando);
+                        SuscribirSemaforoVagones(puestoDeTrabajo.Id, puestoDeTrabajo.Concentrador, "EntradaDesactivada",
+                                urlNotificacionesWeb, resultadoComando);
+                    } 
+                    else
+                    {
+                        Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.Concentrador, "CambioEstadoSensor",
+                                urlNotificaciones, resultadoComando);
+                    }                    
+                }
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.LectorQr, "LecturaQr",
+                            urlNotificacionesWeb, resultadoComando);
 
-            //    Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.IntercomunicadorCodigo, "CambioEstadoIntercomunicador",
-            //          urlNotificacionesWeb, resultadoComando);
-            //}
+                Suscribir(puestoDeTrabajo.Id, puestoDeTrabajo.IntercomunicadorCodigo, "CambioEstadoIntercomunicador",
+                      urlNotificacionesWeb, resultadoComando);
+            }
 
             var balanzas = Repositorio.Listar<BalanzaPuerto>();
             if(balanzas != null)

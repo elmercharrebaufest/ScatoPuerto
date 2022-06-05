@@ -19,8 +19,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         protected override void ModificarEntidad(ModificarEmbarque comando)
         {
+
             var Embarque = Repositorio.Obtener<Embarque>(comando.Dto.Id);
 
+            #region Modificacion del Embarque
             if (comando.Dto.ATA != null)
                 Embarque.ATA = Repositorio.Obtener<ATAPuerto>(comando.Dto.ATA.Id);
             else
@@ -38,17 +40,40 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Embarque.MotivosLimpieza = Repositorio.Obtener<MotivosLimpieza>(comando.Dto.MotivosLimpieza.Id);
             else
                 Embarque.MotivosLimpieza = null;
+
             if (comando.Dto.Destino != null)
                 Embarque.Destino = Repositorio.Obtener<Destino>(comando.Dto.Destino.Id);
             else
                 Embarque.Destino = null;
 
-            Conversor.Convertir(comando.Dto, Embarque);
+            Embarque.FechaDesdeLimpieza = comando.Dto.FechaDesdeLimpieza != null ? comando.Dto.FechaDesdeLimpieza : null;
+            Embarque.FechaHastaLimpieza = comando.Dto.FechaHastaLimpieza != null ? comando.Dto.FechaHastaLimpieza : null;
+            Embarque.ObligacionCarga = comando.Dto.ObligacionCarga != null ? comando.Dto.ObligacionCarga : null;
+            Embarque.FechaRecalada = comando.Dto.FechaRecalada != null ? comando.Dto.FechaRecalada : null;
+
+            Embarque.HoraDesdeLimpieza = comando.Dto.HoraDesdeLimpieza != null ? comando.Dto.HoraDesdeLimpieza : null;
+            Embarque.HoraHastaLimpieza = comando.Dto.HoraHastaLimpieza != null ? comando.Dto.HoraHastaLimpieza : null;
+            Embarque.HoraRecalada = comando.Dto.HoraRecalada != null ? comando.Dto.HoraRecalada : null;
+
+
+            Embarque.Observaciones = comando.Dto.Observaciones;
+            Embarque.ObservacionesLimpieza = comando.Dto.ObservacionesLimpieza;
+            Embarque.Freeboard = comando.Dto.Freeboard;
+
+            Embarque.CantidadBodegasTanques = comando.Dto.CantidadBodegasTanques;
+            Embarque.PorteNeto              = comando.Dto.PorteNeto ;
+            Embarque.PorteBruto             = comando.Dto.PorteBruto;
+            Embarque.Eslora                 = comando.Dto.Eslora    ;
+            Embarque.Manga                  = comando.Dto.Manga     ;
+            Embarque.Puntal                 = comando.Dto.Puntal;
+            Embarque.Senasa = comando.Dto.Senasa;
+            Embarque.Vicentin = comando.Dto.Vicentin;
+            Embarque.Noryon = comando.Dto.Noryon;
+            Embarque.SanBenito = comando.Dto.SanBenito;
+            Embarque.OtrosMuelles = comando.Dto.OtrosMuelles;
 
             Embarque.TipoBuque = comando.Dto.TipoDeBuque != null ? comando.Dto.TipoDeBuque.Nombre.ToString() : "";
-
             Embarque.Ubicacion = comando.Dto.UbicacionDeBuque != null ? comando.Dto.UbicacionDeBuque.Id : 0;
-
             Embarque.Vapor = Repositorio.Obtener<Vapor>(x => x.Nombre == comando.Dto.NombreBuque) ?? new Vapor
             {
                 Nombre = comando.Dto.NombreBuque
@@ -70,13 +95,36 @@ namespace Molinos.Scato.Servicios.Procesamiento
             LimpiarCarpetaDeArchivosDeEmbarques(comando.Dto.Id);
             if (comando.Dto.filePathShipParticular != null)
                 Embarque.filePathShipParticular = GuardarArchivoEmbarque(comando.Dto.filePathShipParticular, comando.Dto.shipParticularArchivoNombre, comando.Dto.Id);
-            else 
+            else
                 Embarque.filePathShipParticular = null;
 
-            //if (comando.Dto.filePathShipParticular!= null)
-            //    Embarque.filePathShipParticular = GuardarArchivoEmbarque(comando.Dto.filePathShipParticular, comando.Dto.shipParticularArchivoNombre, comando.Dto.Id);
-            //else
-            //    Embarque.filePathShipParticular = null;
+            #endregion
+
+            #region Modificacion de Información del Embarque
+            foreach (var informacion in comando.Dto.EmbarqueInformacion)
+            {
+                var embarqueInformacion_DB = Repositorio.Obtener<EmbarqueInformacion>(informacion.Id);
+                if (embarqueInformacion_DB == null)
+                {
+                    embarqueInformacion_DB = new EmbarqueInformacion();
+                    embarqueInformacion_DB.Bandera = Repositorio.Obtener<Bandera>(informacion.Bandera.Id);
+                    embarqueInformacion_DB.Embarque = Embarque;
+                    embarqueInformacion_DB.IMO = informacion.IMO;
+                    embarqueInformacion_DB.FechaRegistro = DateTime.Now;
+                    Embarque.EmbarqueInformacion.Add(embarqueInformacion_DB);
+                }
+                else
+                {
+                    embarqueInformacion_DB.Bandera = Repositorio.Obtener<Bandera>(informacion.Bandera.Id);
+                    embarqueInformacion_DB.IMO = informacion.IMO;
+                    embarqueInformacion_DB.Embarque = Embarque;
+                    embarqueInformacion_DB.FechaRegistro = DateTime.Now;
+                }
+            }
+            #endregion
+
+            Repositorio.GuardarCambios();
+
         }
 
         protected override void Validar(ModificarEmbarque comando, Resultado resultado)

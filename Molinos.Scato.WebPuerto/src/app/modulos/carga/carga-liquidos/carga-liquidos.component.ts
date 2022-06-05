@@ -24,6 +24,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
 import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/planilla-embarque.component';
 import { TanquesComponent } from './operaciones/tanques/tanques.component';
+import * as html2pdf from 'html2pdf.js';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
 @Component({
   selector: 'app-carga-liquidos',
@@ -32,6 +33,7 @@ import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liq
 })
 
 export class CargaLiquidosComponent implements OnInit {
+  
   @Input() datosGrafico: any;
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
@@ -137,51 +139,90 @@ export class CargaLiquidosComponent implements OnInit {
     });
   }
 
-  imprimir(imprimir: boolean = false) {
-    
-    this.lineasComponent.expandir();
-    this.planillaEmbarqueComponent.expandir();
-    this.planillaTurnoLiquidosComponent.expandir();
+  ocultarBotonesParaImpresion(){
+  //OBTENGO TODOS LOS BOTONES QUE HAY QUE OCULTAR PARA LA IMPRESION
+  // #region ObtenerBotones
+    let botonEnviarTableristas = this.mostrarTableristaOperando == false ? document.getElementById("btn-enviar-a-tablerista") : null;
+    let scrollTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("scroll-bar-turnos-liquidos") : null;
+    let scrollValue = this.mostrarTableristaOperando == true && scrollTurnosLiquidos.style.height;
+    let botonAgregarTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-agregar-turnos-liquidos") : null;
+    let botonGuardarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-guardar-turno-liquidos") : null;
+    let botonTurnoEnviadoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-turno-enviado-liquidos") : null;
+    let botonExportarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-exportar-planilla-liquidos") : null;
+    let valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
+    let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
+    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
+    let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null; 
+    let iconosRelojes = document.getElementsByName('relojPeriodo');
+  // #endregion
+
+
+  //UNA VEZ OBTENIDOS LOS BOTONES LOS OCULTOS CAMBIANDO SU DYSPLAY = 'none'
+  // #region OcultarBotones
+    iconosRelojes.forEach(reloj => reloj.style.display = 'none');
+  
+    btonConformacionLineasEmbarque.style.display = 'none';
+    if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'none';
+    if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
+  
+    if (this.mostrarTableristaOperando == true){
+      botonAgregarTurnosLiquidos.style.display = 'none';
+      botonGuardarTurnoLiquidos.style.display = 'none';
+      if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'none';
+      botonExportarTurnoLiquidos.style.display = 'none';
+      scrollTurnosLiquidos.style.height = 'auto';
+    } 
+  // #endregion
+
+
+  //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
+  // #region setValores
+    setTimeout(() =>{
+      iconosRelojes.forEach(reloj => reloj.style.display = 'block');
+      
+      btonConformacionLineasEmbarque.style.display = valueGuardarLieasEmbarque;
+      if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'block';
+  
+      if (this.mostrarTableristaOperando == true){
+        botonAgregarTurnosLiquidos.style.display = 'block';
+        botonGuardarTurnoLiquidos.style.display = 'block';
+        if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
+        botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
+        scrollTurnosLiquidos.style.height = scrollValue;
+      } 
+  },5000);
+  // #endregion
+ }
+
+  imprimir(imprimir: boolean = false){
+
+    this.ocultarBotonesParaImpresion();
     this.cargaPdf = true;
-    let doc: jspdf = new jspdf('l', 'mm', 'a4', true);
-    //graficos
-    html2canvas(document.getElementById('lineas-embarque-print'), { backgroundColor: '#fff' }).then((canvas) => {
-      canvas.style.backgroundColor = 'white';
-      let img = canvas.toDataURL('image/jpg');
-      doc.addImage(img, 'JPG', 15, 15, 260, 160);
-      html2canvas(document.getElementById('planilla-embarque'), { backgroundColor: '#fff' }).then((canvas2) => {
-        doc.addPage('a4', 'l')
-        canvas.style.backgroundColor = 'white';
-        let img2 = canvas2.toDataURL('image/jpg');
-        doc.addImage(img2, 'JPG', 15, 15, 270, 130);
-        html2canvas(document.getElementById('turno-liquidos'), { backgroundColor: '#fff' }).then((canvas3) => {
-          doc.addPage('a4', 'l')
-          canvas.style.backgroundColor = 'white';
-          let img3 = canvas3.toDataURL('image/jpg');
-          doc.addImage(img3, 'JPG', 15, 15, 270, 100);
-        if (!imprimir) {
-          this.cargaPdf = false;
-          doc.output('pdfobjectnewwindow');
-        } else {
-          let file = doc.output('blob');
-          this.cargarPDF(file);
-        }
-      })
-    })
-  })
+    
+    //OBTENGO EL ID DE QUE ESTABLECÍ EN EL HTML
+    let element = document.getElementById('imprimirCargaLiquidos');
+    let opt = {
+      margin:       0,
+      filename:     'Pantalla Operaciones.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE LIQUIDOS USANDO LIBRERIA JS2PDF, SETEANDO
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+    };
+
+    html2pdf().from(element).set(opt).outputPdf()
+    .then(() => {if (!imprimir) this.cargaPdf = false}).save();
   }
-
-
-  cargarPDF(file) {
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.adjunto = reader.result
-        this.enviarMail();
+  
+    cargarPDF(file) {
+      if (file) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.adjunto = reader.result
+          this.enviarMail();
+        }
       }
     }
-  }
 
   guardar(finalizar: boolean) {
        if(finalizar)
@@ -270,17 +311,16 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
-     null, null, [this.tanquesValue], this.lineasComponent ?  this.lineasComponent.obtenerLineasEmbarque() : null,
+    let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,      null, null, [this.tanquesValue], this.lineasComponent ?  this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
-
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
     //   null, null, [this.tanquesValue], null, [periodoCarga]);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
       this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(finalizar)},
+          // .then(() => {this.imprimir(finalizar)},
+          .then(() => {},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())

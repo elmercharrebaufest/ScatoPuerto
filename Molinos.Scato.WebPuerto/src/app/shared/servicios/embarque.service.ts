@@ -10,6 +10,7 @@ import { CoordinadorPuerto } from '@ScatoModels/coordinador-puerto';
 import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
+import { Bandera } from '@ScatoModels/bandera';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +35,7 @@ export class EmbarqueService {
     return this.http.post(`${this.url}Embarque/ModificarEmbarque`, embarque, { 'withCredentials' : true});
   }
 
-  obtenerEmbarque(id: number): Observable<Embarque>{
+  obtenerEmbarque(id: number): Observable<any>{
     return this.http.get<Embarque>(`${this.url}Embarque/ObtenerEmbarque?id=`+id, { 'withCredentials' : true});
   }
   obtenerListadoMateriales(): Observable<MaterialPuerto[]>{
@@ -107,5 +108,9 @@ export class EmbarqueService {
 
   actualizarEstadoBuque(embarque_Id: number, estado: number) {
     return this.http.post(`${this.url}ModuloDeCarga/ActualizarEstadoBuque?Embarque_Id=${embarque_Id}&Estado=${estado}`, { 'withCredentials': true });
+  }
+
+  obtenerBanderas(): Observable<Bandera[]>{
+    return this.http.get<Bandera[]>(`${this.url}Embarque/ObtenerBanderas`, { 'withCredentials' : true});
   }
 }
