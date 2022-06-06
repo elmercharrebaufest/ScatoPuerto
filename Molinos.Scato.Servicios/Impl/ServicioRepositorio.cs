@@ -9967,25 +9967,28 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (embarque.FechaHoraInicioCarga.Value != null)
                 {
-                    var cargasBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
-                    if (cargasBalanza7 != null)
-                    {
-                        var idCargaInicialBalanza7 = cargasBalanza7.CargaOpuesta_Id;
-                        var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.NumeroBalanza == "7").Id;
-                        var registroUltimaCargaBalanza7 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7).Last().Id;
-                        kgNetosBalanza7 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.CargaInicial_NumeroBalanza == "7");
+                    // var cargasBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
+
+                    kgNetosBalanza7 = repositorio.Sumar<Carga>(x=>x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
+                    kgNetosBalanza8 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
+                    //if (cargasBalanza7 != null)
+                    //{
+                    //    var idCargaInicialBalanza7 = cargasBalanza7.CargaOpuesta_Id;
+                    //    var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.NumeroBalanza == "7").Id;
+                    //    var registroUltimaCargaBalanza7 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7).Last().Id;
+                    //    kgNetosBalanza7 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.CargaInicial_NumeroBalanza == "7");
 
 
-                    }
+                    //}
 
-                    var cargasBalanza8 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
-                    if (cargasBalanza8 != null)
-                    {
-                        var idCargaInicialBalanza8 = cargasBalanza8.CargaOpuesta_Id;
-                        var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.NumeroBalanza == "8").Id;
-                        var registroUltimaCargaBalanza8 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8).Last().Id;
-                        kgNetosBalanza8 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.CargaInicial_NumeroBalanza == "8");
-                    }
+                    //var cargasBalanza8 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
+                    //if (cargasBalanza8 != null)
+                    //{
+                    //    var idCargaInicialBalanza8 = cargasBalanza8.CargaOpuesta_Id;
+                    //    var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.NumeroBalanza == "8").Id;
+                    //    var registroUltimaCargaBalanza8 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8).Last().Id;
+                    //    kgNetosBalanza8 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.CargaInicial_NumeroBalanza == "8");
+                    //}
 
                     if (kgNetosBalanza7 != 0 && kgNetosBalanza8 != 0)
                     {
