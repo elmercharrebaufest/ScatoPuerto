@@ -9941,7 +9941,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 
 
-        public Dictionary<string, int> ObtenerRitmos(int vapor_id, int modulodecarga_id)
+        public Dictionary<string, int> ObtenerRitmos(int modulodecarga_id)
         {
             try
             {
@@ -9952,7 +9952,7 @@ namespace Molinos.Scato.Servicios.Impl
                 decimal kgNetosBalanza8 = 0;
 
                 var embarque = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == modulodecarga_id).Embarque;
-                vapor_id = embarque.Vapor.Id;
+                int vapor_id  = embarque.Vapor.Id;
 
 
                 if (embarque.FechaHoraInicioCarga.Value != null)
