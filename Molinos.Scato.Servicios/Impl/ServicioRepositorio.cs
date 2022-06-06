@@ -9887,10 +9887,12 @@ namespace Molinos.Scato.Servicios.Impl
                 var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return ritmosBalanzas78;
+
+                DateTime? fechaFinal = embarqueBase.FechaHoraInicioCarga.Value.AddDays(-1);
                 int idEmbarque = embarqueBase.Id;
                 int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
                 var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
-                                                            x.FechaInicio > embarqueBase.FechaHoraInicioCarga.Value.AddDays(-1) &&
+                                                            x.FechaInicio > fechaFinal &&
                                                             x.NumeroBalanza == numeroBalanzaStr);
                 // Sumatoria de peso neto
                 int totalPesoNeto = 0;
@@ -9900,7 +9902,7 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 // Busco primer y último ID de Carga
                 var primeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor &&
-                                                                          x.FechaInicio >= embarqueBase.FechaHoraInicioCarga.Value.AddDays(-1) &&
+                                                                          x.FechaInicio >= fechaFinal &&
                                                                           x.NumeroBalanza == numeroBalanzaStr);
                 if (primeraCarga == null) return ritmosBalanzas78;
                 int idPrimeraCarga = (int)primeraCarga.CargaOpuesta_Id;
