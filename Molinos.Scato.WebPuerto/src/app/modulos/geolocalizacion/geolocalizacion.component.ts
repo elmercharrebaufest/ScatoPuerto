@@ -2,6 +2,7 @@ import { Component, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 import { SessionService } from '@ScatoServicios/session.service';
 import { MapaBuqueComponent } from './mapa-buque/mapa-buque.component';
@@ -28,8 +29,10 @@ export class GeolocalizacionComponent implements OnInit {
     private geolocalizacionService: GeolocalizacionService,
     private geolocalizacionSharingService: GeolocalizacionSharingService,
     private router: Router,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private parametrosService: ParametrosService) {
     this.user = this.session.getUser();
+    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
     this.cargarPuntosInteres();
     this.cargarBuquesGeolocalizacion();
   }

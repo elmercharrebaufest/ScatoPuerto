@@ -3,6 +3,7 @@ import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas, InformacionAdicional } from '@ScatoModels/balanzadas/balanza';
 import { EmbarqueService } from './embarque.service';
 import { RitmosBalanzas78 } from '@ScatoModels/balanzadas/ritmos-balanzas78';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
   /**
@@ -37,11 +38,16 @@ export class Balanzas78Service {
   @Output() sendRitmosBalanzas78 = new EventEmitter<RitmosBalanzas78>();
 
   materialesPuerto = [];
+  tiempoActualizacionBalanzas: number = 0;
+  tiempoActualizacionRitmosBlzas78: number = 0;
 
   constructor(private _balanzaService: BalanzaService, 
-              private embarqueService: EmbarqueService){
+              private embarqueService: EmbarqueService,
+              private parametrosService: ParametrosService){
 
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
+    this.tiempoActualizacionBalanzas = this.parametrosService.getParametroTiempoActualizacionBalanzas();
+    this.tiempoActualizacionRitmosBlzas78 = this.parametrosService.getParametroTiempoActualizacionRitmosBlzas78();
   }
 
   //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
@@ -80,12 +86,12 @@ export class Balanzas78Service {
           this.setBalanzada8Kilos(resp.balanzas);
           this.setInfoAdicional(resp.informacionAdicional);
         })
-    }, 15000);
+    }, this.tiempoActualizacionBalanzas);
 
     this.intervalRitmosBalanzas78 = setInterval(() => {
       this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
         .subscribe(resp => this.setSincRitmosBalanzas78(resp) )
-    }, 15000);
+    }, this.tiempoActualizacionRitmosBlzas78);
 
   }
 

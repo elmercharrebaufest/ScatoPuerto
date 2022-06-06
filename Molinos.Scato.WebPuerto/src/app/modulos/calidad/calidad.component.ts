@@ -12,6 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboDeBuque } from '@ScatoModels/recibo-buque';
 import { PDFService } from '@ScatoServicios/pdf.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 
 @Component({
@@ -55,7 +56,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private _procesoService: DatosEmbarquesProcesoService,
     private balanzas78Service: Balanzas78Service,
     private embarqueService: EmbarqueService,
-    private _PDFService: PDFService
+    private _PDFService: PDFService,
+    private parametrosService: ParametrosService,
     ) {
 
     this.unsubscribe = new Subject();
@@ -66,7 +68,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-
+    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
     this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => {
       this.trabajoOrdenado();
       this.obtenerBalanzadasEnVivo();

@@ -9894,6 +9894,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
                                                             x.FechaInicio > fechaFinal &&
                                                             x.NumeroBalanza == numeroBalanzaStr);
+
                 // Sumatoria de peso neto
                 int totalPesoNeto = 0;
                 foreach (Carga carga in cargas)
