@@ -5,7 +5,7 @@
             <h4 class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos sólidos Tablerista</h4>
         </div>
         <div id="collapsePlanillaTurnosSolido" class="collapse show">
-        
+    
         <br>
         <br>
         
@@ -46,9 +46,6 @@
                                                     <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
                                                     <span class='turno'>por turno</span>
                                                 </div>
-                                                <button class='btn bt-cerrar-turno' *ngIf="mostrarBtn" (click)='guardarTurnoGeneral(d,t)' [ngClass]='!turno.value.guardadoPorTablerista ? "btn-success" : "btn-outline-success"'>
-                                                    {{!turno.value.guardadoPorTablerista ? 'Enviar turno' : 'Turno enviado'}}
-                                                </button>
                                             </td>
                                         </tr>
                                         <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesSolido'>
@@ -115,7 +112,7 @@
                                                     </table>
                                             </td>                                           
                                         </tr>
-                                        <tr *ngIf='getCorteTurnos(d, t).controls.length <= 0'>
+                                        <tr *ngIf='getCorteTurnos(d, t).controls.length == 0'>
                                             <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                         </tr>
                                         <tr *ngIf='getObservacionTurnos(d, t).controls.length > 0'>
@@ -154,7 +151,7 @@
                                                 </table>
                                             </td>
                                         </tr>
-                                        <tr  *ngIf='getObservacionTurnos(d, t).controls.length <= 0'>
+                                        <tr  *ngIf='getObservacionTurnos(d, t).controls.length == 0'>
 
                                         </tr>
                                     </ng-container>
@@ -176,5 +173,4 @@
         </div>
         </div>    
     </div>
-    
-    
+        

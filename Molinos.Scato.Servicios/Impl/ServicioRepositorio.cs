@@ -9246,15 +9246,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 moduloDeCargaPlanillaDeTurnosDto = null;
             }
-
-            /*moduloDeCargaPlanillaDeTurnosDto = Obtener<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido);
-
-            if (moduloDeCargaPlanillaDeTurnosDto != null)
-            {
-                return moduloDeCargaPlanillaDeTurnosDto;
-            }*/
             return moduloDeCargaPlanillaDeTurnosDto;
-
         }
 
         public string ObtenerLlenadoMilimetroPorTanque(string cm, string mm, string tanqueNum)

@@ -92,7 +92,6 @@ export class LineupComponent implements OnInit, Observador {
   
     function_name = 'LINEUP - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
-     
 
   }
 
