@@ -331,7 +331,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             return prop;
           });
 
-          this.startBalanza7 = `${this.getDia( blzas7[0].fecha_Inicio )} ${this.getHora( blzas7[0].fecha_Inicio )}`;
+         // this.startBalanza7 = `${this.getDia( blzas7[0].fecha_Inicio )} ${this.getHora( blzas7[0].fecha_Inicio )}`;
+          let blzaConStartBalanza7 = blzas7.reduce( (blzas71, blzas72) => { return blzas71.fecha_Inicio < blzas72.fecha_Inicio ? blzas71 : blzas72; });
+          this.startBalanza7 = `${this.getDia( blzaConStartBalanza7.fecha_Inicio )} ${this.getHora( blzaConStartBalanza7.fecha_Inicio )}`;
 
           console.log('---- CORTES 7: ----', cortes7);
           
@@ -361,7 +363,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             return prop;
           });
 
-          this.startBalanza8 = `${this.getDia( blzas8[0].fecha_Inicio )} ${this.getHora( blzas8[0].fecha_Inicio )}`;
+        //  this.startBalanza8 = `${this.getDia( blzas8[0].fecha_Inicio )} ${this.getHora( blzas8[0].fecha_Inicio )}`;
+        let blzaConStartBalanza8 = blzas8.reduce( (blzas81, blzas82) => { return blzas81.fecha_Inicio < blzas82.fecha_Inicio ? blzas81 : blzas82; });
+        this.startBalanza8 = `${this.getDia( blzaConStartBalanza8.fecha_Inicio )} ${this.getHora( blzaConStartBalanza8.fecha_Inicio )}`;
 
           console.log('---- CORTES 8 : ----', cortes8);          
 
