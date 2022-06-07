@@ -23,7 +23,7 @@
           <td style="width: 10px"></td>
           <td><button class="btn btn-muelles color-muelle-nouryon" (click)='goNouryon()'>Nouryon</button></td>
           <td><button class="btn btn-estados-muelles"
-            [ngClass]="estadoNoryon() == 'Operando' ?
+            [ngClass]="estadoNoryonLp == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
             {{estadoNoryonLp}}</button></td>
         </tr>       
@@ -31,13 +31,13 @@
         <tr>
           <td style="padding-top: 10px"><button class="btn btn-muelles color-muelle-vicentin" (click)='goVicentin()'>Vicentin</button></td>
           <td style="padding-top: 10px"><button class="btn btn-estados-muelles"
-            [ngClass]="estadoVicentin() == 'Operando' ?
+            [ngClass]="estadoVicentinLp == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'"> 
             {{estadoVicentinLp}}</button></td>
           <td style="width: 10px"></td>
           <td style="padding-top: 10px"><button class="btn btn-muelles color-muelle-otros-muelles" (click)='goOtrosMuelles()'>Otros Muelles</button></td>
           <td style="padding-top: 10px"><button class="btn btn-estados-muelles"
-            [ngClass]="estadoOtros() == 'Operando' ?
+            [ngClass]="estadoOtrosLp == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">         
             {{estadoOtrosLp}}</button></td>
         </tr> 
@@ -102,7 +102,7 @@
               <!--</div>-->
               <button class="btn btn-muelles color-muelle-vicentin">Vicentin</button>
                 <button class="btn btn-estados-muelles"
-                  [ngClass]="estadoVicentin() == 'Operando' ?
+                  [ngClass]="estadoVicentinLp == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
                 {{estadoVicentinLp}}</button>
             </div>
@@ -139,7 +139,7 @@
               </div>-->
               <button class="btn btn-muelles color-muelle-nouryon">Nouryon</button>
                 <button class="btn btn-estados-muelles"
-                  [ngClass]="estadoNoryon() == 'Operando' ?
+                  [ngClass]="estadoNoryonLp == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
                 {{estadoNoryonLp}}</button>
             </div>
@@ -173,7 +173,7 @@
             <div class="row" id='muelleOtrosMuelles'>
               <button class="btn btn-muelles color-muelle-otros-muelles">Otros Muelles</button>
                 <button class="btn btn-estados-muelles"
-                  [ngClass]="estadoOtros() == 'Operando' ?
+                  [ngClass]="estadoOtrosLp == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
                 {{estadoOtrosLp}}</button>
             </div>
