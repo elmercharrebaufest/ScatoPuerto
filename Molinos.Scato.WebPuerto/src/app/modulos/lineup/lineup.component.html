@@ -17,15 +17,15 @@
         <tr>
           <td><button class="btn btn-muelles color-muelle-sanbenito">San Benito</button></td>
           <td><button class="btn btn-estados-muelles"
-            [ngClass]="estadoSanBenito() == 'Operando' ?
+            [ngClass]="estadoSanBenitoLp == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">
-            {{estadoSanBenito()}}</button></td>
+            {{estadoSanBenitoLp}}</button></td>
           <td style="width: 10px"></td>
           <td><button class="btn btn-muelles color-muelle-nouryon" (click)='goNouryon()'>Nouryon</button></td>
           <td><button class="btn btn-estados-muelles"
             [ngClass]="estadoNoryon() == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
-            {{estadoNoryon()}}</button></td>
+            {{estadoNoryonLp}}</button></td>
         </tr>       
 
         <tr>
@@ -33,13 +33,13 @@
           <td style="padding-top: 10px"><button class="btn btn-estados-muelles"
             [ngClass]="estadoVicentin() == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'"> 
-            {{estadoVicentin()}}</button></td>
+            {{estadoVicentinLp}}</button></td>
           <td style="width: 10px"></td>
           <td style="padding-top: 10px"><button class="btn btn-muelles color-muelle-otros-muelles" (click)='goOtrosMuelles()'>Otros Muelles</button></td>
           <td style="padding-top: 10px"><button class="btn btn-estados-muelles"
             [ngClass]="estadoOtros() == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">         
-            {{estadoOtros()}}</button></td>
+            {{estadoOtrosLp}}</button></td>
         </tr> 
       </table>
     </div>
@@ -104,7 +104,7 @@
                 <button class="btn btn-estados-muelles"
                   [ngClass]="estadoVicentin() == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
-                {{estadoVicentin()}}</button>
+                {{estadoVicentinLp}}</button>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@
                 <button class="btn btn-estados-muelles"
                   [ngClass]="estadoNoryon() == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
-                {{estadoNoryon()}}</button>
+                {{estadoNoryonLp}}</button>
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@
                 <button class="btn btn-estados-muelles"
                   [ngClass]="estadoOtros() == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">        
-                {{estadoOtros()}}</button>
+                {{estadoOtrosLp}}</button>
             </div>
           </div>
         </div>
