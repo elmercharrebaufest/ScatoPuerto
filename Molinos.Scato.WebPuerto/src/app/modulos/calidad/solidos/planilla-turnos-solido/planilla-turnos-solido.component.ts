@@ -1184,7 +1184,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           baseCell = baseCell + (CantRows > 0 ? CantRows : CantRows);
      
         }
-      
+        console.log('workbook.xlsx.writeBuffer()');
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           
@@ -1197,7 +1197,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         });
   }
   private enviarPlanillaSolido(blob){ 
-
     const titulo = "Enviar Planilla de Turno Solido";
     const text = "Cuerpo del Mail:"
     const textoCuerpoMail = `Se enviara la planilla de turnos. \n
@@ -1223,7 +1222,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           });
           
           const base64String = await convertBlobToBase64(blob);
-          this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(this.idModuloDeCarga, mail, base64String).subscribe(resp =>{});
+          this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(this.idModuloDeCarga, mail, base64String).subscribe(resp =>{
+            this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success)
+          });
         }
       })
       .catch((e) => {
