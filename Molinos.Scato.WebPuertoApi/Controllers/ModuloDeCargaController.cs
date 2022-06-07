@@ -558,7 +558,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/ObtenerRitmos")]
-        public HttpResponseMessage ObtenerRitmos( int modulodecarga_id)
+        public HttpResponseMessage ObtenerRitmos(int modulodecarga_id)
         {
             try
             {
