@@ -64,8 +64,9 @@ export class ParametrosService {
    * @returns {void}
    * @memberof ParametrosService
    */
-  consola(msje: string, other: any): void{
-    if(this.verConsoleLog) console.log(msje, other);
+  consola(msje: string, other: any = null): void{
+    if(this.verConsoleLog)
+      other == null ? console.log(msje) : console.log(msje, other);
   }
   
   obtenerParametros(): Observable<Parametros[]>{
