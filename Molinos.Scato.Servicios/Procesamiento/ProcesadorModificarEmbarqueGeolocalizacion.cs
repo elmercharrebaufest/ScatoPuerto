@@ -150,7 +150,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : comando.DtoPosicion.FechaRegistro,
                         };
                         embarque.EmbarquePosicion.Add(posicion);
-                        Repositorio.Agregar(embarque);
+                        //Repositorio.Agregar(embarque);
                     }
 
                 }
