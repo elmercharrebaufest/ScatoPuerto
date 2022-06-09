@@ -30,6 +30,7 @@ using System.Linq.Expressions;
 using System.Printing;
 using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
+using System.DirectoryServices;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -2265,6 +2266,51 @@ namespace Molinos.Scato.Servicios.Impl
             return
                 conversor.ConvertirList<Permiso, PermisoDto>(
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
+        }
+
+        public IList<PermisoDto> ListarPermisosPorUsuarioAD(string nombreUsuario)
+        {
+            var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+            var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+            var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
+            //var aaaa = System.DirectoryServices.AccountManagement.GroupPrincipal;
+
+            // Supongamos que el GrupoAD es Tableristas
+            string grupoAD = "Tableristas";
+
+            // Grupos AD
+            // - ADPuertoGruposAd
+            // - ADPuertoGruposRoles
+            // - ADPuertoRoles
+            // - ADPuertoRolesPermisos
+            // - ADPuertoPermisos
+
+            //select *
+            //from ADPuertoGruposAd ad
+            //left join ADPuertoGruposRoles gr on ad.Id = gr.Id_Grupo
+            //left join ADPuertoRoles r on gr.Id_Rol = r.Id
+            //left join ADPuertoRolesPermisos rp on r.Id = rp.Id_Rol
+            //left join ADPuertoPermisos p on rp.Id_Permiso = p.Id
+            //where NombreGrupoAD = 'Tableristas'
+
+            IList<ADPuertoGruposAd> puertoGruposAd = repositorio.Listar<ADPuertoGruposAd>();
+            //IList<ADPuertoGruposRoles> puertoGruposRoles = repositorio.Listar<ADPuertoGruposRoles>();
+            IList<ADPuertoRoles> puertoRoles = repositorio.Listar<ADPuertoRoles>();
+            //IList<ADPuertoRolesPermisos> puertoRolesPermisos = repositorio.Listar<ADPuertoRolesPermisos>();
+            IList<ADPuertoPermisos> puertoPermisos = repositorio.Listar<ADPuertoPermisos>();
+
+            //var query = (from G in ADPuertoGruposAd
+            //             join GR in ADPuertoGruposRoles on G.Id equals GR.Id_Grupo
+            //             into union_G_GR
+            //             from G_GR in union_G_GR.DefaultIfEmpty()
+            //             join )
+
+            var method = puertoGruposAd
+                .Join(puertoRoles, GR => GR.Id, R => R.Id, (GR, R) => new { NombreGrupoAd = GR.NombreGrupoAd, idRol = R.Id, NombreRol = R.NombreRol })
+                .Join(puertoPermisos, R => R.idRol, P => P.Id, (R, P) => new { NombreGrupoAd = R.NombreGrupoAd, idRol = R.idRol, NombreRol = R.NombreRol, NombrePermiso = P.NombrePermiso })
+                .Where(x=>x.NombreGrupoAd==grupoAD).ToList();
+
+            return conversor.ConvertirList<Permiso, PermisoDto>(repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
