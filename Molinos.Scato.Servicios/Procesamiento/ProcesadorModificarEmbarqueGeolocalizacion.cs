@@ -116,7 +116,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Longitud = embarqPos.Longitud,
                             Estado = embarqPos.Estado,
                             VelocidadCurso = embarqPos.VelocidadCurso,
-                            FechaRegistro = embarqPos.FechaRegistro < fechaMinima ? fechaMinima : embarqPos.FechaRegistro,
+                            FechaRegistro = DateTime.Now,
                         };
                         //   embarque.EmbarquePosicion.Add(embarqPos);
                         Repositorio.Agregar(posicionHist);
@@ -129,7 +129,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         embarqPos.Longitud = comando.DtoPosicion.Longitud;
                         embarqPos.Estado = comando.DtoPosicion.Estado;
                         embarqPos.VelocidadCurso = comando.DtoPosicion.VelocidadCurso;
-                        embarqPos.FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : embarqPos.FechaRegistro;
+                        embarqPos.FechaRegistro = DateTime.Now;
                         Repositorio.GuardarCambios();
 
                     }
@@ -147,7 +147,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Longitud = comando.DtoPosicion.Longitud,
                             Estado = comando.DtoPosicion.Estado,
                             VelocidadCurso = comando.DtoPosicion.VelocidadCurso,
-                            FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : comando.DtoPosicion.FechaRegistro,
+                            FechaRegistro = DateTime.Now,
                         };
                         embarque.EmbarquePosicion.Add(posicion);
                         //Repositorio.Agregar(embarque);

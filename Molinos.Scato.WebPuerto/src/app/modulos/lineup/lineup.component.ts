@@ -18,7 +18,6 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
-import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 @Component({
   selector: 'app-lineup',

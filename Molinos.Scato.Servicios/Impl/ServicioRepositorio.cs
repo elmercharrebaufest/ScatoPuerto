@@ -9958,7 +9958,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (embarque.FechaHoraInicioCarga.Value != null)
                 {
-                    DateTime? fechaInicioFinal = embarque.FechaHoraInicioCarga.Value.AddDays(-1);
+                    //DateTime? fechaInicioFinal = embarque.FechaHoraInicioCarga.Value.AddDays(-1);
                     // var cargasBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
 
                     kgNetosBalanza7 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > fechaInicioFinal);
