@@ -92,7 +92,6 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
 
   // #region Eventos Controles
   public onChangeMuelleSeleccionado(event: any) {
-    console.log(event.target.value)
     const muelleSeleccionado = event.target.value;
     if (muelleSeleccionado == 'Todos') {
       this.listaBuquesGeolocalizacion.forEach((item) => {
@@ -129,7 +128,6 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
 
   public onOpenModalGeo(modal, geolocalizacion: any) {
     this.buque = geolocalizacion;
-
     this.modalService.open(modal, { windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
       .then(() => {
         console.log('_modalService.open');
