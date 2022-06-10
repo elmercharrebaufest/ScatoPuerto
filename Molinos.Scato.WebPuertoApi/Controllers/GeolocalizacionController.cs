@@ -52,7 +52,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (System.Exception ex)
             {
 
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
 
 

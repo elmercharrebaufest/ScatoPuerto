@@ -31,9 +31,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 if (embarque != null)
                 {
+                    string sLatitud = string.Empty;
+                    string sLongitud = string.Empty;
+
                     if (embarque.EmbarqueInformacion.Count == 0 && comando.DtoInformacion != null)
                     {
-
 
                         EmbarqueInformacion inf = new EmbarqueInformacion
                         {
@@ -116,25 +118,36 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Longitud = embarqPos.Longitud,
                             Estado = embarqPos.Estado,
                             VelocidadCurso = embarqPos.VelocidadCurso,
-                            FechaRegistro = embarqPos.FechaRegistro < fechaMinima ? fechaMinima : embarqPos.FechaRegistro,
+                            FechaRegistro = DateTime.Now,
                         };
                         //   embarque.EmbarquePosicion.Add(embarqPos);
                         Repositorio.Agregar(posicionHist);
+                        
+                        sLatitud = comando.DtoPosicion.Latitud.Replace("°" , "");
+                        sLongitud = comando.DtoPosicion.Longitud.Replace("°" , "");
+
+                        sLatitud = sLatitud.Replace("/", "");
+                        sLongitud = sLongitud.Replace("/", "");
 
                         embarqPos.HoraUTCPosicionRecibida = comando.DtoPosicion.HoraUTCPosicionRecibida < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraUTCPosicionRecibida;
                         embarqPos.HoraLocalBarco = comando.DtoPosicion.HoraLocalBarco < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraLocalBarco;
                         embarqPos.Area = comando.DtoPosicion.Area;
                         embarqPos.PuertoActual = comando.DtoPosicion.PuertoActual;
-                        embarqPos.Latitud = comando.DtoPosicion.Latitud;
-                        embarqPos.Longitud = comando.DtoPosicion.Longitud;
+                        embarqPos.Latitud = sLatitud.Trim();
+                        embarqPos.Longitud = sLongitud.Trim();
                         embarqPos.Estado = comando.DtoPosicion.Estado;
                         embarqPos.VelocidadCurso = comando.DtoPosicion.VelocidadCurso;
-                        embarqPos.FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : embarqPos.FechaRegistro;
+                        embarqPos.FechaRegistro = DateTime.Now;
                         Repositorio.GuardarCambios();
 
                     }
                     else if (comando.DtoPosicion != null)
                     {
+                        sLatitud = comando.DtoPosicion.Latitud.Replace("°", "");
+                        sLongitud = comando.DtoPosicion.Longitud.Replace("°", "");
+
+                        sLatitud = sLatitud.Replace("/", "");
+                        sLongitud = sLongitud.Replace("/", "");
 
                         EmbarquePosicion posicion = new EmbarquePosicion
                         {
@@ -143,14 +156,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             HoraLocalBarco = comando.DtoPosicion.HoraLocalBarco < fechaMinima ? fechaMinima : comando.DtoPosicion.HoraLocalBarco,
                             Area = comando.DtoPosicion.Area,
                             PuertoActual = comando.DtoPosicion.PuertoActual,
-                            Latitud = comando.DtoPosicion.Latitud,
-                            Longitud = comando.DtoPosicion.Longitud,
+                            Latitud = sLatitud.Trim(),
+                            Longitud = sLongitud.Trim(),
                             Estado = comando.DtoPosicion.Estado,
                             VelocidadCurso = comando.DtoPosicion.VelocidadCurso,
-                            FechaRegistro = comando.DtoPosicion.FechaRegistro < fechaMinima ? fechaMinima : comando.DtoPosicion.FechaRegistro,
+                            FechaRegistro = DateTime.Now,
                         };
                         embarque.EmbarquePosicion.Add(posicion);
-                        Repositorio.Agregar(embarque);
+                        //Repositorio.Agregar(embarque);
                     }
 
                 }
