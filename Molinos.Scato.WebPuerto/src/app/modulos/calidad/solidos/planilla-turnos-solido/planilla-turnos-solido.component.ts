@@ -1,4 +1,4 @@
-import { AfterViewInit,  Component, EventEmitter,  OnInit, Output, ViewChild} from '@angular/core';
+import { AfterViewInit,  Component, EventEmitter,  Input,  OnInit, Output, ViewChild} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -21,6 +21,8 @@ import { Embarque } from '@ScatoModels/embarque';
 import { PlanoContentComponent } from 'app/modulos/lineup/plano-de-carga/plano-content/plano-content.component';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { Mail } from '@ScatoModels/mail';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -34,6 +36,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   formCorte: FormGroup;
   formNuevoTurno: FormGroup;
   formExportarExcel: FormGroup;
+  obsCalidadForm: FormGroup;
   moduloCarga: ModuloDeCarga;
   exportadores: any[];
   lineas: any[];
@@ -46,9 +49,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   turnoPuerto: any[];
   idModuloDeCarga: number;
   planillaDeTurnos: PlanillaDeTurnos[];
-  nuevoTurno: PlanillaDeTurnos;
-
-  
+  nuevoTurno: PlanillaDeTurnos; 
   embarqueId: number; 
   embarque: Embarque;
   vientoAmarre: string;
@@ -56,6 +57,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   valorCargado: number;
   pedidoPorPlano: number;
   mostrarBtn:boolean=true;
+  selectedNewTurno: number;
+  @Input() tablerista: boolean;
+  private user: Usuario;
+
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -66,17 +71,18 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private lineasService: LineasService,
+    private session: SessionService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
-    console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => this.embarque = res); 
   }
 
   ngOnInit(): void {
+    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
@@ -117,7 +123,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     this.getCombos();
   }
 
-  selectedNewTurno: number;
 
   addTurno(turno: any){
     if (this.formNuevoTurno.value.fecha != null){
@@ -236,9 +241,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         }
         
         //Agrego detalles
-        console.log('dia---->><')
-        console.log(dia)
-        console.log(this.diasTurno['controls'])
         if(dia.moduloDeCargaPlanillaDeTurnosDetallesSolido?.length > 0){
           this.initTurnoDetalle(dia.moduloDeCargaPlanillaDeTurnosDetallesSolido,
                                 this.diasTurno['controls'][dayIndex]['controls'].turnos, 
@@ -306,6 +308,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number){
+      return;
        //Si entro aca creo el turno del día actual en hora actual.
 
        //Calculo el turnoPuerto actual así lo traigo de la DB
@@ -404,8 +407,17 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       });
   }
 
-  
+  initFormularioObs() {
+    this.obsCalidadForm = this._builder.group({
+      id: [''],
+      fecha: ['', [Validators.required]],
+      hora: ['', [Validators.required]],
+      observaciones: ['', [Validators.required]],
+      observacionVisible: true,
+      userCarga: this.user.username
 
+    })
+  }  
   //Obtener los horarios de los turnos
   getTurnoPuerto() {
     this.moduloCargaService.obtenerTurnoPuerto().subscribe(
@@ -450,9 +462,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad as FormArray;
   }
 
- 
-
-
   //Calcula el total de tiempo de los cortes
   calcularTotal() {
     let desde = this.formCorte.get('horaInicio').value ? this.formCorte.get('horaInicio').value.split(':') : '',
@@ -472,11 +481,25 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
   getRowSpan(dia: any) {
     let contador = 0;
+    let index = 0;
     for (let turnos of dia.controls.turnos.controls) {
-      contador += this.getRowSpanTurno(turnos);
-      //contador += 1;
+      contador += this.getRowSpanTurnoCalc(turnos);
+      
     }
     return contador;
+  }
+
+  getRowSpanTurnoCalc(turno: any) {
+    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
+    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
+    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
+
+    registroLiquido = registroLiquido > 0 ? 5 : 0; // tamaño del detalle de cada turno
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? registroCalidad : 1; // tamaño de la observacion
+
+    let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
+    return numeroRegistros;
   }
 
   getRowSpanTurno(turno: any) {
@@ -485,8 +508,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroLiquido = registroLiquido > 0 ? 5 : 0; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
 
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -535,6 +558,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
       contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
     }
+    contador = contador > 0? contador/1000 : 0;
     return contador;
   }
 
@@ -544,6 +568,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turno of d['controls']['turnos']['controls']) {
       contador += this.getCantTurno(turno);
     }
+    contador = contador > 0? contador/1000 : 0;
     return contador;
   }
 
@@ -553,6 +578,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
       contador += this.getCantDia(dia);
     }
+    contador = contador > 0? contador/1000 : 0;
     return contador;
   }
 
@@ -574,9 +600,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
   initTurnoDetalle(detalle: TurnoDetalleSolido[], turno: PlanillaDeTurnos, turnoIndex?: number){
     let planillaTurnoDetalles = turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'];
-    
-      console.log('turno[controls] --->>')
-      console.log(turno['controls'])
      if (detalle != null){
         if(detalle.length > 0){
           detalle.forEach(element => {      
@@ -644,7 +667,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       exportador: [{value: line ? line.exportador : '', disabled:  true}] ,
       bodega: [{value: line ? line.bodega : '',disabled: true}] ,
       materialPuerto: [{value: line ? line.materialPuerto :'',disabled: true}] ,
-      destino: [{value: line ? line.destino.id : '',disabled: true}] ,
+      destino: [{value: line ? line.destino.nombre : '',disabled: true}] ,
       cantidad: [{value: line ? line.cantidad : '',disabled: true}] ,
       id:  [{value: line ? line.id : null,disabled: true}]
     })
@@ -1161,7 +1184,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           baseCell = baseCell + (CantRows > 0 ? CantRows : CantRows);
      
         }
-      
+        console.log('workbook.xlsx.writeBuffer()');
         workbook.xlsx.writeBuffer().then((data) => {
           let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           
@@ -1174,7 +1197,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         });
   }
   private enviarPlanillaSolido(blob){ 
-
     const titulo = "Enviar Planilla de Turno Solido";
     const text = "Cuerpo del Mail:"
     const textoCuerpoMail = `Se enviara la planilla de turnos. \n
@@ -1200,7 +1222,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           });
           
           const base64String = await convertBlobToBase64(blob);
-          this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(this.idModuloDeCarga, mail, base64String).subscribe(resp =>{});
+          this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(this.idModuloDeCarga, mail, base64String).subscribe(resp =>{
+            this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success)
+          });
         }
       })
       .catch((e) => {
@@ -1279,6 +1303,5 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
      }, error => {
       this.confirmationDialogService.confirm('¡Error!', 'No se ha podido guardar el turno.', 'Cerrar', '', null, null, Tipoalerta.Error)
      })
-   }
-   
+   }   
 }

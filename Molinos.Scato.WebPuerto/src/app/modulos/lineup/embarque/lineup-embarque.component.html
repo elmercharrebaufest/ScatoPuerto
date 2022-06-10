@@ -180,7 +180,7 @@
       </div>
       
       <div class="col-9">
-        <div class="row">
+        <div class="row"> 
           <div class="col-12 font-weight-bold" [ngClass]="'text-'+ fechaRecaladaCorrecta()" style="font-size: 16px;">
             {{instanciaWorkflow.embarque.fechaRecalada | date}}&zwnj;
           </div>
@@ -194,11 +194,12 @@
     <div class="row">
       <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
         <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA -->
+        <!--
         <img  id="imgLineup" [ngStyle]="{'cursor': hayBuque ? 'pointer' : 'default'}"  [src]="ruta" class="float-left" (click)="verGeolocalizacion(hayBuque,instanciaWorkflow.embarque.id)">
         <div class="right">
           <p [ngClass]="colorMapa" class="float-left">{{mensajeBuque}}</p>
         </div>   
-        
+        -->
     </div>
     </div>
     

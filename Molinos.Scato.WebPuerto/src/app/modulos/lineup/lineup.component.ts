@@ -14,9 +14,11 @@ import { AlertService } from '@ScatoServicios/alert.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 @Component({
   selector: 'app-lineup',
@@ -45,6 +47,12 @@ export class LineupComponent implements OnInit, Observador {
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   LogCount: number = 0;
   private user: Usuario;
+
+  estadoVicentinLp: string;
+  estadoNoryonLp: string;
+  estadoSanBenitoLp: string;
+  estadoOtrosLp: string;
+
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -54,6 +62,7 @@ export class LineupComponent implements OnInit, Observador {
     private datepipe: DatePipe,
     private embarqueService: EmbarqueService,
     private _messageService: MessageService,
+    private parametrosService: ParametrosService,
     private session: SessionService
   ) {
     this.user = this.session.getUser()
@@ -61,9 +70,19 @@ export class LineupComponent implements OnInit, Observador {
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
-    this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => this.ubicacionDeBuquePuerto = res);
-  }
+   // this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => this.ubicacionDeBuquePuerto = res);
 
+  // this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
+   this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
+     console.log('xxxxxxxx')
+     this.ubicacionDeBuquePuerto = res;
+     this.estadoVicentinLp = this.estadoVicentin();
+     this.estadoNoryonLp = this.estadoNoryon();
+      this.estadoSanBenitoLp = this.estadoSanBenito();
+      this.estadoOtrosLp = this.estadoOtros();
+  });
+
+  }
   ngOnInit(): void {
     let actualDate = new Date();
     let function_name = 'LINEUP INICIO';
@@ -73,7 +92,6 @@ export class LineupComponent implements OnInit, Observador {
   
     function_name = 'LINEUP - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
-     
 
   }
 

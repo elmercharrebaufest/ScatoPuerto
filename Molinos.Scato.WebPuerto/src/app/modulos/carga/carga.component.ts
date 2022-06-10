@@ -5,6 +5,7 @@ import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { PlanoContentComponent } from '../lineup/plano-de-carga/plano-content/plano-content.component';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 
 @Component({
@@ -26,9 +27,11 @@ export class CargaComponent implements OnInit, OnDestroy {
 
   constructor(
     private workflowService: WorkflowService,
-    private _procesoService: DatosEmbarquesProcesoService
+    private _procesoService: DatosEmbarquesProcesoService,
+    private parametrosService: ParametrosService,
   ) {
     this.unsubscribe = new Subject();
+    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
   }
 
   ngOnInit(): void {
@@ -55,6 +58,18 @@ export class CargaComponent implements OnInit, OnDestroy {
           this.embarquesEnLineUp = res;
           this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
           this.mostrarTabs = true;
+
+          let embarqueDelStorage = this.obtenerEmbarqueSelectedEnLocalStorage();
+          if(embarqueDelStorage){
+            let vaporEncontrado = this.embarquesEnLineUp.find( x => x.id == embarqueDelStorage.id);
+            if(vaporEncontrado)
+              this.parametrosService.consola('=== vaporEncontrado === : ', vaporEncontrado);
+            else{
+              this.parametrosService.consola('=== vapor NO Encontrado ===');
+              localStorage.removeItem('embarqueSelected');
+            }
+          }
+
         });
     } catch (e) {
       console.log(e);
