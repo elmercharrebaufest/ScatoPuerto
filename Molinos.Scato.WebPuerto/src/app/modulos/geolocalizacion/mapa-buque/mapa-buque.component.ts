@@ -325,13 +325,10 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     let divChildsNodes = divsOverlayChilds[0].childNodes;
     let itemIndex = 1;
     divChildsNodes.forEach((item) => {
-      console.log('item---->>')
-      console.log(item)
       // Se retira el checkbox para las referencias y buques
       if (itemIndex == 1 || itemIndex == 4) {
         item.childNodes[0].childNodes[0].remove();
       } else {
-
         // Cambia la posicion de los check hacia la derecha
         const checkBoxReference = item.childNodes[0].childNodes[0];
         const spanReference = item.childNodes[0].childNodes[1];
@@ -345,7 +342,6 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         this.rederer.setStyle(item.childNodes[0], 'justify-content', 'flex-end');
         this.rederer.setStyle(item.childNodes[0].childNodes[0], 'margin-right', 'auto');
         this.rederer.setStyle(item.childNodes[0].childNodes[0], 'padding-right', '10px');
-
       }
       itemIndex++;
     })
@@ -412,13 +408,14 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
           (c: any) => {
             c.instance.nombreBuque = buque.nombreBuque;
             c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '';
-            c.instance.imo = buque.embarque ? buque.embarque.imo : '';
-            c.instance.bandera = buque.embarque ? buque.embarque.destino ? buque.embarque.destino.nombre : '' : '';
+            c.instance.imo = buque.informacion ? buque.informacion.imo : '';
+            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '' ;
             c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '';
             c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
             c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
-            c.instance.cantidadBodegas = '';
+            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '';
             c.instance.eslora = buque.embarque ? buque.embarque.eslora : '';
+            c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
         mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
