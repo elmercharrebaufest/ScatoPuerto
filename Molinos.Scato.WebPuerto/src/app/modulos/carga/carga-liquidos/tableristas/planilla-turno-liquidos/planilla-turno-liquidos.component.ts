@@ -289,6 +289,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     //Si la planilla tiene turnos
     if(this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0){
       this.cantidadTurnos = this.planillaDeTurnos.length;
+
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
         element.fechaMiliseconds = new Date(element.fecha).getTime();
@@ -941,6 +942,7 @@ getValidaFecha(fechaTurno: Date, fechaActual: Date){
 
       }
   }
+
 
   async getImgMolinos(){
     let response = await fetch('assets/iconMolinos.png');
