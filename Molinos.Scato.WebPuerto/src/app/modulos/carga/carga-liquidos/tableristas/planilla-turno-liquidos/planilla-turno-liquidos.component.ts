@@ -289,8 +289,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     //Si la planilla tiene turnos
     if(this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0){
       this.cantidadTurnos = this.planillaDeTurnos.length;
-      console.log('this.cantidadTurnos--->>>>')
-      console.log(this.cantidadTurnos)
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
         element.fechaMiliseconds = new Date(element.fecha).getTime();
@@ -935,13 +933,14 @@ getValidaFecha(fechaTurno: Date, fechaActual: Date){
         this.lineasService.obtenerLlenadoMilimetroPorTanque(medidaFinalCM, medidaFinalMM, tkLinea).toPromise(),
         this.lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuerto, temperatura).toPromise()
         ]).then(([inicial, final, densidad]) => {
+          inicial = inicial != null ? inicial : 0;
+          final = final != null ? final : 0;
           let cantidad = (Number(inicial) - Number(final)) * Number(densidad);
           lineaTurno.cantidad.setValue(cantidad);
         })
 
       }
   }
-
 
   async getImgMolinos(){
     let response = await fetch('assets/iconMolinos.png');
