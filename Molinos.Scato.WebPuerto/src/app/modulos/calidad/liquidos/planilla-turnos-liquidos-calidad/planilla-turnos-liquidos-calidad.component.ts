@@ -621,7 +621,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
       "Desea guardar las observaciones de calidad?";
 
-    this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then((confirmed) => {
         if (confirmed && !fechaHoraIncorrecta) {
 
@@ -640,9 +640,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
             observaciones: observaciones,
             observacionVisible: observacionVisible
           };
-          console.log('observacionCalidad =>')
-          console.log(observacionCalidad)
-
 
           this.procesoCalidadService.guardarObservacionesDeCalidad(idPlanillaDeTurnos, [observacionCalidad]).subscribe(res => {
             console.log("::::ObsDeCalidad RES:::::", res);
@@ -665,7 +662,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         else
           this._modalService.dismissAll();
         return;
-      }).catch(() => window.location.reload());
+      }).catch(() => {
+        this._modalService.dismissAll()
+      });
   }
   comparaFechaHoraObs(fecha: any, hora: any): boolean {
     let lFechaHoraObs = fecha + ' ' + hora;
@@ -737,12 +736,23 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   getRowSpan(dia: any) {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
-      contador += this.getRowSpanTurno(turnos);
-      contador += 1;
+      contador += this.getRowSpanTurnoCalc(turnos);
     }
     return contador;
   }
+  getRowSpanTurnoCalc(turno: any) {
 
+    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls.length;
+    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
+    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
+
+    registroLiquido = registroLiquido > 0 ? 6 : 0; // tamaño del detalle de cada turno
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? registroCalidad : 1; // tamaño de la observacion
+
+    let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
+    return numeroRegistros;
+  }
   getRowSpanTurno(turno: any) {
 
     let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls.length;
@@ -750,8 +760,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroLiquido = registroLiquido > 0 ? 6 : 0; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
 
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -818,8 +828,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   initTurnoDetalle(detalle: TurnoDetalleLiquido[], turno: PlanillaDeTurnos, turnoIndex?: number) {
     let planillaTurnoDetalles = turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'];
 
-    console.log(turno)
-    console.log(detalle)
     if (detalle != null) {
       if (detalle.length > 0) {
         detalle.forEach(element => {
@@ -1024,6 +1032,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         this.lineasService.obtenerLlenadoMilimetroPorTanque(medidaFinalCM, medidaFinalMM, tkLinea).toPromise(),
         this.lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuerto, temperatura).toPromise()
       ]).then(([inicial, final, densidad]) => {
+        inicial = inicial != null ? inicial : 0;
+        final = final != null ? final : 0;
         let cantidad = (Number(inicial) - Number(final)) * Number(densidad);
         lineaTurno.cantidad.setValue(cantidad);
       })
