@@ -1024,13 +1024,13 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         this.lineasService.obtenerLlenadoMilimetroPorTanque(medidaFinalCM, medidaFinalMM, tkLinea).toPromise(),
         this.lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuerto, temperatura).toPromise()
       ]).then(([inicial, final, densidad]) => {
+        inicial = inicial != null ? inicial : 0;
+        final = final != null ? final : 0;
         let cantidad = (Number(inicial) - Number(final)) * Number(densidad);
         lineaTurno.cantidad.setValue(cantidad);
       })
-
     }
   }
-
 
   async getImgMolinos() {
     let response = await fetch('assets/iconMolinos.png');
