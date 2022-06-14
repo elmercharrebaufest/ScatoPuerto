@@ -20,13 +20,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var listadoPermisos = servicio.
-                    ListarPermisosPorUsuarioAD(nombreUsuario).Where(x => x.TipoPermiso == Dominio.Enums.TipoPermiso.Puerto);
+                var listadoPermisos = servicio.ListarPermisosPorUsuarioAD(nombreUsuario);
 
                 return Request.CreateResponse(HttpStatusCode.OK, new
                 {
-                    username = "GSianPrueba",
-                    permisos = ""
+                    username = nombreUsuario,
+                    permisos = listadoPermisos
                 });
             }
             catch (Exception ex)

@@ -1,21 +1,19 @@
+export class PermisosUsuario {
+    nombre: string;
+    email: string;
+    gruposAd: ADPuertoGruposAd[];
+}
+
 export class ADPuertoGruposAd {
     id: number;
     nombreGrupoAd: string;
-}
-
-export class ADPuertoGruposRoles {
-    id_grupo: number;
-    id_rol: string;
+    roles: ADPuertoRoles[];
 }
 
 export class ADPuertoRoles {
     id: number;
     nombreRol: string;
-}
-
-export class ADPuertoRolesPermisos {
-    id_rol: number;
-    id_permiso: string;
+    permisos: ADPuertoPermisos[]
 }
 
 export class ADPuertoPermisos {

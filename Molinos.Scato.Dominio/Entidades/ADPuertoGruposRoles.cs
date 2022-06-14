@@ -10,12 +10,14 @@ namespace Molinos.Scato.Dominio.Entidades
 {
     public class ADPuertoGruposRoles
 	{
-		[Key, Column(Order = 0)]
+		//[Key, Column(Order = 1)]
 		public virtual int Id_Grupo { get; set; }
-		[Key, Column(Order = 1)]
+		//[Key, Column(Order = 2)]
 		public virtual int Id_Rol { get; set; }
-		public ADPuertoGruposAd ADPuertoGruposAd { get; set; }
-		public ADPuertoRoles ADPuertoRoles { get; set; }
+        [ForeignKey("Id_Grupo")]
+        public ADPuertoGruposAd ADPuertoGruposAd { get; set; }
+        [ForeignKey("Id_Rol")]
+        public ADPuertoRoles ADPuertoRoles { get; set; }
 
 	}
 }

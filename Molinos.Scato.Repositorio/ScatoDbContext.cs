@@ -52,6 +52,11 @@ namespace Molinos.Scato.Repositorio
             modelBuilder.Entity<LineUp>()
                 .Property(p => p.Orden)
                 .HasPrecision(18, 4);
+
+            modelBuilder.Entity<ADPuertoGruposRoles>()
+                .HasKey(c => new { c.Id_Grupo, c.Id_Rol });
+            modelBuilder.Entity<ADPuertoRolesPermisos>()
+                .HasKey(c => new { c.Id_Rol, c.Id_Permiso });
         }
 
         private void MapearAssemblyDe<TEntidad>(DbModelBuilder modelBuilder, Predicate<Type> incluir, Predicate<Type> excluir)

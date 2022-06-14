@@ -14,7 +14,6 @@ import { AlertService } from '@ScatoServicios/alert.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
-import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
