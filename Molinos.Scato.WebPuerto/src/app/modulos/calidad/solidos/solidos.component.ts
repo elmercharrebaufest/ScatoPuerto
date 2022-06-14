@@ -12,7 +12,6 @@ import { GraficoCargaComponent } from 'app/modulos/carga/carga-solidos/operacion
 import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/manos/manos.component';
 import { forkJoin } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
-import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 @Component({
   selector: 'app-solidos',
@@ -38,10 +37,8 @@ export class SolidosComponent implements OnInit {
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
     private _changeDetector: ChangeDetectorRef,
-    private parametrosService: ParametrosService) {
-      
+    ) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
   }
 
   ngOnInit(): void {
