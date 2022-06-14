@@ -73,7 +73,6 @@ export class LineupComponent implements OnInit, Observador {
     this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
 
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-      console.log('xxxxxxxx')
       this.ubicacionDeBuquePuerto = res;
       this.estadoVicentinLp = this.estadoVicentin();
       this.estadoNoryonLp = this.estadoNoryon();

@@ -52,7 +52,6 @@ export class Balanzas78Service {
 
   //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
   /**
-   * 
    * @param {number} id id del Modulo De Carga del embarque seleccionado
    * @returns {void}
    * @memberof Balanzas78Service
