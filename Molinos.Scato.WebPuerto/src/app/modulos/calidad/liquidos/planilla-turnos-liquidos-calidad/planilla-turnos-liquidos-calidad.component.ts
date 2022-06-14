@@ -78,7 +78,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   destinoPuerto: Destino[];
   @Input() tablerista: boolean;
   cantidadTurnos: number;
-
+  exportaPlanilla: boolean = false;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -282,6 +282,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
   fillPlanilla() {
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
+    console.log('this.planillaDeTurnos -->>')
+    console.log(this.planillaDeTurnos)
+
     this.diasTurno.clear();
 
     //Si la planilla tiene turnos
@@ -289,14 +292,16 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.cantidadTurnos = this.planillaDeTurnos.length;
       console.log('this.cantidadTurnos--->>>>')
       console.log(this.cantidadTurnos)
+
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
         element.fechaMiliseconds = new Date(element.fecha).getTime();
       });
+      //filtroTurno.sort((a,b) => a.turnoPuerto.orden-b.turnoPuerto.orden)
 
-
+      // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
-        return a.fechaMiliseconds - b.fechaMiliseconds;
+        return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden-b.turnoPuerto.orden);
       });
 
       this.turnoPuerto = [];
@@ -389,6 +394,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number) {
+    return;
     //Si entro aca creo el turno del día actual en hora actual.
 
     //Calculo el turnoPuerto actual así lo traigo de la DB
@@ -498,7 +504,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     this.getMotivosCorte();
   }
 
-
   deleteObsCalidad(dia: number, turno: number, ObsCalidad: any) {
     this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Si', 'No', null, null, Tipoalerta.Success)
       .then((confirmed) => {
@@ -558,6 +563,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   get diasTurno(): FormArray {
     return this.formTurnos.get('diasTurno') as FormArray;
   }
+
   get parcelSeleccionados(): FormArray {
     return this.formExportarExcel.get('parcelSeleccionados') as FormArray;
   }
@@ -748,7 +754,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
     registroLiquido = registroLiquido > 0 ? 6 : 0; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? registroCalidad : 1; // tamaño de la observacion
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
 
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -1049,6 +1055,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   }
 
   async generarExcelPorParcel(enviarPlanillaLiquido: boolean = false) {
+    this.exportaPlanilla = true;
     const fname = "parcels";
     const header = ["Exportador", "Partida", "Tks de abordo", , "Destino", "Tks Tierra", , "TN", "Producto"];
     const headerDetalles = ["Exportador", "Línea", "Partida", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Cm.", "Destino", "Cant."];
@@ -1172,8 +1179,10 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
     let rowOffset = 9;
     let planillaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeEmbarque;
-    let PlanillaEmbarqueData = worksheet.getRows(rowOffset, planillaDeEmbarque.length)
-    PlanillaEmbarqueData.forEach((row, i) => {
+    let planillaEmbarqueData = worksheet.getRows(rowOffset, planillaDeEmbarque.length)
+    console.log('planillaEmbarqueData -->>')
+    console.log(planillaEmbarqueData)
+    planillaEmbarqueData.forEach((row, i) => {
       let currentRow = worksheet.getRow(rowOffset + i);
       currentRow.getCell('A').value = planillaDeEmbarque[i].exportador.nombre;
       currentRow.getCell('B').value = planillaDeEmbarque[i].bodegaParcel;
@@ -1186,6 +1195,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     });
 
     let rowsTable1 = worksheet.getRows(9, planillaDeEmbarque.length);
+    console.log('rowsTable1 -->>')
+    console.log(rowsTable1)
     rowsTable1.forEach((row) => {
       [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((number) => {
         let currentCell = row.getCell(number);
@@ -1204,6 +1215,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       let currentCell = worksheet.getCell(`K${numCelda}`);
       currentCell.value = ref;
     });
+    /*
     //Ordeno por turno
     this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
       if (a.turnoPuerto.id > b.turnoPuerto.id) return 1;
@@ -1217,7 +1229,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       if (a.fechaMiliseconds < b.fechaMiliseconds) return -1;
       return 0;
     });
-
+    */
+    
+    // Ordenamos los turnos por fecha y turno correspondiente
+    this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
+      return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
+    });
+    console.log('planillaDeTurnos -->>')
+    console.log(this.planillaDeTurnos)
     let diaOrder = 0;
     this.planillaDeTurnos.forEach((turno: PlanillaDeTurnos, i) => {
       if (i == 0) {
@@ -1243,6 +1262,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
     let numeroTurno = 0;
     let totalNumeroTurnos = this.planillaDeTurnos.length;
+    
+    console.log('2 planillaDeTurnos -->>')
+    console.log(this.planillaDeTurnos)
 
     this.planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
       // sino tiene informacion de detalle de turnos y cortes no lo considera
@@ -1250,6 +1272,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         totalNumeroTurnos -= 1;
       }
     });
+
+    console.log('3 planillaDeTurnos -->>')
+    console.log(this.planillaDeTurnos)
 
     //Renderizo todos los detalles
     this.planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
@@ -1344,6 +1369,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
           right: { style: 'thin' }
         }
 
+        console.log('3 moduloDeCargaPlanillaDeTurnosDetallesLiquido -->>')
+        console.log(turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido)
+
         turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach((turno: any, index) => {
 
           let lineaDescripcion;
@@ -1410,6 +1438,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         });
 
         offset = offset + 1;
+        console.log('3 moduloDeCargaPlanillaDeTurnosCortes -->>')
+        console.log(turno.moduloDeCargaPlanillaDeTurnosCortes)
         turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((turno: CorteTurno, index) => {
 
           worksheet.mergeCells(`C${offset}:D${offset}`);
@@ -1467,6 +1497,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         });
 
         offset = offset + 1;
+        console.log('3 moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad -->>')
+        console.log(turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
         turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.forEach((observacion: any, index) => {
           //if (index == 2){
           worksheet.mergeCells(`E${offset}:N${(offset)}`);
@@ -1511,7 +1543,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         //si es el mismo día cuento las filas que voy a necesitar para calcular el merge
         if (turno.indexDia == dia) {
           fechaDia = new Date(turno.fecha);
-          if (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length > 0) {
+          if (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length > 0) {
             CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length + 1);
           }
           if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
@@ -1593,7 +1625,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         fs.saveAs(blob, fname + '.xlsx');
       }
     });
-
+    this.exportaPlanilla = false;
   }
 
   private enviarPlanillaLiquido(blob) {
