@@ -687,13 +687,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]
-        public HttpResponseMessage GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDetallesDto reciboDeBuqueDetallesDto)
+        public HttpResponseMessage GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
         {
             try
             {
-                servicio.GuardarReciboDeBuque(reciboDeBuque, reciboDeBuqueDetallesDto);
+                servicio.GuardarReciboDeBuque(idEmbarque, reciboDeBuque);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ListarRecibosDeBuque")]
+        public HttpResponseMessage ListarRecibosDeBuque(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarRecibosDeBuque(idEmbarque));
             }
             catch (Exception ex)
             {

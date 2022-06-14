@@ -261,6 +261,8 @@
     <Compile Include="Conversiones\Impl\Perfiles\PuntosInteresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RangosDeRedondeoMappinProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BodegaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ReciboDeBuqueDetallesMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ReciboDeBuqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RegistroBalanzaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ReglaDeAnalisisObligatorioMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SentidoManoDeEmbarqueMappingProfile.cs" />

@@ -9,7 +9,6 @@ import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { takeUntil } from 'rxjs/operators';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
-import { ReciboDeBuque } from '@ScatoModels/recibo-buque';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 
@@ -27,7 +26,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
   embarqueSelected: EmbarqueNav;
   unsubscribe: Subject<any>;
   errorMessage: boolean = false;
-  reciboBuque: ReciboDeBuque;
   
   embarquesEnLineUpSinFiltrar: EmbarqueNav[];
   listadoEmbarques: InstanciaWorkflowPuerto[];

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace Molinos.Scato.Dominio.Dto
 {
@@ -6,16 +9,16 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public string Exportador { get; set; }
-        public string Cantidad { get; set; }
+        public int Cantidad { get; set; }
         public string PuertoDestino { get; set; }
-        public string FechaRecibo { get; set; }
+        public DateTime FechaRecibo { get; set; }
         public string PuertoOrigen { get; set; }
         public string NombreBuque { get; set; }
         public string CantidadLetrasYClaseCarga { get; set; }
         public string EstibadoEnBodega { get; set; }
-        public string CantidadYCalidadDesconocida { get; set; }
-        public string IncluirImpresionDestino { get; set; }
-        public string IncluirImpresionCalidad { get; set; }
-        public string IncluirImpresionEstibado { get; set; }
+        public string CalidadYCantidadDesconocida { get; set; }
+        public bool IncluirImpresionDestino { get; set; }
+        public bool IncluirImpresionCalidad { get; set; }
+        public bool IncluirImpresionEstibado { get; set; }
     }
 }

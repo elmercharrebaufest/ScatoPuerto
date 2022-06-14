@@ -10205,37 +10205,6 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        //public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ObservacionesDeCalidadDto> observacionesDeCalidadDto)
-        //{
-        //    ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnosTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
-
-        //    foreach (var item in observacionesDeCalidadDto)
-        //    {
-        //        ObservacionesDeCalidad observacionesDeCalidad_db = repositorio.Obtener<ObservacionesDeCalidad>(x => x.Id == item.Id);
-        //        if (observacionesDeCalidad_db != null)
-        //        {
-        //            observacionesDeCalidad_db.Fecha = item.Fecha;
-        //            //observacionesDeCalidad_db.Hora = item.Hora;
-        //            observacionesDeCalidad_db.Observaciones = item.Observaciones;
-        //            observacionesDeCalidad_db.ObservacionVisible = item.ObservacionVisible;
-        //        }
-        //        else
-        //        {
-        //            observacionesDeCalidad_db = new ObservacionesDeCalidad()
-        //            {
-        //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnosTurnos,
-        //            Fecha = item.Fecha,
-        //            //Hora = item.Hora,
-        //            Observaciones = item.Observaciones,
-        //            ObservacionVisible = item.ObservacionVisible,
-        //            };
-        //            moduloDeCargaPlanillaDeTurnosTurnos.ObservacionesDeCalidad.Add(observacionesDeCalidad_db);
-
-        //        }
-        //    }
-        //    repositorio.GuardarCambios();
-        //}
-
         public Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id)
         {
             var cantTotal = 0;
@@ -10627,38 +10596,110 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<Bandera, BanderaDto>();
         }
 
-        public void GuardarReciboDeBuque(ReciboDeBuqueDto reciboDeBuque, ReciboDeBuqueDetallesDto reciboDeBuqueDetallesDto)
+        public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
         {
-            ReciboDeBuque reciboDB = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDeBuque.Id);
-            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == reciboDB.Embarque.Id);
-            if (reciboDB != null)
+            try
             {
-                reciboDB.Embarque = embarque;
-                reciboDB.NumeroRecibo = reciboDeBuque.NumeroRecibo;
-                reciboDB.Estado = reciboDeBuque.Estado;
-                reciboDB.Usuario = reciboDeBuque.Usuario;
-                reciboDB.UltimaActualizacion = reciboDeBuque.UltimaActualizacion;
-            }
-            else
-            {
-                reciboDB = new ReciboDeBuque()
+                //Obtengo embarque
+                Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque);
+                //Obtengo ReciboDeBuque que asociado
+                ReciboDeBuque reciboDB = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDeBuque.Id);
+                //Si existe modifico la data  
+                if (reciboDB != null)
                 {
-                    Embarque = embarque,
-                    NumeroRecibo = reciboDeBuque.NumeroRecibo,
-                    Estado = reciboDeBuque.Estado,
-                    Usuario = reciboDeBuque.Usuario,
-                    UltimaActualizacion = reciboDeBuque.UltimaActualizacion,
-                };
-                repositorio.Agregar(reciboDB);
+                    reciboDB.Estado = reciboDeBuque.Estado;
+                    reciboDB.Emitio = reciboDeBuque.Emitio;
+                    reciboDB.Superviso = reciboDeBuque.Superviso;
+                    reciboDB.FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion;
+
+                    foreach (var detallesDto in reciboDeBuque.ReciboDeBuqueDetalles)
+                    {
+                        ReciboDeBuqueDetalles reciboDetallesDB = repositorio.Obtener<ReciboDeBuqueDetalles>(x => x.Id == detallesDto.Id);
+
+                        if (reciboDetallesDB != null)
+                        {
+                            reciboDetallesDB.Cantidad = detallesDto.Cantidad;
+                            reciboDetallesDB.CantidadLetrasYClaseCarga = detallesDto.CantidadLetrasYClaseCarga;
+                            reciboDetallesDB.CalidadYCantidadDesconocida = detallesDto.CalidadYCantidadDesconocida;
+                            reciboDetallesDB.EstibadoEnBodega = detallesDto.EstibadoEnBodega;
+                            reciboDetallesDB.Exportador = detallesDto.Exportador;
+                            reciboDetallesDB.FechaRecibo = detallesDto.FechaRecibo;
+                            reciboDetallesDB.IncluirImpresionCalidad = detallesDto.IncluirImpresionCalidad;
+                            reciboDetallesDB.IncluirImpresionDestino = detallesDto.IncluirImpresionDestino;
+                            reciboDetallesDB.IncluirImpresionEstibado = detallesDto.IncluirImpresionEstibado;
+                            reciboDetallesDB.NombreBuque = detallesDto.NombreBuque;
+                            reciboDetallesDB.PuertoDestino = detallesDto.PuertoDestino;
+                            reciboDetallesDB.PuertoOrigen = detallesDto.PuertoOrigen;
+                        }
+                        else
+                        {
+                            reciboDetallesDB = new ReciboDeBuqueDetalles
+                            {
+                                Cantidad = detallesDto.Cantidad,
+                                CantidadLetrasYClaseCarga = detallesDto.CantidadLetrasYClaseCarga,
+                                CalidadYCantidadDesconocida = detallesDto.CalidadYCantidadDesconocida,
+                                EstibadoEnBodega = detallesDto.EstibadoEnBodega,
+                                Exportador = detallesDto.Exportador,
+                                FechaRecibo = detallesDto.FechaRecibo,
+                                IncluirImpresionCalidad = detallesDto.IncluirImpresionCalidad,
+                                IncluirImpresionDestino = detallesDto.IncluirImpresionDestino,
+                                IncluirImpresionEstibado = detallesDto.IncluirImpresionEstibado,
+                                NombreBuque = detallesDto.NombreBuque,
+                                PuertoDestino = detallesDto.PuertoDestino,
+                                PuertoOrigen = detallesDto.PuertoOrigen,
+                            };
+                        }
+                        reciboDB.ReciboDeBuqueDetalles.Add(reciboDetallesDB);
+                    }
+                }
+                else
+                {
+                    reciboDB = new ReciboDeBuque()
+                    {
+                        Embarque = embarque,
+                        NumeroRecibo = reciboDeBuque.NumeroRecibo,
+                        Estado = reciboDeBuque.Estado,
+                        Emitio = reciboDeBuque.Emitio,
+                        Superviso = reciboDeBuque.Superviso,
+                        FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion,
+                    };
+
+                    var detalles = new List<ReciboDeBuqueDetalles>();
+
+                    foreach (var detallesDto in reciboDeBuque.ReciboDeBuqueDetalles)
+                    {
+                        var detalleDB = new ReciboDeBuqueDetalles();
+
+                        detalleDB.Cantidad = detallesDto.Cantidad;
+                        detalleDB.CantidadLetrasYClaseCarga = detallesDto.CantidadLetrasYClaseCarga;
+                        detalleDB.CalidadYCantidadDesconocida = detallesDto.CalidadYCantidadDesconocida;
+                        detalleDB.EstibadoEnBodega = detallesDto.EstibadoEnBodega;
+                        detalleDB.Exportador = detallesDto.Exportador;
+                        detalleDB.FechaRecibo = detallesDto.FechaRecibo;
+                        detalleDB.IncluirImpresionCalidad = detallesDto.IncluirImpresionCalidad;
+                        detalleDB.IncluirImpresionDestino = detallesDto.IncluirImpresionDestino;
+                        detalleDB.IncluirImpresionEstibado = detallesDto.IncluirImpresionEstibado;
+                        detalleDB.NombreBuque = detallesDto.NombreBuque;
+                        detalleDB.PuertoDestino = detallesDto.PuertoDestino;
+                        detalleDB.PuertoOrigen = detallesDto.PuertoOrigen;
+
+                        detalles.Add(detalleDB);
+                    }
+                    reciboDB.ReciboDeBuqueDetalles = detalles;
+                    repositorio.Agregar(reciboDB);
+
+                }
+                repositorio.GuardarCambios();
             }
-            repositorio.GuardarCambios();
-
-            //ReciboDeBuqueDetalles reciboDetallesDB = repositorio.Obtener<ReciboDeBuqueDetalles>(x => x.Id == reciboDeBuqueDetallesDto.Id);
-            //ReciboDeBuque recibo = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDetallesDB.ReciboDeBuque.Id);
-
-            //recibo
-
+            catch (Exception e)
+            {
+                log.Error(e, "Error al guardar recibo de buque");
+            }
         }
 
+        public IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque)
+        {
+            return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
+        }
     }
 }
