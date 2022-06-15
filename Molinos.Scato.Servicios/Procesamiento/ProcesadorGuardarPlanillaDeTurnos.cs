@@ -32,170 +32,178 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
 
                 //Si el turno tiene id > 0 es que ya existe, por lo tanto simplemente lo actualizo.
-                if(comando.Dto != null)
+                if (comando.Dto != null)
                 {
 
-                        
-                        if (comando.Dto.Id > 0)
+
+                    if (comando.Dto.Id > 0)
+                    {
+                        var ModuloDeCargaPlanillaDeTurnos_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
+
+                        if (comando.Enviado)
                         {
-                            var ModuloDeCargaPlanillaDeTurnos_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
-
-                            if(comando.Enviado)
-                                ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
-                            ModuloDeCargaPlanillaDeTurnos_DB.EsLiquido = true;
-                            
-                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
-                            {
-                                foreach (var detalle in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                                {
-                                    if (detalle.Id > 0)
-                                    {
-                                        var detalle_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(detalle.Id);
-
-                                        detalle_DB.Exportador = Repositorio.Obtener<Exportador>(detalle.Exportador.Id);
-                                        detalle_DB.Linea_Id = detalle.Linea_Id;
-                                        detalle_DB.BodegaParcel = detalle.BodegaParcel;
-                                        detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id);
-                                        detalle_DB.Tk = detalle.Tk.ToString();
-                                        detalle_DB.Temperatura = detalle.Temperatura;
-                                        detalle_DB.MedidaInicialCM = detalle.MedidaInicialCM;
-                                        detalle_DB.MedidaInicialMM = detalle.MedidaInicialMM;
-                                        detalle_DB.MedidaFinalCM = detalle.MedidaFinalCM;
-                                        detalle_DB.MedidaFinalMM = detalle.MedidaFinalMM;
-                                        detalle_DB.Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id);
-                                        detalle_DB.Cantidad = detalle.Cantidad;
-                                    }
-                                    else
-                                    {
-                                        if (detalle.Destino != null)
-                                        {
-                                            var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido()
-                                            {
-                                                ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
-                                                Exportador = Repositorio.Obtener<Exportador>(detalle.Exportador.Id),
-                                                Linea_Id = detalle.Linea_Id,
-                                                BodegaParcel = detalle.BodegaParcel,
-                                                MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id),
-                                                Tk = detalle.Tk.ToString(),
-                                                Temperatura = detalle.Temperatura,
-                                                MedidaInicialCM = detalle.MedidaInicialCM,
-                                                MedidaInicialMM = detalle.MedidaInicialMM,
-                                                MedidaFinalCM = detalle.MedidaFinalCM,
-                                                MedidaFinalMM = detalle.MedidaFinalMM,
-                                                Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id),
-                                                Cantidad = detalle.Cantidad
-                                            };
-                                            Repositorio.Agregar(detalle_DB);
-                                        }
-                                    
-                                    }
-                                }
-                            }
-
-                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
-                            {
-                                foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
-                                {
-                                    if (corte.Id > 0)
-                                    {
-                                        var corte_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(corte.Id);
-
-                                        corte_DB.HoraInicio = corte.HoraInicio;
-                                        corte_DB.HoraFin = corte.HoraFin;
-                                        corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id);
-                                        corte_DB.Observaciones = corte.Observaciones;
-                                        corte_DB.TiempoTotal = corte.TiempoTotal;
-                                    }
-                                    else
-                                    {
-                                        var corte_DB = new ModuloDeCargaPlanillaDeTurnosCortes(){
-                                            ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
-                                            HoraInicio = corte.HoraInicio,
-                                            HoraFin = corte.HoraFin,
-                                            MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
-                                            Observaciones = corte.Observaciones,
-                                            TiempoTotal = corte.TiempoTotal
-                                        };
-
-                                        Repositorio.Agregar(corte_DB);
-                                    }
-                                }
-                            }
-
-
+                            ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
+                            ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorRecibidor = comando.Dto.GuardadoPorRecibidor ? true : false;
                         }
-                        else
+                        ModuloDeCargaPlanillaDeTurnos_DB.EsLiquido = true;
+
+                        if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
                         {
-                            var turno_DB = new ModuloDeCargaPlanillaDeTurnos();
-
-                            turno_DB.Fecha = comando.Dto.Fecha;
-                            
-                            turno_DB.ModuloDeCarga = moduloDeCarga;
-                            turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
-                            turno_DB.EsLiquido = comando.Dto.EsLiquido;
-                            if (comando.Enviado)
-                                turno_DB.GuardadoPorTablerista = true;
-
-                        var detalles = new List<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();   
-                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
+                            foreach (var detalle in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                             {
-                                foreach (var modulodetalle in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                                if (detalle.Id > 0)
                                 {
-                                    if (modulodetalle.Linea_Id != null)
-                                    {
-                                        var ModuloDeCargaPlanillaDeTurnosDetallesLiquido = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido()
-                                        {
-                                            ModuloDeCargaPlanillaDeTurnos = turno_DB,
-                                            Exportador = Repositorio.Obtener<Exportador>(modulodetalle.Exportador.Id),
-                                            Linea_Id = modulodetalle.Linea_Id,
-                                            BodegaParcel = modulodetalle.BodegaParcel,
-                                            MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(modulodetalle.MaterialPuerto.Id),
-                                            Tk = modulodetalle.Tk.ToString(),
-                                            Temperatura = modulodetalle.Temperatura,
-                                            MedidaInicialCM = modulodetalle.MedidaInicialCM,
-                                            MedidaInicialMM = modulodetalle.MedidaInicialMM,
-                                            MedidaFinalCM = modulodetalle.MedidaFinalCM,
-                                            MedidaFinalMM = modulodetalle.MedidaFinalMM,
-                                            Destino = Repositorio.Obtener<Destino>(modulodetalle.Destino.Id),
-                                            Cantidad = modulodetalle.Cantidad
-                                        };
-                                        detalles.Add(ModuloDeCargaPlanillaDeTurnosDetallesLiquido);
-                                    }
+                                    var detalle_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(detalle.Id);
+
+                                    detalle_DB.Exportador = Repositorio.Obtener<Exportador>(detalle.Exportador.Id);
+                                    detalle_DB.Linea_Id = detalle.Linea_Id;
+                                    detalle_DB.BodegaParcel = detalle.BodegaParcel;
+                                    detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id);
+                                    detalle_DB.Tk = detalle.Tk.ToString();
+                                    detalle_DB.Temperatura = detalle.Temperatura;
+                                    detalle_DB.MedidaInicialCM = detalle.MedidaInicialCM;
+                                    detalle_DB.MedidaInicialMM = detalle.MedidaInicialMM;
+                                    detalle_DB.MedidaFinalCM = detalle.MedidaFinalCM;
+                                    detalle_DB.MedidaFinalMM = detalle.MedidaFinalMM;
+                                    detalle_DB.Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id);
+                                    detalle_DB.Cantidad = detalle.Cantidad;
                                 }
-                            
-                                //Repositorio.GuardarCambios();
-                            }
-
-                            var cortes = new List<ModuloDeCargaPlanillaDeTurnosCortes>();
-                            if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
-                            {
-
-                                foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
+                                else
                                 {
-
-                                    var ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
+                                    if (detalle.Destino != null)
                                     {
-                                        ModuloDeCargaPlanillaDeTurnos = turno_DB,
+                                        var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido()
+                                        {
+                                            ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
+                                            Exportador = Repositorio.Obtener<Exportador>(detalle.Exportador.Id),
+                                            Linea_Id = detalle.Linea_Id,
+                                            BodegaParcel = detalle.BodegaParcel,
+                                            MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id),
+                                            Tk = detalle.Tk.ToString(),
+                                            Temperatura = detalle.Temperatura,
+                                            MedidaInicialCM = detalle.MedidaInicialCM,
+                                            MedidaInicialMM = detalle.MedidaInicialMM,
+                                            MedidaFinalCM = detalle.MedidaFinalCM,
+                                            MedidaFinalMM = detalle.MedidaFinalMM,
+                                            Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id),
+                                            Cantidad = detalle.Cantidad
+                                        };
+                                        Repositorio.Agregar(detalle_DB);
+                                    }
+
+                                }
+                            }
+                        }
+
+                        if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
+                        {
+                            foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
+                            {
+                                if (corte.Id > 0)
+                                {
+                                    var corte_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(corte.Id);
+
+                                    corte_DB.HoraInicio = corte.HoraInicio;
+                                    corte_DB.HoraFin = corte.HoraFin;
+                                    corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id);
+                                    corte_DB.Observaciones = corte.Observaciones;
+                                    corte_DB.TiempoTotal = corte.TiempoTotal;
+                                }
+                                else
+                                {
+                                    var corte_DB = new ModuloDeCargaPlanillaDeTurnosCortes()
+                                    {
+                                        ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
                                         HoraInicio = corte.HoraInicio,
                                         HoraFin = corte.HoraFin,
                                         MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
                                         Observaciones = corte.Observaciones,
                                         TiempoTotal = corte.TiempoTotal
-
                                     };
 
-                                    cortes.Add(ModuloDeCargaPlanillaDeTurnosCortes);
-
+                                    Repositorio.Agregar(corte_DB);
                                 }
+                            }
+                        }
+
+
+                    }
+                    else
+                    {
+                        var turno_DB = new ModuloDeCargaPlanillaDeTurnos();
+
+                        turno_DB.Fecha = comando.Dto.Fecha;
+
+                        turno_DB.ModuloDeCarga = moduloDeCarga;
+                        turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
+                        turno_DB.EsLiquido = comando.Dto.EsLiquido;
+
+                        if (comando.Enviado)
+                        {
+                            turno_DB.GuardadoPorTablerista = true;
+                            turno_DB.GuardadoPorRecibidor = comando.Dto.GuardadoPorRecibidor ? true : false;
+                        }
+
+                        var detalles = new List<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
+                        if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
+                        {
+                            foreach (var modulodetalle in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                            {
+                                if (modulodetalle.Linea_Id != null)
+                                {
+                                    var ModuloDeCargaPlanillaDeTurnosDetallesLiquido = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido()
+                                    {
+                                        ModuloDeCargaPlanillaDeTurnos = turno_DB,
+                                        Exportador = Repositorio.Obtener<Exportador>(modulodetalle.Exportador.Id),
+                                        Linea_Id = modulodetalle.Linea_Id,
+                                        BodegaParcel = modulodetalle.BodegaParcel,
+                                        MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(modulodetalle.MaterialPuerto.Id),
+                                        Tk = modulodetalle.Tk.ToString(),
+                                        Temperatura = modulodetalle.Temperatura,
+                                        MedidaInicialCM = modulodetalle.MedidaInicialCM,
+                                        MedidaInicialMM = modulodetalle.MedidaInicialMM,
+                                        MedidaFinalCM = modulodetalle.MedidaFinalCM,
+                                        MedidaFinalMM = modulodetalle.MedidaFinalMM,
+                                        Destino = Repositorio.Obtener<Destino>(modulodetalle.Destino.Id),
+                                        Cantidad = modulodetalle.Cantidad
+                                    };
+                                    detalles.Add(ModuloDeCargaPlanillaDeTurnosDetallesLiquido);
+                                }
+                            }
+
+                            //Repositorio.GuardarCambios();
+                        }
+
+                        var cortes = new List<ModuloDeCargaPlanillaDeTurnosCortes>();
+                        if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
+                        {
+
+                            foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
+                            {
+
+                                var ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
+                                {
+                                    ModuloDeCargaPlanillaDeTurnos = turno_DB,
+                                    HoraInicio = corte.HoraInicio,
+                                    HoraFin = corte.HoraFin,
+                                    MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
+                                    Observaciones = corte.Observaciones,
+                                    TiempoTotal = corte.TiempoTotal
+
+                                };
+
+                                cortes.Add(ModuloDeCargaPlanillaDeTurnosCortes);
 
                             }
 
-                            turno_DB.ModuloDeCargaPlanillaDeTurnosCortes = cortes;
-                            turno_DB.ModuloDeCargaPlanillaDeTurnosDetallesLiquido = detalles;
-
-                            Repositorio.Agregar(turno_DB);
                         }
-                        Repositorio.GuardarCambios();
+
+                        turno_DB.ModuloDeCargaPlanillaDeTurnosCortes = cortes;
+                        turno_DB.ModuloDeCargaPlanillaDeTurnosDetallesLiquido = detalles;
+
+                        Repositorio.Agregar(turno_DB);
+                    }
+                    Repositorio.GuardarCambios();
 
                 }
             }

@@ -75,10 +75,9 @@
                                                         style="margin-top: 5px; margin-bottom: 5px"
                                                         *ngIf="!turno.value.guardadoPorTablerista"
                                                         (click)='guardarTurnoGeneral(d,t)'>
-                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Turno
-                                                        guardado'}}
+                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Turno guardado'}}
                                                     </button>
-                                                    <button id="btn-turno-enviado-liquidos" *ngIf="mostrarBtn"
+                                                    <button id="btn-turno-enviado-liquidos" *ngIf="!turno.value.guardadoPorTablerista"
                                                         (click)='guardarTurnoGeneral(d,t,true)'
                                                         [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
                                                         {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
@@ -198,13 +197,13 @@
                                                                         {{corte.controls.motivosDeCorte.value.nombre}}
                                                                     </td>
                                                                     <td colspan="1">
-                                                                        {{corte.controls.horaInicio.value}}hs
+                                                                        {{corte.controls.horaInicio.value}} hs
                                                                     </td>
                                                                     <td colspan="1">
-                                                                        {{corte.controls.horaFin.value}}hs
+                                                                        {{corte.controls.horaFin.value}} hs
                                                                     </td>
                                                                     <td colspan="1">
-                                                                        {{corte.controls.tiempoTotal.value}}hs
+                                                                        {{corte.controls.tiempoTotal.value}} hs
                                                                     </td>
                                                                     <td colspan="5">
                                                                         {{corte.controls.observaciones.value}}

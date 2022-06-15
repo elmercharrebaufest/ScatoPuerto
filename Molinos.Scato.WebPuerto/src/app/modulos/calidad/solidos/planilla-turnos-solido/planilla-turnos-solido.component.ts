@@ -850,22 +850,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       worksheet.getCell('A5').alignment = { vertical: 'middle', horizontal: 'right' };
       worksheet.getCell('A5').value = "Buque:";
       worksheet.getCell('C5').value = this.procesoService.getEmbarqueSelected().nombreBuque;
-
-      /*
-      //Ordeno por turno
-      this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
-        if (a.turnoPuerto.id > b.turnoPuerto.id) return 1;
-        if (a.turnoPuerto.id < b.turnoPuerto.id) return -1;
-        return 0;
-      });
-
-      //Ordeno por día
-      this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
-        if (a.fechaMiliseconds > b.fechaMiliseconds) return 1;
-        if (a.fechaMiliseconds < b.fechaMiliseconds) return -1;
-        return 0;
-      });
-      */
       
       // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
@@ -965,7 +949,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
           // Cargando Agrupador de Turnos
           let registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length - 1;
-          const numRegistroTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length;
           const nombreTurno = turno.turnoPuerto.nombre;
 
           if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0){
