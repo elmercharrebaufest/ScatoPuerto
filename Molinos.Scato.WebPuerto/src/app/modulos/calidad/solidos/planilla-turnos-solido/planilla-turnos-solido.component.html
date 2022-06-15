@@ -1,3 +1,4 @@
+    <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>
 
     <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
         <app-collapse-button collapseSelectorId='collapsePlanillaTurnosSolido'></app-collapse-button>
@@ -51,7 +52,7 @@
                                         <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesSolido'>
                                             <ng-container *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
                                                 [formGroupName]='i'>
-                                                <tr>
+                                                <tr  disabled="true">
                                                     <!-- EXPORTADOR -->
                                                     <td>
                                                         {{result.controls.exportador.value.nombre}}
