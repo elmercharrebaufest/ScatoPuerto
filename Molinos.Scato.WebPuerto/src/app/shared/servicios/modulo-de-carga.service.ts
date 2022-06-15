@@ -132,21 +132,21 @@ export class ModuloDeCargaService {
     return this.http.get<Nir[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
   }
   
-  guardarModuloDeCargaNirManualPuerto(moduloDeCargaNirManualPuerto: Nir[], moduloDeCarga_Id: number){
+  guardarModuloDeCargaNirManualPuerto(objetoMail:any, moduloDeCarga_Id: number){
     
-    let objetoMail = {
-      nirManualPuerto : moduloDeCargaNirManualPuerto,
-      mail: {
-        "body": "body",
-        "destinatarios": [
-          "destinatarios1",
-          "destinatarios2"
-        ],
-        "titulo": "titulo2",
-        "adjunto": "adjunto3",
-        "nombre": "nombre4"
-      }
-    }
+    // let objetoMail = {
+    //   nirManualPuerto : moduloDeCargaNirManualPuerto,
+    //   mail: {
+    //     "body": "body",
+    //     "destinatarios": [
+    //       "destinatarios1",
+    //       "destinatarios2"
+    //     ],
+    //     "titulo": "titulo2",
+    //     "adjunto": "adjunto3",
+    //     "nombre": "nombre4"
+    //   }
+    // }
 
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?IdModuloDeCarga=${moduloDeCarga_Id}`, objetoMail, { 'withCredentials': true});
   }
