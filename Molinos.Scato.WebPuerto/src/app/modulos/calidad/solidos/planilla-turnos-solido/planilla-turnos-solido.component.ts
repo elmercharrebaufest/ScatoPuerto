@@ -60,7 +60,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   selectedNewTurno: number;
   @Input() tablerista: boolean;
   private user: Usuario;
-
+  exportaPlanilla: boolean = false;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -212,9 +212,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         element.fechaMiliseconds = new Date(element.fecha).getTime();
       });
   
-  
+      // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
-        return a.fechaMiliseconds - b.fechaMiliseconds;
+        return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden-b.turnoPuerto.orden);
       });
     
       this.turnoPuerto = [];
@@ -663,13 +663,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
   initLinea(line?: any, cerrado?: boolean) {
     return this._builder.group({
-      linea:[{value: line ? line.linea_Id : '', disabled: true}] ,
-      exportador: [{value: line ? line.exportador : '', disabled:  true}] ,
-      bodega: [{value: line ? line.bodega : '',disabled: true}] ,
-      materialPuerto: [{value: line ? line.materialPuerto :'',disabled: true}] ,
-      destino: [{value: line ? line.destino.nombre : '',disabled: true}] ,
-      cantidad: [{value: line ? line.cantidad : '',disabled: true}] ,
-      id:  [{value: line ? line.id : null,disabled: true}]
+      linea:[{value: line ? line.linea_Id : '', disabled: cerrado}] ,
+      exportador: [{value: line ? line.exportador : '', disabled:  cerrado}] ,
+      bodega: [{value: line ? line.bodega : '',disabled: cerrado}] ,
+      materialPuerto: [{value: line ? line.materialPuerto :'',disabled: cerrado}] ,
+      destino: [{value: line ? line.destino.nombre : '',disabled: cerrado}] ,
+      cantidad: [{value: line ? line.cantidad : '',disabled: cerrado}] ,
+      id:  [{value: line ? line.id : null,disabled: cerrado}]
     })
   }
 
@@ -772,6 +772,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   async generarExcelPorParcel(bEnviarPlanilla: boolean){
+    this.exportaPlanilla = true;
     let fname = "parcels";
     const headerDetalles = ["Exportador","Bodega", "Producto", "Destino", "Cant."];
     const headerCortes = ["Motivo","Inicio","Fin","Tiempo total","Observaciones"];
@@ -849,19 +850,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       worksheet.getCell('A5').alignment = { vertical: 'middle', horizontal: 'right' };
       worksheet.getCell('A5').value = "Buque:";
       worksheet.getCell('C5').value = this.procesoService.getEmbarqueSelected().nombreBuque;
-
-      //Ordeno por turno
+      
+      // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
-        if (a.turnoPuerto.id > b.turnoPuerto.id) return 1;
-        if (a.turnoPuerto.id < b.turnoPuerto.id) return -1;
-        return 0;
-      });
-
-      //Ordeno por día
-      this.planillaDeTurnos = this.planillaDeTurnos.sort((a,b) =>{
-        if (a.fechaMiliseconds > b.fechaMiliseconds) return 1;
-        if (a.fechaMiliseconds < b.fechaMiliseconds) return -1;
-        return 0;
+        return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
       });
 
       let diaOrder = 0;
@@ -957,7 +949,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
           // Cargando Agrupador de Turnos
           let registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length - 1;
-          const numRegistroTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length;
           const nombreTurno = turno.turnoPuerto.nombre;
 
           if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0){
@@ -1195,6 +1186,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
             fs.saveAs(blob, fname + '.xlsx');
           }
         });
+        this.exportaPlanilla = false;
   }
   private enviarPlanillaSolido(blob){ 
     const titulo = "Enviar Planilla de Turno Solido";

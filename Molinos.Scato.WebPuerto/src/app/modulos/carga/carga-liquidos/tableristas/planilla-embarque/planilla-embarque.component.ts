@@ -49,9 +49,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
   }
 
-  desabilitarEmbarque()
+  public desabilitarEmbarque()
   {
-   
     this.mostrarbtnGuardar=false;
   }
   newForm() {
@@ -62,15 +61,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     const exportadoresData = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad)
     const exportadorFiltro = exportadoresData.map(item => item.exportador);
     this.exportadores = [...new Map(exportadorFiltro.map(item => [item['nombre'], item])).values()];
-/*
-    const bodegasData = this.turnosService.getBodega();
-    const bodegasFiltro = bodegasData.map(item => item.destino);
-
-    //this.bodegas = [...new Map(bodegasFiltro.map(item => [item['nombre'], item])).values()];
-
-    const productosFiltro = bodegasData.map(item => item.materialPuerto);
-    this.productos = [...new Map(productosFiltro.map(item => [item['descripcionCorta'], item])).values()];
-*/
 
     this.bodegas = this.turnosService.getBodega();
     //this.partidas = this.bodegas.map(item => ({bodegaParcel: item.bodegaParcel}));

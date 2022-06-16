@@ -318,9 +318,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var resultado = new ResultadoPrevisualizar();
                 comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado});
-
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

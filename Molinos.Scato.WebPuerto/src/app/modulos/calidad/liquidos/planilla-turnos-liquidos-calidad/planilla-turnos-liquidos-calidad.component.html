@@ -1,4 +1,4 @@
-
+    <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>
     <app-collapse-button collapseSelectorId='collapsePlanillaTurnosLiquidos'></app-collapse-button>
     <div class="divHeaderRightLeft">
         <h4 *ngIf="tablerista" class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos líquidos Tablerista</h4>
@@ -61,8 +61,11 @@
                                                 <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
                                                 <span class='turno'>por turno</span>
                                                 <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span><br>
-                                                <button class='btn btn btn-success' style="margin-top: 5px; margin-bottom: 5px" (click)='guardarTurnoGeneral(d,t)'>
-                                                    {{!turno.value.guardadoPorRecibidor ? 'Cerrar turno' : 'Turno cerrado'}}
+                                                <button class='btn btn btn-success' 
+                                                        *ngIf="!turno.value.guardadoPorRecibidor"
+                                                        style="margin-top: 5px; margin-bottom: 5px" 
+                                                        (click)='guardarTurnoGeneral(d,t, true)'>
+                                                        Cerrar turno
                                                 </button>
                                             </div>
                                         </td>
@@ -154,13 +157,13 @@
                                                                     {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                 </td>
                                                                 <td colspan="1">
-                                                                    {{corte.controls.horaInicio.value}}hs
+                                                                    {{corte.controls.horaInicio.value}} hs
                                                                 </td>
                                                                 <td colspan="1">
-                                                                    {{corte.controls.horaFin.value}}hs
+                                                                    {{corte.controls.horaFin.value}} hs
                                                                 </td>
                                                                 <td colspan="1">
-                                                                    {{corte.controls.tiempoTotal.value}}hs
+                                                                    {{corte.controls.tiempoTotal.value}} hs
                                                                 </td>
                                                                 <td colspan="5">
                                                                     {{corte.controls.observaciones.value}}
