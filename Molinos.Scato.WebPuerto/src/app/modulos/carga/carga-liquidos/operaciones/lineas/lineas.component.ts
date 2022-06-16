@@ -123,7 +123,7 @@ export class LineasComponent implements OnInit, OnChanges {
                 console.log('resultado alturaInicialMM ')
                 console.log(' ', resultado, ' ', densidadInicial)
                 linea.controls['litros'].setValue(resultado, { emitEvent: false });
-                if (densidadInicial) {
+                if (densidadInicial != undefined || densidadInicial != null) {
                   const kilosInicial = (Number(resultado) * Number(densidadInicial));
                   linea.controls['kilos'].setValue(kilosInicial, { emitEvent: false })
                 }
@@ -158,7 +158,10 @@ export class LineasComponent implements OnInit, OnChanges {
                 console.log('densidadFinal ', densidadFinal)
                 console.log(' ', litrosFinal, ' ', densidadFinal, ' ', kilos)
 
-                if (litrosFinal && densidadFinal && kilos) {
+                if ((litrosFinal != undefined || litrosFinal != null) && 
+                    (densidadFinal != undefined || densidadFinal != null) && 
+                    (kilos != undefined || kilos != null)
+                    ) {
                   let kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
                   linea.controls['tkFinal'].setValue(Number(kilos) - kilosFinal, { emitEvent: false })
                 }

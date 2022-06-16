@@ -103,7 +103,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
       this.embarque = res;
-      this.cargarShipParticular(res);
+      //this.cargarShipParticular(res);
     });
 
 
@@ -126,7 +126,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     }, 2000);
 
     this.initFormularioObs();
-    this.initShipParticular();
+    //this.initShipParticular();
 
 
 

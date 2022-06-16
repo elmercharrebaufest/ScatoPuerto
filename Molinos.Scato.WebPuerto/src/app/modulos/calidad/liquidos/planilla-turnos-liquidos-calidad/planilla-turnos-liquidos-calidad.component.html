@@ -129,13 +129,6 @@
                                         </ng-container>
                                     </ng-container>
                                     <tr>
-                                        <!-- <td colspan="12" class='btn-add-cell'>
-                                            <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
-                                                <button type='button' class='btn btn-primary bt-circle'
-                                                    style='margin-top: -5px;'>+</button>
-                                                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
-                                            </div>
-                                        </td> -->
                                     </tr>
                                     <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
                                         <td colspan="12" class='p-0'>
@@ -249,6 +242,7 @@
         </div>
     </div>
 
+    <!--
     <div fxLayout='row wrap' class='px-4 pb-4' *ngIf='turnoPuerto' >
         <form [formGroup]="formShipParticular">
             <div class="form-row">
@@ -303,7 +297,8 @@
             </div>
         </form>
     </div>
-
+    -->
+     
     <ng-template #addCorte let-modal>
         <div class='modal-body'>
             <form [formGroup]='formCorte' fxLayout='row wrap'>
