@@ -7,19 +7,20 @@ import { environment } from 'environments/environment';
   providedIn: 'root'
 })
 export class LineasService {
-    url: string = environment.apiUrl;
-  
-    constructor(
-      private http: HttpClient,
-    ) {
-  
-    }
+  url: string = environment.apiUrl;
 
-    obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId: number, temperatura: number): Observable<number> {
-        return this.http.get<number>(`${this.url}ModuloDeCarga/ObtenerDensidadPorTemperaturaDeMaterial?materialPuertoId=${materialPuertoId}&grado=${temperatura}`, { 'withCredentials': true });
-    }
+  constructor(
+    private http: HttpClient,
+  ) {
 
-    obtenerLlenadoMilimetroPorTanque(cm: number, mm: number, tanqueNum: string): Observable<number> {
-        return this.http.get<number>(`${this.url}ModuloDeCarga/obtenerLlenadoMilimetroPorTanque?cm=${cm}&mm=${mm}&tanqueNum=${tanqueNum}`, { 'withCredentials': true });
-    }
+  }
+
+  obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId: number, temperatura: number): Observable<number> {
+    return this.http.get<number>(`${this.url}ModuloDeCarga/ObtenerDensidadPorTemperaturaDeMaterial?materialPuertoId=${materialPuertoId}&grado=${temperatura}`, { 'withCredentials': true });
+  }
+
+  obtenerLlenadoMilimetroPorTanque(cm: number, mm: number, tanqueNum: string): Observable<number> {
+    return this.http.get<number>(`${this.url}ModuloDeCarga/obtenerLlenadoMilimetroPorTanque?cm=${cm}&mm=${mm}&tanqueNum=${tanqueNum}`, { 'withCredentials': true });
+  }
+
 }

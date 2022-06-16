@@ -929,15 +929,26 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const tkLinea = lineaTurno?.tk.value.toString().padStart(3, "0");;
       const temperatura = lineaTurno?.temperatura.value;
       const materialPuerto = lineaTurno?.materialPuerto?.value.id
-
+      console.log(' input medidaInicialMM ==>')
+      console.log(' ', medidaInicialCM, medidaInicialMM, tkLinea)
+      console.log(' input medidaFinalMM ==>')
+      console.log(' ', medidaFinalCM, medidaFinalMM, tkLinea)
+      console.log(' input densidad ==>')
+      console.log(' ', materialPuerto, temperatura)
       Promise.all([
         //await
         this.lineasService.obtenerLlenadoMilimetroPorTanque(medidaInicialCM, medidaInicialMM, tkLinea).toPromise(),
         this.lineasService.obtenerLlenadoMilimetroPorTanque(medidaFinalCM, medidaFinalMM, tkLinea).toPromise(),
         this.lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuerto, temperatura).toPromise()
       ]).then(([inicial, final, densidad]) => {
+
+        console.log(' resultado ==>')
+        console.log(' ', inicial, final, densidad)
+
         inicial = inicial != null ? inicial : 0;
         final = final != null ? final : 0;
+        densidad = densidad != null ? densidad : 0;
+
         let cantidad = (Number(inicial) - Number(final)) * Number(densidad);
         lineaTurno.cantidad.setValue(cantidad);
       })
