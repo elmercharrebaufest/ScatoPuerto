@@ -59,72 +59,47 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private _PDFService: PDFService,
     private parametrosService: ParametrosService,
     ) {
-
     this.unsubscribe = new Subject();
-
-    // TODO: lo nuevo para datos de balanzadas -----------------------------
-    // this.embarque = this._procesoService.getEmbarqueSelected();
-    // this.embarqueId = this._procesoService.getEmbarqueId();
-
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
     this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
+
     this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => {
       this.trabajoOrdenado();
-      this.obtenerBalanzadasEnVivo();
+      // this.obtenerBalanzadasEnVivo();
       this.inicializarReciboBuque();
     });
-
-    // this.workflowService.obtenerListado().subscribe((resp: any) => {
-    //   this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
-    //   this.vaporId = this.barquitos['embarque'].vapor.id;
-
-    //   // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
-    //   this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
-    // });
-    // finTODO: lo nuevo para datos de balanzadas --------------------------
   }
 
-  // ngAfterViewInit(): void {
-  //   this.obtenerBalanzadasEnVivo();
-  // }
-
   ngOnInit(): void {
-    // this._procesoService.disposeData();
     this.embarque = this._procesoService.getEmbarqueSelected();
-    // this.embarqueId = this._procesoService.getEmbarqueId();
-    // this.subscribeEmbarques();
-    
-    // if( this.vaporId > 0 ){
-      this.trabajoOrdenado();
-      this.obtenerBalanzadasEnVivo();
-    // }
-
+    this.trabajoOrdenado();
+    // this.obtenerBalanzadasEnVivo();
     this.inicializarReciboBuque();
   }
 
-  subscribeEmbarques(){
-    try {
-      this.workflowService.obtenerListado()
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe((resp: any) => {
-          this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
-          this.vaporId = this.barquitos['embarque'].vapor.id;
-          // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.
-          this.balanzas78Service.setEmbarqueBalanza(this.vaporId);
-        });
-    } catch (e) {
-      console.log(e);
-      console.log("Error en listarEmbarquesEnLineUp");
-    }
-  }
+  // subscribeEmbarques(){
+  //   try {
+  //     this.workflowService.obtenerListado()
+  //       .pipe(takeUntil(this.unsubscribe))
+  //       .subscribe((resp: any) => {
+  //         this.barquitos = resp.find(x => x.embarque.id === this.embarqueId);
+  //         this.vaporId = this.barquitos['embarque'].vapor.id;
+
+  //         console.log("setEmbarqueBalanzaCalidad(), desde CALIDAD, desde subscribeEmbarques()");
+  //         this.balanzas78Service.setEmbarqueBalanzaCalidad(this.vaporId);
+  //       });
+  //   } catch (e) {
+  //     console.log(e);
+  //     console.log("Error en listarEmbarquesEnLineUp");
+  //   }
+  // }
 
   trabajoOrdenado(){
     forkJoin({
       obtenerListado: this.workflowService.obtenerListado(),
       listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
     })
-    // .subscribe( (res: any) => {
     .subscribe( (res: {
                         obtenerListado: InstanciaWorkflowPuerto[], 
                         listarEmbarquesEnLineUp: EmbarqueNav[]
@@ -144,18 +119,14 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
 
       if(this.embarqueId){
-        // this.barquitos = res.obtenerListado.find(x => x.embarque.id === this.embarqueId);
         res.obtenerListado.forEach( x => x.embarque.id === this.embarqueId ?? this.barquitos.push(x) );
         if(this.barquitos){
-          // this.vaporId = this.barquitos['embarque'].vapor.id;
           this.vaporId = this.barquitos[0]['embarque'].vapor.id;
-          // Seteamos el vapor para que el Servicio comience a enviar las balanzadas.        
           // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-          // const selLineUp = this.barquitos['lineUp'];
           const selLineUp = this.barquitos[0].lineUp;
           const selModuloDeCarga = selLineUp['moduloDeCarga'];
           this.moduloDeCarga_Id = selModuloDeCarga.id;
-          this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
         }
       }
 
@@ -186,29 +157,37 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.procesoCalidadService.setOtrosMuelles(this.buqueEnOtrosMuelles);
   }
 
-  obtenerBalanzadasEnVivo() {
+  // obtenerBalanzadasEnVivo() {
 
-    this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.filtroBalanza7);
-    this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.filtroBalanza8);
+  //   this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.filtroBalanza7);
+  //   this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.filtroBalanza8);
     
-    this.balanzas78Service.sendDataBalanzadaAgrupada7
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe( blzas7 => {
-        if(blzas7.length>0){
-          this.startBalanza7 = ``;
-          this.balanzas78Service.setBalanzadaAgrupada7(blzas7);
-        }
-      } );
+  //   this.balanzas78Service.sendDataBalanzadaAgrupada7
+  //     .pipe(takeUntil(this.unsubscribe))
+  //     .subscribe( blzas7 => {
+  //       if(blzas7.length>0){
+  //         this.startBalanza7 = ``;
 
-    this.balanzas78Service.sendDataBalanzadaAgrupada8
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe( blzas8 => {
-        if(blzas8.length>0){
-          this.startBalanza8 = ``;
-          this.balanzas78Service.setBalanzadaAgrupada8(blzas8);
-        }
-      } );
-  }
+  //         this.posibleLoop01 = this.posibleLoop01 + 1;
+  //         console.log('SUBSCRIBE en sendDataBalanzadaAgrupada7 - this.posibleLoop01: ', this.posibleLoop01);
+
+  //         this.balanzas78Service.setBalanzadaAgrupada7(blzas7);
+  //       }
+  //     } );
+
+  //   this.balanzas78Service.sendDataBalanzadaAgrupada8
+  //     .pipe(takeUntil(this.unsubscribe))
+  //     .subscribe( blzas8 => {
+  //       if(blzas8.length>0){
+  //         this.startBalanza8 = ``;
+
+  //         this.posibleLoop02 = this.posibleLoop02 + 1;
+  //         console.log('SUBSCRIBE en sendDataBalanzadaAgrupada8 - this.posibleLoop02: ', this.posibleLoop02);
+
+  //         this.balanzas78Service.setBalanzadaAgrupada8(blzas8);
+  //       }
+  //     } );
+  // }
 
   getDate(fecha: Date): string{
     let fechaDate = new Date(fecha);
@@ -289,7 +268,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.balanzas78Service.limpiarInterval();
+    // this.balanzas78Service.limpiarInterval();
     this.unsubscribe.next();
     this.unsubscribe.complete();
   }

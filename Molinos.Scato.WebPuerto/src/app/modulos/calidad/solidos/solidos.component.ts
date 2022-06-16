@@ -79,7 +79,7 @@ export class SolidosComponent implements OnInit {
       if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
           
           // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-          this.balanzas78Service.setEmbarqueBalanza(this.embarqueSelected.moduloDeCargaId);
+          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
           this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
           this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
           this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());

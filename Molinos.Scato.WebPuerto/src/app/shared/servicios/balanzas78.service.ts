@@ -65,17 +65,9 @@ export class Balanzas78Service {
     this.tiempoActualizacionBalanzas = this.parametrosService.getParametroTiempoActualizacionBalanzas();
     this.tiempoActualizacionRitmosBlzas78 = this.parametrosService.getParametroTiempoActualizacionRitmosBlzas78();
 
-    // this._balanzaService.listarBalanzadaBuque(vaporId).subscribe( res => {
-    //   this.balanzadasArray = res;
-    // })
-
     this.interval = setInterval(() => {
       this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
         .subscribe(resp => {
-          // console.log('++++++++++++++++++++++++++++++++++');
-          // console.log('sincronizarBalanzasCortes desde SERV', resp);
-          // console.log('++++++++++++++++++++++++++++++++++');
-          
           this.balanzadasArray = resp.balanzas;
           this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
           this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
@@ -95,6 +87,28 @@ export class Balanzas78Service {
         .subscribe(resp => this.setSincRitmosBalanzas78(resp) )
     }, this.tiempoActualizacionRitmosBlzas78);
 
+  }
+
+  setEmbarqueBalanzaCalidad(idModuloDeCarga: number = 0) {
+    if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
+    
+    this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
+      .subscribe(resp => {        
+        this.balanzadasArray = resp.balanzas;
+        this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
+        this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
+
+        this.setBalanzada7y8(this.balanzadasArray);
+        this.setBalanzada7(this.filtroBalanza7);
+        this.setBalanzada8(this.filtroBalanza8);
+        this.setBalanzada7y8Completas(resp.balanzas);
+        this.setBalanzada7Kilos(resp.balanzas);
+        this.setBalanzada8Kilos(resp.balanzas);
+        this.setInfoAdicional(resp.informacionAdicional);
+      });
+
+    this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
+      .subscribe(resp => this.setSincRitmosBalanzas78(resp) );
   }
 
   limpiarInterval(){
@@ -140,9 +154,13 @@ export class Balanzas78Service {
 
   // Usados en "balanzas" y "calidad"
   setBalanzadaAgrupada7(balanzadaAgrupada7: Balanzas[]){
+    // this.posibleLoop01 = this.posibleLoop01 + 1;
+    // console.log('setBalanzadaAgrupada7() - this.posibleLoop01: ', this.posibleLoop01);
     this.sendDataBalanzadaAgrupada7.emit(balanzadaAgrupada7);
   }
   setBalanzadaAgrupada8(balanzadaAgrupada8: Balanzas[]){
+    // this.posibleLoop02 = this.posibleLoop02 + 1;
+    // console.log('setBalanzadaAgrupada8() - this.posibleLoop02: ', this.posibleLoop02);
     this.sendDataBalanzadaAgrupada8.emit(balanzadaAgrupada8);
   }
 
