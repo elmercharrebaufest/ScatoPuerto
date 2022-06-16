@@ -119,9 +119,12 @@ export class LineasComponent implements OnInit, OnChanges {
             this._lineasService.obtenerLlenadoMilimetroPorTanque(linea.controls['alturaInicialCM'].value, current, '0' + linea.controls['tkInicial'].value.value)
               .subscribe(res => {
                 const resultado = res != null ? res : 0;
+                const densidadInicial = linea.controls['densidadInicial'].value;
+                console.log('resultado alturaInicialMM ')
+                console.log(' ', resultado, ' ', densidadInicial)
                 linea.controls['litros'].setValue(resultado, { emitEvent: false });
-                if (linea.controls['densidadInicial'].value) {
-                  let kilosInicial = (Number(resultado) * Number(linea.controls['densidadInicial'].value));
+                if (densidadInicial) {
+                  const kilosInicial = (Number(resultado) * Number(densidadInicial));
                   linea.controls['kilos'].setValue(kilosInicial, { emitEvent: false })
                 }
               });
@@ -148,11 +151,16 @@ export class LineasComponent implements OnInit, OnChanges {
           if (current && linea.controls['alturaFinalCM'].value && linea.controls['tkInicial']) {
             this._lineasService.obtenerLlenadoMilimetroPorTanque(linea.controls['alturaFinalCM'].value, current, '0' + linea.controls['tkInicial'].value.value)
               .subscribe(res => {
-                let litrosFinal = res != null ? res : 0;
-                let densidadFinal = linea.controls['densidadFinal'].value;
-                if (litrosFinal && densidadFinal && linea.controls['kilos'].value) {
+                const litrosFinal = res != null ? res : 0;
+                const densidadFinal = linea.controls['densidadFinal'].value;
+                const kilos = linea.controls['kilos'].value;
+                console.log('resultado alturaFinalMM ')
+                console.log('densidadFinal ', densidadFinal)
+                console.log(' ', litrosFinal, ' ', densidadFinal, ' ', kilos)
+
+                if (litrosFinal && densidadFinal && kilos) {
                   let kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
-                  linea.controls['tkFinal'].setValue(Number(linea.controls['kilos'].value) - kilosFinal, { emitEvent: false })
+                  linea.controls['tkFinal'].setValue(Number(kilos) - kilosFinal, { emitEvent: false })
                 }
               });
           } else {
