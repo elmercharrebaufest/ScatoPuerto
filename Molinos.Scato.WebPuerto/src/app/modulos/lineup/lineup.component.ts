@@ -69,18 +69,19 @@ export class LineupComponent implements OnInit, Observador {
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
+   // this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => this.ubicacionDeBuquePuerto = res);
 
-    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
-
-    this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-      this.ubicacionDeBuquePuerto = res;
-      this.estadoVicentinLp = this.estadoVicentin();
-      this.estadoNoryonLp = this.estadoNoryon();
+  // this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
+   this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
+     console.log('xxxxxxxx')
+     this.ubicacionDeBuquePuerto = res;
+     this.estadoVicentinLp = this.estadoVicentin();
+     this.estadoNoryonLp = this.estadoNoryon();
       this.estadoSanBenitoLp = this.estadoSanBenito();
       this.estadoOtrosLp = this.estadoOtros();
-    });
-  }
+  });
 
+  }
   ngOnInit(): void {
     let actualDate = new Date();
     let function_name = 'LINEUP INICIO';

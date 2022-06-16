@@ -9946,6 +9946,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
+
                 decimal totalCargado = 0;
                 double tiempoCargaNeto = 0;
                 decimal kgNetosBalanza7 = 0;
@@ -9953,13 +9954,32 @@ namespace Molinos.Scato.Servicios.Impl
 
                 var embarque = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == modulodecarga_id).Embarque;
                 int vapor_id = embarque.Vapor.Id;
+                //DateTime? fechaInicioFinal = embarque.FechaHoraInicioCarga.Value.AddDays(-1);
 
                 if (embarque.FechaHoraInicioCarga.Value != null)
                 {
                     DateTime? fechaInicioFinal = embarque.FechaHoraInicioCarga.Value.AddDays(-1);
+                    // var cargasBalanza7 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
 
                     kgNetosBalanza7 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > fechaInicioFinal);
-                    kgNetosBalanza8 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > fechaInicioFinal);
+                    kgNetosBalanza8 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > fechaInicioFinal);//if (cargasBalanza7 != null)
+                    //{
+                    //    var idCargaInicialBalanza7 = cargasBalanza7.CargaOpuesta_Id;
+                    //    var registroPrimeraCargaBalanza7 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.NumeroBalanza == "7").Id;
+                    //    var registroUltimaCargaBalanza7 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza7).Last().Id;
+                    //    kgNetosBalanza7 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza7 && x.CargaInicial_NumeroBalanza == "7");
+
+
+                    //}
+
+                    //var cargasBalanza8 = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > embarque.FechaHoraInicioCarga.Value);
+                    //if (cargasBalanza8 != null)
+                    //{
+                    //    var idCargaInicialBalanza8 = cargasBalanza8.CargaOpuesta_Id;
+                    //    var registroPrimeraCargaBalanza8 = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.NumeroBalanza == "8").Id;
+                    //    var registroUltimaCargaBalanza8 = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaInicialBalanza8).Last().Id;
+                    //    kgNetosBalanza8 = repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.CargaInicial_Id == idCargaInicialBalanza8 && x.CargaInicial_NumeroBalanza == "8");
+                    //}
 
                     if (kgNetosBalanza7 != 0 && kgNetosBalanza8 != 0)
                     {
@@ -9987,6 +10007,9 @@ namespace Molinos.Scato.Servicios.Impl
                         tiempoCargaNeto = 0;
                         totalCargado = 0;
                     }
+
+
+
                 }
 
                 int ritmoCargaNeto = 0;
@@ -9996,6 +10019,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (tiempoCargaNeto != 0)
                 {
+
                     ritmoDeCarga = ((double)totalCargado * 60) / tiempoCargaNeto;
 
                     //como ritmo carga NETO no contempla bajas nargas ni fuleos hago un if que comprueba si hay un corte, en casode no haber retorna el ritmo si cortes 
@@ -10021,9 +10045,7 @@ namespace Molinos.Scato.Servicios.Impl
                             var fechaInicioCOrte = bc.Fecha_Inicio;
                             var fechaCorte = bc.Fecha_Corte;
 
-                            if (tnBc == null) tnBcTotales += 0;
-                            else tnBcTotales += (int)tnBc;
-
+                            tnBcTotales += (int)tnBc;
                             tiempoCargaNetoBc += (fechaCorte - fechaInicioCOrte).GetValueOrDefault().TotalMinutes;
 
                         }
@@ -10042,12 +10064,18 @@ namespace Molinos.Scato.Servicios.Impl
                 ritmosDeCarga.Add("ritmoDeCarga", (int)ritmoDeCarga);
                 ritmosDeCarga.Add("ritmoCargaNeto", ritmoCargaNeto);
 
+
+
                 return ritmosDeCarga;
+
             }
             catch (Exception ex)
             {
+
                 throw ex;
             }
+
+
         }
 
         public IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga)

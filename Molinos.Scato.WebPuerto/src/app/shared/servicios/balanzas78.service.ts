@@ -38,8 +38,8 @@ export class Balanzas78Service {
   @Output() sendRitmosBalanzas78 = new EventEmitter<RitmosBalanzas78>();
 
   materialesPuerto = [];
-  tiempoActualizacionBalanzas: number = 15000; // por default
-  tiempoActualizacionRitmosBlzas78: number = 15000; // por default
+  tiempoActualizacionBalanzas: number = 0;
+  tiempoActualizacionRitmosBlzas78: number = 0;
 
   constructor(private _balanzaService: BalanzaService, 
               private embarqueService: EmbarqueService,
@@ -52,6 +52,7 @@ export class Balanzas78Service {
 
   //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
   /**
+   * 
    * @param {number} id id del Modulo De Carga del embarque seleccionado
    * @returns {void}
    * @memberof Balanzas78Service
@@ -62,9 +63,6 @@ export class Balanzas78Service {
     
     console.log('ID en setEmbarqueBalanza desde SERV', idModuloDeCarga);
     
-    this.tiempoActualizacionBalanzas = this.parametrosService.getParametroTiempoActualizacionBalanzas();
-    this.tiempoActualizacionRitmosBlzas78 = this.parametrosService.getParametroTiempoActualizacionRitmosBlzas78();
-
     // this._balanzaService.listarBalanzadaBuque(vaporId).subscribe( res => {
     //   this.balanzadasArray = res;
     // })

@@ -36,8 +36,8 @@ export class SolidosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
-    private _changeDetector: ChangeDetectorRef,
-    ) {
+    private _changeDetector: ChangeDetectorRef) {
+      
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
   }
 
