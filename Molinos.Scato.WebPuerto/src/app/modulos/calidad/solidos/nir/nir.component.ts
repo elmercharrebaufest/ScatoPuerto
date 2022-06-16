@@ -28,7 +28,7 @@ export class NIRComponent implements OnInit {
   conMaiz: boolean = false;
   hideSpinner: any;
   destinatarios: string[];
-  
+
   constructor(
     private fb: FormBuilder,
     private moduloDeCargaService: ModuloDeCargaService,
@@ -53,7 +53,7 @@ export class NIRComponent implements OnInit {
       .pipe( finalize( () => this.obtenerNir() ) )
       .subscribe( bod => this.bodegas = bod );
   }
-  
+
   initFormulario(){
     this.forms = this.fb.group({
       maizMano1: this.fb.array([this.initMaiz(null, 1)]),
@@ -104,14 +104,14 @@ export class NIRComponent implements OnInit {
       mano = 'mano1';
     else
       mano = 'mano2';
-    
+
     return mano;
   }
 
   obtenerNir(){
     this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe( nir => {
       console.log('obtenerNir NIR: ', nir);
-      
+
       let trigoMano1 = nir.filter(n => n.material_id === this.materialTrigo?.id && n.mano=='mano1');
       let trigoMano2 = nir.filter(n => n.material_id === this.materialTrigo?.id && n.mano=='mano2');
       let maizMano1 = nir.filter(n => n.material_id === this.materialMaiz?.id && n.mano=='mano1');
@@ -183,7 +183,7 @@ export class NIRComponent implements OnInit {
     else
       this.maizMano2.push(this.initMaiz(null, numeroMano));
   }
-  
+
   eliminarLineasEmbarque(pos: number, productoMano: string) {
     this[productoMano].removeAt(pos);
   }
@@ -196,12 +196,12 @@ export class NIRComponent implements OnInit {
     maizMano2 = this.obtenerMaizMano2();
     trigoMano1 = this.obtenerTrigoMano1();
     trigoMano2 = this.obtenerTrigoMano2();
-    
+
     for(let m1 of maizMano1){ nir.push(m1); }
     for(let m2 of maizMano2){ nir.push(m2); }
     for(let t1 of trigoMano1){ nir.push(t1); }
     for(let t2 of trigoMano2){ nir.push(t2); }
-    
+
     return nir;
   }
 
@@ -221,24 +221,22 @@ export class NIRComponent implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
-  getDestinatarios(temp : string){
-    this.procesoCalidadService.obtenerDestinatariosNirManual(temp).subscribe( res => {
-      this.destinatarios = res
-      console.log(res);
-    })
-  }
+  // getDestinatarios(temp : string){
+  //   this.procesoCalidadService.obtenerDestinatariosNirManual(temp).subscribe( data => {
+  //     this.destinatarios = data
+  //   });
+  // }
 
   enviarMail(nir) {
-    console.log('********NIR********', nir)
+    
     var titulo = "Enviar NIR";
     var text = "Cuerpo del Mail:"
     var textoCuerpoMail = 'Cuerpo del mail';
     var inputTitle = "Destinatarios";
     var mailNir = new Mail(`NIR.`,`${textoCuerpoMail}`);
-    
-    this.getDestinatarios('NirManual');
-    mailNir.destinatarios = this.destinatarios
-  
+
+    this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual').subscribe(data => {mailNir.destinatarios = data })
+
     var button1 = 'Enviar';
     var button2 = 'Cancelar';
 
@@ -246,27 +244,27 @@ export class NIRComponent implements OnInit {
       .then((confirmed) => {
         // this.hideSpinner.emit(true);
         if (confirmed) {
-          
-            let objetoMail = {
+            let ObjetoMailNir = {
               nirManualPuerto : nir,
               mail: mailNir
             }
-            this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( objetoMail, this.moduloDeCarga_Id );
+            // console.log("----::::::::::ObjetoMailNir::::::::::::------",ObjetoMailNir);
+            
+            this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK');
+            });
           }
       })
       .catch((e) => {
         this.confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
         .then((confirmed) => {
           if (confirmed){
-            this.hideSpinner.emit(false)
+            // this.hideSpinner.emit(false)
             return
-          } 
-          this.hideSpinner.emit(false)
+          }
+          // this.hideSpinner.emit(false)
           return
           }).catch(() => window.location.reload());
-
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-        this.hideSpinner.emit(false);
+        // this.hideSpinner.emit(false);
       });
   }
 }
