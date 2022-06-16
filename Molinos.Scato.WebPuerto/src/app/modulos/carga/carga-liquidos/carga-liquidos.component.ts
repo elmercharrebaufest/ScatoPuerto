@@ -33,14 +33,14 @@ import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liq
 })
 
 export class CargaLiquidosComponent implements OnInit {
-  
+
   @Input() datosGrafico: any;
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
   @ViewChild(TanquesComponent) tanquesComponent: TanquesComponent;
-  @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent:PlanillaTurnoLiquidosComponent;
+  @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent: PlanillaTurnoLiquidosComponent;
   datatanks: any;
   enviado: boolean;
   usuarioFinalizacion: string;
@@ -54,10 +54,10 @@ export class CargaLiquidosComponent implements OnInit {
   mostrarTableristaOperando = true;
   tanquesSeleccionados: any;
   private user: Usuario;
-  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
-                  {id: 2, descripcion: 'Cargando'}, 
-                  {id: 3, descripcion: 'ControlCalidad'}, 
-                  {id: 4, descripcion: 'PostOperativo'}];
+  estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
+  { id: 2, descripcion: 'Cargando' },
+  { id: 3, descripcion: 'ControlCalidad' },
+  { id: 4, descripcion: 'PostOperativo' }];
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
@@ -121,16 +121,15 @@ export class CargaLiquidosComponent implements OnInit {
   obtenerModuloDeCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe(resp => {
       this.enviado = resp.enviado;
-      localStorage.setItem("desabilitar","");
-      if(this.enviado)
-      {
+      localStorage.setItem("desabilitar", "");
+      if (this.enviado) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
         this.planillaEmbarqueComponent.desabilitarEmbarque();
-        localStorage.setItem("desabilitar","true");
+        localStorage.setItem("desabilitar", "true");
       }
-      if (resp.moduloDeCargaPeriodoDeCarga){
+      if (resp.moduloDeCargaPeriodoDeCarga) {
         // console.log('resp.moduloDeCargaPeriodoDeCarga[0]: ', resp.moduloDeCargaPeriodoDeCarga[0]);
-        if(!resp.moduloDeCargaPeriodoDeCarga[0])
+        if (!resp.moduloDeCargaPeriodoDeCarga[0])
           return
         else
           if (this.mostrarTableristaOperando)
@@ -139,9 +138,9 @@ export class CargaLiquidosComponent implements OnInit {
     });
   }
 
-  ocultarBotonesParaImpresion(){
-  //OBTENGO TODOS LOS BOTONES QUE HAY QUE OCULTAR PARA LA IMPRESION
-  // #region ObtenerBotones
+  ocultarBotonesParaImpresion() {
+    //OBTENGO TODOS LOS BOTONES QUE HAY QUE OCULTAR PARA LA IMPRESION
+    // #region ObtenerBotones
     let botonEnviarTableristas = this.mostrarTableristaOperando == false ? document.getElementById("btn-enviar-a-tablerista") : null;
     let scrollTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("scroll-bar-turnos-liquidos") : null;
     let scrollValue = this.mostrarTableristaOperando == true && scrollTurnosLiquidos.style.height;
@@ -152,87 +151,88 @@ export class CargaLiquidosComponent implements OnInit {
     let valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
     let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
     let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
-    let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null; 
+    let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null;
     let iconosRelojes = document.getElementsByName('relojPeriodo');
-  // #endregion
+    // #endregion
 
 
-  //UNA VEZ OBTENIDOS LOS BOTONES LOS OCULTOS CAMBIANDO SU DYSPLAY = 'none'
-  // #region OcultarBotones
+    //UNA VEZ OBTENIDOS LOS BOTONES LOS OCULTOS CAMBIANDO SU DYSPLAY = 'none'
+    // #region OcultarBotones
     iconosRelojes.forEach(reloj => reloj.style.display = 'none');
-  
+
     btonConformacionLineasEmbarque.style.display = 'none';
     if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'none';
     if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
-  
-    if (this.mostrarTableristaOperando == true){
+
+    if (this.mostrarTableristaOperando == true) {
       botonAgregarTurnosLiquidos.style.display = 'none';
       botonGuardarTurnoLiquidos.style.display = 'none';
       if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'none';
       botonExportarTurnoLiquidos.style.display = 'none';
       scrollTurnosLiquidos.style.height = 'auto';
-    } 
-  // #endregion
+    }
+    // #endregion
 
 
-  //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
-  // #region setValores
-    setTimeout(() =>{
+    //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
+    // #region setValores
+    setTimeout(() => {
       iconosRelojes.forEach(reloj => reloj.style.display = 'block');
-      
+
       btonConformacionLineasEmbarque.style.display = valueGuardarLieasEmbarque;
       if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'block';
-  
-      if (this.mostrarTableristaOperando == true){
+
+      if (this.mostrarTableristaOperando == true) {
         botonAgregarTurnosLiquidos.style.display = 'block';
         botonGuardarTurnoLiquidos.style.display = 'block';
         if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
         botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
         scrollTurnosLiquidos.style.height = scrollValue;
-      } 
-  },5000);
-  // #endregion
- }
+      }
+    }, 5000);
+    // #endregion
+  }
 
-  imprimir(imprimir: boolean = false){
+  imprimir(imprimir: boolean = false) {
 
     this.ocultarBotonesParaImpresion();
     this.cargaPdf = true;
-    
+
     //OBTENGO EL ID DE QUE ESTABLECÍ EN EL HTML
     let element = document.getElementById('imprimirCargaLiquidos');
     let opt = {
-      margin:       0,
-      filename:     'Pantalla Operaciones.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE LIQUIDOS USANDO LIBRERIA JS2PDF, SETEANDO
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+      margin: 0,
+      filename: 'Pantalla Operaciones.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 3, letterRendering: true },                         //IMPRIMO PANTALLA DE LIQUIDOS USANDO LIBRERIA JS2PDF, SETEANDO
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 
     html2pdf().from(element).set(opt).outputPdf()
-    .then(() => {if (!imprimir) this.cargaPdf = false}).save();
+      .then(() => { if (!imprimir) this.cargaPdf = false }).save();
   }
-  
-    cargarPDF(file) {
-      if (file) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          this.adjunto = reader.result
-          this.enviarMail();
-        }
+
+  cargarPDF(file) {
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        this.adjunto = reader.result
+        this.enviarMail();
+      }
+    }
+  }
+
+  guardar(finalizar: boolean) {
+    if (finalizar) {
+      if (this.planillaTurnoLiquidosComponent != undefined || this.planillaTurnoLiquidosComponent != null) {
+        this.planillaTurnoLiquidosComponent.desabilitarTurno();
+        this.planillaEmbarqueComponent.desabilitarEmbarque();
       }
     }
 
-  guardar(finalizar: boolean) {
-       if(finalizar)
-       {
-        this.planillaTurnoLiquidosComponent.desabilitarTurno();
-        this.planillaEmbarqueComponent.desabilitarEmbarque();
-       }
-    
     let fechasHorasOK = this.mostrarTableristaOperando ? this.validarFechas() : false;
-    if(!fechasHorasOK && this.mostrarTableristaOperando)
+    if (!fechasHorasOK && this.mostrarTableristaOperando)
       return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     //CAMBIOS, POR LO QUE DEBERÝA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
@@ -251,39 +251,39 @@ export class CargaLiquidosComponent implements OnInit {
       this.guardarContinuacion(finalizar);
   }
 
-  validarFechas(): boolean{
+  validarFechas(): boolean {
     let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
     console.log('--- periodoCarga --- : ', periodoCarga);
 
-    let fechaAmarro1 = new Date(periodoCarga.fechaAmarro+' '+periodoCarga.horaAmarro);
+    let fechaAmarro1 = new Date(periodoCarga.fechaAmarro + ' ' + periodoCarga.horaAmarro);
     let fechaAmarro2 = fechaAmarro1.getTime();
-    let fechaDesamarro1 = new Date(periodoCarga.fechaDesamarro+' '+periodoCarga.horaDesamarro);
+    let fechaDesamarro1 = new Date(periodoCarga.fechaDesamarro + ' ' + periodoCarga.horaDesamarro);
     let fechaDesamarro2 = fechaDesamarro1.getTime();
 
-    let fechaConexionMangueras1 = new Date(periodoCarga.fechaConexionMangueras+' '+periodoCarga.horaConexionMangueras);
+    let fechaConexionMangueras1 = new Date(periodoCarga.fechaConexionMangueras + ' ' + periodoCarga.horaConexionMangueras);
     let fechaConexionMangueras2 = fechaConexionMangueras1.getTime();
-    let fechaDesconexionMangueras1 = new Date(periodoCarga.fechaDesconexionMangueras+' '+periodoCarga.horaDesconexionMangueras);
+    let fechaDesconexionMangueras1 = new Date(periodoCarga.fechaDesconexionMangueras + ' ' + periodoCarga.horaDesconexionMangueras);
     let fechaDesconexionMangueras2 = fechaDesconexionMangueras1.getTime();
 
-    let fechaComienzoCarga1 = new Date(periodoCarga.fechaComienzoCarga+' '+periodoCarga.horaComienzoCarga);
+    let fechaComienzoCarga1 = new Date(periodoCarga.fechaComienzoCarga + ' ' + periodoCarga.horaComienzoCarga);
     let fechaComienzoCarga2 = fechaComienzoCarga1.getTime();
-    let fechaFinalizacionCarga1 = new Date(periodoCarga.fechaFinalizacionCarga+' '+periodoCarga.horaFinalizacionCarga);
+    let fechaFinalizacionCarga1 = new Date(periodoCarga.fechaFinalizacionCarga + ' ' + periodoCarga.horaFinalizacionCarga);
     let fechaFinalizacionCarga2 = fechaFinalizacionCarga1.getTime();
-    
-    if(fechaAmarro2 && fechaDesamarro2){
-      if( fechaAmarro2 > fechaDesamarro2 ){
+
+    if (fechaAmarro2 && fechaDesamarro2) {
+      if (fechaAmarro2 > fechaDesamarro2) {
         this.mensajeGenerico('La fecha-hora de Amarre es mayor a la fecha-hora del Desamarre.');
         return false;
       }
     }
-    if(fechaConexionMangueras2 && fechaDesconexionMangueras2){
-      if( fechaConexionMangueras2 > fechaDesconexionMangueras2 ){
+    if (fechaConexionMangueras2 && fechaDesconexionMangueras2) {
+      if (fechaConexionMangueras2 > fechaDesconexionMangueras2) {
         this.mensajeGenerico('La fecha-hora de Conexión de Mangueras es mayor a la fecha-hora de Desconexión de Mangueras.');
         return false;
       }
     }
-    if(fechaComienzoCarga2 && fechaFinalizacionCarga2){
-      if( fechaComienzoCarga2 > fechaFinalizacionCarga2 ){
+    if (fechaComienzoCarga2 && fechaFinalizacionCarga2) {
+      if (fechaComienzoCarga2 > fechaFinalizacionCarga2) {
         this.mensajeGenerico('La fecha-hora de Comienzo de Carga es mayor a la fecha-hora de Finalización de Carga.');
         return false;
       }
@@ -292,10 +292,10 @@ export class CargaLiquidosComponent implements OnInit {
     return true;
   }
 
-  mensajeGenerico(text: string){
+  mensajeGenerico(text: string) {
     this.confirmationDialogService.confirm("Atención!", text, 'Aceptar', '', null, null, Tipoalerta.Success)
-      .then( (confirmed) => {
-        if (confirmed) console.log('Mensaje: '+text);
+      .then((confirmed) => {
+        if (confirmed) console.log('Mensaje: ' + text);
       })
       .catch(() => {
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
@@ -311,22 +311,22 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,      null, null, [this.tanquesValue], this.lineasComponent ?  this.lineasComponent.obtenerLineasEmbarque() : null,
+    let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
     // let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null,
     //   null, null, [this.tanquesValue], null, [periodoCarga]);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
-      this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           // .then(() => {this.imprimir(finalizar)},
-          .then(() => {},
+          .then(() => { },
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
       else {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {},
+          .then(() => { },
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
@@ -337,15 +337,15 @@ export class CargaLiquidosComponent implements OnInit {
     });
   }
 
-  modificarEstadoBuque(estado: string){
-    let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
-    this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
+  modificarEstadoBuque(estado: string) {
+    let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes(estado));
+    this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe(res => {
 
       let texto = "Se envió a Tableristas correctamente";
       this.mostrarTableristaOperando = true;
       this.obtenerModuloDeCarga();
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-    } );
+    });
   }
 
   enviarMail() {
