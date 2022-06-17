@@ -23,6 +23,7 @@ import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { Mail } from '@ScatoModels/mail';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
+import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -61,11 +62,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   @Input() tablerista: boolean;
   private user: Usuario;
   exportaPlanilla: boolean = false;
+
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
     private _procesoService: DatosEmbarquesProcesoService,
     private datePipe: DatePipe,
+    private procesoCalidadService: ProcesoCalidadService,
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
@@ -88,6 +91,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
+    this.initFormularioObs();
   }
   expandir()
   {
@@ -380,7 +384,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
   }
-
   
   deleteObsCalidad(dia: number, turno: number, ObsCalidad: any){
     this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Si', 'No', null, null, Tipoalerta.Success)
@@ -407,17 +410,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       });
   }
 
-  initFormularioObs() {
-    this.obsCalidadForm = this._builder.group({
-      id: [''],
-      fecha: ['', [Validators.required]],
-      hora: ['', [Validators.required]],
-      observaciones: ['', [Validators.required]],
-      observacionVisible: true,
-      userCarga: this.user.username
-
-    })
-  }  
   //Obtener los horarios de los turnos
   getTurnoPuerto() {
     this.moduloCargaService.obtenerTurnoPuerto().subscribe(
@@ -462,6 +454,95 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad as FormArray;
   }
 
+  initFormularioObs() {
+    this.obsCalidadForm = this._builder.group({
+      id: [''],
+      fecha: ['', [Validators.required]],
+      hora: ['', [Validators.required]],
+      observaciones: ['', [Validators.required]],
+      observacionVisible: true,
+      userCarga: this.user.username
+
+    })
+  }
+
+  openModalAgregarObsCalidad(modal) {
+    this.formNuevoTurno.reset();
+
+    this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte', size: 'lg', centered: true }).result.then(() => {
+
+    })
+  }
+
+  guardarObservacionesDeCalidad() {
+    if (this.obsCalidadForm.controls.observaciones.value === '' || this.obsCalidadForm.controls.fecha.value === '' || this.obsCalidadForm.controls.hora.value === '')
+      return;
+
+    let { fecha, hora } = this.obsCalidadForm.getRawValue();
+    let { observaciones, observacionVisible } = this.obsCalidadForm.getRawValue()
+    let fechaHora = `${this.obsCalidadForm.controls.fecha.value} ${this.obsCalidadForm.controls.hora.value}`
+    let fechaHoraIncorrecta = this.comparaFechaHoraObs(fecha, hora);
+
+    let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
+      "Desea guardar las observaciones de calidad?";
+
+    this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      .then((confirmed) => {
+        if (confirmed && !fechaHoraIncorrecta) {
+
+          this.procesoCalidadService.setObsCalidad(this.obsCalidadForm.getRawValue());
+          // this.obsCalidadForm.reset();
+
+          // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
+          //obtengo el turno en el que tengo que guardar
+          let horaDate = new Date(fechaHora)
+          let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
+          //me traigo todos los turnos de la fecha seleccionada
+          let idPlanillaDeTurnos = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto)[0].id;
+
+          let observacionCalidad = {
+            fechaHora: fechaHora,
+            observaciones: observaciones,
+            observacionVisible: observacionVisible
+          };
+
+          this.procesoCalidadService.guardarObservacionesDeCalidad(idPlanillaDeTurnos, [observacionCalidad]).subscribe(res => {
+            console.log("::::ObsDeCalidad RES:::::", res);
+
+
+            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+                this.fillPlanilla();
+              }
+            });
+
+
+          });
+          this.obsCalidadForm.reset();
+          this._modalService.dismissAll();
+        }
+        else
+          this._modalService.dismissAll();
+        return;
+      }).catch(() => {
+        this._modalService.dismissAll()
+      });
+  }
+  
+  comparaFechaHoraObs(fecha: any, hora: any): boolean {
+    let lFechaHoraObs = fecha + ' ' + hora;
+    let lFechaHoy = new Date();
+    let lFechaObs = new Date(lFechaHoraObs);
+
+    if (lFechaHoy.getTime() < lFechaObs.getTime()) {
+      return true;
+    } else
+      return false;
+  }
+
   //Calcula el total de tiempo de los cortes
   calcularTotal() {
     let desde = this.formCorte.get('horaInicio').value ? this.formCorte.get('horaInicio').value.split(':') : '',
@@ -481,37 +562,34 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
   getRowSpan(dia: any) {
     let contador = 0;
-    let index = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurnoCalc(turnos);
-      
     }
     return contador;
   }
 
   getRowSpanTurnoCalc(turno: any) {
-    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
+    let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroLiquido = registroLiquido > 0 ? 5 : 0; // tamaño del detalle de cada turno
+    registroSolido = registroSolido > 0 ? 5 : 0; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? registroCalidad : 1; // tamaño de la observacion
-
-    let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
+    registroCalidad = registroCalidad > 0 ? 2 : 1; // tamaño de la observacion
+    const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
 
   getRowSpanTurno(turno: any) {
-    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
+    let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroLiquido = registroLiquido > 0 ? 5 : 0; // tamaño del detalle de cada turno
+    registroSolido = registroSolido > 0 ? 5 : 0; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
     registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
 
-    let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
+    const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
 
