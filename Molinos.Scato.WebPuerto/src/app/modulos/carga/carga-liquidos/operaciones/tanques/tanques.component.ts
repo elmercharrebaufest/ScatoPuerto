@@ -17,6 +17,7 @@ export class TanquesComponent implements OnInit {
   moduloDeCarga: any;
   @Output() tanquesSeleccionados = new EventEmitter<any>();
   @Input() esCalidad: boolean = false;
+  
   constructor(
     private _tanksService: EstadoTanquesService,
     private _procesoService: DatosEmbarquesProcesoService,

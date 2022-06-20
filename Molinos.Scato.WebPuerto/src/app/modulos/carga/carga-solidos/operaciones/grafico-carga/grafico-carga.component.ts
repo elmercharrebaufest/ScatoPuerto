@@ -19,6 +19,7 @@ export class GraficoCargaComponent implements AfterViewInit {
   materialDictionary: object = {};
   lastSelectedElement: any = null;
   rotacionCheckbox: boolean = false;
+  
   @Input() esCalidad: boolean = false;
 
   constructor(private _procesoService: DatosEmbarquesProcesoService,

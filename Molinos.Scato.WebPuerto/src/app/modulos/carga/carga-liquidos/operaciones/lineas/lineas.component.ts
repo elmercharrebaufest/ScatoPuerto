@@ -39,6 +39,7 @@ export class LineasComponent implements OnInit, OnChanges {
   moduloDeCarga: ModuloDeCarga;
   @Input() tanquesSeleccionados;
   @Input() esCalidad: boolean = false;
+  
   constructor(
     private formBuilder: FormBuilder,
     confirmationDialogService: ConfirmationDialogService,

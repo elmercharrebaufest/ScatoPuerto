@@ -23,7 +23,8 @@ export class ManosComponent implements OnInit {
 
   datosEmbarque: any;
   productos: MaterialPuerto[] = [];
-  @Input() esCalidad: boolean = false;
+  
+  @Input() esCalidad: boolean = false; 
 
   constructor(private formBuilder: FormBuilder,
     private manosEmbarqueService: ManosEmbarqueService,
