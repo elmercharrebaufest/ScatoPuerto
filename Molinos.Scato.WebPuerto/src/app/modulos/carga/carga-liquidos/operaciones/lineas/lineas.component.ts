@@ -39,7 +39,7 @@ export class LineasComponent implements OnInit, OnChanges {
   moduloDeCarga: ModuloDeCarga;
   @Input() tanquesSeleccionados;
   @Input() esCalidad: boolean = false;
-  
+
   constructor(
     private formBuilder: FormBuilder,
     confirmationDialogService: ConfirmationDialogService,
@@ -49,7 +49,7 @@ export class LineasComponent implements OnInit, OnChanges {
     private _tanquesService: EstadoTanquesService,
     private _lineasService: LineasService,
   ) {
-
+    this.creaFormLineasEmbarque();
     this._tanquesService.sendData.subscribe(resObj => {
       let tanks = new Array();
       for (var [key, value] of Object.entries(resObj.value)) {
@@ -58,6 +58,7 @@ export class LineasComponent implements OnInit, OnChanges {
       }
 
       this.tanquesOption = tanks;
+      
       if (this.esCalidad) {
         this.cargarDatosLineas();
       }
@@ -100,7 +101,6 @@ export class LineasComponent implements OnInit, OnChanges {
   private cargarDatosLineas() {
     this.obtenerEmbarque();
     forkJoin([
-      this.creaFormLineasEmbarque(),
       this.cargarLineasEmbarque(),
       this.obtenerDatosModuloCarga(),
     ]
