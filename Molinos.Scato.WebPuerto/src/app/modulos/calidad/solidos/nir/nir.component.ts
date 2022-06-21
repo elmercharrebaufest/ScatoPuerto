@@ -28,6 +28,8 @@ export class NIRComponent implements OnInit {
   conMaiz: boolean = false;
   hideSpinner: any;
   destinatarios: string[];
+  envioNir:boolean = false;
+  objetoMailNir: object;
 
   constructor(
     private fb: FormBuilder,
@@ -212,6 +214,10 @@ export class NIRComponent implements OnInit {
     //   .subscribe( res => console.log(res) );
 
     this.enviarMail(nir);
+    
+    // if(this.envioNir === false){
+    //   this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( this.objetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK');});
+    // }
   }
 
   compareOrigen(c1: any, c2: any) {
@@ -228,43 +234,50 @@ export class NIRComponent implements OnInit {
   // }
 
   enviarMail(nir) {
-    
+    //#region variables mail
     var titulo = "Enviar NIR";
     var text = "Cuerpo del Mail:"
     var textoCuerpoMail = 'Cuerpo del mail';
     var inputTitle = "Destinatarios";
     var mailNir = new Mail(`NIR.`,`${textoCuerpoMail}`);
+    let destinatariosLista: string[];
 
-    this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual').subscribe(data => {mailNir.destinatarios = data })
+    this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual')
+    .subscribe(data => {mailNir.destinatarios = data
 
-    var button1 = 'Enviar';
-    var button2 = 'Cancelar';
-
-    this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailNir, null, inputTitle, true)
-      .then((confirmed) => {
-        // this.hideSpinner.emit(true);
-        if (confirmed) {
-            let ObjetoMailNir = {
-              nirManualPuerto : nir,
-              mail: mailNir
-            }
-            // console.log("----::::::::::ObjetoMailNir::::::::::::------",ObjetoMailNir);
-            
-            this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK');
-            });
-          }
-      })
-      .catch((e) => {
-        this.confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
+      var button1 = 'Enviar';
+      var button2 = 'Cancelar';
+      let ObjetoMailNir = {
+        nirManualPuerto : nir,
+        mail: mailNir
+      }
+      this.objetoMailNir = ObjetoMailNir;
+      //#endregion 
+      this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailNir, null, inputTitle, true)
         .then((confirmed) => {
-          if (confirmed){
+          // this.hideSpinner.emit(true);
+          if (confirmed) {
+              console.log(ObjetoMailNir);
+              
+              this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK');
+              this.envioNir = true;
+              });
+            }
+        })
+        .catch((e) => {
+          this.confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
+          .then((confirmed) => {
+            if (confirmed){
+              this.envioNir = false;
+              return
+            }
             // this.hideSpinner.emit(false)
             return
-          }
-          // this.hideSpinner.emit(false)
-          return
-          }).catch(() => window.location.reload());
-        // this.hideSpinner.emit(false);
-      });
+            }).catch(() => window.location.reload());
+          // this.hideSpinner.emit(false);
+        });
+    })
+    
+    
   }
 }
