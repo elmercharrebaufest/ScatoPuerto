@@ -4,8 +4,8 @@
   <div id="collapseLineasEmbarque" class="collapse show">
     <div fxLayout='row wrap' class="mt-3">
       <div fxFlex='100'>
-        <div class='btn-add-container pt-btn-add' (click)="agregarLineasEmbarque()" >
-          <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+        <div class='btn-add-container pt-btn-add' (click)="onAgregarLineasEmbarque()" id="btn-add-container-lineas">
+          <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;' >+</button>
           <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
         </div>
       </div>
@@ -137,8 +137,9 @@
                             <div class="form-group" fxFlex='6'>
                               <input type="text" class="inputLineasEmbarque" formControlName="tkFinal" />
                             </div>
-                            <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0'>
-                                <img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="basurerito" (click)="eliminarLineasEmbarque(i)">
+                            
+                            <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0' >
+                                <img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarLineasEmbarque(i)">
                             </div>
 
                           </td>
@@ -156,8 +157,8 @@
       </div>
     </table>
     <br/>
-    <div class="text-center">
-      <button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary" (click)="guardar()">GUARDAR</button>
+    <div class="text-center" >
+      <button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary" (click)="onGuardar()">GUARDAR</button>
    </div>
   </div>
 </div>
