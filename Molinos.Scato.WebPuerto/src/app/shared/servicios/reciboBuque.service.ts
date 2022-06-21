@@ -11,7 +11,7 @@ import { tap } from 'rxjs/operators';
 export class ReciboBuqueService {
 
   @Output() sendGenerarPDF = new EventEmitter();
-  private _refresh = new Subject<void>();
+  // private _refresh = new Subject<void>();
 
   url: string = environment.apiUrl;
   constructor(
@@ -19,18 +19,22 @@ export class ReciboBuqueService {
   ) 
   { }
   
-  get refresh(){
-    return this._refresh
-  }
+  // get refresh(){
+  //   return this._refresh
+  // }
 
   guardarReciboDeBuque(idEmbarque: number, reciboDeBuque:ReciboDeBuque ){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarReciboDeBuque?idEmbarque=${idEmbarque}`,reciboDeBuque, { 'withCredentials' : true});
   }
 
+  obtenerDestinatariosRecibo(templateMail : string){
+    return this.http.get<string[]>(`${this.url}ModuloDeCarga/ObtenerSupervisoresDeRecibo?templateMail=${templateMail}`, { 'withCredentials' : true});
+  }
+
   obtenerRecibos(idEmbarque: number,): Observable<ReciboDeBuque[]>{
     return this.http.get<ReciboDeBuque[]>(`${this.url}ModuloDeCarga/ListarRecibosDeBuque?idEmbarque=${idEmbarque}`, { 'withCredentials' : true})
-    .pipe(tap(()=> {
-      this._refresh.next();
-    }));
+    // .pipe(tap(()=> {
+    //   this._refresh.next();
+    // }));
   }
 }

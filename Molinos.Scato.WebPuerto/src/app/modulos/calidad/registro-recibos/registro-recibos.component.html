@@ -23,10 +23,10 @@
 
             <tr *ngFor="let recibo of recibosDeBuque, index as cont">
               <td
-              class="alCentro" 
-              
+              class="alCentroIconos" 
+              (click)="onVerReciboSelected(recibo)"
               >
-              <a><img (click)="onVerReciboSelected(recibo)" src="assets\ojoIcon.svg" alt=""></a>
+              <img src="assets\ojoIcon.svg" alt="">
               </td>
               <td class="alCentro"> {{idEmbarque}} - 0{{ cont+1 }} </td>
               <td class="alCentro"> {{ recibo.reciboDeBuqueDetalles[0].exportador }} </td>
@@ -35,7 +35,7 @@
               <td class="alCentro"> {{recibo.superviso}} </td>
               <td class="alCentro"> - </td>
               <!-- <td *ngIf="recibo.estado == 'Aprobado'" class="alCentro"> <img src="assets\iconoImpresion.svg" alt=""> </td> -->
-              <td *ngIf="recibo.estado == 'Aprobado'" class="alCentro" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
+              <td *ngIf="recibo.estado == 'Aprobado'" class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
               <td *ngIf="recibo.estado == 'Pendiente'" class="alCentro"> <img src="assets\iconImDeshabilitada.svg" alt=""> </td>
             </tr>
             
@@ -48,5 +48,4 @@
         <div *ngIf="mostrarModal" > <app-modal-recibo [mostrarModal]="mostrarModal" (reciboEmitido)="reciboEmitido($event)"></app-modal-recibo> <div>
       
       </div>
-
 </div>

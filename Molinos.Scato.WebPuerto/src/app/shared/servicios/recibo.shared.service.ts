@@ -9,8 +9,10 @@ export class ReciboSharingService {
 
   // #region Variables  
   private filtroRecibosSubject: BehaviorSubject<ReciboDeBuque> = new BehaviorSubject<ReciboDeBuque>(null);
-  // #endregion
+  private refreshRecibo: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
+  // #endregion
+  
   // #region Constructor  
   constructor() {
   }
@@ -20,9 +22,15 @@ export class ReciboSharingService {
   public getFiltroRecibos() {
     return this.filtroRecibosSubject.asObservable();
   }
+  public getRefreshRecibo() {
+    return this.refreshRecibo.asObservable();
+  }
   
   public setFiltroRecibos(recibo: ReciboDeBuque) {
     this.filtroRecibosSubject.next(recibo);
+  }
+  public setRefreshRecibo(refrescar : boolean) {
+    this.refreshRecibo.next(refrescar);
   }
   // #endregion
 

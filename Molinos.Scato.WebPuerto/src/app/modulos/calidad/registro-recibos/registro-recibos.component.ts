@@ -32,15 +32,14 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
 
   ) 
   {
+    this.refreshRecibos();
     this._reciboSharingService.getFiltroRecibos().subscribe((data:ReciboDeBuque) => {
       this.recibo = data;
     });
-    
    }
 
   ngOnInit(): void {
     this.initGrillaRecibos();
-    this.refreshRecibos();
     
   }
 
@@ -49,9 +48,19 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   }
   
   refreshRecibos(){
-    this.subscriptionRecibo = this._reciboBuqueService.refresh.subscribe(() =>{
-      // this._reciboBuqueService.obtenerRecibos(this.idEmbarque).subscribe(data => this.recibosDeBuque = data);
+    this._reciboSharingService.getRefreshRecibo().subscribe(refresh => { 
+      if(refresh == true){
+        this._reciboBuqueService.obtenerRecibos(this.idEmbarque).subscribe(data => {
+          this.recibosDeBuque = data;
+
+        })
+      }
     })
+    this._reciboSharingService.setRefreshRecibo(false);
+    
+    // this.subscriptionRecibo = this._reciboBuqueService.refresh.subscribe(() =>{
+    //   this._reciboBuqueService.obtenerRecibos(this.idEmbarque).subscribe(data => this.recibosDeBuque = data);
+    // })
   }
 
   initGrillaRecibos() {
@@ -70,6 +79,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   }
 
   onVerReciboSelected(recibo){
+    console.log("Click");
     this._reciboSharingService.setFiltroRecibos(recibo);
     this.mostrarModal = true;
   

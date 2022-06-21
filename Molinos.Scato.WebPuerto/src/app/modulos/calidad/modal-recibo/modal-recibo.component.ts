@@ -8,6 +8,8 @@ import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Mail } from '@ScatoModels/mail';
 
 
 
@@ -37,24 +39,29 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     private _datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
     private _embarqueService: EmbarqueService,
     private _reciboSharingService: ReciboSharingService,
-    private formBuilder: FormBuilder,
-    
+    private _formBuilder: FormBuilder,
+    private _confirmationDialogService: ConfirmationDialogService,    
   ) 
   { 
-    this._reciboSharingService.getFiltroRecibos().pipe(finalize(() => {
-    }))
+    console.log("====ingresando al constructor====");
+    
+    this._reciboSharingService.getFiltroRecibos()
     .subscribe(
+
       (data) => {this.reciboBuqueOjito = data;
-        console.log(data);
+        console.log(":::::::DATA:::::::::",data);
         this.mostrarModalOjito();
     });
     
-
+    console.log("====saliendo del constructor====");
   }
   //#endregion
   ngOnInit(): void {
+    console.log("====entrando al init del recibo====");
+
     this.initFormReciboDetalles();
     this.initObtenerEmbarque();
+    console.log("====saliendo del init del recibo====");
     
   }
   ngAfterViewInit(){
@@ -63,7 +70,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   
   private initFormReciboDetalles() {
     var converter = require('number-to-words');
-    this.reciboDeBuqueForm = this.formBuilder.group({
+    this.reciboDeBuqueForm = this._formBuilder.group({
       exportador: ['MOLINOS AGRO S.A'],
       cantidad: [''],
       puertoDestino: [''],
@@ -145,14 +152,44 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboBuque.estado = "Aprobado";
     this.reciboBuque.fechaHoraImpresion = null;
     this.reciboBuque.reciboDeBuqueDetalles = [];
+
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
-    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe(() => console.log('200 Ok'));
     
-    // this._reciboBuqueService.obtenerRecibos(this.idEmbarque); 
+    this.enviarMail(this.idEmbarque, this.reciboBuque);
 
   }
   // generarPDF(){
   //   this._reciboBuqueService.sendGenerarPDF.emit();
   // }
+  enviarMail(idEmbarque, Recibo) {
+    var titulo = "Enviar a supervisor";
+    var text = "Cuerpo del Mail:"
+    var textoCuerpoMail = 'Cuerpo del mail';
+    var inputTitle = "Destinatarios";
+    var mailSupervisor = new Mail(`Recibo.`,`${textoCuerpoMail}`);
+    this._reciboBuqueService.obtenerDestinatariosRecibo('SupervisoresRecibo').subscribe(destinatarios => { mailSupervisor.destinatarios = destinatarios; });
+    var button1 = 'Enviar';
+    var button2 = 'Cancelar';
 
+    this._confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailSupervisor, null, inputTitle, true)
+      .then((confirmed) => {
+        if (confirmed) {
+          this._reciboBuqueService.guardarReciboDeBuque(idEmbarque, Recibo).subscribe(() => console.log('200 Ok'));
+          this._reciboSharingService.setRefreshRecibo(true);
+
+          }
+      })
+      .catch((e) => {
+         this._confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
+         .then((confirmed) => {
+          if (confirmed){
+            
+            return
+          }
+          return
+       }).catch(() => window.location.reload());
+
+        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+      });
+  }
 }
