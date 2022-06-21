@@ -646,7 +646,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turno of d['controls']['turnos']['controls']) {
       contador += this.getCantTurno(turno);
     }
-    contador = contador > 0? contador/1000 : 0;
+    contador = contador > 0? contador : 0;
     return contador;
   }
 
