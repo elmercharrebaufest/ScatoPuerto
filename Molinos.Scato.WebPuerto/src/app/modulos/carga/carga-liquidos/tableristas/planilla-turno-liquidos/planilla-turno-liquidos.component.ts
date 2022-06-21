@@ -942,14 +942,25 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this.lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuerto, temperatura).toPromise()
       ]).then(([inicial, final, densidad]) => {
 
+
         console.log(' resultado ==>')
         console.log(' ', inicial, final, densidad)
 
-        inicial = inicial != null ? inicial : 0;
-        final = final != null ? final : 0;
-        densidad = densidad != null ? densidad : 0;
+        let valInicial = inicial.toString(); 
+        let valFinal = final.toString();
+        let valDensidad = densidad.toString();
 
-        let cantidad = (Number(inicial) - Number(final)) * Number(densidad);
+        valInicial = valInicial != null ? valInicial : '0';
+        valFinal = valFinal != null ? valFinal : '0';
+        valDensidad = valDensidad != null ? valDensidad : '0';
+
+        valInicial = valInicial.toString().replace(',','');
+        valFinal = valFinal.toString().replace(',','');
+        valDensidad = valDensidad.toString().replace(',','');
+
+        console.log(' ', valInicial, valFinal, valDensidad)
+
+        let cantidad = (Number(valInicial) - Number(valFinal)) * Number(valDensidad);
         lineaTurno.cantidad.setValue(cantidad);
       })
 
