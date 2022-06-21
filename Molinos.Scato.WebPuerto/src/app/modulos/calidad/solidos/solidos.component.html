@@ -2,9 +2,13 @@
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='RecibidoresPdf' [src]='"pdf"'></ship-spinner>
     </div>
-    <app-grafico-carga id='graficoCargaCanva' class='bg-white'></app-grafico-carga>
+    <app-grafico-carga id='graficoCargaCanva' 
+                       class='bg-white'
+                       [esCalidad]="true"></app-grafico-carga>
 
-    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"></app-manos>
+    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" 
+               [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"
+               [esCalidad]="true"></app-manos>
 
     <div class="html2pdf__page-break"></div>
 
@@ -21,6 +25,7 @@
     <app-balanzas-ritmos></app-balanzas-ritmos>
 
     <div fxLayout='row wrap' class="mt-4 shadow" >
+        
         <div fxFlex='50'>
             <!-- <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos> -->
         </div>
