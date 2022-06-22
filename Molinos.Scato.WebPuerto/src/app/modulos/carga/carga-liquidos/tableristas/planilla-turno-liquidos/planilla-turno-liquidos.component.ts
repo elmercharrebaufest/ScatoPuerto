@@ -284,6 +284,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   fillPlanilla() {
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
+
     this.diasTurno.clear();
 
     //Si la planilla tiene turnos
@@ -299,6 +300,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
       });
+
+
+      console.log('planillaDeTurnos 1234--->>')
+      console.log(this.planillaDeTurnos)
 
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
@@ -399,22 +404,18 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     turno.fecha = new Date();
     turno.fechaMiliseconds = new Date().getTime();
     const esLiquido: boolean = true;
-    this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido).subscribe((turnoDb: PlanillaDeTurnos) => {
+    console.log('this.getFechaFormato ===>')
+    console.log(this.getFechaFormato(turno.fecha))
+    const turnoFecha = this.getFechaFormato(turno.fecha);
 
-      if (turnoDb != null) {
-        console.log('entro')
-        const fechaTurnoActual = new Date(turnoDb.fecha);
-        const fechaActual = new Date();
-        const validacionFecha = this.getValidaFecha(fechaTurnoActual, fechaActual);
+    this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido, turnoFecha).subscribe((turnoDb: PlanillaDeTurnos) => {
 
-        if (!validacionFecha) {
-          turnoDb = null;
-        }
-      }
       console.log(turnoDb)
       if (turnoDb == null) {
 
         this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
+          console.log('turnossssss')
+          console.log(res)
           res.forEach((turnoPuerto: TurnoPuerto) => {
             if (turnoPuerto.id == idTurnoPuerto) {
               turno.turnoPuerto = turnoPuerto;
@@ -427,7 +428,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               this.guardarTurno(turno);
 
             }
-          })
+          });
         });
       }
     });
@@ -449,6 +450,20 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       bFechaValida = true;
     }
     return bFechaValida;
+  }
+
+  getFechaFormato(fechaTurno: Date) {
+    const anioTurno: number = fechaTurno.getFullYear();
+    const mesTurno: number = fechaTurno.getMonth() + 1;
+    const diaTurno: number = fechaTurno.getDate();
+
+    const anioFormato: string = anioTurno.toString();
+    const mesFormato: string = mesTurno < 10 ? '0' + mesTurno.toString() : mesTurno.toString();
+    const diaFormato: string = diaTurno < 10 ? '0' + diaTurno.toString() : diaTurno.toString();
+
+    const fechaFormato = anioFormato + mesFormato + diaFormato;
+    
+    return fechaFormato;
   }
 
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean) {
@@ -742,6 +757,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   initDia(dia?: any, turno?: PlanillaDeTurnos, date?: Date) {
+    console.log('initDia')
+    console.log(dia)
+    console.log(turno)
     if (dia != null) {
       return this._builder.group({
         turnos: this._builder.array([this.initTurno(dia)]),
@@ -790,7 +808,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   initTurno(turnoPuerto?: PlanillaDeTurnos, esNuevoTurno?: boolean) {
     let fg: FormGroup;
 
-
     if (!esNuevoTurno) {
       fg = this._builder.group({
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([]),
@@ -800,6 +817,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
+      console.log('turnoPuerto.....')
+      console.log(turnoPuerto)
     } else {
       fg = this._builder.group({
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([this.initLinea(), this.initLinea(), this.initLinea(), this.initLinea()]),
@@ -1525,8 +1544,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   guardarTurno(Turno: PlanillaDeTurnos, reload: boolean = false) {
     Turno.fecha = new Date();
     this.moduloCargaService.guardarTurnoPlanillaDeTurnos(Turno, this.idModuloDeCarga).subscribe(res => {
-      this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos.push(Turno);
-      this.fillPlanilla();
+      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+        if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+          const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+          this.fillPlanilla();
+        }
+      });
     }, error => {
       console.log(error);
       this.confirmationDialogService.confirm('¡Error!', 'No se ha podido guardar el turno.', 'Cerrar', '', null, null, Tipoalerta.Error)
@@ -1535,7 +1560,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
     let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
-
+    console.log('Turno General')
+    console.log(Turno)
+    console.log('Turno this.getTurnos')
+    console.log(this.getTurnos(dia)['controls'][turno]['controls'])
     try {
 
       let moduloDeCargaPlanillaDeTurnosCortes = [];
@@ -1579,7 +1607,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
         }
       }
-
+      
       let planillaTurno = {
         Fecha: Turno.turnoPuerto['value'].fecha,
         esLiquido: true,
@@ -1614,6 +1642,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this.confirmationDialogService.confirm(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
           .then((confirmed) => {
             if (confirmed) {
+              console.log('guardarTurnoGeneral planillaTurno---->>')
+              console.log(planillaTurno)
               this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
 
                 this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
