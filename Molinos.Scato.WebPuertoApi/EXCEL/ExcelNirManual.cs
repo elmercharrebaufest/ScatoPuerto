@@ -24,6 +24,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
 
             ICellStyle estiloHeader = EstiloHeader(workbook);
+            ICellStyle estiloColumnas = EstiloColumnas(workbook);
+
             var styleBold = workbook.CreateCellStyle();
             var fontBold = workbook.CreateFont();
 
@@ -42,7 +44,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var Bodega_id = mod.Bodega.Id;
                 var fecha = mod.Fecha;
                 var hd = mod.HD;
-                var hora = mod.Hora;
                 var mano = mod.Mano;
                 var origen = mod.Origen;
                 var ph = mod.PH;
@@ -53,34 +54,40 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var row2 = sheet.CreateRow(i);
 
                 var cel = row2.CreateCell(0);
+                cel.CellStyle = estiloColumnas;
                 cel.SetCellValue(mano);
 
                 var cel2 = row2.CreateCell(1);
+                cel2.CellStyle = estiloColumnas;
                 cel2.SetCellValue(fecha.ToString());
 
                 var cel3 = row2.CreateCell(2);
+                cel3.CellStyle = estiloColumnas;
                 cel3.SetCellValue(hd);
 
                 var cel4 = row2.CreateCell(3);
-                cel4.SetCellValue(hora);
+                cel4.CellStyle = estiloColumnas;
+                cel4.SetCellValue((double)Bodega_id);
 
                 var cel5 = row2.CreateCell(4);
-                cel5.SetCellValue((double)Bodega_id);
+                cel5.CellStyle = estiloColumnas;
+                cel5.SetCellValue(origen);
 
                 var cel6 = row2.CreateCell(5);
-                cel6.SetCellValue(origen);
+                cel6.CellStyle = estiloColumnas;
+                cel6.SetCellValue(ph);
 
                 var cel7 = row2.CreateCell(6);
-                cel7.SetCellValue(ph);
+                cel7.CellStyle = estiloColumnas;
+                cel7.SetCellValue(portBase);
 
                 var cel8 = row2.CreateCell(7);
-                cel8.SetCellValue(portBase);
+                cel8.CellStyle = estiloColumnas;
+                cel8.SetCellValue(portBS);
 
                 var cel9 = row2.CreateCell(8);
-                cel9.SetCellValue(portBS);
-
-                var cel10 = row2.CreateCell(9);
-                cel10.SetCellValue(ritmo);
+                cel9.CellStyle = estiloColumnas;
+                cel9.SetCellValue(ritmo);
                 
                 i++;
             }
@@ -92,40 +99,36 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             celda1.CellStyle = estiloHeader;
 
             var celda2 = row.CreateCell(1);
-            celda2.SetCellValue("Fecha");
+            celda2.SetCellValue("Fecha - Hora");
             celda2.CellStyle = estiloHeader;
 
             var celda3 = row.CreateCell(2);
             celda3.SetCellValue("HD");
             celda3.CellStyle = estiloHeader;
-
+            
             var celda4 = row.CreateCell(3);
-            celda4.SetCellValue("Hora");
+            celda4.SetCellValue("Bodega");
             celda4.CellStyle = estiloHeader;
 
             var celda5 = row.CreateCell(4);
-            celda5.SetCellValue("Bodega");
+            celda5.SetCellValue("Origen");
             celda5.CellStyle = estiloHeader;
 
             var celda6 = row.CreateCell(5);
-            celda6.SetCellValue("Origen");
+            celda6.SetCellValue("PH");
             celda6.CellStyle = estiloHeader;
 
             var celda7 = row.CreateCell(6);
-            celda7.SetCellValue("PH");
+            celda7.SetCellValue("ProtBase");
             celda7.CellStyle = estiloHeader;
 
             var celda8 = row.CreateCell(7);
-            celda8.SetCellValue("PortBase");
+            celda8.SetCellValue("Prot BS");
             celda8.CellStyle = estiloHeader;
 
             var celda9 = row.CreateCell(8);
-            celda9.SetCellValue("Port BS");
+            celda9.SetCellValue("Ritmo");
             celda9.CellStyle = estiloHeader;
-
-            var celda10 = row.CreateCell(9);
-            celda10.SetCellValue("Ritmo");
-            celda10.CellStyle = estiloHeader;
 
             row = sheet.CreateRow(1);
             var cellNumber = 1;
@@ -134,7 +137,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             {
                 workbook.Write(fileData);
                 return fileData.ToArray();
-
             }
         }
         private static ICellStyle EstiloHeader(HSSFWorkbook workbook)
@@ -155,6 +157,21 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             cellBorderStyleColumnTitles.WrapText = true;
             return cellBorderStyleColumnTitles;
         }
+
+        private static ICellStyle EstiloColumnas(HSSFWorkbook workbook)
+        {
+            var fontBold = workbook.CreateFont();
+            fontBold.FontHeightInPoints = 11;
+            fontBold.Boldweight = (short)FontBoldWeight.Bold;
+
+            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
+            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
+            cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
+            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
+            cellBorderStyleColumnTitles.WrapText = true;
+            return cellBorderStyleColumnTitles;
+        }
+
     }
 
     
