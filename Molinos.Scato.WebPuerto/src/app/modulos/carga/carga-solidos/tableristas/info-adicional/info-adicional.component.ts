@@ -36,7 +36,7 @@ export class InfoAdicionalComponent implements OnInit, OnDestroy {
     this.balanzas78Service.informacionAdicional
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( info => {
-        // console.log('info: ', info);
+        console.log('=== Información adicional: ===', info);
         this.paradasOperativasPuerto = info.op;
         this.paradasOperativasBuque = info.ob;
         this.paradasElectricas = info.e;

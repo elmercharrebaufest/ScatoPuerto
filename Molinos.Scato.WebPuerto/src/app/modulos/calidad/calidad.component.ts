@@ -137,8 +137,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   filtrarMuelles() {
     // Hasta que el pasaje a produccion de recibidores, pasar de Cargando → Post operativo (ticket 293)
-    // let idEstadoCargando = 3; // ControlCalidad
-    let idEstadoCargando = 4; // PostOperativo
+    let idEstadoCargando = 3; // ControlCalidad
+    // let idEstadoCargando = 4; // PostOperativo
 
     // Filtro los buques de cada muelle. Buque que esta cargando en el muelle
     this.buqueEnSanBenito = this.listadoEmbarques ? this.listadoEmbarques
