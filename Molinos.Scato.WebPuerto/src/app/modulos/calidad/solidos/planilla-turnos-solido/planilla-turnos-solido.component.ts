@@ -312,41 +312,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number){
-      return;
-       //Si entro aca creo el turno del día actual en hora actual.
-
-       //Calculo el turnoPuerto actual así lo traigo de la DB
-       let idTurnoPuerto = Math.floor(new Date().getHours()/6) + 1
-
-       //Si no, tengo que agregar el turno
-       let turno: PlanillaDeTurnos = new PlanillaDeTurnos();
-               
-       turno.cerrado = false;
-       turno.guardadoPorRecibidor = false;
-       turno.fecha = new Date();
-       turno.fechaMiliseconds = new Date().getTime();
-       const esLiquido: boolean=  false; 
-       this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido).subscribe((turnoDb: PlanillaDeTurnos) => {
-
-         if (turnoDb == null){
-
-          this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
-            res.forEach((turnoPuerto: TurnoPuerto) => {
-              if (turnoPuerto.id == idTurnoPuerto){
-                turno.turnoPuerto = turnoPuerto;
-                //Aca me fijo si solo agrego el turno o también tengo que agregar el día. Es solo para la visualización de la planilla
-                if (soloTurno)
-                  this.setTurno(diaIndex,turno);  
-                else
-                  this.setDia(null,turno)
-
-                this.guardarTurno(turno);
-                
-              }
-            })          
-          });
-         }
-       }); 
+    return;
   }
 
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean){

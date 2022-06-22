@@ -130,13 +130,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                     else
                     {
-                        var turno_DB = new ModuloDeCargaPlanillaDeTurnos();
 
-                        turno_DB.Fecha = comando.Dto.Fecha;
+                        var turno_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
 
-                        turno_DB.ModuloDeCarga = moduloDeCarga;
-                        turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
-                        turno_DB.EsLiquido = comando.Dto.EsLiquido;
+                        if (turno_DB == null)
+                        {
+                            turno_DB = new ModuloDeCargaPlanillaDeTurnos();
+                            turno_DB.Fecha = comando.Dto.Fecha;
+                            turno_DB.ModuloDeCarga = moduloDeCarga;
+                            turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
+                            turno_DB.EsLiquido = comando.Dto.EsLiquido;
+                        }
 
                         if (comando.Enviado)
                         {

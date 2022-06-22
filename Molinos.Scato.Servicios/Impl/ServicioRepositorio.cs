@@ -9225,11 +9225,14 @@ namespace Molinos.Scato.Servicios.Impl
             return 0;
         }
 
-        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido)
+        public ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido, string fechaTurno)
         {
             ModuloDeCargaPlanillaDeTurnosDto moduloDeCargaPlanillaDeTurnosDto = new ModuloDeCargaPlanillaDeTurnosDto();
-            DateTime dateWithoutHours = new DateTime();
-            dateWithoutHours = DateTime.Now.Date;
+            //DateTime dateWithoutHours = new DateTime();
+            //dateWithoutHours = DateTime.Now.Date;
+            
+            DateTime dateWithoutHours = DateTime.ParseExact(fechaTurno,"yyyyMMdd", null);
+
             try
             {
                 var listarModuloDeCargaPlanillaDeTurnos = Listar<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(x => x.TurnoPuerto.Id == turnoPuerto_id && x.ModuloDeCarga.Id == moduloDeCarga_id && x.EsLiquido == esLiquido && (x.Fecha.Value.Year == dateWithoutHours.Year && x.Fecha.Value.Month == dateWithoutHours.Month && x.Fecha.Value.Day == dateWithoutHours.Day));
@@ -9238,6 +9241,10 @@ namespace Molinos.Scato.Servicios.Impl
                     if (listarModuloDeCargaPlanillaDeTurnos.Count > 0)
                     {
                         moduloDeCargaPlanillaDeTurnosDto = listarModuloDeCargaPlanillaDeTurnos[0];
+                    }
+                    else if (listarModuloDeCargaPlanillaDeTurnos.Count == 0)
+                    {
+                        moduloDeCargaPlanillaDeTurnosDto = null;
                     }
                 }
 
