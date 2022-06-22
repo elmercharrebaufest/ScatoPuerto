@@ -821,7 +821,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         if (confirmed && !this.balanzasIncompletas) {
           this.modificarEstadoBuque('ControlCalidad');
           // Hasta que el pasaje a produccion de recibidores, pasar de Cargando → Post operativo (ticket 293)
-          this.modificarEstadoBuque('PostOperativo');
+          // this.modificarEstadoBuque('PostOperativo');
           this.exportarBalanzasAExcel();
         }
         else
