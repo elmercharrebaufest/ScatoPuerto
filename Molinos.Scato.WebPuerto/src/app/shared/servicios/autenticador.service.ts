@@ -21,6 +21,10 @@ export class AutenticadorService {
     return this.http.get(`${this.url}AutenticarUsuario`, { 'withCredentials': true });
   }
 
+  public autenticarUsuarioAD() {
+    return this.http.get(`${this.url}AutenticarUsuarioAD`, { 'withCredentials': true });
+  }
+
   // public getUserName() {
   //   return this.sessionService.getUsername();
   // }

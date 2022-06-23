@@ -30,6 +30,9 @@ using System.Linq.Expressions;
 using System.Printing;
 using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
+using System.DirectoryServices;
+using System.Security.Principal;
+using System.DirectoryServices.AccountManagement;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -2265,6 +2268,69 @@ namespace Molinos.Scato.Servicios.Impl
             return
                 conversor.ConvertirList<Permiso, PermisoDto>(
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
+        }
+
+        public Dictionary<string, string> ListarPermisosPorUsuarioAD(string nombreUsuario)
+        {
+            Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
+
+            var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+            var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+            var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
+            var usuario = userPrincipal1.SamAccountName;
+
+            IList<ADPuertoGruposAd> puertoGruposAd = repositorio.Listar<ADPuertoGruposAd>();
+            IList<ADPuertoGruposRoles> puertoGruposRoles = repositorio.Listar<ADPuertoGruposRoles>();
+            IList<ADPuertoRoles> puertoRoles = repositorio.Listar<ADPuertoRoles>();
+            IList<ADPuertoRolesPermisos> puertoRolesPermisos = repositorio.Listar<ADPuertoRolesPermisos>();
+            IList<ADPuertoPermisos> puertoPermisos = repositorio.Listar<ADPuertoPermisos>();
+            
+            System.Collections.ArrayList groups01 = new System.Collections.ArrayList();
+            System.Collections.ArrayList arrPermisosUsuario = new System.Collections.ArrayList();
+
+            List<GroupPrincipal> result = new List<GroupPrincipal>();
+            // establish domain context
+            PrincipalContext yourDomain = new PrincipalContext(ContextType.Domain);
+            // find your user
+            UserPrincipal user = UserPrincipal.FindByIdentity(yourDomain, usuario);
+            // if found - grab its groups
+            if (user != null)
+            {
+                PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
+                // iterate over all groups
+                foreach (Principal p in groups)
+                {
+                    // make sure to add only group principals
+                    if (p is GroupPrincipal)
+                    {
+                        result.Add((GroupPrincipal)p);
+                        groups01.Add(((GroupPrincipal)p).Name);
+                    }
+                }
+            }
+
+            foreach (var p in groups01) 
+            {
+                var nombreGrupo = p;
+                // REVISAR: no está obteniendo todos los permisos comparando con query SQL.
+                var permisosUsuario1 = puertoGruposAd
+                                .Join(puertoGruposRoles, G => G.Id, GR => GR.Id_Rol, (G, GR) => new { idGrupo = G.Id, nombreGrupo = G.NombreGrupoAd, idRol = GR.Id_Rol })
+                                .Join(puertoRoles, GR => GR.idRol, R => R.Id, (GR, R) => new { GR.idGrupo, GR.nombreGrupo, GR.idRol, nombreRol = R.NombreRol })
+                                .Join(puertoRolesPermisos, R => R.idRol, RP => RP.Id_Rol, (R, RP) => new { R.idGrupo, R.nombreGrupo, R.idRol, R.nombreRol, idPermiso = RP.Id_Permiso })
+                                .Join(puertoPermisos, RP => RP.idPermiso, P => P.Id, (RP, P) => new { RP.idGrupo, RP.nombreGrupo, RP.idRol, RP.nombreRol, RP.idPermiso, nombrePermiso = P.NombrePermiso })
+                                .Where(x => x.nombreGrupo == (string)nombreGrupo).ToList();
+
+                if (permisosUsuario1.Count() > 0) 
+                {
+                    arrPermisosUsuario.Add(permisosUsuario1);
+
+                    foreach (var pp in permisosUsuario1)
+                    {
+                        informacionPermisos.Add(pp.nombrePermiso, pp.nombrePermiso);
+                    }
+                }
+            }
+            return informacionPermisos;
         }
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)

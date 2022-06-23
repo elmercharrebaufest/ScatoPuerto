@@ -635,6 +635,9 @@ namespace Molinos.Scato.Servicios
         IList<PermisoDto> ListarPermisosPorUsuario(string nombreUsuario);
 
         [OperationContract]
+        Dictionary<string, string> ListarPermisosPorUsuarioAD(string nombreUsuario);
+
+        [OperationContract]
         ExcepcionEnvioCamaraDto ObtenerExcepcionEnvioCamara(int id);
 
         [OperationContract]
