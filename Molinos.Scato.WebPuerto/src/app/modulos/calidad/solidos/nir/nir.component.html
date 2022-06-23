@@ -1,8 +1,13 @@
 <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
-  <app-collapse-button collapseSelectorId="collapseLineasEmbarque"></app-collapse-button>
+  <app-collapse-button collapseSelectorId="collapseLineasEmbarque" *ngIf="conMaiz || conTrigo"></app-collapse-button>
 
   <h4 class="colorTitle pt-4">NIR</h4>
-  <div id="collapseLineasEmbarque" class="collapse show">
+
+  <div class="alert alert-warning" role="alert" *ngIf="!conMaiz && !conTrigo">
+    El buque no posee TRIGO ni MAÍZ.
+  </div>
+
+  <div id="collapseLineasEmbarque" class="collapse show" *ngIf="conMaiz || conTrigo">
     <div class="row">
       <div class="col-7 pl-4" *ngIf="conTrigo">
         <h4 class='colorTitle py-2'>Trigo</h4>
@@ -426,8 +431,6 @@
       </div>
     </div>
 
-
-      <button id="btn-enviar-nir" class="btn btn-primary" (click)="enviarNir()">ENVIAR NIR</button>
-    </div>
+    <button id="btn-enviar-nir" class="btn btn-primary" (click)="enviarNir()">ENVIAR NIR</button>
   </div>
-
+</div>
