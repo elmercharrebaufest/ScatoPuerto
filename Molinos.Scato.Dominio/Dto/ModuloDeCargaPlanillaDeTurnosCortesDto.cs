@@ -8,5 +8,6 @@
         public string HoraFin { get; set; }
         public string TiempoTotal { get; set; }
         public string Observaciones { get; set; }
+        public int idBalanzaCorte { get; set; }
     }
 }
