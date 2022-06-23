@@ -2270,35 +2270,6 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
-        //public List<GroupPrincipal> GetGroups(string userName)
-        //{
-        //    List<GroupPrincipal> result = new List<GroupPrincipal>();
-
-        //    // establish domain context
-        //    PrincipalContext yourDomain = new PrincipalContext(ContextType.Domain);
-
-        //    // find your user
-        //    UserPrincipal user = UserPrincipal.FindByIdentity(yourDomain, userName);
-
-        //    // if found - grab its groups
-        //    if (user != null)
-        //    {
-        //        PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
-
-        //        // iterate over all groups
-        //        foreach (Principal p in groups)
-        //        {
-        //            // make sure to add only group principals
-        //            if (p is GroupPrincipal)
-        //            {
-        //                result.Add((GroupPrincipal)p);
-        //            }
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
         public Dictionary<string, string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
             Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
@@ -2306,28 +2277,22 @@ namespace Molinos.Scato.Servicios.Impl
             var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
             var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
             var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
-
-            // Supongamos que el GrupoAD es Tableristas
-            //string grupoAD = "SWDEV";
+            var usuario = userPrincipal1.SamAccountName;
 
             IList<ADPuertoGruposAd> puertoGruposAd = repositorio.Listar<ADPuertoGruposAd>();
             IList<ADPuertoGruposRoles> puertoGruposRoles = repositorio.Listar<ADPuertoGruposRoles>();
             IList<ADPuertoRoles> puertoRoles = repositorio.Listar<ADPuertoRoles>();
             IList<ADPuertoRolesPermisos> puertoRolesPermisos = repositorio.Listar<ADPuertoRolesPermisos>();
             IList<ADPuertoPermisos> puertoPermisos = repositorio.Listar<ADPuertoPermisos>();
-
             
-
             System.Collections.ArrayList groups01 = new System.Collections.ArrayList();
-            System.Collections.ArrayList groups02 = new System.Collections.ArrayList();
             System.Collections.ArrayList arrPermisosUsuario = new System.Collections.ArrayList();
 
-            //====================================================================
             List<GroupPrincipal> result = new List<GroupPrincipal>();
             // establish domain context
             PrincipalContext yourDomain = new PrincipalContext(ContextType.Domain);
             // find your user
-            UserPrincipal user = UserPrincipal.FindByIdentity(yourDomain, "gsian");
+            UserPrincipal user = UserPrincipal.FindByIdentity(yourDomain, usuario);
             // if found - grab its groups
             if (user != null)
             {
@@ -2343,32 +2308,11 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 }
             }
-            var gruposDelUsuario1 = result;
-
-            //====================================================================
-
-            //string userName2 = "gsian";
-            //List<string> result2 = new List<string>();
-            //WindowsIdentity wi = new WindowsIdentity(userName2);
-
-            //foreach (IdentityReference group in wi.Groups)
-            //{
-            //    try
-            //    {
-            //        result2.Add(group.Translate(typeof(NTAccount)).ToString());
-            //    }
-            //    catch (Exception ex) { }
-            //}
-            //result2.Sort();
-            //var gruposDelUsuario2 = result2;
-
-            //====================================================================
-
-            //var permisosUsuario;
 
             foreach (var p in groups01) 
             {
                 var nombreGrupo = p;
+                // REVISAR: no está obteniendo todos los permisos comparando con query SQL.
                 var permisosUsuario1 = puertoGruposAd
                                 .Join(puertoGruposRoles, G => G.Id, GR => GR.Id_Rol, (G, GR) => new { idGrupo = G.Id, nombreGrupo = G.NombreGrupoAd, idRol = GR.Id_Rol })
                                 .Join(puertoRoles, GR => GR.idRol, R => R.Id, (GR, R) => new { GR.idGrupo, GR.nombreGrupo, GR.idRol, nombreRol = R.NombreRol })
@@ -2386,9 +2330,6 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 }
             }
-
-            //informacionParada.Add("porcBC", Convert.ToString(porcen));
-
             return informacionPermisos;
         }
 

@@ -14,6 +14,7 @@ import { AlertService } from '@ScatoServicios/alert.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
@@ -70,15 +71,16 @@ export class LineupComponent implements OnInit, Observador {
     this.otrosMuelles = new Array();
    // this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => this.ubicacionDeBuquePuerto = res);
 
-  // this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
-   this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-     console.log('xxxxxxxx')
-     this.ubicacionDeBuquePuerto = res;
-     this.estadoVicentinLp = this.estadoVicentin();
-     this.estadoNoryonLp = this.estadoNoryon();
-      this.estadoSanBenitoLp = this.estadoSanBenito();
-      this.estadoOtrosLp = this.estadoOtros();
-  });
+    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
+    
+    this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
+      console.log('xxxxxxxx')
+      this.ubicacionDeBuquePuerto = res;
+      this.estadoVicentinLp = this.estadoVicentin();
+      this.estadoNoryonLp = this.estadoNoryon();
+        this.estadoSanBenitoLp = this.estadoSanBenito();
+        this.estadoOtrosLp = this.estadoOtros();
+    });
 
   }
   ngOnInit(): void {
