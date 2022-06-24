@@ -19,13 +19,24 @@ export class CardBuqueComponent implements OnInit {
 
   // #region Eventos del Componente  
   ngOnInit(): void {
-    this.fotoEmbarque = 'data:image/jpeg;base64,' + this.buque.informacion.fotoEmbarque;
+    this.setCargarFoto();
   }
   // #endregion
 
   // #region Eventos Controles
   onCerrarModal(){
     this.cerrar.emit(true);
+  }
+  // #endregion
+
+  // #region Metodos
+  private setCargarFoto(){
+    this.fotoEmbarque = this.buque.informacion.fotoEmbarque;
+    if (this.fotoEmbarque != null || this.fotoEmbarque != undefined){
+      this.fotoEmbarque = this.fotoEmbarque > '' ? ('data:image/png;base64,' + this.fotoEmbarque) : null;
+    }else{
+      this.fotoEmbarque = null
+    }
   }
   // #endregion
 
