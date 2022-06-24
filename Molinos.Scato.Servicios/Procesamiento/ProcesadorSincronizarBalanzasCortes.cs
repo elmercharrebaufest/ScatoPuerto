@@ -301,69 +301,79 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         public void CrearModuloDeCargaPlanillaDeTurnosCortes(int idModulodeCarga)
         {
-            var moduloTurnoDblista1 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x=> x.ModuloDeCarga.Id == idModulodeCarga);
 
-            foreach (var turno in moduloTurnoDblista1)
+            try
             {
-                string[] horariosTurno = turno.TurnoPuerto.Nombre.Split('-');
+                var moduloTurnoDblista1 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModulodeCarga);
 
-                int fechaInicio = Convert.ToInt32(horariosTurno[0]);
-                int fechaFin = Convert.ToInt32(horariosTurno[1]);
-                DateTime fechaCort = turno.Fecha.Value;
-                //var ListadoCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.Fecha_Inicio >= fechaCort.Date && x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Corte.Value.Hour < fechaFin && x.MotivosFallasBalanza_id >0);
-
-                var listaCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.MotivosFallasBalanza_id >0);
-                var ListadoCortes = listaCortes.Where(x => x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Inicio.Value.Hour < fechaFin && x.Fecha_Inicio.Value.Date >= fechaCort.Date);
-
-
-
-                foreach (var corte in ListadoCortes)
+                foreach (var turno in moduloTurnoDblista1)
                 {
-                    
-                    var turnoDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.idBalanzaCorte == corte.Id);
-                    double tiempo = corte.Fecha_Corte.Value.Subtract(corte.Fecha_Inicio.Value).TotalMinutes;
-                    TimeSpan t = new TimeSpan(0, (int)tiempo, 0);
-                    if (turnoDB == null)
+                    string[] horariosTurno = turno.TurnoPuerto.Nombre.Split('-');
+
+                    int fechaInicio = Convert.ToInt32(horariosTurno[0]);
+                    int fechaFin = Convert.ToInt32(horariosTurno[1]);
+                    DateTime fechaCort = turno.Fecha.Value;
+                    //var ListadoCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.Fecha_Inicio >= fechaCort.Date && x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Corte.Value.Hour < fechaFin && x.MotivosFallasBalanza_id >0);
+
+                    var listaCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.MotivosFallasBalanza_id > 0);
+                    var ListadoCortes = listaCortes.Where(x => x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Inicio.Value.Hour < fechaFin && x.Fecha_Inicio.Value.Date >= fechaCort.Date);
+
+
+
+                    foreach (var corte in ListadoCortes)
                     {
-                     var turnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes
-                                    {
-                                        ModuloDeCargaPlanillaDeTurnos = turno,
-                                        HoraInicio = corte.Fecha_Inicio.Value.ToShortTimeString(),
-                                        HoraFin = corte.Fecha_Corte.Value.ToShortTimeString(),
-                                        Observaciones = corte.Observaciones,
-                                        TiempoTotal = t.ToString(),
-                                        MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(x => x.Id == corte.MotivosFallasBalanza_id),
-                                        idBalanzaCorte = corte.Id,
-                                    };
-                     Repositorio.Agregar(turnosCortes);
+
+                        var turnoDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.idBalanzaCorte == corte.Id);
+                        double tiempo = corte.Fecha_Corte.Value.Subtract(corte.Fecha_Inicio.Value).TotalMinutes;
+                        TimeSpan t = new TimeSpan(0, (int)tiempo, 0);
+                        if (turnoDB == null)
+                        {
+                            var turnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes
+                            {
+                                ModuloDeCargaPlanillaDeTurnos = turno,
+                                HoraInicio = corte.Fecha_Inicio.Value.ToShortTimeString(),
+                                HoraFin = corte.Fecha_Corte.Value.ToShortTimeString(),
+                                Observaciones = corte.Observaciones,
+                                TiempoTotal = t.ToString(),
+                                MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(x => x.Id == corte.MotivosFallasBalanza_id),
+                                idBalanzaCorte = corte.Id,
+                            };
+                            Repositorio.Agregar(turnosCortes);
+                        }
+                        else
+                        {
+                            turnoDB.HoraInicio = corte.Fecha_Inicio.Value.ToShortTimeString();
+                            turnoDB.HoraFin = corte.Fecha_Corte.Value.ToShortTimeString();
+                            turnoDB.Observaciones = corte.Observaciones;
+                            turnoDB.TiempoTotal = t.ToString();
+                        }
+
+
+                        Repositorio.GuardarCambios();
                     }
-                    else
-                    {
-                        turnoDB.HoraInicio = corte.Fecha_Inicio.Value.ToShortTimeString();
-                        turnoDB.HoraFin = corte.Fecha_Corte.Value.ToShortTimeString();
-                        turnoDB.Observaciones = corte.Observaciones;
-                        turnoDB.TiempoTotal = t.ToString();
-                    }
-               
 
                     Repositorio.GuardarCambios();
+
                 }
 
+                var listadoBC = Repositorio.Listar<BalanzasCortes, int>(x => x.Id, x => x.ModuloDeCarga_id == idModulodeCarga);
+                var listadoTC = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == idModulodeCarga);
+
+                foreach (var itemTC in listadoTC)
+                {
+                    var existe = listadoBC.Where(x => x == itemTC.idBalanzaCorte).Count();
+
+                    if (existe < 1)
+                        Repositorio.Remover(itemTC);
+                }
                 Repositorio.GuardarCambios();
-
             }
-
-            var listadoBC = Repositorio.Listar<BalanzasCortes, int>(x => x.Id, x => x.ModuloDeCarga_id == idModulodeCarga);
-            var listadoTC = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == idModulodeCarga);
-
-            foreach (var itemTC in listadoTC)
+            catch (Exception ex)
             {
-                var existe = listadoBC.Where(x => x == itemTC.idBalanzaCorte).Count();
-
-                if (existe < 1)
-                    Repositorio.Remover(itemTC);
+                Log.Info("ProcesadorSincronizarBalanzasCortes: Error al generar los cortes en solido" + ex.InnerException);
+                throw ex;
             }
-            Repositorio.GuardarCambios();
+           
         }
 
 

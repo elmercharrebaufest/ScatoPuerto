@@ -32,7 +32,14 @@ export class TarjetaBuqueComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fotoEmbarque = 'data:image/png;base64,' + this.fotoEmbarque
+    this.setCargarFoto();
+  }
+  private setCargarFoto(){
+    if (this.fotoEmbarque != null || this.fotoEmbarque != undefined){
+      this.fotoEmbarque = this.fotoEmbarque > '' ? ('data:image/png;base64,' + this.fotoEmbarque) : null;
+    }else{
+      this.fotoEmbarque = null
+    }
   }
 
 }

@@ -24,10 +24,12 @@ import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services
   styleUrls: ['./lineup-embarque.component.css']
 })
 export class LineupEmbarqueComponent implements OnInit {
+  @Input() buquesGeolocalizacion;
   @Input() index: number;
   @Input() instanciaWorkflow: InstanciaWorkflowPuerto;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
+
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
@@ -37,12 +39,12 @@ export class LineupEmbarqueComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
   posicionesDeLineUps: number[];
   embarquesPuerto: InstanciaWorkflowPuerto[];
-  hayBuque=true;
-  mensajeBuque:string;
-  colorMapa:string='color-text-espera';
+  hayBuque = true;
+  mensajeBuque: string;
+  colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
-  ruta:string='assets/esperaBuque.svg';
+  ruta: string = 'assets/esperaBuque.svg';
   constructor(
     private lineUpService: LineupService,
     private workflowService: WorkflowService,
@@ -65,7 +67,7 @@ export class LineupEmbarqueComponent implements OnInit {
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res;});
+    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
 
     this.lineUpService.obtenerListadoUbicacionDeBuquePuerto()
       .subscribe(res => {
@@ -73,32 +75,31 @@ export class LineupEmbarqueComponent implements OnInit {
       });
   }
 
-  cargarBuqueGeolocalizacion(id:any)
-  {
-    this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe( data => {
-      this.mensajeBuque=data.find(o=>o.embarque_Id==id)!=null?"Ver en el mapa":"No se encontró. Completar IMO";
-      this.hayBuque=data.find(o=>o.embarque_Id==id)!=null?true:false;
-      this.ruta= this.hayBuque?"assets/verMapa.svg":"assets/existImo.svg";
-      this.colorMapa=this.hayBuque?'color-text-mapa':'color-text-imo';
-    },
-      err => {
-            console.error('Observer got an error: ' + err)
-            },
-      () => {
-            }
-    );
+  cargarBuqueGeolocalizacion(id: any) {
+    console.log('cargarBuqueGeolocalizacion llega --->>')
+    console.log(this.buquesGeolocalizacion)
+    console.log(id)
+    this.mensajeBuque = "No se encontró. Completar IMO";
+    this.hayBuque = false;
+    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
+      this.mensajeBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? "Ver en el mapa" : "No se encontró. Completar IMO";
+      this.hayBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? true : false;
+      this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
+      this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
+    } else {
+      this.mensajeBuque = "No se encontró. Completar IMO";
+      this.hayBuque = false;
+    }
   }
-  setListaBuquesGeolocalizacion(BuquesGeolocalizacion){
+  setListaBuquesGeolocalizacion(BuquesGeolocalizacion) {
     this.listaBuquesGeolocalizacion = BuquesGeolocalizacion;
   }
-  getListaBuquesGeolocalizacion(){
+  getListaBuquesGeolocalizacion() {
     return this.listaBuquesGeolocalizacion;
   }
-  verGeolocalizacion(flagVerGeo:any,embarque_Id:number)
-  {
-    if(flagVerGeo)
-    {
-      this.router.navigate(['/geolocalizacion'], { queryParams: {embarque_id: embarque_Id, tipo: 'zoom'}});
+  verGeolocalizacion(flagVerGeo: any, embarque_Id: number) {
+    if (flagVerGeo) {
+      this.router.navigate(['/geolocalizacion'], { queryParams: { embarque_id: embarque_Id, tipo: 'zoom' } });
     }
   }
   public modificarLineUp(campo: string) {
@@ -305,7 +306,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   nombreUbicacionDeBuquePuerto(numero): string {
-    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.id == numero)!=undefined ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
+    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.id == numero) != undefined ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
   }
 
   numeroUbicacionDeBuquePuerto(nombre): number {
