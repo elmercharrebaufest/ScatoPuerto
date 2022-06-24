@@ -49,7 +49,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     UsuarioFinalizacion = planoDeCarga.UsuarioFinalizacion
                 });
 
-                Repositorio.GuardarCambios();
+
 
                 if (planoDeCarga.PlanoDeCargaBodega != null)
                 {
@@ -69,6 +69,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                 }
                 //Repositorio.GuardarCambios();
+
 
                 if (planoDeCarga.CargaComercial != null)
                 {
@@ -96,7 +97,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                 }
 
-                Repositorio.GuardarCambios();
+                //Repositorio.GuardarCambios();
             }
             //PROCESO PARA EL HISTORICO
 
@@ -137,6 +138,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             Repositorio.RemoverTodos(planoDeCarga.PlanoDeCargaBodega.ToList());
             if (comando.Dto.PlanoDeCargaBodegas != null)
             {
+
                 foreach (var pla in comando.Dto.PlanoDeCargaBodegas.Where(x => x.Cantidad > 0))
                 {
                     var destino = pla.Destino != null ? Repositorio.Obtener<Destino>(pla.Destino.Id) : null;
@@ -152,9 +154,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         SfFull = pla.SfFull,
                         TanqueDeAbordo = pla.TanqueDeAbordo
                     });
-                }                
+                }
             }
-                        
+
             Repositorio.RemoverTodos(planoDeCarga.CargaComercial.ToList());
             if (comando.Dto.CargasComerciales != null)
             {
@@ -180,6 +182,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 planoDeCarga.FilePathSecuencia = GuardarArchivo(comando.Dto.FilePathSecuencia, comando.Dto.PlanoDeCargaArchivoSecuenciaNombre, comando.Dto.Id);
             else
                 planoDeCarga.FilePathSecuencia = null;
+            Repositorio.GuardarCambios();
         }
 
         private void LimpiarCarpetaDeArchivos(int planoDeCargaId)
@@ -195,7 +198,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     file.Delete();
                 }
             }
-            
+
         }
 
         public string GuardarArchivo(string archivoBase64, string nombreArchivo, int planoDeCargaId)
@@ -204,7 +207,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var path = ConfigurationManager.AppSettings["ArchivosPath"];
                 var directorio = "PlanosDeCarga";
-                var archivoBase64Split = archivoBase64.Contains(',') ?  archivoBase64.Split(',')[1] : archivoBase64;
+                var archivoBase64Split = archivoBase64.Contains(',') ? archivoBase64.Split(',')[1] : archivoBase64;
                 var archivo = Convert.FromBase64String(archivoBase64Split);
 
                 var rutaDestino = path + (path.EndsWith("\\") ? "" : "\\") + directorio + "\\" + planoDeCargaId + "\\" + nombreArchivo;

@@ -8,17 +8,17 @@
     <ship-spinner *ngIf='cargaPdf' [src]='"pdf"'></ship-spinner>
   </div>
 
-  
+
   <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
   <div id="grafico-liquidos" class="mt-4 shadow bg-white min-h5">
-      <app-tanques (tanquesSeleccionados)="onTanquesSeleccionados($event)"></app-tanques>
+    <app-tanques (tanquesSeleccionados)="onTanquesSeleccionados($event)"></app-tanques>
   </div>
 
   <div class="row mt-4" id='lineas-embarque-print'>
     <div class="col">
       <div id="lineasEmbarque" class="shadow" style="background-color: white; min-height: 5rem;" *ngIf="tanquesSeleccionados">
         <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-        <app-lineas [tanquesSeleccionados] = "tanquesSeleccionados"></app-lineas>
+        <app-lineas [tanquesSeleccionados]="tanquesSeleccionados"></app-lineas>
       </div>
     </div>
   </div>
@@ -27,26 +27,27 @@
     <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
     <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
     <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
-    <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
-    <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('ControlCalidad')">ENVIAR A TABLERISTA</button>
+    <button type="button" class="btn btn-success mx-5" (click)="guardar(false)">FINALIZAR</button>
+    <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
   </div>
+
 
 
   <!-- Rol Tablerista -->
   <!-- <ng-container *ngIf='embarqueSelected.nombreUbicacion.toLowerCase() == "muelle de carga"'> -->
-    
+
   <ng-container *ngIf="mostrarTableristaOperando">
     <div class='shadow' id="planilla-embarque" style="background-color: white; min-height: 5rem;">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-        <app-planilla-embarque></app-planilla-embarque>
+      <app-planilla-embarque></app-planilla-embarque>
     </div>
     <div class='bg-white px-4 min-h5 shadow mt-4' id="turno-liquidos">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-        <app-planilla-turno-liquidos [tablerista]='true'></app-planilla-turno-liquidos>
+      <app-planilla-turno-liquidos [tablerista]='true'></app-planilla-turno-liquidos>
     </div>
     <div class='mt-5' style='margin-left: 25%; width: 50%;'>
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-        <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
+      <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
     </div>
   </ng-container>
 
