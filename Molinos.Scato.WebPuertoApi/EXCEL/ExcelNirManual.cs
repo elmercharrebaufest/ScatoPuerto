@@ -154,6 +154,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightGreen.Index;
             cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
+            cellBorderStyleColumnTitles.VerticalAlignment = VerticalAlignment.Center;
             cellBorderStyleColumnTitles.WrapText = true;
             return cellBorderStyleColumnTitles;
         }
@@ -167,8 +168,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
+            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
+            cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
-            cellBorderStyleColumnTitles.WrapText = true;
+            cellBorderStyleColumnTitles.VerticalAlignment = VerticalAlignment.Center;
             return cellBorderStyleColumnTitles;
         }
 

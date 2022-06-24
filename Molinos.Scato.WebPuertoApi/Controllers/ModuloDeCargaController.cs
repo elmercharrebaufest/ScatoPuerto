@@ -235,7 +235,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     Cuerpo = ObjetoMailNir.mail.Body,
                     Destinatarios = Emails,
-                    Titulo = $"NIR" + IdModuloDeCarga,
+                    Titulo = $"NIR" + "-" + IdModuloDeCarga,
                     Attachment = resultado.Archivo,
                     AttachmentName = docFile
                 });
