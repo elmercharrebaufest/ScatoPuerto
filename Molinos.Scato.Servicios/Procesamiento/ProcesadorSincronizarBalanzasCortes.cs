@@ -307,7 +307,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 string[] horariosTurno = turno.TurnoPuerto.Nombre.Split('-');
 
-                var ListadoCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.Fecha_Inicio.Value.Hour >= Convert.ToInt32(horariosTurno[0]) && x.Fecha_Corte.Value.Hour < Convert.ToInt32(horariosTurno[1]));
+                int fechaInicio = Convert.ToInt32(horariosTurno[0]);
+                int fechaFin = Convert.ToInt32(horariosTurno[1]);
+                DateTime fechaCort = turno.Fecha.Value;
+                //var ListadoCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.Fecha_Inicio >= fechaCort.Date && x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Corte.Value.Hour < fechaFin && x.MotivosFallasBalanza_id >0);
+
+                var listaCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.MotivosFallasBalanza_id >0);
+                var ListadoCortes = listaCortes.Where(x => x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Inicio.Value.Hour < fechaFin && x.Fecha_Inicio.Value.Date >= fechaCort.Date);
+
+
 
                 foreach (var corte in ListadoCortes)
                 {
@@ -340,18 +348,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     Repositorio.GuardarCambios();
                 }
-             //   return repositorio.Listar<Material, int>(x => x.Id, x => x.CodigoSAP == codigo).FirstOrDefault();
 
-
-               var listaC = Repositorio.Listar<BalanzasCortes, int>( x=> x.Id, x=>  x.ModuloDeCarga_id == idModulodeCarga && x.Fecha_Inicio.Value.Hour >= Convert.ToInt32(horariosTurno[0]) && x.Fecha_Corte.Value.Hour < Convert.ToInt32(horariosTurno[1]));
-
-               var noExiste = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => !listaC.Contains(x.Id) && x.ModuloDeCargaPlanillaDeTurnos.Id == turno.Id );
-
-                Repositorio.RemoverTodos(noExiste);
                 Repositorio.GuardarCambios();
 
             }
 
+            var listadoBC = Repositorio.Listar<BalanzasCortes, int>(x => x.Id, x => x.ModuloDeCarga_id == idModulodeCarga);
+            var listadoTC = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == idModulodeCarga);
+
+            foreach (var itemTC in listadoTC)
+            {
+                var existe = listadoBC.Where(x => x == itemTC.idBalanzaCorte).Count();
+
+                if (existe < 1)
+                    Repositorio.Remover(itemTC);
+            }
+            Repositorio.GuardarCambios();
         }
 
 
