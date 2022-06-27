@@ -345,6 +345,7 @@ export class CargaLiquidosComponent implements OnInit {
       this.mostrarTableristaOperando = true;
       this.obtenerModuloDeCarga();
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
+      window.location.reload();
     });
   }
 
