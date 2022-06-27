@@ -753,9 +753,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   initDia(dia?: any, turno?: PlanillaDeTurnos, date?: Date) {
-    console.log('initDia')
-    console.log(dia)
-    console.log(turno)
     if (dia != null) {
       return this._builder.group({
         turnos: this._builder.array([this.initTurno(dia)]),
@@ -916,11 +913,21 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   getDestinos() {
     this.destinos = new Array();
-    this.bodegas.forEach(b => {
-      if (!this.destinos.find(d => d.nombre == b.destino)) {
-        this.destinos.push(b.destino);
-      }
-    })
+    if (this.bodegas != null || this.bodegas != undefined){
+        this.bodegas.forEach(b => {
+          /*if (this.bodegas.length == 0) {
+            console.log('entro bodegas --->>')
+            console.log(this.bodegas)
+            this.destinos.push(b.destino);
+          }else{*/
+            if (!this.destinos.find(d => d.nombre == b.destino)) {
+              this.destinos.push(b.destino);
+              console.log('fin bodegas --->>')
+              console.log(this.bodegas)
+            }
+          //}
+        })
+    }
   }
 
   getCantidadLinea(linea: any) {

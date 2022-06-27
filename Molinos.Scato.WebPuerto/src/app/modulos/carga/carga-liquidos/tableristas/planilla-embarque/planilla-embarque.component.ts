@@ -156,7 +156,13 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     const parcelValue =  parcel.split(":");
     parcel = (parcelValue.length > 0) ? parcelValue[1] :  parcel;
     */
+    console.log('parcel--->>')
+    console.log(parcel)
     let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);
+    
+    console.log('bodega--->>')
+    console.log(bodega)
+
     l.controls.tanqueDeAbordo.setValue(bodega.tanqueDeAbordo);
     l.controls.destino.setValue(bodega.destino);
     l.controls.tn.setValue(bodega.cantidad);
