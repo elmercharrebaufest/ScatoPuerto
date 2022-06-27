@@ -9255,9 +9255,16 @@ namespace Molinos.Scato.Servicios.Impl
             return resultado;
         }
 
-        public IList<MotivosDeCorteDto> ListarMotivosDeCorte()
+        //public IList<MotivosDeCorteDto> ListarMotivosDeCorte()
+        //{
+        //    return Listar<MotivosDeCorte, MotivosDeCorteDto>();
+
+        //}
+
+        public IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte()
         {
-            return Listar<MotivosDeCorte, MotivosDeCorteDto>();
+            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x=>x.Liquido==true);
+
         }
 
         public IList<MotivosFallasBalanzaDto> ListarMotivosFallasBalanza()

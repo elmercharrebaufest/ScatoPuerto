@@ -105,7 +105,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                                     corte_DB.HoraInicio = corte.HoraInicio;
                                     corte_DB.HoraFin = corte.HoraFin;
-                                    corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id);
+                                    //   corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id);
+                                    corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id);
                                     corte_DB.Observaciones = corte.Observaciones;
                                     corte_DB.TiempoTotal = corte.TiempoTotal;
                                 }
@@ -116,7 +117,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
                                         HoraInicio = corte.HoraInicio,
                                         HoraFin = corte.HoraFin,
-                                        MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
+                                        //  MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
+                                        MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id),
                                         Observaciones = corte.Observaciones,
                                         TiempoTotal = corte.TiempoTotal
                                     };
@@ -190,7 +192,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     ModuloDeCargaPlanillaDeTurnos = turno_DB,
                                     HoraInicio = corte.HoraInicio,
                                     HoraFin = corte.HoraFin,
-                                    MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
+                                    // MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
+                                    MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id),
                                     Observaciones = corte.Observaciones,
                                     TiempoTotal = corte.TiempoTotal
 

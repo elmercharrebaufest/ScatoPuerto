@@ -2472,7 +2472,8 @@ namespace Molinos.Scato.Servicios
         ModuloDeCargaListadoDto ObtenerUltimaHabilitacionDeTanques();
 
         [OperationContract]
-        IList<MotivosDeCorteDto> ListarMotivosDeCorte();
+        //  IList<MotivosDeCorteDto> ListarMotivosDeCorte();
+        IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte();
 
         [OperationContract]
         IList<MotivosFallasBalanzaDto> ListarMotivosFallasBalanza();

@@ -335,7 +335,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 HoraFin = corte.Fecha_Corte.Value.ToShortTimeString(),
                                 Observaciones = corte.Observaciones,
                                 TiempoTotal = t.ToString(),
-                                MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(x => x.Id == corte.MotivosFallasBalanza_id),
+                                //  MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(x => x.Id == corte.MotivosFallasBalanza_id),
+                                MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == corte.MotivosFallasBalanza_id),
                                 idBalanzaCorte = corte.Id,
                             };
                             Repositorio.Agregar(turnosCortes);
