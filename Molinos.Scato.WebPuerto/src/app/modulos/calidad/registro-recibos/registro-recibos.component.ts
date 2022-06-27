@@ -4,7 +4,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { ReciboBuqueService } from '@ScatoServicios/reciboBuque.service';
-import { forkJoin, Subscription } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-registro-recibos',
@@ -19,9 +19,8 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   recibosDeBuqueArray:ReciboDeBuque[];
   recibo:ReciboDeBuque;
   mostrarModal:boolean = false;
-  subscriptionRecibo: Subscription;
   reciboAImprimir: ReciboDeBuqueDetalles;
-  impresion:boolean = false;
+  // impresion:boolean = false;
 
   constructor
   (
@@ -33,9 +32,13 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   ) 
   {
     this.refreshRecibos();
+    this._reciboSharingService.getReciboImpresionSubject().subscribe((data:ReciboDeBuque) => {
+      this.recibo = data;
+    });
     this._reciboSharingService.getFiltroRecibos().subscribe((data:ReciboDeBuque) => {
       this.recibo = data;
     });
+    
    }
 
   ngOnInit(): void {
@@ -44,7 +47,6 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptionRecibo.unsubscribe();
   }
   
   refreshRecibos(){
@@ -73,23 +75,24 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
       this.nombreBuque = res1.nombreBuque;
       this.recibosDeBuque = res2;
             
-      // this.mostrarGrilla = true;
 
       });
   }
 
   onVerReciboSelected(recibo){
-    console.log("Click");
     this._reciboSharingService.setFiltroRecibos(recibo);
     this.mostrarModal = true;
   
   }
   generarPDF(recibo){
-    this.reciboAImprimir = recibo.reciboDeBuqueDetalles[0];
-    console.log(this.reciboAImprimir);
-    this.impresion = true;
-    this._reciboBuqueService.sendGenerarPDF.emit();
-    this.impresion = false;
+    this._reciboSharingService.setReciboImpresionSubject(recibo);
+    // let fechaActual = new Date;
+    // let anio = fechaActual.getFullYear();
+    // let mes = fechaActual.getMonth();
+    // let dia = fechaActual.getDate();
+    recibo.fechaHoraImpresion = new Date();
+    console.log("--===FECHA RECIBO===--", recibo.fechaHoraImpresion);
+    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {console.log('200 Ok')});
+    this.refreshRecibos();
   }
-  
 }

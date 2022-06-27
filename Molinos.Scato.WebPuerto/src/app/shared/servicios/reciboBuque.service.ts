@@ -33,8 +33,6 @@ export class ReciboBuqueService {
 
   obtenerRecibos(idEmbarque: number,): Observable<ReciboDeBuque[]>{
     return this.http.get<ReciboDeBuque[]>(`${this.url}ModuloDeCarga/ListarRecibosDeBuque?idEmbarque=${idEmbarque}`, { 'withCredentials' : true})
-    // .pipe(tap(()=> {
-    //   this._refresh.next();
-    // }));
+    
   }
 }

@@ -30,19 +30,23 @@
               </td>
               <td class="alCentro"> {{idEmbarque}} - 0{{ cont+1 }} </td>
               <td class="alCentro"> {{ recibo.reciboDeBuqueDetalles[0].exportador }} </td>
-              <td class="alCentro"> <span [ngClass]="{'warn': recibo.estado == 'Pendiente'}">{{recibo.estado}} </span></td>
-              <td class="alCentro"> {{recibo.emitio}} </td>
-              <td class="alCentro"> {{recibo.superviso}} </td>
               <td class="alCentro"> - </td>
-              <!-- <td *ngIf="recibo.estado == 'Aprobado'" class="alCentro"> <img src="assets\iconoImpresion.svg" alt=""> </td> -->
-              <td *ngIf="recibo.estado == 'Aprobado'" class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
-              <td *ngIf="recibo.estado == 'Pendiente'" class="alCentro"> <img src="assets\iconImDeshabilitada.svg" alt=""> </td>
+              <!-- <td class="alCentro"> <span [ngClass]="{'warn': recibo.estado == 'Pendiente'}">{{recibo.estado}} </span></td> -->
+              <td class="alCentro"> {{recibo.emitio}} </td>
+              <td class="alCentro"> - </td>
+              <!-- <td class="alCentro"> {{recibo.superviso}} </td> -->
+              <td *ngIf="recibo.fechaHoraImpresion == null" class="alCentro"> - </td>
+              <td *ngIf="recibo.fechaHoraImpresion !== null" class="alCentro"> {{recibo.fechaHoraImpresion | date:'short'}} </td>
+              <td class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
+              <!-- <td *ngIf="recibo.estado == 'Aprobado'" class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
+              <td *ngIf="recibo.estado == 'Pendiente'" class="alCentro"> <img src="assets\iconImDeshabilitada.svg" alt=""> </td> -->
+              
             </tr>
             
           </tbody>
         </table>
 
-        <div *ngIf="impresion"><app-recibodebuquepdf [recibo]="reciboAImprimir"></app-recibodebuquepdf></div>
+        <div><app-recibodebuquepdf></app-recibodebuquepdf></div>
 
 
         <div *ngIf="mostrarModal" > <app-modal-recibo [mostrarModal]="mostrarModal" (reciboEmitido)="reciboEmitido($event)"></app-modal-recibo> <div>

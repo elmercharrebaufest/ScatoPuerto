@@ -43,25 +43,18 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     private _confirmationDialogService: ConfirmationDialogService,    
   ) 
   { 
-    console.log("====ingresando al constructor====");
     
-    this._reciboSharingService.getFiltroRecibos()
-    .subscribe(
-
-      (data) => {this.reciboBuqueOjito = data;
-        console.log(":::::::DATA:::::::::",data);
-        this.mostrarModalOjito();
+    this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
+      this.reciboBuqueOjito = data;
+      this.mostrarModalOjito();
     });
     
-    console.log("====saliendo del constructor====");
   }
   //#endregion
   ngOnInit(): void {
-    console.log("====entrando al init del recibo====");
 
     this.initFormReciboDetalles();
     this.initObtenerEmbarque();
-    console.log("====saliendo del init del recibo====");
     
   }
   ngAfterViewInit(){
@@ -114,7 +107,6 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       if (this.mostrarModal){
         this._modalService.open(this.ojitoRecibo, { size: 'lg'});
         this.setModalOjito()
-
       }
     }
   }
@@ -132,7 +124,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboDeBuqueForm.controls.incluirImpresionDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionDestino);
     this.reciboDeBuqueForm.controls.incluirImpresionCalidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionCalidad);
     this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionEstibado);
-    this.reciboDeBuqueForm.disable();
+    // this.reciboDeBuqueForm.disable();
   }
 
   openModalEmitirRecibo(modal: any) {
@@ -140,9 +132,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this._modalService.open(modal, { size: 'lg'});
     
   }
-  get recibos() : FormArray {
-    return this.reciboDeBuqueForm.get("recibos") as FormArray;
-  }
+  
   guardarRecibo(){
     
     this.reciboBuqueDetalles = this.reciboDeBuqueForm.getRawValue();
@@ -158,9 +148,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.enviarMail(this.idEmbarque, this.reciboBuque);
 
   }
-  // generarPDF(){
-  //   this._reciboBuqueService.sendGenerarPDF.emit();
-  // }
+  
   enviarMail(idEmbarque, Recibo) {
     var titulo = "Enviar a supervisor";
     var text = "Cuerpo del Mail:"

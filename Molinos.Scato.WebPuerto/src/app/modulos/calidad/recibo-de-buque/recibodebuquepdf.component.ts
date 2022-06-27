@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ReciboDeBuqueDetalles } from '@ScatoModels/reciboDeBuque';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { ReciboDeBuque, ReciboDeBuqueDetalles } from '@ScatoModels/reciboDeBuque';
+import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { ReciboBuqueService } from '@ScatoServicios/reciboBuque.service';
 import jspdf from 'jspdf'; 
 
@@ -9,17 +10,35 @@ import jspdf from 'jspdf';
   templateUrl: './recibodebuquepdf.component.html',
   styleUrls: ['./recibodebuquepdf.component.css']
 })
-export class RecibodebuquepdfComponent implements OnInit {
-    
-    @Input() recibo : ReciboDeBuqueDetalles; 
+export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
+    reciboBuque:ReciboDeBuque;
+    recibo : ReciboDeBuqueDetalles; 
 
     constructor
     (
-      private _reciboBuqueService:ReciboBuqueService
-    ) { }
+      private _reciboBuqueService:ReciboBuqueService,
+      private _reciboSharingService: ReciboSharingService,
+    ) 
+    { 
+      this._reciboSharingService.getReciboImpresionSubject().subscribe((data:ReciboDeBuque) => {this.reciboBuque = data
+        this.recibirDataImpresion()
+      });
+    }
 
     ngOnInit(): void {
-      this._reciboBuqueService.sendGenerarPDF.subscribe(() => this.crearPDF());
+      
+    }
+    ngAfterViewInit(){
+      this.recibirDataImpresion()
+      
+    }
+    
+    recibirDataImpresion(){
+      console.log("RECIBIENDO DATA DESDE PDF", this.reciboBuque);
+      if(this.reciboBuque !== null){
+        this.recibo = this.reciboBuque.reciboDeBuqueDetalles[0];
+        this.crearPDF();
+      }
     }
 
     crearPDF(){
