@@ -580,6 +580,7 @@
     <Compile Include="Procesamiento\ProcesadorModificarEstiba.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarIngresoDatosExportacion.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarDocumentoExterno.cs" />
+    <Compile Include="Procesamiento\ProcesadorModificarLineUp.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMaterialPorCentro.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMotivosLimpieza.cs" />
     <Compile Include="Procesamiento\ProcesadorAgregarMarcaSustentable.cs" />

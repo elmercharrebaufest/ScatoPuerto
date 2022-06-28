@@ -251,27 +251,21 @@ export class LineupEmbarqueComponent implements OnInit {
       else if (posicion >= cantidadDeLineUps) {
         this.instanciaWorkflow.lineUp.orden = this.embarquesPuerto[cantidadDeLineUps - 1].lineUp.orden + 1;
       }
-      else {
-        var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow);
-        var moverParaAbajo = posicionActual < posicion;
-        var ordenSiguiente = this.embarquesPuerto[posicion].lineUp.orden;
-        var ordenActual = this.embarquesPuerto[posicion - 1].lineUp.orden;
-        var ordenanerior = this.embarquesPuerto[posicion - 2].lineUp.orden;
+      
+        var cantidadDeLineUps = this.embarquesPuerto.length;
+        //1,2,3,4,5,6,7,8
+        var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
+        
+        if (posicion > posicionActual){
+          this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion + 0.5
+        }else{
+          this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion - 0.5
+        }
+        //1,2,3,4,5,6
+        //1,2,3,2.5,5,6
+        this.embarquesPuerto = this.embarquesPuerto.sort((a,b) => a.lineUp.orden - b.lineUp.orden);
 
-        this.embarquesPuerto.forEach((x, index) => { console.log(index + ":" + x.embarque.nombreBuque + " - " + x.lineUp.orden) });
-        console.log(ordenanerior + ' - ' + ordenActual);
-        console.log("Base:" + this.embarquesPuerto[posicion - 1].embarque.nombreBuque + " " + ordenActual);
-        var ordenNuevo = ordenActual + Math.round((moverParaAbajo ? (ordenSiguiente - ordenActual) : -(ordenActual - ordenanerior)) / 2 * 10000) / 10000;
-        console.log(ordenActual + "para abajo?" + moverParaAbajo + "? " + (ordenSiguiente - ordenActual) / 2 + " : " + -(ordenActual - ordenanerior) / 2 + "= " + ordenNuevo);
-
-
-        console.log("Base2:" + this.embarquesPuerto[posicionActual].embarque.nombreBuque + " " + this.embarquesPuerto[posicionActual].lineUp.orden + "=>" + ordenNuevo);
-
-        this.instanciaWorkflow.lineUp.orden = ordenNuevo;
-      }
-    }
-
-    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { if (this.observador) this.observador.Actualizar(); });
+        let index = 1
   }
 
   /**ubicacion == 2 --> Muelle de Carga**/
