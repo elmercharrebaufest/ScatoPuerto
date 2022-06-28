@@ -26,6 +26,7 @@ import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/plani
 import { TanquesComponent } from './operaciones/tanques/tanques.component';
 import * as html2pdf from 'html2pdf.js';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
+import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
 @Component({
   selector: 'app-carga-liquidos',
   templateUrl: './carga-liquidos.component.html',
@@ -36,11 +37,14 @@ export class CargaLiquidosComponent implements OnInit {
 
   @Input() datosGrafico: any;
   @Output() hideSpinner = new EventEmitter<boolean>();
+  @Output() recargar = new EventEmitter<boolean>();
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
   @ViewChild(TanquesComponent) tanquesComponent: TanquesComponent;
   @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent: PlanillaTurnoLiquidosComponent;
+  @ViewChild(GraficosRitmosComponent) graficosRitmosComponent: GraficosRitmosComponent;
+
   datatanks: any;
   enviado: boolean;
   usuarioFinalizacion: string;
@@ -392,6 +396,12 @@ export class CargaLiquidosComponent implements OnInit {
 
   onTanquesSeleccionados(tanques) {
     this.tanquesSeleccionados = tanques;
+  }
+
+  recargarGraficoRitmos(recargar: boolean){
+    if (recargar){
+      this.graficosRitmosComponent.ngOnInit();
+    }
   }
 
 }

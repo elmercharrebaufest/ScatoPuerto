@@ -40,6 +40,7 @@ import { ObsCalidad } from '@ScatoModels/obs-calidad';
 })
 export class PlanillaTurnoLiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
+  @Output() recargarGraficos = new EventEmitter<boolean>();
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
   formTurnos: FormGroup;
   formCorte: FormGroup;
@@ -922,8 +923,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           }else{*/
             if (!this.destinos.find(d => d.nombre == b.destino)) {
               this.destinos.push(b.destino);
-              console.log('fin bodegas --->>')
-              console.log(this.bodegas)
             }
           //}
         })
@@ -1643,6 +1642,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
                     const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
                     this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
                     this.fillPlanilla();
+                    this.recargarGraficos.emit(true);
                   }
                 });
               }, error => {
