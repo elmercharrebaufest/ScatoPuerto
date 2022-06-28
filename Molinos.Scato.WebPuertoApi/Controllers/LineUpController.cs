@@ -137,7 +137,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
-            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpGet]
