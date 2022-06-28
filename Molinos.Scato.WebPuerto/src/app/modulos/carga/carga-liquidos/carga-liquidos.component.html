@@ -43,7 +43,7 @@
     </div>
     <div class='bg-white px-4 min-h5 shadow mt-4' id="turno-liquidos">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-      <app-planilla-turno-liquidos [tablerista]='true'></app-planilla-turno-liquidos>
+      <app-planilla-turno-liquidos [tablerista]='true' (recargarGraficos)="recargarGraficoRitmos($event)"></app-planilla-turno-liquidos>
     </div>
     <div class='mt-5' style='margin-left: 25%; width: 50%;'>
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
