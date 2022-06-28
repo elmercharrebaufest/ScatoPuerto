@@ -153,7 +153,7 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
-    this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('PostOperativo'));
+    this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad'));
     console.log('this.sanBenito: ', this.sanBenito);
 
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
