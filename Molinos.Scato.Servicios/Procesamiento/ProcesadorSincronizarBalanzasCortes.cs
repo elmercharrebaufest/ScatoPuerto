@@ -32,6 +32,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return;
 
+                if(embarqueBase.Ubicacion!=3)
+                    EnviarCalidad(embarqueBase);
+                
                 int embarque = embarqueBase.Id;
 
                 //int embarque = Repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == comando.IdModuloDeCarga).Embarque.Id;
@@ -76,7 +79,29 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 throw ex;
             }
         }
+        public void EnviarCalidad(Embarque embarque)
+        {
+            int horaInicio = 0;
+            int horaFin = 0;
+            var turnos = Repositorio.Listar<TurnoPuerto>();
+            var listaTurnos = new List<turnoMemoria>();
 
+            foreach (var item in turnos)
+            {
+                var horas = item.Nombre.Split('-');
+
+                horaInicio = Convert.ToInt32(horas[0]);
+                horaFin = Convert.ToInt32(horas[1]);
+
+                if( embarque.FechaHoraInicioCarga.Value.Hour >=horaInicio && 
+                    embarque.FechaHoraInicioCarga.Value.Hour < horaFin && DateTime.Now.Hour> horaFin)
+                {
+                    embarque.Ubicacion = 3;
+                    Repositorio.GuardarCambios();
+                }
+            }
+            
+        }
         public void ProcesarCargasPlanillaSolidos(int vapor_id, int IdModuloDeCarga, DateTime? fechaInicio)
         {
             try
