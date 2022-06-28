@@ -19,7 +19,9 @@ export class LineupService {
   ) {
 
   }
-
+  modificarOrdenLineUp(dcnIdsYOrden: any) {
+    return this.http.post(`${this.url}LineUp/ModificarOrden`, dcnIdsYOrden, { 'withCredentials': true });
+  }
   modificarLineUp(lineUp: LineUp) {
     return this.http.post(`${this.url}LineUp/Modificar`, lineUp, { 'withCredentials': true });
   }
