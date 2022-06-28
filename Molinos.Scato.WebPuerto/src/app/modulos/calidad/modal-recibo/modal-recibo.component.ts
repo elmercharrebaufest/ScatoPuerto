@@ -27,6 +27,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   idEmbarque:number;
   nombreBuque:string;
   reciboDeBuqueForm: FormGroup;
+  enviado: boolean;
   @Input() mostrarModal:boolean = false;
   @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo:TemplateRef<any>;
 
@@ -105,6 +106,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   mostrarModalOjito(){
     if(this.ojitoRecibo != undefined){
       if (this.mostrarModal){
+        this.enviado = true;
+
         this._modalService.open(this.ojitoRecibo, { size: 'lg'});
         this.setModalOjito()
       }
@@ -128,6 +131,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   }
 
   openModalEmitirRecibo(modal: any) {
+    this.enviado = false;
     // this.errorMessage = false;
     this._modalService.open(modal, { size: 'lg'});
     
@@ -146,7 +150,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
     
     this.enviarMail(this.idEmbarque, this.reciboBuque);
-
+    this.enviado = true;
   }
   
   enviarMail(idEmbarque, Recibo) {

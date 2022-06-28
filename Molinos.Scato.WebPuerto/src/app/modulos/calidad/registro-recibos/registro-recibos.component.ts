@@ -93,6 +93,6 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     recibo.fechaHoraImpresion = new Date();
     console.log("--===FECHA RECIBO===--", recibo.fechaHoraImpresion);
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {console.log('200 Ok')});
-    this.refreshRecibos();
+    // this.refreshRecibos();
   }
 }

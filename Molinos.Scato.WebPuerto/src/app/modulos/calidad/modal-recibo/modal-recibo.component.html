@@ -263,12 +263,22 @@
         CANCELAR
       </button>
       <button
+        *ngIf="!enviado"
         type="button"
         class="btn btn-success"
         (click)="guardarRecibo()"
         (click)="modal.dismiss('Cross click')"
       >
         ENVIAR A SUPERVISOR
+      </button>
+      <button
+        *ngIf="enviado"
+        type="button"
+        class="btn btn-success"
+        (click)="guardarRecibo()"
+        (click)="modal.dismiss('Cross click')"
+      >
+        CONFIRMAR DATOS
       </button>
     </div>
   </form>
