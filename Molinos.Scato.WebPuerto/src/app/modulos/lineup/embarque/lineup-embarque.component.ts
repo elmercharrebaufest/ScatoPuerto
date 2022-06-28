@@ -61,7 +61,7 @@ export class LineupEmbarqueComponent implements OnInit {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
     }
-    this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
+    //this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
@@ -241,17 +241,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   actualizarOrden(posicion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {
-
-      var cantidadDeLineUps = this.embarquesPuerto.length;
-
-      if (posicion == 1) {
-        this.instanciaWorkflow.lineUp.orden = this.embarquesPuerto[0].lineUp.orden / 2;
-      }
-      else if (posicion >= cantidadDeLineUps) {
-        this.instanciaWorkflow.lineUp.orden = this.embarquesPuerto[cantidadDeLineUps - 1].lineUp.orden + 1;
-      }
-      
+    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {  
         var cantidadDeLineUps = this.embarquesPuerto.length;
         //1,2,3,4,5,6,7,8
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
@@ -266,8 +256,22 @@ export class LineupEmbarqueComponent implements OnInit {
         this.embarquesPuerto = this.embarquesPuerto.sort((a,b) => a.lineUp.orden - b.lineUp.orden);
 
         let index = 1
-  }
+        this.embarquesPuerto.forEach(embarquePuerto => {
+          embarquePuerto.lineUp.orden = index;
+          index += 1;
+        }); 
+        let idsYorden: { [key: number]: number; } = {};
+        this.embarquesPuerto.forEach( embarquePuerto => {
+          idsYorden[embarquePuerto.lineUp.id] = embarquePuerto.lineUp.orden;
+        });        
 
+        this.instanciaWorkflow.lineUp.orden = posicion;
+        
+        this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
+          if (this.observador) this.observador.Actualizar(); 
+        });
+    }    
+  }
   /**ubicacion == 2 --> Muelle de Carga**/
   BarcoEnMuelleActualmente(listado: InstanciaWorkflowPuerto[]): boolean {
     if (!this.instanciaWorkflow.embarque.vicentin && !this.instanciaWorkflow.embarque.otrosMuelles && !this.instanciaWorkflow.embarque.noryon)
