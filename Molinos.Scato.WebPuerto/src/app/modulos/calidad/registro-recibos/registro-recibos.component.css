@@ -1,0 +1,10 @@
+.alCentro{
+    text-align: center;
+}
+.alCentroIconos{
+    text-align: center;
+    cursor: pointer;
+}
+.warn{
+    color: #F0AD4E;
+}
