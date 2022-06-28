@@ -294,6 +294,25 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ObtenerSupervisoresDeRecibo")]
+        public HttpResponseMessage ObtenerSupervisoresDeRecibo()
+        {
+            try
+            {
+                string destinatarios = servicio.obtenerDireccionesDeMail("SupervisoresRecibo");
+                System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
+                foreach (string mail in destinatarios.Split(';'))
+                    dest.Add(mail);
+                return Request.CreateResponse(HttpStatusCode.OK, dest);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos")]
         public HttpResponseMessage ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido, string fechaTurno)
         {
@@ -678,6 +697,39 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.EliminarObservacionDeCalidad(observacion_id);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]
+        public HttpResponseMessage GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
+        {
+            try
+            {
+                if(reciboDeBuque.FechaHoraImpresion != null) reciboDeBuque.FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion.Value.ToLocalTime();
+
+                servicio.GuardarReciboDeBuque(idEmbarque, reciboDeBuque);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ListarRecibosDeBuque")]
+        public HttpResponseMessage ListarRecibosDeBuque(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarRecibosDeBuque(idEmbarque));
             }
             catch (Exception ex)
             {
