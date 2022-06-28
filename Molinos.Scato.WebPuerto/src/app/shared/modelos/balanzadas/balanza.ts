@@ -67,4 +67,5 @@ export class MotivosFallasBalanza {
   nombre: string;
   id: number;
   siglas: string;
+  liquido:boolean;
 }

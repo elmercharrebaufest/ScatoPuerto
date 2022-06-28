@@ -182,7 +182,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 planoDeCarga.FilePathSecuencia = GuardarArchivo(comando.Dto.FilePathSecuencia, comando.Dto.PlanoDeCargaArchivoSecuenciaNombre, comando.Dto.Id);
             else
                 planoDeCarga.FilePathSecuencia = null;
-            Repositorio.GuardarCambios();
+            //Repositorio.GuardarCambios();
         }
 
         private void LimpiarCarpetaDeArchivos(int planoDeCargaId)
