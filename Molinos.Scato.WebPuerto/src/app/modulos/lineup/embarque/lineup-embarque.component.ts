@@ -18,6 +18,8 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocalizacion.component';
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
+import { sign } from 'crypto';
+import { LineUp } from '@ScatoModels/lineUp';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -241,7 +243,7 @@ export class LineupEmbarqueComponent implements OnInit {
     this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { if (this.observador) this.observador.Actualizar(); });
   }
 
-  actualizarOrden(posicion) {
+  actualizarOrden2(posicion) {
     if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {
 
       var cantidadDeLineUps = this.embarquesPuerto.length;
@@ -273,6 +275,42 @@ export class LineupEmbarqueComponent implements OnInit {
     }
 
     this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { if (this.observador) this.observador.Actualizar(); });
+  }
+
+  actualizarOrden(posicion) {
+    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {
+      
+        var cantidadDeLineUps = this.embarquesPuerto.length;
+        //1,2,3,4,5,6,7,8
+        var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
+        
+        if (posicion > posicionActual){
+          this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion + 0.5
+        }else{
+          this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion - 0.5
+        }
+        //1,2,3,4,5,6
+        //1,2,3,2.5,5,6
+        this.embarquesPuerto = this.embarquesPuerto.sort((a,b) => a.lineUp.orden - b.lineUp.orden);
+
+        let index = 1
+        this.embarquesPuerto.forEach(embarquePuerto => {
+          embarquePuerto.lineUp.orden = index;
+          index += 1;
+        }); 
+        let idsYorden: { [key: number]: number; } = {};
+        this.embarquesPuerto.forEach( embarquePuerto => {
+          idsYorden[embarquePuerto.lineUp.id] = embarquePuerto.lineUp.orden;
+        });        
+
+        this.instanciaWorkflow.lineUp.orden = posicion;
+        
+        this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
+          if (this.observador) this.observador.Actualizar(); 
+        });
+      }    
+
+   
   }
 
   /**ubicacion == 2 --> Muelle de Carga**/
