@@ -128,7 +128,7 @@ export class LineasComponent implements OnInit, OnChanges {
     const temperaturaInicial = linea.controls['temperaturaInicial'].value;
     const alturaInicialCM = linea.controls['alturaInicialCM'].value;
     const alturaFinalMM = linea.controls['alturaFinalMM'].value;
-    const tkInicial = linea.controls['tkInicial'].value;
+    const tkInicial = linea.controls['tkInicial'].value.value;
     linea.controls['temperaturaFinal'].setValue(0, { emitEvent: false });
     linea.controls['litros'].setValue(0, { emitEvent: false });
     linea.controls['kilos'].setValue(0, { emitEvent: false })
@@ -150,7 +150,7 @@ export class LineasComponent implements OnInit, OnChanges {
     const temperaturaInicial = linea.controls['temperaturaInicial'].value;
     const alturaInicialCM = linea.controls['alturaInicialCM'].value;
     const alturaFinalMM = linea.controls['alturaFinalMM'].value;
-    const tkInicial = linea.controls['tkInicial'].value;
+    const tkInicial = linea.controls['tkInicial'].value.value;
     linea.controls['tkFinal'].setValue(0, { emitEvent: false })
     linea.controls['temperaturaFinal'].setValue(0, { emitEvent: false });
     linea.controls['temperaturaFinal'].setValue(temperaturaInicial, { emitEvent: false });

@@ -38,14 +38,17 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargarTurnosBalanzas();
+  }
+
+  private cargarTurnosBalanzas() {
     if (this.liquido)
       this.subscribeTurnos();
     else
       this.subscribeBalanzas();
   }
-
   subscribeTurnos() {
-    this.balanzaService.obtenerRitmosLiquidos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
+    this.balanzaService.obtenerRitmosLiquidos(this.vaporId, this.moduloDeCargaId).subscribe(res => {
       // console.log('==> GRAFICOS-RITMOS - Líquido: ', res);
       this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
       this.valorNeto = res?.ritmoAcumuladoNeto ? res.ritmoAcumuladoNeto : 0;
@@ -62,7 +65,7 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeBalanzas() {
-    this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
+    this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe(res => {
       // console.log('obtenerRitmos: ', res);
       this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
       this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
