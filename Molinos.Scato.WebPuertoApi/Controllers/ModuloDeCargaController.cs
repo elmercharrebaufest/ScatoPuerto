@@ -710,6 +710,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
+                if(reciboDeBuque.FechaHoraImpresion != null) reciboDeBuque.FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion.Value.ToLocalTime();
+
                 servicio.GuardarReciboDeBuque(idEmbarque, reciboDeBuque);
 
                 return Request.CreateResponse(HttpStatusCode.OK);

@@ -27,7 +27,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   idEmbarque:number;
   nombreBuque:string;
   reciboDeBuqueForm: FormGroup;
-  enviado: boolean;
+  // enviado: boolean;
   @Input() mostrarModal:boolean = false;
   @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo:TemplateRef<any>;
 
@@ -106,7 +106,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   mostrarModalOjito(){
     if(this.ojitoRecibo != undefined){
       if (this.mostrarModal){
-        this.enviado = true;
+        // this.enviado = true;
 
         this._modalService.open(this.ojitoRecibo, { size: 'lg'});
         this.setModalOjito()
@@ -131,7 +131,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   }
 
   openModalEmitirRecibo(modal: any) {
-    this.enviado = false;
+    // this.enviado = false;
     // this.errorMessage = false;
     this._modalService.open(modal, { size: 'lg'});
     
@@ -146,42 +146,42 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboBuque.estado = "Aprobado";
     this.reciboBuque.fechaHoraImpresion = null;
     this.reciboBuque.reciboDeBuqueDetalles = [];
-
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
-    
-    this.enviarMail(this.idEmbarque, this.reciboBuque);
-    this.enviado = true;
+    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => console.log('200 Ok'));
+    this._reciboSharingService.setRefreshRecibo(true);
+    // this.enviarMail(this.idEmbarque, this.reciboBuque);
+    // this.enviado = true;
   }
   
-  enviarMail(idEmbarque, Recibo) {
-    var titulo = "Enviar a supervisor";
-    var text = "Cuerpo del Mail:"
-    var textoCuerpoMail = 'Cuerpo del mail';
-    var inputTitle = "Destinatarios";
-    var mailSupervisor = new Mail(`Recibo.`,`${textoCuerpoMail}`);
-    this._reciboBuqueService.obtenerDestinatariosRecibo('SupervisoresRecibo').subscribe(destinatarios => { mailSupervisor.destinatarios = destinatarios; });
-    var button1 = 'Enviar';
-    var button2 = 'Cancelar';
+  // enviarMail(idEmbarque, Recibo) {
+  //   var titulo = "Enviar a supervisor";
+  //   var text = "Cuerpo del Mail:"
+  //   var textoCuerpoMail = 'Cuerpo del mail';
+  //   var inputTitle = "Destinatarios";
+  //   var mailSupervisor = new Mail(`Recibo.`,`${textoCuerpoMail}`);
+  //   this._reciboBuqueService.obtenerDestinatariosRecibo('SupervisoresRecibo').subscribe(destinatarios => { mailSupervisor.destinatarios = destinatarios; });
+  //   var button1 = 'Enviar';
+  //   var button2 = 'Cancelar';
 
-    this._confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailSupervisor, null, inputTitle, true)
-      .then((confirmed) => {
-        if (confirmed) {
-          this._reciboBuqueService.guardarReciboDeBuque(idEmbarque, Recibo).subscribe(() => console.log('200 Ok'));
-          this._reciboSharingService.setRefreshRecibo(true);
+  //   this._confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailSupervisor, null, inputTitle, true)
+  //     .then((confirmed) => {
+  //       if (confirmed) {
+  //         this._reciboBuqueService.guardarReciboDeBuque(idEmbarque, Recibo).subscribe(() => console.log('200 Ok'));
+  //         this._reciboSharingService.setRefreshRecibo(true);
 
-          }
-      })
-      .catch((e) => {
-         this._confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
-         .then((confirmed) => {
-          if (confirmed){
+  //         }
+  //     })
+  //     .catch((e) => {
+  //        this._confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
+  //        .then((confirmed) => {
+  //         if (confirmed){
             
-            return
-          }
-          return
-       }).catch(() => window.location.reload());
+  //           return
+  //         }
+  //         return
+  //      }).catch(() => window.location.reload());
 
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-      });
-  }
+  //       console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+  //     });
+  // }
 }

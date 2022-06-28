@@ -32,10 +32,10 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   ) 
   {
     this.refreshRecibos();
-    this._reciboSharingService.getReciboImpresionSubject().subscribe((data:ReciboDeBuque) => {
+    this._reciboSharingService.getFiltroRecibos().subscribe((data:ReciboDeBuque) => {
       this.recibo = data;
     });
-    this._reciboSharingService.getFiltroRecibos().subscribe((data:ReciboDeBuque) => {
+    this._reciboSharingService.getReciboImpresionSubject().subscribe((data:ReciboDeBuque) => {
       this.recibo = data;
     });
     
@@ -86,13 +86,8 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   }
   generarPDF(recibo){
     this._reciboSharingService.setReciboImpresionSubject(recibo);
-    // let fechaActual = new Date;
-    // let anio = fechaActual.getFullYear();
-    // let mes = fechaActual.getMonth();
-    // let dia = fechaActual.getDate();
     recibo.fechaHoraImpresion = new Date();
-    console.log("--===FECHA RECIBO===--", recibo.fechaHoraImpresion);
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {console.log('200 Ok')});
-    // this.refreshRecibos();
+    this.refreshRecibos();
   }
 }
