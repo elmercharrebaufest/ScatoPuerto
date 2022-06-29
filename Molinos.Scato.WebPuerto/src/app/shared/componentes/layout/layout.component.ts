@@ -53,11 +53,14 @@ export class LayoutComponent implements OnInit {
   }
 
   goHome() {
-    if (this.user.permisos.find(x => x === 600))
+    // if (this.user.permisos.find(x => x === 600))
+    if (this.user.permisos.find(x => x === 'LineUp_Ver'))
       this.router.navigate(['/lineup']);
-    if (this.user.permisos.find(x => x === 630))
+    // if (this.user.permisos.find(x => x === 630))
+    if (this.user.permisos.find(x => x === 'PlanoDeCarga_Ver'))
       this.router.navigate(['/carga'])
-    if (this.user.permisos.find(x => x === 640))
+    // if (this.user.permisos.find(x => x === 640))
+    if (this.user.permisos.find(x => x === 'Recibidores_Ver'))
       this.router.navigate(['/calidad'])
     this.opened = false;
   }
@@ -76,7 +79,8 @@ export class LayoutComponent implements OnInit {
       this.opened = false;
   }
 
-  tienePermiso(permiso: number) {
+  // tienePermiso(permiso: number) {
+  tienePermiso(permiso: string) {
     return this.user.permisos.find(x => x === permiso);
   }
 

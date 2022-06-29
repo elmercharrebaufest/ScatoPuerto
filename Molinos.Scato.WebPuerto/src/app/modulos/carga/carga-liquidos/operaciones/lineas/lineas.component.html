@@ -5,8 +5,10 @@
     <div fxLayout='row wrap' class="mt-3">
       <div fxFlex='100'>
         <div class='btn-add-container pt-btn-add' (click)="onAgregarLineasEmbarque()" id="btn-add-container-lineas">
-          <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;' >+</button>
-          <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
+          <ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Editar()">
+            <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;' >+</button>
+            <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -157,7 +159,9 @@
                             </div>
 
                             <div fxFlex='4' class='full-center btn-eliminar'>
-                                <img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarLineasEmbarque(i)">
+								<ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Eliminar()">
+                                	<img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarLineasEmbarque(i)">
+                            	</ng-container>
                             </div>
 
                           </td>
@@ -176,9 +180,11 @@
     </table>
     <br/>
     <div class="text-center" >
-      <button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary"  
-      (click)="onGuardar()" 
-      [disabled]="!esGuardadoActivo" >GUARDAR</button>
+    	<ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Editar()">
+			<button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary"  
+			(click)="onGuardar()" 
+			[disabled]="!esGuardadoActivo" >GUARDAR</button>
+   		</ng-container>
    </div>
   </div>
 </div>

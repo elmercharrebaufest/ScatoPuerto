@@ -1,6 +1,7 @@
 export interface Usuario{
     username: string;
-    permisos: number[];
+    // permisos: number[];
+    permisos: string[];
     token: any;
     autenticado: boolean;
 }

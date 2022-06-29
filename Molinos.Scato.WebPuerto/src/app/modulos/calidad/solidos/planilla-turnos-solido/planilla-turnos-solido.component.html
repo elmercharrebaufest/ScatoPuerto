@@ -212,8 +212,10 @@
         <p-toast data-html2canvas-ignore="true" position='top-center' key='enviar-turno'></p-toast>
     
         <div data-html2canvas-ignore="true" class="mt-4 text-center">
-            <button id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
-            <button id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
+        	<ng-container *ngIf="hasPermisoRecibidores_ExportarEnviarPlanillas()">
+	            <button id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
+	            <button id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
+			</ng-container>
         </div>
         </div>    
     </div>

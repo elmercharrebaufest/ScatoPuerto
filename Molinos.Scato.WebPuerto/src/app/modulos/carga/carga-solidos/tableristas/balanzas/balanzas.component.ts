@@ -19,8 +19,11 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
+import { SessionService } from '@ScatoServicios/session.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 
@@ -86,6 +89,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   producto8EnCurso: string;
   llevaCargando8EnCurso: number;
   mostrarInfoBalanzadasEnCurso: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -98,10 +103,12 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     private embarqueService: EmbarqueService,
     private _balanzaService: BalanzaService,
     private funcionesGeneralesService: FuncionesGeneralesService,
-    private parametrosService: ParametrosService) {
+    private parametrosService: ParametrosService,
+    private session: SessionService,) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
+    this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
     /*
@@ -1116,4 +1123,13 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.unsubscribe.complete();
   }
 
+  hasPermisoCorteManualBalanzas() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_CorteManualBalanzas);
+  }
+  hasPermisoTableroSolido_MotivoCorte_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_MotivoCorte_Editar);
+  }
+  hasPermisoTableroSolido_TerminarCarga_Exportar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_TerminarCarga_Exportar);
+  }
 }

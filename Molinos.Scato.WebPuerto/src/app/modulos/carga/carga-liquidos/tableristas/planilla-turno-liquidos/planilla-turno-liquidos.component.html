@@ -7,8 +7,10 @@
     <!-- <button class='btn btn-primary' (click)="fillPlanilla()">Cargar turnos </button> -->
 </div>
 <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
-    <button *ngIf="tablerista" id="btn-agregar-turnos-liquidos" class='btn btn-success divHeaderRight'
-        (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
+    <ng-container *ngIf="hasPermisoTableroLiquido_AgregarTurno()">
+        <button *ngIf="tablerista" id="btn-agregar-turnos-liquidos" class='btn btn-success divHeaderRight'
+            (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
+    </ng-container>
     <br>
     <br>
 
@@ -73,21 +75,27 @@
                                                             {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.
                                                         </span>
                                                     </span>
-                                                    <button id="btn-guardar-turno-liquidos"
-                                                        class='btn btn-success btn-sm'
-                                                        style="margin-right: 5px; margin-bottom: 5px"
-                                                        (click)='guardarTurnoGeneral(d,t)'
-                                                        [disabled]="!bGrabandoTurnoActivo">
-                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
-                                                        'Guardar Turno'}}
-                                                    </button>
-                                                    <button id="btn-turno-enviado-liquidos"
-                                                        *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
-                                                        (click)='guardarTurnoGeneral(d,t,true)'
-                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-                                                        {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
-                                                        'Turno enviado'}}
-                                                    </button>
+                                                    <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_GuardarTurno()) || 
+                                                    turno.value.guardadoPorTablerista">
+	                                                    <button id="btn-guardar-turno-liquidos"
+	                                                        class='btn btn-success btn-sm'
+	                                                        style="margin-right: 5px; margin-bottom: 5px"
+	                                                        (click)='guardarTurnoGeneral(d,t)'
+	                                                        [disabled]="!bGrabandoTurnoActivo">
+	                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
+	                                                        'Guardar Turno'}}
+	                                                    </button>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_EnviarARecibidores()) ||
+                                                    turno.value.guardadoPorTablerista">
+	                                                    <button id="btn-turno-enviado-liquidos"
+	                                                        *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
+	                                                        (click)='guardarTurnoGeneral(d,t,true)'
+	                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
+	                                                        {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
+	                                                        'Turno enviado'}}
+	                                                    </button>
+													</ng-container>
                                                     <span class='parcel-cantidad'
                                                         *ngIf="turno.value.guardadoPorTablerista"><b>Turno en
                                                             recibidores</b></span>
@@ -212,9 +220,11 @@
                                             <td colspan="13" class='btn-add-cell'>
                                                 <div class='btn-add-container center-bt' 
                                                     (click)='openModalCorte(addCorte, d, t)' #addButton>
-                                                    <button type='button' class='btn btn-primary bt-circle'
-                                                        style='margin-top: -5px;'>+</button>
-                                                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                                    <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
+                                                        <button type='button' class='btn btn-primary bt-circle'
+                                                            style='margin-top: -5px;'>+</button>
+                                                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                                    </ng-container>
                                                 </div>
                                             </td>
                                         </tr>
@@ -450,8 +460,10 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
-            (click)='onExportarExcelLiquido()'>Exportar planilla</button>
+    	<ng-container *ngIf="hasPermisoTableroLiquido_Exportar()">
+	        <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
+	            (click)='onExportarExcelLiquido()'>Exportar planilla</button>
+		</ng-container>
     </div>
 </div>
 

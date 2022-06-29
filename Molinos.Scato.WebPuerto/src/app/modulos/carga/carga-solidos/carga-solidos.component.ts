@@ -1,8 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { forkJoin } from 'rxjs';
-import jspdf from 'jspdf';
-import html2canvas from 'html2canvas';
 import * as html2pdf from 'html2pdf.js';
 
 // MODELOS
@@ -16,7 +14,6 @@ import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
 // SERVICIOS
 import { AlertService } from '@ScatoServicios/alert.service';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -32,6 +29,7 @@ import { NIRComponent } from '../../calidad/solidos/nir/nir.component';
 import { UmapComponent } from './tableristas/umap/umap.component';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 
 @Component({
@@ -61,7 +59,7 @@ export class CargaSolidosComponent implements OnInit {
   inicioCarga: boolean = false;
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
-  
+  permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
@@ -355,5 +353,32 @@ export class CargaSolidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
       if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
     });
+
+  hasPermisoPlanoDeCarga_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Guardar);
+  }
+  hasPermisoPlanoDeCarga_Finalizar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Finalizar);
+  }
+  hasPermisoPlanoDeCarga_Imprimir() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Imprimir);
+  }
+  hasPermisoPlanoDeCarga_Cancelar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Cancelar);
+  }
+  hasPermisoEnviarATablerista() {
+    return this.user.permisos.find(p => p === this.permisosScato.Operadores_EnviarATablerista);
+  }
+  hasPermisoTableroSolido_VerRitmosEmbarqueBlzas78() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerRitmosEmbarqueBlzas78);
+  }
+  hasPermisoTableroSolido_VerCargasBodegas() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerCargasBodegas);
+  }
+  hasPermisoTableroSolido_VerRitmos() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerRitmos);
+  }
+  hasPermisoTableroSolido_VerInformacionAdicional() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerInformacionAdicional);
   }
 }

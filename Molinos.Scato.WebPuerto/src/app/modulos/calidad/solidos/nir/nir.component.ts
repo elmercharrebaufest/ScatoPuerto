@@ -14,6 +14,9 @@ import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { NirManoComponent } from './nir-mano/nir-mano.component';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-nir',
@@ -40,6 +43,15 @@ export class NIRComponent {
   MaizMano2: boolean = false;
   isLoaded: boolean = false;
   guardando: boolean = false;
+  bodegas: Bodega[];
+  hideSpinner: any;
+  envioNir:boolean = false;
+  objetoMailNir: object;
+  celdasManoDeEmbarque: CeldaManoDeEmbarque[];
+  file:any;
+  public configListaMultiple: any;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private fb: FormBuilder,
@@ -48,9 +60,11 @@ export class NIRComponent {
     confirmationDialogService: ConfirmationDialogService,
     private procesoCalidadService: ProcesoCalidadService,
     private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
-    private _CalidadSharedService: CalidadSharedService
+    private _CalidadSharedService: CalidadSharedService,
+    private session: SessionService,
   ) {
     this.nir = new Nir();
+    this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
 
@@ -324,5 +338,28 @@ export class NIRComponent {
     this.nir.mano1.tipo = this.Mano1Visible ? this.TrigoMano1 ? 'Trigo' : 'Maíz' : ''
     this.nir.mano2 = new Mano();
     this.nir.mano2.tipo = this.Mano2Visible ? this.TrigoMano2 ? 'Trigo' : 'Maíz' : ''
+  }
+
+  hasPermisoRecibidores_Nir_AgregarNuevaFila() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
+  }
+  hasPermisoRecibidores_Nir_EliminarFila() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
+  }
+  hasPermisoRecibidores_Nir_EnviarNir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EnviarNir);
+  }
+  hasPermisoRecibidores_Nir_GuardarNir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_GuardarNir);
+  }
+
+  hasPermisoRecibidores_Nir_AgregarNuevaFila() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
+  }
+  hasPermisoRecibidores_Nir_EliminarFila() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
+  }
+  hasPermisoRecibidores_Nir_EnviarNir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EnviarNir);
   }
 }

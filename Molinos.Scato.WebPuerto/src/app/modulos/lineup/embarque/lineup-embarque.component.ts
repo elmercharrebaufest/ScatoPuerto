@@ -46,8 +46,6 @@ export class LineupEmbarqueComponent implements OnInit {
   ArchivosPuerto: ArchivoPuerto[];
   ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
-
-
   imagePath: any;
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
@@ -57,6 +55,7 @@ export class LineupEmbarqueComponent implements OnInit {
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
+
   constructor(
     private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
@@ -115,7 +114,9 @@ export class LineupEmbarqueComponent implements OnInit {
     }
   }
   public modificarLineUp(campo: string) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
+    // if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
+    // if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque)) {
+    if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       switch (campo) {
         case "CartaDeSubidaEnviada": {
           this.instanciaWorkflow.lineUp.cartaDeSubidaEnviada = !this.instanciaWorkflow.lineUp.cartaDeSubidaEnviada;
@@ -164,7 +165,8 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public armarPlanoCarga() {
-    if (this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Editar))
+    // if (this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Editar))
+    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPlanoDeCarga))
       this.router.navigate([`/lineup/plano-de-carga/${this.instanciaWorkflow.embarque.id}`]);
     else
       this.showWarning();
@@ -206,7 +208,9 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public onSelectAction(accion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacion)) {
+    // if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacion)) {
+    // if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacionEmbarque)) {
+    if (this.hasPermisoLineUp_EditarUbicacionEmbarque()) {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
       if (accion == 2) {
@@ -254,7 +258,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   actualizarOrden(posicion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {  
+    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque)) {  
         var cantidadDeLineUps = this.embarquesPuerto.length;
         //1,2,3,4,5,6,7,8
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
@@ -303,8 +307,9 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public guardarFechaCarta() {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
-
+    // if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
+    // if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque)) {
+    if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       console.log(this.fechaCarta + ' ' + this.horaCarta)
       if (this.fechaCarta && this.horaCarta) {
         this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada = this.fechaCarta + ' ' + this.horaCarta;
@@ -344,16 +349,29 @@ export class LineupEmbarqueComponent implements OnInit {
     this.messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
   }
 
-  hasPermisoRadios() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks);
+  // hasPermisoRadios() {
+  //   // return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks);
+  //   return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
+  // }
+  hasPermisoLineUp_EliminarBuque() {
+    // return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EliminarBuque);
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EliminarBuque);
   }
-
-  hasPermisoDeleteEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EliminarBuque);
+  hasPermisoLineUp_EditarBuque() {
+    // return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarBuque);
   }
-
-  hasPermisoEditEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
+  hasPermisoLineUp_EditarChecksEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
+  }
+  hasPermisoLineUp_EditarUbicacionEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacionEmbarque);
+  }
+  hasPermisoLineUp_EditarOrdenEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
+  }
+  hasPermisoLineUp_EditarPlanoDeCarga() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPlanoDeCarga);
   }
 
 //------------------------------------------------------------------------------------------------------------

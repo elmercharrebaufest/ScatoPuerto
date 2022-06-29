@@ -6,6 +6,9 @@ import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { finalize } from 'rxjs/operators';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-cargando-muelle',
@@ -23,11 +26,16 @@ export class CargandoMuelleComponent implements OnInit {
   liquido: boolean;
   fechaAmarro: Date;
   horaAmarro: string;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private router: Router,
     private balanzaService: BalanzaService,
-    private moduloCargaService: ModuloDeCargaService,) { }
+    private moduloCargaService: ModuloDeCargaService,
+    private session: SessionService,) { 
+      this.user = this.session.getUser()
+  }
 
   ngOnInit(): void {
 
@@ -94,4 +102,9 @@ export class CargandoMuelleComponent implements OnInit {
   get filteredMaterialList(): MaterialPuertoCantidad[] {
     return this.instanciaWorkflow.embarque.materialesPuertoCantidad.filter(x => x.cantidad > 0);
   }
+
+  hasPermisoEditarEmbarqueEnCalidad(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarEmbarqueEnCalidad);
+  }
+}
 }

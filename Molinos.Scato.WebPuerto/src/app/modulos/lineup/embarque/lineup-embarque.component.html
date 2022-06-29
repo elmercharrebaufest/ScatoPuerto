@@ -124,7 +124,8 @@
       </div>
       <div class="col border-left border-top border-gris"><div class="my-auto d-none"><i class="fa fa-sort-down"></i></div></div>
       <div class="col border-left border-top border-gris">
-        <ng-container *ngIf="hasPermisoRadios()">
+        <!-- <ng-container *ngIf="hasPermisoRadios()"> -->
+        <ng-container *ngIf="hasPermisoLineUp_EditarChecksEmbarque()">
           <app-toggle-menu-acciones>
             <div class="list-group" style="width: min-content; margin-left:-50%">
               <div class="list-group-item">
@@ -140,7 +141,6 @@
               </div>
               <div class="list-group-item">
                 <button type="button" class="btn btn-primary btn-sm ml-n2" (click)="guardarFechaCarta()">Guardar</button>
-
               </div>
             </div>
           </app-toggle-menu-acciones>
@@ -228,14 +228,16 @@
     <p class="text-left mb-0 overflow-auto"><strong>Observaciones: </strong>{{instanciaWorkflow.embarque.observaciones}}</p>
   </div>
   <div class="col-md-3 col-xs-6 mt-4">
-    <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.cargado == false && instanciaWorkflow.embarque.sanBenito">
-      <button type="button" class="btn btn-success btn-md float-right"
-              (click)="armarPlanoCarga()">ARMAR PLANO DE CARGA</button>
-    </div>
-    <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.cargado && instanciaWorkflow.lineUp.planoDeCarga.enviado == false && instanciaWorkflow.embarque.sanBenito">
-      <button type="button" class="btn btn-outline-success btn-md float-right"
-              (click)="armarPlanoCarga()">EDITAR PLANO DE CARGA</button>
-    </div>
+    <ng-container *ngIf="hasPermisoLineUp_EditarPlanoDeCarga()">
+      <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.cargado == false && instanciaWorkflow.embarque.sanBenito">
+        <button type="button" class="btn btn-success btn-md float-right"
+                (click)="armarPlanoCarga()">ARMAR PLANO DE CARGA</button>
+      </div>
+      <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.cargado && instanciaWorkflow.lineUp.planoDeCarga.enviado == false && instanciaWorkflow.embarque.sanBenito">
+        <button type="button" class="btn btn-outline-success btn-md float-right"
+                (click)="armarPlanoCarga()">EDITAR PLANO DE CARGA</button>
+      </div>
+    </ng-container>
     <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.enviado && instanciaWorkflow.lineUp.planoDeCarga.cargado && instanciaWorkflow.embarque.sanBenito">
       <img float-right src="assets/planoDeCargaEnviadoButton.svg" onmouseover="this.src='assets/planoDeCargaEnviadoButtonInvertido.svg';" 
         onmouseout="this.src='assets/planoDeCargaEnviadoButton.svg';" class="cursorPointer float-right" (click)="armarPlanoCarga()">
@@ -280,11 +282,11 @@
   <div class="col-md-3 col-xs-6">
     <div class="form-row justify-content-end">
       <div class="col-12 align-items-center">
-        <ng-container *ngIf="hasPermisoDeleteEmbarque()">
+        <ng-container *ngIf="hasPermisoLineUp_EliminarBuque()">
           <img src="assets/trashIcon.svg" class="cursorPointer float-right" (click)="eliminarEmbarque()">
         </ng-container>
 
-        <ng-container *ngIf="hasPermisoEditEmbarque()">
+        <ng-container *ngIf="hasPermisoLineUp_EditarBuque()">
           <button type="button" class="btn btn-primary btn-md float-right mr-2 mt-2" (click)="editarEmbarque()">EDITAR BUQUE</button>
         </ng-container>
       </div>

@@ -23,6 +23,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { convertToObject } from 'typescript';
 import { PlanillaTurnoSolidoExcelService } from '@ScatoServicios/planilla-turno-solido-excel';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -60,6 +61,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   selectedNewTurno: number;
   @Input() tablerista: boolean;
   private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   exportaPlanilla: boolean = false;
 
   constructor(
@@ -76,6 +78,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private planillaTurnoExcelService: PlanillaTurnoSolidoExcelService
   ) {
+    this.user = this.session.getUser();
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
@@ -83,7 +86,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
@@ -938,4 +940,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     }
   }
 
+  hasPermisoRecibidores_ExportarEnviarPlanillas() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
+  }
 }

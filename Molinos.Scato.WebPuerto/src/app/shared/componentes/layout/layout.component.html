@@ -6,7 +6,8 @@
       <img src='assets/sidebar/Logo_Molinos_M.png' (click)='goHome()'>
     </div>
     <div class='links-container' #menuSide>
-      <a routerLink='/' *ngIf='tienePermiso(600)'>
+      <!-- <a routerLink='/' *ngIf='tienePermiso(600)'> -->
+      <a routerLink='/' *ngIf='tienePermiso("LineUp_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "lineup" || rutaActual == ""'>
           <div class='icon-lineup'></div>
           <span>Line Up</span>
@@ -31,8 +32,10 @@
       <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA-->
       
       
-      <hr *ngIf='tienePermiso(600)'> 
-      <a routerLink='/geolocalizacion' *ngIf='tienePermiso(600)'>
+      <!-- <hr *ngIf='tienePermiso(600)'>  -->
+      <hr *ngIf='tienePermiso("LineUp_Ver")'> 
+      <!-- <a routerLink='/geolocalizacion' *ngIf='tienePermiso(600)'> -->
+      <a routerLink='/geolocalizacion' *ngIf='tienePermiso("LineUp_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
         
           <div class='icon-geolocalizacion'></div>
@@ -41,8 +44,10 @@
       </a>
     
 
-      <hr *ngIf='tienePermiso(630)'>
-      <a routerLink='/carga' *ngIf='tienePermiso(630)'>
+      <!-- <hr *ngIf='tienePermiso(630)'> -->
+      <hr *ngIf='tienePermiso("LineUp_Ver")'>
+      <!-- <a routerLink='/carga' *ngIf='tienePermiso(630)'> -->
+      <a routerLink='/carga' *ngIf='tienePermiso("LineUp_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>
           <div class='icon-operaciones'></div>
           <span *ngIf='opened'>Operaciones</span>
@@ -50,8 +55,10 @@
       </a>
 
       
-      <hr *ngIf='tienePermiso(640)'>
-      <a routerLink='/calidad' *ngIf='tienePermiso(640)'>
+      <!-- <hr *ngIf='tienePermiso(640)'> -->
+      <hr *ngIf='tienePermiso("LineUp_Ver")'>
+      <!-- <a routerLink='/calidad' *ngIf='tienePermiso(640)'> -->
+      <a routerLink='/calidad' *ngIf='tienePermiso("LineUp_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "calidad"'>
           <div class='icon-recibidores'></div>
           <span *ngIf='opened'>Recibidores</span>

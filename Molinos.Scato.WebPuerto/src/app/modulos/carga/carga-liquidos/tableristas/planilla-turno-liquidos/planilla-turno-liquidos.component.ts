@@ -27,6 +27,8 @@ import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { Observable, Subject } from 'rxjs';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
+import { convertToObject } from 'typescript';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -66,6 +68,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   cortesTurno: CorteTurno[] = [];
   private user: Usuario
   mostrarBtn: boolean = true;
+  permisosScato: typeof PermisosScato = PermisosScato;
   fechaHoraInicioCarga: Date;
 
   embarqueId: number;
@@ -108,7 +111,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
-
+    /*this.planoDeCargaService.obtenerDestinos().subscribe(res => {
+      this.destinoPuerto = res
+      console.log('this.destinoPuerto -->>')
+      console.log(this.destinoPuerto)
+    });*/
+    this.user = this.session.getUser();
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
     console.log('xxxx')
@@ -123,7 +131,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
@@ -131,13 +138,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }, 2000);
     this.initFormularioObs();
     this.initShipParticular();
+
+    setTimeout(() => {
+      this.controlarPermisos();
+    }, 3000);
   }
+  
   private obtenerTipoLineaEmbarque() {
     this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
       this.tipoLineaEmbarque = res;
       this.obtenerLineaProductoTk();
     });
   }
+
   cargarEmbarqueShipParticular() {
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
       this.embarque = res;
@@ -1735,4 +1748,35 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
     linea.controls['medidaFinalMM'].setValue(mm);
   }
+  
+  hasPermisoTableroLiquido_AgregarTurno() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarTurno);
+  }
+  hasPermisoTableroLiquido_EnviarARecibidores() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EnviarARecibidores);
+  }
+  hasPermisoTableroLiquido_AgregarCorte() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarCorte);
+  }
+  hasPermisoTableroLiquido_Exportar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Exportar);
+  }
+  hasPermisoTableroLiquido_Planilla_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Planilla_Editar);
+  }
+  hasPermisoTableroLiquido_GuardarTurno() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_GuardarTurno);
+  }
+
+  controlarPermisos(){
+    if(!this.hasPermisoTableroLiquido_Planilla_Editar()){
+      this.diasTurno.controls.forEach(dia => {
+        const turnos = dia['controls']['turnos']['controls'];
+        turnos.forEach(turno => {
+          turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].disable();
+        });
+      });
+    }
+  }
+
 }

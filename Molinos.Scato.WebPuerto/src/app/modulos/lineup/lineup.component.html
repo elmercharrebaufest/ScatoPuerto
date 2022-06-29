@@ -56,18 +56,22 @@
       </table>
     </div>
     <div class="col-lg-1 col-md-2 text-center">
-      <button type="button" class="btn btn-light btn-circle " (click)="cambiarVista()">
-        <i class="fa fa-calendar fa-2x c-celeste" [ngClass]="{'fa-calendar': !mostrarCalendario, 'fa-list-ul': mostrarCalendario}"></i>
-      </button>
+      <ng-container *ngIf="hasPermisoVerCalendario()">
+        <button type="button" class="btn btn-light btn-circle " (click)="cambiarVista()">
+          <i class="fa fa-calendar fa-2x c-celeste" [ngClass]="{'fa-calendar': !mostrarCalendario, 'fa-list-ul': mostrarCalendario}"></i>
+        </button>
+      </ng-container>
       <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA -->
 
-      <button type="button" class="btn btn-light btn-circle" (click)="cambiarGeolocalizacion()">
-        <i class="fa fa-map-marker fa-2x c-celeste"></i>
-      </button>
-
+      <ng-container *ngIf="hasPermisoVerGeo()">
+        <button type="button" class="btn btn-light btn-circle" (click)="cambiarGeolocalizacion()">
+          <i class="fa fa-map-marker fa-2x c-celeste"></i>
+        </button>
+      </ng-container>
 
       <!--<input class="form-control search" type="search" placeholder="&#xF002; Buscar" aria-label="Search">-->
     </div>
+
     <div class="col pr-0">
       <div class="row">
         <div class="col text-sm-center text-md-right">
@@ -78,6 +82,7 @@
       </div>
       <app-estados-puerto-content></app-estados-puerto-content>
     </div>
+    
   </div>
 
   <app-cargando-muelle *ngIf="sanBenitoCargandoMuelle" [instanciaWorkflow]="sanBenitoCargandoMuelle"></app-cargando-muelle>
@@ -247,3 +252,5 @@
 </div>
 
 <p-toast position='top-center' key='access-lineup'></p-toast>
+
+<!-- </ng-container> -->

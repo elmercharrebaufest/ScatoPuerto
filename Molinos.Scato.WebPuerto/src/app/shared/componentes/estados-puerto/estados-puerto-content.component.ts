@@ -19,7 +19,7 @@ export class EstadosPuertoContentComponent implements OnInit {
 
   constructor(
     private lineupService: LineupService,
-    public autenticadorService: AutenticadorService,
+    public auth: AutenticadorService,
     private _procesoService:DatosEmbarquesProcesoService
     ) { }
 
