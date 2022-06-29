@@ -55,6 +55,18 @@ export class CargaComponent implements OnInit, OnDestroy {
           this.embarquesEnLineUp = res;
           this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
           this.mostrarTabs = true;
+
+          let embarqueDelStorage = this.obtenerEmbarqueSelectedEnLocalStorage();
+          if(embarqueDelStorage){
+            let vaporEncontrado = this.embarquesEnLineUp.find( x => x.id == embarqueDelStorage.id);
+            if(vaporEncontrado){
+              //this.parametrosService.consola('=== vaporEncontrado === : ', vaporEncontrado);
+            }else{
+              //this.parametrosService.consola('=== vapor NO Encontrado ===');
+              localStorage.removeItem('embarqueSelected');
+            }
+          }
+
         });
     } catch (e) {
       console.log(e);
