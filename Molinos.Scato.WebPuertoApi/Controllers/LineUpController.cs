@@ -8,6 +8,7 @@ using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -119,6 +120,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,e.Message);
             }
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/LineUp/ModificarOrden")]
+        public HttpResponseMessage ModificarOrden(Dictionary<int,int> idsYOrden)
+        {           
+            try
+            {
+                servicioComandos.Ejecutar(new ModificarOrdenLineUp { IdsYOrden = idsYOrden });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
         [HttpGet]

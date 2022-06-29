@@ -159,6 +159,7 @@
     <Compile Include="Comandos\ModificarEstiba.cs" />
     <Compile Include="Comandos\ModificarIngresoDatosExportacion.cs" />
     <Compile Include="Comandos\ModificarDocumentoExterno.cs" />
+    <Compile Include="Comandos\ModificarLineUp.cs" />
     <Compile Include="Comandos\ModificarMaterialPorCentro.cs" />
     <Compile Include="Comandos\ModificarMotivosLimpieza.cs" />
     <Compile Include="Comandos\ModificarRecorridoDemora.cs" />
