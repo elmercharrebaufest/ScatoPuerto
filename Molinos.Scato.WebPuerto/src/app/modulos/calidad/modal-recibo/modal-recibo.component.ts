@@ -10,6 +10,7 @@ import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Mail } from '@ScatoModels/mail';
+import { SessionService } from '@ScatoServicios/session.service';
 
 
 
@@ -41,10 +42,11 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     private _embarqueService: EmbarqueService,
     private _reciboSharingService: ReciboSharingService,
     private _formBuilder: FormBuilder,
-    private _confirmationDialogService: ConfirmationDialogService,    
+    private _confirmationDialogService: ConfirmationDialogService,
+    public session: SessionService    
   ) 
   { 
-    
+    // session.getUser().username
     this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
       this.reciboBuqueOjito = data;
       this.mostrarModalOjito();
@@ -138,10 +140,12 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   }
   
   guardarRecibo(){
+
     
     this.reciboBuqueDetalles = this.reciboDeBuqueForm.getRawValue();
     this.reciboBuque = new ReciboDeBuque();
-    this.reciboBuque.emitio = 'pepito recibidor';
+    this.reciboBuque.emitio = this.session.getUser().username
+    // this.reciboBuque.emitio = 'pepito recibidor';
     this.reciboBuque.superviso = 'pepito sipervisor';
     this.reciboBuque.estado = "Aprobado";
     this.reciboBuque.fechaHoraImpresion = null;
