@@ -171,7 +171,7 @@
                                     <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length <= 0 : false'>
                                         <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                     </tr>
-                                    <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).controls.length > 0 : false'>
+                                    <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false'>
                                         <td colspan="12" class='p-0'>
                                             <table class='tabla table-bordered tabla-embebida'>
                                                 <thead>
@@ -184,21 +184,21 @@
                                                 </thead>
                                                 <tbody>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
-                                                        <ng-container *ngFor='let observacion of getObservacionTurnos(d, t).controls; let y = index' [formGroupName]='y'>
+                                                        <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                             <tr>
                                                                 <td colspan="1">
-                                                                    <div (click)="deleteObsCalidad(d, t, observacion)">
+                                                                    <div (click)="deleteObsCalidad(observacion)">
                                                                         <img src="assets/trashIcon.svg"  style="width: 40px;">
                                                                     </div>
                                                                 </td>
                                                                 <td colspan="6">
-                                                                    {{observacion.controls.observaciones.value}}
+                                                                    {{observacion.observaciones}}
                                                                 </td>
                                                                 <td colspan="3">
-                                                                    {{observacion.controls.fecha.value}}
+                                                                    {{observacion.fecha}}
                                                                 </td>
                                                                 <td colspan="2">
-                                                                    {{observacion.controls.hora.value}}
+                                                                    {{observacion.hora}}
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
@@ -207,7 +207,7 @@
                                             </table>
                                         </td>
                                     </tr>
-                                    <tr  *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).controls.length <= 0 : false'>
+                                    <tr  *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length <= 0 : false'>
 
                                     </tr>
                                 </ng-container>

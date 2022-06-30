@@ -103,25 +103,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
-    this.planoDeCargaService.obtenerDestinos().subscribe(res => this.destinoPuerto = res);
+    /*this.planoDeCargaService.obtenerDestinos().subscribe(res => {
+      this.destinoPuerto = res
+      console.log('this.destinoPuerto -->>')
+      console.log(this.destinoPuerto)
+    });*/
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
-
-    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
-      this.embarque = res;
-      this.cargarShipParticular(res);
-    });
-
-
-
-    this._turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;
-      if (this.formExportarExcel) this.addParcelChecks();
-      this.getProductos();
-
-      this.getDestinos();
-    });
-
+    this.cargarTurnosBodegasDestinos();
+    this.cargarEmbarqueShipParticular();
   }
 
   ngOnInit(): void {
@@ -134,11 +124,28 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     this.initFormularioObs();
     this.initShipParticular();
-
-
-
   }
-
+  cargarEmbarqueShipParticular() {
+    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
+      this.embarque = res;
+      if (res.embarqueInformacion != null || res.embarqueInformacion != undefined) {
+        const destino: Destino = {
+          id: res.embarqueInformacion[0].bandera.id,
+          nombre: res.embarqueInformacion[0].bandera.nombre,
+        }
+        this.destinoPuerto = [destino];
+      }
+      this.cargarShipParticular(res);
+    });
+  }
+  cargarTurnosBodegasDestinos() {
+    this._turnosService.sendBodega.subscribe(res => {
+      this.bodegas = res;
+      if (this.formExportarExcel) this.addParcelChecks();
+      this.getProductos();
+      this.getDestinos();
+    });
+  }
   expandir() {
     document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
   }
@@ -168,7 +175,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     else
       this.formShipParticular.get('fechaLibrePlatica').setValue('');
 
-    this.formShipParticular.get('destino').setValue(this.destinoPuerto.find(x => x.id == embarque.destino?.id));
+    if (this.destinoPuerto.length > 0) {
+      this.formShipParticular.get('destino').setValue(this.destinoPuerto[0]);
+    }
   }
 
   isInvalidDate(date: Date): boolean {
@@ -914,18 +923,18 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   getDestinos() {
     this.destinos = new Array();
-    if (this.bodegas != null || this.bodegas != undefined){
-        this.bodegas.forEach(b => {
-          /*if (this.bodegas.length == 0) {
-            console.log('entro bodegas --->>')
-            console.log(this.bodegas)
-            this.destinos.push(b.destino);
-          }else{*/
-            if (!this.destinos.find(d => d.nombre == b.destino)) {
-              this.destinos.push(b.destino);
-            }
-          //}
-        })
+    if (this.bodegas != null || this.bodegas != undefined) {
+      this.bodegas.forEach(b => {
+        /*if (this.bodegas.length == 0) {
+          console.log('entro bodegas --->>')
+          console.log(this.bodegas)
+          this.destinos.push(b.destino);
+        }else{*/
+        if (!this.destinos.find(d => d.nombre == b.destino)) {
+          this.destinos.push(b.destino);
+        }
+        //}
+      })
     }
   }
 

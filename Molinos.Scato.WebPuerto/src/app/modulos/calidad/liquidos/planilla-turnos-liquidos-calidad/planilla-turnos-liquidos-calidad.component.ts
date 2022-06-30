@@ -456,11 +456,11 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     this.getMotivosCorte();
   }
 
-  deleteObsCalidad(dia: number, turno: number, ObsCalidad: any) {
+  deleteObsCalidad(ObsCalidad: any) {
     this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Si', 'No', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed) {
-          this.moduloCargaService.eliminarObservacionDeCalidad(ObsCalidad.value.id)
+          this.moduloCargaService.eliminarObservacionDeCalidad(ObsCalidad.id)
             .subscribe(res => {
               this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
                 if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
@@ -537,8 +537,19 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosCortes as FormArray;
   }
 
-  getObservacionTurnos(d, t): FormArray {
-    return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad as FormArray;
+  getObservacionTurnos(d, t) {
+    const observacionesCalidad = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad  as FormArray;
+    let listaObservacionesCalidad = observacionesCalidad.value;
+
+    for(let observacion of listaObservacionesCalidad){ 
+      observacion.fechaMiliseconds = new Date(observacion.fechaHora).getTime();
+    }
+
+    listaObservacionesCalidad = listaObservacionesCalidad.sort((a, b) => {
+      return (a.fechaMiliseconds - b.fechaMiliseconds);
+    });
+    
+    return listaObservacionesCalidad;
   }
 
   openModalNuevoTurno(modal) {
@@ -888,7 +899,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   initObservacion(observacion?: any, cerrado?: boolean) {
     let fechaObs = '';
     let horaObs = '';
-
+    let fechaHora = observacion.fechaHora;
     if (observacion.fechaHora != undefined) {
       if (observacion.fechaHora != null) {
         fechaObs = this.formatoFechaHora(true, observacion.fechaHora)
@@ -899,6 +910,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       return this._builder.group({
         fecha: [{ value: fechaObs, disabled: true }, Validators.required],
         hora: [{ value: horaObs, disabled: true }, Validators.required],
+        fechaHora: [{ value: fechaHora, disabled: true }, Validators.required],
         observaciones: [{ value: observacion.observaciones, disabled: true }, Validators.required],
         id: [{ value: observacion.id, disabled: true }, Validators.required]
       })

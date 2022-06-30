@@ -119,10 +119,6 @@ export class LineupComponent implements OnInit, Observador {
   }
 
   ListarEmbarques(): InstanciaWorkflowPuerto[] {
-    let actualDate = new Date();
-    let function_name = 'ListarEmbarques';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-
     return this.listadoEmbarques;
   }
 
