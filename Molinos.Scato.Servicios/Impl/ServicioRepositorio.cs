@@ -2270,7 +2270,7 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
-       
+      
 
         public Dictionary<string, string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
