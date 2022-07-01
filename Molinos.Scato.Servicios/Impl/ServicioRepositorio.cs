@@ -2274,52 +2274,59 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
-            Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
-            var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
-            var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
-            var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
-            var usuario = userPrincipal1.SamAccountName;
-            List<string> gruposPermisos = new List<string>();
-
-            //IList<ADPuertoGruposAd> puertoGruposAd = repositorio.Listar<ADPuertoGruposAd>();
-            //IList<ADPuertoGruposRoles> puertoGruposRoles = repositorio.Listar<ADPuertoGruposRoles>();
-            //IList<ADPuertoRoles> puertoRoles = repositorio.Listar<ADPuertoRoles>();
-            //IList<ADPuertoRolesPermisos> puertoRolesPermisos = repositorio.Listar<ADPuertoRolesPermisos>();
-            //IList<ADPuertoPermisos> puertoPermisos = repositorio.Listar<ADPuertoPermisos>();
-            
-            System.Collections.ArrayList groups01 = new System.Collections.ArrayList();
-            System.Collections.ArrayList arrPermisosUsuario = new System.Collections.ArrayList();
-
-            List<GroupPrincipal> result = new List<GroupPrincipal>();
-            // establish domain context
-            PrincipalContext yourDomain = new PrincipalContext(ContextType.Domain);
-            // find your user
-            UserPrincipal user = UserPrincipal.FindByIdentity(yourDomain, usuario);
-            // if found - grab its groups
-            if (user != null)
+            try
             {
-                // PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
-                PrincipalSearchResult<Principal> groups = user.GetGroups();
+                Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
-                
-                // iterate over all groups
-                foreach (Principal p in groups)
+                var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+                var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+                var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
+                var usuario = userPrincipal1.SamAccountName;
+                List<string> gruposPermisos = new List<string>();
+
+                System.Collections.ArrayList groups01 = new System.Collections.ArrayList();
+                System.Collections.ArrayList arrPermisosUsuario = new System.Collections.ArrayList();
+
+                List<GroupPrincipal> result = new List<GroupPrincipal>();
+                // establish domain context
+                PrincipalContext yourDomain = new PrincipalContext(ContextType.Domain);
+                // find your user
+                UserPrincipal user = UserPrincipal.FindByIdentity(yourDomain, usuario);
+                // if found - grab its groups
+                if (user != null)
                 {
-                    var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
-                                       join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
-                                     join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
-                                     join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
-                                     join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
-                                     where a.NombreGrupoAd == ((GroupPrincipal)p).Name
-                                     select (e.NombrePermiso);
+                    // PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
+                    PrincipalSearchResult<Principal> groups = user.GetGroups();
 
-                    gruposPermisos.AddRange(permisoGrupo);
+
+                    // iterate over all groups
+                    foreach (Principal p in groups)
+                    {
+                        log.Info("Grupo AD: " + ((GroupPrincipal)p).Name);
+                        var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
+                                           join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                           join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                           join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                           join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                           where a.NombreGrupoAd == ((GroupPrincipal)p).Name
+                                           select (e.NombrePermiso);
+                        log.Info("Cantidad permiso: " + permisoGrupo.Count());
+                        gruposPermisos.AddRange(permisoGrupo);
+
+                    }
                 }
+
+                log.Info("Cantidad permiso: " + gruposPermisos.Count());
+                return gruposPermisos;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error en listar permisos AD",ex.InnerException);
+                throw ex.InnerException;
             }
 
-            
-            return gruposPermisos;
+           
         }
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
