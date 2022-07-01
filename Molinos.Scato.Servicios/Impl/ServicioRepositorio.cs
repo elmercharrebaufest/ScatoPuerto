@@ -2272,7 +2272,7 @@ namespace Molinos.Scato.Servicios.Impl
 
       
 
-        public Dictionary<string, string> ListarPermisosPorUsuarioAD(string nombreUsuario)
+        public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
             Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
@@ -2319,7 +2319,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             
-            return informacionPermisos;
+            return gruposPermisos;
         }
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
