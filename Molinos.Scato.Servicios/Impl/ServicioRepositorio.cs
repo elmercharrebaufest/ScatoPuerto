@@ -2270,7 +2270,7 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
-      
+
 
         public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
@@ -2325,11 +2325,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                log.Error("Error en listar permisos AD",ex.InnerException);
+                log.Error("Error en listar permisos AD", ex.InnerException);
                 throw ex.InnerException;
             }
 
-           
+
         }
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
