@@ -78,9 +78,6 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   cargarBuqueGeolocalizacion(id: any) {
-    console.log('cargarBuqueGeolocalizacion llega --->>')
-    console.log(this.buquesGeolocalizacion)
-    console.log(id)
     this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
     if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
