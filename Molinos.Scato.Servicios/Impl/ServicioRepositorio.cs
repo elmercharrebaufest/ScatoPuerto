@@ -2277,6 +2277,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             try
             {
+                log.Info("----- Inicio ListarPermisosPorUsuarioAD: " + nombreUsuario + " -----");
                 Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
                 var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
@@ -2303,7 +2304,7 @@ namespace Molinos.Scato.Servicios.Impl
                     // iterate over all groups
                     foreach (Principal p in groups)
                     {
-                        log.Info("Grupo AD: " + ((GroupPrincipal)p).Name);
+                        
                         var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
                                            join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
                                            join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
@@ -2311,13 +2312,15 @@ namespace Molinos.Scato.Servicios.Impl
                                            join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
                                            where a.NombreGrupoAd == ((GroupPrincipal)p).Name
                                            select (e.NombrePermiso);
-                        log.Info("Cantidad permiso: " + permisoGrupo.Count());
+
+                        log.Info("Grupo AD: " + ((GroupPrincipal)p).Name + "Cantidad permiso: " + permisoGrupo.Count() );
                         gruposPermisos.AddRange(permisoGrupo);
 
                     }
                 }
 
-                log.Info("Cantidad permiso: " + gruposPermisos.Count());
+                log.Info("Cantidad permisos total: " + gruposPermisos.Count());
+                log.Info("----- Fin ListarPermisosPorUsuarioAD -----");
                 return gruposPermisos;
             }
             catch (Exception ex)
