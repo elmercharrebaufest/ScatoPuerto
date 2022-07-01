@@ -2270,7 +2270,9 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
-        public Dictionary<string, string> ListarPermisosPorUsuarioAD(string nombreUsuario)
+      
+
+        public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
             Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
@@ -2278,12 +2280,13 @@ namespace Molinos.Scato.Servicios.Impl
             var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
             var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
             var usuario = userPrincipal1.SamAccountName;
+            List<string> gruposPermisos = new List<string>();
 
-            IList<ADPuertoGruposAd> puertoGruposAd = repositorio.Listar<ADPuertoGruposAd>();
-            IList<ADPuertoGruposRoles> puertoGruposRoles = repositorio.Listar<ADPuertoGruposRoles>();
-            IList<ADPuertoRoles> puertoRoles = repositorio.Listar<ADPuertoRoles>();
-            IList<ADPuertoRolesPermisos> puertoRolesPermisos = repositorio.Listar<ADPuertoRolesPermisos>();
-            IList<ADPuertoPermisos> puertoPermisos = repositorio.Listar<ADPuertoPermisos>();
+            //IList<ADPuertoGruposAd> puertoGruposAd = repositorio.Listar<ADPuertoGruposAd>();
+            //IList<ADPuertoGruposRoles> puertoGruposRoles = repositorio.Listar<ADPuertoGruposRoles>();
+            //IList<ADPuertoRoles> puertoRoles = repositorio.Listar<ADPuertoRoles>();
+            //IList<ADPuertoRolesPermisos> puertoRolesPermisos = repositorio.Listar<ADPuertoRolesPermisos>();
+            //IList<ADPuertoPermisos> puertoPermisos = repositorio.Listar<ADPuertoPermisos>();
             
             System.Collections.ArrayList groups01 = new System.Collections.ArrayList();
             System.Collections.ArrayList arrPermisosUsuario = new System.Collections.ArrayList();
@@ -2296,41 +2299,27 @@ namespace Molinos.Scato.Servicios.Impl
             // if found - grab its groups
             if (user != null)
             {
-                PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
+                // PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
+                PrincipalSearchResult<Principal> groups = user.GetGroups();
+
+                
                 // iterate over all groups
                 foreach (Principal p in groups)
                 {
-                    // make sure to add only group principals
-                    if (p is GroupPrincipal)
-                    {
-                        result.Add((GroupPrincipal)p);
-                        groups01.Add(((GroupPrincipal)p).Name);
-                    }
+                    var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
+                                       join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                     join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                     join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                     join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                     where a.NombreGrupoAd == ((GroupPrincipal)p).Name
+                                     select (e.NombrePermiso);
+
+                    gruposPermisos.AddRange(permisoGrupo);
                 }
             }
 
-            foreach (var p in groups01) 
-            {
-                var nombreGrupo = p;
-                // REVISAR: no está obteniendo todos los permisos comparando con query SQL.
-                var permisosUsuario1 = puertoGruposAd
-                                .Join(puertoGruposRoles, G => G.Id, GR => GR.Id_Rol, (G, GR) => new { idGrupo = G.Id, nombreGrupo = G.NombreGrupoAd, idRol = GR.Id_Rol })
-                                .Join(puertoRoles, GR => GR.idRol, R => R.Id, (GR, R) => new { GR.idGrupo, GR.nombreGrupo, GR.idRol, nombreRol = R.NombreRol })
-                                .Join(puertoRolesPermisos, R => R.idRol, RP => RP.Id_Rol, (R, RP) => new { R.idGrupo, R.nombreGrupo, R.idRol, R.nombreRol, idPermiso = RP.Id_Permiso })
-                                .Join(puertoPermisos, RP => RP.idPermiso, P => P.Id, (RP, P) => new { RP.idGrupo, RP.nombreGrupo, RP.idRol, RP.nombreRol, RP.idPermiso, nombrePermiso = P.NombrePermiso })
-                                .Where(x => x.nombreGrupo == (string)nombreGrupo).ToList();
-
-                if (permisosUsuario1.Count() > 0) 
-                {
-                    arrPermisosUsuario.Add(permisosUsuario1);
-
-                    foreach (var pp in permisosUsuario1)
-                    {
-                        informacionPermisos.Add(pp.nombrePermiso, pp.nombrePermiso);
-                    }
-                }
-            }
-            return informacionPermisos;
+            
+            return gruposPermisos;
         }
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
