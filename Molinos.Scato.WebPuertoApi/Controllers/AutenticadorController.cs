@@ -20,7 +20,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var listadoPermisos = servicio.ListarPermisosPorUsuarioAD(nombreUsuario);
+                  var listadoPermisos = servicio.ListarPermisosPorUsuarioAD(nombreUsuario);
 
                 return Request.CreateResponse(HttpStatusCode.OK, new
                 {
