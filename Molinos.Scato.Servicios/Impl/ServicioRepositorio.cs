@@ -9875,6 +9875,9 @@ namespace Molinos.Scato.Servicios.Impl
         public void EliminarCorteBalanza(int idCorteBalanza)
         {
             BalanzasCortes bal = repositorio.Obtener<BalanzasCortes>(x => x.Id == idCorteBalanza);
+
+            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(bal), "DELETE");
+
             repositorio.Remover(bal);
             repositorio.GuardarCambios();
 
@@ -10614,13 +10617,51 @@ namespace Molinos.Scato.Servicios.Impl
         public void EliminarObservacionDeCalidad(int observacion_id)
         {
             ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
+
+            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
             repositorio.Remover(obs);
             repositorio.GuardarCambios();
+        }
+
+        public void GenerarLogging(string service, string data, string tipo)
+        {
+            if (service.Length > 0 && data != null && tipo.Length > 0)
+            {
+                Logging log = new Logging()
+                {
+                    Data = data,
+                    Servicio = service,
+                    Tipo = tipo,
+                    Fecha = DateTime.Now,
+                    Usuario = "NULL" 
+
+                };
+
+                repositorio.Agregar(log);
+                repositorio.GuardarCambios();
+            }
         }
 
         public IList<BanderaDto> ObtenerBanderas()
         {
             return Listar<Bandera, BanderaDto>();
+        }
+        public IList<InstanciaWorkflowPuertoDto> ListarEmbarques()
+        {
+
+            var embarques = Listar<Embarque, EmbarqueDto>();
+            List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
+
+            foreach (var embarque in embarques)
+            {
+                var lineupDto = Listar<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id).First();
+                InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                {
+                    Embarque = embarque,
+                    LineUp = lineupDto
+                });
+            }
+            return InstanciaWorkflowPuertoDtos;
         }
 
         public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)

@@ -16,8 +16,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
     public abstract class ProcesadorModificar<TComando> : ProcesadorComando<TComando>
         where TComando : Comando
     {
-        protected ProcesadorModificar(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        protected ProcesadorModificar(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio = null)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 

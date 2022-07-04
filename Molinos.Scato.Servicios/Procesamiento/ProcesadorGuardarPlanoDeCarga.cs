@@ -12,8 +12,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarPlanoDeCarga : ProcesadorModificar<GuardarPlanoDeCarga>
     {
-        public ProcesadorGuardarPlanoDeCarga(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarPlanoDeCarga(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -27,6 +28,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             else
             {
                 planoDeCarga.FechaDeModificacion = DateTime.Now;
+
+                ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
                 var planodecargahistorico = Repositorio.Agregar(new PlanoDeCargaHistorico
                 {
