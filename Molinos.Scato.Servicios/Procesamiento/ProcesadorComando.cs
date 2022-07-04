@@ -12,12 +12,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
         protected IRepositorio Repositorio { get; private set; }
         protected IConversor Conversor { get; private set; }
         protected ILogger Log { get; private set; }
+        protected IServicioRepositorio ServicioRepositorio { get; private set; }
 
-        protected ProcesadorComando(IRepositorio repositorio, IConversor conversor, ILogger log)
+        protected ProcesadorComando(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio = null)
         {
             Log = log;
             Repositorio = repositorio;
             Conversor = conversor;
+            ServicioRepositorio = servicioRepositorio;
         }
 
         public Resultado Ejecutar(Comando comando)

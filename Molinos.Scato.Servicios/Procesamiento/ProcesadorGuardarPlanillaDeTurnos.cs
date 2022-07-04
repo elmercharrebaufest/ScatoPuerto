@@ -11,8 +11,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarPlanillaDeTurnos : ProcesadorModificar<GuardarPlanillaDeTurnos>
     {
-        public ProcesadorGuardarPlanillaDeTurnos(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarPlanillaDeTurnos(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -34,7 +34,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 //Si el turno tiene id > 0 es que ya existe, por lo tanto simplemente lo actualizo.
                 if (comando.Dto != null)
                 {
-
+                    ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
                     if (comando.Dto.Id > 0)
                     {
