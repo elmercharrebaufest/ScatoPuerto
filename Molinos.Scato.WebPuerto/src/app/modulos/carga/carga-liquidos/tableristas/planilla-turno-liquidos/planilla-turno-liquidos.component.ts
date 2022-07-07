@@ -129,11 +129,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
       this.embarque = res;
       if (res.embarqueInformacion != null || res.embarqueInformacion != undefined) {
-        const destino: Destino = {
-          id: res.embarqueInformacion[0].bandera.id,
-          nombre: res.embarqueInformacion[0].bandera.nombre,
+        if (res.embarqueInformacion.length > 0) {
+          const destino: Destino = {
+            id: res.embarqueInformacion[0].bandera.id,
+            nombre: res.embarqueInformacion[0].bandera.nombre,
+          }
+          this.destinoPuerto = [destino];
         }
-        this.destinoPuerto = [destino];
       }
       this.cargarShipParticular(res);
     });
@@ -175,9 +177,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     else
       this.formShipParticular.get('fechaLibrePlatica').setValue('');
 
-    if (this.destinoPuerto.length > 0) {
-      this.formShipParticular.get('destino').setValue(this.destinoPuerto[0]);
-    }
+      if (this.destinoPuerto != null || this.destinoPuerto != undefined) {
+        if (this.destinoPuerto.length > 0) {
+          this.formShipParticular.get('destino').setValue(this.destinoPuerto[0]);
+        }
+      }
   }
 
   isInvalidDate(date: Date): boolean {
