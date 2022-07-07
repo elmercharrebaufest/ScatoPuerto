@@ -37,6 +37,12 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
     config.keyboard = false;
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) => {
       if (data != null) {
+        data.forEach((item) => {
+          let fechaRecibida: Date = new Date(item.posicion.horaUTCPosicionRecibida);
+          fechaRecibida.setHours(fechaRecibida.getHours() - 3);
+          item.posicion.horaUTCPosicionRecibida = fechaRecibida;
+          item.posicion.estado = this.setEstadoBuque(item.posicion.estado);
+        })
         this.setListaBuquesGeolocalizacion(data);
         this.cargarListado = true;
         this.cargarPaginas();
@@ -58,6 +64,30 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Metodos
+  private setEstadoBuque(estado) {
+    let mensaje: string = '';
+
+    switch (estado) {
+      case 'At Anchor':
+        mensaje = 'Fondeado';
+        break;
+      case 'Underway using Engine':
+        mensaje = 'En viaje';
+        break;
+      case 'Moored':
+        mensaje = 'Amarrado';
+        break;
+      case 'Underway':
+        mensaje = 'En marcha';
+        break;
+      case 'Stopped':
+        mensaje = 'Parado';
+        break;
+      default:
+        mensaje = estado;
+    }
+    return mensaje;
+  }
   private setListadoMuelleCarga(listaBuques: any) {
     if (listaBuques == undefined) return;
     this.listadoMuelleCarga = [];
@@ -116,9 +146,11 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
     this.listaBuquesGeolocalizacion[indexEmbarque].esSeleccionado = esSeleccionado
     this.listaBuquesGeolocalizacionFiltro.emit(this.listaBuquesGeolocalizacion)
     this.geolocalizacionSharingService.setBuquesLineUp(this.listaBuquesGeolocalizacion);
+    
   }
 
   public onZoomBuqueSeleccionado(event) {
+    
     const esSeleccionado = event.esSeleccionado;
     if (esSeleccionado) {
       const ubicacionPosicion = event.posicion;
@@ -158,7 +190,7 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
   }
 
   private cargarPaginas() {
-    const registros = this.getListaBuquesGeolocalizacion().filter(d => d.esSeleccionadoPorMuelle == true).length + 1;
+    const registros = this.getListaBuquesGeolocalizacion().filter(d => d.esSeleccionadoPorMuelle == true).length;
     this.totalPaginas = (registros / this.tamanioPagina);
     this.totalPaginas = Math.ceil(this.totalPaginas);
     this.listaPaginas = new Array(this.totalPaginas);
