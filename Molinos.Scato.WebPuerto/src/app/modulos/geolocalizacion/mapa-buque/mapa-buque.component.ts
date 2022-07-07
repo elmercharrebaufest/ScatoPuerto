@@ -112,7 +112,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         }
       } else {
         // sino hay buque seleccionado muestra por defecto la vista general del map
-        this.map.setView([-35.340, -56.577]);
+        this.cargarPosicionPorDefectoMapa();
       }
     });
   }
@@ -373,10 +373,15 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     this.workflowService.obtenerListado().subscribe(
       data => this.listadoEmbarques = data,
       err => console.log(err),
-      () => this.crearTarjetaBuque()
+      () => {
+              this.crearTarjetaBuque();
+              this.cargarPosicionPorDefectoMapa();
+            }
     );
   }
-
+  private cargarPosicionPorDefectoMapa(){
+    this.map.setView([-35.340, -56.577], this.zoom);
+  }
   private crearTarjetaBuque() {
     this.listaEmbarcacion.forEach(buque => {
 
@@ -403,13 +408,16 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
           iconUrl: buqueIconUrl,
           iconSize: [32, 37]
         });
+        let fechaPosicionRecibida = this.ultimaPosicionRecibida(buque.posicion.horaUTCPosicionRecibida)
+        fechaPosicionRecibida = fechaPosicionRecibida == undefined ? '' : fechaPosicionRecibida;
+        fechaPosicionRecibida = fechaPosicionRecibida == null      ? '' : fechaPosicionRecibida;
 
         let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent,
           (c: any) => {
             c.instance.nombreBuque = buque.nombreBuque;
             c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '';
             c.instance.imo = buque.informacion ? buque.informacion.imo : '';
-            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '' ;
+            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '';
             c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '';
             c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
             c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
@@ -420,14 +428,44 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
         mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
-        mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
+        //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
+        mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida}</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
         markerBuque.addTo(this.map);
       }
     });
   }
+  private ultimaPosicionRecibida(fechaPosicionRecibida) {
+    const fechaActual: Date = new Date();
+    const fechaPosicion: Date = new Date(fechaPosicionRecibida);
+    const fechaActualTime = fechaActual.getTime()
+    const fechaPosicionTime = fechaPosicion.getTime()
+    const tempDays = (fechaActualTime - fechaPosicionTime) / (1000 * 60 * 60 * 24);
+    const tempHours = ((Math.abs(fechaActualTime - fechaPosicionTime) / (1000 * 60 * 60) % 24));
+    const tempMinutes = ((Math.abs(fechaActualTime - fechaPosicionTime) / (1000 * 60) % 60));
 
+    const days = parseInt(tempDays.toString())
+    const hours = parseInt(tempHours.toString())
+    const minutes = parseInt(tempMinutes.toString())
+
+    let messageDays = '';
+    let messageHours = '';
+    let messageMinutes = '';
+
+    if (days > 0)
+      messageDays = days > 1 ? days + ' dias ' : days + ' dia ';
+
+    if (hours > 0)
+      messageHours = hours > 1 ? hours + ' horas ' : hours + ' hora ';
+
+    if (minutes > 0)
+      messageMinutes = minutes > 1 ? minutes + ' minutos ' : minutes + ' minuto ';
+
+    const mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
+
+    return mensajeUltimaPosicion;
+  }
   public async limpiarMarcadores() {
     this.map.eachLayer((layer) => {
       if ((layer instanceof L.Marker) ||
