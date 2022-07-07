@@ -22,7 +22,7 @@
         </div>
     </div>
     
-    <div class="row m-lg-4">
+    <div class="row m-lg-4" >
         <div class="col pl-0">
           <div class="row">
             <div class="col">
@@ -50,8 +50,7 @@
     
     <!-- Contenido-->
     <div class="geolocalizacion">
-        
-        <div class="geolocalizacion__mapa">
+        <div class="geolocalizacion__mapa" id="mapaGeolocalizacion">
             <app-mapa-buque *ngIf="getListaPuntosInteres() && getListaBuquesGeolocalizacion()">
             </app-mapa-buque>
         </div>

@@ -35,6 +35,7 @@ export class GeolocalizacionComponent implements OnInit {
     this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
     this.cargarPuntosInteres();
     this.cargarBuquesGeolocalizacion();
+    
   }
   // #endregion
 
@@ -188,6 +189,11 @@ export class GeolocalizacionComponent implements OnInit {
   }
 
   public async onZoomBuqueSeleccionado(event) {
+    document.getElementById('mapaGeolocalizacion').scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest"
+    });
     await this.mapaBuqueComponent.onZoomBuqueSeleccionado(event);
   }
 
@@ -195,5 +201,4 @@ export class GeolocalizacionComponent implements OnInit {
     this.router.navigate(['lineup']);
   }
   // #endregion
-
 }
