@@ -170,7 +170,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             catch (Exception ex)
             {
-
+                Log.Error("ProcesadorModificarEmbarqueGeolocalizacion:" + ex.InnerException);
                 throw ex;
             }
         }
