@@ -44,7 +44,7 @@
                     <tspan x="0" y="111">Porte neto (TNR): </tspan>
                     <tspan y="111" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.porteNeto}}</tspan>
                     <tspan x="0" y="135">Eslora x manga: </tspan>
-                    <tspan y="135" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.eslora}}</tspan>
+                    <tspan y="135" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.informacion.largoxAnchoExtremo ? buque.informacion.largoxAnchoExtremo : ''}}</tspan>
                     <tspan x="0" y="159">Puntal: </tspan>
                     <tspan y="159" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.puntal}}</tspan>
                     <tspan x="0" y="183">Freeboard: </tspan>
@@ -61,7 +61,7 @@
         <g id="x" transform="translate(326.5 13.5)" 
             style="cursor:pointer;" 
             (click)='onCerrarModal()'>
-            <path id="Trazado_10" data-name="Trazado 10" d="M0,0,11.25,11.25M11.25,0,0,11.25" transform="translate(1.375 1.375)" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+            <path id="Trazado_10" data-name="Trazado 10" d="M0,0,11.25,11.25M11.25,0,0,11.25" transform="translate(1.375 1.375)" stroke="#212529" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
         </g>
     </g>
 </svg>
