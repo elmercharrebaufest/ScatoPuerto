@@ -411,7 +411,6 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         let fechaPosicionRecibida = this.ultimaPosicionRecibida(buque.posicion.horaUTCPosicionRecibida)
         fechaPosicionRecibida = fechaPosicionRecibida == undefined ? '' : fechaPosicionRecibida;
         fechaPosicionRecibida = fechaPosicionRecibida == null      ? '' : fechaPosicionRecibida;
-
         let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent,
           (c: any) => {
             c.instance.nombreBuque = buque.nombreBuque;
@@ -422,7 +421,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
             c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
             c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
             c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '';
-            c.instance.eslora = buque.embarque ? buque.embarque.eslora : '';
+            c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '';
             c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
