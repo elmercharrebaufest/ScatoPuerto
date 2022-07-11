@@ -27,7 +27,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 DateTime fechaMinima = (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
 
-                Embarque embarque = Repositorio.Obtener<Embarque>(x => x.EmbarqueInformacion.FirstOrDefault().Bandera.Id == banderaBase.Id && x.Patente == comando.NombreBuque && x.TipoBuque == comando.TipoBuque);
+                Embarque embarque = Repositorio.Listar<Embarque>(x => x.EmbarqueInformacion.FirstOrDefault().Bandera.Id == banderaBase.Id && x.Patente == comando.NombreBuque && x.TipoBuque == comando.TipoBuque).OrderByDescending(y=>y.Id).FirstOrDefault();
 
                 if (embarque != null)
                 {
