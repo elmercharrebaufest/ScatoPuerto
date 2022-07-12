@@ -2277,11 +2277,28 @@ namespace Molinos.Scato.Servicios.Impl
 
             try
             {
+#if DEBUG
+                log.Info("----- Inicio ListarPermisosPorUsuarioAD Modo Debug: " + nombreUsuario + " -----");
+                List<string> gruposPermisosDebug = new List<string>();
+                var permisoGrupoDebug = from a in repositorio.Listar<ADPuertoGruposAd>()
+                                   join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                   join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                   join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                   join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                   where a.NombreGrupoAd == "SWDEV"
+                                        select (e.NombrePermiso);
+       
+                gruposPermisosDebug.AddRange(permisoGrupoDebug);
+                log.Info("----- Fin ListarPermisosPorUsuarioAD Modo Debug -----");
+                return gruposPermisosDebug;
+#else
+
+
                 log.Info("----- Inicio ListarPermisosPorUsuarioAD: " + nombreUsuario + " -----");
                 Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
-                var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
-                var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+                //var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+                //var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
                 var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
                 var usuario = userPrincipal1.SamAccountName;
                 List<string> gruposPermisos = new List<string>();
@@ -2322,6 +2339,7 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Info("Cantidad permisos total: " + gruposPermisos.Count());
                 log.Info("----- Fin ListarPermisosPorUsuarioAD -----");
                 return gruposPermisos;
+#endif
             }
             catch (Exception ex)
             {
@@ -2331,6 +2349,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 
         }
+
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
         {
@@ -3063,7 +3082,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var listaVagones = new List<VehiculoDto>();
 
-                    #region FerroviarioCPE
+#region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -3137,7 +3156,7 @@ namespace Molinos.Scato.Servicios.Impl
                         return ObtenerCartaPorteAReutilizarPorNumero(numero, centroId, workflowCodigo);
                     }
 
-                    #endregion FerroviarioCPE
+#endregion FerroviarioCPE
                 }
                 else
                 {
@@ -9805,43 +9824,52 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos)
         {
-            foreach (var item in balanzasCortesDtos)
+            try
             {
-                BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
-                if (balanzasCortes_db != null)
+                foreach (var item in balanzasCortesDtos)
                 {
-                    //balanzasCortes_db.Cerrado = item.Cerrado;
-                    balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
-                    balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
-                    //balanzasCortes_db.Kg = item.Kg;
-                    //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
-                    balanzasCortes_db.Observaciones = item.Observaciones;
-                    //balanzasCortes_db.Material_id = item.Material_id;
-                    //balanzasCortes_db.Tn = item.Tn;
-                    balanzasCortes_db.CorteManual = item.CorteManual;
-                    balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
-                }
-                else
-                {
-                    balanzasCortes_db = new BalanzasCortes()
+                    BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
+                    if (balanzasCortes_db != null)
                     {
-                        Cerrado = item.Cerrado,
-                        Fecha_Corte = item.Fecha_Corte,
-                        Fecha_Inicio = item.Fecha_Inicio,
-                        Kg = item.Kg,
-                        NumeroBalanza = item.NumeroBalanza,
-                        Observaciones = item.Observaciones,
-                        Material_id = item.Material_id,
-                        Tn = item.Tn,
-                        CorteManual = item.CorteManual,
-                        MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
-                        ModuloDeCarga_id = item.ModuloDeCarga_id,
-                        Bodega_id = item.Bodega_id
-                    };
-                    repositorio.Agregar(balanzasCortes_db);
+                        //balanzasCortes_db.Cerrado = item.Cerrado;
+                        balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
+                        balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
+                        //balanzasCortes_db.Kg = item.Kg;
+                        //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
+                        balanzasCortes_db.Observaciones = item.Observaciones;
+                        //balanzasCortes_db.Material_id = item.Material_id;
+                        //balanzasCortes_db.Tn = item.Tn;
+                        balanzasCortes_db.CorteManual = item.CorteManual;
+                        balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
+                    }
+                    else
+                    {
+                        balanzasCortes_db = new BalanzasCortes()
+                        {
+                            Cerrado = item.Cerrado,
+                            Fecha_Corte = item.Fecha_Corte,
+                            Fecha_Inicio = item.Fecha_Inicio,
+                            Kg = item.Kg,
+                            NumeroBalanza = item.NumeroBalanza,
+                            Observaciones = item.Observaciones,
+                            Material_id = item.Material_id,
+                            Tn = item.Tn,
+                            CorteManual = item.CorteManual,
+                            MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
+                            ModuloDeCarga_id = item.ModuloDeCarga_id,
+                            Bodega_id = item.Bodega_id
+                        };
+                        repositorio.Agregar(balanzasCortes_db);
+                    }
                 }
+                repositorio.GuardarCambios();
             }
-            repositorio.GuardarCambios();
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+         
         }
 
         public void EliminarCorteBalanza(int idCorteBalanza)
@@ -9954,7 +9982,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        #region ObtenerRitmosBalanzas78
+#region ObtenerRitmosBalanzas78
         public Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza)
         {
             try
@@ -10018,7 +10046,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-        #endregion ObtenerRitmosBalanzas78
+#endregion ObtenerRitmosBalanzas78
 
 
         public Dictionary<string, int> ObtenerRitmos(int modulodecarga_id)
@@ -10494,7 +10522,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (tipoVehiculo == (int)TipoVehiculo.Tren && !consultactg)
                 {
-                    #region FerroviarioCPE
+#region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -10515,7 +10543,7 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     }
 
-                    #endregion FerroviarioCPE
+#endregion FerroviarioCPE
                 }
                 else
                 {
