@@ -11,8 +11,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarNirManual : ProcesadorModificar<GuardarNirManual>
     {
-        public ProcesadorGuardarNirManual(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarNirManual(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -23,6 +23,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             IList<ModuloDeCargaNirManualPuerto> nirs = Repositorio.Listar<ModuloDeCargaNirManualPuerto>(x => x.ModuloDeCarga.Id == moduloDeCarga.Id).ToList();
             Repositorio.RemoverTodos(nirs);
+
+            ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
             foreach (var item in comando.Dto)
             {
