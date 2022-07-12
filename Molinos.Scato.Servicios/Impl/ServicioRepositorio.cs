@@ -9824,43 +9824,52 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos)
         {
-            foreach (var item in balanzasCortesDtos)
+            try
             {
-                BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
-                if (balanzasCortes_db != null)
+                foreach (var item in balanzasCortesDtos)
                 {
-                    //balanzasCortes_db.Cerrado = item.Cerrado;
-                    balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
-                    balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
-                    //balanzasCortes_db.Kg = item.Kg;
-                    //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
-                    balanzasCortes_db.Observaciones = item.Observaciones;
-                    //balanzasCortes_db.Material_id = item.Material_id;
-                    //balanzasCortes_db.Tn = item.Tn;
-                    balanzasCortes_db.CorteManual = item.CorteManual;
-                    balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
-                }
-                else
-                {
-                    balanzasCortes_db = new BalanzasCortes()
+                    BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
+                    if (balanzasCortes_db != null)
                     {
-                        Cerrado = item.Cerrado,
-                        Fecha_Corte = item.Fecha_Corte,
-                        Fecha_Inicio = item.Fecha_Inicio,
-                        Kg = item.Kg,
-                        NumeroBalanza = item.NumeroBalanza,
-                        Observaciones = item.Observaciones,
-                        Material_id = item.Material_id,
-                        Tn = item.Tn,
-                        CorteManual = item.CorteManual,
-                        MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
-                        ModuloDeCarga_id = item.ModuloDeCarga_id,
-                        Bodega_id = item.Bodega_id
-                    };
-                    repositorio.Agregar(balanzasCortes_db);
+                        //balanzasCortes_db.Cerrado = item.Cerrado;
+                        balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
+                        balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
+                        //balanzasCortes_db.Kg = item.Kg;
+                        //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
+                        balanzasCortes_db.Observaciones = item.Observaciones;
+                        //balanzasCortes_db.Material_id = item.Material_id;
+                        //balanzasCortes_db.Tn = item.Tn;
+                        balanzasCortes_db.CorteManual = item.CorteManual;
+                        balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
+                    }
+                    else
+                    {
+                        balanzasCortes_db = new BalanzasCortes()
+                        {
+                            Cerrado = item.Cerrado,
+                            Fecha_Corte = item.Fecha_Corte,
+                            Fecha_Inicio = item.Fecha_Inicio,
+                            Kg = item.Kg,
+                            NumeroBalanza = item.NumeroBalanza,
+                            Observaciones = item.Observaciones,
+                            Material_id = item.Material_id,
+                            Tn = item.Tn,
+                            CorteManual = item.CorteManual,
+                            MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
+                            ModuloDeCarga_id = item.ModuloDeCarga_id,
+                            Bodega_id = item.Bodega_id
+                        };
+                        repositorio.Agregar(balanzasCortes_db);
+                    }
                 }
+                repositorio.GuardarCambios();
             }
-            repositorio.GuardarCambios();
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+         
         }
 
         public void EliminarCorteBalanza(int idCorteBalanza)
