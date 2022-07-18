@@ -63,16 +63,23 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
 
             //log.Info("Agregando claims de permisos de Scato para el usuario {0}", nombreUsuario);
 
+            var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAD(nombreUsuario);
 
 
-               var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAD(nombreUsuario);
-            
+            foreach (string permiso in permisosAd)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, permiso));
 
-                        foreach (string permiso in permisosAd)
-                        {
-                                identity.AddClaim(new Claim(ClaimTypes.Role, permiso));
-             
-                        }
+            }
+
+            var permisos = ServicioRepositorio.ListarPermisosPorUsuario(nombreUsuario);
+            foreach (PermisoDto permiso in permisos)
+            {
+                if (permiso.Codigo != null)
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, permiso.Codigo.Value.ToString()));
+                }
+            }
 
             //try
             //{
