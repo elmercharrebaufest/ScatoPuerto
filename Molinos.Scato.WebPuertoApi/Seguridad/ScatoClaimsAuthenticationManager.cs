@@ -64,12 +64,9 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
             //log.Info("Agregando claims de permisos de Scato para el usuario {0}", nombreUsuario);
 
             var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAD(nombreUsuario);
-
-
             foreach (string permiso in permisosAd)
             {
                 identity.AddClaim(new Claim(ClaimTypes.Role, permiso));
-
             }
 
             var permisos = ServicioRepositorio.ListarPermisosPorUsuario(nombreUsuario);
@@ -88,7 +85,7 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
             //    //log.Info($"Ips detectados: {ips} para el usuario {nombreUsuario}");
             //    IPAddress IP = IPAddress.Parse(RequestIP);
             //    IPHostEntry GetIPHost = Dns.GetHostEntry(IP);
-                
+
             //    List<string> hostName = GetIPHost.HostName.ToString().Split('.').ToList();
             //    string ComputerName = hostName.First();
             //    string MachineName1 = Environment.MachineName;

@@ -62,6 +62,12 @@ namespace Molinos.Scato.Web.Seguridad
 
             ServicioComandos.Ejecutar(new ModificarUsuarioUltimoLogin { Usuario = nombreUsuario });
 
+            var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAD(nombreUsuario);
+            foreach (string permiso in permisosAd)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, permiso));
+            }
+
             log.Info("Agregando claims de permisos de Scato para el usuario {0}", nombreUsuario);
             var permisos = ServicioRepositorio.ListarPermisosPorUsuario(nombreUsuario);
             foreach (PermisoDto permiso in permisos)
