@@ -9383,6 +9383,52 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
+        public BalanzadasCompletasDto BalanzadasBuque(int IdModuloDeCarga)
+        {
+            try
+            {
+                BalanzadasCompletasDto balanzadasCompletas = new BalanzadasCompletasDto();
+                balanzadasCompletas.balanzadasBuque = new List<BalanzadasBuque>();
+
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return balanzadasCompletas;
+
+                DateTime? fechaFinal = embarqueBase.FechaHoraInicioCarga.Value.AddDays(-1);
+                int idEmbarque = embarqueBase.Id;
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
+                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
+                                                             x.FechaInicio > fechaFinal);
+
+                foreach (Carga carga in cargas)
+                {
+                    var balanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id);
+
+                    foreach (Balanzada balanzada in balanzadas) 
+                    {
+                        BalanzadasBuque balanzadasBuque = new BalanzadasBuque();
+
+                        balanzadasBuque.NumeroBalanza = carga.NumeroBalanza;
+                        balanzadasBuque.Bodega_Id = carga.Bodega.Id;
+                        balanzadasBuque.Material_Id = carga.Material.Id;
+                        balanzadasBuque.Id = balanzada.Id;
+                        balanzadasBuque.PesoBruto = balanzada.PesoBruto;
+                        balanzadasBuque.PesoNeto = balanzada.PesoNeto;
+                        balanzadasBuque.PesoTara = balanzada.PesoTara;
+                        balanzadasBuque.CargaInicial_Id = balanzada.CargaInicial_Id;
+
+                        balanzadasCompletas.balanzadasBuque.Add(balanzadasBuque);
+                    }
+                }
+                return balanzadasCompletas;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga)
         {
             try
@@ -9559,7 +9605,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
-        }
+        }            
 
         public void RitmoDeCargaBalanzas2(int buque, BalanzadasCompletasDto balanzadasCompletas)
         {
