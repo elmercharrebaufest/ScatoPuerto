@@ -69,3 +69,20 @@ export class MotivosFallasBalanza {
   siglas: string;
   liquido:boolean;
 }
+
+export class BalanzadasCompletas {
+  balanzadasAgrupadas: any[];
+  balanzadasBajaCarga: any[];
+  balanzadasBuque: BalanzadasBuque[];
+}
+
+export class BalanzadasBuque {
+  bodega_Id: number;
+  cargaInicial_Id: number;
+  id: number;
+  material_Id: number;
+  numeroBalanza: string;
+  pesoBruto: number;
+  pesoNeto: number;
+  pesoTara: number;
+}
