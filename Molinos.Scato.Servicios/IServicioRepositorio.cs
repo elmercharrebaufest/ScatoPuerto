@@ -2497,6 +2497,9 @@ namespace Molinos.Scato.Servicios
         BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga);
 
         [OperationContract]
+        BalanzadasCompletasDto BalanzadasBuque(int IdModuloDeCarga);
+
+        [OperationContract]
         IList<CargaDto> ListarCargaBalanzaPuerto();
 
         [OperationContract]

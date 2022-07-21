@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
-import { Balanzas, Bodega } from '@ScatoModels/balanzadas/balanza';
+import { BalanzadasBuque, Bodega } from '@ScatoModels/balanzadas/balanza';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 
@@ -51,19 +51,20 @@ export class BodegasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+
     this.planoDeCargaService.obtenerPlanoDeCarga(this.embarqueSelected.planoDeCargaId)
+      .pipe(finalize( () => this.obtenerBalanzadasEnVivo() ))
       .subscribe( res => this.planoDeCargaBodega = res.planoDeCargaBodegas );
-    
-    this.obtenerBalanzadasEnVivo();
   }
 
   obtenerBalanzadasEnVivo() {
     // Datos de ambas balanzas
-    this.balanzas78Service.sendDataBalanzada7y8Completas
+    this._balanzaService.balanzadasBuque(this.embarqueSelected.moduloDeCargaId)
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe( (blzas7y8: Balanzas[]) => {
+      .subscribe( blzas => {
+        let blzas7y8: BalanzadasBuque[] = blzas.balanzadasBuque;
         let balanzadasUnidas: BalanzadasUnidas[] = [];
-        let balanzadasDataOK = blzas7y8.filter( x => x.material_id > 0 && x.tn > 0 && x.bodega_id > 0 );
+        let balanzadasDataOK = blzas7y8.filter( x => x.material_Id > 0 && x.pesoNeto > 0 && x.bodega_Id > 0 );
         balanzadasUnidas = this.unirBalanzadasParaBodegas(balanzadasDataOK);
 
         if(balanzadasUnidas.length>0){
@@ -90,12 +91,12 @@ export class BodegasComponent implements OnInit, OnDestroy {
       } );
   }
 
-  unirBalanzadasParaBodegas(blzas7y8: Balanzas[]): BalanzadasUnidas[] {
+  unirBalanzadasParaBodegas(blzas7y8: BalanzadasBuque[]): BalanzadasUnidas[] {
     let nuevaBalanzadasBajaCarga: BalanzadasUnidas[] = blzas7y8.map( x => {
       let propBalanzadasUnidas = {
-        "bodega": this.getNombreBodega(x.bodega_id),
-        "producto": this.getDescripcionCortaMaterial(x.material_id),
-        "kilos": x.kg
+        "bodega": this.getNombreBodega(x.bodega_Id),
+        "producto": this.getDescripcionCortaMaterial(x.material_Id),
+        "kilos": x.pesoNeto
       };
       return propBalanzadasUnidas;
     });
