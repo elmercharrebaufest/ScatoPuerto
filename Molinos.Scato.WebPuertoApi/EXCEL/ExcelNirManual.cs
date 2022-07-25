@@ -2,6 +2,7 @@
 using Molinos.Scato.Dominio.Dto;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -94,6 +95,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
 
             var row = sheet.CreateRow(0);
+            
             var celda1 = row.CreateCell(0);
             celda1.SetCellValue("Mano");
             celda1.CellStyle = estiloHeader;
@@ -166,11 +168,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             fontBold.Boldweight = (short)FontBoldWeight.Bold;
 
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
+            var sheet = workbook.CreateSheet();
+            
+            CellRangeAddress celImg = new CellRangeAddress(0, 3, 1, 2);
+            
             cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
+            cellBorderStyleColumnTitles.VerticalAlignment = VerticalAlignment.Center;
             cellBorderStyleColumnTitles.VerticalAlignment = VerticalAlignment.Center;
             return cellBorderStyleColumnTitles;
         }
