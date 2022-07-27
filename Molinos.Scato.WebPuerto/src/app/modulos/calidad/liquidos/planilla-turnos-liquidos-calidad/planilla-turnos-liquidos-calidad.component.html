@@ -19,48 +19,41 @@
         <div id="scrollbar-planilla-recibidores-liquido" class='mt-4 px-4 pb-4' [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
             <!-- ACA VA LA SCROLLBAR -->
             <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
-            <table class='table table-bordered turnos'>
+            <table class='table table-bordered turnos table-ancho'>
                 <thead class="header-fijo" >
                     <tr>
-                        <th class="header-fijo">Día</th>
-                        <th class="header-fijo">Turno</th>
-                        <th class="header-fijo">Exportador</th>
-                        <th class="header-fijo">Línea</th>
-                        <th class="header-fijo">Partida</th>
-                        <th class="header-fijo">Producto</th>
-                        <th class="header-fijo">Tk</th>
-                        <th class="header-fijo">°C</th>
-                        <th class="header-fijo">Med.Ini. CM</th>
-                        <th class="header-fijo">Med.Ini. MM</th>
-                        <th class="header-fijo">Med.fin. CM</th>
-                        <th class="header-fijo">Med.fin. MM</th>
-                        <th class="header-fijo">Destino</th>
-                        <th class="header-fijo">Cant.</th>
+                        <th class="header-fijo" width="10%">Día</th>
+                        <th class="header-fijo" width="10%">Turno</th>
+                        <th class="header-fijo" width="15%">Exportador</th>
+                        <th class="header-fijo" width="15%">Línea</th>
+                        <th class="header-fijo" >Partida</th>
+                        <th class="header-fijo" width="18%">Producto</th>
+                        <th class="header-fijo" width="18%">Destino</th>
+                        <th class="header-fijo" >Cant.</th>
                     </tr>
                 </thead>
                 <tbody>
                     <ng-container formArrayName='diasTurno'>
                         <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
                             <tr>
-                                <td [attr.rowspan]='getRowSpan(dia)'>
-                                    
+                                <td [attr.rowspan]='getRowSpan(dia)' width="10%">
                                     <div class='column-center'>
                                         <span><b>{{getDia(d)}}</b></span>
-                                        <span class='toneladas'>{{getCantDia(dia) | number: '1.0-0'}}</span>
+                                        <span class='toneladas'>{{ getCantDia(dia) }}</span>
                                         <span class='turno'>por día</span>
-                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelDia(bodega.bodegaParcel, d)| number: '1.2-2'}} Tn.</span>
+                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{ getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.</span>
                                     </div>
                                 </td>
                             </tr>
-                            <ng-container formArrayName='turnos'>
+                            <ng-container formArrayName='turnos' >
                                 <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index' [formGroupName]='t'>
-                                    <tr disabled="true"> 
-                                        <td [attr.rowspan]='getRowSpanTurno(turno)'>
+                                    <tr> 
+                                        <td [attr.rowspan]='getRowSpanTurno(turno)' width="10%">
                                             <div class="column-center">
                                                 <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
-                                                <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
+                                                <span class='toneladas'>{{ getCantTurno(turno) }}</span>
                                                 <span class='turno'>por turno</span>
-                                                <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number: '1.2-2'}} Tn.</span><br>
+                                                <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.</span><br>
                                                 <button class='btn btn btn-success' 
                                                         *ngIf="!turno.value.guardadoPorRecibidor"
                                                         style="margin-top: 5px; margin-bottom: 5px" 
@@ -92,7 +85,7 @@
                                                 </td>
                                                 <!-- PARTIDA -->
                                                 <td>
-                                                    <select formControlName='bodegaParcel'>
+                                                    <select formControlName='bodegaParcel' class="planilla-texto-derecha">
                                                         <option [value]='0'></option>
                                                         <option *ngFor='let bodega of bodegas' [ngValue]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}</option>
                                                     </select>
@@ -104,19 +97,6 @@
                                                         <option *ngFor='let producto of productos' [ngValue]='producto'>{{producto.descripcionCorta}}</option>
                                                     </select>
                                                 </td>
-                                                <!-- TK -->
-                                                <td>
-                                                    <!-- <input type="text" formControlName='tk' disabled> -->
-                                                    <select formControlName='tk' (change)='getCantidadLinea(result)'>
-                                                        <option *ngFor='let linea of lineas' [ngValue]='linea.tkInicial'>{{linea.tkInicial}}</option>
-                                                    </select>
-                                                </td>
-                                                <!-- °C -->
-                                                <td><input type="number" formControlName='temperatura' (change)='getCantidadLinea(result)'></td>
-                                                <td><input type="number" formControlName='medidaInicialCM' (focusout)='getCantidadLinea(result)'></td>
-                                                <td><input type="number" formControlName='medidaInicialMM' (focusout)='getCantidadLinea(result)'></td>
-                                                <td><input type="number" formControlName='medidaFinalCM' (focusout)='getCantidadLinea(result)'></td>
-                                                <td><input type="number" formControlName='medidaFinalMM' (focusout)='getCantidadLinea(result)'></td>
                                                 <!-- DESTINO -->
                                                 <td>
                                                     <select formControlName='destino'>
@@ -124,29 +104,38 @@
                                                         <option *ngFor='let destino of destinos' [ngValue]='destino.id'>{{destino.nombre}}</option>
                                                     </select>
                                                 </td>
-                                                <td><input type="number" formControlName='cantidad'></td>
+                                                <td>
+                                                    <input type="number" formControlName='cantidad' class="planilla-texto-derecha">
+                                                </td>
                                             </tr>
                                         </ng-container>
                                     </ng-container>
                                     <tr>
+                                        <!-- <td colspan="12" class='btn-add-cell'>
+                                            <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
+                                                <button type='button' class='btn btn-primary bt-circle'
+                                                    style='margin-top: -5px;'>+</button>
+                                                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                            </div>
+                                        </td> -->
                                     </tr>
                                     <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
-                                        <td colspan="12" class='p-0'>
-                                            <table class='tabla table-bordered tabla-embebida'>
+                                        <td colspan="6" class='p-0'>
+                                            <table width="100%">
                                                 <thead>
                                                     <tr class='table-active'>
-                                                        <th colspan="4">Motivo</th>
+                                                        <th colspan="1">Motivo</th>
                                                         <th colspan="1">Inicio</th>
                                                         <th colspan="1">Fin</th>
                                                         <th colspan="1">Tiempo total</th>
-                                                        <th colspan="5">Observaciones</th>
+                                                        <th colspan="2">Observaciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
                                                             <tr class='tabla-fila-corte'>
-                                                                <td colspan="4">
+                                                                <td colspan="1">
                                                                     {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                 </td>
                                                                 <td colspan="1">
@@ -158,7 +147,7 @@
                                                                 <td colspan="1">
                                                                     {{corte.controls.tiempoTotal.value}} hs
                                                                 </td>
-                                                                <td colspan="5">
+                                                                <td colspan="2">
                                                                     {{corte.controls.observaciones.value}}
                                                                 </td>
                                                             </tr>
@@ -172,32 +161,32 @@
                                         <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                     </tr>
                                     <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false'>
-                                        <td colspan="12" class='p-0'>
-                                            <table class='tabla table-bordered tabla-embebida'>
+                                        <td colspan="6" class='p-0'>
+                                            <table width="100%">
                                                 <thead>
                                                     <tr class='table-active'>
-                                                        <th colspan="1"></th>
-                                                        <th colspan="6">Observación de calidad</th>
-                                                        <th colspan="3">Fecha</th>
-                                                        <th colspan="2">Hora</th>
+                                                        <th></th>
+                                                        <th colspan="3">Observación de calidad</th>
+                                                        <th colspan="1">Fecha</th>
+                                                        <th colspan="1">Hora</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
                                                         <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                             <tr>
-                                                                <td colspan="1">
+                                                                <td>
                                                                     <div (click)="deleteObsCalidad(observacion)">
                                                                         <img src="assets/trashIcon.svg"  style="width: 40px;">
                                                                     </div>
                                                                 </td>
-                                                                <td colspan="6">
+                                                                <td colspan="3">
                                                                     {{observacion.observaciones}}
                                                                 </td>
-                                                                <td colspan="3">
+                                                                <td colspan="1">
                                                                     {{observacion.fecha}}
                                                                 </td>
-                                                                <td colspan="2">
+                                                                <td colspan="1">
                                                                     {{observacion.hora}}
                                                                 </td>
                                                             </tr>
@@ -224,21 +213,21 @@
         <div fxFlex='50'>
             <div fxLayout='row wrap'>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea vieja:</b> {{getToneladasLinea('vieja') | number: '1.2-2'}} Tn.</span>
+                    <span class='txt-blue'><b>Línea vieja:</b> {{getToneladasLinea('vieja') }} Tn.</span>
                 </div>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea nueva:</b> {{getToneladasLinea('nueva') | number: '1.2-2'}} Tn.</span>
+                    <span class='txt-blue'><b>Línea nueva:</b> {{getToneladasLinea('nueva') }} Tn.</span>
                 </div>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea Vicentin:</b> {{getToneladasLinea('vicentin') | number: '1.2-2'}} Tn.</span>
+                    <span class='txt-blue'><b>Línea Vicentin:</b> {{getToneladasLinea('vicentin') }} Tn.</span>
                 </div>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea Biodiesel:</b> {{getToneladasLinea('biodiesel') | number: '1.2-2'}} Tn.</span>
+                    <span class='txt-blue'><b>Línea Biodiesel:</b> {{getToneladasLinea('biodiesel') }} Tn.</span>
                 </div>
             </div>
         </div>
         <div fxFlex='50' class='right-side'>
-            <div class='bt-total'>Total a bordo: {{getCantTotalABordo() | number: '1.2-2'}}<div class='img-tn'></div></div>
+            <div class='bt-total'>Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn'></div></div>
         </div>
     </div>
 

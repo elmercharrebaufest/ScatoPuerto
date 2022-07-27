@@ -12,7 +12,7 @@
     [MedidaInicialMM]                           FLOAT,
     [MedidaFinalCM]                             FLOAT,
     [MedidaFinalMM]                             FLOAT,
-    [Destino_Id]                                INT NOT NULL,
+    [Destino_Id]                                INT NULL,
     [Cantidad]                                  DECIMAL(18, 8),
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesLiquido] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesLiquido_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,
