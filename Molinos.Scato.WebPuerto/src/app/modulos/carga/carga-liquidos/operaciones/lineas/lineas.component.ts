@@ -118,9 +118,11 @@ export class LineasComponent implements OnInit, OnChanges {
           if (current && linea.controls['alturaInicialCM'].value && linea.controls['tkInicial']) {
             this._lineasService.obtenerLlenadoMilimetroPorTanque(linea.controls['alturaInicialCM'].value, current, '0' + linea.controls['tkInicial'].value.value)
               .subscribe(res => {
-                linea.controls['litros'].setValue(res, { emitEvent: false });
+                let resultado = res != null ? res : '0';
+                const valResultado = resultado.toString().replace(',', '');
+                linea.controls['litros'].setValue(valResultado, { emitEvent: false });
                 if (linea.controls['densidadInicial'].value) {
-                  let kilosInicial = (Number(res) * Number(linea.controls['densidadInicial'].value));
+                  let kilosInicial = (Number(valResultado) * Number(linea.controls['densidadInicial'].value));
                   linea.controls['kilos'].setValue(kilosInicial, { emitEvent: false })
                 }
               });
@@ -147,7 +149,8 @@ export class LineasComponent implements OnInit, OnChanges {
           if (current && linea.controls['alturaFinalCM'].value && linea.controls['tkInicial']) {
             this._lineasService.obtenerLlenadoMilimetroPorTanque(linea.controls['alturaFinalCM'].value, current, '0' + linea.controls['tkInicial'].value.value)
               .subscribe(res => {
-                let litrosFinal = res;
+                let litrosFinal = res != null ? res : '0';
+                litrosFinal = litrosFinal.toString().replace(',', '');
                 let densidadFinal = linea.controls['densidadFinal'].value;
                 if (litrosFinal && densidadFinal && linea.controls['kilos'].value) {
                   let kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
