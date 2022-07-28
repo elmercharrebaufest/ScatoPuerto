@@ -23,18 +23,18 @@
                         <tr>
                             <th class="header-fijo">Día</th>
                             <th class="header-fijo">Turno</th>
-                            <th class="header-fijo">Exportador</th>
+                            <th class="header-fijo" width="12%">Exportador</th>
                             <th class="header-fijo">Línea</th>
-                            <th class="header-fijo">Partida</th>
-                            <th class="header-fijo">Producto</th>
-                            <th class="header-fijo">Tk</th>
-                            <th class="header-fijo">°C</th>
+                            <th class="header-fijo" width="5%">Partida</th>
+                            <th class="header-fijo" width="12%">Producto</th>
+                            <th class="header-fijo" width="4%">Tk</th>
+                            <th class="header-fijo" width="4%">°C</th>
                             <th class="header-fijo">Med.Ini. CM</th>
                             <th class="header-fijo">Med.Ini. MM</th>
                             <th class="header-fijo">Med.fin. CM</th>
                             <th class="header-fijo">Med.fin. MM</th>
                             <th class="header-fijo">Destino</th>
-                            <th class="header-fijo">Cant.</th>
+                            <th class="header-fijo" width="5%">Cant.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,12 +44,12 @@
                                     <td [attr.rowspan]='getRowSpan(dia) + 1'>
 
                                         <div class='column-center'>
-                                            <span><b>{{getDia(d)}}</b></span>
-                                            <span class='toneladas'>{{getCantDia(dia) | number: '1.0-0'}}</span>
+                                            <span><b>{{ getDia(d) }}</b></span>
+                                            <span class='toneladas'>{{ getCantDia(dia) }}</span>
                                             <span class='turno'>por día</span>
                                             <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel
                                                     {{bodega.bodegaParcel}}:</b>
-                                                {{getToneladasParcelDia(bodega.bodegaParcel, d)| number: '1.2-2'}}
+                                                {{ getToneladasParcelDia(bodega.bodegaParcel, d) }}
                                                 Tn.</span>
                                         </div>
                                     </td>
@@ -64,19 +64,18 @@
                                                             turno.value.turnoPuerto.turnoPuerto ?
                                                             turno.value.turnoPuerto.turnoPuerto.nombre : ' ' :
                                                             ''}}</b></span>
-                                                    <span class='toneladas'>{{getCantTurno(turno) | number:
-                                                        '1.2-2'}}</span>
+                                                    <span class='toneladas'>{{ getCantTurno(turno) }}</span>
                                                     <span class='turno'>por turno</span>
                                                     <span *ngFor='let bodega of bodegas'
                                                         class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
-                                                        {{getToneladasParcelTurno(bodega.bodegaParcel, d, t)| number:
-                                                        '1.2-2'}} Tn.</span><br>
+                                                        {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.</span><br>
                                                     <button id="btn-guardar-turno-liquidos" class='btn btn btn-success'
                                                         style="margin-top: 5px; margin-bottom: 5px"
-                                                        *ngIf="!turno.value.guardadoPorTablerista"
                                                         (click)='guardarTurnoGeneral(d,t)'>
-                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Turno guardado'}}
+                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Guardar turno'}}
                                                     </button>
+                                                    <span class='parcel-cantidad' *ngIf="turno.value.guardadoPorTablerista"><b>Turno en recibidores</b></span>
+
                                                     <button id="btn-turno-enviado-liquidos" *ngIf="!turno.value.guardadoPorTablerista"
                                                         (click)='guardarTurnoGeneral(d,t,true)'
                                                         [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
@@ -113,7 +112,7 @@
                                                     </td>
                                                     <!-- PARTIDA -->
                                                     <td>
-                                                        <select formControlName='bodegaParcel'>
+                                                        <select formControlName='bodegaParcel' style="text-align: right">
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let bodega of bodegas'
                                                                 [ngValue]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}
@@ -135,22 +134,22 @@
                                                     <td>
                                                         <!-- <input type="text" formControlName='tk' disabled> -->
                                                         <select formControlName='tk'
-                                                            (change)='getCantidadLinea(result)'>
+                                                            (change)='getCantidadLinea(result)' class='planilla-text-derecha'>
                                                             <option *ngFor='let linea of lineas'
                                                                 [ngValue]='linea.tkInicial'>{{linea.tkInicial}}</option>
                                                         </select>
                                                     </td>
                                                     <!-- °C -->
                                                     <td><input type="number" formControlName='temperatura'
-                                                            (change)='getCantidadLinea(result)'></td>
+                                                            (change)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaInicialCM'
-                                                            (focusout)='getCantidadLinea(result)'></td>
+                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaInicialMM'
-                                                            (focusout)='getCantidadLinea(result)'></td>
+                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaFinalCM'
-                                                            (focusout)='getCantidadLinea(result)'></td>
+                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaFinalMM'
-                                                            (focusout)='getCantidadLinea(result)'></td>
+                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
                                                     <!-- DESTINO -->
                                                     <td>
                                                         <select formControlName='destino'>
@@ -159,7 +158,7 @@
                                                                 [ngValue]='destino.id'>{{destino.nombre}}</option>
                                                         </select>
                                                     </td>
-                                                    <td><input type="number" formControlName='cantidad'></td>
+                                                    <td><input type="number" formControlName='cantidad' class='planilla-text-derecha'></td>
                                                 </tr>
                                             </ng-container>
                                         </ng-container>
@@ -229,25 +228,25 @@
         <div fxFlex='50'>
             <div fxLayout='row wrap'>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea vieja:</b> {{getToneladasLinea('vieja') | number: '1.2-2'}}
+                    <span class='txt-blue'><b>Línea vieja:</b> {{getToneladasLinea('vieja')}}
                         Tn.</span>
                 </div>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea nueva:</b> {{getToneladasLinea('nueva') | number: '1.2-2'}}
+                    <span class='txt-blue'><b>Línea nueva:</b> {{getToneladasLinea('nueva')}}
                         Tn.</span>
                 </div>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea Vicentin:</b> {{getToneladasLinea('vicentin') | number: '1.2-2'}}
+                    <span class='txt-blue'><b>Línea Vicentin:</b> {{getToneladasLinea('vicentin')}}
                         Tn.</span>
                 </div>
                 <div fxFlex='100'>
-                    <span class='txt-blue'><b>Línea Biodiesel:</b> {{getToneladasLinea('biodiesel') | number: '1.2-2'}}
+                    <span class='txt-blue'><b>Línea Biodiesel:</b> {{getToneladasLinea('biodiesel')}}
                         Tn.</span>
                 </div>
             </div>
         </div>
         <div fxFlex='50' class='right-side'>
-            <div class='bt-total'>Total a bordo: {{getCantTotalABordo() | number: '1.2-2'}}<div class='img-tn'></div>
+            <div class='bt-total'>Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn'></div>
             </div>
         </div>
     </div>

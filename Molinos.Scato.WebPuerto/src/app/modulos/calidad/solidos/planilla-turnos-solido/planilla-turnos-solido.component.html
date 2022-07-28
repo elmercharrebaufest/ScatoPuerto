@@ -36,7 +36,7 @@
                                     <td [attr.rowspan]='getRowSpan(dia)'>
                                         <div class='column-center'>
                                             <span><b>{{getDia(d)}}</b></span>
-                                            <span class='toneladas'>{{getCantDia(dia) | number: '1.0-0'}}</span>
+                                            <span class='toneladas'>{{ getCantDia(dia) }}</span>
                                             <span class='turno'>por día</span>
                                         </div>
                                     </td>
@@ -47,7 +47,7 @@
                                             <td [attr.rowspan]='getRowSpanTurno(turno)'>
                                                 <div class="column-center">
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
-                                                    <span class='toneladas'>{{getCantTurno(turno) | number: '1.2-2'}}</span>
+                                                    <span class='toneladas'>{{ getCantTurno(turno) }}</span>
                                                     <span class='turno'>por turno</span>
                                                 </div>
                                             </td>
@@ -72,8 +72,7 @@
                                                     <td>
                                                         {{result.controls.destino.value}}
                                                     </td>
-                                                    <td>
-                                                        {{result.controls.cantidad.value / 1000}}
+                                                    <td> {{ soloEnteros(result.controls.cantidad.value / 1000) }}
                                                     </td>
                                                 </tr>
                                             </ng-container>

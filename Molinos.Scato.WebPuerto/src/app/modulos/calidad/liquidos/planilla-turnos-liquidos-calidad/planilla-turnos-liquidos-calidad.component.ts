@@ -295,19 +295,32 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
-        element.fechaMiliseconds = new Date(element.fecha).getTime();
+        element.fechaMiliseconds = new Date(element.fecha).getTime();       
       });
       //filtroTurno.sort((a,b) => a.turnoPuerto.orden-b.turnoPuerto.orden)
 
       // Ordenamos los turnos por fecha y turno correspondiente
+      console.log('Ordenando.....')
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
-        return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
+        return (b.fechaMiliseconds - a.fechaMiliseconds);// && (b.turnoPuerto.orden - a.turnoPuerto.orden);
       });
-
+      /*
+      this.planillaDeTurnos.forEach((dia) => {
+        console.log(dia)
+        console.log(dia.fecha.substring(0,10))
+        if (dia.turnoPuerto != undefined || dia.turnoPuerto != null){
+          if(dia.turnoPuerto.nombre == '00-06') dia.posicionTurno = 1;
+          if(dia.turnoPuerto.nombre == '06-12') 
+          if(dia.turnoPuerto.nombre == '12-18')
+          if(dia.turnoPuerto.nombre == '18-24')
+        }
+      });
+      */
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
         let exists: boolean = false;
         let dayIndex: number;
+
         //Me fijo si el día ya está agregado
         this.formTurnos.get('diasTurno')['controls'].forEach((element, indexDiaTurno) => {
           //Si el día ya está agregado
@@ -716,9 +729,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroLiquido = registroLiquido > 0 ? 6 : 0; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
+    registroLiquido = registroLiquido > 0 ? 6 : 6; // tamaño del detalle de cada turno
+    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
 
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -757,6 +770,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     // return 0;
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls) {
       contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
+      contador = parseInt(contador.toString());
     }
     return contador;
   }
@@ -766,6 +780,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     // return 0;
     for (let turno of d['controls']['turnos']['controls']) {
       contador += this.getCantTurno(turno);
+      contador = parseInt(contador.toString());
     }
     return contador;
   }
@@ -775,6 +790,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     // return 0;
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
       contador += this.getCantDia(dia);
+      contador = parseInt(contador.toString());
     }
     return contador;
   }
@@ -865,6 +881,10 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   }
 
   initLinea(line?: any, guardado?: boolean) {
+    let destino = 0;
+    if (line != null || line != undefined) {
+      destino = line.destino?.id;
+    }
     return this._builder.group({
       linea: [{ value: line ? line.linea_Id : '', disabled: guardado },],
       exportador: [{ value: line ? line.exportador : '', disabled: guardado }],
@@ -876,8 +896,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       medidaInicialMM: [{ value: line ? line.medidaInicialMM : '', disabled: guardado }],
       medidaFinalCM: [{ value: line ? line.medidaFinalCM : '', disabled: guardado }],
       medidaFinalMM: [{ value: line ? line.medidaFinalMM : '', disabled: guardado }],
-      destino: [{ value: line ? line.destino.id : '', disabled: guardado }],
-      cantidad: [{ value: line ? line.cantidad : '', disabled: guardado }],
+      destino: [{ value: destino, disabled: guardado }],
+      cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: guardado }],
       id: [{ value: line ? line.id : null, disabled: guardado }]
     })
   }
@@ -925,6 +945,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     for (let turno of dia.controls) {
       for (let linea of turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido']['controls']) {
         cantidad += (linea.controls.bodegaParcel.value == bodega ? Number(linea.controls.cantidad.value) : 0);
+        cantidad = parseInt(cantidad.toString());
       }
     }
     return cantidad;
@@ -936,6 +957,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     // return 0;
     for (let linea of turno.controls) {
       cantidad += (linea['controls'].bodegaParcel.value == bodega ? Number(linea['controls'].cantidad.value) : 0);
+      cantidad = parseInt(cantidad.toString());
     }
     return cantidad;
   }
@@ -955,12 +977,12 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
               const lineaSel = lineaFiltro[0];
               const lineaValue = lineaSel.linea != null ? lineaSel.linea : '';
               contador += (lineaValue.toLowerCase() == value ? Number(linea.get('cantidad').value) : 0);
+              contador = parseInt(contador.toString());
             }
           }
         })
       });
     })
-
     return contador;
   }
 
@@ -1025,7 +1047,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     this.exportaPlanilla = true;
     const fname = "parcels";
     const header = ["Exportador", "Partida", "Tks de abordo", , "Destino", "Tks Tierra", , "TN", "Producto"];
-    const headerDetalles = ["Exportador", "Línea", "Partida", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Cm.", "Destino", "Cant."];
+    const headerDetalles = ["Exportador", "Línea", "Partida", "Producto", /*"Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Cm.",*/ "Destino", "Cant."];
     const headerCortes = ["Motivo", "Inicio", "Fin", "Tiempo total", "Observaciones"];
     const referencias = ["REFERENCIAS",
       "CSBO = ACTE CRUDO DE SOJA",
@@ -1038,7 +1060,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     const imgMolinos = await this.getImgMolinos();
     // datosModal.parcelSeleccionados.forEach((element, i) => {
     let workbook = new Workbook();
-
+  
     const molinosImg = workbook.addImage({
       buffer: imgMolinos,
       extension: 'png',
@@ -1050,7 +1072,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
           { state: 'frozen', activeCell: 'A1', showGridLines: false }
         ]
       });
-
+      
     //Seteo el ancho de todas las columnas.
     worksheet.columns = [
       { width: 12 },
@@ -1342,17 +1364,19 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
           worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
           worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
           worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
+          /*
           worksheet.getRow(offset).getCell(7).value = turno.tk;
           worksheet.getRow(offset).getCell(8).value = turno.temperatura;
           worksheet.getRow(offset).getCell(9).value = turno.medidaInicialCM;
           worksheet.getRow(offset).getCell(10).value = turno.medidaFinalMM;
           worksheet.getRow(offset).getCell(11).value = turno.medidaFinalCM;
           worksheet.getRow(offset).getCell(12).value = turno.medidaFinalMM;
-          worksheet.getRow(offset).getCell(13).value = turno.destino.nombre;
-          worksheet.getRow(offset).getCell(14).value = turno.cantidad;
+          */
+          worksheet.getRow(offset).getCell(7).value = turno?.destino?.nombre;
+          worksheet.getRow(offset).getCell(8).value = parseInt(turno.cantidad.toString());
 
           let celdaDetalle = 3
-          for (let indexCell = 1; indexCell <= 12; indexCell++) {
+          for (let indexCell = 1; indexCell <= 6; indexCell++) {
             worksheet.getRow(offset).getCell(celdaDetalle).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
             celdaDetalle += 1;
           }
@@ -1363,14 +1387,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
       if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
 
-        worksheet.mergeCells(`C${offset}:D${offset}`);
-        worksheet.mergeCells(`E${offset}:F${offset}`);
+        worksheet.mergeCells(`C${offset}:C${offset}`);
+        worksheet.mergeCells(`D${offset}:D${offset}`);
+        worksheet.mergeCells(`E${offset}:E${offset}`);
+        worksheet.mergeCells(`F${offset}:F${offset}`);
         worksheet.mergeCells(`G${offset}:H${offset}`);
-        worksheet.mergeCells(`I${offset}:J${offset}`);
-        worksheet.mergeCells(`K${offset}:N${offset}`);
 
         headerCortes.forEach((text, index) => {
-          let currentCell = worksheet.getRow(offset).getCell(3 + (2 * index));
+          let currentCell = worksheet.getRow(offset).getCell(3 + (1 * index));
 
           if (text) {
             currentCell.value = text;
@@ -1400,22 +1424,22 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         console.log(turno.moduloDeCargaPlanillaDeTurnosCortes)
         turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((turno: CorteTurno, index) => {
 
-          worksheet.mergeCells(`C${offset}:D${offset}`);
-          worksheet.mergeCells(`E${offset}:F${offset}`);
+          worksheet.mergeCells(`C${offset}:C${offset}`);
+          worksheet.mergeCells(`D${offset}:D${offset}`);
+          worksheet.mergeCells(`E${offset}:E${offset}`);
+          worksheet.mergeCells(`F${offset}:F${offset}`);
           worksheet.mergeCells(`G${offset}:H${offset}`);
-          worksheet.mergeCells(`I${offset}:J${offset}`);
-          worksheet.mergeCells(`K${offset}:N${offset}`);
 
           worksheet.getRow(offset).getCell(3).value = turno.motivosDeCorte.nombre;
-          worksheet.getRow(offset).getCell(5).value = turno.horaInicio;
-          worksheet.getRow(offset).getCell(7).value = turno.horaFin;
-          worksheet.getRow(offset).getCell(9).value = turno.tiempoTotal;
-          worksheet.getRow(offset).getCell(11).value = turno.observaciones;
+          worksheet.getRow(offset).getCell(4).value = turno.horaInicio;
+          worksheet.getRow(offset).getCell(5).value = turno.horaFin;
+          worksheet.getRow(offset).getCell(6).value = turno.tiempoTotal;
+          worksheet.getRow(offset).getCell(7).value = turno.observaciones;
 
           let celdaCorte = 3
           for (let indexCell = 1; indexCell <= 5; indexCell++) {
             worksheet.getRow(offset).getCell(celdaCorte).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-            celdaCorte += 2;
+            celdaCorte += 1;
           }
 
           offset = offset + 1;
@@ -1428,7 +1452,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
           let currentCell = worksheet.getRow(offset).getCell(3 + (index));
 
           if (index == 2) {
-            worksheet.mergeCells(`E${offset}:N${(offset)}`);
+            worksheet.mergeCells(`E${offset}:H${(offset)}`);
           }
 
           if (text) {
@@ -1459,7 +1483,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         console.log(turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
         turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.forEach((observacion: any, index) => {
           //if (index == 2){
-          worksheet.mergeCells(`E${offset}:N${(offset)}`);
+          worksheet.mergeCells(`E${offset}:H${(offset)}`);
           //}
           console.log('observacion =>>')
           console.log(observacion)

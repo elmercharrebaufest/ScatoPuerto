@@ -65,31 +65,45 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     detalle_DB.MedidaInicialMM = detalle.MedidaInicialMM;
                                     detalle_DB.MedidaFinalCM = detalle.MedidaFinalCM;
                                     detalle_DB.MedidaFinalMM = detalle.MedidaFinalMM;
-                                    detalle_DB.Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id);
+                                    if (detalle.Destino != null)
+                                    {
+                                        detalle_DB.Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id);
+                                    }
+                                    else
+                                    {
+                                        detalle_DB.Destino = null;
+                                    }
                                     detalle_DB.Cantidad = detalle.Cantidad;
                                 }
                                 else
                                 {
+
+                                    var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido();
+
+                                    detalle_DB.ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB;
+                                    detalle_DB.Exportador = Repositorio.Obtener<Exportador>(detalle.Exportador.Id);
+                                    detalle_DB.Linea_Id = detalle.Linea_Id;
+                                    detalle_DB.BodegaParcel = detalle.BodegaParcel;
+                                    detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id);
+                                    detalle_DB.Tk = detalle.Tk.ToString();
+                                    detalle_DB.Temperatura = detalle.Temperatura;
+                                    detalle_DB.MedidaInicialCM = detalle.MedidaInicialCM;
+                                    detalle_DB.MedidaInicialMM = detalle.MedidaInicialMM;
+                                    detalle_DB.MedidaFinalCM = detalle.MedidaFinalCM;
+                                    detalle_DB.MedidaFinalMM = detalle.MedidaFinalMM;
                                     if (detalle.Destino != null)
                                     {
-                                        var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido()
-                                        {
-                                            ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
-                                            Exportador = Repositorio.Obtener<Exportador>(detalle.Exportador.Id),
-                                            Linea_Id = detalle.Linea_Id,
-                                            BodegaParcel = detalle.BodegaParcel,
-                                            MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id),
-                                            Tk = detalle.Tk.ToString(),
-                                            Temperatura = detalle.Temperatura,
-                                            MedidaInicialCM = detalle.MedidaInicialCM,
-                                            MedidaInicialMM = detalle.MedidaInicialMM,
-                                            MedidaFinalCM = detalle.MedidaFinalCM,
-                                            MedidaFinalMM = detalle.MedidaFinalMM,
-                                            Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id),
-                                            Cantidad = detalle.Cantidad
-                                        };
-                                        Repositorio.Agregar(detalle_DB);
+                                        detalle_DB.Destino = Repositorio.Obtener<Destino>(detalle.Destino.Id);
                                     }
+                                    else
+                                    {
+                                        detalle_DB.Destino = null;
+                                    }
+
+                                    detalle_DB.Cantidad = detalle.Cantidad;
+
+                                    Repositorio.Agregar(detalle_DB);
+
 
                                 }
                             }
@@ -157,23 +171,33 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             {
                                 if (modulodetalle.Linea_Id != null)
                                 {
-                                    var ModuloDeCargaPlanillaDeTurnosDetallesLiquido = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido()
+                                    var planillaLquido = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido();
+
+                                    planillaLquido.ModuloDeCargaPlanillaDeTurnos = turno_DB;
+                                    planillaLquido.Exportador = Repositorio.Obtener<Exportador>(modulodetalle.Exportador.Id);
+                                    planillaLquido.Linea_Id = modulodetalle.Linea_Id;
+                                    planillaLquido.BodegaParcel = modulodetalle.BodegaParcel;
+                                    planillaLquido.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(modulodetalle.MaterialPuerto.Id);
+                                    planillaLquido.Tk = modulodetalle.Tk.ToString();
+                                    planillaLquido.Temperatura = modulodetalle.Temperatura;
+                                    planillaLquido.MedidaInicialCM = modulodetalle.MedidaInicialCM;
+                                    planillaLquido.MedidaInicialMM = modulodetalle.MedidaInicialMM;
+                                    planillaLquido.MedidaFinalCM = modulodetalle.MedidaFinalCM;
+                                    planillaLquido.MedidaFinalMM = modulodetalle.MedidaFinalMM;
+                                    if (modulodetalle.Destino != null)
                                     {
-                                        ModuloDeCargaPlanillaDeTurnos = turno_DB,
-                                        Exportador = Repositorio.Obtener<Exportador>(modulodetalle.Exportador.Id),
-                                        Linea_Id = modulodetalle.Linea_Id,
-                                        BodegaParcel = modulodetalle.BodegaParcel,
-                                        MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(modulodetalle.MaterialPuerto.Id),
-                                        Tk = modulodetalle.Tk.ToString(),
-                                        Temperatura = modulodetalle.Temperatura,
-                                        MedidaInicialCM = modulodetalle.MedidaInicialCM,
-                                        MedidaInicialMM = modulodetalle.MedidaInicialMM,
-                                        MedidaFinalCM = modulodetalle.MedidaFinalCM,
-                                        MedidaFinalMM = modulodetalle.MedidaFinalMM,
-                                        Destino = Repositorio.Obtener<Destino>(modulodetalle.Destino.Id),
-                                        Cantidad = modulodetalle.Cantidad
-                                    };
-                                    detalles.Add(ModuloDeCargaPlanillaDeTurnosDetallesLiquido);
+                                        planillaLquido.Destino = Repositorio.Obtener<Destino>(modulodetalle.Destino.Id);
+                                    }
+                                    else
+                                    {
+                                        planillaLquido.Destino = null;
+                                    }
+
+
+
+                                    planillaLquido.Cantidad = modulodetalle.Cantidad;
+
+                                    detalles.Add(planillaLquido);
                                 }
                             }
 

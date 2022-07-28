@@ -1,6 +1,6 @@
 <div id="imprimirRecibidoresLiquido">
   <div id="grafico-liquidos" class="mt-4 shadow bg-white min-h5">
-      <app-tanques [esCalidad]="true"></app-tanques>
+    <app-tanques [esCalidad]="true"></app-tanques>
   </div>
 
   <div id="element-to-hide" data-html2canvas-ignore="true">
@@ -25,17 +25,19 @@
   </div>
 
   <div class="html2pdf__page-break"></div>
-  
+
   <div data-html2canvas-ignore="true" class="col text-center">
     <app-modal-recibo></app-modal-recibo>
   </div>
 
-<app-registro-recibos></app-registro-recibos>
-
+  <app-registro-recibos></app-registro-recibos>
+  
+  <!--
   <div class='mt-5' style='margin-left: 25%; width: 50%;'>
       <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
   </div>
-  
+  -->
+
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
     <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
   </div>

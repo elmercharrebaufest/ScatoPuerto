@@ -78,7 +78,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 Nombre = comando.Dto.NombreBuque
             };
-
+            Embarque.Patente = comando.Dto.NombreBuque;
             Repositorio.RemoverTodos(Embarque.MaterialPuertoCantidad.ToList());
 
             foreach (var mat in comando.Dto.MaterialesPuertoCantidad.Where(y => y.Cantidad > 0))
