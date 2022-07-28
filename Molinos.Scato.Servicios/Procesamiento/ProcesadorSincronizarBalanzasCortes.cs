@@ -486,13 +486,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var fechasFin = reg.fechaFin;
 
                     var PesoTotal = (int)Repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.Id >= reg.idInicio && x.Id <= reg.idFin && x.NumeroBalanza == reg.numeroBalanza);
-                    var car = Repositorio.Obtener<Carga>(x => x.Id == reg.numeroCarga); 
+                    var car = Repositorio.Obtener<Carga>(x => x.Id == reg.numeroCarga);
 
                     double tiempo = fechasFin.Subtract(fechasInicio).TotalMinutes;
 
                     int kgHora = (int)((PesoTotal / tiempo) * 60);
 
-                    if (((kgHora / 1000) < 950 && kgHora >0))
+                    if (((kgHora / 1000) < 950 && kgHora > 0))
                     {
                         BalanzasCortes bc = new BalanzasCortes
                         {
@@ -538,18 +538,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Material_id = car.Material == null ? 0 : car.Material.Id,
                         };
                         cortes8.Add(bc);
-                    //    GuardarRegistroBalanzasCortes(bc);
+                        //    GuardarRegistroBalanzasCortes(bc);
 
                     }
 
+
                 }
 
-                for (int i = 0; i < cortes7.Count()-1; i++)
+                for (int i = 0; i < cortes7.Count() - 1; i++)
                 {
-                   
-                   var tiempo = cortes7[i+1].Fecha_Inicio.Value.Subtract(cortes7[i].Fecha_Corte.Value).TotalMinutes;
 
-                    if (tiempo <5 && cortes7[i].Bodega_id == cortes7[i+1].Bodega_id && cortes7[i].Material_id == cortes7[i + 1].Material_id)
+                    var tiempo = cortes7[i + 1].Fecha_Inicio.Value.Subtract(cortes7[i].Fecha_Corte.Value).TotalMinutes;
+
+                    if (tiempo < 5 && cortes7[i].Bodega_id == cortes7[i + 1].Bodega_id && cortes7[i].Material_id == cortes7[i + 1].Material_id)
                     {
                         cortes7[i + 1].Kg += cortes7[i].Kg;
                         cortes7[i + 1].Tn += cortes7[i].Tn;
@@ -592,6 +593,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 throw;
             }
         }
+
 
 
         public void ValidarCargasRegistroBalanzasCortes7(int idModulodeCarga)
