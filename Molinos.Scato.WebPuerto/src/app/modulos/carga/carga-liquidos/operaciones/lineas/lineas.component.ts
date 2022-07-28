@@ -127,13 +127,13 @@ export class LineasComponent implements OnInit, OnChanges {
   public onCalculaLitros(linea) {
     const temperaturaInicial = linea.controls['temperaturaInicial'].value;
     const alturaInicialCM = linea.controls['alturaInicialCM'].value;
-    const alturaFinalMM = linea.controls['alturaFinalMM'].value;
+    const alturaInicialMM = linea.controls['alturaInicialMM'].value;
     const tkInicial = linea.controls['tkInicial'].value.value;
-    linea.controls['temperaturaFinal'].setValue(0, { emitEvent: false });
-    linea.controls['litros'].setValue(0, { emitEvent: false });
-    linea.controls['kilos'].setValue(0, { emitEvent: false })
-    linea.controls['temperaturaFinal'].setValue(temperaturaInicial, { emitEvent: false });
-    this._lineasService.obtenerLlenadoMilimetroPorTanque(alturaInicialCM, alturaFinalMM, '0' + tkInicial)
+    linea.controls['temperaturaFinal'].setValue(0);
+    linea.controls['litros'].setValue(0);
+    linea.controls['kilos'].setValue(0)
+    linea.controls['temperaturaFinal'].setValue(temperaturaInicial);
+    this._lineasService.obtenerLlenadoMilimetroPorTanque(alturaInicialCM, alturaInicialMM, '0' + tkInicial)
       .subscribe(res => {
         let resultado = res != null ? res : '0';
         const densidadInicial = linea.controls['densidadInicial'].value;
@@ -148,13 +148,13 @@ export class LineasComponent implements OnInit, OnChanges {
   }
   public onCalculaKilos(linea) {
     const temperaturaInicial = linea.controls['temperaturaInicial'].value;
-    const alturaInicialCM = linea.controls['alturaInicialCM'].value;
+    const alturaFinalCM = linea.controls['alturaFinalCM'].value;
     const alturaFinalMM = linea.controls['alturaFinalMM'].value;
     const tkInicial = linea.controls['tkInicial'].value.value;
     linea.controls['tkFinal'].setValue(0, { emitEvent: false })
     linea.controls['temperaturaFinal'].setValue(0, { emitEvent: false });
     linea.controls['temperaturaFinal'].setValue(temperaturaInicial, { emitEvent: false });
-    this._lineasService.obtenerLlenadoMilimetroPorTanque(alturaInicialCM, alturaFinalMM, '0' + tkInicial)
+    this._lineasService.obtenerLlenadoMilimetroPorTanque(alturaFinalCM, alturaFinalMM, '0' + tkInicial)
       .subscribe(res => {
         let litrosFinal = res != null ? res : '0';
         litrosFinal = litrosFinal.toString().replace(',', '');
@@ -176,6 +176,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
   private cargarLineasEmbarque() {
     console.log('entro a cargarLineasEmbarque');
+    /*
     this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'].forEach((linea, indexLinea) => {
       linea.controls['alturaInicialCM'].valueChanges.pipe(startWith(null as object), pairwise())
         .subscribe(([previous, current]) => {
@@ -267,6 +268,7 @@ export class LineasComponent implements OnInit, OnChanges {
           }
         });
     });
+    */
   }
 
   private cargarEmbarque(idEmbarque: number) {
@@ -375,7 +377,7 @@ export class LineasComponent implements OnInit, OnChanges {
       this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadFinal'].setValue(0);
       return;
     }
-
+    console.log('entro onFocusOutEvent')
     this._lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId, temperatura)
       .subscribe(res => {
         if (res == 0 || !res) {

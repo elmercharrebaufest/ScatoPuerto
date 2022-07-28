@@ -17,7 +17,9 @@
     align-items: center;
     height: 100%;
 }
-
+.planilla-text-derecha{
+    text-align: right;
+}
 label{
     font-weight: bold;
 }
