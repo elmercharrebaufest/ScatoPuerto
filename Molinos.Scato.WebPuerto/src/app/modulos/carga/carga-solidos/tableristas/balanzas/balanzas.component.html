@@ -1,3 +1,7 @@
+<div class="alert alert-warning mt-3" role="alert" *ngIf="this.nombreDiferente">
+  El nombre del Vapor ({{this.nombreVapor}}) no coincide con la patente ({{this.patenteEmbarque}})
+</div>
+
 <div class="row">
   <!-- Inicio BALANZA 7 -->
   <div class="col">
@@ -14,10 +18,6 @@
           <div class="col">
             <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7)'>Corte Manual</button>
           </div>
-        </div>
-  
-        <div class="alert alert-warning" role="alert" *ngIf="balanza7DiferenteNombre" >
-          El nombre del buque no coincide con el registrado en balanzadas.
         </div>
 
         <table class="claseTable" id="excel-table7">
@@ -395,6 +395,27 @@
           </div>
         </div>
 
+        <!-- <div fxLayout='row wrap' class='info-desc' *ngIf="this.mostrarInfoBalanzadasEnCurso">
+          <p fxFlex='100'><b>Información de Carga en curso:</b></p>
+          <p fxFlex='100'><b>Primera balanzada: </b>{{this.fechaInicio7EnCurso}}</p>
+          <p fxFlex='100'><b>Última balanzada: </b>{{this.fechaFin7EnCurso}}</p>
+          <p fxFlex='100'><b>Lleva cargando (Kg): </b>{{this.llevaCargando7EnCurso}}</p>
+        </div> -->
+
+        <table class="tableEnCurso info-desc" *ngIf="this.mostrarInfoBalanzadasEnCurso">
+          <tr>
+            <td><b>Estado de la balanza:</b> Carga en curso</td>
+          </tr>
+          <tr>
+            <td><b>Inicio:</b> {{this.fechaInicio7EnCurso}}</td>
+            <td><b>Lleva Cargando (Tn):</b> {{this.llevaCargando7EnCurso/1000}}</td>
+          </tr>
+          <tr>
+            <td><b>Producto:</b> {{this.producto7EnCurso}}</td>
+            <td><b>Bodega:</b> {{this.bodega7EnCurso}}</td>
+          </tr>
+        </table>
+
       </div>
 
 
@@ -420,10 +441,6 @@
           <div class="col">
             <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8)'>Corte Manual</button>
           </div>
-        </div>
-  
-        <div class="alert alert-warning" role="alert" *ngIf="balanza8DiferenteNombre" >
-          El nombre del buque no coincide con el registrado en balanzadas.
         </div>
 
         <table class="claseTable" id="excel-table8">
@@ -799,6 +816,28 @@
               <li *ngFor="let res8 of resultado8" > <span class="prodToneladas">{{ res8.material_nombre }}: {{ res8.tn | number }} Tn</span> </li>
             </ul> -->
           </div>
+
+          <!-- <div fxLayout='row wrap' class='info-desc' *ngIf="this.mostrarInfoBalanzadasEnCurso">
+            <p fxFlex='100'><b>Información de Carga en curso:</b></p>
+            <p fxFlex='100'><b>Primera balanzada: </b>{{this.fechaInicio8EnCurso}}</p>
+            <p fxFlex='100'><b>Última balanzada: </b>{{this.fechaFin8EnCurso}}</p>
+            <p fxFlex='100'><b>Lleva cargando (Kg): </b>{{this.llevaCargando8EnCurso}}</p>
+          </div> -->
+
+          <table class="tableEnCurso info-desc" *ngIf="this.mostrarInfoBalanzadasEnCurso">
+            <tr>
+              <td><b>Estado de la balanza:</b> Carga en curso</td>
+            </tr>
+            <tr>
+              <td><b>Inicio:</b> {{this.fechaInicio8EnCurso}}</td>
+              <td><b>Lleva Cargando (Tn):</b> {{this.llevaCargando8EnCurso/1000}}</td>
+            </tr>
+            <tr>
+              <td><b>Producto:</b> {{this.producto8EnCurso}}</td>
+              <td><b>Bodega:</b> {{this.bodega8EnCurso}}</td>
+            </tr>
+          </table>
+
         </div>
 
       </div>
