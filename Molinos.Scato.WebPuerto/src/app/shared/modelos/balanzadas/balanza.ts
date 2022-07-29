@@ -3,6 +3,7 @@ import { MaterialPuerto } from "@ScatoModels/material-puerto";
 export class InfoTableristas {
   balanzas: Balanzas[];
   informacionAdicional: InformacionAdicional;
+  balanzadasEnCurso: BalanzadasCompletas;
 }
 
 export class Balanzas {
@@ -71,7 +72,7 @@ export class MotivosFallasBalanza {
 }
 
 export class BalanzadasCompletas {
-  balanzadasAgrupadas: any[];
+  balanzadasAgrupadas: BalanzadasAgrupadas[];
   balanzadasBajaCarga: any[];
   balanzadasBuque: BalanzadasBuque[];
 }
@@ -85,4 +86,18 @@ export class BalanzadasBuque {
   pesoBruto: number;
   pesoNeto: number;
   pesoTara: number;
+}
+
+export class BalanzadasAgrupadas {
+  nombreBuque: string
+  numeroBalanza: string
+  fechaInicio: Date;
+  horaInicio: string
+  toneladas: number
+  kilos: number
+  producto: string; 
+  bodega: string; 
+  porcentajeCarga: number; 
+  totalProducto: number; 
+  seleccionado: boolean;
 }

@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy, AfterViewInit, Input } from '@angular/cor
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, finalize } from 'rxjs/operators';
 // Excel
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 // Models
-import { Balanzas, ListadoTotalBalanzadas, MotivosFallasBalanza, Bodega } from '@ScatoModels/balanzadas/balanza';
+import { Balanzas, ListadoTotalBalanzadas, MotivosFallasBalanza, Bodega, BalanzadasAgrupadas } from '@ScatoModels/balanzadas/balanza';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 // Services
@@ -21,6 +21,7 @@ import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.s
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Embarque } from '@ScatoModels/embarque';
 
 interface TotToneladas {
   producto: string;
@@ -36,8 +37,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   agregaCorte: boolean = false;
   balanza7Form: FormGroup;
   balanza8Form: FormGroup;
-  balanza7DiferenteNombre: boolean = false;
-  balanza8DiferenteNombre: boolean = false;
+  nombreDiferente: boolean = false;
   balanzasIncompletas: boolean = false;
   balanzaCorteManual: number = 0;
   bodegas: Bodega[] = [];
@@ -68,6 +68,19 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   vaporId: number = 0;
   yaCargoModal: boolean = false;
   @Input() imprimir : boolean = false; 
+  patenteEmbarque: string;
+  nombreVapor: string;
+  fechaInicio7EnCurso: string;
+  fechaFin7EnCurso: string;
+  bodega7EnCurso: string;
+  producto7EnCurso: string;
+  llevaCargando7EnCurso: number;
+  fechaInicio8EnCurso: string;
+  fechaFin8EnCurso: string;
+  bodega8EnCurso: string;
+  producto8EnCurso: string;
+  llevaCargando8EnCurso: number;
+  mostrarInfoBalanzadasEnCurso: boolean = false;
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -95,6 +108,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     
     this.cargarMotivosBalanzas78();
     this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
+    this.verificarNombresBuque();
     this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
   }
 
@@ -375,6 +389,52 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           this.actualizarBalanzadas8(cortes8);
         }
       } );
+
+    this.obtenerInfoBalanzadasEnCurso();
+  }
+
+  obtenerInfoBalanzadasEnCurso(){
+    this.balanzas78Service.sendDataBalanzadas7EnCurso
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe( bal7 => {
+        if(bal7.length>0){
+          this.mostrarInfoBalanzadasEnCurso = true;
+          this.bodega7EnCurso = bal7[0].bodega;
+          this.producto7EnCurso = bal7[0].producto;
+          this.fechaInicio7EnCurso = `${this.getDia( bal7[0].fechaInicio )} ${this.getHora( bal7[0].fechaInicio )}`;
+          this.fechaFin7EnCurso = `${this.getDia( bal7[bal7.length-1].fechaInicio )} ${this.getHora( bal7[bal7.length-1].fechaInicio )}`;
+          this.llevaCargando7EnCurso = 0;
+          bal7.forEach( x => this.llevaCargando7EnCurso = x.kilos+this.llevaCargando7EnCurso);
+        }else{
+          this.mostrarInfoBalanzadasEnCurso = false;
+          this.bodega7EnCurso = '';
+          this.producto7EnCurso = '';
+          this.fechaInicio7EnCurso = '';
+          this.fechaFin7EnCurso = ''
+          this.llevaCargando7EnCurso = 0;
+        }
+      });
+
+    this.balanzas78Service.sendDataBalanzadas8EnCurso
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe( (bal8:BalanzadasAgrupadas[]) => {
+        if(bal8.length>0){
+          this.mostrarInfoBalanzadasEnCurso = true;
+          this.bodega8EnCurso = bal8[0].bodega;
+          this.producto8EnCurso = bal8[0].producto;
+          this.fechaInicio8EnCurso = `${this.getDia( bal8[0].fechaInicio )} ${this.getHora( bal8[0].fechaInicio )}`;
+          this.fechaFin8EnCurso = `${this.getDia( bal8[bal8.length-1].fechaInicio )} ${this.getHora( bal8[bal8.length-1].fechaInicio )}`;
+          this.llevaCargando8EnCurso = 0;
+          bal8.forEach( x => this.llevaCargando8EnCurso = x.kilos+this.llevaCargando8EnCurso);
+        }else{
+          this.mostrarInfoBalanzadasEnCurso = false;
+          this.bodega8EnCurso = '';
+          this.producto8EnCurso = '';
+          this.fechaInicio8EnCurso = '';
+          this.fechaFin8EnCurso = ''
+          this.llevaCargando8EnCurso = 0;
+        }
+      });
   }
 
   actualizarBalanzadas8(balanzada: Balanzas[]) {
@@ -395,7 +455,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resultado8 = this.agruparProductos(balanzadasDataOK);
     // this.totalTnBodegas8 = this.agruparBodegas(balanzadasDataOK);
 
-    // this.verificarNombresBuque();
     this.parametrosService.consola(`---- FORM BAL8: ----: `,this.balanzas8.value);
   }
 
@@ -415,7 +474,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resultado7 = this.agruparProductos(balanzadasDataOK);
     // this.totalTnBodegas7 = this.agruparBodegas(balanzadasDataOK);
 
-    // this.verificarNombresBuque();
     this.parametrosService.consola(`---- FORM BAL7: ----: `,this.balanzas7.value);
   }
 
@@ -447,13 +505,14 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  // verificarNombresBuque() {
-  //   let balanza7Diferente = this.listadoBalanza7.find(x => x.nombreBuque != this.embarque.nombreBuque);
-  //   let balanza8Diferente = this.listadoBalanza8.find(x => x.nombreBuque != this.embarque.nombreBuque);
-
-  //   if (balanza7Diferente) this.balanza7DiferenteNombre = true;
-  //   if (balanza8Diferente) this.balanza8DiferenteNombre = true;
-  // }
+  verificarNombresBuque() {
+    this.embarqueService.obtenerEmbarque(this.embarqueId)
+    .pipe(finalize(() => this.patenteEmbarque !== this.nombreVapor ? this.nombreDiferente = true : this.nombreDiferente = false))
+    .subscribe( (resp:Embarque) => {
+      this.patenteEmbarque = resp.patente.toUpperCase();
+      this.nombreVapor = resp.vapor.nombre.toUpperCase();
+    });
+  }
 
   verificaCamposCompletos() {
     let balanza7Incompleta = this.balanzas7.value.find(x => x.toneladas < 1000 && (x.listadoTotalBalanzadas.motivosFallasBalanza == null || x.listadoTotalBalanzadas.observaciones == '') && x.id != 0);

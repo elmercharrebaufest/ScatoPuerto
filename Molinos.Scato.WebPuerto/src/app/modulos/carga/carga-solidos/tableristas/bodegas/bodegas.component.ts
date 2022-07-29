@@ -59,12 +59,14 @@ export class BodegasComponent implements OnInit, OnDestroy {
 
   obtenerBalanzadasEnVivo() {
     // Datos de ambas balanzas
-    this._balanzaService.balanzadasBuque(this.embarqueSelected.moduloDeCargaId)
+    // this._balanzaService.balanzadasBuque(this.embarqueSelected.moduloDeCargaId)
+    this.balanzas78Service.sendBalanzadasBuque
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( blzas => {
-        let blzas7y8: BalanzadasBuque[] = blzas.balanzadasBuque;
+        // let blzas7y8: BalanzadasBuque[] = blzas.balanzadasBuque;
         let balanzadasUnidas: BalanzadasUnidas[] = [];
-        let balanzadasDataOK = blzas7y8.filter( x => x.material_Id > 0 && x.pesoNeto > 0 && x.bodega_Id > 0 );
+        // let balanzadasDataOK = blzas7y8.filter( x => x.material_Id > 0 && x.pesoNeto > 0 && x.bodega_Id > 0 );
+        let balanzadasDataOK = blzas.filter( x => x.material_Id > 0 && x.pesoNeto > 0 && x.bodega_Id > 0 );
         balanzadasUnidas = this.unirBalanzadasParaBodegas(balanzadasDataOK);
 
         if(balanzadasUnidas.length>0){
