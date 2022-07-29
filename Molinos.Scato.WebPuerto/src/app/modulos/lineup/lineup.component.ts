@@ -73,8 +73,9 @@ export class LineupComponent implements OnInit, Observador {
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
     this.cargarEstadoLineUp();
-  }
 
+  }
+  
   cargarGeolocalizacionLineUp() {
     this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(data => {
       this.buquesGeolocalizacion = data;
@@ -97,6 +98,7 @@ export class LineupComponent implements OnInit, Observador {
       this.estadoOtrosLp = this.estadoOtros();
     });
   }
+
 
   ngOnInit(): void {
     let actualDate = new Date();
