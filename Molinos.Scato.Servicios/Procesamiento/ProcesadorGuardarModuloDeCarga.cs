@@ -29,7 +29,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 ///// OPERACIONES/TABLERISTAS /////
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
 
-                ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
+                //ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
                 var modulodecargahistorico = Repositorio.Agregar(new ModuloDeCargaHistorico
                 {
