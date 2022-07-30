@@ -50,6 +50,10 @@ export class LineupEmbarqueComponent implements OnInit {
   posicionesDeLineUps: number[];
   embarquesPuerto: InstanciaWorkflowPuerto[];
   hayBuque = true;
+  ListTipoArchivoPuerto: TipoArchivoPuerto[];
+  ArchivosPuertoDb: ArchivoPuerto[];
+  ArchivosPuerto: ArchivoPuerto[];
+  ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
 
 
