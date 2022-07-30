@@ -380,7 +380,63 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerBanderas()
             );
         }
-        
+
+        [HttpPost]
+        [Route("api/Embarque/GuardarArchivos")]
+        public HttpResponseMessage GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto)
+        {
+            try
+            {
+                servicio.GuardarArchivos(archivosPuerto);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpGet]
+        [Route("api/Embarque/ObtenerArchivos")]
+        public HttpResponseMessage obtenerArchivos(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerArchivos(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/Embarque/ObtenerTipoArchivos")]
+        public HttpResponseMessage obtenerTipoArchivos()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerTipoArchivos());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Embarque/EliminarArchivos")]
+        public HttpResponseMessage EliminarArchivos(int[] filesIds)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.eliminarArchivos(filesIds));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
 
         /*
         [HttpGet]

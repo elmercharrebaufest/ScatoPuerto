@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
@@ -9,6 +9,7 @@ import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Observador } from '@ScatoInterfaces/observador';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoadScreen } from '@ScatoInterfaces/load-screen';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
@@ -20,6 +21,11 @@ import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocaliz
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 import { sign } from 'crypto';
 import { LineUp } from '@ScatoModels/lineUp';
+import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
+import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { FormGroup } from '@angular/forms';
+import { textChangeRangeIsUnchanged } from 'typescript';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -32,6 +38,7 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
 
+  
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
@@ -42,7 +49,17 @@ export class LineupEmbarqueComponent implements OnInit {
   posicionesDeLineUps: number[];
   embarquesPuerto: InstanciaWorkflowPuerto[];
   hayBuque = true;
+  ListTipoArchivoPuerto: TipoArchivoPuerto[];
+  ArchivosPuertoDb: ArchivoPuerto[];
+  ArchivosPuerto: ArchivoPuerto[];
+  ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
+  formArchivos: FormGroup;
+  @ViewChild('input_file')
+  FileInput: ElementRef;
+  TipoArchivosDbList: TipoArchivoPuerto[] = [];
+  nombreArchivo: TipoArchivoPuerto;
+  fileToUpload: any | null = null;
   colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
@@ -55,7 +72,9 @@ export class LineupEmbarqueComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService
+    private geolocalizacionService: GeolocalizacionService,
+    private _modalService: NgbModal,
+    private embarqueService: EmbarqueService,
   ) {
     this.user = this.session.getUser();
   }
@@ -76,7 +95,9 @@ export class LineupEmbarqueComponent implements OnInit {
         this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
       });
   }
-
+  counter(i: number) {
+    return new Array(i);
+}
   cargarBuqueGeolocalizacion(id: any) {
     this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
@@ -342,5 +363,92 @@ export class LineupEmbarqueComponent implements OnInit {
   hasPermisoEditEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
   }
+
+//------------------------------------------------------------------------------------------------------------
+//------------------------------------------Sistema de archivos-----------------------------------------------
+//------------------------------------------------------------------------------------------------------------
+
+  openModalFiles(Modal: any){
+    //embarqueid 
+    this.ListFilesToErase = null;
+
+     this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(res => this.ArchivosPuertoDb = res); 
+     this.embarqueService.obtenerTipoArchivos().subscribe(res => {
+      this.TipoArchivosDbList = res
+    }); 
+    
+    this._modalService.open(Modal);
+  }
+    
+  guardarArchivos(){
+
+    this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los cambios?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
+    .then((confirmed) => {
+      // this.embarqueService.eliminarArchivos(this.ListFilesToErase).subscribe(res => {
+      // });
+      if (confirmed) {
+        //Borro archivos 
+        this.eliminarArchivo2s();
+      }
+    })
+  }
+
+  eliminarArchivo2s(){
+    //Primero me fijo si al guardar hay archivos para eliminar.
+    if (this.ListFilesToErase.length > 0) {
+      //   this.embarqueService.eliminarArchivos(this.ListFilesToErase).subscribe(res => {
+      // });
+    }  
+    this.ListFilesToErase = null;
+  }
+
+  eliminarArchivos(reg: ArchivoPuerto){
+    if(reg.id > 0){
+      this.ListFilesToErase = this.ListFilesToErase || [];
+      this.ListFilesToErase.push(reg);
+  
+      this.ArchivosPuertoDb.forEach((element,index)=>{
+        if(element.id ==reg.id) this.ArchivosPuertoDb.splice(index,1);
+     }); 
+      
+    }
+  }
+
+  handleFileInput(files: any) {
+    this.fileToUpload = files.target.files[0];
 }
 
+addFileToSave(){
+    let fileToAdd = new ArchivoPuerto;
+    // fileToAdd.NombreArchivo = files.item(0).name;
+    fileToAdd.fecha = new Date;
+    //fileToAdd.Usuario_Id
+    fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
+    if(this.fileToUpload != null){
+      fileToAdd.nombreArchivo = this.fileToUpload.name 
+    }else{
+      fileToAdd.nombreArchivo = "";
+    }
+    fileToAdd.tipoArchivoPuerto = this.nombreArchivo;
+    fileToAdd.id = 0;
+    // fileToAdd.TipoArchivoPuerto = this.TipoArchivosDbList ;
+    this.ArchivosPuerto = this.ArchivosPuerto || [];
+    
+    //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
+    //Primero valido que esté toda la data necesaria completa
+    if (fileToAdd.nombreArchivo != "" || this.nombreArchivo.TipoArchivo == ""){ //Falta validar el fileToAdd.Archivo
+      this.ArchivosPuertoDb.push(fileToAdd);
+      this.ArchivosPuertoDb = this.ArchivosPuertoDb.sort((a,b) => a.id - b.id)
+      this.nombreArchivo.Id = 0;
+      this.nombreArchivo.TipoArchivo = "";
+      this.fileToUpload = null
+    }else{
+      this.confirmationDialogService.confirm('Atención','Deberás completar todos los campos para agregar el archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    }
+}
+
+}
+
+//------------------------------------------------------------------------------------------------------------
+//------------------------------------------Fin sistema de archivos-------------------------------------------
+//------------------------------------------------------------------------------------------------------------
