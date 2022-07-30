@@ -684,6 +684,7 @@
     <Compile Include="Dto\ADPuertoPermisosDto.cs" />
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
+    <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosUltimaActualizacionDto.cs" />
@@ -830,6 +831,7 @@
     <Compile Include="Dto\SectorCantidadCamionesDto.cs" />
     <Compile Include="Dto\SentidoManoDeEmbarqueDto.cs" />
     <Compile Include="Dto\EntradaDto.cs" />
+    <Compile Include="Dto\TipoArchivoPuertoDto.cs" />
     <Compile Include="Dto\TipoDeActividadDto.cs" />
     <Compile Include="Dto\TipoDeBuquePuertoDto.cs" />
     <Compile Include="Dto\TransmisionASapManualDto.cs" />
@@ -947,6 +949,7 @@
     <Compile Include="Entidades\ADPuertoPermisos.cs" />
     <Compile Include="Entidades\ADPuertoRoles.cs" />
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
+    <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
     <Compile Include="Entidades\BalanzasCortes.cs" />
     <Compile Include="Entidades\CaracteristicasCartaPorteOtrosPuertos.cs" />
@@ -1065,6 +1068,7 @@
     <Compile Include="Entidades\Bodega.cs" />
     <Compile Include="Entidades\Adjunto.cs" />
     <Compile Include="Entidades\ReglaDeAnalisisObligatorio.cs" />
+    <Compile Include="Entidades\TipoArchivoPuerto.cs" />
     <Compile Include="Entidades\TipoDeActividad.cs" />
     <Compile Include="Entidades\TipoDeBuquePuerto.cs" />
     <Compile Include="Entidades\TurnoPuerto.cs" />

@@ -16,6 +16,29 @@ small{
 text-r {
   font: normal normal normal 16px/18px Roboto;
 }
+/* Solid border */
+hr.solid {
+  border-top: 1px solid #bbb;
+}
+
+.btn-outline-grey {
+  border-color: #c0c0c0;
+}
+
+.fullWidth {
+  /* I added this just for fun */
+  background-color: skyblue;
+  color: white;
+  font-family: Century Gothic;
+  padding: 5px;
+  text-align: center;
+
+  /* The code that you need to copy */
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+}
 
 .text-gris {
   letter-spacing: var(--unnamed-character-spacing-0);

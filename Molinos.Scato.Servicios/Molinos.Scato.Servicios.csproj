@@ -152,6 +152,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoRolesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ArchivosPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\RegistroBalanzaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ReglaDeAnalisisObligatorioMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SentidoManoDeEmbarqueMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TipoArchivoPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDeBuquePuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TurnoPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\UbicacionDeBuquePuertoMappingProfile.cs" />

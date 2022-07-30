@@ -10769,5 +10769,54 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
+
+        public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto)
+        {
+            foreach (var archivo in archivosPuerto)
+            {
+                ArchivosPuerto archivoPuertoDB = repositorio.Obtener<ArchivosPuerto>(x => x.Id == archivo.Id);
+                Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == archivo.Embarque_id);
+                if (archivoPuertoDB != null)
+                {
+                    archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
+                    archivoPuertoDB.Archivo = archivo.Archivo;
+                    archivoPuertoDB.Fecha = archivo.Fecha;
+                    archivoPuertoDB.Id = archivo.TipoDeArchivoPuertoDto.Id;
+                }
+                else
+                {
+                    archivoPuertoDB = new ArchivosPuerto()
+                    {
+                        TipoArchivoPuerto_Id = archivo.TipoDeArchivoPuertoDto.Id,
+                        Embarque = embarque,
+                        NombreArchivo = archivo.NombreArchivo,
+                        Archivo = archivo.Archivo,
+                        Fecha = archivo.Fecha
+                    };
+                }
+                repositorio.Agregar(archivoPuertoDB);
+            }
+            repositorio.GuardarCambios();
+        }
+        public IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque)
+        {
+            return Listar<ArchivosPuerto, ArchivosPuertoDto>(x => x.Embarque.Id == idEmbarque);
+        }
+
+        public IList<TipoArchivoPuertoDto> obtenerTipoArchivos()
+        {
+            IList<TipoArchivoPuertoDto> TipoArchivos = Listar<TipoArchivoPuerto, TipoArchivoPuertoDto>();
+            return TipoArchivos;
+        }
+
+        public bool eliminarArchivos(int[] filesIds)
+        {
+            foreach (var id in filesIds)
+            {
+                ArchivosPuerto archivosPuerto = repositorio.Obtener<ArchivosPuerto>(x => x.Id == id);
+                repositorio.Remover(archivosPuerto);
+            }
+            return true;
+        }
     }
 }
