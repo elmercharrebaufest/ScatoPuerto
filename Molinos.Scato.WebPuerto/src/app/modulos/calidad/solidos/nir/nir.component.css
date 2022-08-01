@@ -7,6 +7,10 @@
 
 label{ font-weight: bold; }
 
+.mxWidthR{
+    max-width: 1594px;
+}
+
 .max-5vh{
     max-height: 200px;
     height: 400px;

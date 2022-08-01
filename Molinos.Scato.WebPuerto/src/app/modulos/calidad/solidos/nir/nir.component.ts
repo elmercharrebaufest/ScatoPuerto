@@ -9,6 +9,7 @@ import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { finalize } from 'rxjs/operators';
 import { Mail } from '@ScatoModels/mail';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
+import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 
 @Component({
   selector: 'app-nir',
@@ -30,6 +31,8 @@ export class NIRComponent implements OnInit {
   destinatarios: string[];
   envioNir:boolean = false;
   objetoMailNir: object;
+  celdasManoDeEmbarque: CeldaManoDeEmbarque[];
+
 
   constructor(
     private fb: FormBuilder,
@@ -51,9 +54,11 @@ export class NIRComponent implements OnInit {
   ngOnInit(): void {
     this.initFormulario();
 
+    this.obtenerCeldasOrigen();
     this.moduloDeCargaService.obtenerListadoBodegas()
       .pipe( finalize( () => this.obtenerNir() ) )
       .subscribe( bod => this.bodegas = bod );
+
   }
 
   initFormulario(){
@@ -70,8 +75,11 @@ export class NIRComponent implements OnInit {
       id: x?.id ?? 0,
       fecha: x?.fecha ? x.fecha : '',
       hora: x?.hora ?? '',
+      ritmo: x?.ritmo ?? '',
       hd: x?.hd ?? '',
       ph: x?.ph ?? '',
+      protBase: x?.protBase ?? '',
+      prot_BS: x?.prot_BS ?? '',
       origen: x?.origen ?? '',
       bodega: x?.bodega ?? '',
       mano: x?.mano ?? this.asignarMano(numeroMano),
@@ -87,9 +95,9 @@ export class NIRComponent implements OnInit {
       hora: x?.hora ?? '',
       ritmo: x?.ritmo ?? '',
       hd: x?.hd ?? '',
+      ph: x?.ph ?? '',
       protBase: x?.protBase ?? '',
       prot_BS: x?.prot_BS ?? '',
-      ph: x?.ph ?? '',
       origen: x?.origen ?? '',
       bodega: x?.bodega ?? '',
       mano: x?.mano ?? this.asignarMano(numeroMano),
@@ -98,6 +106,9 @@ export class NIRComponent implements OnInit {
     });
   }
 
+  obtenerCeldasOrigen(){
+    this.moduloDeCargaService.obtenerListadoCeldaManoDeEmbarque().subscribe(data => {this.celdasManoDeEmbarque = data})
+  }
   asignarMano(numeroMano: number):string{
     if(!numeroMano) return '';
 
@@ -224,6 +235,9 @@ export class NIRComponent implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
   compareBodega(c1: any, c2: any) {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  }
+  compareCeldaOrigen(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 

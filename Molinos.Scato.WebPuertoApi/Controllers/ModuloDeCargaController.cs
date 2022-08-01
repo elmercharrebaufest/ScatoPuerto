@@ -220,6 +220,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
+                
                 var resultado = new ResultadoPrevisualizar();
                 comandos.Ejecutar(new GuardarNirManual { Dto = ObjetoMailNir.nirManualPuerto, IdModuloDeCarga = IdModuloDeCarga });
 
@@ -227,6 +228,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 var generadorExcel = new ExcelNirManual();
 
+       
                 generadorExcel.GenerarArchivo(resultado, ObjetoMailNir.nirManualPuerto, IdModuloDeCarga);
                 List<string> Emails = new List<string>();
                 Emails = ObjetoMailNir.mail.Destinatarios;
