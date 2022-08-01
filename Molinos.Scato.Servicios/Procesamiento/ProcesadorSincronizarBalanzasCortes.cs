@@ -32,7 +32,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return;
 
-                if(embarqueBase.Ubicacion!=3)
+                if (embarqueBase.EstadoBuque.Id != 3)
                     EnviarCalidad(embarqueBase);
                 
                 int embarque = embarqueBase.Id;
@@ -75,6 +75,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             catch (Exception ex)
             {
+                Log.Info("ModificarEntidad: error 1" + ex.Message);
+                Log.Info("ModificarEntidad: error 2" + ex.StackTrace);
 
                 throw ex;
             }
@@ -96,7 +98,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if( embarque.FechaHoraInicioCarga.Value.Hour >=horaInicio && 
                     embarque.FechaHoraInicioCarga.Value.Hour < horaFin && DateTime.Now.Hour> horaFin)
                 {
-                    embarque.EstadoBuque.Id = 3;
+                    var estadoBuq = Repositorio.Obtener<EstadoBuque>(x => x.Id == 3);
+                    embarque.EstadoBuque = estadoBuq;
                     Repositorio.GuardarCambios();
                 }
             }
