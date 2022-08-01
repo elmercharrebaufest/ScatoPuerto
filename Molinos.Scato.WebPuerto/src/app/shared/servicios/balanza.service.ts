@@ -53,4 +53,8 @@ export class BalanzaService {
     balanzadasBuque(IdModuloDeCarga: number): Observable<BalanzadasCompletas> {
       return this.http.get<BalanzadasCompletas>(`${this.url}PlanoDeCarga/BalanzadasBuque?IdModuloDeCarga=${IdModuloDeCarga}`, {'withCredentials': true});
     }
+
+    obtenerBalanzadasEnCurso(IdModuloDeCarga: number): Observable<InfoTableristas> {
+      return this.http.get<InfoTableristas>(`${this.url}ModuloDeCarga/ObtenerBalanzadasEnCurso?IdModuloDeCarga=${IdModuloDeCarga}`, {'withCredentials': true});
+    }
 }

@@ -447,8 +447,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 CortesRegistrados cor = new CortesRegistrados()
                 {
                     balanzas = servicio.ObtenerCortesBalanzas(IdModuloDeCarga),
-                    informacionAdicional = servicio.ObtenerInformacionCortesBalanzas(IdModuloDeCarga)
-
+                    informacionAdicional = servicio.ObtenerInformacionCortesBalanzas(IdModuloDeCarga),
+                    //balanzadasEnCurso = servicio.ObtenerBalanzadasEnCurso(IdModuloDeCarga)
                 };
 
                 return Request.CreateResponse(HttpStatusCode.OK, cor);
@@ -463,6 +463,31 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             public IList<BalanzasCortesDto> balanzas { get; set; }
             public Dictionary<string, string> informacionAdicional { get; set; }
+            //public BalanzadasCompletasDto balanzadasEnCurso { get; set; }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerBalanzadasEnCurso")]
+        public HttpResponseMessage obtenerBalanzadasEnCurso(int IdModuloDeCarga)
+        {
+            try
+            {
+                BalanzadasCompletas cor = new BalanzadasCompletas()
+                {
+                    balanzadasEnCurso = servicio.ObtenerBalanzadasEnCurso(IdModuloDeCarga)
+                };
+
+                return Request.CreateResponse(HttpStatusCode.OK, cor);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        public class BalanzadasCompletas
+        {
+            public BalanzadasCompletasDto balanzadasEnCurso { get; set; }
         }
 
         [HttpPost]
