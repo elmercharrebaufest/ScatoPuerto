@@ -11,8 +11,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarLineasDeEmbarque : ProcesadorModificar<GuardarLineasDeEmbarque>
     {
-        public ProcesadorGuardarLineasDeEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarLineasDeEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -26,6 +26,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 moduloDeCarga.FechaDeCreacion = DateTime.Now;
             else
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
+
+            ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
             foreach (var linea in comando.Dto)
             {

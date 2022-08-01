@@ -96,7 +96,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if( embarque.FechaHoraInicioCarga.Value.Hour >=horaInicio && 
                     embarque.FechaHoraInicioCarga.Value.Hour < horaFin && DateTime.Now.Hour> horaFin)
                 {
-                    embarque.Ubicacion = 3;
+                    embarque.EstadoBuque.Id = 3;
                     Repositorio.GuardarCambios();
                 }
             }
@@ -566,7 +566,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         GuardarRegistroBalanzasCortes(cor7);
                 }
 
-                for (int i = 0; i < cortes8.Count() - 1; i++)
+                for (int i = 0; i < cortes8.Count()-1; i++)
                 {
 
                     var tiempo = cortes8[i + 1].Fecha_Inicio.Value.Subtract(cortes8[i].Fecha_Corte.Value).TotalMinutes;

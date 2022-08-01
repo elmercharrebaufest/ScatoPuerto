@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
-import { Balanzas, Bodega, InfoTableristas } from '@ScatoModels/balanzadas/balanza';
+import { BalanzadasCompletas, Balanzas, Bodega, InfoTableristas } from '@ScatoModels/balanzadas/balanza';
 import { Ritmos, RitmosLiquido } from '@ScatoModels/balanzadas/ritmos';
 import { RitmosBalanzas78 } from '@ScatoModels/balanzadas/ritmos-balanzas78';
 
@@ -38,14 +38,23 @@ export class BalanzaService {
       return this.http.post(`${this.url}ModuloDeCarga/GuardarFechaInicioCarga?embarque_id=${embarque_id}&fechaHorastring=${fechaHorastring}`, { 'withCredentials': true});
     }
 
-  obtenerRitmos(vapor_id: any, modulodecarga_id: number): Observable<Ritmos> {
-    return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+    obtenerRitmos(vapor_id: any, modulodecarga_id: number): Observable<Ritmos> {
+      return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
+
     obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
       return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 
     sincronizarRitmosBalanzas(IdModuloDeCarga: number): Observable<RitmosBalanzas78>{
       return this.http.post<RitmosBalanzas78>(`${this.url}ModuloDeCarga/SincronizarRitmosBalanzas?IdModuloDeCarga=${IdModuloDeCarga}`, { 'withCredentials': true });
+    }
+
+    balanzadasBuque(IdModuloDeCarga: number): Observable<BalanzadasCompletas> {
+      return this.http.get<BalanzadasCompletas>(`${this.url}PlanoDeCarga/BalanzadasBuque?IdModuloDeCarga=${IdModuloDeCarga}`, {'withCredentials': true});
+    }
+
+    obtenerBalanzadasEnCurso(IdModuloDeCarga: number): Observable<InfoTableristas> {
+      return this.http.get<InfoTableristas>(`${this.url}ModuloDeCarga/ObtenerBalanzadasEnCurso?IdModuloDeCarga=${IdModuloDeCarga}`, {'withCredentials': true});
     }
 }

@@ -2497,6 +2497,9 @@ namespace Molinos.Scato.Servicios
         BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga);
 
         [OperationContract]
+        BalanzadasCompletasDto BalanzadasBuque(int IdModuloDeCarga);
+
+        [OperationContract]
         IList<CargaDto> ListarCargaBalanzaPuerto();
 
         [OperationContract]
@@ -2557,6 +2560,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
+
+        [OperationContract]
+        BalanzadasCompletasDto ObtenerBalanzadasEnCurso(int IdModuloDeCarga);
 
         [OperationContract]
         Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza);
@@ -2655,7 +2661,9 @@ namespace Molinos.Scato.Servicios
         void EliminarObservacionDeCalidad(int observacion_id);
 
         [OperationContract]
-        IList<BanderaDto> ObtenerBanderas();
+        void GenerarLogging(string service, string data, string tipo);
+        [OperationContract]
+        IList<BanderaDto> ObtenerBanderas(); 
 
         [OperationContract]
         void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque);

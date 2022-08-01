@@ -11,8 +11,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarModuloDeCarga : ProcesadorModificar<GuardarModuloDeCarga>
     {
-        public ProcesadorGuardarModuloDeCarga(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarModuloDeCarga(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -28,6 +28,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 ///// OPERACIONES/TABLERISTAS /////
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
+
+                //ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
                 var modulodecargahistorico = Repositorio.Agregar(new ModuloDeCargaHistorico
                 {

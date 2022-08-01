@@ -1,5 +1,5 @@
 .tabla-embebida{
-    width: 100%;
+    width: auto;
     margin: 0;
     padding: 0;
 }
@@ -45,7 +45,9 @@ select { margin: 0; height: 30px;}
 .label-float textarea{
     width: 100%;
 }
-
+.planilla-texto-derecha{
+    text-align: right;
+}
 .right-buttons-turnos{
     margin-top: 15px;
     display: flex;
@@ -55,7 +57,9 @@ select { margin: 0; height: 30px;}
 .right-buttons-turnos button:first-child{
     margin-right: 10px;
 }
-
+.table-ancho{
+    width: 100% !important;
+}
 table {
     table-layout:fixed;
 }
@@ -91,10 +95,10 @@ table td select {
 }
 
 table.turnos th:nth-child(1) {
-    width: 120px;
+    width: auto;
 }
 table.turnos th:nth-child(2) {
-    width: 150px;
+    width: auto;
 }
 
 table.turnos table.tabla-embebida th{

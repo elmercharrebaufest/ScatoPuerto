@@ -2277,11 +2277,28 @@ namespace Molinos.Scato.Servicios.Impl
 
             try
             {
+#if DEBUG
+                log.Info("----- Inicio ListarPermisosPorUsuarioAD Modo Debug: " + nombreUsuario + " -----");
+                List<string> gruposPermisosDebug = new List<string>();
+                var permisoGrupoDebug = from a in repositorio.Listar<ADPuertoGruposAd>()
+                                   join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                   join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                   join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                   join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                   where a.NombreGrupoAd == "SWDEV"
+                                        select (e.NombrePermiso);
+       
+                gruposPermisosDebug.AddRange(permisoGrupoDebug);
+                log.Info("----- Fin ListarPermisosPorUsuarioAD Modo Debug -----");
+                return gruposPermisosDebug;
+#else
+
+
                 log.Info("----- Inicio ListarPermisosPorUsuarioAD: " + nombreUsuario + " -----");
                 Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
-                var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
-                var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
+                //var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
+                //var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
                 var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
                 var usuario = userPrincipal1.SamAccountName;
                 List<string> gruposPermisos = new List<string>();
@@ -2322,6 +2339,7 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Info("Cantidad permisos total: " + gruposPermisos.Count());
                 log.Info("----- Fin ListarPermisosPorUsuarioAD -----");
                 return gruposPermisos;
+#endif
             }
             catch (Exception ex)
             {
@@ -2331,6 +2349,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 
         }
+
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
         {
@@ -3063,7 +3082,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var listaVagones = new List<VehiculoDto>();
 
-                    #region FerroviarioCPE
+#region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -3137,7 +3156,7 @@ namespace Molinos.Scato.Servicios.Impl
                         return ObtenerCartaPorteAReutilizarPorNumero(numero, centroId, workflowCodigo);
                     }
 
-                    #endregion FerroviarioCPE
+#endregion FerroviarioCPE
                 }
                 else
                 {
@@ -9364,6 +9383,103 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
+        public BalanzadasCompletasDto BalanzadasBuque(int IdModuloDeCarga)
+        {
+            try
+            {
+                BalanzadasCompletasDto balanzadasCompletas = new BalanzadasCompletasDto();
+                balanzadasCompletas.balanzadasBuque = new List<BalanzadasBuque>();
+
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return balanzadasCompletas;
+
+                DateTime? fechaFinal = embarqueBase.FechaHoraInicioCarga.Value.AddDays(-1);
+                int idEmbarque = embarqueBase.Id;
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
+                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
+                                                             x.FechaInicio > fechaFinal);
+
+                foreach (Carga carga in cargas)
+                {
+                    var balanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id);
+
+                    foreach (Balanzada balanzada in balanzadas) 
+                    {
+                        BalanzadasBuque balanzadasBuque = new BalanzadasBuque();
+
+                        balanzadasBuque.NumeroBalanza = carga.NumeroBalanza;
+                        balanzadasBuque.Bodega_Id = carga.Bodega.Id;
+                        balanzadasBuque.Material_Id = carga.Material.Id;
+                        balanzadasBuque.Id = balanzada.Id;
+                        balanzadasBuque.PesoBruto = balanzada.PesoBruto;
+                        balanzadasBuque.PesoNeto = balanzada.PesoNeto;
+                        balanzadasBuque.PesoTara = balanzada.PesoTara;
+                        balanzadasBuque.CargaInicial_Id = balanzada.CargaInicial_Id;
+
+                        balanzadasCompletas.balanzadasBuque.Add(balanzadasBuque);
+                    }
+                }
+                return balanzadasCompletas;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public BalanzadasCompletasDto ObtenerBalanzadasEnCurso(int IdModuloDeCarga)
+        {
+            try 
+            {
+                BalanzadasCompletasDto balanzadasCompletas = new BalanzadasCompletasDto();
+                balanzadasCompletas.balanzadasAgrupadas = new List<BalanzadasAgrupadas>();
+
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return balanzadasCompletas;
+
+                int idEmbarque = embarqueBase.Id;
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
+                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio==null && x.CargaOpuesta_Id==null);
+
+                foreach (Carga carga in cargas)
+                {
+                    var balanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.Id);
+
+                    BalanzadasAgrupadas balanzadasAgrupadas = new BalanzadasAgrupadas();
+                    balanzadasAgrupadas.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
+                    balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
+
+                    foreach (Balanzada balanzada in balanzadas)
+                    {
+                        balanzadasAgrupadas.Bodega = carga.Bodega.Nombre;
+                        balanzadasAgrupadas.Producto = carga.Material.DescripcionCorta;
+                        balanzadasAgrupadas.NumeroBalanza = carga.NumeroBalanza;
+
+                        DateTime FechaInicioBalanzadaAgrupada = Listar<RegistroBalanzaPuerto, RegistroBalanzaPuerto>(x => x.Id == balanzada.Id).First().Fecha;
+                        balanzadasAgrupadas.FechaInicio = FechaInicioBalanzadaAgrupada;
+                        balanzadasAgrupadas.HoraInicio = Convert.ToString((FechaInicioBalanzadaAgrupada.Hour).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Minute).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Second).ToString().PadLeft(2, '0'));
+
+                        balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
+                        balanzadasAgrupadas = new BalanzadasAgrupadas();
+                        balanzadasAgrupadas.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
+                        balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
+
+                        balanzadasAgrupadas.Kilos = balanzada.PesoNeto;
+                        balanzadasAgrupadas.Toneladas = Math.Round(Convert.ToDecimal(balanzada.PesoNeto) / 1000, 2);
+                    }
+                }
+                return balanzadasCompletas;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga)
         {
             try
@@ -9540,7 +9656,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
-        }
+        }            
 
         public void RitmoDeCargaBalanzas2(int buque, BalanzadasCompletasDto balanzadasCompletas)
         {
@@ -9805,48 +9921,60 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos)
         {
-            foreach (var item in balanzasCortesDtos)
+            try
             {
-                BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
-                if (balanzasCortes_db != null)
+                foreach (var item in balanzasCortesDtos)
                 {
-                    //balanzasCortes_db.Cerrado = item.Cerrado;
-                    balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
-                    balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
-                    //balanzasCortes_db.Kg = item.Kg;
-                    //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
-                    balanzasCortes_db.Observaciones = item.Observaciones;
-                    //balanzasCortes_db.Material_id = item.Material_id;
-                    //balanzasCortes_db.Tn = item.Tn;
-                    balanzasCortes_db.CorteManual = item.CorteManual;
-                    balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
-                }
-                else
-                {
-                    balanzasCortes_db = new BalanzasCortes()
+                    BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
+                    if (balanzasCortes_db != null)
                     {
-                        Cerrado = item.Cerrado,
-                        Fecha_Corte = item.Fecha_Corte,
-                        Fecha_Inicio = item.Fecha_Inicio,
-                        Kg = item.Kg,
-                        NumeroBalanza = item.NumeroBalanza,
-                        Observaciones = item.Observaciones,
-                        Material_id = item.Material_id,
-                        Tn = item.Tn,
-                        CorteManual = item.CorteManual,
-                        MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
-                        ModuloDeCarga_id = item.ModuloDeCarga_id,
-                        Bodega_id = item.Bodega_id
-                    };
-                    repositorio.Agregar(balanzasCortes_db);
+                        //balanzasCortes_db.Cerrado = item.Cerrado;
+                        balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
+                        balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
+                        //balanzasCortes_db.Kg = item.Kg;
+                        //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
+                        balanzasCortes_db.Observaciones = item.Observaciones;
+                        //balanzasCortes_db.Material_id = item.Material_id;
+                        //balanzasCortes_db.Tn = item.Tn;
+                        balanzasCortes_db.CorteManual = item.CorteManual;
+                        balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
+                    }
+                    else
+                    {
+                        balanzasCortes_db = new BalanzasCortes()
+                        {
+                            Cerrado = item.Cerrado,
+                            Fecha_Corte = item.Fecha_Corte,
+                            Fecha_Inicio = item.Fecha_Inicio,
+                            Kg = item.Kg,
+                            NumeroBalanza = item.NumeroBalanza,
+                            Observaciones = item.Observaciones,
+                            Material_id = item.Material_id,
+                            Tn = item.Tn,
+                            CorteManual = item.CorteManual,
+                            MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
+                            ModuloDeCarga_id = item.ModuloDeCarga_id,
+                            Bodega_id = item.Bodega_id
+                        };
+                        repositorio.Agregar(balanzasCortes_db);
+                    }
                 }
+                repositorio.GuardarCambios();
             }
-            repositorio.GuardarCambios();
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+         
         }
 
         public void EliminarCorteBalanza(int idCorteBalanza)
         {
             BalanzasCortes bal = repositorio.Obtener<BalanzasCortes>(x => x.Id == idCorteBalanza);
+
+            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(bal), "DELETE");
+
             repositorio.Remover(bal);
             repositorio.GuardarCambios();
 
@@ -9954,7 +10082,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        #region ObtenerRitmosBalanzas78
+#region ObtenerRitmosBalanzas78
         public Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza)
         {
             try
@@ -10018,7 +10146,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-        #endregion ObtenerRitmosBalanzas78
+#endregion ObtenerRitmosBalanzas78
 
 
         public Dictionary<string, int> ObtenerRitmos(int modulodecarga_id)
@@ -10494,7 +10622,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (tipoVehiculo == (int)TipoVehiculo.Tren && !consultactg)
                 {
-                    #region FerroviarioCPE
+#region FerroviarioCPE
 
                     var numeroOperativo = Convert.ToInt64(numero);
                     var cartaPortesFerroviario = repositorio.Listar<CartaPorte>(x => x.NumeroOperativo == numeroOperativo);
@@ -10515,7 +10643,7 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     }
 
-                    #endregion FerroviarioCPE
+#endregion FerroviarioCPE
                 }
                 else
                 {
@@ -10586,13 +10714,52 @@ namespace Molinos.Scato.Servicios.Impl
         public void EliminarObservacionDeCalidad(int observacion_id)
         {
             ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
+
+            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
             repositorio.Remover(obs);
             repositorio.GuardarCambios();
+        }
+
+        public void GenerarLogging(string service, string data, string tipo)
+        {
+            
+            if (service.Length > 0 && data != null && tipo.Length > 0)
+            {
+                Logging log = new Logging()
+                {
+                    Data = data,
+                    Servicio = service,
+                    Tipo = tipo,
+                    Fecha = DateTime.Now,
+                    Usuario = "NULL" 
+
+                };
+
+                repositorio.Agregar(log);
+                repositorio.GuardarCambios();
+            }
         }
 
         public IList<BanderaDto> ObtenerBanderas()
         {
             return Listar<Bandera, BanderaDto>();
+        }
+        public IList<InstanciaWorkflowPuertoDto> ListarEmbarques()
+        {
+
+            var embarques = Listar<Embarque, EmbarqueDto>();
+            List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
+
+            foreach (var embarque in embarques)
+            {
+                var lineupDto = Listar<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id).First();
+                InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                {
+                    Embarque = embarque,
+                    LineUp = lineupDto
+                });
+            }
+            return InstanciaWorkflowPuertoDtos;
         }
 
         public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)

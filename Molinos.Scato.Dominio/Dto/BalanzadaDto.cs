@@ -56,6 +56,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public IList<BalanzadasAgrupadas> balanzadasAgrupadas { get; set; }
         public IList<BalanzadasBajaCarga> balanzadasBajaCarga{ get; set; }
+        public IList<BalanzadasBuque> balanzadasBuque { get; set; }
     }
 
     public sealed class ListadoTotalBalanzadasDto
@@ -64,5 +65,17 @@ namespace Molinos.Scato.Dominio.Dto
         public MotivosFallasBalanzaDto MotivosFallasBalanza { get; set; }
         public string Observaciones { get; set; }
         public IList<BalanzadaDto> Balanzadas { get; set; }
+    }
+
+    public sealed class BalanzadasBuque
+    {
+        public int Id { get; set; }
+        public string NumeroBalanza { get; set; }
+        public int PesoBruto { get; set; }
+        public int PesoNeto { get; set; }
+        public int PesoTara { get; set; }
+        public int CargaInicial_Id { get; set; }
+        public int Bodega_Id { get; set; }
+        public int Material_Id { get; set; }
     }
 }
