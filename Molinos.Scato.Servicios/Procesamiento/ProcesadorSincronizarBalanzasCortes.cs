@@ -70,14 +70,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 ValidarBajaCarga(comando.IdModuloDeCarga);
 
               
-               ProcesarCargasPlanillaSolidos(vapor_id, comando.IdModuloDeCarga, embarqueBase.FechaHoraInicioCarga);
+               	ProcesarCargasPlanillaSolidos(vapor_id, comando.IdModuloDeCarga, embarqueBase.FechaHoraInicioCarga);
 
             }
             catch (Exception ex)
             {
                 Log.Info("ModificarEntidad: error 1" + ex.Message);
                 Log.Info("ModificarEntidad: error 2" + ex.StackTrace);
-
                 throw ex;
             }
         }
