@@ -96,7 +96,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if( embarque.FechaHoraInicioCarga.Value.Hour >=horaInicio && 
                     embarque.FechaHoraInicioCarga.Value.Hour < horaFin && DateTime.Now.Hour> horaFin)
                 {
-                    embarque.Ubicacion = 3;
+                    embarque.EstadoBuque.Id = 3;
                     Repositorio.GuardarCambios();
                 }
             }
