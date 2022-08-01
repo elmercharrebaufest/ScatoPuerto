@@ -10722,7 +10722,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GenerarLogging(string service, string data, string tipo)
         {
-            
+            /*
             if (service.Length > 0 && data != null && tipo.Length > 0)
             {
                 Logging log = new Logging()
@@ -10738,6 +10738,7 @@ namespace Molinos.Scato.Servicios.Impl
                 repositorio.Agregar(log);
                 repositorio.GuardarCambios();
             }
+            */
         }
 
         public IList<BanderaDto> ObtenerBanderas()
