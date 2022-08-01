@@ -70,7 +70,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 ValidarBajaCarga(comando.IdModuloDeCarga);
 
               
-               //ProcesarCargasPlanillaSolidos(vapor_id, comando.IdModuloDeCarga, embarqueBase.FechaHoraInicioCarga);
+               ProcesarCargasPlanillaSolidos(vapor_id, comando.IdModuloDeCarga, embarqueBase.FechaHoraInicioCarga);
 
             }
             catch (Exception ex)
@@ -97,7 +97,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if( embarque.FechaHoraInicioCarga.Value.Hour >=horaInicio && 
                     embarque.FechaHoraInicioCarga.Value.Hour < horaFin && DateTime.Now.Hour> horaFin)
                 {
-                    embarque.EstadoBuque.Id = 3;
+                    var estadoBuq = Repositorio.Obtener<EstadoBuque>(x => x.Id == 3);
+                    embarque.EstadoBuque = estadoBuq;
                     Repositorio.GuardarCambios();
                 }
             }
