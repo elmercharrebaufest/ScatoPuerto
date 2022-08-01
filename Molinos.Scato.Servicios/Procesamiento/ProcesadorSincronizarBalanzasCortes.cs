@@ -32,7 +32,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return;
 
-                if (embarqueBase.EstadoBuque.Id != 3)
+                if(embarqueBase.EstadoBuque.Id != 3)
                     EnviarCalidad(embarqueBase);
                 
                 int embarque = embarqueBase.Id;
