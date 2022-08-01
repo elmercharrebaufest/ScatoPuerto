@@ -164,7 +164,7 @@ export class CargaSolidosComponent implements OnInit {
       });
   }
 
-  imprimir(imprimir: boolean = false){
+  imprimir(imprimir: boolean = false, finalizado?: boolean){
     
     this.ocultarBotonesImpresion();
 
@@ -184,17 +184,37 @@ export class CargaSolidosComponent implements OnInit {
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 
-    html2pdf().from(element).set(opt).outputPdf()
-    .then(() => {
-      if (!imprimir){ this.cargaPdf = false
-        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
-            document.getElementById('balanza7-scroll').classList.add('max-5vh');
-            document.getElementById('balanza8-scroll').classList.add('max-5vh');
-        }
-        this.terminaImprimir = true;
+    if(finalizado){
+      let fileBlobParaAdjuntar = html2pdf().from(element).set(opt).outputPdf()
+        .then(() => this.siNoImprime(imprimir) ).output('blob');
+
+      fileBlobParaAdjuntar.then(()=> this.cargarPDF(fileBlobParaAdjuntar._result));
+    }else{
+      html2pdf().from(element).set(opt).outputPdf()
+        .then(() => this.siNoImprime(imprimir) ).save();
+    }
+  }
+
+  cargarPDF(file) {
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {        
+        this.adjunto = reader.result;
+        this.enviarMail();
       }
-    }).save();
-     
+    }
+  }
+
+  siNoImprime(imprimir: boolean = false){
+    if (!imprimir){
+      this.cargaPdf = false;
+      if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+          document.getElementById('balanza7-scroll').classList.add('max-5vh');
+          document.getElementById('balanza8-scroll').classList.add('max-5vh');
+      }
+      this.terminaImprimir = true;
+    }
   }
 
   ocultarBotonesImpresion(){
@@ -275,7 +295,7 @@ export class CargaSolidosComponent implements OnInit {
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {},
+          .then(() => {this.imprimir(true, finalizar)},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())

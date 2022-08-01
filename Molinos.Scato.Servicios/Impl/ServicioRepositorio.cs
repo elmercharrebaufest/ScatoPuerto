@@ -9429,6 +9429,57 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public BalanzadasCompletasDto ObtenerBalanzadasEnCurso(int IdModuloDeCarga)
+        {
+            try 
+            {
+                BalanzadasCompletasDto balanzadasCompletas = new BalanzadasCompletasDto();
+                balanzadasCompletas.balanzadasAgrupadas = new List<BalanzadasAgrupadas>();
+
+                var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return balanzadasCompletas;
+
+                int idEmbarque = embarqueBase.Id;
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
+                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio==null && x.CargaOpuesta_Id==null);
+
+                foreach (Carga carga in cargas)
+                {
+                    var balanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.Id);
+
+                    BalanzadasAgrupadas balanzadasAgrupadas = new BalanzadasAgrupadas();
+                    balanzadasAgrupadas.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
+                    balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
+
+                    foreach (Balanzada balanzada in balanzadas)
+                    {
+                        balanzadasAgrupadas.Bodega = carga.Bodega.Nombre;
+                        balanzadasAgrupadas.Producto = carga.Material.DescripcionCorta;
+                        balanzadasAgrupadas.NumeroBalanza = carga.NumeroBalanza;
+
+                        DateTime FechaInicioBalanzadaAgrupada = Listar<RegistroBalanzaPuerto, RegistroBalanzaPuerto>(x => x.Id == balanzada.Id).First().Fecha;
+                        balanzadasAgrupadas.FechaInicio = FechaInicioBalanzadaAgrupada;
+                        balanzadasAgrupadas.HoraInicio = Convert.ToString((FechaInicioBalanzadaAgrupada.Hour).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Minute).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Second).ToString().PadLeft(2, '0'));
+
+                        balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
+                        balanzadasAgrupadas = new BalanzadasAgrupadas();
+                        balanzadasAgrupadas.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
+                        balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
+
+                        balanzadasAgrupadas.Kilos = balanzada.PesoNeto;
+                        balanzadasAgrupadas.Toneladas = Math.Round(Convert.ToDecimal(balanzada.PesoNeto) / 1000, 2);
+                    }
+                }
+                return balanzadasCompletas;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga)
         {
             try

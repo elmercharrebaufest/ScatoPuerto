@@ -209,6 +209,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin: 0px,0px,0px;
 }
 
+.info-desc{
+    margin-top: 1.3rem;
+    /* padding-left: 1.3rem; */
+    padding-bottom: 0.5rem;
+    line-height: 16px;
+    color: #666;
+}
+
+/* nuevo */
+table.tableEnCurso { width: 100%; }
+
+.tableEnCurso th, .tableEnCurso td { 
+  text-align: left; 
+  padding: 0.25em;
+}
+
+.tableEnCurso tr { 
+  border-bottom: 1px solid #DDD;
+}
+
+/* fin nuevo */
+
 @media screen and (min-width: 800px) and (max-width: 1250px) {
     .icono{
         width: 20px;
