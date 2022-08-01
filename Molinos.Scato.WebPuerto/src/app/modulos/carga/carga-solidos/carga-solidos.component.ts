@@ -218,30 +218,21 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   ocultarBotonesImpresion(){
-
+    let valueBotonTerminarYExportarPLanillasSolidos = '';
     let botonCorteManualBalanzasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementsByName('ocultarImpresionTableristaSolido') : null;
     let botonTerminarYExportarPLanillasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementById('btn-terminar-exportar-planillas') : null;
-    let valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display
-
-    if (botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
-    botonCorteManualBalanzasSolidos.forEach(btns => {
-      btns.style.display = 'none'
-    });
+    if(botonTerminarYExportarPLanillasSolidos != null) valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display;
+    if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
       
-      setTimeout(() => {
-        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
-        
-          botonCorteManualBalanzasSolidos.forEach(btns => {
-            btns.style.display = 'block'
-          });
-  
-          botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
-        }
-  
-        botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    setTimeout(() => {
+      if(this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+        if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'block');
+        if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
+      }
 
-      },6500);
-      
+      if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    },6500);
   }
 
 
@@ -266,9 +257,13 @@ export class CargaSolidosComponent implements OnInit {
             else
               return;
           }).catch(() => window.location.reload());
-      }
-      else
+      } else {
         this.guardarContinuacion(finalizar);
+
+        this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
+          if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
+        });
+      }
     }
   }
 
@@ -282,11 +277,6 @@ export class CargaSolidosComponent implements OnInit {
       this.usuarioFinalizacion = null;
 
     let elementosGraficos = this.graficoCarga.obtenerElementosGraficos();
-
-    // this.balanzadasEmbarque = this.balanzasComponent.obtenerBalanzadas78();
-    // console.log('balanzasEmbarque a guardar: ', this.balanzadasEmbarque);
-    //console.log('obtenerAmarre: ', this.umapComponent.obtenerAmarre());
-    //console.log('obtenerUmap: ', this.umapComponent.obtenerUmap());
 
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
