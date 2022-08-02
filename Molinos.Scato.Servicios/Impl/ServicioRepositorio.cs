@@ -9384,6 +9384,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 log.Info("error rfc:" + ex.InnerException);
                 log.Info("error rfc:" + ex.Message);
+                log.Info("----- Fin ObtenerLlenadoMilimetroPorTanque  -----");
                 throw ex;
             }
 
