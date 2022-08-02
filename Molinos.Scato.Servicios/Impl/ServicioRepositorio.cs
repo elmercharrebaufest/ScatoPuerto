@@ -9352,11 +9352,14 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
 #if (DEBUG)
+                log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  DEBUG-----");
                 return "10000";
 #endif
-
+                log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  -----");
                 string mmABuscar = cm + "," + mm;
                 string mmABuscar1 = cm + "." + mm;
+                log.Info("mmABuscar:" + mmABuscar);
+                log.Info("mmABuscar1:" + mmABuscar1);
                 var request = new Z_SDMF_RFC_CONS_PP_TAB_CUB_TANRequest(
                     new Z_SDMF_RFC_CONS_PP_TAB_CUB_TAN
                     {
@@ -9372,12 +9375,14 @@ namespace Molinos.Scato.Servicios.Impl
                        TanqueNum = item.LGORT,
                        LlenadoMm = item.ZCANM3.ToString()
                    }).Where(x => x.Mm == mmABuscar || x.Mm == mmABuscar1).Select(y => y.LlenadoMm).FirstOrDefault();
+                log.Info("MM3:"+mm3 );
                 return mm3;
 
 
             }
             catch (Exception ex)
             {
+                log.Info("error rfc:" + ex.InnerException);
                 throw;
             }
 
@@ -10722,22 +10727,31 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GenerarLogging(string service, string data, string tipo)
         {
-
-            if (service.Length > 0 && data != null && tipo.Length > 0)
+            try
             {
-                Logging log = new Logging()
+                if (service.Length > 0 && data != null && tipo.Length > 0)
                 {
-                    Data = data,
-                    Servicio = service,
-                    Tipo = tipo,
-                    Fecha = DateTime.Now,
-                    Usuario = "NULL"
+                    Logging log = new Logging()
+                    {
+                        Data = data,
+                        Servicio = service,
+                        Tipo = tipo,
+                        Fecha = DateTime.Now,
+                        Usuario = "NULL"
 
-                };
+                    };
 
-                repositorio.Agregar(log);
-                repositorio.GuardarCambios();
+                    repositorio.Agregar(log);
+                    repositorio.GuardarCambios();
+                }
             }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+            
 
         }
 
