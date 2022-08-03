@@ -260,9 +260,11 @@ export class CargaSolidosComponent implements OnInit {
       } else {
         this.guardarContinuacion(finalizar);
 
-        this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
-          if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
-        });
+        if(finalizar){
+          this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
+            if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
+          });
+        }
       }
     }
   }
@@ -294,8 +296,9 @@ export class CargaSolidosComponent implements OnInit {
           .then(() => {},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
-            this.cargaPdf = false;
+            }).catch(() => window.location.reload());
+
+        this.cargaPdf = false;
       }
 
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);

@@ -47,8 +47,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/GuardarModuloDeCarga")]
         public HttpResponseMessage GuardarModuloDeCarga(ModuloDeCargaDto moduloDeCarga)
         {
-            comandos.Ejecutar(new GuardarModuloDeCarga { Dto = moduloDeCarga });
-            return Request.CreateResponse(HttpStatusCode.OK);
+            try
+            {
+                comandos.Ejecutar(new GuardarModuloDeCarga { Dto = moduloDeCarga });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
         [HttpGet]
