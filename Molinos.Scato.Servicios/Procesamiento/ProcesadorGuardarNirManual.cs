@@ -24,7 +24,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             IList<ModuloDeCargaNirManualPuerto> nirs = Repositorio.Listar<ModuloDeCargaNirManualPuerto>(x => x.ModuloDeCarga.Id == moduloDeCarga.Id).ToList();
             Repositorio.RemoverTodos(nirs);
 
-            ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
+            //ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
 
             foreach (var item in comando.Dto)
             {
