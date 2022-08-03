@@ -10,6 +10,7 @@ import { finalize } from 'rxjs/operators';
 import { Mail } from '@ScatoModels/mail';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
+import { readFile } from 'fs';
 
 @Component({
   selector: 'app-nir',
@@ -32,6 +33,22 @@ export class NIRComponent implements OnInit {
   envioNir:boolean = false;
   objetoMailNir: object;
   celdasManoDeEmbarque: CeldaManoDeEmbarque[];
+  promedioHDMano1:number;
+  promedioHDMano2:number;
+  promedioTotalHD:number;
+  promedioPHMano1:number;
+  promedioPHMano2:number;
+  promedioTotalPH:number;
+  promedioProtBaseMano1:number;
+  promedioProtBaseMano2:number;
+  promedioTotalProtBase:number;
+  promedioProtBSMano1:number;
+  promedioProtBSMano2:number;
+  promedioTotalProtBS:number;
+  file:any;
+
+
+  public configListaMultiple: any;
 
 
   constructor(
@@ -40,6 +57,7 @@ export class NIRComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     confirmationDialogService: ConfirmationDialogService,
     private procesoCalidadService: ProcesoCalidadService,
+    private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
   ) {
     this.confirmationDialogService = confirmationDialogService;
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
@@ -55,6 +73,7 @@ export class NIRComponent implements OnInit {
     this.initFormulario();
 
     this.obtenerCeldasOrigen();
+
     this.moduloDeCargaService.obtenerListadoBodegas()
       .pipe( finalize( () => this.obtenerNir() ) )
       .subscribe( bod => this.bodegas = bod );
@@ -107,7 +126,10 @@ export class NIRComponent implements OnInit {
   }
 
   obtenerCeldasOrigen(){
-    this.moduloDeCargaService.obtenerListadoCeldaManoDeEmbarque().subscribe(data => {this.celdasManoDeEmbarque = data})
+    this.moduloDeCargaService.obtenerListadoCeldaManoDeEmbarque().subscribe(data => {
+      this.celdasManoDeEmbarque = data;
+      this.setConfigListaMultiple();
+    })
   }
   asignarMano(numeroMano: number):string{
     if(!numeroMano) return '';
@@ -217,18 +239,36 @@ export class NIRComponent implements OnInit {
 
     return nir;
   }
+  
+  public setConfigListaMultiple() {
 
-  enviarNir(){
-    let nir: Nir[] = this.obtenerNirCompleto();
-
-    // this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( nir, this.moduloDeCarga_Id )
-    //   .subscribe( res => console.log(res) );
-
-    this.enviarMail(nir);
+    this.configListaMultiple = {
+    singleSelection: false,
+    idField: 'id',
+    textField: 'nombre',
+    enableCheckAll: false,
+    maxHeight: 100,
     
-    // if(this.envioNir === false){
-    //   this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( this.objetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK');});
-    // }
+    // selectAllText: 'Marcar Todos',
+    
+    // unSelectAllText: 'Desmarcar Todos',
+    
+    }
+    
+    }
+  enviarNir(guardarYEnviar : boolean = false) {
+    let nir: Nir[] = this.obtenerNirCompleto();
+    this.calcularPromedios(nir);
+    if(guardarYEnviar == true) {
+      this.enviarMail(nir);
+      
+    }else{
+      let ObjetoMailNir = {
+        nirManualPuerto : nir,
+        mail: '',
+      }
+      this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK')});   
+    }
   }
 
   compareOrigen(c1: any, c2: any) {
@@ -241,11 +281,7 @@ export class NIRComponent implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
-  // getDestinatarios(temp : string){
-  //   this.procesoCalidadService.obtenerDestinatariosNirManual(temp).subscribe( data => {
-  //     this.destinatarios = data
-  //   });
-  // }
+  
 
   enviarMail(nir) {
     //#region variables mail
@@ -273,7 +309,8 @@ export class NIRComponent implements OnInit {
           if (confirmed) {
               console.log(ObjetoMailNir);
               
-              this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK');
+              let nombreBuque = this.datosEmbarqueProcesoService.getEmbarqueSelected().nombreBuque
+              this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id, nombreBuque ).subscribe(res => {console.log('200 OK');
               this.envioNir = true;
               });
             }
@@ -291,7 +328,48 @@ export class NIRComponent implements OnInit {
           // this.hideSpinner.emit(false);
         });
     })
-    
-    
+  }
+  calcularPromedios(nirs : Nir[]){
+    let contadorMano1 = 0;
+    let contadorMano2 = 0;
+    let hdMano1 = 0;
+    let hdMano2 = 0;
+    let phMano1 = 0;
+    let phMano2 = 0;
+    let protBaseMano1 = 0;
+    let protBaseMano2 = 0;
+    let prot_BSMano1 = 0;
+    let prot_BSMano2 = 0;
+    nirs.forEach(nir => {
+      if(nir.mano == "mano1"){
+        hdMano1 += parseFloat(nir.hd);
+        phMano1 += parseFloat(nir.ph);
+        if(nir.material_id == 17){
+        prot_BSMano1 += parseFloat(nir.prot_BS);
+        protBaseMano1 += parseFloat(nir.protBase);
+        }
+        contadorMano1++;
+      }else if(nir.mano == "mano2"){
+        hdMano2 += parseFloat(nir.hd);
+        phMano2 += parseFloat(nir.ph);
+        if(nir.material_id == 17){
+          prot_BSMano2 += parseFloat(nir.prot_BS);
+          protBaseMano2 += parseFloat(nir.protBase);
+        }
+        contadorMano2++;
+      }
+    });
+    this.promedioHDMano1 = hdMano1 / contadorMano1;
+    this.promedioHDMano2 = hdMano2 / contadorMano2;
+    this.promedioTotalHD = (this.promedioHDMano1 + this.promedioHDMano2) / 2;
+    this.promedioPHMano1 = phMano1 / contadorMano1;
+    this.promedioPHMano2 = phMano2 / contadorMano2;
+    this.promedioTotalPH = (this.promedioPHMano1 + this.promedioPHMano2) / 2;
+    this.promedioProtBSMano1 = prot_BSMano1 / contadorMano1;
+    this.promedioProtBSMano2 = prot_BSMano2 / contadorMano2;
+    this.promedioTotalProtBS = (this.promedioProtBSMano1 + this.promedioProtBSMano2) / 2
+    this.promedioProtBaseMano1 = protBaseMano1 / contadorMano1;
+    this.promedioProtBaseMano2 = protBaseMano2 / contadorMano2;
+    this.promedioTotalProtBase = (this.promedioProtBaseMano1 + this.promedioProtBaseMano2) / 2
   }
 }
