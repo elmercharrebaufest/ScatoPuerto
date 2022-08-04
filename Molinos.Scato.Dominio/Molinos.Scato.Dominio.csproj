@@ -685,6 +685,7 @@
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
+    <Compile Include="Dto\ErroresGeolocalizacionDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosUltimaActualizacionDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaFiltroDto.cs" />
@@ -966,6 +967,7 @@
     <Compile Include="Entidades\EmbarqueInformacionViaje.cs" />
     <Compile Include="Entidades\EmbarquePosicion.cs" />
     <Compile Include="Entidades\EmbarquePosicionHistorico.cs" />
+    <Compile Include="Entidades\ErroresGeolocalizacion.cs" />
     <Compile Include="Entidades\EstadoBuque.cs" />
     <Compile Include="Entidades\ImpEtiquetaPuerto.cs" />
     <Compile Include="Entidades\LlenadoMilimetroPorTanque.cs" />

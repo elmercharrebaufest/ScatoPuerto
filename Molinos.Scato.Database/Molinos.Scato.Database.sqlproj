@@ -535,7 +535,7 @@
     <Build Include="dbo\Tables\Parametros.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosUltimaActualizacion.sql" />
     <Build Include="dbo\Tables\Logging.sql" />
-    
+    <Build Include="dbo\Tables\ErroresGeolocalizacion.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
