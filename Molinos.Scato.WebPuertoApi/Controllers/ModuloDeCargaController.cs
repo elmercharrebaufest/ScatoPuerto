@@ -8,6 +8,7 @@ using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -47,8 +48,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/GuardarModuloDeCarga")]
         public HttpResponseMessage GuardarModuloDeCarga(ModuloDeCargaDto moduloDeCarga)
         {
-            comandos.Ejecutar(new GuardarModuloDeCarga { Dto = moduloDeCarga });
-            return Request.CreateResponse(HttpStatusCode.OK);
+            try
+            {
+                comandos.Ejecutar(new GuardarModuloDeCarga { Dto = moduloDeCarga });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
         [HttpGet]
@@ -216,29 +224,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto")]
-        public HttpResponseMessage GuardarModuloDeCargaNirManualPuerto(int IdModuloDeCarga, ObjetoMailNir ObjetoMailNir)
+        public HttpResponseMessage GuardarModuloDeCargaNirManualPuerto(int IdModuloDeCarga, ObjetoMailNir ObjetoMailNir, string nombreBuque)
         {
             try
             {
+                var path = System.Web.HttpContext.Current.Server.MapPath("~/iconMolinosChiquito.png");
+                //System.Web.HttpServerUtility server = new System.Web.HttpServerUtility();
+                byte[] data = File.ReadAllBytes(path);
+
                 var resultado = new ResultadoPrevisualizar();
                 comandos.Ejecutar(new GuardarNirManual { Dto = ObjetoMailNir.nirManualPuerto, IdModuloDeCarga = IdModuloDeCarga });
-
-                var docFile = "Nir.xls";
-
-                var generadorExcel = new ExcelNirManual();
-
-                generadorExcel.GenerarArchivo(resultado, ObjetoMailNir.nirManualPuerto, IdModuloDeCarga);
-                List<string> Emails = new List<string>();
-                Emails = ObjetoMailNir.mail.Destinatarios;
-
-                comandos.Ejecutar(new EnvioMail
+                if(nombreBuque != "undefined")
                 {
-                    Cuerpo = ObjetoMailNir.mail.Body,
-                    Destinatarios = Emails,
-                    Titulo = $"NIR" + "-" + IdModuloDeCarga,
-                    Attachment = resultado.Archivo,
-                    AttachmentName = docFile
-                });
+                    var docFile = "Nir.xls";
+
+                    var generadorExcel = new ExcelNirManual();
+
+
+                    generadorExcel.GenerarArchivo(resultado, ObjetoMailNir.nirManualPuerto, IdModuloDeCarga, nombreBuque, data);
+                    List<string> Emails = new List<string>();
+                    Emails = ObjetoMailNir.mail.Destinatarios;
+
+                    comandos.Ejecutar(new EnvioMail
+                    {
+                        Cuerpo = ObjetoMailNir.mail.Body,
+                        Destinatarios = Emails,
+                        Titulo = $"NIR" + "-" + IdModuloDeCarga,
+                        Attachment = resultado.Archivo,
+                        AttachmentName = docFile
+                    });
+                }
+
+                
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

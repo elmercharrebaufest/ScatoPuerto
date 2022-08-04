@@ -12,6 +12,7 @@ import { RecibodebuquepdfComponent } from "./recibo-de-buque/recibodebuquepdf.co
 import { PlanillaTurnoLiquidosCalidadComponent } from "./liquidos/planilla-turnos-liquidos-calidad/planilla-turnos-liquidos-calidad.component";
 import { ModalReciboComponent } from './modal-recibo/modal-recibo.component';
 import { RegistroRecibosComponent } from './registro-recibos/registro-recibos.component';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { RegistroRecibosComponent } from './registro-recibos/registro-recibos.co
         CommonModule,
         CalidadRoutingModule,
         SharedModule,
-        CargaModule
+        CargaModule,
+        NgMultiSelectDropDownModule.forRoot(),
     ],
     declarations: [
         CalidadComponent,
