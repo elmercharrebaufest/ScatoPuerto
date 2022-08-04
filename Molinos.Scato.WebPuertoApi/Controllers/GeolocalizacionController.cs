@@ -150,7 +150,51 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
         }
-        
+
+        [HttpPost]
+        [Route("api/Geolocalizacion/RegistrarErroresGeolocalizacion")]
+        public HttpResponseMessage RegistrarErroresGeolocalizacion(List<erroresGeo> ErroresGeolocalizacion)
+        {
+            try
+            {
+                List<ErroresGeolocalizacionDto> errores = new List<ErroresGeolocalizacionDto>();
+                foreach (var item in ErroresGeolocalizacion)
+                {
+                    ErroresGeolocalizacionDto error = new ErroresGeolocalizacionDto
+                    {
+                        Bandera = item.Bandera,
+                        IMO = item.IMO,
+                        FechaError = DateTime.Now,
+                        Mensaje = item.Mensaje,
+                        NombreBuque = item.NombreBuque,
+                        TipoBuque = item.TipoBuque
+
+                    };
+                    errores.Add(error);
+                }
+
+                servicio.RegistrarErroresGeolocalizacion(errores);
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            }
+            catch (System.Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+
+     
+        }
+        public class erroresGeo
+        {
+            public string NombreBuque;
+            public string TipoBuque;
+            public string Bandera;
+            public string IMO;
+            public string Mensaje;
+        }
+
+
         #region Metodos para cargar los embarques en la pantalla de geolocalización
         private void cargarEmbarquenesLineUpPorPuerto(IList<InstanciaWorkflowPuertoDto> listaEmbarques, ref List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion,  IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto, short tipoMuelleCarga)
         {
@@ -238,6 +282,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
 
         }
+
+
+       
         private enum MuelleCarga
         {
             SanBenito = 1,

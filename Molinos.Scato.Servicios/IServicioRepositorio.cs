@@ -2670,5 +2670,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque);
+        [OperationContract]
+        void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion);
     }
 }
