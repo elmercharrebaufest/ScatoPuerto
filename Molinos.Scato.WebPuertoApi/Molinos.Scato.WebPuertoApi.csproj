@@ -242,6 +242,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="iconMolinosChiquito.png" />
     <Content Include="parameters.xml" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -345,6 +346,10 @@
     <ProjectReference Include="..\Molinos.Scato.Dominio\Molinos.Scato.Dominio.csproj">
       <Project>{9BC79C49-4F39-409F-A3D4-F1DABB8122B4}</Project>
       <Name>Molinos.Scato.Dominio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Molinos.Scato.Repositorio\Molinos.Scato.Repositorio.csproj">
+      <Project>{C26344C6-9829-4673-940A-A3F44CFA945C}</Project>
+      <Name>Molinos.Scato.Repositorio</Name>
     </ProjectReference>
     <ProjectReference Include="..\Molinos.Scato.Servicios\Molinos.Scato.Servicios.csproj">
       <Project>{15B3E0D2-6217-493A-A690-158C497F5318}</Project>

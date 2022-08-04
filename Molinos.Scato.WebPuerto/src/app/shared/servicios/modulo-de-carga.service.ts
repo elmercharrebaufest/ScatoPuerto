@@ -132,8 +132,8 @@ export class ModuloDeCargaService {
     return this.http.get<Nir[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
   }
   
-  guardarModuloDeCargaNirManualPuerto(objetoMailNir:Object, IdModuloDeCarga: number){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?IdModuloDeCarga=${IdModuloDeCarga}`, objetoMailNir, { 'withCredentials': true});
+  guardarModuloDeCargaNirManualPuerto(objetoMailNir:Object, IdModuloDeCarga: number, nombreBuque?: string){
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?IdModuloDeCarga=${IdModuloDeCarga}&nombreBuque=${nombreBuque}`, objetoMailNir, { 'withCredentials': true});
   }
 
   obtenerListadoBodegas(): Observable<Bodega[]>{
