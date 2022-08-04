@@ -10884,5 +10884,37 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
+
+        public void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion)
+        {
+            try
+            {
+                foreach (var errorGeolocalizacion in ErroresGeolocalizacion)
+                {
+                    int idEmb = 0;
+                    var emb = repositorio.Listar<Embarque>(x => x.Patente == errorGeolocalizacion.NombreBuque).LastOrDefault();
+                    if (emb != null)
+                        idEmb = emb.Id;
+                    var error = new ErroresGeolocalizacion()
+                    {
+                        Bandera = errorGeolocalizacion.Bandera,
+                        IMO = errorGeolocalizacion.IMO,
+                        Mensaje = errorGeolocalizacion.Mensaje,
+                        NombreBuque = errorGeolocalizacion.NombreBuque,
+                        TipoBuque = errorGeolocalizacion.TipoBuque,
+                        FechaError = errorGeolocalizacion.FechaError,
+                        Embarque_id = idEmb
+                    };
+                    repositorio.Agregar(error);
+                    repositorio.GuardarCambios();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
+        }
     }
 }
