@@ -77,7 +77,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 Log.Info("ModificarEntidad: error 1" + ex.Message);
                 Log.Info("ModificarEntidad: error 2" + ex.StackTrace);
-
                 throw ex;
             }
         }
