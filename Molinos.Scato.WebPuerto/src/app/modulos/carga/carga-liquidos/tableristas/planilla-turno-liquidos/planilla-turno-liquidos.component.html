@@ -71,7 +71,8 @@
                                                         {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.</span><br>
                                                     <button id="btn-guardar-turno-liquidos" class='btn btn btn-success'
                                                         style="margin-top: 5px; margin-bottom: 5px"
-                                                        (click)='guardarTurnoGeneral(d,t)'>
+                                                        (click)='guardarTurnoGeneral(d,t)'
+                                                        [disabled]="!bGrabandoTurnoActivo">
                                                         {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Guardar turno'}}
                                                     </button>
                                                     <span class='parcel-cantidad' *ngIf="turno.value.guardadoPorTablerista"><b>Turno en recibidores</b></span>
@@ -93,8 +94,7 @@
                                                     <!-- EXPORTADOR -->
                                                     <td>
                                                         <!-- <ng-container formGroupName="exportador"> -->
-                                                        <select formControlName='exportador'
-                                                            [compareWith]='compareFields'>
+                                                        <select formControlName='exportador'[compareWith]='compareFields'>
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let exportador of exportadores'
                                                                 [ngValue]='exportador'>{{exportador.nombre}}</option>
@@ -103,9 +103,11 @@
                                                     </td>
                                                     <!-- LINEA -->
                                                     <td>
-                                                        <select formControlName='linea'
-                                                            (change)="onLineaChange(result,d,t, i)">
-                                                            <option *ngFor='let linea of lineas' [ngValue]='linea.id'>
+                                                        <select formControlName='tipoLineaEmbarque'
+                                                                (change)="onLineaChange(result,d,t, i)"
+                                                                [compareWith]='compareFieldLineas'>
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let linea of tipoLineaEmbarque' [ngValue]='linea'>
                                                                 {{linea.linea}}
                                                             </option>
                                                         </select>
@@ -123,9 +125,9 @@
                                                     <td>
                                                         <select formControlName='materialPuerto'
                                                             [compareWith]='compareFields'
-                                                            (change)='getCantidadLinea(result)' disabled>
+                                                            (change)='getCantidadLinea(result)'>
                                                             <option [value]='0'></option>
-                                                            <option *ngFor='let producto of productos'
+                                                            <option *ngFor='let producto of obtenerMaterialxLinea(result)'
                                                                 [ngValue]='producto'>{{producto.descripcionCorta}}
                                                             </option>
                                                         </select>
@@ -135,7 +137,8 @@
                                                         <!-- <input type="text" formControlName='tk' disabled> -->
                                                         <select formControlName='tk'
                                                             (change)='getCantidadLinea(result)' class='planilla-text-derecha'>
-                                                            <option *ngFor='let linea of lineas'
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let linea of obtenerTkxLinea(result)'
                                                                 [ngValue]='linea.tkInicial'>{{linea.tkInicial}}</option>
                                                         </select>
                                                     </td>

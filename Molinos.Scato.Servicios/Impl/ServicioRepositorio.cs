@@ -10891,6 +10891,12 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
 
+        public IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque()
+        {
+            return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
+        }
+
+
         public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
             //Me traigo el embarque
@@ -10959,15 +10965,6 @@ namespace Molinos.Scato.Servicios.Impl
             return TipoArchivos;
         }
 
-        public bool eliminarArchivos(int[] filesIds)
-        {
-            foreach (var id in filesIds)
-            {
-                ArchivosPuerto archivosPuerto = repositorio.Obtener<ArchivosPuerto>(x => x.Id == id);
-                repositorio.Remover(archivosPuerto);
-            }
-            return true;
-        }
         public void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion)
         {
             try

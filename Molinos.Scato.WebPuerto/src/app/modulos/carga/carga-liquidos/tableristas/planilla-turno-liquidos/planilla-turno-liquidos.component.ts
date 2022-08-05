@@ -33,6 +33,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { convertToObject } from 'typescript';
+import { timeoutWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -52,6 +53,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   moduloCarga: ModuloDeCarga;
   exportadores: any[];
   lineas: any[];
+  lineasPlanilla: any[] = [];
+  tkInicialPlanilla: any[] = [];
   arrLineas: any[];
   partidas: any[];
   producto: any[];
@@ -82,6 +85,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
   selectedNewTurno: number;
+  tipoLineaEmbarque: any;
+  tipoLineaProductoTk = [];
+  bGrabandoTurnoActivo: boolean = true;
   estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
   { id: 2, descripcion: 'Cargando' },
   { id: 3, descripcion: 'ControlCalidad' },
@@ -114,6 +120,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.embarqueId = this.procesoService.getEmbarqueId();
     this.cargarTurnosBodegasDestinos();
     this.cargarEmbarqueShipParticular();
+    this.obtenerTipoLineaEmbarque();
+
+
   }
 
   ngOnInit(): void {
@@ -123,9 +132,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
-
     this.initFormularioObs();
     this.initShipParticular();
+  }
+  private obtenerTipoLineaEmbarque() {
+    this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
+      this.tipoLineaEmbarque = res;
+      this.obtenerLineaProductoTk();
+    });
   }
   cargarEmbarqueShipParticular() {
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
@@ -495,11 +509,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   getCombos() {
     this.lineas = this._procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
-    this.arrLineas = this.lineas;
-    this.arrLineas = this.arrLineas.map(l => { return l = l.linea });
-    this.arrLineas.filter((value, index, array) => {
-      return array.indexOf(value) === index;
-    })
+
+
+    let lineasPlanilla = [];
+    this.lineas.forEach(function (item) {
+      var i = lineasPlanilla.findIndex(x => x.linea == item.linea);
+      if (i <= -1) {
+        lineasPlanilla.push({ id: item.id, linea: item.linea });
+      }
+
+    });
+    this.lineasPlanilla = lineasPlanilla;
 
     let exportadoresForm = this._turnosService.getExportadores();
     this.exportadores = new Array();
@@ -507,9 +527,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (e.exportador) this.exportadores.push(e.exportador);
     }
 
+    console.log('exportadores-->>')
+    console.log(this.exportadores)
+
     this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
     this.bodegas = this._turnosService.getBodega();
-    this.addParcelChecks();
+    //this.addParcelChecks();
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.vientoAmarre = this.procesoService.getVientoAmarre();
@@ -604,7 +627,84 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     })
   }
+  private obtenerLineaProductoTk() {
+    this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
+    let lineasEmbarque = null;
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      lineasEmbarque = resp.moduloDeCargaLineasDeEmbarque;
+    },
+      error => { },
+      () => {
 
+        let tipoLineas = [];
+        this.tipoLineaEmbarque.forEach(function (item) {
+          const filtroTipoLinea = lineasEmbarque.filter(linea => linea.tipoLineaEmbarque.id == item.id);
+          if (filtroTipoLinea.length > 0) {
+            var i = tipoLineas.findIndex(x => x.id == item.id);
+            if (i <= -1) {
+              tipoLineas.push({ id: item.id, linea: item.linea });
+            }
+          }
+        });
+        this.tipoLineaEmbarque = tipoLineas;
+
+        this.tipoLineaEmbarque.forEach(tipo => {
+          const filtroTipoLinea = lineasEmbarque.filter(item => item.tipoLineaEmbarque.id == tipo.id);
+
+          if (filtroTipoLinea.length > 0) {
+            let materialPuerto = [];
+            let tkInicialPlanilla = [];
+
+            filtroTipoLinea.forEach((item) => {
+              var i = materialPuerto.findIndex(x => x.id == item.materialPuerto.id);
+              if (i <= -1) {
+                materialPuerto.push({ id: item.materialPuerto.id, descripcionCorta: item.materialPuerto.descripcionCorta });
+              }
+            });
+
+            filtroTipoLinea.forEach((item) => {
+              var i = tkInicialPlanilla.findIndex(x => x.tkInicial == item.tkInicial);
+              if (i <= -1) {
+                tkInicialPlanilla.push({ tkInicial: item.tkInicial });
+              }
+            });
+
+            this.tipoLineaProductoTk.push({
+              tipoLinea: tipo,
+              materialPuerto: materialPuerto,
+              tkInicial: tkInicialPlanilla,
+            })
+          }
+        });
+      });
+  }
+
+  obtenerMaterialxLinea(lineaTurno) {
+    const linea = lineaTurno['controls'].tipoLineaEmbarque.value;
+    let materialPuerto = [];
+    const materiales = this.tipoLineaProductoTk.filter(item => item.tipoLinea?.id == linea?.id);
+
+    if (materiales != null || materiales != undefined) {
+      if (materiales.length > 0) {
+        materialPuerto = materiales[0].materialPuerto;
+      }
+    }
+    return materialPuerto;
+  }
+
+  obtenerTkxLinea(lineaTurno) {
+
+    const linea = lineaTurno['controls'].tipoLineaEmbarque.value;
+    let tkInicialPlanilla = [];
+    const tkIniciales = this.tipoLineaProductoTk.filter(item => item.tipoLinea?.id == linea?.id);
+    if (tkIniciales != null || tkIniciales != undefined) {
+      if (tkIniciales.length > 0) {
+        tkInicialPlanilla = tkIniciales[0].tkInicial;
+      }
+    }
+
+    return tkInicialPlanilla;
+  }
   guardarObservacionesDeCalidad() {
     if (this.obsCalidadForm.controls.observaciones.value === '' || this.obsCalidadForm.controls.fecha.value === '' || this.obsCalidadForm.controls.hora.value === '')
       return;
@@ -660,47 +760,47 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   onLineaChange(result: any, dia: number, turno: number, index: number) {
     const lineaFiltro = this.lineas.filter(linea => linea.id == result.value.linea);
-    if (lineaFiltro.length > 0) {
-      const lineaSel = lineaFiltro[0];
-      const valueTk = lineaSel.tkInicial != null ? lineaSel.tkInicial : null;
-      const valueMaterialPuerto = lineaSel?.materialPuerto != null ? lineaSel?.materialPuerto : null;
 
       let controSel = this.getTurnoDetalles(dia, turno);
+      const lineaSeleccionada = result['controls'].tipoLineaEmbarque.value.linea;
 
-      controSel['controls'][index]['controls'].tk.setValue(valueTk);
-      controSel['controls'][index]['controls'].materialPuerto.setValue(valueMaterialPuerto);
-      controSel['controls'][index]['controls'].tk.setValue(valueTk);
+      console.log('lineaFiltro--->>')
+      console.log(result)
+      console.log(this.lineas)
+      console.log(lineaFiltro)
 
+      console.log('asignando.....')
+      console.log(lineaFiltro)
 
+      controSel['controls'][index]['controls'].linea.setValue(0)
       controSel['controls'][index]['controls'].temperatura.enable();
-      controSel['controls'][index]['controls'].tk.enable();
       controSel['controls'][index]['controls'].medidaInicialCM.enable();
       controSel['controls'][index]['controls'].medidaInicialMM.enable();
       controSel['controls'][index]['controls'].medidaFinalCM.enable();
       controSel['controls'][index]['controls'].medidaFinalMM.enable();
       controSel['controls'][index]['controls'].destino.enable();
-      const filtro = this.lineaDeEmbarque.filter(x => x.id == result.value.linea);
-      if (filtro != null || filtro != undefined) {
-        if (filtro.length > 0) {
-          if (filtro[0].linea == 'Vicentin') {
-            controSel['controls'][index]['controls'].temperatura.setValue(0);
-            controSel['controls'][index]['controls'].medidaInicialCM.setValue(0);
-            controSel['controls'][index]['controls'].medidaInicialMM.setValue(0);
-            controSel['controls'][index]['controls'].medidaFinalCM.setValue(0);
-            controSel['controls'][index]['controls'].medidaFinalMM.setValue(0);
-            controSel['controls'][index]['controls'].destino.setValue(0);
+      console.log(controSel)
+      if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
+        controSel['controls'][index]['controls'].materialPuerto.setValue(0);
+        controSel['controls'][index]['controls'].tk.setValue(0);
+        if (lineaSeleccionada == 'Vicentin') {
+          controSel['controls'][index]['controls'].temperatura.setValue(0);
+          controSel['controls'][index]['controls'].medidaInicialCM.setValue(0);
+          controSel['controls'][index]['controls'].medidaInicialMM.setValue(0);
+          controSel['controls'][index]['controls'].medidaFinalCM.setValue(0);
+          controSel['controls'][index]['controls'].medidaFinalMM.setValue(0);
+          controSel['controls'][index]['controls'].destino.setValue(0);
 
-            controSel['controls'][index]['controls'].temperatura.disable();
-            controSel['controls'][index]['controls'].tk.disable();
-            controSel['controls'][index]['controls'].medidaInicialCM.disable();
-            controSel['controls'][index]['controls'].medidaInicialMM.disable();
-            controSel['controls'][index]['controls'].medidaFinalCM.disable();
-            controSel['controls'][index]['controls'].medidaFinalMM.disable();
-            controSel['controls'][index]['controls'].destino.disable();
-          }
+          controSel['controls'][index]['controls'].temperatura.disable();
+          controSel['controls'][index]['controls'].medidaInicialCM.disable();
+          controSel['controls'][index]['controls'].medidaInicialMM.disable();
+          controSel['controls'][index]['controls'].medidaFinalCM.disable();
+          controSel['controls'][index]['controls'].medidaFinalMM.disable();
+          controSel['controls'][index]['controls'].destino.disable();
         }
       }
-    }
+
+    
   }
 
   agregarCorteLiquido(dia, turno) {
@@ -872,7 +972,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     return fg;
   }
-
+  compareFieldLineas(c1: any, c2: any) {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  }
   compareFields(c1: Exportador, c2: Exportador) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
@@ -890,15 +992,25 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
     }
     let destino = 0;
+    let tipoLineaEmbarque = null;
     if (line != null || line != undefined) {
       destino = line.destino?.id;
+      const linea_Id = line ? line.linea_Id : 0;
+      const filtro = this.lineaDeEmbarque.filter(x => x.id == linea_Id);
+      if (filtro != null || filtro != undefined) {
+        if (filtro.length > 0) {
+          tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
+        }
+      }
     }
+
     return this._builder.group({
       linea: [{ value: line ? line.linea_Id : '', disabled: false },],
+      tipoLineaEmbarque: [{ value: tipoLineaEmbarque, disabled: false },],
       exportador: [{ value: line ? line.exportador : '', disabled: false }],
       bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: false }],
       materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: false }],
-      tk: [{ value: line ? line.tk : '', disabled: guardado }],
+      tk: [{ value: line ? line.tk : '', disabled: false }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: guardado }],
       medidaInicialCM: [{ value: line ? line.medidaInicialCM : '', disabled: guardado }],
       medidaInicialMM: [{ value: line ? line.medidaInicialMM : '', disabled: guardado }],
@@ -994,7 +1106,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   getCantidadLinea(linea: any) {
+    
     let lineaTurno = linea?.controls;
+
     if (lineaTurno?.medidaInicialCM.value &&
       lineaTurno?.medidaInicialMM.value &&
       lineaTurno?.medidaFinalCM.value &&
@@ -1632,63 +1746,74 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
         const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle.value.destino)
         const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0] : 0
-        const lineaIdVal = turnoDetalle.value.linea;
-        const tkVal = turnoDetalle['controls'].tk.value;
+        
+        const tkInicial = turnoDetalle['controls'].tk.value;
         const bodegaParcelVal = turnoDetalle.value.bodegaParcel;
         const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
+        const exportadorVal = turnoDetalle['controls'].exportador.value;
+        const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
+        
+        const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque.id == tipoLineaEmbarqueVal?.id);
+        
+        if(lineaSeleccionada != null || lineaSeleccionada != undefined)
+           turnoDetalle['controls'].linea.setValue(lineaSeleccionada[0]?.id)
+        
+        const lineaIdVal = turnoDetalle.value.linea;
+        if ((lineaIdVal != null || lineaIdVal != undefined)) {
+          if ((lineaIdVal != '' || lineaIdVal != '0')) {
 
-
-        if (lineaIdVal != '' &&
-          tkVal != '' &&
-          bodegaParcelVal != '' &&
-          materialPuertoVal != '') {
-
-          let medidaFinalCM = 0;
-          let medidaFinalMM = 0;
-          let medidaInicialCM = 0;
-          let medidaInicialMM = 0;
-          let temperatura = 0;
-          let cantidad = 0;
-
-
-          console.log('turnoDetalle.value.medidaFinalCM-->>')
-          console.log(turnoDetalle.value.medidaFinalCM)
-
-          if (turnoDetalle.value.medidaFinalCM != null || turnoDetalle.value.medidaFinalCM != undefined )
-            medidaFinalCM = turnoDetalle.value.medidaFinalCM;
-
-          if (turnoDetalle.value.medidaFinalMM != null || turnoDetalle.value.medidaFinalMM != undefined )
-            medidaFinalMM = turnoDetalle.value.medidaFinalMM;
-
-          if (turnoDetalle.value.medidaInicialCM != null || turnoDetalle.value.medidaInicialCM != undefined )
-            medidaInicialCM = turnoDetalle.value.medidaInicialCM;
-
-          if (turnoDetalle.value.medidaInicialMM != null || turnoDetalle.value.medidaInicialMM != undefined )
-            medidaInicialMM = turnoDetalle.value.medidaInicialMM;
-
-          if (turnoDetalle.value.temperatura != null || turnoDetalle.value.temperatura != undefined )
-            temperatura = turnoDetalle.value.temperatura;
-
-          if (turnoDetalle.value.cantidad != null || turnoDetalle.value.cantidad != undefined )
-            cantidad = turnoDetalle.value.cantidad;
-
-          const objTurnosDetalles = {
-            bodegaParcel: turnoDetalle.value.bodegaParcel,
-            cantidad: cantidad,
-            destino: turnoDestinoVal,
-            exportador: turnoDetalle.value.exportador,
-            id: turnoDetalle.value.id,
-            linea_id: turnoDetalle.value.linea,
-            medidaFinalCM: medidaFinalCM,
-            medidaFinalMM: medidaFinalMM,
-            medidaInicialCM: medidaInicialCM,
-            medidaInicialMM: medidaInicialMM,
-            temperatura: temperatura,
-            MaterialPuerto: turnoDetalle['controls'].materialPuerto.value,
-            Tk: turnoDetalle['controls'].tk.value
+            let bPlanillaIncompleta: boolean = this.bValidaPlanillaOtrasLineas(turnoDetalle);
+            if (bPlanillaIncompleta) {
+              var mensaje = "No se ha completado todos los datos requeridos para guardar el turno.";
+              this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+              return;
+            }
+  
+            let medidaFinalCM = 0;
+            let medidaFinalMM = 0;
+            let medidaInicialCM = 0;
+            let medidaInicialMM = 0;
+            let temperatura = 0;
+            let cantidad = 0;
+  
+            if (turnoDetalle.value.medidaFinalCM != null || turnoDetalle.value.medidaFinalCM != undefined)
+              medidaFinalCM = turnoDetalle.value.medidaFinalCM;
+  
+            if (turnoDetalle.value.medidaFinalMM != null || turnoDetalle.value.medidaFinalMM != undefined)
+              medidaFinalMM = turnoDetalle.value.medidaFinalMM;
+  
+            if (turnoDetalle.value.medidaInicialCM != null || turnoDetalle.value.medidaInicialCM != undefined)
+              medidaInicialCM = turnoDetalle.value.medidaInicialCM;
+  
+            if (turnoDetalle.value.medidaInicialMM != null || turnoDetalle.value.medidaInicialMM != undefined)
+              medidaInicialMM = turnoDetalle.value.medidaInicialMM;
+  
+            if (turnoDetalle.value.temperatura != null || turnoDetalle.value.temperatura != undefined)
+              temperatura = turnoDetalle.value.temperatura;
+  
+            if (turnoDetalle.value.cantidad != null || turnoDetalle.value.cantidad != undefined)
+              cantidad = turnoDetalle.value.cantidad;
+  
+  
+            const objTurnosDetalles = {
+              bodegaParcel: bodegaParcelVal,
+              cantidad: cantidad,
+              destino: turnoDestinoVal,
+              exportador: exportadorVal,
+              id: turnoDetalle.value.id,
+              linea_id: turnoDetalle.value.linea,
+              medidaFinalCM: medidaFinalCM,
+              medidaFinalMM: medidaFinalMM,
+              medidaInicialCM: medidaInicialCM,
+              medidaInicialMM: medidaInicialMM,
+              temperatura: temperatura,
+              MaterialPuerto: materialPuertoVal,
+              Tk: tkInicial
+            }
+            moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
           }
-          moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
         }
+        
       }
 
       let planillaTurno = {
@@ -1700,7 +1825,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
         turnoPuerto: Turno.turnoPuerto['value'].turnoPuerto
       }
-     
+      console.log('grabar')
+      console.log(moduloDeCargaPlanillaDeTurnosDetallesLiquido)
+      console.log(moduloDeCargaPlanillaDeTurnosCortes)
+      
       if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
         var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.";
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
@@ -1710,8 +1838,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             else
               return;
           }).catch();
-
-      } 
+      }
       /*
       else if (planillaTurno.guardadoPorTablerista == true) {
         var texto = "El turno ya ha sido guardado anteriormente.";
@@ -1722,12 +1849,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             else
               return;
           }).catch();
-      }*/ 
+      }*/
       else {
         this.confirmationDialogService.confirm(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
           .then((confirmed) => {
             if (confirmed) {
-
+              this.bGrabandoTurnoActivo = false;
               this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
 
                 this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
@@ -1741,10 +1868,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
                     this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
                     this.fillPlanilla();
                     this.recargarGraficos.emit(true);
+                    this.bGrabandoTurnoActivo = true;
                   }
                 });
               }, error => {
                 console.log(error);
+                this.bGrabandoTurnoActivo = true;
                 this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "enviar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
               })
             }
@@ -1758,6 +1887,74 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       console.error(error);
     }
   };
+
+  private bValidaPlanillaOtrasLineas(turnoDetalle) {
+
+    let bPlanillaIncompleta: boolean = false;
+    console.log('bValidaPlanillaOtrasLineas-->>')
+    console.log(turnoDetalle)
+    console.log(this.lineaDeEmbarque)
+
+    const lineaSeleccionada = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
+    console.log(lineaSeleccionada)
+
+    if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
+      const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle.value.destino)
+      const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0].id : 0
+      const lineaIdVal = turnoDetalle.value.linea;
+      const tkVal = turnoDetalle['controls'].tk.value;
+      const bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
+      const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value.id;
+      const exportadorVal = turnoDetalle['controls'].exportador.value.id;
+      let medidaFinalCM = '';
+      let medidaFinalMM = '';
+      let medidaInicialCM = '';
+      let medidaInicialMM = '';
+      let temperatura = '';
+
+      if (turnoDetalle.value.medidaFinalCM != null || turnoDetalle.value.medidaFinalCM != undefined)
+        medidaFinalCM = turnoDetalle.value.medidaFinalCM;
+
+      if (turnoDetalle.value.medidaFinalMM != null || turnoDetalle.value.medidaFinalMM != undefined)
+        medidaFinalMM = turnoDetalle.value.medidaFinalMM;
+
+      if (turnoDetalle.value.medidaInicialCM != null || turnoDetalle.value.medidaInicialCM != undefined)
+        medidaInicialCM = turnoDetalle.value.medidaInicialCM;
+
+      if (turnoDetalle.value.medidaInicialMM != null || turnoDetalle.value.medidaInicialMM != undefined)
+        medidaInicialMM = turnoDetalle.value.medidaInicialMM;
+
+      if (turnoDetalle.value.temperatura != null || turnoDetalle.value.temperatura != undefined)
+        temperatura = turnoDetalle.value.temperatura;
+     
+      if (lineaSeleccionada != 'Vicentin') {
+        if (turnoDestinoVal == '0' ||
+          (tkVal == '' || tkVal == '0') ||
+          (bodegaParcelVal == '' || bodegaParcelVal == '0') ||
+          (materialPuertoVal == '' || materialPuertoVal == '0') ||
+          (exportadorVal == '' || exportadorVal == '0') ||
+          (medidaFinalCM == '' || medidaFinalCM == '0') ||
+          (medidaFinalMM == '' || medidaFinalMM == '0') ||
+          (medidaInicialCM == '' || medidaInicialCM == '0') ||
+          (medidaInicialMM == '' || medidaInicialMM == '0') ||
+          (temperatura == '' || temperatura == '0')) {
+          console.log('No es Vicentin')
+          bPlanillaIncompleta = true;
+        }
+      }
+
+      if (lineaSeleccionada == 'Vicentin') {
+        if ((bodegaParcelVal == '' || bodegaParcelVal == '0') ||
+          (exportadorVal == '' || exportadorVal == '0') ||
+          (materialPuertoVal == '' || materialPuertoVal == '0')){
+          console.log('Es Vicentin')
+          bPlanillaIncompleta = true;
+        }
+      }
+    }
+
+    return bPlanillaIncompleta;
+  }
 
   private enviarRecibidores() {
     const embarque_id = this.procesoService.getEmbarqueSelected().id;

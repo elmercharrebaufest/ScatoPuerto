@@ -143,4 +143,9 @@ export class ModuloDeCargaService {
   eliminarObservacionDeCalidad( observacion_id: number ){
     return this.http.post(`${this.url}ModuloDeCarga/EliminarObservacionDeCalidad?observacion_id=${observacion_id}`, { 'withCredentials': true });
   }
+
+  listarTipoLineaEmbarque() {
+    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials' : true});
+  }
+
 }

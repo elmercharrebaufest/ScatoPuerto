@@ -779,5 +779,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ListarTipoLineaEmbarque")]
+        public HttpResponseMessage ListarTipoLineaEmbarque()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarTipoLineaEmbarque());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
     }
 }
