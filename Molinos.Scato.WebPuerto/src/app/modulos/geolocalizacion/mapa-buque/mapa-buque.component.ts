@@ -21,6 +21,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   private zoom = 8;
   private map!: L.Map;
   private iconoBuque!: L.Icon;
+  private iconoBuqueSeleccionado!: L.Icon;
   private iconoAncla!: L.Icon;
   private iconoUbicacion!: L.Icon;
   private markadorAncla!: L.Marker;
@@ -54,7 +55,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     await this.cargarPuntosInteres();
     await this.cargarBuquesMapa();
     this.map.on('zoomend', this.onMapZoomEnd.bind(this));
-    this.mostrarBuqueSeleccionado();
+ 
   }
   public ngOnDestroy(): void {
     this.puntosInteresSubject$.unsubscribe();
@@ -100,6 +101,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   }
 
   private async mostrarBuqueSeleccionado() {
+    console.log("mostrarBuqueSeleccionado");
     let embarqueSeleccionado;
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuqueSeleccionado().subscribe((data) => {
       embarqueSeleccionado = data;
@@ -108,14 +110,24 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
           const embarque = embarqueSeleccionado[0];
           const latitud = embarque.posicion.latitud;
           const longitud = embarque.posicion.longitud;
-          this.map.setView([latitud, longitud], 13);
+         this.map.setView([latitud, longitud], 9);
+
+         this.modificarIconoSeleccionado(latitud, longitud);
+
         }
+        else
+{ 
+  this.cargarPosicionPorDefectoMapa();
+}
+
       } else {
         // sino hay buque seleccionado muestra por defecto la vista general del map
-        this.cargarPosicionPorDefectoMapa();
+       this.cargarPosicionPorDefectoMapa();
       }
     });
   }
+
+
 
   public async cargarPuntosInteres() {
     let layerAncla = new L.LayerGroup();
@@ -370,12 +382,13 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   }
 
   private async agregarEmbarque() {
+    console.log("agregarEmbarque");
     this.workflowService.obtenerListado().subscribe(
       data => this.listadoEmbarques = data,
       err => console.log(err),
       () => {
               this.crearTarjetaBuque();
-              this.cargarPosicionPorDefectoMapa();
+              this.mostrarBuqueSeleccionado();
             }
     );
   }
@@ -396,7 +409,9 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
         let buqueIconUrl = '';
 
-        if (buque.sanBenito) buqueIconUrl = './assets/buque_san_benito.svg';
+       if (buque.sanBenito) buqueIconUrl = './assets/buque_san_benito.svg';
+
+     // if (buque.sanBenito) buqueIconUrl = './assets/buque_san_benito.gif';
 
         if (buque.vicentin) buqueIconUrl = './assets/buque_vicentin.svg';
 
@@ -499,6 +514,46 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     const latitud = event.latitud;
     const longitud = event.longitud;
     this.map.setView([latitud, longitud], 12);
+    this.modificarIconoSeleccionado(latitud, longitud);
+   
+
+  }
+
+  private modificarIconoSeleccionado(latitud?: any, longitud?: any)
+  {
+    this.map.eachLayer((layer) => {
+      if ((layer instanceof L.Marker)) {
+        if(layer.getLatLng().lat==latitud && layer.getLatLng().lng == longitud)
+        {
+          var nombreIcono = layer.getIcon().options.iconUrl;
+          this.iconoBuqueSeleccionado = new L.Icon({
+            //iconUrl: './assets/buque_san_benito.gif',
+            iconUrl:nombreIcono.replace(".svg","_seleccionado.gif"),
+            iconSize: [32, 37]
+          });
+
+       layer.getIcon().remove;
+       layer.setIcon(this.iconoBuqueSeleccionado);
+
+        }
+        else
+        {
+          var nombreIcono = layer.getIcon().options.iconUrl;
+          if(nombreIcono.includes("_Seleccionado.gif"))
+            {
+              this.iconoBuqueSeleccionado = new L.Icon({
+                // iconUrl: './assets/buque_san_benito.gif',
+                iconUrl:nombreIcono.replace("_Seleccionado.gif",".svg"),
+                 iconSize: [32, 37]
+               });
+ 
+            layer.getIcon().remove;
+            layer.setIcon(this.iconoBuqueSeleccionado);
+     
+            }
+        }
+      }
+    });
   }
   private onMapZoomEnd(map: L.Map): void {
     /*
