@@ -9,7 +9,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public string Exportador { get; set; }
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
         public string PuertoDestino { get; set; }
         public DateTime FechaRecibo { get; set; }
         public string PuertoOrigen { get; set; }
@@ -20,5 +20,7 @@ namespace Molinos.Scato.Dominio.Dto
         public bool IncluirImpresionDestino { get; set; }
         public bool IncluirImpresionCalidad { get; set; }
         public bool IncluirImpresionEstibado { get; set; }
+        public bool esEuropeo { get; set; }
+        public bool valorEnKG { get; set; }
     }
 }

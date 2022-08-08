@@ -3,7 +3,7 @@
 	[Id] INT IDENTITY (1, 1) NOT NULL,
     [ReciboDeBuque_Id] INT NOT NULL, 
     [Exportador] NVARCHAR(50) NOT NULL, 
-    [Cantidad] INT NOT NULL, 
+    [Cantidad] DECIMAL(10, 3) NOT NULL, 
     [PuertoDestino] NVARCHAR(50) NULL, 
     [FechaRecibo] DATETIME NOT NULL, 
     [PuertoOrigen] NVARCHAR(50) NOT NULL, 
@@ -15,6 +15,8 @@
     [IncluirImpresionCalidad] BIT NOT NULL DEFAULT 1, 
     [IncluirImpresionEstibado] BIT NOT NULL DEFAULT 1,
 
+    [esEuropeo] BIT NOT NULL DEFAULT 1, 
+    [valorEnKG] BIT NOT NULL DEFAULT 1, 
     CONSTRAINT [PK_dbo.ReciboDeBuqueDetalles] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.Embarque_dbo.ReciboDeBuque_ReciboDeBuque_Id] FOREIGN KEY ([ReciboDeBuque_Id]) REFERENCES [dbo].[ReciboDeBuque] ([Id]),
 
