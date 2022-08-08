@@ -539,11 +539,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         else
         {
           var nombreIcono = layer.getIcon().options.iconUrl;
-          if(nombreIcono.includes("_Seleccionado.gif"))
+          if(nombreIcono.includes("_seleccionado.gif"))
             {
               this.iconoBuqueSeleccionado = new L.Icon({
                 // iconUrl: './assets/buque_san_benito.gif',
-                iconUrl:nombreIcono.replace("_Seleccionado.gif",".svg"),
+                iconUrl:nombreIcono.replace("_seleccionado.gif",".svg"),
                  iconSize: [32, 37]
                });
  
