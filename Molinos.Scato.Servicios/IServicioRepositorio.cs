@@ -2674,6 +2674,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque();
 
+        [OperationContract]
+        void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle);
+
+
 		[OperationContract]
         void GuardarArchivos(List<ArchivosPuertoDto> archivosPuertoDto, int idEmbarque);
         
@@ -2685,6 +2689,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion);
+        
         
     }
 }

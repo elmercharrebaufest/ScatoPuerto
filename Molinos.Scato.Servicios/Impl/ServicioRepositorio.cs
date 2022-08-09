@@ -10895,6 +10895,12 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
         }
+        public void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
+        {
+            ModuloDeCargaPlanillaDeTurnosDetallesLiquido planillaDeTurnosDetallesLiquido = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(x => x.Id == idModuloDeCargaPlanillaDetalle);
+            repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(planillaDeTurnosDetallesLiquido);
+            repositorio.GuardarCambios();
+        }
 
 
         public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)

@@ -200,8 +200,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
-
-
+        }
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido")]
+        public HttpResponseMessage EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
+        {
+            try
+            {
+                servicio.EliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpPost]
@@ -352,6 +365,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
+
                 comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado});
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

@@ -110,7 +110,7 @@ export class LineasComponent implements OnInit, OnChanges {
     });
     this.formInitialValues = this.lineasDeEmbarqueForm.getRawValue();
   }
-  private obtenerTipoLineaEmbarque(){
+  private obtenerTipoLineaEmbarque() {
     this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
       this.tipoLineaEmbarque = res;
     });
@@ -301,7 +301,7 @@ export class LineasComponent implements OnInit, OnChanges {
     return this.formBuilder.group({
       id: x?.id ?? "",
       linea: [{ value: x?.linea ?? "", disabled: deshabilitar }],
-      tipoLineaEmbarque:[{ value: x?.tipoLineaEmbarque ?? "", disabled: deshabilitar }],
+      tipoLineaEmbarque: [{ value: x?.tipoLineaEmbarque ?? "", disabled: deshabilitar }],
       tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar }],
       materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar }],
       temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: deshabilitar }],
@@ -326,9 +326,9 @@ export class LineasComponent implements OnInit, OnChanges {
     this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
 
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-      
+
       this.moduloDeCarga = resp;
-      
+
       if (this.moduloDeCarga.moduloDeCargaLineasDeEmbarque && this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.length > 0) {
         this.lineasEmbarque.clear();
         this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.forEach((x, index) => {
@@ -420,8 +420,59 @@ export class LineasComponent implements OnInit, OnChanges {
       });
   }
 
+  private validarLineasDuplicadas() {
+    
+    const lineasEmbarque = this.obtenerLineasEmbarque();
+    let bValidarDuplicadas: boolean = false;
+    let filtroLineas = [];
+
+    lineasEmbarque.forEach(function (item) {
+      console.log('filtroLineas...>>')
+      console.log(filtroLineas)
+      if (filtroLineas.length == 0) {
+        filtroLineas.push({
+          idTipoLinea: item.tipoLineaEmbarque.id,
+          idMaterial: item.materialPuerto.id,
+          tkInicial: item.tkInicial,
+          cantidad: 0
+        });
+      } else {
+        const linea = filtroLineas.findIndex(x => x.idTipoLinea == item.tipoLineaEmbarque.id &&
+          x.idMaterial == item.materialPuerto.id &&
+          x.tkInicial == item.tkInicial);
+        if (linea <= -1) {
+          filtroLineas.push({
+            idTipoLinea: item.tipoLineaEmbarque.id,
+            idMaterial: item.materialPuerto.id,
+            tkInicial: item.tkInicial,
+            cantidad: 0
+          });
+        }
+      }
+    });
+    filtroLineas.forEach(filtro =>{
+      const selLinea = lineasEmbarque.filter(item =>{
+        return (filtro.idTipoLinea == item.tipoLineaEmbarque.id &&
+                filtro.idMaterial == item.materialPuerto.id &&
+                filtro.tkInicial == item.tkInicial)
+
+      });
+      filtro.cantidad = selLinea.length;
+    })
+    const cantidadLineas =  filtroLineas.filter(linea => {return linea.cantidad > 1 });
+    if (cantidadLineas.length > 0) 
+      bValidarDuplicadas = true;
+    return bValidarDuplicadas;
+  }
   onGuardar() {
     if (this.esCalidad) return;
+    const bValidarDuplicadas = this.validarLineasDuplicadas();
+    if (bValidarDuplicadas){
+      const mensaje = "No se puede guardar, debido a que existe un tipo de linea, producto y tanque duplicado en la conformacion de lineas de embarque.";
+      this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
     this.esGuardadoActivo = false;
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
@@ -436,7 +487,7 @@ export class LineasComponent implements OnInit, OnChanges {
     });
     if (erroresLinea) {
       var texto = "No se puede guardar, debido a que no se han completado la información para el registro de linea.";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
           this.esGuardadoActivo = true;
           if (confirmed)
@@ -448,13 +499,14 @@ export class LineasComponent implements OnInit, OnChanges {
 
       console.log('this.obtenerLineasEmbarque()---->>>');
       console.log(this.obtenerLineasEmbarque());
-      
+
       this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe(res => {
         let texto = "Se guardaron las lineas de embarque correctamente";
         this.esGuardadoActivo = true;
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
         this.creaFormLineasEmbarque();
         this.cargarDatosLineas();
+        this.moduloCargaService.actualizarPlanillaLiquido = true;
       });
     }
   }

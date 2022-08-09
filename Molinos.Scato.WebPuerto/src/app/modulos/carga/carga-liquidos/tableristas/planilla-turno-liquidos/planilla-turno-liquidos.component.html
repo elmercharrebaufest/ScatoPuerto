@@ -35,6 +35,7 @@
                             <th class="header-fijo">Med.fin. MM</th>
                             <th class="header-fijo">Destino</th>
                             <th class="header-fijo" width="5%">Cant.</th>
+                            <th class="header-fijo" width="5%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,6 +163,15 @@
                                                         </select>
                                                     </td>
                                                     <td><input type="number" formControlName='cantidad' class='planilla-text-derecha'></td>
+                                                    <td>
+                                                        <div fxFlex='2' class='full-left' *ngIf='i == 0 && !turno.value.guardadoPorTablerista' >
+                                                            <img src="assets/Mas.svg" class="adicionar" (click)="onAgregarDetalleTurno(turno, d)"  alt="Añadir Detalle">
+                                                        </div>
+                                                        <div fxFlex='2' class='full-right'  *ngIf="!turno.value.guardadoPorTablerista">
+                                                            <img src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarDetalleTurno(result)" alt="Eliminar Detalle">
+                                                        </div>
+                                                    </td>
+
                                                 </tr>
                                             </ng-container>
                                         </ng-container>
