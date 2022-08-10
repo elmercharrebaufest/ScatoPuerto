@@ -12,6 +12,8 @@ namespace Molinos.Scato.Dominio.Dto
         public string Archivo { get; set; }
         public DateTime Fecha { get; set; }
         public int Embarque_id { get; set; }
+        public int Size { get; set; }
+        public string Extension { get; set; }
         public TipoArchivoPuertoDto TipoArchivoPuerto { get; set; }
     }
 }
