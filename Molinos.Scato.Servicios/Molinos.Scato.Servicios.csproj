@@ -270,6 +270,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\SentidoManoDeEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoArchivoPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDeBuquePuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TipoLineaEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TurnoPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\UbicacionDeBuquePuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VaporMappingProfile.cs" />

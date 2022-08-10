@@ -10891,6 +10891,24 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
 
+        public IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque()
+        {
+            return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
+        }
+        public void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
+        {
+            ModuloDeCargaPlanillaDeTurnosDetallesLiquido planillaDeTurnosDetallesLiquido = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(x => x.Id == idModuloDeCargaPlanillaDetalle);
+            repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(planillaDeTurnosDetallesLiquido);
+            repositorio.GuardarCambios();
+        }
+        public void EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte)
+        {
+            ModuloDeCargaPlanillaDeTurnosCortes planillaDeTurnosCortes = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.Id == idModuloDeCargaPlanillaCorte);
+            repositorio.Remover<ModuloDeCargaPlanillaDeTurnosCortes>(planillaDeTurnosCortes);
+            repositorio.GuardarCambios();
+        }
+
+
         public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
             //Me traigo el embarque
@@ -10959,15 +10977,6 @@ namespace Molinos.Scato.Servicios.Impl
             return TipoArchivos;
         }
 
-        public bool eliminarArchivos(int[] filesIds)
-        {
-            foreach (var id in filesIds)
-            {
-                ArchivosPuerto archivosPuerto = repositorio.Obtener<ArchivosPuerto>(x => x.Id == id);
-                repositorio.Remover(archivosPuerto);
-            }
-            return true;
-        }
         public void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion)
         {
             try
