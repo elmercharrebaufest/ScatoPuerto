@@ -2672,11 +2672,13 @@ namespace Molinos.Scato.Servicios
         IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque);
 
         [OperationContract]
-        void GuardarArchivos(List<ArchivosPuertoDto> archivosPuertoDto);
+        void GuardarArchivos(List<ArchivosPuertoDto> archivosPuertoDto, int idEmbarque);
         [OperationContract]
         IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque);
+
         [OperationContract]
         IList<TipoArchivoPuertoDto> obtenerTipoArchivos();
+
         [OperationContract]
         bool eliminarArchivos(int[] filesIds);
         [OperationContract]

@@ -383,11 +383,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/Embarque/GuardarArchivos")]
-        public HttpResponseMessage GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto)
+        public HttpResponseMessage GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
             try
             {
-                servicio.GuardarArchivos(archivosPuerto);
+                servicio.GuardarArchivos(archivosPuerto, idEmbarque);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

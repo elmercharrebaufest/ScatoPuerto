@@ -10891,37 +10891,62 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
 
-        public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto)
+        public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
+            //Me traigo el embarque
+            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque);
+
+            //Me traigo todos los archivos que tengo en la DB que corresponden a ese Embarque.
+            var archivosPuertoDB = repositorio.Listar<ArchivosPuerto>(x => x.Embarque.Id == idEmbarque);
+
+            //Recorro todos los archivos que tengo guardados en la base de datos que correspondan a ese Embarque.
+            foreach (var archivo in archivosPuertoDB)
+            {
+                //Me fijo si el archivo está en la lista que voy a guardar.
+                bool archivoBorrado = archivosPuerto.FindAll(x => x.Id == archivo.Id).Count == 0;
+
+                //En caso de no estar, lo elimino de la base de datos.
+                if (archivoBorrado)
+                {
+                    repositorio.Remover(archivo);
+                }
+            }
+
+            //Recorro todos los archivos a guardar
             foreach (var archivo in archivosPuerto)
             {
+                //Me traigo el archivo de la DB.
                 ArchivosPuerto archivoPuertoDB = repositorio.Obtener<ArchivosPuerto>(x => x.Id == archivo.Id);
-                Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == archivo.Embarque_id);
+
+                //En caso de que exista piso su data.
                 if (archivoPuertoDB != null)
                 {
                     archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
                     archivoPuertoDB.Archivo = archivo.Archivo;
                     archivoPuertoDB.Fecha = archivo.Fecha;
-                    archivoPuertoDB.Id = archivo.TipoDeArchivoPuertoDto.Id;
                 }
+                //Si no existe lo agrego a la DB.
                 else
                 {
+                    TipoArchivoPuerto tipoArchivoPuertoDB = repositorio.Obtener<TipoArchivoPuerto>(x => x.Id == archivo.TipoArchivoPuerto.Id);
                     archivoPuertoDB = new ArchivosPuerto()
                     {
-                        TipoArchivoPuerto_Id = archivo.TipoDeArchivoPuertoDto.Id,
+                        TipoArchivoPuerto = tipoArchivoPuertoDB,
                         Embarque = embarque,
                         NombreArchivo = archivo.NombreArchivo,
                         Archivo = archivo.Archivo,
                         Fecha = archivo.Fecha
                     };
+                    //Guardo toda la data en la DB.
+                    repositorio.Agregar(archivoPuertoDB);
                 }
-                repositorio.Agregar(archivoPuertoDB);
             }
             repositorio.GuardarCambios();
         }
         public IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque)
         {
-            return Listar<ArchivosPuerto, ArchivosPuertoDto>(x => x.Embarque.Id == idEmbarque);
+            var archivosPuerto = Listar<ArchivosPuerto, ArchivosPuertoDto>(x => x.Embarque.Id == idEmbarque);
+            return archivosPuerto;
         }
 
         public IList<TipoArchivoPuertoDto> obtenerTipoArchivos()

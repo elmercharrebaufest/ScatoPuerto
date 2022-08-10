@@ -24,6 +24,7 @@ import { LineUp } from '@ScatoModels/lineUp';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { DomSanitizer } from '@angular/platform-browser';
 import { FormGroup } from '@angular/forms';
 import { textChangeRangeIsUnchanged } from 'typescript';
 @Component({
@@ -49,22 +50,22 @@ export class LineupEmbarqueComponent implements OnInit {
   posicionesDeLineUps: number[];
   embarquesPuerto: InstanciaWorkflowPuerto[];
   hayBuque = true;
-  ListTipoArchivoPuerto: TipoArchivoPuerto[];
-  ArchivosPuertoDb: ArchivoPuerto[];
-  ArchivosPuerto: ArchivoPuerto[];
-  ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
-  formArchivos: FormGroup;
-  @ViewChild('input_file')
-  FileInput: ElementRef;
+
+
+  imagePath: any;
+  ListTipoArchivoPuerto: TipoArchivoPuerto[];
+  ArchivosPuerto: ArchivoPuerto[];
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
   fileToUpload: any | null = null;
+
   colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
   constructor(
+    private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
     private workflowService: WorkflowService,
     private router: Router,
@@ -370,82 +371,141 @@ export class LineupEmbarqueComponent implements OnInit {
 
   openModalFiles(Modal: any){
     //embarqueid 
-    this.ListFilesToErase = null;
-
-     this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(res => this.ArchivosPuertoDb = res); 
+    this.initializeModalArchivos();
+     this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(
+        res => this.ArchivosPuerto = res)
+      ; 
      this.embarqueService.obtenerTipoArchivos().subscribe(res => {
       this.TipoArchivosDbList = res
     }); 
     
     this._modalService.open(Modal);
   }
+
+  downloadFile(file: ArchivoPuerto){
+    //Me fijo si el archivo a descargar es de alguno de los siguientes formatos.
+    if(file.archivo.includes("data:image") || file.archivo.includes("openxmlformats") || file.archivo.includes("data:application/pdf") || file.archivo.includes("text/plain")){
+      const linkSource = file.archivo;
+      const downloadLink = document.createElement("a");
+      downloadLink.href = linkSource;
+      downloadLink.download = file.nombreArchivo;
+      downloadLink.click();
+    //En caso de no ser, le aviso que no se puede descargar.
+    }else{
+      this.confirmationDialogService.confirm('¡Atención!', "El archivo tiene un formato inválido para la acción que desea realizar.", 'Aceptar', '', null, null, Tipoalerta.Warning)
+    }    
+  }
+  
+  previewFile(Modal: any, file: ArchivoPuerto){
+    if(file.archivo.includes("data:image")){
+      this.convertB64ToImg(file);
+      this._modalService.open(Modal);
+    }else if(file.archivo.includes("data:application/pdf")){      
+      let pdfWindow = window.open("");
+      pdfWindow.document.write(
+      "<iframe width='100%' height='100%' src='" +
+      encodeURI(file.archivo) + "'></iframe>"
+      )      
+    }else{
+      this.confirmationDialogService.confirm('¡Atención!', "El tipo de archivo no se puede mostrar", 'Aceptar', '', null, null, Tipoalerta.Warning)
+    }    
+  }
+    
+  convertB64ToImg(file: ArchivoPuerto) {
+    this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl(file.archivo);
+  }
+
+  initializeModalArchivos(){
+    this.nombreArchivo = null;
+  }
     
   guardarArchivos(){
 
     this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los cambios?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
     .then((confirmed) => {
-      // this.embarqueService.eliminarArchivos(this.ListFilesToErase).subscribe(res => {
-      // });
       if (confirmed) {
-        //Borro archivos 
-        this.eliminarArchivo2s();
+        this.embarqueService.guardarArchivos(this.instanciaWorkflow.embarque.id, this.ArchivosPuerto).subscribe(res => {
+          this._modalService.dismissAll();
+        })          
       }
     })
   }
 
-  eliminarArchivo2s(){
-    //Primero me fijo si al guardar hay archivos para eliminar.
-    if (this.ListFilesToErase.length > 0) {
-      //   this.embarqueService.eliminarArchivos(this.ListFilesToErase).subscribe(res => {
-      // });
-    }  
-    this.ListFilesToErase = null;
-  }
 
-  eliminarArchivos(reg: ArchivoPuerto){
-    if(reg.id > 0){
-      this.ListFilesToErase = this.ListFilesToErase || [];
-      this.ListFilesToErase.push(reg);
-  
-      this.ArchivosPuertoDb.forEach((element,index)=>{
-        if(element.id ==reg.id) this.ArchivosPuertoDb.splice(index,1);
-     }); 
-      
+  eliminarArchivo(reg: ArchivoPuerto){
+    if(reg.id > 0){  
+      this.ArchivosPuerto.forEach((element,index)=>{
+        if(element.id ==reg.id) this.ArchivosPuerto.splice(index,1);
+     });
+    } else{
+      this.ArchivosPuerto.forEach((element,index)=>{
+        if(element.nombreArchivo ==reg.nombreArchivo) this.ArchivosPuerto.splice(index,1);
+     });
     }
   }
 
   handleFileInput(files: any) {
     this.fileToUpload = files.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(this.fileToUpload);
+    reader.onload = () => {
+        console.log(reader.result);
+    };
 }
 
 addFileToSave(){
-    let fileToAdd = new ArchivoPuerto;
-    // fileToAdd.NombreArchivo = files.item(0).name;
-    fileToAdd.fecha = new Date;
-    //fileToAdd.Usuario_Id
-    fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
-    if(this.fileToUpload != null){
-      fileToAdd.nombreArchivo = this.fileToUpload.name 
+  if(this.fileToUpload == null){
+    this.confirmationDialogService.confirm('Atención','No has seleccionado ningún archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    return;
+  }
+
+  if(!this.nombreArchivo[0] || this.nombreArchivo[0].tipoArchivo == undefined || this.nombreArchivo[0].tipoArchivo == ""){
+    this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+    return;
+  }
+  
+  if (this.fileToUpload.name  == "" ){
+    this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+    return;
+  }
+
+  if(this.fileToUpload.size >= 5000000){  
+    this.confirmationDialogService.confirm('Atención','El tamaño del archivo debe ser menor a 5MB.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    return;
+  }    
+
+  
+  const reader = new FileReader();
+  reader.readAsDataURL(this.fileToUpload);
+  reader.onload = () => {
+    var file = reader.result.toString(); 
+      if(file.includes("data:image") || file.includes("openxmlformats") || file.includes("data:application/pdf") || file.includes("text/plain")){
+
+        let fileToAdd = new ArchivoPuerto;
+
+        fileToAdd.archivo = file;
+        fileToAdd.fecha = new Date;
+        fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
+        fileToAdd.nombreArchivo = this.fileToUpload.name        
+        fileToAdd.tipoArchivoPuerto = this.nombreArchivo[0];
+        fileToAdd.id = 0;
+
+        this.ArchivosPuerto.push(fileToAdd);
+        this.ArchivosPuerto = this.ArchivosPuerto.sort((a,b) => a.id - b.id)
+        this.nombreArchivo = null;
+        this.fileToUpload = null
+  
     }else{
-      fileToAdd.nombreArchivo = "";
+      //Salgo y no lo dejo agregar 
+      this.confirmationDialogService.confirm('Atención','El archivo tiene un formato inválido.', 'Cerrar', '', null, null, Tipoalerta.Warning);
     }
-    fileToAdd.tipoArchivoPuerto = this.nombreArchivo;
-    fileToAdd.id = 0;
-    // fileToAdd.TipoArchivoPuerto = this.TipoArchivosDbList ;
-    this.ArchivosPuerto = this.ArchivosPuerto || [];
+  }
     
     //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
     //Primero valido que esté toda la data necesaria completa
-    if (fileToAdd.nombreArchivo != "" || this.nombreArchivo.TipoArchivo == ""){ //Falta validar el fileToAdd.Archivo
-      this.ArchivosPuertoDb.push(fileToAdd);
-      this.ArchivosPuertoDb = this.ArchivosPuertoDb.sort((a,b) => a.id - b.id)
-      this.nombreArchivo.Id = 0;
-      this.nombreArchivo.TipoArchivo = "";
-      this.fileToUpload = null
-    }else{
-      this.confirmationDialogService.confirm('Atención','Deberás completar todos los campos para agregar el archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-    }
+   
 }
+
 
 }
 
