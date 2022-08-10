@@ -827,9 +827,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     f_hasta.setHours(hasta[0], hasta[1], 0, 0);
 
     total.setHours(f_hasta.getHours() - f_desde.getHours(), f_hasta.getMinutes() - f_desde.getMinutes(), 0, 0);
-
-    if (total.getHours())
-      this.formCorte.get('tiempoTotal').setValue(`${total.getHours() < 10 ? '0' + total.getHours() : total.getHours()}:${total.getMinutes() < 10 ? '0' + total.getMinutes() : total.getMinutes()}`)
+    this.formCorte.get('tiempoTotal').setValue(`${total.getHours() < 10 ? '0' + total.getHours() : total.getHours()}:${total.getMinutes() < 10 ? '0' + total.getMinutes() : total.getMinutes()}`)
   }
 
   getRowSpan(dia: any) {
@@ -1712,7 +1710,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     console.log('Antes y despues Turno')
     console.log(planillaTurno)
     planillaTurno.fecha = new Date();
-    this.asignarFechaHoraTurno(planillaTurno);
+    //this.asignarFechaHoraTurno(planillaTurno);
     console.log(planillaTurno)
     this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
@@ -1970,8 +1968,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const idModuloDeCargaPlanillaCorte = corte['controls']?.id?.value == undefined ? 0 : corte['controls']?.id?.value;
     console.log(corte['controls'])
     if (idModuloDeCargaPlanillaCorte > 0) {
-      const mensaje = "¿Esta seguro que desea eliminar el detalle del corte seleccionado?";
-      this.confirmationDialogService.confirm("Eliminar detalle del corte", mensaje, "Aceptar", "Cancelar")
+      const mensaje = "¿Esta seguro que desea eliminar el corte seleccionado?";
+      this.confirmationDialogService.confirm("Eliminar corte", mensaje, "Aceptar", "Cancelar")
         .then((confirmed) => {
           if (confirmed) {
             this.moduloCargaService.eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte).subscribe(res => {

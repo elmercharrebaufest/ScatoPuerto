@@ -5,6 +5,7 @@
 }
 .tabla-fila-corte{
     background-color: #F4F4F4;
+    height: 35px !important;
 }
 .tabla-fila-corte-boton{
     height: 55px;
@@ -13,7 +14,6 @@
 .center-bt{
     margin: auto !important;
 }
-
 .column-center{
     display: flex;
     flex-direction: column;
@@ -75,6 +75,11 @@ select { margin: 0; height: 30px;}
 .agrupador_botones{
     display: flex;
     justify-content: inline-flex;
+}
+.celda-elimina-corte{
+    justify-content: flex-start;    
+    align-items: center;
+    text-align: center;
 }
 .full-right{
     display: flex;

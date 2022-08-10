@@ -21,21 +21,21 @@
                 <table class='table table-bordered turnos'>
                     <thead class="header-fijo">
                         <tr>
-                            <th class="header-fijo">Día</th>
-                            <th class="header-fijo">Turno</th>
-                            <th class="header-fijo" width="12%">Exportador</th>
-                            <th class="header-fijo">Destino</th>
-                            <th class="header-fijo" width="7%">Partida</th>
-                            <th class="header-fijo">Línea</th>
-                            <th class="header-fijo" width="12%">Producto</th>
-                            <th class="header-fijo" width="4%">Tk</th>
-                            <th class="header-fijo" width="4%">°C</th>
-                            <th class="header-fijo">Med.Ini. CM</th>
-                            <th class="header-fijo">Med.Ini. MM</th>
-                            <th class="header-fijo">Med.fin. CM</th>
-                            <th class="header-fijo">Med.fin. MM</th>
-                            <th class="header-fijo" width="5%">Cant.</th>
-                            <th class="header-fijo" width="4%"></th>
+                            <th class="header-fijo tabla-border-resaltado">Día</th>
+                            <th class="header-fijo tabla-border-resaltado">Turno</th>
+                            <th class="header-fijo tabla-border-resaltado" width="12%">Exportador</th>
+                            <th class="header-fijo tabla-border-resaltado">Destino</th>
+                            <th class="header-fijo tabla-border-resaltado" width="7%">Partida</th>
+                            <th class="header-fijo tabla-border-resaltado">Línea</th>
+                            <th class="header-fijo tabla-border-resaltado" width="12%">Producto</th>
+                            <th class="header-fijo tabla-border-resaltado" width="4%">Tk</th>
+                            <th class="header-fijo tabla-border-resaltado" width="4%">°C</th>
+                            <th class="header-fijo tabla-border-resaltado">Med.Ini. CM</th>
+                            <th class="header-fijo tabla-border-resaltado">Med.Ini. MM</th>
+                            <th class="header-fijo tabla-border-resaltado">Med.fin. CM</th>
+                            <th class="header-fijo tabla-border-resaltado">Med.fin. MM</th>
+                            <th class="header-fijo tabla-border-resaltado" width="5%">Cant.</th>
+                            <th class="header-fijo tabla-border-resaltado" width="4%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -221,7 +221,7 @@
                                                             <th colspan="1">Fin</th>
                                                             <th colspan="1">Tiempo total</th>
                                                             <th colspan="4">Observaciones</th>
-                                                            <th colspan="1"></th>
+                                                            <th colspan="1" width="5%"></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -247,11 +247,11 @@
                                                                     <td colspan="4">
                                                                         {{corte.controls.observaciones.value}}
                                                                     </td>
-                                                                    <td colspan="1">
-                                                                        <img src="assets/trashIcon.svg"
-                                                                            class="basurerito"
-                                                                            (click)="onEliminarDetalleCorte(corte, d, t, i)"
-                                                                            title="Eliminar Corte">
+                                                                    <td colspan="1" class='celda-elimina-corte'>
+                                                                            <img src="assets/trashIcon.svg"
+                                                                                class="basurerito"
+                                                                                (click)="onEliminarDetalleCorte(corte, d, t, i)"
+                                                                                title="Eliminar Corte">
                                                                     </td>
                                                                 </tr>
                                                             </ng-container>
