@@ -15,6 +15,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Archivo { get; set; }
         public virtual TipoArchivoPuerto TipoArchivoPuerto { get; set; }
         public virtual DateTime Fecha { get; set; }
+        public int Size { get; set; }
+        public string Extension { get; set; }
 
     }
 }
