@@ -11,9 +11,9 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { Bandera } from '@ScatoModels/bandera';
-import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { identifierName } from '@angular/compiler';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
+import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 
 @Injectable({
   providedIn: 'root'
