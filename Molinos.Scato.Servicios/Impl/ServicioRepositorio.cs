@@ -10891,6 +10891,79 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
 
+        public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
+        {
+            //Me traigo el embarque
+            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque);
+
+            //Me traigo todos los archivos que tengo en la DB que corresponden a ese Embarque.
+            var archivosPuertoDB = repositorio.Listar<ArchivosPuerto>(x => x.Embarque.Id == idEmbarque);
+
+            //Recorro todos los archivos que tengo guardados en la base de datos que correspondan a ese Embarque.
+            foreach (var archivo in archivosPuertoDB)
+            {
+                //Me fijo si el archivo está en la lista que voy a guardar.
+                bool archivoBorrado = archivosPuerto.FindAll(x => x.Id == archivo.Id).Count == 0;
+
+                //En caso de no estar, lo elimino de la base de datos.
+                if (archivoBorrado)
+                {
+                    repositorio.Remover(archivo);
+                }
+            }
+
+            //Recorro todos los archivos a guardar
+            foreach (var archivo in archivosPuerto)
+            {
+                //Me traigo el archivo de la DB.
+                ArchivosPuerto archivoPuertoDB = repositorio.Obtener<ArchivosPuerto>(x => x.Id == archivo.Id);
+
+                //En caso de que exista piso su data.
+                if (archivoPuertoDB != null)
+                {
+                    archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
+                    archivoPuertoDB.Archivo = archivo.Archivo;
+                    archivoPuertoDB.Fecha = archivo.Fecha;
+                }
+                //Si no existe lo agrego a la DB.
+                else
+                {
+                    TipoArchivoPuerto tipoArchivoPuertoDB = repositorio.Obtener<TipoArchivoPuerto>(x => x.Id == archivo.TipoArchivoPuerto.Id);
+                    archivoPuertoDB = new ArchivosPuerto()
+                    {
+                        TipoArchivoPuerto = tipoArchivoPuertoDB,
+                        Embarque = embarque,
+                        NombreArchivo = archivo.NombreArchivo,
+                        Archivo = archivo.Archivo,
+                        Fecha = archivo.Fecha
+                    };
+                    //Guardo toda la data en la DB.
+                    repositorio.Agregar(archivoPuertoDB);
+                }
+            }
+            repositorio.GuardarCambios();
+        }
+        public IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque)
+        {
+            var archivosPuerto = Listar<ArchivosPuerto, ArchivosPuertoDto>(x => x.Embarque.Id == idEmbarque);
+            return archivosPuerto;
+        }
+
+        public IList<TipoArchivoPuertoDto> obtenerTipoArchivos()
+        {
+            IList<TipoArchivoPuertoDto> TipoArchivos = Listar<TipoArchivoPuerto, TipoArchivoPuertoDto>();
+            return TipoArchivos;
+        }
+
+        public bool eliminarArchivos(int[] filesIds)
+        {
+            foreach (var id in filesIds)
+            {
+                ArchivosPuerto archivosPuerto = repositorio.Obtener<ArchivosPuerto>(x => x.Id == id);
+                repositorio.Remover(archivosPuerto);
+            }
+            return true;
+        }
         public void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion)
         {
             try

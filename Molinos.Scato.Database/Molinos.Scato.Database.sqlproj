@@ -532,6 +532,8 @@
     <Build Include="dbo\Tables\ADPuertoRoles.sql" />
     <Build Include="dbo\Tables\ADPuertoRolesPermisos.sql" />
     <Build Include="dbo\Tables\ADPuertoPermisos.sql" />
+    <Build Include="dbo\Tables\ArchivosPuerto.sql" />
+    <Build Include="dbo\Tables\TipoArchivoPuerto.sql" />	
     <Build Include="dbo\Tables\Parametros.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosUltimaActualizacion.sql" />
     <Build Include="dbo\Tables\Logging.sql" />
