@@ -11,6 +11,7 @@ import { finalize } from 'rxjs/operators';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Mail } from '@ScatoModels/mail';
 import { SessionService } from '@ScatoServicios/session.service';
+import { ToWords } from 'to-words';
 
 
 
@@ -65,21 +66,25 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   }
   
   private initFormReciboDetalles() {
-    var converter = require('number-to-words');
+    const toWords = new ToWords();
     this.reciboDeBuqueForm = this._formBuilder.group({
       exportador: ['MOLINOS AGRO S.A'],
-      cantidad: [''],
+      cantidad: [],
       puertoDestino: [''],
       fechaRecibo: new Date(),
       puertoOrigen: ['San Lorenzo, ARGENTINA'],
       nombreBuque: {disabled:true},
-      cantidadLetrasYClaseCarga: [''],
+      cantidadLetras: [''],
+      claseCarga: [''],
+      cantidadLetrasYClaseCarga: [' '],
       estibadoEnBodega: [''],
       calidadYCantidadDesconocida: [''],
       fechaImpresion: [''],
       incluirImpresionDestino: [true],
       incluirImpresionCalidad: [true],
       incluirImpresionEstibado: [true],
+      esEuropeo:[true],
+      valorEnKG:[true],
     })
   }
 
@@ -99,8 +104,10 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
 
   onChangeCantidadEnLetras(cantidad: number){
     if(cantidad != null){
-      var converter = require('number-to-words');
-      this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(converter.toWords(cantidad).toUpperCase());
+      const toWords = new ToWords({localeCode: 'en-US'});
+      // this.reciboDeBuqueForm.controls.cantidadLetras.setValue(converter.toWords(cantidad).toUpperCase());
+      let convertido = toWords.convert(cantidad)
+      this.reciboDeBuqueForm.controls.cantidadLetras.setValue(convertido.toString().toUpperCase());
     }
     
   }
@@ -117,18 +124,24 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   }
 
   setModalOjito(){
+    let cantidadYClaseCarga = this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga
+    let arrClase = cantidadYClaseCarga.split('of');
+
     this.reciboDeBuqueForm.controls.puertoOrigen.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoOrigen);
     this.reciboDeBuqueForm.controls.fechaRecibo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo);
     this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].nombreBuque);
     this.reciboDeBuqueForm.controls.exportador.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].exportador);
     this.reciboDeBuqueForm.controls.puertoDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoDestino);
     this.reciboDeBuqueForm.controls.cantidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad);
-    this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga);
+    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(arrClase[0]);
+    this.reciboDeBuqueForm.controls.claseCarga.setValue(arrClase[1]);
     this.reciboDeBuqueForm.controls.estibadoEnBodega.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].estibadoEnBodega);
     this.reciboDeBuqueForm.controls.calidadYCantidadDesconocida.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].calidadYCantidadDesconocida);
     this.reciboDeBuqueForm.controls.incluirImpresionDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionDestino);
     this.reciboDeBuqueForm.controls.incluirImpresionCalidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionCalidad);
     this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionEstibado);
+    this.reciboDeBuqueForm.controls.esEuropeo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
+    this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
     // this.reciboDeBuqueForm.disable();
   }
 
@@ -139,20 +152,28 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     
   }
   
-  guardarRecibo(){
+  guardarRecibo(modifico:boolean){
+    let reciboActual = this.reciboDeBuqueForm.getRawValue();
+    if(reciboActual.valorEnKG == true){
+      this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} KILOS OF ${reciboActual.claseCarga}`);
+    }else this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} METRIC TONS OF ${reciboActual.claseCarga}`);
 
-    
     this.reciboBuqueDetalles = this.reciboDeBuqueForm.getRawValue();
     this.reciboBuque = new ReciboDeBuque();
     this.reciboBuque.emitio = this.session.getUser().username
+    // this.reciboBuque.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga = this.reciboBuqueDetalles
     // this.reciboBuque.emitio = 'pepito recibidor';
     this.reciboBuque.superviso = 'pepito sipervisor';
     this.reciboBuque.estado = "Aprobado";
     this.reciboBuque.fechaHoraImpresion = null;
     this.reciboBuque.reciboDeBuqueDetalles = [];
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
-    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => console.log('200 Ok'));
+    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => {
+    console.log('200 Ok')
     this._reciboSharingService.setRefreshRecibo(true);
+  });
+    
+    
     // this.enviarMail(this.idEmbarque, this.reciboBuque);
     // this.enviado = true;
   }

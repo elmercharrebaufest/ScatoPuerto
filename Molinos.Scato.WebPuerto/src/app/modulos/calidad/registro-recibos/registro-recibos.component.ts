@@ -54,7 +54,6 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
       if(refresh == true){
         this._reciboBuqueService.obtenerRecibos(this.idEmbarque).subscribe(data => {
           this.recibosDeBuque = data;
-
         })
       }
     })
