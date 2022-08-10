@@ -110,7 +110,7 @@
                                             </tr>
                                         </ng-container>
                                     </ng-container>
-                                    <tr>
+                                    <tr [ngStyle]="getTurnoDetalles(d, t).controls.length == 1 && {'height': '120px'}">
                                         <!-- <td colspan="12" class='btn-add-cell'>
                                             <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                 <button type='button' class='btn btn-primary bt-circle'
