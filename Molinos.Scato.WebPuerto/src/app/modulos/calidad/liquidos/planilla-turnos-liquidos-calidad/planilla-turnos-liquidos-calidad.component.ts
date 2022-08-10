@@ -135,6 +135,11 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   expandir() {
     document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
   }
+
+  // expandirObsCalidad(t : number) {
+  //   document.getElementById(`collapseObsDeCalidad_${t}`).className = "collapse show";
+  // }
+
   desabilitarTurno() {
     this.mostrarBtn = false;
   }
@@ -715,10 +720,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.formCorte.get('tiempoTotal').setValue(`${total.getHours() < 10 ? '0' + total.getHours() : total.getHours()}:${total.getMinutes() < 10 ? '0' + total.getMinutes() : total.getMinutes()}`)
   }
 
+  
   getRowSpan(dia: any) {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurnoCalc(turnos);
+      contador += 1;
+    }
+    if(this.diasTurno.length == 1) {
       contador += 1;
     }
     return contador;
@@ -742,10 +751,10 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroLiquido = registroLiquido > 0 ? 6 : 0; // tamaño del detalle de cada turno
+    registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
     registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-
+    registroLiquido += 2;
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -821,9 +830,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         });
 
         //HAGO ESTO PARA COMPLETAR CON LINEAS VACÝAS HASTA LLEGAR A 4.
-        for (let i = detalle.length; i < 4; i++) {
-          (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, true));
-        }
+        // for (let i = detalle.length; i < 4; i++) {
+        //   (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, true));
+        // }
       }
       //Si no hay detalles completo con 4 lineas vacías.
     } else {

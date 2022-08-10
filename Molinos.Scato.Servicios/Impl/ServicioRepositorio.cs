@@ -10722,7 +10722,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
 
-            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
+            //GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
             repositorio.Remover(obs);
             repositorio.GuardarCambios();
         }
