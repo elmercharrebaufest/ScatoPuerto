@@ -58,8 +58,6 @@ export class LineupEmbarqueComponent implements OnInit {
 
 
   imagePath: any;
-  ListTipoArchivoPuerto: TipoArchivoPuerto[];
-  ArchivosPuerto: ArchivoPuerto[];
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
   fileToUpload: any | null = null;
