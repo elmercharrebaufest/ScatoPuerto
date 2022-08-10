@@ -10924,6 +10924,8 @@ namespace Molinos.Scato.Servicios.Impl
                     archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
                     archivoPuertoDB.Archivo = archivo.Archivo;
                     archivoPuertoDB.Fecha = archivo.Fecha;
+                    archivoPuertoDB.Extension = archivo.Extension;
+                    archivoPuertoDB.Size = archivo.Size;
                 }
                 //Si no existe lo agrego a la DB.
                 else
@@ -10935,7 +10937,9 @@ namespace Molinos.Scato.Servicios.Impl
                         Embarque = embarque,
                         NombreArchivo = archivo.NombreArchivo,
                         Archivo = archivo.Archivo,
-                        Fecha = archivo.Fecha
+                        Fecha = archivo.Fecha,
+                        Size = archivo.Size,
+                        Extension = archivo.Extension
                     };
                     //Guardo toda la data en la DB.
                     repositorio.Agregar(archivoPuertoDB);
