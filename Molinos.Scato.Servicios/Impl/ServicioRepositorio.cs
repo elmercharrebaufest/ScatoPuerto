@@ -10722,7 +10722,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
 
-            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
+            //GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
             repositorio.Remover(obs);
             repositorio.GuardarCambios();
         }
@@ -10891,6 +10891,24 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
         }
 
+        public IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque()
+        {
+            return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
+        }
+        public void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
+        {
+            ModuloDeCargaPlanillaDeTurnosDetallesLiquido planillaDeTurnosDetallesLiquido = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(x => x.Id == idModuloDeCargaPlanillaDetalle);
+            repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(planillaDeTurnosDetallesLiquido);
+            repositorio.GuardarCambios();
+        }
+        public void EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte)
+        {
+            ModuloDeCargaPlanillaDeTurnosCortes planillaDeTurnosCortes = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.Id == idModuloDeCargaPlanillaCorte);
+            repositorio.Remover<ModuloDeCargaPlanillaDeTurnosCortes>(planillaDeTurnosCortes);
+            repositorio.GuardarCambios();
+        }
+
+
         public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
             //Me traigo el embarque
@@ -10924,6 +10942,8 @@ namespace Molinos.Scato.Servicios.Impl
                     archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
                     archivoPuertoDB.Archivo = archivo.Archivo;
                     archivoPuertoDB.Fecha = archivo.Fecha;
+                    archivoPuertoDB.Extension = archivo.Extension;
+                    archivoPuertoDB.Size = archivo.Size;
                 }
                 //Si no existe lo agrego a la DB.
                 else
@@ -10935,7 +10955,9 @@ namespace Molinos.Scato.Servicios.Impl
                         Embarque = embarque,
                         NombreArchivo = archivo.NombreArchivo,
                         Archivo = archivo.Archivo,
-                        Fecha = archivo.Fecha
+                        Fecha = archivo.Fecha,
+                        Size = archivo.Size,
+                        Extension = archivo.Extension
                     };
                     //Guardo toda la data en la DB.
                     repositorio.Agregar(archivoPuertoDB);
@@ -10955,15 +10977,6 @@ namespace Molinos.Scato.Servicios.Impl
             return TipoArchivos;
         }
 
-        public bool eliminarArchivos(int[] filesIds)
-        {
-            foreach (var id in filesIds)
-            {
-                ArchivosPuerto archivosPuerto = repositorio.Obtener<ArchivosPuerto>(x => x.Id == id);
-                repositorio.Remover(archivosPuerto);
-            }
-            return true;
-        }
         public void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion)
         {
             try

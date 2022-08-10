@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'environments/environment';
 import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
@@ -15,8 +15,8 @@ import { FuncionesGeneralesService } from './funciones-generales.service';
   providedIn: 'root'
 })
 export class ModuloDeCargaService {
-  url: string = environment.apiUrl;
-
+  private url: string = environment.apiUrl;
+  private _actualizarPlanillaLiquido: BehaviorSubject<any> = new BehaviorSubject<any>(null); 
   constructor(
     private http: HttpClient,
     private funcionesGeneralesService: FuncionesGeneralesService,
@@ -24,6 +24,13 @@ export class ModuloDeCargaService {
 
   }
   
+  set actualizarPlanillaLiquido(value: any){
+    this._actualizarPlanillaLiquido.next(value);
+  }
+  get actualizarPlanillaLiquido(){
+    return this._actualizarPlanillaLiquido.asObservable();
+  }
+
   obtenerListadoSentidoManoDeEmbarque(): Observable<SentidoManoDeEmbarque[]> {
     return this.http.get<SentidoManoDeEmbarque[]>(`${this.url}ModuloDeCarga/ListarSentidoManoDeEmbarques`, { 'withCredentials': true });
   }
@@ -143,4 +150,17 @@ export class ModuloDeCargaService {
   eliminarObservacionDeCalidad( observacion_id: number ){
     return this.http.post(`${this.url}ModuloDeCarga/EliminarObservacionDeCalidad?observacion_id=${observacion_id}`, { 'withCredentials': true });
   }
+
+  listarTipoLineaEmbarque() {
+    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials' : true});
+  }
+  
+  eliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle: any): Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido?idModuloDeCargaPlanillaDetalle=${parseInt(idModuloDeCargaPlanillaDetalle)}`, {'withCredentials': true});
+  }
+
+  eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte: any): Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeTurnosCortes?idModuloDeCargaPlanillaCorte=${parseInt(idModuloDeCargaPlanillaCorte)}`, {'withCredentials': true});
+  }
+
 }

@@ -8,4 +8,6 @@ export class ArchivoPuerto{
     nombreArchivo: string;
     archivo: string;
     fecha: Date;
+    size: number;
+    extension: string;
 }

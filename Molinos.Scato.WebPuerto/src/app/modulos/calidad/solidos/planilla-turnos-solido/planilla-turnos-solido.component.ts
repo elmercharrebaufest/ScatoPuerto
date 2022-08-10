@@ -547,9 +547,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroSolido = registroSolido > 0 ? 5 : 0; // tamaño del detalle de cada turno
+    registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 2 : 1; // tamaño de la observacion
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
+    registroSolido += 2;
     const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -559,10 +560,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroSolido = registroSolido > 0 ? 5 : 0; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-
+    registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
+    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+    registroSolido += 2;
     const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -660,11 +661,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         detalle.forEach(element => {
           (planillaTurnoDetalles as FormArray).push(this.initLinea(element, true));
         });
-
-        //HAGO ESTO PARA COMPLETAR CON LINEAS VACÍAS HASTA LLEGAR A 4.
-        for (let i = detalle.length; i < 4; i++) {
-          (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'] as FormArray).push(this.initLinea(null, true));
-        }
       }
       //Si no hay detalles completo con 4 lineas vacías.
     } else {

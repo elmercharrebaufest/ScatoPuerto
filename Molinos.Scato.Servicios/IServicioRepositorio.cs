@@ -2672,7 +2672,18 @@ namespace Molinos.Scato.Servicios
         IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque);
 
         [OperationContract]
+        IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque();
+
+        [OperationContract]
+        void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle);
+
+        [OperationContract]
+        void EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte);
+
+
+		[OperationContract]
         void GuardarArchivos(List<ArchivosPuertoDto> archivosPuertoDto, int idEmbarque);
+        
         [OperationContract]
         IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque);
 
@@ -2680,8 +2691,8 @@ namespace Molinos.Scato.Servicios
         IList<TipoArchivoPuertoDto> obtenerTipoArchivos();
 
         [OperationContract]
-        bool eliminarArchivos(int[] filesIds);
-        [OperationContract]
         void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion);
+        
+        
     }
 }

@@ -110,7 +110,7 @@
                                             </tr>
                                         </ng-container>
                                     </ng-container>
-                                    <tr>
+                                    <tr [ngStyle]="getTurnoDetalles(d, t).controls.length == 1 && {'height': '120px'}">
                                         <!-- <td colspan="12" class='btn-add-cell'>
                                             <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                 <button type='button' class='btn btn-primary bt-circle'
@@ -119,48 +119,112 @@
                                             </div>
                                         </td> -->
                                     </tr>
-                                    <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
-                                        <td colspan="6" class='p-0'>
-                                            <table width="100%">
-                                                <thead>
-                                                    <tr class='table-active'>
-                                                        <th colspan="1">Motivo</th>
-                                                        <th colspan="1">Inicio</th>
-                                                        <th colspan="1">Fin</th>
-                                                        <th colspan="1">Tiempo total</th>
-                                                        <th colspan="2">Observaciones</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
-                                                        <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
-                                                            <tr class='tabla-fila-corte'>
-                                                                <td colspan="1">
-                                                                    {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
-                                                                </td>
-                                                                <td colspan="1">
-                                                                    {{corte.controls.horaInicio.value}} hs
-                                                                </td>
-                                                                <td colspan="1">
-                                                                    {{corte.controls.horaFin.value}} hs
-                                                                </td>
-                                                                <td colspan="1">
-                                                                    {{corte.controls.tiempoTotal.value}} hs
-                                                                </td>
-                                                                <td colspan="2">
-                                                                    {{corte.controls.observaciones.value}}
-                                                                </td>
-                                                            </tr>
-                                                        </ng-container>
-                                                    </ng-container>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length <= 0 : false'>
-                                        <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
-                                    </tr>
-                                    <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false'>
+
+
+                                    
+                                            <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
+                                                <td colspan="6" class='p-0'>
+                                                    <div *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false' class="div-active">
+                                                        <app-collapse-button collapseSelectorId="collapseCortesCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
+                                                        <p class="font-weight-bold p-13px" >Corte<p>
+                                                        <div id="collapseCortesCalidad_{{t}}" class="collapse show" colspan="6">
+                                                            <table width="100%">
+                                                                <thead>
+                                                                    <tr class='table-active'>
+                                                                        <th colspan="1">Motivo</th>
+                                                                        <th colspan="1">Inicio</th>
+                                                                        <th colspan="1">Fin</th>
+                                                                        <th colspan="1">Tiempo total</th>
+                                                                        <th colspan="2">Observaciones</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
+                                                                        <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
+                                                                            <tr class='tabla-fila-corte'>
+                                                                                <td colspan="1">
+                                                                                    {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
+                                                                                </td>
+                                                                                <td colspan="1">
+                                                                                    {{corte.controls.horaInicio.value}} hs
+                                                                                </td>
+                                                                                <td colspan="1">
+                                                                                    {{corte.controls.horaFin.value}} hs
+                                                                                </td>
+                                                                                <td colspan="1">
+                                                                                    {{corte.controls.tiempoTotal.value}} hs
+                                                                                </td>
+                                                                                <td colspan="2">
+                                                                                    {{corte.controls.observaciones.value}}
+                                                                                </td>
+                                                                            </tr>
+                                                                        </ng-container>
+                                                                    </ng-container>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length <= 0 : false'>
+                                                <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
+                                            </tr>
+                                            
+                                        
+                                    
+
+                                    
+                                    
+                                            <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false'>
+                                                <td colspan="6" class='p-0'>
+                                                    <div *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false' class="div-active">
+                                                        <app-collapse-button collapseSelectorId="collapseObsDeCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
+                                                        <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
+                                                        <div id="collapseObsDeCalidad_{{t}}" class="collapse show" colspan="6">
+                                                            <table width="100%" class="">
+                                                                <thead>
+                                                                    <tr class='table-active'>
+                                                                        <th></th>
+                                                                        <th colspan="3">Observación</th>
+                                                                        <th colspan="1">Fecha</th>
+                                                                        <th colspan="1">Hora</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
+                                                                        <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <div (click)="deleteObsCalidad(observacion)">
+                                                                                        <img src="assets/trashIcon.svg"  style="width: 40px;">
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td colspan="3">
+                                                                                    {{observacion.observaciones}}
+                                                                                </td>
+                                                                                <td colspan="1">
+                                                                                    {{observacion.fecha}}
+                                                                                </td>
+                                                                                <td colspan="1">
+                                                                                    {{observacion.hora}}
+                                                                                </td>
+                                                                            </tr>
+                                                                        </ng-container>
+                                                                    </ng-container>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr  *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length <= 0 : false'>
+
+                                            </tr>
+                                        
+                                    <!-- <app-collapse-button collapseSelectorId="collapseObsDeCalidad"></app-collapse-button>
+
+                                    <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false' id="collapseObsDeCalidad" class="collapse show">
                                         <td colspan="6" class='p-0'>
                                             <table width="100%">
                                                 <thead>
@@ -198,7 +262,7 @@
                                     </tr>
                                     <tr  *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length <= 0 : false'>
 
-                                    </tr>
+                                    </tr> -->
                                 </ng-container>
                             </ng-container>
                         </ng-container>

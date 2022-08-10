@@ -292,7 +292,8 @@
   </div>
 </div>
 
-<ng-template #previsualizeImageModal let-modal style="width: 600px;">
+<ng-template #previsualizeImageModal let-modal style="width: 800px;
+align-self: center;">
   <div class="modal-content">
     <div class="modal-header">
       <h5 class="modal-title" style="color: #4d60A8;">Previsualización</h5>
@@ -307,8 +308,9 @@
   </div>
 </ng-template>
 
-<ng-template #appendFiles let-modal>
-  <div class="modal-content">
+<ng-template #appendFiles let-modal >
+  <div class="modal-content" style="width: 700px; 
+  align-self: center;">
     <div class="modal-header">
       <h5 class="modal-title" style="color: #4d60A8;">Adjuntar archivos</h5>
     </div>
@@ -387,29 +389,76 @@
       
       <div *ngIf="ArchivosPuerto != null && ArchivosPuerto.length > 0">      
         <hr class="solid">
-        <div class="row" fullWidth style="margin-left: 20px;" >
+        <div class="row" fullWidth style="margin-left: 8px;" >
           <label  class="font-weight-bold">Archivos adjuntos</label>
         </div>
-        <div class="row" *ngFor="let a of ArchivosPuerto ;let i = index"  fullWidth  style="margin-left: 20px;margin-bottom: 5px;">
-        <input [value]="a.nombreArchivo" *ngIf="a.id == null || a.id == 0" class="col-9" style="color: #5cb85c;" disabled/>
-        <input [value]="a.nombreArchivo" *ngIf="a.id != null && a.id > 0" class="col-9" disabled/>
-        <img src="assets\trashIcon-no-border.svg" style="
-        border-radius: 6px;
-        height: 25px;
-        margin-left: 10px" (click)="eliminarArchivo(a)" />
-        <img src="assets\download.svg" style="border-radius: 6px;
-        height: 31px;
-        margin-top: -2px;
-        margin-left: 6px"
-        (click)="downloadFile(a)"  />
-
-        <img src="assets\ojoIcon.svg" style="border-radius: 6px;
-        height: 31px;
-        margin-top: -2px;
-        margin-left: 6px"
-        *ngIf='a.archivo.includes("data:image") || a.archivo.includes("data:application/pdf")'
-        (click)="previewFile(previsualizeImageModal, a)"  />
+        <div class="row" *ngFor="let a of ArchivosPuerto ;let i = index"  fullWidth  style="margin-bottom: 5px;
+        display: flex;
+        justify-content: space-evenly">
+          <div  *ngIf="a.id == null || a.id == 0"  style="width: 73%;
+          display: flex;
+          align-content: space-evenly;
+          justify-content: space-between;
+          border-style: solid;
+          border-radius: 4px;
+          border-width: 1px;
+          border-color: lightgray;
+          padding: 2px;">
+            <label style="color: #5cb85c; margin-bottom: 0px; margin-left: 10px;">{{a.tipoArchivoPuerto.tipoArchivo}}</label> 
+            <label style="color: #5cb85c; margin-bottom: 0px; margin-right: 10px">.{{a.extension}}/{{a.size}} Kb</label>
+          </div>
+          <div   *ngIf="a.id != null && a.id > 0"   style="width: 73%;
+          display: flex;
+          align-content: space-evenly;
+          justify-content: space-between;
+          border-style: solid;
+          border-radius: 4px;
+          border-width: 1px;
+          border-color: lightgray;
+          padding: 2px;">
+            <label style="color: darkgray; margin-bottom: 0px; margin-left: 10px">{{a.tipoArchivoPuerto.tipoArchivo}}</label> 
+            <label style="color: darkgray; margin-bottom: 0px; margin-right: 10px">.{{a.extension}}/{{a.size}} Kb</label>
+          </div>
         
+          <!-- <input [value]="a.tipoArchivoPuerto.tipoArchivo" *ngIf="a.id == null || a.id == 0" class="col-9" style="color: #5cb85c;" disabled/>
+          <input [value]="a.tipoArchivoPuerto.tipoArchivo" *ngIf="a.id != null && a.id > 0" class="col-9" disabled/> -->
+
+          <img src="assets\download.svg" style="    border-radius: 5px;
+          border-style: solid;
+          border-color: lightgray;
+          border-width: 1px;
+          width: 33px;
+          height: 33px;
+          padding: 3px;"
+          (click)="downloadFile(a)"  />
+
+          <img src="assets\ojoIcon.svg" style="    border-radius: 5px;
+          border-style: solid;
+          border-color: lightgray;
+          border-width: 1px;
+          width: 33px;
+          height: 33px;
+          padding: 3px;"
+          *ngIf='a.archivo.includes("data:image") || a.archivo.includes("data:application/pdf")'          
+          (click)="previewFile(previsualizeImageModal, a)"  />
+
+          <img src="assets\ojoIconGray.svg" style="    border-radius: 5px;
+          border-style: solid;
+          border-color: lightgray;
+          border-width: 1px;
+          width: 33px;
+          height: 33px;
+          padding: 3px;"
+          *ngIf='!a.archivo.includes("data:image") && !a.archivo.includes("data:application/pdf")'          
+          (click)="previewFile(previsualizeImageModal, a)"  />
+          
+          <img src="assets\trashIcon-no-border.svg" style="    border-radius: 5px;
+          border-style: solid;
+          border-color: lightgray;
+          border-width: 1px;
+          width: 33px;
+          height: 33px;
+          padding: 3px;" (click)="eliminarArchivo(a)" />
 
       </div>
     </div>

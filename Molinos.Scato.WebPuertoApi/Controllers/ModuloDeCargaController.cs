@@ -200,10 +200,39 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
-
-
+        }
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido")]
+        public HttpResponseMessage EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
+        {
+            try
+            {
+                servicio.EliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
         }
 
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/EliminarDetallePlanillaDeTurnosCortes")]
+        public HttpResponseMessage EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte)
+        {
+            try
+            {
+                servicio.EliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+        }
+        
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaBalanzas")]
@@ -352,6 +381,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
+
                 comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado});
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -772,6 +802,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarRecibosDeBuque(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ListarTipoLineaEmbarque")]
+        public HttpResponseMessage ListarTipoLineaEmbarque()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarTipoLineaEmbarque());
             }
             catch (Exception ex)
             {

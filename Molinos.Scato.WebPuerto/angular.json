@@ -138,5 +138,8 @@
       }
     }
   },
-  "defaultProject": "web-puerto"
+  "defaultProject": "web-puerto",
+  "cli": {
+    "analytics": false
+  }
 }

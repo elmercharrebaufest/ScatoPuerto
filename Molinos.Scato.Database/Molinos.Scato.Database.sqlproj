@@ -536,6 +536,7 @@
     <Build Include="dbo\Tables\TipoArchivoPuerto.sql" />	
     <Build Include="dbo\Tables\Parametros.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosUltimaActualizacion.sql" />
+    <Build Include="dbo\Tables\TipoLineaEmbarque.sql" />
     <Build Include="dbo\Tables\Logging.sql" />
     <Build Include="dbo\Tables\ErroresGeolocalizacion.sql" />
   </ItemGroup>

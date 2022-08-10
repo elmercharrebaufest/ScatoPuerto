@@ -5,11 +5,15 @@
 }
 .tabla-fila-corte{
     background-color: #F4F4F4;
+    height: 35px !important;
+}
+.tabla-fila-corte-boton{
+    height: 55px;
+    background-color: #F4F4F4;
 }
 .center-bt{
     margin: auto !important;
 }
-
 .column-center{
     display: flex;
     flex-direction: column;
@@ -58,12 +62,53 @@ select { margin: 0; height: 30px;}
     margin-right: 10px;
 }
 
+.basurerito{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+.adicionar{
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+}
+.agrupador_botones{
+    display: flex;
+    justify-content: inline-flex;
+}
+.celda-elimina-corte{
+    justify-content: flex-start;    
+    align-items: center;
+    text-align: center;
+}
+.full-right{
+    display: flex;
+    justify-content: flex-start;
+    
+    align-items: center;
+    text-align: center;
+}
+.full-left{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: center;
+    margin-left: 20px;
+}
+
+.btn-eliminar { 
+    justify-content: flex-start; 
+    right: 0;
+    margin-left: 5px
+}
+
 table {
     table-layout:fixed;
 }
 table td {
     position: relative;
-    height: 40px !important;
+    height: 40px;
+    padding-right: 5px;
 }
 
 table td input {
@@ -72,10 +117,9 @@ table td input {
     top:0;
     left:0;
     margin: 0;
-    height: 38px;
     width: 100%;
     border: none;
-    padding: 10px;
+    padding: 5px;
     box-sizing: border-box;
 }
 
@@ -85,10 +129,9 @@ table td select {
     top:0;
     left:0;
     margin: 0;
-    height: 38px;
     width: 100%;
     border: none;
-    padding: 10px;
+    padding: 5px;
     box-sizing: border-box;
 }
 

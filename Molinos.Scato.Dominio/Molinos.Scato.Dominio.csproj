@@ -835,6 +835,7 @@
     <Compile Include="Dto\TipoArchivoPuertoDto.cs" />
     <Compile Include="Dto\TipoDeActividadDto.cs" />
     <Compile Include="Dto\TipoDeBuquePuertoDto.cs" />
+    <Compile Include="Dto\TipoLineaEmbarqueDto.cs" />
     <Compile Include="Dto\TransmisionASapManualDto.cs" />
     <Compile Include="Dto\AnalisisObligatorioDto.cs" />
     <Compile Include="Dto\CaladoDto.cs" />
@@ -1073,6 +1074,7 @@
     <Compile Include="Entidades\TipoArchivoPuerto.cs" />
     <Compile Include="Entidades\TipoDeActividad.cs" />
     <Compile Include="Entidades\TipoDeBuquePuerto.cs" />
+    <Compile Include="Entidades\TipoLineaEmbarque.cs" />
     <Compile Include="Entidades\TurnoPuerto.cs" />
     <Compile Include="Entidades\UbicacionDeBuquePuerto.cs" />
     <Compile Include="Entidades\Vapor.cs" />

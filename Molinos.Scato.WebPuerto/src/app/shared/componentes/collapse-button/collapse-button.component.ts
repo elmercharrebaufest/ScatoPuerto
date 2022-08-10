@@ -8,6 +8,7 @@ import { Component, Input } from '@angular/core';
 export class CollapseButtonComponent {
   @Input() collapseSelectorId: string;
   @Input() isCollapsed: boolean = false;
+  @Input() esChiquito: boolean = false;
 
   toggleCollapse(){
     this.isCollapsed = !this.isCollapsed;

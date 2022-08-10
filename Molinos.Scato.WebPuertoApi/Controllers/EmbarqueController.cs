@@ -423,21 +423,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/Embarque/EliminarArchivos")]
-        public HttpResponseMessage EliminarArchivos(int[] filesIds)
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.eliminarArchivos(filesIds));
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
-            }
-        }
-
-
         /*
         [HttpGet]
         [Route("api/Embarque/ObtenerPuntosInteresGeolocalizacion")]

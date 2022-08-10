@@ -1,1 +1,1 @@
-<img data-toggle="collapse" [attr.href]="'#'+collapseSelectorId" [src]="isCollapsed ? 'assets/collapseDown.svg':'assets/collapseUp.svg'" (click)="toggleCollapse()"/>
+<img data-toggle="collapse" [attr.href]="'#'+collapseSelectorId" [src]="isCollapsed ? 'assets/collapseDown.svg':'assets/collapseUp.svg'" [ngClass]="esChiquito && 'chiquito'" (click)="toggleCollapse()"/>

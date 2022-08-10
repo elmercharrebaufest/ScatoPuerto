@@ -16,6 +16,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { forkJoin } from 'rxjs';
+import { cpuUsage } from 'process';
 
 @Component({
   selector: 'app-lineas',
@@ -31,12 +32,13 @@ export class LineasComponent implements OnInit, OnChanges {
   idModuloDeCarga: number;
   tanquesOptionAux: any[] = new Array();
   materialesPuerto: MaterialPuerto[];
-  lineas = [{ idLinea: 0, nombreLinea: '' }, { idLinea: 1, nombreLinea: 'Nueva' }, { idLinea: 2, nombreLinea: 'Vieja' },
-  { idLinea: 3, nombreLinea: 'Vicentin' }, { idLinea: 4, nombreLinea: 'Biodiesel' }];
+  tipoLineaEmbarque: any;
+  tipoLineaProductoTk: any;
   lineasDeEmbarqueForm: FormGroup;
   colorSelected: any[] = new Array();
 
   moduloDeCarga: ModuloDeCarga;
+  esGuardadoActivo: boolean = true;
   @Input() tanquesSeleccionados;
   @Input() esCalidad: boolean = false;
 
@@ -61,7 +63,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
     });
     this.confirmationDialogService = confirmationDialogService;
-
+    this.obtenerTipoLineaEmbarque();
   }
   ngOnChanges() {
     this._tanquesService.sendData.subscribe(resObj => {
@@ -108,6 +110,12 @@ export class LineasComponent implements OnInit, OnChanges {
     });
     this.formInitialValues = this.lineasDeEmbarqueForm.getRawValue();
   }
+  private obtenerTipoLineaEmbarque() {
+    this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
+      this.tipoLineaEmbarque = res;
+    });
+  }
+
 
   private obtenerEmbarque() {
     this._procesoService.sendEmbarque.subscribe(
@@ -120,7 +128,6 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   private obtenerDatosModuloCarga() {
-    console.log('entro a obtenerDatosModuloCarga');
     this.obtenerModuloDeCarga();
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
   }
@@ -294,6 +301,7 @@ export class LineasComponent implements OnInit, OnChanges {
     return this.formBuilder.group({
       id: x?.id ?? "",
       linea: [{ value: x?.linea ?? "", disabled: deshabilitar }],
+      tipoLineaEmbarque: [{ value: x?.tipoLineaEmbarque ?? "", disabled: deshabilitar }],
       tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar }],
       materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar }],
       temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: deshabilitar }],
@@ -315,17 +323,24 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   obtenerModuloDeCarga() {
-    this.moduloDeCarga = this._procesoService.getModuloDeCarga();
     this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
-    if (this.moduloDeCarga.moduloDeCargaLineasDeEmbarque && this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.length > 0) {
-      this.lineasEmbarque.clear();
 
-      this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.forEach((x, index) => {
-        this.lineasEmbarque.push(this.initLineasEmbarque(x))
-      });
-    }
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+
+      this.moduloDeCarga = resp;
+
+      if (this.moduloDeCarga.moduloDeCargaLineasDeEmbarque && this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.length > 0) {
+        this.lineasEmbarque.clear();
+        this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.forEach((x, index) => {
+          this.lineasEmbarque.push(this.initLineasEmbarque(x))
+        });
+      }
+
+    });
   }
-
+  compareLineaEmbarque(c1: any, c2: any) {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  }
   compareLineas(c1: LineasDeEmbarque, c2: LineasDeEmbarque) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
@@ -366,6 +381,14 @@ export class LineasComponent implements OnInit, OnChanges {
 
   }
 
+  onLineaSeleccionada(lineaSel: any) {
+    console.log('lineaSel-->>')
+    console.log(lineaSel)
+    const tipoLineaEmbarqueSel = lineaSel['controls']?.tipoLineaEmbarque?.value;
+    lineaSel['controls']?.linea.setValue(tipoLineaEmbarqueSel?.linea);
+    console.log(lineaSel)
+  }
+
   onFocusOutEvent(index: number) {
     const materialPuertoId = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['materialPuerto'].value.id;
     let temperatura = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaInicial'].value;
@@ -382,11 +405,11 @@ export class LineasComponent implements OnInit, OnChanges {
       .subscribe(res => {
         if (res == 0 || !res) {
           const texto = 'No existe la densidad para los valores ingresados.';
-          this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
+          this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Warning)
             .then((confirmed) => {
               if (confirmed) {
               } else return;
-            }).catch(() => window.location.reload());
+            }).catch();
         }
         this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadInicial'].setValue(res, { emitEvent: false });
         this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadFinal'].setValue(res, { emitEvent: false });
@@ -397,13 +420,64 @@ export class LineasComponent implements OnInit, OnChanges {
       });
   }
 
+  private validarLineasDuplicadas() {
+    
+    const lineasEmbarque = this.obtenerLineasEmbarque();
+    let bValidarDuplicadas: boolean = false;
+    let filtroLineas = [];
+
+    lineasEmbarque.forEach(function (item) {
+      console.log('filtroLineas...>>')
+      console.log(filtroLineas)
+      if (filtroLineas.length == 0) {
+        filtroLineas.push({
+          idTipoLinea: item.tipoLineaEmbarque.id,
+          idMaterial: item.materialPuerto.id,
+          tkInicial: item.tkInicial,
+          cantidad: 0
+        });
+      } else {
+        const linea = filtroLineas.findIndex(x => x.idTipoLinea == item.tipoLineaEmbarque.id &&
+          x.idMaterial == item.materialPuerto.id &&
+          x.tkInicial == item.tkInicial);
+        if (linea <= -1) {
+          filtroLineas.push({
+            idTipoLinea: item.tipoLineaEmbarque.id,
+            idMaterial: item.materialPuerto.id,
+            tkInicial: item.tkInicial,
+            cantidad: 0
+          });
+        }
+      }
+    });
+    filtroLineas.forEach(filtro =>{
+      const selLinea = lineasEmbarque.filter(item =>{
+        return (filtro.idTipoLinea == item.tipoLineaEmbarque.id &&
+                filtro.idMaterial == item.materialPuerto.id &&
+                filtro.tkInicial == item.tkInicial)
+
+      });
+      filtro.cantidad = selLinea.length;
+    })
+    const cantidadLineas =  filtroLineas.filter(linea => {return linea.cantidad > 1 });
+    if (cantidadLineas.length > 0) 
+      bValidarDuplicadas = true;
+    return bValidarDuplicadas;
+  }
   onGuardar() {
     if (this.esCalidad) return;
+    const bValidarDuplicadas = this.validarLineasDuplicadas();
+    if (bValidarDuplicadas){
+      const mensaje = "No se puede guardar, debido a que existe un tipo de linea, producto y tanque duplicado en la conformacion de lineas de embarque.";
+      this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
+    this.esGuardadoActivo = false;
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
     lineasEmabarque.forEach(item => {
       if (
-        (item.linea == '' || item.linea == undefined) ||
         (item.tkInicial == '' || item.tkInicial == undefined) ||
         (item.materialPuerto == '' || item.materialPuerto == undefined)
       ) {
@@ -413,17 +487,26 @@ export class LineasComponent implements OnInit, OnChanges {
     });
     if (erroresLinea) {
       var texto = "No se puede guardar, debido a que no se han completado la información para el registro de linea.";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
+          this.esGuardadoActivo = true;
           if (confirmed)
             return;
           else
             return;
         }).catch();
     } else {
+
+      console.log('this.obtenerLineasEmbarque()---->>>');
+      console.log(this.obtenerLineasEmbarque());
+
       this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe(res => {
         let texto = "Se guardaron las lineas de embarque correctamente";
+        this.esGuardadoActivo = true;
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
+        this.creaFormLineasEmbarque();
+        this.cargarDatosLineas();
+        this.moduloCargaService.actualizarPlanillaLiquido = true;
       });
     }
   }
