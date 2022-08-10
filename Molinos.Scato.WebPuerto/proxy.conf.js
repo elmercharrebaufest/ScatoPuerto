@@ -2,7 +2,7 @@ const Agent = require('agentkeepalive');
 
 module.exports = {
         '/api/*': {
-            target: 'http://gslopuertoappqa00.molinosagro.ad/Scato.WebPuertoApi/api',
+            target: 'http://localhost/Scato.WebPuertoApi',
             secure: false,
             agent: new Agent({
                 maxSockets: 100,
