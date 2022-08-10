@@ -1,6 +1,6 @@
 {
     "/api/*":{
-        "target": "http://localhost/Scato.WebPuertoApi",
+        "target": "http://gslopuertoappqa00.molinosagro.ad/Scato.WebPuertoApi/api",
         "secure": false,
         "logLevel": "debug"
     }
