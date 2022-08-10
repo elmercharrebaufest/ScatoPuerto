@@ -6,7 +6,10 @@
 .center-bt{
     margin: auto !important;
 }
-
+.p-13px{
+    padding-top:13px;
+    padding-left: 10px;
+}
 .column-center{
     display: flex;
     flex-direction: column;
