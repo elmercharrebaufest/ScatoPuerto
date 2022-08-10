@@ -13,6 +13,8 @@ import jspdf from 'jspdf';
 export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
     reciboBuque:ReciboDeBuque;
     recibo : ReciboDeBuqueDetalles; 
+    cantidadFormatoEntera : string;
+    cantidadAMostrar : string;
 
     constructor
     (
@@ -37,10 +39,65 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       console.log("RECIBIENDO DATA DESDE PDF", this.reciboBuque);
       if(this.reciboBuque !== null){
         this.recibo = this.reciboBuque.reciboDeBuqueDetalles[0];
+        this.darFormato(this.recibo.cantidad, this.recibo.esEuropeo)
         this.crearPDF();
       }
     }
 
+    darFormato(cantidad: number, formatoEuropeo: boolean = false) {
+      let arrNumero = cantidad.toString().split(".");
+      let numeroEntero = arrNumero[0];
+      let numeroDecimal = arrNumero[1];
+      
+
+      if(numeroEntero.length == 9){
+      let part1 = numeroEntero.slice(0, 3);
+      let part2 = numeroEntero.slice(3, 6);
+      let part3 = numeroEntero.slice(6, 9);
+      this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2},${part3}` : `${part1}.${part2}.${part3}`;
+      }else if(numeroEntero.length == 8){
+          let part1 = numeroEntero.slice(0, 2);
+          let part2 = numeroEntero.slice(2, 5);
+          let part3 = numeroEntero.slice(5, 8);
+          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2},${part3}` : `${part1}.${part2}.${part3}`;
+          
+      }else if(numeroEntero.length == 7){
+          let part1 = numeroEntero.slice(0, 1);
+          let part2 = numeroEntero.slice(1, 4);
+          let part3 = numeroEntero.slice(4, 7);
+          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2},${part3}` : `${part1}.${part2}.${part3}`;
+          
+      }else if(numeroEntero.length == 6){
+          let part1 = numeroEntero.slice(0, 3);
+          let part2 = numeroEntero.slice(3, 6);
+          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2}` : `${part1}.${part2}`;
+          
+      }else if(numeroEntero.length == 5){
+          let part1 = numeroEntero.slice(0, 2);
+          let part2 = numeroEntero.slice(2, 5);
+          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2}` : `${part1}.${part2}`;
+          
+      }
+      else if(numeroEntero.length == 4){
+          let part1 = numeroEntero.slice(0, 1);
+          let part2 = numeroEntero.slice(1, 4);
+          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2}` : `${part1}.${part2}`;
+      }else if(numeroEntero.length < 4){
+        this.cantidadFormatoEntera = !formatoEuropeo ? `${numeroEntero}` : `${numeroEntero}`;
+      }
+
+      if(numeroDecimal !== undefined || numeroDecimal !== ' '){
+        this.cantidadAMostrar = !formatoEuropeo ? `${this.cantidadFormatoEntera}.${numeroDecimal}` : `${this.cantidadFormatoEntera},${numeroDecimal}`
+      }else{
+        if(formatoEuropeo){
+          this.cantidadAMostrar = this.cantidadFormatoEntera
+        }else{
+          this.cantidadAMostrar = `${this.cantidadFormatoEntera}.000`
+
+        }
+        
+      }
+    }
     crearPDF(){
       let doc = new jspdf();
       doc.text("ORIGINAL", 105, 10, null, 'center');
@@ -71,7 +128,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       
       //NOMBRE VAPOR
       doc.setFontSize(12);
-      doc.text("Recived, on board the M/V _____________________________", 79, 50)
+      doc.text("Received, on board the M/V _____________________________", 79, 50)
       doc.setFontSize(11);
       doc.text(this.recibo.nombreBuque, 165, 49.5, null, 'center')
       doc.setFontSize(9);
@@ -113,7 +170,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       doc.setFontSize(9);
       doc.text("CANTIDAD", 35, 111, null, 'center');
       doc.setFontSize(11);
-      doc.text(this.recibo.cantidad.toString(), 35, 131.5, null, 'center');
+      doc.text(this.cantidadAMostrar, 35, 131.5, null, 'center');
   
       //CALIDAD EN LETRAS
       doc.setFontSize(12);

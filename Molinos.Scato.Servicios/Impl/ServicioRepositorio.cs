@@ -10813,6 +10813,8 @@ namespace Molinos.Scato.Servicios.Impl
                             reciboDetallesDB.NombreBuque = detallesDto.NombreBuque;
                             reciboDetallesDB.PuertoDestino = detallesDto.PuertoDestino;
                             reciboDetallesDB.PuertoOrigen = detallesDto.PuertoOrigen;
+                            reciboDetallesDB.esEuropeo = detallesDto.esEuropeo;
+                            reciboDetallesDB.valorEnKG = detallesDto.valorEnKG;
                         }
                         else
                         {
@@ -10830,6 +10832,8 @@ namespace Molinos.Scato.Servicios.Impl
                                 NombreBuque = detallesDto.NombreBuque,
                                 PuertoDestino = detallesDto.PuertoDestino,
                                 PuertoOrigen = detallesDto.PuertoOrigen,
+                                esEuropeo = detallesDto.esEuropeo,
+                                valorEnKG = detallesDto.valorEnKG,
                             };
                         }
                         reciboDB.ReciboDeBuqueDetalles.Add(reciboDetallesDB);
@@ -10865,6 +10869,8 @@ namespace Molinos.Scato.Servicios.Impl
                         detalleDB.NombreBuque = detallesDto.NombreBuque;
                         detalleDB.PuertoDestino = detallesDto.PuertoDestino;
                         detalleDB.PuertoOrigen = detallesDto.PuertoOrigen;
+                        detalleDB.esEuropeo = detallesDto.esEuropeo;
+                        detalleDB.valorEnKG = detallesDto.valorEnKG;
 
                         detalles.Add(detalleDB);
                     }

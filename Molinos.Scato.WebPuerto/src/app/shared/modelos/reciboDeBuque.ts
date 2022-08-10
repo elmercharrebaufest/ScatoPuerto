@@ -24,4 +24,6 @@ export class ReciboDeBuqueDetalles {
     incluirImpresionDestino: boolean; 
     incluirImpresionCalidad: boolean;
     incluirImpresionEstibado: boolean;
+    esEuropeo:boolean;
+    valorEnKG:boolean;
 };
