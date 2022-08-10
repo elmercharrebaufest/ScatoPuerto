@@ -392,3 +392,9 @@ if not exists(select 1 from Bandera where Nombre = 'Yemen') begin INSERT INTO Ba
 if not exists(select 1 from Bandera where Nombre = 'Yibuti') begin INSERT INTO Bandera (Abreviatura, Nombre) VALUES('DJ', 'Yibuti');  end
 if not exists(select 1 from Bandera where Nombre = 'Zambia') begin INSERT INTO Bandera (Abreviatura, Nombre) VALUES('ZM', 'Zambia');  end
 if not exists(select 1 from Bandera where Nombre = 'Zimbabue') begin INSERT INTO Bandera (Abreviatura, Nombre) VALUES('ZW', 'Zimbabue');  end
+
+--Tipo Linea de Embarque
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Nueva'    ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Nueva'    ); END
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vieja'    ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vieja'    ); END
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vicentin' ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vicentin' ); END
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Biodiesel') BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Biodiesel'); END

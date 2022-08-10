@@ -1,9 +1,12 @@
-﻿namespace Molinos.Scato.Dominio.Dto
+﻿using Molinos.Scato.Dominio.Entidades;
+
+namespace Molinos.Scato.Dominio.Dto
 {
     public class ModuloDeCargaLineasDeEmbarqueHistoricoDto
     {
         public int Id { get; set; }
         public string Linea { get; set; }
+        public TipoLineaEmbarqueDto TipoLineaEmbarque { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public string TkInicial { get; set; }
         public double TemperaturaInicial { get; set; }

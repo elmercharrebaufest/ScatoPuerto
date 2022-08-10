@@ -738,10 +738,10 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
-    registroLiquido = registroLiquido > 0 ? 6 : 6; // tamaño del detalle de cada turno
+    registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
     registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
-
+    registroLiquido += 2;
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -752,8 +752,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
+    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
     registroLiquido += 2;
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -1366,21 +1366,13 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
           let lineaDescripcion;
           const lineaFiltro = this.lineas.filter(linea => linea.id == turno.linea_Id);
           if (lineaFiltro.length > 0) {
-            lineaDescripcion = lineaFiltro[0].linea != null ? lineaFiltro[0].linea : '';
+            lineaDescripcion = lineaFiltro[0].tipoLineaEmbarque != null ? lineaFiltro[0].tipoLineaEmbarque.linea : '';
           }
 
           worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
           worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
           worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
           worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
-          /*
-          worksheet.getRow(offset).getCell(7).value = turno.tk;
-          worksheet.getRow(offset).getCell(8).value = turno.temperatura;
-          worksheet.getRow(offset).getCell(9).value = turno.medidaInicialCM;
-          worksheet.getRow(offset).getCell(10).value = turno.medidaFinalMM;
-          worksheet.getRow(offset).getCell(11).value = turno.medidaFinalCM;
-          worksheet.getRow(offset).getCell(12).value = turno.medidaFinalMM;
-          */
           worksheet.getRow(offset).getCell(7).value = turno?.destino?.nombre;
           worksheet.getRow(offset).getCell(8).value = parseInt(turno.cantidad.toString());
 
@@ -1491,11 +1483,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         console.log('3 moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad -->>')
         console.log(turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
         turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.forEach((observacion: any, index) => {
-          //if (index == 2){
           worksheet.mergeCells(`E${offset}:H${(offset)}`);
-          //}
-          console.log('observacion =>>')
-          console.log(observacion)
           let fechaObs = '';
           let horaObs = '';
           if (observacion.fechaHora != undefined) {

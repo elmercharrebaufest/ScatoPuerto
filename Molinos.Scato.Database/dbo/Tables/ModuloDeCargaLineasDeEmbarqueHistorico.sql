@@ -3,6 +3,7 @@
 	[Id]                INT IDENTITY (1, 1) NOT NULL,
     [ModuloDeCargaHistorico_Id]  INT NOT NULL,
     [Linea]             NVARCHAR(10) NULL,
+    [TipoLineaEmbarque_Id]  INT NULL,
     [MaterialPuerto_Id] INT NULL,
     [TkInicial]         NVARCHAR(10) NULL,
     [TemperaturaInicial]FLOAT NULL,
@@ -19,4 +20,5 @@
     CONSTRAINT [PK_dbo.ModuloDeCargaLineasDeEmbarqueHistorico] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaLineasDeEmbarqueHistorico_dbo.ModuloDeCargaHistorico_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCargaHistorico_Id]) REFERENCES [dbo].[ModuloDeCargaHistorico] ([Id]) on delete cascade,
     CONSTRAINT [FK_dbo.ModuloDeCargaLineasDeEmbarqueHistorico_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto] ([Id]),
+    CONSTRAINT [FK_dbo.ModuloDeCargaLineasDeEmbarqueHistorico_dbo.TipoLineaEmbarque_TipoLineaEmbarque_Id] FOREIGN KEY ([TipoLineaEmbarque_Id]) REFERENCES [dbo].[TipoLineaEmbarque] ([Id]),
 );
