@@ -6,6 +6,10 @@
 .tabla-fila-corte{
     background-color: #F4F4F4;
 }
+.tabla-fila-corte-boton{
+    height: 55px;
+    background-color: #F4F4F4;
+}
 .center-bt{
     margin: auto !important;
 }
@@ -67,6 +71,10 @@ select { margin: 0; height: 30px;}
     cursor: pointer;
     width: 30px;
     height: 30px;
+}
+.agrupador_botones{
+    display: flex;
+    justify-content: inline-flex;
 }
 .full-right{
     display: flex;

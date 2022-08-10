@@ -15,25 +15,17 @@ import { Workbook, Worksheet } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Mail } from '@ScatoModels/mail';
 import { PlanillaDeTurnos, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { TurnoDetalleLiquido } from '@ScatoModels/planilla-turnos/turno';
 import { CorteTurno } from '@ScatoModels/planilla-turnos/corte-turno';
-import { convertActionBinding, ConvertActionBindingResult } from '@angular/compiler/src/compiler_util/expression_converter';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { Embarque } from '@ScatoModels/embarque';
 import { PlanoContentComponent } from 'app/modulos/lineup/plano-de-carga/plano-content/plano-content.component';
-import { style } from '@angular/animations';
-import { WorkflowService } from '@ScatoServicios/workflow.service';
-import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Destino } from '@ScatoModels/destino';
-import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { convertToObject } from 'typescript';
-import { timeoutWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -107,7 +99,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
-    private planoDeCargaService: PlanoDeCargaService,
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
@@ -242,7 +233,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         if (fechaSeleccionada < fechaInicio || fechaSeleccionada > new Date()) {
           this.confirmationDialogService.confirm('¡Atención!', 'La fecha debe ser entre ' + fechaInicio.toLocaleString().split(', ')[0] + ' y ' + new Date().toLocaleString().split(', ')[0] + '.', 'Cerrar', '', null, null, Tipoalerta.Warning)
         } else {
-
+          console.log('addTurnoFechaSeleccionada---->>')
           this.addTurnoFechaSeleccionada(turno, exitFunction, diaTurnoToAdd, fechaSeleccionada);
           //CIERRO EL MODAL
           //this._modalService.dismissAll();
@@ -436,19 +427,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     const turnoFecha = this.getFechaFormato(turno.fecha);
     turno.fecha = turnoFecha;
-    console.log('valida turno')
-    console.log(idTurnoPuerto) 
-    console.log(this.procesoService.getModuloDeCarga().id)
-    console.log(esLiquido)
-    console.log(turnoFecha)
-    console.log('turno -->>>')
-    console.log(turno)
     this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido, turnoFecha).subscribe((turnoDb: PlanillaDeTurnos) => {
 
       if (turnoDb == null) {
         console.log('soloTurno xxxxxx')
         console.log(soloTurno)
-        
+
         this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
           res.forEach((turnoPuerto: TurnoPuerto) => {
             if (turnoPuerto.id == idTurnoPuerto) {
@@ -538,7 +522,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
     this.bodegas = this._turnosService.getBodega();
-    //this.addParcelChecks();
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.vientoAmarre = this.procesoService.getVientoAmarre();
@@ -633,6 +616,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     })
   }
+
   private obtenerLineaProductoTk() {
     this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
     let lineasEmbarque = null;
@@ -699,7 +683,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   obtenerTkxLinea(lineaTurno) {
-
     const linea = lineaTurno['controls'].tipoLineaEmbarque.value;
     let tkInicialPlanilla = [];
     const tkIniciales = this.tipoLineaProductoTk.filter(item => item.tipoLinea?.id == linea?.id);
@@ -711,6 +694,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     return tkInicialPlanilla;
   }
+
   guardarObservacionesDeCalidad() {
     if (this.obsCalidadForm.controls.observaciones.value === '' || this.obsCalidadForm.controls.fecha.value === '' || this.obsCalidadForm.controls.hora.value === '')
       return;
@@ -832,7 +816,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   }
 
-  //Calcula el total de tiempo de los cortes
   calcularTotal() {
     let desde = this.formCorte.get('horaInicio').value ? this.formCorte.get('horaInicio').value.split(':') : '',
       hasta = this.formCorte.get('horaFin').value ? this.formCorte.get('horaFin').value.split(':') : '',
@@ -853,7 +836,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurno(turnos);
-      contador += 2;
+      contador += 3;
     }
     return contador;
   }
@@ -874,7 +857,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.getTurnos(dia)['controls'][turno]['controls'].turnoPuerto.setValue(returnHorario);
     return returnHorario;
   }
-
 
   sendRitmos(dia, turno) {
     this._turnosService.setTurnos(this.getTurnos(dia).controls[turno].value)
@@ -978,9 +960,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     return fg;
   }
+
   compareFieldLineas(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
+
   compareFields(c1: Exportador, c2: Exportador) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
@@ -1469,8 +1453,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
           let lineaDescripcion;
           const lineaFiltro = this.lineas.filter(linea => linea.id == turno.linea_Id);
+          console.log('lineaFiltro--->>')
+          console.log(lineaFiltro)
           if (lineaFiltro.length > 0) {
-            lineaDescripcion = lineaFiltro[0].linea != null ? lineaFiltro[0].linea : '';
+            lineaDescripcion = lineaFiltro[0].tipoLineaEmbarque != null ? lineaFiltro[0].tipoLineaEmbarque.linea : '';
           }
 
           worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
@@ -1595,23 +1581,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       worksheet.mergeCells(`A${baseCell + 1}:A${baseCell + (CantRows > 0 ? CantRows - 1 : CantRows)}`);
       worksheet.getCell(`A${baseCell}`).value = "Fecha";
 
-      worksheet.getCell(`A${baseCell}`).fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFCCFFCC' }
-      };
-      worksheet.getCell(`A${baseCell}`).border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
-      }
-      worksheet.getCell(`A${baseCell}`).font = {
-        name: 'Arial',
-        family: 2,
-        size: 11,
-        bold: true
-      }
+      worksheet.getCell(`A${baseCell}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' } };
+      worksheet.getCell(`A${baseCell}`).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      worksheet.getCell(`A${baseCell}`).font = { name: 'Arial', family: 2, size: 11, bold: true }
 
       /* Cabeceras Turno */
       worksheet.getCell(`B${baseCell}`).fill = {
@@ -1716,12 +1688,33 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   }
 
-  guardarTurno(Turno: PlanillaDeTurnos, reload: boolean = false) {
+  private asignarFechaHoraTurno(planillaTurno: PlanillaDeTurnos) {
+
+    let turnoFechaHora = this.getFechaFormato(planillaTurno.fecha);
+
+    switch (planillaTurno.turnoPuerto.id) {
+      case 1:
+        turnoFechaHora += turnoFechaHora + ' 06:00';
+        break;
+      case 2:
+        turnoFechaHora += turnoFechaHora + ' 12:00';
+        break;
+      case 3:
+        turnoFechaHora += turnoFechaHora + ' 18:00';
+        break;
+      case 4:
+        turnoFechaHora += turnoFechaHora + ' 23:00';
+        break;
+    }
+    planillaTurno.fecha = turnoFechaHora;
+  }
+  guardarTurno(planillaTurno: PlanillaDeTurnos, reload: boolean = false) {
     console.log('Antes y despues Turno')
-    console.log(Turno)
-    Turno.fecha = new Date();
-    console.log(Turno)
-    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(Turno, this.idModuloDeCarga).subscribe(res => {
+    console.log(planillaTurno)
+    planillaTurno.fecha = new Date();
+    this.asignarFechaHoraTurno(planillaTurno);
+    console.log(planillaTurno)
+    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
           this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
@@ -1750,9 +1743,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
+
         const turnoDetalle = Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls'][index];
-
-
         const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle['controls'].destino.value)
         const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0] : 0
 
@@ -1763,19 +1755,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
 
         const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque.id == tipoLineaEmbarqueVal?.id);
-        
-        console.log('lineaSeleccionada lllllllllllll')
-        console.log(lineaSeleccionada)
-        console.log(turnoDetalle['controls'].linea.value)
-        if (turnoDetalle['controls'].linea.value == '' ||  turnoDetalle['controls'].linea.value == '0') {
+
+        if (turnoDetalle['controls'].linea.value == '' || turnoDetalle['controls'].linea.value == '0') {
           if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
             turnoDetalle['controls'].linea.setValue(lineaSeleccionada[0]?.id)
           }
         }
 
         const lineaIdVal = turnoDetalle['controls'].linea.value;
-        console.log('lineaIdValxxxx')
-        console.log(lineaIdVal)
+
         if ((lineaIdVal != null || lineaIdVal != undefined)) {
           if ((lineaIdVal > '' && lineaIdVal != '0')) {
 
@@ -1811,7 +1799,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
           }
         }
-
       }
 
       let planillaTurno = {
@@ -1837,38 +1824,18 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               return;
           }).catch();
       }
-      /*
-      else if (planillaTurno.guardadoPorTablerista == true) {
-        var texto = "El turno ya ha sido guardado anteriormente.";
-        this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then((confirmed) => {
-            if (confirmed)
-              return;
-            else
-              return;
-          }).catch();
-      }*/
       else {
         this.confirmationDialogService.confirm(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
           .then((confirmed) => {
             if (confirmed) {
               this.bGrabandoTurnoActivo = false;
               this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
-
                 this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
                 if (enviado) {
                   this.enviarRecibidores();
                 }
-                this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-                  if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-                    this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
-                    const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-                    this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
-                    this.fillPlanilla();
-                    this.recargarGraficos.emit(true);
-                    this.bGrabandoTurnoActivo = true;
-                  }
-                });
+                this.recargarTurnosPlanilla();
+                this.bGrabandoTurnoActivo = true;
               }, error => {
                 console.log(error);
                 this.bGrabandoTurnoActivo = true;
@@ -1970,7 +1937,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       });
   }
 
-  onEliminarDetalleTurno(detalle) {
+  onEliminarDetalleTurno(detalle, dia, turno, index) {
     const idModuloDeCargaDetalleLiquido = detalle['controls']?.id?.value;
     if (idModuloDeCargaDetalleLiquido > 0) {
       const mensaje = "¿Esta seguro que desea eliminar el detalle del turno seleccionado?";
@@ -1982,16 +1949,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             }, error => {
               console.log(error);
               this.confirmationDialogService.confirm("¡Error!", "No se ha podido eliminar el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
-            },() => {
-              this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-                if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-                  this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
-                  const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-                  this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
-                  this.fillPlanilla();
-                  this.recargarGraficos.emit(true);
-                }
-              });
+            }, () => {
+              this.recargarTurnosPlanilla();
             })
           }
         })
@@ -1999,11 +1958,59 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           this.hideSpinner.emit(false)
           return;
         });
+    } else {
+      let lineaSel = this.getTurnos(dia)['controls'][turno]['controls'].moduloDeCargaPlanillaDeTurnosDetallesLiquido;
+      let numeroLineas = lineaSel['controls'].length;
+      if (numeroLineas > 1)
+        lineaSel.removeAt(index);
     }
   }
-  onAgregarDetalleTurno(turno, index) {
+  
+  onEliminarDetalleCorte(corte, dia, turno, index){
+    const idModuloDeCargaPlanillaCorte = corte['controls']?.id?.value == undefined ? 0 : corte['controls']?.id?.value;
+    console.log(corte['controls'])
+    if (idModuloDeCargaPlanillaCorte > 0) {
+      const mensaje = "¿Esta seguro que desea eliminar el detalle del corte seleccionado?";
+      this.confirmationDialogService.confirm("Eliminar detalle del corte", mensaje, "Aceptar", "Cancelar")
+        .then((confirmed) => {
+          if (confirmed) {
+            this.moduloCargaService.eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte).subscribe(res => {
+              this.confirmationDialogService.confirm('¡Atención!', 'Se elimino el corte correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+            }, error => {
+              console.log(error);
+              this.confirmationDialogService.confirm("¡Error!", "No se ha podido eliminar el corte.", "Cerrar", "", null, null, Tipoalerta.Error)
+            }, () => {
+              this.recargarTurnosPlanilla();
+            })
+          }
+        })
+        .catch((e) => {
+          this.hideSpinner.emit(false)
+          return;
+        });
+    } else {
+      let lineaSel = this.getTurnos(dia)['controls'][turno]['controls'].moduloDeCargaPlanillaDeTurnosCortes;
+      const numeroLineas = lineaSel['controls'].length;
+      if (numeroLineas > 0)
+        lineaSel.removeAt(index);
+    }
+  }
+
+  onAgregarDetalleTurno(turno) {
     let turnoSeleccionado = turno['controls'];
     (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, turnoSeleccionado.guardadoPorTablerista.value));
   }
 
+  recargarTurnosPlanilla() {
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      console.log(resp)
+      if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+        this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+        const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+        this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+        this.fillPlanilla();
+        this.recargarGraficos.emit(true);
+      }
+    });
+  }
 }

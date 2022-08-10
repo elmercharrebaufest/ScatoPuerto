@@ -2677,6 +2677,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle);
 
+        [OperationContract]
+        void EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte);
+
 
 		[OperationContract]
         void GuardarArchivos(List<ArchivosPuertoDto> archivosPuertoDto, int idEmbarque);

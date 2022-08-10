@@ -24,8 +24,9 @@
                             <th class="header-fijo">Día</th>
                             <th class="header-fijo">Turno</th>
                             <th class="header-fijo" width="12%">Exportador</th>
+                            <th class="header-fijo">Destino</th>
+                            <th class="header-fijo" width="7%">Partida</th>
                             <th class="header-fijo">Línea</th>
-                            <th class="header-fijo" width="5%">Partida</th>
                             <th class="header-fijo" width="12%">Producto</th>
                             <th class="header-fijo" width="4%">Tk</th>
                             <th class="header-fijo" width="4%">°C</th>
@@ -33,9 +34,8 @@
                             <th class="header-fijo">Med.Ini. MM</th>
                             <th class="header-fijo">Med.fin. CM</th>
                             <th class="header-fijo">Med.fin. MM</th>
-                            <th class="header-fijo">Destino</th>
                             <th class="header-fijo" width="5%">Cant.</th>
-                            <th class="header-fijo" width="5%"></th>
+                            <th class="header-fijo" width="4%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,7 +59,7 @@
                                     <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index'
                                         [formGroupName]='t'>
                                         <tr disabled="true">
-                                            <td [attr.rowspan]='getRowSpanTurno(turno) + 2'>
+                                            <td [attr.rowspan]='getRowSpanTurno(turno) + 3'>
                                                 <div class="column-center">
                                                     <span><b>{{turno.value.turnoPuerto ?
                                                             turno.value.turnoPuerto.turnoPuerto ?
@@ -69,21 +69,26 @@
                                                     <span class='turno'>por turno</span>
                                                     <span *ngFor='let bodega of bodegas'
                                                         class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
-                                                        {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.</span><br>
-                                                    <button id="btn-guardar-turno-liquidos" class='btn btn btn-success'
-                                                        style="margin-top: 5px; margin-bottom: 5px"
+                                                        {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
+                                                        Tn.</span>
+                                                    <button id="btn-guardar-turno-liquidos"
+                                                        class='btn btn-success btn-sm'
+                                                        style="margin-right: 5px; margin-bottom: 5px"
                                                         (click)='guardarTurnoGeneral(d,t)'
                                                         [disabled]="!bGrabandoTurnoActivo">
-                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar turno' : 'Guardar turno'}}
+                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
+                                                        'Guardar Turno'}}
                                                     </button>
-                                                    <span class='parcel-cantidad' *ngIf="turno.value.guardadoPorTablerista"><b>Turno en recibidores</b></span>
-
-                                                    <button id="btn-turno-enviado-liquidos" *ngIf="!turno.value.guardadoPorTablerista"
+                                                    <button id="btn-turno-enviado-liquidos"
+                                                        *ngIf="!turno.value.guardadoPorTablerista"
                                                         (click)='guardarTurnoGeneral(d,t,true)'
-                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary" : "btn btn-outline-primary"'>
+                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
                                                         {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
                                                         'Turno enviado'}}
                                                     </button>
+                                                    <span class='parcel-cantidad'
+                                                        *ngIf="turno.value.guardadoPorTablerista"><b>Turno en
+                                                            recibidores</b></span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -95,30 +100,42 @@
                                                     <!-- EXPORTADOR -->
                                                     <td>
                                                         <!-- <ng-container formGroupName="exportador"> -->
-                                                        <select formControlName='exportador'[compareWith]='compareFields'>
+                                                        <select formControlName='exportador'
+                                                            [compareWith]='compareFields'>
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let exportador of exportadores'
                                                                 [ngValue]='exportador'>{{exportador.nombre}}</option>
                                                         </select>
                                                         <!-- </ng-container> -->
                                                     </td>
-                                                    <!-- LINEA -->
+                                                    <!-- DESTINO -->
                                                     <td>
-                                                        <select formControlName='tipoLineaEmbarque'
-                                                                (change)="onLineaChange(result,d,t, i)"
-                                                                [compareWith]='compareFieldLineas'>
+                                                        <select formControlName='destino'>
                                                             <option [value]='0'></option>
-                                                            <option *ngFor='let linea of tipoLineaEmbarque' [ngValue]='linea'>
-                                                                {{linea.linea}}
-                                                            </option>
+                                                            <option *ngFor='let destino of destinos'
+                                                                [ngValue]='destino.id'>{{destino.nombre}}</option>
                                                         </select>
                                                     </td>
                                                     <!-- PARTIDA -->
                                                     <td>
-                                                        <select formControlName='bodegaParcel' style="text-align: right">
+                                                        <select formControlName='bodegaParcel'
+                                                            style="text-align: right">
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let bodega of bodegas'
-                                                                [ngValue]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}
+                                                                [ngValue]='bodega.bodegaParcel'>Parcel
+                                                                {{bodega.bodegaParcel}}
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <!-- LINEA -->
+                                                    <td>
+                                                        <select formControlName='tipoLineaEmbarque'
+                                                            (change)="onLineaChange(result,d,t, i)"
+                                                            [compareWith]='compareFieldLineas'>
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let linea of tipoLineaEmbarque'
+                                                                [ngValue]='linea'>
+                                                                {{linea.linea}}
                                                             </option>
                                                         </select>
                                                     </td>
@@ -128,7 +145,8 @@
                                                             [compareWith]='compareFields'
                                                             (change)='getCantidadLinea(result)'>
                                                             <option [value]='0'></option>
-                                                            <option *ngFor='let producto of obtenerMaterialxLinea(result)'
+                                                            <option
+                                                                *ngFor='let producto of obtenerMaterialxLinea(result)'
                                                                 [ngValue]='producto'>{{producto.descripcionCorta}}
                                                             </option>
                                                         </select>
@@ -136,8 +154,8 @@
                                                     <!-- TK -->
                                                     <td>
                                                         <!-- <input type="text" formControlName='tk' disabled> -->
-                                                        <select formControlName='tk'
-                                                            (change)='getCantidadLinea(result)' class='planilla-text-derecha'>
+                                                        <select formControlName='tk' (change)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'>
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let linea of obtenerTkxLinea(result)'
                                                                 [ngValue]='linea.tkInicial'>{{linea.tkInicial}}</option>
@@ -145,30 +163,28 @@
                                                     </td>
                                                     <!-- °C -->
                                                     <td><input type="number" formControlName='temperatura'
-                                                            (change)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
+                                                            (change)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaInicialCM'
-                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
+                                                            (focusout)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaInicialMM'
-                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
+                                                            (focusout)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaFinalCM'
-                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
+                                                            (focusout)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'></td>
                                                     <td><input type="number" formControlName='medidaFinalMM'
-                                                            (focusout)='getCantidadLinea(result)' class='planilla-text-derecha'></td>
-                                                    <!-- DESTINO -->
+                                                            (focusout)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'></td>
+                                                    <td><input type="number" formControlName='cantidad'
+                                                            class='planilla-text-derecha'></td>
                                                     <td>
-                                                        <select formControlName='destino'>
-                                                            <option [value]='0'></option>
-                                                            <option *ngFor='let destino of destinos'
-                                                                [ngValue]='destino.id'>{{destino.nombre}}</option>
-                                                        </select>
-                                                    </td>
-                                                    <td><input type="number" formControlName='cantidad' class='planilla-text-derecha'></td>
-                                                    <td>
-                                                        <div fxFlex='2' class='full-left' *ngIf='i == 0 && !turno.value.guardadoPorTablerista' >
-                                                            <img src="assets/Mas.svg" class="adicionar" (click)="onAgregarDetalleTurno(turno, d)"  alt="Añadir Detalle">
-                                                        </div>
-                                                        <div fxFlex='2' class='full-right'  *ngIf="!turno.value.guardadoPorTablerista">
-                                                            <img src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarDetalleTurno(result)" alt="Eliminar Detalle">
+                                                        <div fxFlex='2' class='full-right'
+                                                            *ngIf="!turno.value.guardadoPorTablerista">
+                                                            <img src="assets/trashIcon.svg" class="basurerito"
+                                                                (click)="onEliminarDetalleTurno(result, d, t, i)"
+                                                                title="Eliminar Detalle">
                                                         </div>
                                                     </td>
 
@@ -176,7 +192,17 @@
                                             </ng-container>
                                         </ng-container>
                                         <tr>
-                                            <td colspan="12" class='btn-add-cell'>
+                                            <td colspan="13" class='btn-add-cell'>
+                                                <div class='btn-add-container center-bt' *ngIf="mostrarBtn"
+                                                    (click)='onAgregarDetalleTurno(turno)' #addButton>
+                                                    <button type='button' class='btn btn-primary bt-circle'
+                                                        style='margin-top: -5px;'>+</button>
+                                                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar linea</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="tabla-fila-corte-boton">
+                                            <td colspan="13" class='btn-add-cell'>
                                                 <div class='btn-add-container center-bt' *ngIf="mostrarBtn"
                                                     (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                     <button type='button' class='btn btn-primary bt-circle'
@@ -186,7 +212,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf='getCorteTurnos(d, t).controls.length > 0'>
-                                            <td colspan="12" class='p-0'>
+                                            <td colspan="13" class='p-0'>
                                                 <table class='tabla table-bordered tabla-embebida'>
                                                     <thead>
                                                         <tr class='table-active'>
@@ -194,7 +220,8 @@
                                                             <th colspan="1">Inicio</th>
                                                             <th colspan="1">Fin</th>
                                                             <th colspan="1">Tiempo total</th>
-                                                            <th colspan="5">Observaciones</th>
+                                                            <th colspan="4">Observaciones</th>
+                                                            <th colspan="1"></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -217,8 +244,14 @@
                                                                     <td colspan="1">
                                                                         {{corte.controls.tiempoTotal.value}} hs
                                                                     </td>
-                                                                    <td colspan="5">
+                                                                    <td colspan="4">
                                                                         {{corte.controls.observaciones.value}}
+                                                                    </td>
+                                                                    <td colspan="1">
+                                                                        <img src="assets/trashIcon.svg"
+                                                                            class="basurerito"
+                                                                            (click)="onEliminarDetalleCorte(corte, d, t, i)"
+                                                                            title="Eliminar Corte">
                                                                     </td>
                                                                 </tr>
                                                             </ng-container>
