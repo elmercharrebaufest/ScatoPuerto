@@ -91,18 +91,12 @@
                                 </div>
 
                                 <!-- COLUMNA MOTIVO -->
-                                <!-- CARGA NORMAL -->
-                                <div class="form-group" fxFlex='15' *ngIf="balanza.value.tn>999">
-                                  <input type="text"
-                                        class="inputLineasEmbarque" 
-                                        formControlName="kg"
-                                        [attr.disabled]="true">
-                                </div>
                                 <!-- BAJA CARGA O STOP -->
-                                <div class="form-group borde-div al-medio" fxFlex='15' *ngIf="balanza.value.tn<1000">
+                                <div class="form-group borde-div al-medio" fxFlex='15'>
                                   <label *ngIf="balanza.value.observaciones" 
                                         class="m-1"
-                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': (balanza.value.tn>0 && balanza.value.tn<1000)}" > 
+                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': (balanza.value.tn>0 && balanza.value.tn<1000)}" 
+                                        data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones"> 
                                         {{ balanza.value.listadoTotalBalanzadas.motivosFallasBalanza.siglas }}
                                   </label>
 
@@ -514,18 +508,12 @@
                                 </div>
 
                                 <!-- COLUMNA MOTIVO -->
-                                <!-- CARGA NORMAL -->
-                                <div class="form-group" fxFlex='15' *ngIf="balanza.value.tn>999">
-                                  <input type="text"
-                                        class="inputLineasEmbarque" 
-                                        formControlName="kg"
-                                        [attr.disabled]="true">
-                                </div>
                                 <!-- BAJA CARGA O STOP -->
-                                <div class="form-group borde-div al-medio" fxFlex='15' *ngIf="balanza.value.tn<1000">
+                                <div class="form-group borde-div al-medio" fxFlex='15'>
                                   <label *ngIf="balanza.value.observaciones" 
                                         class="m-1"
-                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': (balanza.value.tn>0 && balanza.value.tn<1000)}" > 
+                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': (balanza.value.tn>0 && balanza.value.tn<1000)}" 
+                                        data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones"> 
                                         {{ balanza.value.listadoTotalBalanzadas.motivosFallasBalanza.siglas }}
                                   </label>
 
