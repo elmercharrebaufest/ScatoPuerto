@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://gslopuertoappqa00.molinosagro.ad/Scato.WebPuertoApi/api/'
+  apiUrl: '/api/'
 };
 
 /*
