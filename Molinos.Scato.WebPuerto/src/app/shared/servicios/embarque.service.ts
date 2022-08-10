@@ -52,12 +52,13 @@ export class EmbarqueService {
   obtenerTipoArchivos(): Observable<TipoArchivoPuerto[]> {
     return this.http.get<TipoArchivoPuerto[]>(`${this.url}Embarque/ObtenerTipoArchivos`, { 'withCredentials': true });
   }
+
   obtenerArchivos(id: number): Observable<ArchivoPuerto[]> {
     return this.http.get<ArchivoPuerto[]>(`${this.url}Embarque/ObtenerArchivos?idEmbarque=`+ id, { 'withCredentials': true });
   }
 
-  eliminarArchivos(files_ids: number[]): Observable<ArchivoPuerto[]> {
-    return this.http.get<ArchivoPuerto[]>(`${this.url}Embarque/EliminarArchivos?filesIds=`+ files_ids, { 'withCredentials': true });
+  guardarArchivos(id: number, archivos : ArchivoPuerto[]) {
+    return this.http.post(`${this.url}Embarque/GuardarArchivos?idEmbarque=`+ id, archivos, { 'withCredentials': true });
   }
 
   obtenerListadoMotivosLimpieza(): Observable<MotivosLimpieza[]> {
