@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
@@ -9,6 +9,7 @@ import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Observador } from '@ScatoInterfaces/observador';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoadScreen } from '@ScatoInterfaces/load-screen';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
@@ -20,6 +21,12 @@ import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocaliz
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 import { sign } from 'crypto';
 import { LineUp } from '@ScatoModels/lineUp';
+import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
+import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { DomSanitizer } from '@angular/platform-browser';
+import { FormGroup } from '@angular/forms';
+import { textChangeRangeIsUnchanged } from 'typescript';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -32,6 +39,7 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
 
+  
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
@@ -42,12 +50,26 @@ export class LineupEmbarqueComponent implements OnInit {
   posicionesDeLineUps: number[];
   embarquesPuerto: InstanciaWorkflowPuerto[];
   hayBuque = true;
+  ListTipoArchivoPuerto: TipoArchivoPuerto[];
+  ArchivosPuertoDb: ArchivoPuerto[];
+  ArchivosPuerto: ArchivoPuerto[];
+  ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
+
+
+  imagePath: any;
+  ListTipoArchivoPuerto: TipoArchivoPuerto[];
+  ArchivosPuerto: ArchivoPuerto[];
+  TipoArchivosDbList: TipoArchivoPuerto[] = [];
+  nombreArchivo: TipoArchivoPuerto;
+  fileToUpload: any | null = null;
+
   colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
   constructor(
+    private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
     private workflowService: WorkflowService,
     private router: Router,
@@ -55,7 +77,9 @@ export class LineupEmbarqueComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService
+    private geolocalizacionService: GeolocalizacionService,
+    private _modalService: NgbModal,
+    private embarqueService: EmbarqueService,
   ) {
     this.user = this.session.getUser();
   }
@@ -76,7 +100,9 @@ export class LineupEmbarqueComponent implements OnInit {
         this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
       });
   }
-
+  counter(i: number) {
+    return new Array(i);
+}
   cargarBuqueGeolocalizacion(id: any) {
     this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
@@ -342,5 +368,151 @@ export class LineupEmbarqueComponent implements OnInit {
   hasPermisoEditEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
   }
+
+//------------------------------------------------------------------------------------------------------------
+//------------------------------------------Sistema de archivos-----------------------------------------------
+//------------------------------------------------------------------------------------------------------------
+
+  openModalFiles(Modal: any){
+    //embarqueid 
+    this.initializeModalArchivos();
+     this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(
+        res => this.ArchivosPuerto = res)
+      ; 
+     this.embarqueService.obtenerTipoArchivos().subscribe(res => {
+      this.TipoArchivosDbList = res
+    }); 
+    
+    this._modalService.open(Modal);
+  }
+
+  downloadFile(file: ArchivoPuerto){
+    //Me fijo si el archivo a descargar es de alguno de los siguientes formatos.
+    if(file.archivo.includes("data:image") || file.archivo.includes("openxmlformats") || file.archivo.includes("data:application/pdf") || file.archivo.includes("text/plain")){
+      const linkSource = file.archivo;
+      const downloadLink = document.createElement("a");
+      downloadLink.href = linkSource;
+      downloadLink.download = file.nombreArchivo;
+      downloadLink.click();
+    //En caso de no ser, le aviso que no se puede descargar.
+    }else{
+      this.confirmationDialogService.confirm('¡Atención!', "El archivo tiene un formato inválido para la acción que desea realizar.", 'Aceptar', '', null, null, Tipoalerta.Warning)
+    }    
+  }
+  
+  previewFile(Modal: any, file: ArchivoPuerto){
+    if(file.archivo.includes("data:image")){
+      this.convertB64ToImg(file);
+      this._modalService.open(Modal);
+    }else if(file.archivo.includes("data:application/pdf")){      
+      let pdfWindow = window.open("");
+      pdfWindow.document.write(
+      "<iframe width='100%' height='100%' src='" +
+      encodeURI(file.archivo) + "'></iframe>"
+      )      
+    }else{
+      this.confirmationDialogService.confirm('¡Atención!', "El tipo de archivo no se puede mostrar", 'Aceptar', '', null, null, Tipoalerta.Warning)
+    }    
+  }
+    
+  convertB64ToImg(file: ArchivoPuerto) {
+    this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl(file.archivo);
+  }
+
+  initializeModalArchivos(){
+    this.nombreArchivo = null;
+  }
+    
+  guardarArchivos(){
+
+    this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los cambios?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.embarqueService.guardarArchivos(this.instanciaWorkflow.embarque.id, this.ArchivosPuerto).subscribe(res => {
+          this._modalService.dismissAll();
+        })          
+      }
+    })
+  }
+
+
+  eliminarArchivo(reg: ArchivoPuerto){
+    if(reg.id > 0){  
+      this.ArchivosPuerto.forEach((element,index)=>{
+        if(element.id ==reg.id) this.ArchivosPuerto.splice(index,1);
+     });
+    } else{
+      this.ArchivosPuerto.forEach((element,index)=>{
+        if(element.nombreArchivo ==reg.nombreArchivo) this.ArchivosPuerto.splice(index,1);
+     });
+    }
+  }
+
+  handleFileInput(files: any) {
+    this.fileToUpload = files.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(this.fileToUpload);
+    reader.onload = () => {
+        console.log(reader.result);
+    };
 }
 
+addFileToSave(){
+  if(this.fileToUpload == null){
+    this.confirmationDialogService.confirm('Atención','No has seleccionado ningún archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    return;
+  }
+
+  if(!this.nombreArchivo[0] || this.nombreArchivo[0].tipoArchivo == undefined || this.nombreArchivo[0].tipoArchivo == ""){
+    this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+    return;
+  }
+  
+  if (this.fileToUpload.name  == "" ){
+    this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+    return;
+  }
+
+  if(this.fileToUpload.size >= 5000000){  
+    this.confirmationDialogService.confirm('Atención','El tamaño del archivo debe ser menor a 5MB.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    return;
+  }    
+
+  
+  const reader = new FileReader();
+  reader.readAsDataURL(this.fileToUpload);
+  reader.onload = () => {
+    var file = reader.result.toString(); 
+      if(file.includes("data:image") || file.includes("openxmlformats") || file.includes("data:application/pdf") || file.includes("text/plain")){
+
+        let fileToAdd = new ArchivoPuerto;
+
+        fileToAdd.archivo = file;
+        fileToAdd.fecha = new Date;
+        fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
+        fileToAdd.nombreArchivo = this.fileToUpload.name        
+        fileToAdd.tipoArchivoPuerto = this.nombreArchivo[0];
+        fileToAdd.id = 0;
+
+        this.ArchivosPuerto.push(fileToAdd);
+        this.ArchivosPuerto = this.ArchivosPuerto.sort((a,b) => a.id - b.id)
+        this.nombreArchivo = null;
+        this.fileToUpload = null
+  
+    }else{
+      //Salgo y no lo dejo agregar 
+      this.confirmationDialogService.confirm('Atención','El archivo tiene un formato inválido.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    }
+  }
+    
+    //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
+    //Primero valido que esté toda la data necesaria completa
+   
+}
+
+
+}
+
+//------------------------------------------------------------------------------------------------------------
+//------------------------------------------Fin sistema de archivos-------------------------------------------
+//------------------------------------------------------------------------------------------------------------

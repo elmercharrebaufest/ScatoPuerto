@@ -48,7 +48,7 @@
       <div class="row">
         <div class="col">
           <label for="recipient-name" class="col-form-label"
-            ><b>Recived, in board the M/V/</b><br /><span class="Traduccion">
+            ><b>Received, on board the M/V/</b><br /><span class="Traduccion">
               Recibido a bordo del vapor</span
             ></label
           >
@@ -66,9 +66,9 @@
       <div>
         <label for="recipient-name"
           ><b
-            >the under noted goods in apparent good order and confition form/</b
+            >the under noted goods in apparent good order and condition from/</b
           ><br /><span class="Traduccion">
-            las mercaderías abajo mencionadas en aparente buen orden y condcion
+            las mercaderías abajo mencionadas en aparente buen orden y condición
             de</span
           ></label
         >
@@ -124,14 +124,45 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-4">
+          <label for="recipient-name" class="col-form-label"
+            ><b>Numerical format:</b><br /><span class="Traduccion">
+              formato numérico</span></label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="esEuropeo"
+                   formControlName="esEuropeo" [value]="false">
+            <label class="form-check-label" for="No">Asian e.i.</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="esEuropeo"
+                  formControlName="esEuropeo" [value]="true">
+            <label class="form-check-label" for="No">European e.i.</label>
+          </div>
+        </div>
+          <div class="col-6">
+            <label for="recipient-name" class="col-form-label"
+            ><b>Unit:</b><br /><span class="Traduccion">
+          unidad</span></label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="valorEnKG"
+                     formControlName="valorEnKG" [value]="false">
+              <label class="form-check-label" for="No">MT (metric tons)</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="valorEnKG"
+                     formControlName="valorEnKG" [value]="true">
+              <label class="form-check-label" for="No">KG (kilos)</label>
+            </div>
+          </div>
+      </div>
+      
+
       <div><label></label></div>
 
       <div>
         <label for="recipient-name" class="col-form-label"
-          ><small
-            >(Quantity to be stated in Figures and also in Words).(Cantidades
-            establecidas en números y tambien en letras)</small
-          ></label
+          ><small>(Quantity to be stated in Figures and also in Words).(Cantidadesestablecidas en números y tambien en letras)</small></label
         >
       </div>
 
@@ -150,26 +181,34 @@
             class="form-control inputCantidad"
             formControlName="cantidad"
             (change)="
-              onChangeCantidadEnLetras(
-                this.reciboDeBuqueForm.controls.cantidad.value
-              )
-            "
+              onChangeCantidadEnLetras(this.reciboDeBuqueForm.controls.cantidad.value)"
           />
         </div>
         <div class="col cantidadLetras">
           <label for="recipient-name" class="col-form-label"
             ><b>QUANTITY IN WORDS AND CLASS OF CARGO</b><br /><span
-              class="Traduccion"
-            >
-              CANTIDAD EN LETRAS Y CLASE DE CARGA</span
-            ></label
-          >
+              class="Traduccion"> CANTIDAD EN LETRAS Y CLASE DE CARGA</span></label>
           <textarea
             class="form-control resizeArea"
             rows="2"
             cols="50"
-            formControlName="cantidadLetrasYClaseCarga"
-          ></textarea>
+            formControlName="cantidadLetras">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-6 cantidadLetras">
+          <label for="recipient-name" class="col-form-label">
+          <b>DESCRIPTION OF GOODS AND CLASS OF CARGO</b><br /><span class="Traduccion"> DESCRIPCIÓN DEL PRODUCTO Y CLASE DE CARGA</span></label>
+          <!-- <input type="text" class="form-control"> -->
+          <textarea
+            class="form-control"
+            rows="2"
+            cols="50"
+            formControlName="claseCarga"
+            >
+          </textarea>
         </div>
       </div>
 
@@ -179,7 +218,7 @@
         <div class="col">
           <div>
             <label for="recipient-name" class="col-form-label"
-              ><b>Stowed </b><br /><span class="Traduccion"
+              ><b>Stowed: </b><br /><span class="Traduccion"
                 >Estibado en bodega</span
               ></label
             >
@@ -218,7 +257,7 @@
         <div class="col">
           <div>
             <label for="recipient-name" class="col-form-label"
-              ><b>Quality and Quantity unknown Said to Weigh:</b><br /><span
+              ><b>Quality and Quantity unknown Said to Weigh: </b><br /><span
                 class="Traduccion"
               >
                 Calidad y cantidad desconocidas que se dice pasar</span
@@ -265,7 +304,7 @@
       <button
         type="button"
         class="btn btn-success"
-        (click)="guardarRecibo()"
+        (click)="guardarRecibo(true)"
         (click)="modal.dismiss('Cross click')"
       >
         CONFIRMAR DATOS

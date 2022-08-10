@@ -188,10 +188,22 @@
             {{instanciaWorkflow.embarque.horaRecalada != null ? instanciaWorkflow.embarque.horaRecalada : ''}} 
             {{instanciaWorkflow.embarque.horaRecalada != null && instanciaWorkflow.embarque.horaRecalada.length > 3 ? 'Hrs' : ''}}&zwnj;
           </small>
-        </div>
+        </div>      
       </div>
+      
+        <!-- <button (click)="openModalFiles(appendFiles)"   style="width: 40px;">
+          Adjuntar archivos
+        </button> -->
     </div>
+    <svg style="margin-top: 10px; margin-left:4px" id="choose_file" data-name="Chose file" xmlns="http://www.w3.org/2000/svg" width="153" height="37" viewBox="0 0 153 37" (click)="openModalFiles(appendFiles)">
+      <g id="Rectángulo_199" data-name="Rectángulo 199" fill="#fff" stroke="#95989a" stroke-width="1">
+      <rect width="153" height="37" rx="4" stroke="none"/>
+      <rect x="0.5" y="0.5" width="152" height="36" rx="3.5" fill="none"/>
+      </g>
+      <text id="Adjuntar_archivos" data-name="Adjuntar archivos" transform="translate(14 24.6)" fill="#666" font-size="16" font-family="Roboto-Regular, Roboto"><tspan x="0" y="0">Adjuntar archivos</tspan></text>
+    </svg>
     <div class="row">
+      
       <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
         <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA -->
         
@@ -279,3 +291,134 @@
     </div>
   </div>
 </div>
+
+<ng-template #previsualizeImageModal let-modal style="width: 600px;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" style="color: #4d60A8;">Previsualización</h5>
+    </div>
+    <div class="modal-body" style="display: flex;
+    justify-content: center;" >
+      <img [src]="imagePath" style="width: 100%;" />
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-grey" data-dismiss="modal" (click)="modal.close('cancelar')">Cerrar</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #appendFiles let-modal>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" style="color: #4d60A8;">Adjuntar archivos</h5>
+    </div>
+    <!-- BODY -->
+  <div class="modal-body">
+
+      <div class="row" style="width: 100%;
+      justify-content: space-evenly;
+      margin: auto;">
+        <div style="width: 15%; 
+        display: flex;
+      align-items: center;
+      justify-content: center;">
+          <label style="font-size: 23px; color: cadetblue;">
+            1
+          </label>
+        </div>
+        <!-- Selector de archivo -->
+        <div style="width: 70%">
+          <input  type="file" (change)="handleFileInput($event)">
+        </div>
+        <div style="width: 15%">
+          <label style="font-size: 23px; color: cadetblue;">
+            
+          </label>
+        </div>
+      </div>
+
+      <div class="row" fullWidth style="width: 100%;
+                                        justify-content: space-evenly;
+                                        margin: auto;" >
+        <div style="width: 15%; display: flex;
+                             align-items: center;
+                            justify-content: center;">
+          <label style="font-size: 23px; color: cadetblue; margin-bottom: 0px;">
+            2
+          </label>
+        </div>
+        <div style="display:flex; flex-direction: column; align-items: initial; width: 70%;">
+          <div>
+            <tag-input  
+                    [(ngModel)]="nombreArchivo"
+                    [placeholder]="'Nombre del archivo'"
+                    [secondaryPlaceholder]="'Nombre del archivo'"
+                    [identifyBy]="'id'"
+                    [displayBy]="'tipoArchivo'"
+                    [maxItems]="1">
+              <tag-input-dropdown 
+                      [appendToBody]="false"
+                      [showDropdownIfEmpty]="true"
+                      [autocompleteItems]="TipoArchivosDbList"
+                      [identifyBy]="'id'"
+                      [displayBy]="'tipoArchivo'">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+          <div>
+            <div fullWidth >        
+              <label style="font-size: 9px; color: rgb(48, 48, 48);">
+                Completar el nombre con el que desea guardar el documento.
+              </label>
+            </div>
+
+          </div>
+          
+        </div>
+        <div style="width: 15%; display: flex;
+                            flex-direction: row;
+                            align-content: center;
+                            align-items: center;
+                            justify-content: center;">
+          <img src="assets/Mas.svg" class="cursorPointer" (click)="addFileToSave()" >          
+        </div>
+      </div>
+
+      
+      <div *ngIf="ArchivosPuerto != null && ArchivosPuerto.length > 0">      
+        <hr class="solid">
+        <div class="row" fullWidth style="margin-left: 20px;" >
+          <label  class="font-weight-bold">Archivos adjuntos</label>
+        </div>
+        <div class="row" *ngFor="let a of ArchivosPuerto ;let i = index"  fullWidth  style="margin-left: 20px;margin-bottom: 5px;">
+        <input [value]="a.nombreArchivo" *ngIf="a.id == null || a.id == 0" class="col-9" style="color: #5cb85c;" disabled/>
+        <input [value]="a.nombreArchivo" *ngIf="a.id != null && a.id > 0" class="col-9" disabled/>
+        <img src="assets\trashIcon-no-border.svg" style="
+        border-radius: 6px;
+        height: 25px;
+        margin-left: 10px" (click)="eliminarArchivo(a)" />
+        <img src="assets\download.svg" style="border-radius: 6px;
+        height: 31px;
+        margin-top: -2px;
+        margin-left: 6px"
+        (click)="downloadFile(a)"  />
+
+        <img src="assets\ojoIcon.svg" style="border-radius: 6px;
+        height: 31px;
+        margin-top: -2px;
+        margin-left: 6px"
+        *ngIf='a.archivo.includes("data:image") || a.archivo.includes("data:application/pdf")'
+        (click)="previewFile(previsualizeImageModal, a)"  />
+        
+
+      </div>
+    </div>
+      
+    </div>
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-grey" data-dismiss="modal" (click)="modal.close('cancelar')">Cancelar</button>
+      <button type="button" class="btn btn-primary" (click)=guardarArchivos() >Guardar</button>
+    </div>
+  </div>
+</ng-template>
