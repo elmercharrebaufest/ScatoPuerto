@@ -193,8 +193,8 @@
                                         </ng-container>
                                         <tr>
                                             <td colspan="13" class='btn-add-cell'>
-                                                <div class='btn-add-container center-bt' *ngIf="mostrarBtn"
-                                                    (click)='onAgregarDetalleTurno(turno)' #addButton>
+                                                <div class='btn-add-container center-bt' 
+                                                    (click)='onAgregarDetalleTurno(turno, d)' #addButton>
                                                     <button type='button' class='btn btn-primary bt-circle'
                                                         style='margin-top: -5px;'>+</button>
                                                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar linea</span>
@@ -203,7 +203,7 @@
                                         </tr>
                                         <tr class="tabla-fila-corte-boton">
                                             <td colspan="13" class='btn-add-cell'>
-                                                <div class='btn-add-container center-bt' *ngIf="mostrarBtn"
+                                                <div class='btn-add-container center-bt' 
                                                     (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                     <button type='button' class='btn btn-primary bt-circle'
                                                         style='margin-top: -5px;'>+</button>

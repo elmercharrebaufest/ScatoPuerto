@@ -811,7 +811,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this.agregarCorteLiquido(dia, turno);
       })
     } else {
-      this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un corte a un turno cerrado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un corte a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
 
   }
@@ -1994,7 +1994,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
   }
 
-  onAgregarDetalleTurno(turno) {
+  onAgregarDetalleTurno(turno, dia) {
+    const esGuardadoPorTablerista =  turno['controls'].guardadoPorTablerista.value;
+    if (esGuardadoPorTablerista){
+      this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un detalle a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
     let turnoSeleccionado = turno['controls'];
     (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, turnoSeleccionado.guardadoPorTablerista.value));
   }
