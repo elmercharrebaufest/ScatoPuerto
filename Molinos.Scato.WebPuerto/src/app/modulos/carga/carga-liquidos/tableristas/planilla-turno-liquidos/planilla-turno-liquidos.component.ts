@@ -233,7 +233,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         if (fechaSeleccionada < fechaInicio || fechaSeleccionada > new Date()) {
           this.confirmationDialogService.confirm('¡Atención!', 'La fecha debe ser entre ' + fechaInicio.toLocaleString().split(', ')[0] + ' y ' + new Date().toLocaleString().split(', ')[0] + '.', 'Cerrar', '', null, null, Tipoalerta.Warning)
         } else {
-          console.log('addTurnoFechaSeleccionada---->>')
           this.addTurnoFechaSeleccionada(turno, exitFunction, diaTurnoToAdd, fechaSeleccionada);
           //CIERRO EL MODAL
           //this._modalService.dismissAll();
@@ -430,9 +429,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido, turnoFecha).subscribe((turnoDb: PlanillaDeTurnos) => {
 
       if (turnoDb == null) {
-        console.log('soloTurno xxxxxx')
-        console.log(soloTurno)
-
         this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
           res.forEach((turnoPuerto: TurnoPuerto) => {
             if (turnoPuerto.id == idTurnoPuerto) {
@@ -516,9 +512,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     for (let e of exportadoresForm) {
       if (e.exportador) this.exportadores.push(e.exportador);
     }
-
-    console.log('exportadores-->>')
-    console.log(this.exportadores)
 
     this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
     this.bodegas = this._turnosService.getBodega();
@@ -947,7 +940,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       });
     } else {
       fg = this._builder.group({
-        moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([this.initLinea(), this.initLinea(), this.initLinea(), this.initLinea()]),
+        moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([this.initLinea()]),
         moduloDeCargaPlanillaDeTurnosCortes: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
         cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
@@ -1686,33 +1679,42 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   }
 
-  private asignarFechaHoraTurno(planillaTurno: PlanillaDeTurnos) {
+  private asignarFechaHoraTurno(planillaTurno) {
 
     let turnoFechaHora = this.getFechaFormato(planillaTurno.fecha);
 
-    switch (planillaTurno.turnoPuerto.id) {
+    switch (planillaTurno.turnoPuerto.orden) {
       case 1:
-        turnoFechaHora += turnoFechaHora + ' 06:00';
+        turnoFechaHora = turnoFechaHora + ' 06:00';
         break;
       case 2:
-        turnoFechaHora += turnoFechaHora + ' 12:00';
+        turnoFechaHora = turnoFechaHora + ' 12:00';
         break;
       case 3:
-        turnoFechaHora += turnoFechaHora + ' 18:00';
+        turnoFechaHora = turnoFechaHora + ' 18:00';
         break;
       case 4:
-        turnoFechaHora += turnoFechaHora + ' 23:00';
+        turnoFechaHora = turnoFechaHora + ' 23:00';
         break;
     }
     planillaTurno.fecha = turnoFechaHora;
   }
   guardarTurno(planillaTurno: PlanillaDeTurnos, reload: boolean = false) {
-    console.log('Antes y despues Turno')
-    console.log(planillaTurno)
+
     planillaTurno.fecha = new Date();
-    //this.asignarFechaHoraTurno(planillaTurno);
-    console.log(planillaTurno)
-    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga).subscribe(res => {
+    this.asignarFechaHoraTurno(planillaTurno);
+    
+    const planillaTurnoRegistro = {
+      esLiquido: planillaTurno.esLiquido,
+      fecha: null, 
+      fechaTurno : planillaTurno.fecha,
+      fechaMiliseconds: planillaTurno.fechaMiliseconds,
+      guardadoPorRecibidor: planillaTurno.guardadoPorRecibidor,
+      guardadoPorTablerista: planillaTurno.guardadoPorTablerista,
+      turnoPuerto: planillaTurno.turnoPuerto
+    }
+    
+    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
           this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
@@ -1798,9 +1800,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           }
         }
       }
-
+      
       let planillaTurno = {
-        Fecha: Turno.turnoPuerto['value'].fecha,
+        fecha: Turno.turnoPuerto['value'].fecha,
+        fechaTurno: null,
         esLiquido: true,
         guardadoPorTablerista: Turno.guardadoPorTablerista['value'],
         id: Turno.id['value'],
@@ -1808,10 +1811,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
         turnoPuerto: Turno.turnoPuerto['value'].turnoPuerto
       }
-      console.log('grabar')
-      console.log(moduloDeCargaPlanillaDeTurnosDetallesLiquido)
-      console.log(moduloDeCargaPlanillaDeTurnosCortes)
 
+      if (planillaTurno.id == null || planillaTurno.id == 0){
+        this.asignarFechaHoraTurno(planillaTurno);
+        planillaTurno.fechaTurno = planillaTurno.fecha;
+        planillaTurno.fecha = null;
+      }
+            
       if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
         var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.";
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -2006,7 +2012,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   recargarTurnosPlanilla() {
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-      console.log(resp)
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
         const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
