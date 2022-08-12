@@ -1713,7 +1713,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       guardadoPorTablerista: planillaTurno.guardadoPorTablerista,
       turnoPuerto: planillaTurno.turnoPuerto
     }
-    
+    console.log('planillaDeTurnos guardar 123456');
+    console.log(JSON.stringify(planillaTurnoRegistro));
+
     this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
