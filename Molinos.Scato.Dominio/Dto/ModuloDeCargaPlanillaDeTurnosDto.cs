@@ -7,6 +7,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public DateTime? Fecha { get; set; }
+        public string FechaTurno { get; set; }
         public TurnoPuertoDto TurnoPuerto { get; set; }
         public bool Cerrado { get; set; }
         public bool Enviado { get; set; }

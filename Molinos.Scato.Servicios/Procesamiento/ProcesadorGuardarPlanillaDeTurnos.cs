@@ -151,6 +151,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                         if (turno_DB == null)
                         {
+                           
+                            if (comando.Dto.FechaTurno != null)
+                            {
+                                DateTime dtFechaTurno = DateTime.ParseExact(comando.Dto.FechaTurno, "yyyyMMdd HH:mm", null);
+                                comando.Dto.Fecha = dtFechaTurno;
+                            }
+
+
                             turno_DB = new ModuloDeCargaPlanillaDeTurnos();
                             turno_DB.Fecha = comando.Dto.Fecha;
                             turno_DB.ModuloDeCarga = moduloDeCarga;
