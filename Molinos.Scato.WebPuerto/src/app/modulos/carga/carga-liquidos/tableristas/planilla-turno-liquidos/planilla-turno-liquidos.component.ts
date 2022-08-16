@@ -65,6 +65,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   cortesTurno: CorteTurno[] = [];
   private user: Usuario
   mostrarBtn: boolean = true;
+  fechaHoraInicioCarga: Date;
 
   embarqueId: number;
   embarque: Embarque;
@@ -84,11 +85,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   { id: 2, descripcion: 'Cargando' },
   { id: 3, descripcion: 'ControlCalidad' },
   { id: 4, descripcion: 'PostOperativo' }];
-
+  horaTurnoInicio;
+  horaTurnoFin;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
-    private _procesoService: DatosEmbarquesProcesoService,
     private datePipe: DatePipe,
     private procesoCalidadService: ProcesoCalidadService,
     private session: SessionService,
@@ -105,6 +106,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
+    console.log('xxxx')
+    console.log(this.procesoService.getFechaComienzoCarga());
+    this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
     this.cargarTurnosBodegasDestinos();
     this.cargarEmbarqueShipParticular();
     this.obtenerTipoLineaEmbarque();
@@ -224,23 +228,35 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       let fechaSeleccionada: Date = new Date(fechaSplit[0], fechaSplit[1] - 1, fechaSplit[2]);
 
       //Harcodeo una fecha de inicio mínima hasta que se controle por DB
-      let fechaInicio: Date = new Date();
+      let fechaInicio = this.fechaHoraInicioCarga != null ? this.fechaHoraInicioCarga : null;
       let diaTurnoToAdd: number = -1;
       let exitFunction: boolean = false;
+      let fechaActual: Date = new Date();
 
-      fechaInicio.setDate(fechaInicio.getDate() - 10);
-      if (this.formNuevoTurno.value.fecha != '') {
-        if (fechaSeleccionada < fechaInicio || fechaSeleccionada > new Date()) {
-          this.confirmationDialogService.confirm('¡Atención!', 'La fecha debe ser entre ' + fechaInicio.toLocaleString().split(', ')[0] + ' y ' + new Date().toLocaleString().split(', ')[0] + '.', 'Cerrar', '', null, null, Tipoalerta.Warning)
-        } else {
-          this.addTurnoFechaSeleccionada(turno, exitFunction, diaTurnoToAdd, fechaSeleccionada);
-          //CIERRO EL MODAL
-          //this._modalService.dismissAll();
-        }
-        //Si seleccionó una fecha revisamos en la planilla si el día tiene el turno disponible
-      } else {
-        this.confirmationDialogService.confirm('¡Atención!', 'Debes elegir una fecha para el turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      //const diasDiferencia = Math.round((fechaActual-fechaInicio)/(1000*60*60*24));
+      if (fechaInicio == undefined || fechaInicio == null) {
+        const mensaje = 'No es posible agregar turno debido a que no se ha establecido una fecha de inicio de carga.';
+        this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
       }
+      if (fechaSeleccionada < fechaInicio || fechaSeleccionada > new Date()) {
+        console.log('xxxxxx Valida')
+        console.log(fechaSeleccionada)
+        console.log(fechaInicio)
+        const mensaje = 'La fecha debe ser entre ' + new Date(fechaInicio).toLocaleDateString() + ' y ' + new Date().toLocaleDateString() + '.';
+        this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
+      }
+      if (fechaSeleccionada.getFullYear() == fechaActual.getFullYear() &&
+        fechaSeleccionada.getMonth() == fechaActual.getMonth() &&
+        fechaSeleccionada.getDate() == fechaActual.getDate() &&
+        turno > Math.trunc(fechaActual.getHours() / 6) + 1) {
+        const mensaje = 'No puedes crear un turno posterior al actual.';
+        this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning);
+        return;
+      }
+      this.addTurnoFechaSeleccionada(turno, exitFunction, diaTurnoToAdd, fechaSeleccionada);
+      //this._modalService.dismissAll();
     } else {
       this.confirmationDialogService.confirm('¡Atención!', 'Debes elegir una fecha para el turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
@@ -252,11 +268,22 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     this.formTurnos.get('diasTurno')['controls'].forEach((dia, diaIndex) => {
       // //Si el día ya está agregado
+      console.log('addTurnoFechaSeleccionada--->>')
+      console.log(dia.controls.diaTurno.value)
+      console.log(fechaSeleccionada)
+      console.log(fechaSeleccionada.getFullYear())
+
       if (new Date(dia.controls.diaTurno.value).getFullYear() == fechaSeleccionada.getFullYear() &&
         new Date(dia.controls.diaTurno.value).getMonth() == fechaSeleccionada.getMonth() &&
         new Date(dia.controls.diaTurno.value).getDate() == fechaSeleccionada.getDate()) {
-        dia.controls.turnos.controls.forEach(turnoLista => {
+        console.log('entroooooo--->>')
+
+        dia.controls?.turnos?.controls?.forEach(turnoLista => {
+          console.log('bucleeeeee--->>')
+          console.log('turno--->>' + turno)
           if (turnoLista.value.turnoPuerto.turnoPuerto.id == turno) {
+            console.log('validacion turno--->>' + turno)
+
             this.confirmationDialogService.confirm('¡Atención!', 'El turno que deseas agregar no se encuentra disponible.', 'Cerrar', '', null, null, Tipoalerta.Warning)
             exitFunction = true;
           }
@@ -269,8 +296,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if (exitFunction) {
       return;
     }
+    console.log('exitFunction valor--->>' + exitFunction)
+
     this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar el turno seleccionado?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then((confirmed) => {
+        console.log('mensaje xxxx--->>' + exitFunction)
+
         if (confirmed) {
           //Si llegamos hasta aca es porque tenemos que crear el turno.
           let turnoNuevo: PlanillaDeTurnos = new PlanillaDeTurnos();
@@ -296,7 +327,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           });
           this._modalService.dismissAll();
         }
-      }).catch(() => {
+      }).catch((ex) => {
         this._modalService.dismissAll()
       });
 
@@ -318,15 +349,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       });
 
       // Ordenamos los turnos por fecha y turno correspondiente
-
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);
       });
+
 
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
         let exists: boolean = false;
         let dayIndex: number;
+
         //Me fijo si el día ya está agregado
         this.formTurnos.get('diasTurno')['controls'].forEach((element, indexDiaTurno) => {
           //Si el día ya está agregado
@@ -342,12 +374,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           dayIndex = this.diasTurno.length - 1;
         } else {
           //Si ya existe el día agrego 1 turno al array del día.
-
           this.setTurno(dayIndex, dia);
         }
 
         //Agrego detalles
-
         if (dia.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length > 0) {
           this.initTurnoDetalle(dia.moduloDeCargaPlanillaDeTurnosDetallesLiquido,
             this.diasTurno['controls'][dayIndex]['controls'].turnos,
@@ -364,6 +394,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             this.diasTurno['controls'][dayIndex]['controls'].turnos,
             this.diasTurno['controls'][dayIndex]['controls'].turnos.length - 1);
         }
+
       });
 
     }
@@ -372,11 +403,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     //let diaUltimoTurno;
     //let ultimoDiaIndex;
     if (this.diasTurno != undefined && this.diasTurno['controls'].length > 0) {
-      //diaUltimoTurno = this.diasTurno['controls'][this.diasTurno['controls'].length - 1]['controls']['diaTurno']['value'];
-      //ultimoDiaIndex = this.diasTurno['controls'].length - 1;
 
       const diasTurno = this.diasTurno['controls'];
-      const ultimoDiaIndex = this.diasTurno['controls'].length - 1;
+      const ultimoDiaIndex = 0; //this.diasTurno['controls'].length - 1;
       const diaUltimoTurno = diasTurno[ultimoDiaIndex]['controls']['diaTurno']['value'];
 
       //Me fijo si ese día es hoy
@@ -425,7 +454,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const esLiquido: boolean = true;
 
     const turnoFecha = this.getFechaFormato(turno.fecha);
-    turno.fecha = turnoFecha;
+    //turno.fecha = turnoFecha;
     this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido, turnoFecha).subscribe((turnoDb: PlanillaDeTurnos) => {
 
       if (turnoDb == null) {
@@ -434,13 +463,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             if (turnoPuerto.id == idTurnoPuerto) {
               turno.turnoPuerto = turnoPuerto;
               //Aca me fijo si solo agrego el turno o también tengo que agregar el día. Es solo para la visualización de la planilla
-              if (soloTurno)
-                this.setTurno(diaIndex, turno);
-              else
+              if (soloTurno) {
+                this.setTurno(diaIndex, turno, true);
+              } else {
                 this.setDia(null, turno)
-
-              this.guardarTurno(turno);
-
+              }
+              //this.guardarTurno(turno); // Se comenta la funciondad de crear turno en la base de datos.
             }
           });
         });
@@ -481,7 +509,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean) {
-    (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno, esNuevoTurno));
+    if (!esNuevoTurno)
+      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno, esNuevoTurno));
+    else
+      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
   }
 
   setDia(dia: any, turno?: PlanillaDeTurnos, date?: Date) {
@@ -494,7 +525,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   getCombos() {
-    this.lineas = this._procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
 
 
     let lineasPlanilla = [];
@@ -611,7 +642,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   private obtenerLineaProductoTk() {
-    this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
+    this.idModuloDeCarga = this.procesoService.getModuloDeCarga().id;
     let lineasEmbarque = null;
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
       lineasEmbarque = resp.moduloDeCargaLineasDeEmbarque;
@@ -787,6 +818,27 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   agregarCorteLiquido(dia, turno) {
+    const horaInicio = this.formCorte.getRawValue().horaInicio;
+    const horaFin = this.formCorte.getRawValue().horaFin;
+    if (horaInicio == null || horaFin == null) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar fechas para registrar un corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+    const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
+    const turnoSeleccionado = turnoSel.turnoPuerto.value.turnoPuerto.orden;
+    const horaTurnoInicio = this.ordenTurnoTipo(turnoSeleccionado, false);
+    const horaTurnoFin = this.ordenTurnoTipo(turnoSeleccionado, true);
+    let bErrorFechas = false;
+
+    if (horaInicio < horaTurnoInicio || horaFin < horaTurnoInicio) bErrorFechas = true;
+    if (horaInicio > horaTurnoFin || horaInicio > horaTurnoInicio) bErrorFechas = true;
+    if (horaInicio > horaTurnoFin) bErrorFechas = true;
+
+    if (bErrorFechas) {
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio y fin no corresponde al turno seleccionado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
     this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar un corte en la hora indicada?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then((confirmed) => {
         if (confirmed) {
@@ -798,20 +850,42 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   openModalCorte(modal, dia, turno) {
     this.formCorte.reset();
-
-    if (!this.getTurnos(dia)['controls'][turno]['controls'].guardadoPorTablerista.value) {
+    const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
+    if (!turnoSel.guardadoPorTablerista.value) {
       this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result.then(() => {
         this.agregarCorteLiquido(dia, turno);
       })
     } else {
       this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un corte a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
-
   }
 
+  private ordenTurnoTipo(turnoOrden, esFinal: boolean) {
+    let turnoValor = '';
+    switch (turnoOrden) {
+      case 1:
+        turnoValor = !esFinal ? '00:00' : '05:59';
+        break;
+      case 2:
+        turnoValor = !esFinal ? '06:00' : '11:59';
+        break;
+      case 3:
+        turnoValor = !esFinal ? '12:00' : '17:59';
+        break;
+      case 4:
+        turnoValor = !esFinal ? '18:00' : '23:59';
+        break;
+    }
+    return turnoValor;
+  }
   calcularTotal() {
-    let desde = this.formCorte.get('horaInicio').value ? this.formCorte.get('horaInicio').value.split(':') : '',
-      hasta = this.formCorte.get('horaFin').value ? this.formCorte.get('horaFin').value.split(':') : '',
+
+    const fechaDesde = this.formCorte.get('horaInicio').value;
+    const fechaHasta = this.formCorte.get('horaFin').value;
+    if (fechaDesde == null || fechaHasta == null) return;
+
+    let desde = fechaDesde ? fechaDesde.split(':') : '',
+      hasta = fechaHasta ? fechaHasta.split(':') : '',
       f_desde = new Date(),
       f_hasta = new Date(),
       total = new Date();
@@ -820,7 +894,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     f_hasta.setHours(hasta[0], hasta[1], 0, 0);
 
     total.setHours(f_hasta.getHours() - f_desde.getHours(), f_hasta.getMinutes() - f_desde.getMinutes(), 0, 0);
-    this.formCorte.get('tiempoTotal').setValue(`${total.getHours() < 10 ? '0' + total.getHours() : total.getHours()}:${total.getMinutes() < 10 ? '0' + total.getMinutes() : total.getMinutes()}`)
+    if (total != null || total != undefined) {
+      this.formCorte.get('tiempoTotal').setValue(`${total?.getHours() < 10 ? '0' + total?.getHours() : total?.getHours()}:${total?.getMinutes() < 10 ? '0' + total?.getMinutes() : total?.getMinutes()}`)
+    }
   }
 
   getRowSpan(dia: any) {
@@ -1703,17 +1779,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     planillaTurno.fecha = new Date();
     this.asignarFechaHoraTurno(planillaTurno);
-    
+
     const planillaTurnoRegistro = {
       esLiquido: planillaTurno.esLiquido,
-      fecha: null, 
-      fechaTurno : planillaTurno.fecha,
+      fecha: null,
+      fechaTurno: planillaTurno.fecha,
       fechaMiliseconds: planillaTurno.fechaMiliseconds,
       guardadoPorRecibidor: planillaTurno.guardadoPorRecibidor,
       guardadoPorTablerista: planillaTurno.guardadoPorTablerista,
       turnoPuerto: planillaTurno.turnoPuerto
     }
-    
+
     this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
@@ -1753,8 +1829,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
         const exportadorVal = turnoDetalle['controls'].exportador.value;
         const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
-
-        const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque.id == tipoLineaEmbarqueVal?.id);
+        console.log('this.lineas--->>')
+        console.log(this.lineas)
+        const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
 
         if (turnoDetalle['controls'].linea.value == '' || turnoDetalle['controls'].linea.value == '0') {
           if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
@@ -1800,7 +1877,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           }
         }
       }
-      
+
       let planillaTurno = {
         fecha: Turno.turnoPuerto['value'].fecha,
         fechaTurno: null,
@@ -1811,13 +1888,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
         turnoPuerto: Turno.turnoPuerto['value'].turnoPuerto
       }
+      console.log('planillaTurno--->>')
+      console.log(planillaTurno)
+      console.log(Turno)
 
-      if (planillaTurno.id == null || planillaTurno.id == 0){
+      if (planillaTurno.id == null || planillaTurno.id == 0) {
         this.asignarFechaHoraTurno(planillaTurno);
         planillaTurno.fechaTurno = planillaTurno.fecha;
         planillaTurno.fecha = null;
       }
-            
+
       if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
         var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.";
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -1969,8 +2049,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         lineaSel.removeAt(index);
     }
   }
-  
-  onEliminarDetalleCorte(corte, dia, turno, index){
+
+  onEliminarDetalleCorte(corte, dia, turno, index) {
     const idModuloDeCargaPlanillaCorte = corte['controls']?.id?.value == undefined ? 0 : corte['controls']?.id?.value;
     console.log(corte['controls'])
     if (idModuloDeCargaPlanillaCorte > 0) {
@@ -2001,8 +2081,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   onAgregarDetalleTurno(turno, dia) {
-    const esGuardadoPorTablerista =  turno['controls'].guardadoPorTablerista.value;
-    if (esGuardadoPorTablerista){
+    const esGuardadoPorTablerista = turno['controls'].guardadoPorTablerista.value;
+    if (esGuardadoPorTablerista) {
       this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un detalle a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
