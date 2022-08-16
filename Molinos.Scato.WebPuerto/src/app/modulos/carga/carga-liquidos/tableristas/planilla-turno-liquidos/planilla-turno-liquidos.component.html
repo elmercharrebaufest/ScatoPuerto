@@ -376,7 +376,8 @@
                 <div fxFlex='33' class='pr-10 pl-10 mt-2'>
                     <label>Fin</label>
                     <div class='input_img'>
-                        <input formControlName='horaFin' placeholder="00:00" [ngxTimepicker]='finTime' [format]='24'
+                        <input formControlName='horaFin' placeholder="00:00" 
+                            [ngxTimepicker]='finTime' [format]='24'
                             class='w-100' (focusout)='calcularTotal()'>
                         <img src='assets/reloj.svg' class='imgClockInput1'>
                     </div>
@@ -405,7 +406,7 @@
 
     <ng-template #agregarTurno let-modal>
         <div class='modal-body' style="height: 230px; z-index: 200">
-            <form [formGroup]='formNuevoTurno' fxLayout='row wrap'>|
+            <form [formGroup]='formNuevoTurno' fxLayout='row wrap'>
                 <div class='pr-10 mt-2'>
                     <label>Fecha</label>
                     <div class="input_img">
