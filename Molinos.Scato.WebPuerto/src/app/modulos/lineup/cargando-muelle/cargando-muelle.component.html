@@ -15,7 +15,7 @@
                         <div class="col-9">
                             <div class="row">
                             <div class="col-12 font-weight-bold" [ngClass]="'text-'+ fechaRecaladaCorrecta()" style="font-size: 16px;">
-                                &zwnj;
+                                {{this.fechaAmarro | date}}&zwnj;
                             </div>
                             <small class="col-12 mb-1" [ngClass]="'text-'+ fechaRecaladaCorrecta()">
                                 &zwnj;
@@ -45,8 +45,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-2 text-center align-self-center">
-            <p-knob [(ngModel)]='valorRitmo' valueTemplate="{value}%" [textColor]="colorRitmo" [valueColor]='colorRitmo' [size]='150' [min]='0' [max]='100' [strokeWidth]='5' [readonly]='true'></p-knob>
+        <!-- <div class="col-2 text-center align-self-center"> -->
+        <div class="col card-ritmo-grafico">
+            <!-- <p-knob [(ngModel)]='valorRitmo' valueTemplate="{value}%" [textColor]="colorRitmo" [valueColor]='colorRitmo' [size]='150' [min]='0' [max]='100' [strokeWidth]='5' [readonly]='true'></p-knob>
+            <p class='text-knob text-center'>de todo el buque</p> -->
+            <p-knob [(ngModel)]='valorCargando' class='center-knob' [ngClass]="{'si-es-liquido': liquido == true}" valueColor='#5CB85C' [size]='150' [min]='0' 
+                [max]='tnTotales > valorCargando ? tnTotales : valorCargando' 
+                [strokeWidth]='5' [readonly]='true'></p-knob>
+            <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas'>
             <p class='text-knob text-center'>de todo el buque</p>
         </div>
         <div class="col-2 align-self-center">

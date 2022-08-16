@@ -222,7 +222,8 @@
 .text-knob{
     font-size: 10px;
     position: absolute;
-    margin-top: 108px;
+    /* margin-top: 108px; */
+    margin-top: 80px;
     font-weight: 500;
 }
 
@@ -250,4 +251,36 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 0px;
 }
-  
+
+.si-es-liquido{ 
+  width: 150px;
+  height: 150px;
+  position: relative;
+  bottom: 13px;
+}
+
+.img-toneladas{
+  position: absolute;
+  width: 35px;
+  margin-top: -77px;
+}
+
+.card-ritmo-grafico{
+  background-color: white !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0 10px;
+}
+
+.card-ritmo-grafico:first-child{
+  margin-right: 10px;
+  margin-left: 0;
+}
+
+.card-ritmo-grafico{
+  background-color: transparent;
+  /* max-height: 270px; */
+  max-height: 400px;
+}
