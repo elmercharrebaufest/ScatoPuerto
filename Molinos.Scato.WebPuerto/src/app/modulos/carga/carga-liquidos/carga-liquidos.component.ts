@@ -332,7 +332,8 @@ export class CargaLiquidosComponent implements OnInit {
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
-    
+    console.log('moduloCarga--->>')
+    console.log(moduloCarga)
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar)
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
