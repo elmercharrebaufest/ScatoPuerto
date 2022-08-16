@@ -431,11 +431,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this.setTurnoODia();
       }
     } else {
-      this.setTurnoODia();
+      this.setTurnoODia(false, 0, true);
     }
   }
 
-  setTurnoODia(soloTurno: boolean = false, diaIndex?: number) {
+  setTurnoODia(soloTurno: boolean = false, diaIndex?: number, noExisteTurno:boolean = false) {
     //Si entro aca creo el turno del día actual en hora actual.
 
     //Calculo el turnoPuerto actual así lo traigo de la DB
@@ -455,25 +455,38 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     const turnoFecha = this.getFechaFormato(turno.fecha);
     //turno.fecha = turnoFecha;
-    this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido, turnoFecha).subscribe((turnoDb: PlanillaDeTurnos) => {
-
-      if (turnoDb == null) {
-        this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
-          res.forEach((turnoPuerto: TurnoPuerto) => {
-            if (turnoPuerto.id == idTurnoPuerto) {
-              turno.turnoPuerto = turnoPuerto;
-              //Aca me fijo si solo agrego el turno o también tengo que agregar el día. Es solo para la visualización de la planilla
-              if (soloTurno) {
-                this.setTurno(diaIndex, turno, true);
-              } else {
-                this.setDia(null, turno)
-              }
-              //this.guardarTurno(turno); // Se comenta la funciondad de crear turno en la base de datos.
-            }
-          });
+    if (noExisteTurno){
+      this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
+        res.forEach((turnoPuerto: TurnoPuerto) => {
+          if (turnoPuerto.id == idTurnoPuerto) {
+            turno.turnoPuerto = turnoPuerto;
+            this.guardarTurno(turno);
+          }
         });
-      }
-    });
+      });
+       // Se comenta la funciondad de crear turno en la base de datos.
+    }else{
+      this.moduloCargaService.obtenerModuloDeCargaPlanillaDeTurnos(idTurnoPuerto, this.procesoService.getModuloDeCarga().id, esLiquido, turnoFecha).subscribe((turnoDb: PlanillaDeTurnos) => {
+
+        if (turnoDb == null) {
+          this.moduloCargaService.obtenerTurnoPuerto().subscribe((res: TurnoPuerto[]) => {
+            res.forEach((turnoPuerto: TurnoPuerto) => {
+              if (turnoPuerto.id == idTurnoPuerto) {
+                turno.turnoPuerto = turnoPuerto;
+                //Aca me fijo si solo agrego el turno o también tengo que agregar el día. Es solo para la visualización de la planilla
+                if (soloTurno) {
+                  this.setTurno(diaIndex, turno, true);
+                } else {
+                  this.setDia(null, turno)
+                }
+                //this.guardarTurno(turno); // Se comenta la funciondad de crear turno en la base de datos.
+              }
+            });
+          });
+        }
+      });
+    }
+
   }
 
   getValidaFecha(fechaTurno: Date, fechaActual: Date) {
