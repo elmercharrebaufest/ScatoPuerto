@@ -725,10 +725,11 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurnoCalc(turnos);
-      contador += 1;
     }
     if(this.diasTurno.length == 1) {
       contador += 1;
+    }else{
+      contador++;
     }
     return contador;
   }
@@ -739,8 +740,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
     registroLiquido += 2;
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
@@ -752,8 +753,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
     registroLiquido += 2;
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;

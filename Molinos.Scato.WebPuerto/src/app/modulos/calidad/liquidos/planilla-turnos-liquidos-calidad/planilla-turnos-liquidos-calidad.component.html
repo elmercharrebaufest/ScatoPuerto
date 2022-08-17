@@ -41,7 +41,11 @@
                                         <span><b>{{getDia(d)}}</b></span>
                                         <span class='toneladas'>{{ getCantDia(dia) }}</span>
                                         <span class='turno'>por día</span>
-                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{ getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.</span>
+                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'>
+                                            <span *ngIf="getToneladasParcelDia(bodega.bodegaParcel, d, t) > 0">
+                                                <b>Parcel {{bodega.bodegaParcel}}:</b> {{ getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.
+                                            </span>
+                                        </span>
                                     </div>
                                 </td>
                             </tr>
@@ -127,7 +131,7 @@
                                                     <div *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false' class="div-active">
                                                         <app-collapse-button collapseSelectorId="collapseCortesCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                         <p class="font-weight-bold p-13px" >Corte<p>
-                                                        <div id="collapseCortesCalidad_{{t}}" class="collapse show" colspan="6">
+                                                        <div id="collapseCortesCalidad_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
                                                             <table width="100%">
                                                                 <thead>
                                                                     <tr class='table-active'>
@@ -180,7 +184,7 @@
                                                     <div *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false' class="div-active">
                                                         <app-collapse-button collapseSelectorId="collapseObsDeCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                         <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
-                                                        <div id="collapseObsDeCalidad_{{t}}" class="collapse show" colspan="6">
+                                                        <div id="collapseObsDeCalidad_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
                                                             <table width="100%" class="">
                                                                 <thead>
                                                                     <tr class='table-active'>
@@ -195,7 +199,7 @@
                                                                         <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                             <tr>
                                                                                 <td>
-                                                                                    <div (click)="deleteObsCalidad(observacion)">
+                                                                                    <div (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
                                                                                         <img src="assets/trashIcon.svg"  style="width: 40px;">
                                                                                     </div>
                                                                                 </td>
