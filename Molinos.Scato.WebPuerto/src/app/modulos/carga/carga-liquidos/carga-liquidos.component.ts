@@ -153,7 +153,7 @@ export class CargaLiquidosComponent implements OnInit {
     let botonGuardarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-guardar-turno-liquidos") : null;
     let botonTurnoEnviadoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-turno-enviado-liquidos") : null;
     let botonExportarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-exportar-planilla-liquidos") : null;
-    if(botonExportarTurnoLiquidos!=null) valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
+    if (botonExportarTurnoLiquidos != null) valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
     let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
     let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
     let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null;
@@ -170,11 +170,11 @@ export class CargaLiquidosComponent implements OnInit {
     if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
 
     if (this.mostrarTableristaOperando == true) {
-      if(botonAgregarTurnosLiquidos!=null) botonAgregarTurnosLiquidos.style.display = 'none';
-      if(botonGuardarTurnoLiquidos!=null) botonGuardarTurnoLiquidos.style.display = 'none';
+      if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'none';
+      if (botonGuardarTurnoLiquidos != null) botonGuardarTurnoLiquidos.style.display = 'none';
       if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'none';
-      if(botonExportarTurnoLiquidos!=null) botonExportarTurnoLiquidos.style.display = 'none';
-      if(scrollTurnosLiquidos!=null) scrollTurnosLiquidos.style.height = 'auto';
+      if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = 'none';
+      if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = 'auto';
     }
     // #endregion
 
@@ -188,11 +188,11 @@ export class CargaLiquidosComponent implements OnInit {
       if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'block';
 
       if (this.mostrarTableristaOperando == true) {
-        if(botonAgregarTurnosLiquidos!=null) botonAgregarTurnosLiquidos.style.display = 'block';
-        if(botonGuardarTurnoLiquidos!=null) botonGuardarTurnoLiquidos.style.display = 'block';
+        if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'block';
+        if (botonGuardarTurnoLiquidos != null) botonGuardarTurnoLiquidos.style.display = 'block';
         if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
-        if(botonExportarTurnoLiquidos!=null) botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
-        if(scrollTurnosLiquidos!=null) scrollTurnosLiquidos.style.height = scrollValue;
+        if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
+        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;
       }
     }, 5000);
     // #endregion
@@ -213,12 +213,12 @@ export class CargaLiquidosComponent implements OnInit {
       jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 
-    if(finalizado){
+    if (finalizado) {
       let fileBlobParaAdjuntar = html2pdf().from(element).set(opt).outputPdf()
         .then(() => { if (!imprimir) this.cargaPdf = false }).output('blob');
-      
-      fileBlobParaAdjuntar.then(()=> this.cargarPDF(fileBlobParaAdjuntar._result));
-    }else{
+
+      fileBlobParaAdjuntar.then(() => this.cargarPDF(fileBlobParaAdjuntar._result));
+    } else {
       html2pdf().from(element).set(opt).outputPdf()
         .then(() => { if (!imprimir) this.cargaPdf = false }).save();
     }
@@ -261,9 +261,9 @@ export class CargaLiquidosComponent implements OnInit {
     } else {
       this.guardarContinuacion(finalizar);
 
-      if(finalizar){
-        this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
-          if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
+      if (finalizar) {
+        this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
+          if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
         });
       }
     }
@@ -335,19 +335,22 @@ export class CargaLiquidosComponent implements OnInit {
     console.log('moduloCarga--->>')
     console.log(moduloCarga)
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
-      if (finalizar)
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+      if (finalizar) {
+        this.imprimir(true, finalizar)
+        /*
+        this.confirmationDialogService.confirm('Atención!', 'Se ha finalizado el modulo de Carga con exito.', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {this.imprimir(true, finalizar)}, 
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
-      else {
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+            */
+      } else {
+        this.confirmationDialogService.confirm('Atención!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => { },
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload());
-            
+
         this.cargaPdf = false;
       }
 
@@ -413,8 +416,8 @@ export class CargaLiquidosComponent implements OnInit {
     this.tanquesSeleccionados = tanques;
   }
 
-  recargarGraficoRitmos(recargar: boolean){
-    if (recargar){
+  recargarGraficoRitmos(recargar: boolean) {
+    if (recargar) {
       this.graficosRitmosComponent.ngOnInit();
     }
   }

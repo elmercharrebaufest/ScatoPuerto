@@ -3,7 +3,7 @@
     <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
         <app-collapse-button collapseSelectorId='collapsePlanillaTurnosSolido'></app-collapse-button>
         <div class="divHeaderRightLeft">
-            <h4 class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos sólidos Tablerista</h4>
+            <h4 class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos sólidos Recibidores</h4>
         </div>
         <div id="collapsePlanillaTurnosSolido" class="collapse show">
             <div style="margin-left: 1rem;">
@@ -148,7 +148,7 @@
                                                                     <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                         <tr>
                                                                             <td colspan="1">
-                                                                                <div (click)="deleteObsCalidad(observacion)">
+                                                                                <div (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
                                                                                     <img src="assets/trashIcon.svg"  style="width: 40px;">
                                                                                 </div>
                                                                             </td>
