@@ -41,7 +41,11 @@
                                         <span><b>{{getDia(d)}}</b></span>
                                         <span class='toneladas'>{{ getCantDia(dia) }}</span>
                                         <span class='turno'>por día</span>
-                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b> {{ getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.</span>
+                                        <span *ngFor='let bodega of bodegas' class='parcel-cantidad'>
+                                            <span *ngIf="getToneladasParcelDia(bodega.bodegaParcel, d, t) > 0">
+                                                <b>Parcel {{bodega.bodegaParcel}}:</b> {{ getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.
+                                            </span>
+                                        </span>
                                     </div>
                                 </td>
                             </tr>
@@ -195,7 +199,7 @@
                                                                         <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                             <tr>
                                                                                 <td>
-                                                                                    <div (click)="deleteObsCalidad(observacion)">
+                                                                                    <div (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
                                                                                         <img src="assets/trashIcon.svg"  style="width: 40px;">
                                                                                     </div>
                                                                                 </td>
