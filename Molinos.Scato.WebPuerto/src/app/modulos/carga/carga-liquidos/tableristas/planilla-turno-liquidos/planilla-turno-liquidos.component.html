@@ -67,10 +67,12 @@
                                                             ''}}</b></span>
                                                     <span class='toneladas'>{{ getCantTurno(turno) }}</span>
                                                     <span class='turno'>por turno</span>
-                                                    <span *ngFor='let bodega of bodegas'
-                                                        class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
-                                                        {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
-                                                        Tn.</span>
+                                                    <span *ngFor='let bodega of bodegas'class='parcel-cantidad'>
+                                                        <span *ngIf="getToneladasParcelTurno(bodega.bodegaParcel, d, t) > 0">
+                                                        <b>Parcel {{bodega.bodegaParcel}}:</b>
+                                                            {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.
+                                                        </span>
+                                                    </span>
                                                     <button id="btn-guardar-turno-liquidos"
                                                         class='btn btn-success btn-sm'
                                                         style="margin-right: 5px; margin-bottom: 5px"
