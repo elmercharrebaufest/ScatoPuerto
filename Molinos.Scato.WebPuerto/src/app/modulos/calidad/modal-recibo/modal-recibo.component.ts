@@ -12,6 +12,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { Mail } from '@ScatoModels/mail';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ToWords } from 'to-words';
+import { formatDate } from '@angular/common';
 
 
 
@@ -29,6 +30,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   idEmbarque:number;
   nombreBuque:string;
   reciboDeBuqueForm: FormGroup;
+  desdeTabla:boolean = false;
   // enviado: boolean;
   @Input() mostrarModal:boolean = false;
   @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo:TemplateRef<any>;
@@ -47,6 +49,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     public session: SessionService    
   ) 
   { 
+    this.desdeTabla = false;
     // session.getUser().username
     this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
       this.reciboBuqueOjito = data;
@@ -115,6 +118,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   mostrarModalOjito(){
     if(this.ojitoRecibo != undefined){
       if (this.mostrarModal){
+        this.desdeTabla = true;
         // this.enviado = true;
 
         this._modalService.open(this.ojitoRecibo, { size: 'lg'});
@@ -125,10 +129,14 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
 
   setModalOjito(){
     let cantidadYClaseCarga = this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga
-    let arrClase = cantidadYClaseCarga.split('of');
+    let arrClase = cantidadYClaseCarga.split(' OF ');
 
     this.reciboDeBuqueForm.controls.puertoOrigen.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoOrigen);
-    this.reciboDeBuqueForm.controls.fechaRecibo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo);
+
+
+
+    this.reciboDeBuqueForm.controls.fechaRecibo.setValue(formatDate(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo,'yyyy-MM-dd','en'));
+    // this.reciboDeBuqueForm.controls.fechaRecibo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo);
     this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].nombreBuque);
     this.reciboDeBuqueForm.controls.exportador.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].exportador);
     this.reciboDeBuqueForm.controls.puertoDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoDestino);

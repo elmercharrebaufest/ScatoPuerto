@@ -84,7 +84,7 @@
                                                 <div *ngIf='getCorteTurnos(d, t).controls.length > 0' class="div-active">
                                                     <app-collapse-button collapseSelectorId="collapseCortesCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                     <p class="font-weight-bold p-13px" >Corte<p>
-                                                    <div id="collapseCortesCalidad_{{t}}" class="collapse show" colspan="6">
+                                                    <div id="collapseCortesCalidad_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
                                                         <table class='tabla table-bordered tabla-embebida'  >
                                                             <thead>
                                                                 <tr class='table-active'>
@@ -133,7 +133,7 @@
                                                 <div *ngIf='getObservacionTurnos(d, t).length > 0' class="div-active">
                                                     <app-collapse-button collapseSelectorId="collapseObsDeCalidadSolid_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                     <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
-                                                    <div id="collapseObsDeCalidadSolid_{{t}}" class="collapse show" colspan="6">
+                                                    <div id="collapseObsDeCalidadSolid_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
                                                         <table class='tabla table-bordered tabla-embebida'>
                                                             <thead>
                                                                 <tr class='table-active'>

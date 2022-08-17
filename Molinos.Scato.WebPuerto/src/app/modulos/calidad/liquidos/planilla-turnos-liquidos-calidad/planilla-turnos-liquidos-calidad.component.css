@@ -33,7 +33,10 @@
 label{
     font-weight: bold;
 }
+.expTodosPlanillas{
 
+    /* lo uso como ID */
+}
 input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 0px;
     margin: 0px;

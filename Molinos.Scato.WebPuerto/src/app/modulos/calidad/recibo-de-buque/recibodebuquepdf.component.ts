@@ -46,6 +46,9 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
 
     darFormato(cantidad: number, formatoEuropeo: boolean = false) {
       let arrNumero = cantidad.toString().split(".");
+      if (arrNumero.length == 2) {
+        
+      }
       let numeroEntero = arrNumero[0];
       let numeroDecimal = arrNumero[1];
       
@@ -86,7 +89,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
         this.cantidadFormatoEntera = !formatoEuropeo ? `${numeroEntero}` : `${numeroEntero}`;
       }
 
-      if(numeroDecimal !== undefined || numeroDecimal !== ' '){
+      if(numeroDecimal !== undefined){
         this.cantidadAMostrar = !formatoEuropeo ? `${this.cantidadFormatoEntera}.${numeroDecimal}` : `${this.cantidadFormatoEntera},${numeroDecimal}`
       }else{
         if(formatoEuropeo){
@@ -118,7 +121,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       let arrFecha: string[];
       let dateRecibo = new Date(this.recibo.fechaRecibo);
       let dia = dateRecibo.getDate();
-      dateRecibo.setDate(dia + 1);
+      dateRecibo.setDate(dia);
       arrFecha = dateRecibo.toDateString().split(' ',4)
       
       // FECHA
