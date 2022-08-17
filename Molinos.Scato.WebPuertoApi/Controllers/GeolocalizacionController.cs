@@ -34,6 +34,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 foreach (var EmbarqueGeolocalizacion in listaEmbarquesGeolocalizacion)
                 {
+                
                     comandos.Ejecutar(new ModificarEmbarqueGeolocalizacion
                     {
                         DtoInformacion = EmbarqueGeolocalizacion.informacion,
@@ -86,6 +87,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         imo = embarque.Embarque.EmbarqueInformacion.Count() > 0 ? embarque.Embarque.EmbarqueInformacion[0].IMO:""
                     };
                     embarques.Add(embarqueLineUp);
+                    servicio.GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(embarque.Embarque.EmbarqueInformacion), "POST");
+                    servicio.GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(embarque.Embarque.EmbarquePosicion), "POST");
+                    servicio.GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(embarque.Embarque.EmbarqueInformacionViaje), "POST");
 
                 }
 
