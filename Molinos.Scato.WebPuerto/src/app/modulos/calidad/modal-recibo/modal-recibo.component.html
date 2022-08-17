@@ -36,7 +36,7 @@
             type="date"
             max="3000-12-31"
             min="1000-01-01"
-            class="form-control fecha"
+            class="form-control"
             formControlName="fechaRecibo"
           />
           <!-- value="{{this.reciboBuqueDetalles.fechaRecibo}}" -->
@@ -295,6 +295,7 @@
 
     <div class="modal-footer">
       <button
+        *ngIf="!desdeTabla"
         type="button"
         class="btn btn-danger mx-5"
         (click)="modal.dismiss('Cross click')"
@@ -302,6 +303,15 @@
         CANCELAR
       </button>
       <button
+        *ngIf="desdeTabla"
+        type="button"
+        class="btn btn-danger mx-5"
+        (click)="modal.dismiss('Cross click')"
+      >
+        CERRAR
+      </button>
+      <button
+        *ngIf="!desdeTabla"
         type="button"
         class="btn btn-success"
         (click)="guardarRecibo(true)"
