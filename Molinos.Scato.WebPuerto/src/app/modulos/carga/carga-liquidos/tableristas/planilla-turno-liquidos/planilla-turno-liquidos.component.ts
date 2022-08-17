@@ -842,10 +842,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const horaTurnoInicio = this.ordenTurnoTipo(turnoSeleccionado, false);
     const horaTurnoFin = this.ordenTurnoTipo(turnoSeleccionado, true);
     let bErrorFechas = false;
-
+    console.log('fechas 1 --> ' + horaTurnoInicio + '  ' + horaTurnoFin)
+    console.log('fechas 2 --> ' + horaInicio + '  ' + horaFin)
     if (horaInicio < horaTurnoInicio || horaFin < horaTurnoInicio) bErrorFechas = true;
     if (horaInicio > horaTurnoFin || horaInicio > horaTurnoInicio) bErrorFechas = true;
-    if (horaInicio > horaTurnoFin) bErrorFechas = true;
+    if (horaInicio > horaTurnoFin || horaFin > horaTurnoFin) bErrorFechas = true;
 
     if (bErrorFechas) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio y fin no corresponde al turno seleccionado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -1055,7 +1056,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const filtro = this.lineaDeEmbarque.filter(x => x.id == line.linea_Id);
       if (filtro != null || filtro != undefined) {
         if (filtro.length > 0) {
-          if (filtro[0].linea == 'Vicentin') {
+          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin') {
             bloqueoVicentin = true;
           }
         }
@@ -1086,7 +1087,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaInicialMM: [{ value: line ? line.medidaInicialMM : '', disabled: bloqueoVicentin }],
       medidaFinalCM: [{ value: line ? line.medidaFinalCM : '', disabled: bloqueoVicentin }],
       medidaFinalMM: [{ value: line ? line.medidaFinalMM : '', disabled: bloqueoVicentin }],
-      destino: [{ value: destino, disabled: guardado }],
+      destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
       cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
     })
@@ -1168,10 +1169,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.destinos = new Array();
     if (this.bodegas != null || this.bodegas != undefined) {
       this.bodegas.forEach(b => {
-        if (!this.destinos.find(d => d.nombre == b.destino)) {
+        console.log('destino .....')
+        console.log(b.destino)
+        console.log(this.destinos)
+        if (!this.destinos.find(d => d.nombre == b.destino.nombre)) {
           this.destinos.push(b.destino);
         }
-      })
+      });
+      console.log('this.destinos final ......')
+      console.log(this.destinos)
     }
   }
 
