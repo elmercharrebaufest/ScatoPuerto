@@ -48,14 +48,22 @@ export class LiquidosComponent implements OnInit {
     let botonLineasDeEmbarque = document.getElementById('guardar-conformacion-lineas-embarque');
     let valueBotonLineasDeEmbarque = botonLineasDeEmbarque.style.display;
 
+    document.getElementsByName('expTodosPlanillas').forEach(item => {
+      item.className = "collapse show";      
+    })
+
     scrollBarPlanilla.style.height = 'auto';
     botonLineasDeEmbarque.style.display = 'none';
    // #endregion
-
+    
    //#region Mostrar Botones 
     setTimeout(() => {
       scrollBarPlanilla.style.height = valueScrollBarPlanilla;
       botonLineasDeEmbarque.style.display = valueBotonLineasDeEmbarque;
+
+      document.getElementsByName('expTodosPlanillas').forEach(item => {
+        item.className = "collapse";      
+      })
     },5000)
 
    // #endregion

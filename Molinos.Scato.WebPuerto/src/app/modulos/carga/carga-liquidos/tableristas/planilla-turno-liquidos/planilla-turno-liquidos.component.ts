@@ -335,6 +335,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   fillPlanilla() {
+    
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
     this.lineaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
     this.diasTurno.clear();
@@ -844,10 +845,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let bErrorFechas = false;
     console.log('fechas 1 --> ' + horaTurnoInicio + '  ' + horaTurnoFin)
     console.log('fechas 2 --> ' + horaInicio + '  ' + horaFin)
-    if (horaInicio < horaTurnoInicio || horaFin < horaTurnoInicio) bErrorFechas = true;
-    if (horaInicio > horaTurnoFin || horaInicio > horaTurnoInicio) bErrorFechas = true;
-    if (horaInicio > horaTurnoFin || horaFin > horaTurnoFin) bErrorFechas = true;
 
+    if (horaInicio>horaFin){
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio no puede ser mayor a la fecha fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
+    if (horaInicio < horaTurnoInicio || horaFin < horaTurnoInicio) bErrorFechas = true;
+    if (horaInicio > horaTurnoFin || horaInicio < horaTurnoInicio) bErrorFechas = true;
+    if (horaFin > horaTurnoFin) bErrorFechas = true;
     if (bErrorFechas) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio y fin no corresponde al turno seleccionado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
@@ -1812,9 +1818,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+          this.procesoService.setEmbarque(this.embarqueId);
+          /*this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
           const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;*/
           this.fillPlanilla();
         }
       });
@@ -1850,6 +1857,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
         console.log('this.lineas--->>')
         console.log(this.lineas)
+        console.log(turnoDetalle)
         const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
 
         if (turnoDetalle['controls'].linea.value == '' || turnoDetalle['controls'].linea.value == '0') {
@@ -1859,7 +1867,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         }
 
         const lineaIdVal = turnoDetalle['controls'].linea.value;
-
+        console.log('lineaIdVal-->>')
+        console.log(lineaIdVal)
         if ((lineaIdVal != null || lineaIdVal != undefined)) {
           if ((lineaIdVal > '' && lineaIdVal != '0')) {
 
