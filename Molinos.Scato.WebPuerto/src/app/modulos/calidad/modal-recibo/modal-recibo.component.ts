@@ -150,7 +150,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionEstibado);
     this.reciboDeBuqueForm.controls.esEuropeo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
     this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
-    // this.reciboDeBuqueForm.disable();
+    this.reciboDeBuqueForm.disable();
   }
 
   openModalEmitirRecibo(modal: any) {
