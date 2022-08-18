@@ -44,6 +44,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         NombreBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque,
                         TipoBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.TipoBuque
                     });
+
+                    servicio.GenerarLogging("EMBARQUE", EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque, "POST");
+                    servicio.GenerarLogging("POSICION", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.posicion), "POST");
+
                 }
 
 
@@ -75,6 +79,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 var embarquesLineUp = workflows.ListarEmbarques("LineUp");
 
+                embarquesLineUp = embarquesLineUp.GroupBy(x=>x.Embarque.NombreBuque).Select(x=>x.FirstOrDefault()).ToList();
                 List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
 
                 foreach (var embarque in embarquesLineUp)
@@ -87,10 +92,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         imo = embarque.Embarque.EmbarqueInformacion.Count() > 0 ? embarque.Embarque.EmbarqueInformacion[0].IMO:""
                     };
                     embarques.Add(embarqueLineUp);
-                    servicio.GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(embarque.Embarque.EmbarqueInformacion), "POST");
-                    servicio.GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(embarque.Embarque.EmbarquePosicion), "POST");
-                    servicio.GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(embarque.Embarque.EmbarqueInformacionViaje), "POST");
-
+   
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, embarques);
