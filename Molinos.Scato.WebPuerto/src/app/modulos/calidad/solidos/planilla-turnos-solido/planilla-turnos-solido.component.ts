@@ -216,7 +216,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
       // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
-        return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
+        return (b.fechaMiliseconds - a.fechaMiliseconds);
       });
 
       this.turnoPuerto = [];
@@ -538,6 +538,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurnoCalc(turnos);
+      contador += 1;
+    }
+    if(this.diasTurno.length == 1) {
+      contador += 1;
     }
     return contador;
   }
@@ -550,7 +554,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
     registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-    registroSolido += 2;
     const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -561,9 +564,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
 
     registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 0; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 0; // tamaño de la observacion
-    registroSolido += 2;
+    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
+    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
+    registroSolido += 1;
     const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
