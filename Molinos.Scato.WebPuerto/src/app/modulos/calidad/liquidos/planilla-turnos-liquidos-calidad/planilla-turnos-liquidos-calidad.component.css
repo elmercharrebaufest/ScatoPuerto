@@ -4,7 +4,7 @@
     padding: 0;
 }
 .tabla-fila-corte{
-    background-color: #F4F4F4;
+    background-color: white;
 }
 .center-bt{
     margin: auto !important;
@@ -36,6 +36,13 @@ label{
 .expTodosPlanillas{
 
     /* lo uso como ID */
+}
+
+.bg-grisClaro{
+    background-color: #F3F3F3;
+}
+.bg-white{
+    background-color: white;
 }
 input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 0px;
