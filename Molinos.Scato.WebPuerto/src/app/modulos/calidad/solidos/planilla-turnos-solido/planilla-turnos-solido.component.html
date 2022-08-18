@@ -49,6 +49,13 @@
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
                                                     <span class='toneladas'>{{ getCantTurno(turno) }} Tn</span>
                                                     <span class='turno'>por turno</span>
+                                                    <br/>
+                                                    <button class='btn btn btn-success' 
+                                                            *ngIf="!turno.value.guardadoPorRecibidor"
+                                                            style="margin-top: 5px; margin-bottom: 5px" 
+                                                            (click)='onCerrarTurno(turno, dia)'>
+                                                            Cerrar turno
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -77,7 +84,6 @@
                                                 </tr>
                                             </ng-container>
                                         </ng-container>
-
 
                                         <tr *ngIf='getCorteTurnos(d, t).controls.length > 0'>
                                             <td colspan="5" class='p-0' >
@@ -140,7 +146,7 @@
                                                                     <th colspan="6">Observación de calidad</th>
                                                                     <th colspan="1">Fecha</th>
                                                                     <th colspan="1">Hora</th>
-                                                                    <th colspan="1"></th>
+                                                                    <th style="width:85px"></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -156,10 +162,8 @@
                                                                             <td colspan="1">
                                                                                 {{observacion.hora}}
                                                                             </td>
-                                                                            <td colspan="1">
-                                                                                <div (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
-                                                                                    <img src="assets/trashIcon.svg"  style="width: 40px;">
-                                                                                </div>
+                                                                            <td>
+                                                                                <img src="assets/trashIcon.svg"  style="cursor: pointer;" (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
                                                                             </td>
                                                                         </tr>
                                                                     </ng-container>
@@ -182,7 +186,24 @@
             </perfect-scrollbar>
             </div>
         </form>
-        
+        <div fxLayout='row wrap' class='px-4 pb-4' *ngIf='turnoPuerto'>
+            <div fxFlex='50'>
+                <div fxLayout='row wrap'>
+                    <div fxFlex='100'>
+                    </div>
+                    <div fxFlex='100'>
+                    </div>
+                    <div fxFlex='100'>
+                    </div>
+                    <div fxFlex='100'>
+                    </div>
+                </div>
+            </div>
+            <div fxFlex='50' class='right-side'>
+                <div class='bt-total'>Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn'></div>
+                </div>
+            </div>
+        </div>        
     
         <p-toast position='top-center' key='enviar-turno'></p-toast>
     

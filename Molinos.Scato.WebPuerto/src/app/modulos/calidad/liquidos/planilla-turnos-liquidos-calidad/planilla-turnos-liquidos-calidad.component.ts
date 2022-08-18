@@ -475,7 +475,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   }
 
   deleteObsCalidad(ObsCalidad: any) {
-    this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Si', 'No', null, null, Tipoalerta.Success)
+    this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed) {
           this.moduloCargaService.eliminarObservacionDeCalidad(ObsCalidad.id)

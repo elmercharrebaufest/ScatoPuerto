@@ -348,12 +348,37 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
   }
+  onCerrarTurno (turnoSeleccionado: any) {
+    const idPlanillaDeTurnos = turnoSeleccionado['controls'].id.value; 
+    this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos)
+          .subscribe(res => {
+            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+                this.fillPlanilla();
+              }
 
-  deleteObsCalidad(ObsCalidad: any) {
-    this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Si', 'No', null, null, Tipoalerta.Success)
+            });
+          });
+      } else {
+        console.log('Cerrar Turno.')
+      }
+    })
+    .catch(() => {
+      console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+    });
+
+  }
+  deleteObsCalidad(obsCalidad: any) {
+    this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed) {
-          this.moduloCargaService.eliminarObservacionDeCalidad(ObsCalidad.id)
+          this.moduloCargaService.eliminarObservacionDeCalidad(obsCalidad.id)
             .subscribe(res => {
               this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
                 if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
@@ -636,7 +661,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
       contador += this.getCantDia(dia);
     }
-    contador = contador > 0 ? contador / 1000 : 0;
     contador = parseInt(contador.toString());    
     return contador;
   }
