@@ -775,6 +775,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/CerrarTurnoModuloDeCarga")]
+        public HttpResponseMessage CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos)
+        {
+            servicio.CerrarTurnoModuloDeCarga(idPlanillaDeTurnos);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]

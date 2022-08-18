@@ -2661,6 +2661,9 @@ namespace Molinos.Scato.Servicios
         void EliminarObservacionDeCalidad(int observacion_id);
 
         [OperationContract]
+        void CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos);
+
+        [OperationContract]
         void GenerarLogging(string service, string data, string tipo);
         [OperationContract]
         IList<BanderaDto> ObtenerBanderas(); 

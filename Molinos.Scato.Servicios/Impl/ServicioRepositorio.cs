@@ -10727,6 +10727,15 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
+        public void CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos)
+        {
+            ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
+
+            moduloDeCargaPlanillaDeTurnos.Cerrado = true;
+            moduloDeCargaPlanillaDeTurnos.Enviado = true;
+            repositorio.GuardarCambios();
+        }
+
         public void GenerarLogging(string service, string data, string tipo)
         {
             try
