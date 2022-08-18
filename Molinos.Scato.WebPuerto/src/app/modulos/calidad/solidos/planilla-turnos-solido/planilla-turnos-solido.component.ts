@@ -348,12 +348,37 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
   }
+  onCerrarTurno (turnoSeleccionado: any) {
+    const idPlanillaDeTurnos = turnoSeleccionado['controls'].id.value; 
+    this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos)
+          .subscribe(res => {
+            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+                this.fillPlanilla();
+              }
 
-  deleteObsCalidad(ObsCalidad: any) {
-    this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Si', 'No', null, null, Tipoalerta.Success)
+            });
+          });
+      } else {
+        console.log('Cerrar Turno.')
+      }
+    })
+    .catch(() => {
+      console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+    });
+
+  }
+  deleteObsCalidad(obsCalidad: any) {
+    this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed) {
-          this.moduloCargaService.eliminarObservacionDeCalidad(ObsCalidad.id)
+          this.moduloCargaService.eliminarObservacionDeCalidad(obsCalidad.id)
             .subscribe(res => {
               this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
                 if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
@@ -457,6 +482,24 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let fechaHora = `${this.obsCalidadForm.controls.fecha.value} ${this.obsCalidadForm.controls.hora.value}`
     let fechaHoraIncorrecta = this.comparaFechaHoraObs(fecha, hora);
 
+    // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
+    //obtengo el turno en el que tengo que guardar
+    let horaDate = new Date(fechaHora)
+    let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
+    //me traigo todos los turnos de la fecha seleccionada
+    const planillaDeTurnoSel = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto);
+    if (planillaDeTurnoSel.length == 0){
+      this.confirmationDialogService.confirm('¡Atención!', 'No se ha encontrado un turno para la fecha y hora seleccionada.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    if (planillaDeTurnoSel.length > 0){
+      const esTurnoCerrado = planillaDeTurnoSel[0].guardadoPorRecibidor;
+      if (esTurnoCerrado){
+        this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una observacion para un turno cerrado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
+      }
+    }
+
     let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
       "Desea guardar las observaciones de calidad?";
 
@@ -467,12 +510,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           this.procesoCalidadService.setObsCalidad(this.obsCalidadForm.getRawValue());
           // this.obsCalidadForm.reset();
 
-          // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
-          //obtengo el turno en el que tengo que guardar
-          let horaDate = new Date(fechaHora)
-          let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
-          //me traigo todos los turnos de la fecha seleccionada
-          let idPlanillaDeTurnos = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto)[0].id;
+          let idPlanillaDeTurnos = planillaDeTurnoSel[0].id;
 
           let observacionCalidad = {
             fechaHora: fechaHora,
@@ -636,7 +674,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
       contador += this.getCantDia(dia);
     }
-    contador = contador > 0 ? contador / 1000 : 0;
     contador = parseInt(contador.toString());    
     return contador;
   }
