@@ -17,7 +17,12 @@
     align-items: center;
     height: 100%;
 }
-
+.bg-grisClaro{
+    background-color: #F3F3F3;
+}
+.bg-white{
+    background-color: white;
+}
 label{
     font-weight: bold;
 }

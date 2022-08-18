@@ -482,6 +482,24 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let fechaHora = `${this.obsCalidadForm.controls.fecha.value} ${this.obsCalidadForm.controls.hora.value}`
     let fechaHoraIncorrecta = this.comparaFechaHoraObs(fecha, hora);
 
+    // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
+    //obtengo el turno en el que tengo que guardar
+    let horaDate = new Date(fechaHora)
+    let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
+    //me traigo todos los turnos de la fecha seleccionada
+    const planillaDeTurnoSel = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto);
+    if (planillaDeTurnoSel.length == 0){
+      this.confirmationDialogService.confirm('¡Atención!', 'No se ha encontrado un turno para la fecha y hora seleccionada.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    if (planillaDeTurnoSel.length > 0){
+      const esTurnoCerrado = planillaDeTurnoSel[0].guardadoPorRecibidor;
+      if (esTurnoCerrado){
+        this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una observacion para un turno cerrado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
+      }
+    }
+
     let texto = fechaHoraIncorrecta ? "Fecha y hora mayor a la actual. Para poder continuar, debe completarlas correctamente." :
       "Desea guardar las observaciones de calidad?";
 
@@ -492,12 +510,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           this.procesoCalidadService.setObsCalidad(this.obsCalidadForm.getRawValue());
           // this.obsCalidadForm.reset();
 
-          // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
-          //obtengo el turno en el que tengo que guardar
-          let horaDate = new Date(fechaHora)
-          let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
-          //me traigo todos los turnos de la fecha seleccionada
-          let idPlanillaDeTurnos = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto)[0].id;
+          let idPlanillaDeTurnos = planillaDeTurnoSel[0].id;
 
           let observacionCalidad = {
             fechaHora: fechaHora,

@@ -86,7 +86,7 @@
                                         </ng-container>
 
                                         <tr *ngIf='getCorteTurnos(d, t).controls.length > 0'>
-                                            <td colspan="5" class='p-0' >
+                                            <td colspan="5" class='p-0 bg-grisClaro'>
                                                 <div *ngIf='getCorteTurnos(d, t).controls.length > 0' class="div-active">
                                                     <app-collapse-button collapseSelectorId="collapseCortesCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                     <p class="font-weight-bold p-13px" >Corte<p>
@@ -101,7 +101,7 @@
                                                                     <th colspan="5">Observaciones</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody>
+                                                            <tbody class="bg-white">
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                     <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
                                                                         <tr>
@@ -115,7 +115,7 @@
                                                                                 {{corte.controls.horaFin.value}} hs
                                                                             </td>
                                                                             <td colspan="1">
-                                                                                {{corte.controls.tiempoTotal.value | date:'shortTime'}} hs
+                                                                                {{corte.controls.tiempoTotal.value}} hs
                                                                             </td>
                                                                             <td colspan="5">
                                                                                 {{corte.controls.observaciones.value}}
@@ -135,7 +135,7 @@
 
 
                                         <tr *ngIf='getObservacionTurnos(d, t).length > 0'>
-                                            <td colspan="5" class='p-0'>
+                                            <td colspan="5" class='p-0 bg-grisClaro'>
                                                 <div *ngIf='getObservacionTurnos(d, t).length > 0' class="div-active">
                                                     <app-collapse-button collapseSelectorId="collapseObsDeCalidadSolid_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                     <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
@@ -149,7 +149,7 @@
                                                                     <th style="width:85px"></th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody>
+                                                            <tbody class="bg-white">
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
                                                                     <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                         <tr>

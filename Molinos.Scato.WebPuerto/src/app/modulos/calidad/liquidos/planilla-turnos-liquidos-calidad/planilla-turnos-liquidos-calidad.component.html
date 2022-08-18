@@ -154,7 +154,7 @@
 
                                         <tr
                                             *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
-                                            <td colspan="6" class='p-0'>
+                                            <td colspan="6" class='p-0 bg-grisClaro'>
                                                 <div *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'
                                                     class="div-active">
                                                     <app-collapse-button
@@ -174,7 +174,7 @@
                                                                     <th colspan="2">Observaciones</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody>
+                                                            <tbody class="bg-white">
                                                                 <ng-container
                                                                     formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                     <ng-container
@@ -251,7 +251,6 @@
                                                                             </tr>
                                                                         </ng-container>
                                                                     </ng-container>
-                                                                </ng-container>
                                                             </tbody>
                                                         </table>
                                                     </div>
