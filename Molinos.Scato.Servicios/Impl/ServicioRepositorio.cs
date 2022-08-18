@@ -10733,6 +10733,10 @@ namespace Molinos.Scato.Servicios.Impl
 
             moduloDeCargaPlanillaDeTurnos.Cerrado = true;
             moduloDeCargaPlanillaDeTurnos.Enviado = true;
+            moduloDeCargaPlanillaDeTurnos.GuardadoPorRecibidor = true;
+            moduloDeCargaPlanillaDeTurnos.GuardadoPorTablerista = true;
+
+
             repositorio.GuardarCambios();
         }
 
