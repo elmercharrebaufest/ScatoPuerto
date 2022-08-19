@@ -526,9 +526,15 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get balanzas7(): FormArray {
+    var myArray = (this.balanza7Form.get("balanzas7") as FormArray).value;
+    myArray = myArray.sort((a, b) => Number(new Date(a.fecha_Inicio)) - Number(new Date(b.fecha_Inicio)));
+    (this.balanza7Form.get("balanzas7") as FormArray).patchValue(myArray)
     return this.balanza7Form.get("balanzas7") as FormArray;
   }
   get balanzas8(): FormArray {
+    var myArray = (this.balanza8Form.get("balanzas8") as FormArray).value;
+    myArray = myArray.sort((a, b) => Number(new Date(a.fecha_Inicio)) - Number(new Date(b.fecha_Inicio)));
+    (this.balanza8Form.get("balanzas8") as FormArray).patchValue(myArray)
     return this.balanza8Form.get("balanzas8") as FormArray;
   }
 
