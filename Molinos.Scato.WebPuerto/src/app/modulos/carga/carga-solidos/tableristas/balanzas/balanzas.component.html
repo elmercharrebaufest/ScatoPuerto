@@ -173,7 +173,7 @@
                                           </div>
                                           <div class="col corte">
                                             <button class='btn btn-outline-primary' 
-                                                    *ngIf="!balanza.value.corteManual"
+                                                    *ngIf="!balanza.value.corteManual && balanza.value.tn==0"
                                                     (click)="generarCorte()">Nuevo evento</button>
                                           </div>
                                         </div>
@@ -590,7 +590,7 @@
                                           </div>
                                           <div class="col corte">
                                             <button class='btn btn-outline-primary' 
-                                                    *ngIf="!balanza.value.corteManual"
+                                                    *ngIf="!balanza.value.corteManual && balanza.value.tn==0"
                                                     (click)="generarCorte()">Nuevo evento</button>
                                           </div>
                                         </div>
