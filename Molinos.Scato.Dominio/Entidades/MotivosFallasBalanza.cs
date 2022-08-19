@@ -8,7 +8,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual string Nombre { get; set; }
         public virtual string Siglas { get; set; }
-
         public virtual bool Liquido { get; set; }
+        public virtual bool Corte { get; set; }
     }
 }
