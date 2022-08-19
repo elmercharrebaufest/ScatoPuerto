@@ -57,6 +57,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   materialesPuerto: MaterialPuerto[] = [];
   moduloDeCarga_Id: number;
   motivosBalanzas78: MotivosFallasBalanza[];
+  motivosBalanzas78sorted: MotivosFallasBalanza[];
   productos: MaterialPuerto[] = [];
   resultado7: TotToneladas[] = [];
   resultado8: TotToneladas[] = [];
@@ -248,6 +249,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       totalProducto: 0,
     });
   }
+
 
   initListadoTotalBalanzadas(x: ListadoTotalBalanzadas = null){
     if(!x){
@@ -526,9 +528,15 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get balanzas7(): FormArray {
+    var myArray = (this.balanza7Form.get("balanzas7") as FormArray).value;
+    myArray = myArray.sort((a, b) => Number(new Date(a.fecha_Inicio)) - Number(new Date(b.fecha_Inicio)));
+    (this.balanza7Form.get("balanzas7") as FormArray).patchValue(myArray)
     return this.balanza7Form.get("balanzas7") as FormArray;
   }
   get balanzas8(): FormArray {
+    var myArray = (this.balanza8Form.get("balanzas8") as FormArray).value;
+    myArray = myArray.sort((a, b) => Number(new Date(a.fecha_Inicio)) - Number(new Date(b.fecha_Inicio)));
+    (this.balanza8Form.get("balanzas8") as FormArray).patchValue(myArray)
     return this.balanza8Form.get("balanzas8") as FormArray;
   }
 
@@ -848,11 +856,25 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number) {
+
+  balanzas7y8Filter(corte?: boolean){    
+    if(corte != null){
+      this.motivosBalanzas78sorted =  this.motivosBalanzas78.filter(x => x.corte == corte);   
+    }else{
+      this.motivosBalanzas78sorted = this.motivosBalanzas78;
+    }
+}
+
+  //Martín: Agrego parámetro corte a la función, el mismo es para filtrar el combo del modal
+  //siendo -> NULL = sin filtro, 1 = Motivos de corte, 2 = Bajas cargas.
+  //El comentario es porque todos los parámetros se llaman igual WTF.
+  //Si estás leyendo esto leé la linea de abajo de esta y me vas a entender. CORTEE (Con voz de Gaspi Cancelado)
+  openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number, corte?: boolean) {
     this.esCorteManual = corteManual;
     this.balanzaCorteManual = balanzaCorteManual;
     this.agregaCorte = false;
     this.balanzas78Service.limpiarInterval();
+    this.balanzas7y8Filter(corte);
 
     this.parametrosService.consola(`this.corteManualForm.value: `,this.corteManualForm.value);
     
