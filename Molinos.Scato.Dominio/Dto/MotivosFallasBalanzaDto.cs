@@ -7,5 +7,6 @@
         public string Siglas { get; set; }
 
         public bool Liquido { get; set; }
+        public bool Corte { get; set; }
     }
 }
