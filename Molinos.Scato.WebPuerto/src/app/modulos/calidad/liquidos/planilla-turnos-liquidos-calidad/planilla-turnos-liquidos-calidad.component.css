@@ -37,7 +37,23 @@ label{
 
     /* lo uso como ID */
 }
-
+.basurerito{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+.celda-elimina-corte{
+    justify-content: flex-start;    
+    align-items: center;
+    text-align: center;
+}
+.tabla-fila-corte{
+    background-color: #F4F4F4;
+    height: 30px !important;
+    padding: 2px !important;
+    padding-left: 5px !important;
+    vertical-align: middle;
+}
 .bg-grisClaro{
     background-color: #F3F3F3;
 }

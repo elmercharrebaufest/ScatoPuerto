@@ -309,18 +309,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);// && (b.turnoPuerto.orden - a.turnoPuerto.orden);
       });
-      /*
-      this.planillaDeTurnos.forEach((dia) => {
-        console.log(dia)
-        console.log(dia.fecha.substring(0,10))
-        if (dia.turnoPuerto != undefined || dia.turnoPuerto != null){
-          if(dia.turnoPuerto.nombre == '00-06') dia.posicionTurno = 1;
-          if(dia.turnoPuerto.nombre == '06-12') 
-          if(dia.turnoPuerto.nombre == '12-18')
-          if(dia.turnoPuerto.nombre == '18-24')
-        }
-      });
-      */
+
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
         let exists: boolean = false;
