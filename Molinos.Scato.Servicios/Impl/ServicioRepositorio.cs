@@ -9938,11 +9938,11 @@ namespace Molinos.Scato.Servicios.Impl
                         //balanzasCortes_db.Cerrado = item.Cerrado;
                         balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
                         balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
-                        balanzasCortes_db.Kg = item.Kg; // descomentado por ticket 979
+                        //balanzasCortes_db.Kg = item.Kg;
                         //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
                         balanzasCortes_db.Observaciones = item.Observaciones;
                         //balanzasCortes_db.Material_id = item.Material_id;
-                        balanzasCortes_db.Tn = item.Tn; // descomentado por ticket 979
+                        //balanzasCortes_db.Tn = item.Tn;
                         balanzasCortes_db.CorteManual = item.CorteManual;
                         balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
                     }
