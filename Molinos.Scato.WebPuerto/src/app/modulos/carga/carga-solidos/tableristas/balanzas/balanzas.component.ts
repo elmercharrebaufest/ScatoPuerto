@@ -625,6 +625,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     let lfecha_Corte = '';
     let fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial + ' ' + bc.hora_Inicio_Inicial;
     let fecha_Corte_Inicial = bc.fecha_Corte_Inicial + ' ' + bc.hora_Corte_Inicial;
+    // let tnInicial = bc.tn;
+    // let kgInicial = bc.kg;
 
     if( balanzadas.length === 0 ){ // Cuando no selecciona ninguno
       if( !bc.listadoTotalBalanzadas.motivosFallasBalanza.id ){
@@ -677,6 +679,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             // console.log('La nueva FHi será la fechaHoraCorteNueva2');
             fecha_Inicio_Inicial = bc.fecha_Corte_Nueva+' '+bc.hora_Corte_Nueva;
             fecha_Corte_Inicial = bc.fecha_Corte_Inicial+' '+bc.hora_Corte_Inicial;
+            // tnInicial = 0;
+            // kgInicial = 0;
 
             objetoNuevo = {
               ...this[balanza].controls[index].value,
@@ -706,6 +710,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
                 motivosFallasBalanza_Nueva: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva
               },
               observaciones: bc.observaciones_Nueva,
+              // tn: 0,
+              // kg: 0,
             }
           }
 
@@ -732,6 +738,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza.id,
         observaciones: bc.observaciones,
+        // tn: tnInicial,
+        // kg: kgInicial,
       });
 
       let objetoListadoTotalBalanzadas = this.generarObjetoParaGuardado( this[balanza].controls[index].controls );
