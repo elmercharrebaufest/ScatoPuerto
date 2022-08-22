@@ -1,0 +1,10 @@
+<svg id="Componente_321_1" data-name="Componente 321 – 1" xmlns="http://www.w3.org/2000/svg" width="125" height="39" viewBox="0 0 125 39">
+  <g id="Boton_Verde">
+    <g id="Rectángulo_85" data-name="Rectángulo 85" fill="none" stroke="#5cb85c" stroke-width="1">
+      <rect width="125" height="39" rx="4" stroke="none"/>
+      <rect x="0.5" y="0.5" width="124" height="38" rx="3.5" fill="none"/>
+    </g>
+    <text id="Turno_cerrado" data-name="Turno cerrado" transform="translate(8 25)" fill="#5cb85c" font-size="14" font-family="Arial-Bold, Arial" font-weight="700"><tspan x="0" y="0">Turno cerrado</tspan></text>
+  </g>
+  <path id="Trazado_209" data-name="Trazado 209" d="M109.208,498.746a.939.939,0,0,0,1.328,0c.011-.011.022-.022.032-.033l.031-.03,6.642-6.642a.939.939,0,0,0-1.328-1.329l-6.041,6.041-2.435-2.435a.939.939,0,1,0-1.329,1.328Z" transform="translate(1 -474.752)" fill="#5cb85c" fill-rule="evenodd"/>
+</svg>
