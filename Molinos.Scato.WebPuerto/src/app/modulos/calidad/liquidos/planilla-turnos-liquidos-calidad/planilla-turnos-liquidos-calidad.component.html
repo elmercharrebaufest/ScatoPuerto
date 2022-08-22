@@ -35,7 +35,7 @@
                             <th class="header-fijo">Cant.</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    
                         <ng-container formArrayName='diasTurno'>
                             <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
                                 <tr>
@@ -174,13 +174,13 @@
                                                                     <th colspan="2">Observaciones</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody class="bg-white">
+                                                            
                                                                 <ng-container
                                                                     formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                     <ng-container
                                                                         *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
                                                                         [formGroupName]='y'>
-                                                                        <tr class='tabla-fila-corte'>
+                                                                        <tr class='tabla-fila-corte bg-white'>
                                                                             <td colspan="1">
                                                                                 {{corte.controls.motivosDeCorte.value.siglas}}
                                                                                 -
@@ -201,7 +201,7 @@
                                                                         </tr>
                                                                     </ng-container>
                                                                 </ng-container>
-                                                            </tbody>
+                                                            
                                                         </table>
                                                     </div>
                                                 </div>
@@ -229,21 +229,22 @@
                                                                         <th style="width:85px"></th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody class="bg-white">
+                                                                
                                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
                                                                         <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                             <tr>
-                                                                                <td colspan="3">
+                                                                                <td colspan="3" class="bg-white tabla-fila-corte">
                                                                                     {{observacion.observaciones}}
                                                                                 </td>
-                                                                                <td colspan="1">
+                                                                                <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                     {{observacion.fecha}}
                                                                                 </td>
-                                                                                <td colspan="1">
+                                                                                <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                     {{observacion.hora}}
                                                                                 </td>
-                                                                                <td>
+                                                                                <td class="bg-white tabla-fila-corte celda-elimina-corte">
                                                                                     <img src="assets/trashIcon.svg"
+                                                                                         class="basurerito"
                                                                                     	 (click)="deleteObsCalidad(observacion)"
                                                                                     	 *ngIf="!turno.value.guardadoPorRecibidor"
                                                                                     	 style="cursor: pointer;">
@@ -251,7 +252,7 @@
                                                                             </tr>
                                                                         </ng-container>
                                                                     </ng-container>
-                                                            </tbody>
+                                                            
                                                         </table>
                                                     </div>
                                                 </div>
@@ -267,7 +268,7 @@
                                 </ng-container>
                             </ng-container>
                         </ng-container>
-                    </tbody>
+                    
                 </table>
             </perfect-scrollbar>
         </div>
