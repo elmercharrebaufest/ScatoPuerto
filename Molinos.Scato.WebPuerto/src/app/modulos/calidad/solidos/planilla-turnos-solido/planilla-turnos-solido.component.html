@@ -55,6 +55,8 @@
                                                             (click)='onCerrarTurno(turno)'> 
                                                             Cerrar turno
                                                     </button>
+                                                    <img  *ngIf="turno.value.guardadoPorRecibidor"                                                    
+                                                            src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
                                         </tr>
