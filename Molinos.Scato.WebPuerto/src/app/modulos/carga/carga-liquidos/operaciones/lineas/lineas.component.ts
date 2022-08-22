@@ -298,23 +298,24 @@ export class LineasComponent implements OnInit, OnChanges {
 
   initLineasEmbarque(x: LineasDeEmbarque = null) {
     let deshabilitar = this.esCalidad ? true : false;
+    let esVicentin = x?.linea == 'Vicentin';
     return this.formBuilder.group({
       id: x?.id ?? "",
       linea: [{ value: x?.linea ?? "", disabled: deshabilitar }],
       tipoLineaEmbarque: [{ value: x?.tipoLineaEmbarque ?? "", disabled: deshabilitar }],
-      tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar }],
-      materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar }],
-      temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: deshabilitar }],
-      alturaInicialCM: [{ value: x && x.alturaInicialCM ? x.alturaInicialCM > 0 ? x.alturaInicialCM : "" : "", disabled: deshabilitar }],
-      alturaInicialMM: [{ value: x && x.alturaInicialMM ? x.alturaInicialMM > 0 ? x.alturaInicialMM : "" : "", disabled: deshabilitar }],
-      densidadInicial: [{ value: x && x.densidadInicial ? x.densidadInicial > 0 ? x.densidadInicial : "" : "", disabled: true }],
-      temperaturaFinal: [{ value: x && x.temperaturaFinal ? x.temperaturaFinal > 0 ? x.temperaturaFinal : "" : "", disabled: true }],
-      litros: [{ value: x && x.litros ? x.litros > 0 ? x.litros : "" : "", disabled: true }],
-      densidadFinal: [{ value: x && x.densidadFinal ? x.densidadFinal > 0 ? x.densidadFinal : "" : "", disabled: true }],
-      alturaFinalCM: [{ value: x && x.alturaFinalCM ? x.alturaFinalCM > 0 ? x.alturaFinalCM : "" : "", disabled: deshabilitar }],
-      alturaFinalMM: [{ value: x && x.alturaFinalMM ? x.alturaFinalMM > 0 ? x.alturaFinalMM : "" : "", disabled: deshabilitar }],
-      kilos: [{ value: x && x.kilos ? x.kilos > 0 ? x.kilos : "" : "", disabled: true }],
-      tkFinal: [{ value: x?.tkFinal ?? "", disabled: true }]
+      tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar}],
+      materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar}],
+      temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: deshabilitar || esVicentin, }],
+      alturaInicialCM: [{ value: x && x.alturaInicialCM ? x.alturaInicialCM > 0 ? x.alturaInicialCM : "" : "", disabled: deshabilitar || esVicentin }],
+      alturaInicialMM: [{ value: x && x.alturaInicialMM ? x.alturaInicialMM > 0 ? x.alturaInicialMM : "" : "", disabled: deshabilitar || esVicentin }],
+      densidadInicial: [{ value: x && x.densidadInicial ? x.densidadInicial > 0 ? x.densidadInicial : "" : "", disabled: true || esVicentin }],
+      temperaturaFinal: [{ value: x && x.temperaturaFinal ? x.temperaturaFinal > 0 ? x.temperaturaFinal : "" : "", disabled: true || esVicentin }],
+      litros: [{ value: x && x.litros ? x.litros > 0 ? x.litros : "" : "", disabled: true || esVicentin }],
+      densidadFinal: [{ value: x && x.densidadFinal ? x.densidadFinal > 0 ? x.densidadFinal : "" : "", disabled: true || esVicentin }],
+      alturaFinalCM: [{ value: x && x.alturaFinalCM ? x.alturaFinalCM > 0 ? x.alturaFinalCM : "" : "", disabled: deshabilitar || esVicentin }],
+      alturaFinalMM: [{ value: x && x.alturaFinalMM ? x.alturaFinalMM > 0 ? x.alturaFinalMM : "" : "", disabled: deshabilitar || esVicentin }],
+      kilos: [{ value: x && x.kilos ? x.kilos > 0 ? x.kilos : "" : "", disabled: true || esVicentin }],
+      tkFinal: [{ value: x?.tkFinal ?? "", disabled: true || esVicentin }]
     });
   }
 
@@ -387,6 +388,22 @@ export class LineasComponent implements OnInit, OnChanges {
     const tipoLineaEmbarqueSel = lineaSel['controls']?.tipoLineaEmbarque?.value;
     lineaSel['controls']?.linea.setValue(tipoLineaEmbarqueSel?.linea);
     console.log(lineaSel)
+    
+    let selectedVicentin: boolean;
+    selectedVicentin = lineaSel['controls'].tipoLineaEmbarque.value.linea == 'Vicentin'
+    if(selectedVicentin){
+      lineaSel['controls'].alturaFinalCM.disable();
+      lineaSel['controls'].alturaFinalMM.disable();
+      lineaSel['controls'].alturaInicialCM.disable();
+      lineaSel['controls'].alturaInicialMM.disable();
+      lineaSel['controls'].temperaturaInicial.disable();
+    }else {
+      lineaSel['controls'].alturaFinalCM.enable();
+      lineaSel['controls'].alturaFinalMM.enable();
+      lineaSel['controls'].alturaInicialCM.enable();
+      lineaSel['controls'].alturaInicialMM.enable();
+      lineaSel['controls'].temperaturaInicial.enable();
+    }
   }
 
   onFocusOutEvent(index: number) {
