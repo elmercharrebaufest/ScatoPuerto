@@ -621,10 +621,12 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     let balanzadas = this[balanza].value.filter( b => b.seleccionado);
     let cortes = [];
     let bc = this[balanza].value[index];
+    let idOriginal = bc.id
     let lfecha_Inicio = '';
     let lfecha_Corte = '';
     let fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial + ' ' + bc.hora_Inicio_Inicial;
     let fecha_Corte_Inicial = bc.fecha_Corte_Inicial + ' ' + bc.hora_Corte_Inicial;
+    let nuevoEsAnteriorAlOriginal: boolean;
     // let tnInicial = bc.tn;
     // let kgInicial = bc.kg;
 
@@ -675,7 +677,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
               fechaHoraInicioInicial2 <= fechaHoraCorteNueva2 && fechaHoraCorteNueva2 <= fechaHoraCorteInicial2 && 
               fechaHoraInicioNueva2 < fechaHoraCorteNueva2 ){
 
+          // CUANDO LA DIVISIÓN NUEVA SE ANTEPONE A LA DE ORIGEN
           if( fechaHoraInicioNueva2 == fechaHoraInicioInicial2 ){
+            nuevoEsAnteriorAlOriginal = true;
             // console.log('La nueva FHi será la fechaHoraCorteNueva2');
             fecha_Inicio_Inicial = bc.fecha_Corte_Nueva+' '+bc.hora_Corte_Nueva;
             fecha_Corte_Inicial = bc.fecha_Corte_Inicial+' '+bc.hora_Corte_Inicial;
@@ -695,7 +699,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             }
           }
 
+          // CUANDO LA DIVISIÓN NUEVA LE CONTINUA A LA DE ORIGEN
           if( fechaHoraCorteNueva2 == fechaHoraCorteInicial2 ){
+            nuevoEsAnteriorAlOriginal = false;
             // console.log('La nueva FHc será la fechaHoraInicioNueva2');
             fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial+' '+bc.hora_Inicio_Inicial;
             fecha_Corte_Inicial = bc.fecha_Inicio_Nueva+' '+bc.hora_Inicio_Nueva;
@@ -705,10 +711,10 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
               fecha_Inicio: lfecha_Inicio,
               fecha_Corte: lfecha_Corte,
               id: 0,
-              motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva.id,
               listadoTotalBalanzadas: {
                 motivosFallasBalanza_Nueva: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva
               },
+              motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva.id,
               observaciones: bc.observaciones_Nueva,
               // tn: 0,
               // kg: 0,
@@ -729,6 +735,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           return;
         }
       }
+      
+      if(nuevoEsAnteriorAlOriginal) index += 1;
 
       this[balanza].controls[index].patchValue({
         fecha_Inicio: fecha_Inicio_Inicial,
@@ -738,6 +746,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza.id,
         observaciones: bc.observaciones,
+        id: idOriginal,
         // tn: tnInicial,
         // kg: kgInicial,
       });
