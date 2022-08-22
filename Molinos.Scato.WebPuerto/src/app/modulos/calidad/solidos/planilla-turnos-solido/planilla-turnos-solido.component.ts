@@ -202,6 +202,39 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
 
   }
+  private devolverFechaHoraTurno(planillaTurno) {
+
+    let turnoFechaHora = this.getFechaFormato(new Date(planillaTurno.fecha));
+
+    switch (planillaTurno.turnoPuerto.orden) {
+      case 1:
+        turnoFechaHora = turnoFechaHora + ' 06:00';
+        break;
+      case 2:
+        turnoFechaHora = turnoFechaHora + ' 12:00';
+        break;
+      case 3:
+        turnoFechaHora = turnoFechaHora + ' 18:00';
+        break;
+      case 4:
+        turnoFechaHora = turnoFechaHora + ' 23:00';
+        break;
+    }
+    return turnoFechaHora;
+  }
+  getFechaFormato(fechaTurno: Date) {
+    const anioTurno: number = fechaTurno.getFullYear();
+    const mesTurno: number = fechaTurno.getMonth() + 1;
+    const diaTurno: number = fechaTurno.getDate();
+
+    const anioFormato: string = anioTurno.toString();
+    const mesFormato: string = mesTurno < 10 ? '0' + mesTurno.toString() : mesTurno.toString();
+    const diaFormato: string = diaTurno < 10 ? '0' + diaTurno.toString() : diaTurno.toString();
+
+    const fechaFormato = anioFormato + '-' + mesFormato + '-' + diaFormato;
+
+    return fechaFormato;
+  }
   fillPlanilla() {
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     this.diasTurno.clear();
@@ -210,14 +243,22 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     if (this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0) {
 
       //Agrego variable de milisegundos (fecha) para poder ordenar
+      console.log("fill planillaDeTurnos")
       this.planillaDeTurnos.forEach(element => {
-        element.fechaMiliseconds = new Date(element.fecha).getTime();
+        console.log(element)
+        const fechaFormateada = this.devolverFechaHoraTurno(element);
+        console.log('fechaFormateada--->>');
+        console.log(fechaFormateada);
+        console.log(new Date(fechaFormateada));
+        element.fechaMiliseconds = new Date(fechaFormateada).getTime();
       });
 
+      console.log(this.planillaDeTurnos)
       // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);
       });
+      console.log(this.planillaDeTurnos)
 
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {

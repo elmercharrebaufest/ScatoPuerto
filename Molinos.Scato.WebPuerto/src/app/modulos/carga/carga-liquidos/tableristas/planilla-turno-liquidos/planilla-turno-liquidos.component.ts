@@ -268,22 +268,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     this.formTurnos.get('diasTurno')['controls'].forEach((dia, diaIndex) => {
       // //Si el día ya está agregado
-      console.log('addTurnoFechaSeleccionada--->>')
-      console.log(dia.controls.diaTurno.value)
-      console.log(fechaSeleccionada)
-      console.log(fechaSeleccionada.getFullYear())
-
       if (new Date(dia.controls.diaTurno.value).getFullYear() == fechaSeleccionada.getFullYear() &&
         new Date(dia.controls.diaTurno.value).getMonth() == fechaSeleccionada.getMonth() &&
         new Date(dia.controls.diaTurno.value).getDate() == fechaSeleccionada.getDate()) {
-        console.log('entroooooo--->>')
 
         dia.controls?.turnos?.controls?.forEach(turnoLista => {
-          console.log('bucleeeeee--->>')
-          console.log('turno--->>' + turno)
           if (turnoLista.value.turnoPuerto.turnoPuerto.id == turno) {
-            console.log('validacion turno--->>' + turno)
-
             this.confirmationDialogService.confirm('¡Atención!', 'El turno que deseas agregar no se encuentra disponible.', 'Cerrar', '', null, null, Tipoalerta.Warning)
             exitFunction = true;
           }
@@ -296,12 +286,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if (exitFunction) {
       return;
     }
-    console.log('exitFunction valor--->>' + exitFunction)
 
     this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar el turno seleccionado?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then((confirmed) => {
-        console.log('mensaje xxxx--->>' + exitFunction)
-
         if (confirmed) {
           //Si llegamos hasta aca es porque tenemos que crear el turno.
           let turnoNuevo: PlanillaDeTurnos = new PlanillaDeTurnos();
@@ -1175,15 +1162,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.destinos = new Array();
     if (this.bodegas != null || this.bodegas != undefined) {
       this.bodegas.forEach(b => {
-        console.log('destino .....')
-        console.log(b.destino)
-        console.log(this.destinos)
         if (!this.destinos.find(d => d.nombre == b.destino.nombre)) {
           this.destinos.push(b.destino);
         }
       });
-      console.log('this.destinos final ......')
-      console.log(this.destinos)
     }
   }
 
@@ -1855,9 +1837,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
         const exportadorVal = turnoDetalle['controls'].exportador.value;
         const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
-        console.log('this.lineas--->>')
-        console.log(this.lineas)
-        console.log(turnoDetalle)
         const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
 
         if (turnoDetalle['controls'].linea.value == '' || turnoDetalle['controls'].linea.value == '0') {
@@ -1867,8 +1846,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         }
 
         const lineaIdVal = turnoDetalle['controls'].linea.value;
-        console.log('lineaIdVal-->>')
-        console.log(lineaIdVal)
+
         if ((lineaIdVal != null || lineaIdVal != undefined)) {
           if ((lineaIdVal > '' && lineaIdVal != '0')) {
 
@@ -1916,9 +1894,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
         turnoPuerto: Turno.turnoPuerto['value'].turnoPuerto
       }
-      console.log('planillaTurno--->>')
-      console.log(planillaTurno)
-      console.log(Turno)
 
       if (planillaTurno.id == null || planillaTurno.id == 0) {
         this.asignarFechaHoraTurno(planillaTurno);
