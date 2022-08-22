@@ -36,7 +36,7 @@
                                     <td [attr.rowspan]='getRowSpan(dia)'>
                                         <div class='column-center'>
                                             <span><b>{{getDia(d)}}</b></span>
-                                            <span class='toneladas'>{{ getCantDia(dia) }} Tn</span>
+                                            <span class='toneladas'>{{ getCantDia(dia) }} <span class='turno'>Tn</span></span>
                                             <span class='turno'>por día</span>
                                         </div>
                                     </td>
@@ -47,15 +47,16 @@
                                             <td [attr.rowspan]='getRowSpanTurno(turno)'>
                                                 <div class="column-center">
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
-                                                    <span class='toneladas'>{{ getCantTurno(turno) }} Tn</span>
+                                                    <span class='toneladas'>{{ getCantTurno(turno) }} <span class='turno'>Tn</span></span>
                                                     <span class='turno'>por turno</span>
-                                                    <br/>
                                                     <button class='btn btn btn-success' 
                                                             *ngIf="!turno.value.guardadoPorRecibidor"
                                                             style="margin-top: 5px; margin-bottom: 5px" 
                                                             (click)='onCerrarTurno(turno)'> 
                                                             Cerrar turno
                                                     </button>
+                                                    <img  *ngIf="turno.value.guardadoPorRecibidor"                                                    
+                                                            src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
                                         </tr>
@@ -101,29 +102,29 @@
                                                                     <th colspan="5">Observaciones</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody class="bg-white">
+                                                            
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                     <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
                                                                         <tr>
-                                                                            <td colspan="4">
+                                                                            <td colspan="4" class="bg-white tabla-fila-corte">
                                                                                 {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                             </td>
-                                                                            <td colspan="1">
+                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                 {{corte.controls.horaInicio.value}} hs
                                                                             </td>
-                                                                            <td colspan="1">
+                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                 {{corte.controls.horaFin.value}} hs
                                                                             </td>
-                                                                            <td colspan="1">
+                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                 {{corte.controls.tiempoTotal.value | slice:0:5}} hs
                                                                             </td>
-                                                                            <td colspan="5">
+                                                                            <td colspan="5" class="bg-white tabla-fila-corte">
                                                                                 {{corte.controls.observaciones.value}}
                                                                             </td>
                                                                         </tr>
                                                                     </ng-container>
                                                                 </ng-container>
-                                                            </tbody>
+                                                            
                                                         </table>
                                                     </div>
                                                 </div>
@@ -149,26 +150,26 @@
                                                                     <th style="width:85px"></th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody class="bg-white">
+                                                            
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
                                                                     <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                         <tr>
-                                                                            <td colspan="6">
+                                                                            <td colspan="6" class="bg-white tabla-fila-corte">
                                                                                 {{observacion.observaciones}}
                                                                             </td>
-                                                                            <td colspan="1">
+                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                 {{observacion.fecha}}
                                                                             </td>
-                                                                            <td colspan="1">
+                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
                                                                                 {{observacion.hora}}
                                                                             </td>
-                                                                            <td>
-                                                                                <img src="assets/trashIcon.svg"  style="cursor: pointer;" (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
+                                                                            <td class="bg-white tabla-fila-corte celda-elimina-corte">
+                                                                                <img src="assets/trashIcon.svg" class="basurerito" style="cursor: pointer;" (click)="deleteObsCalidad(observacion)" *ngIf="!turno.value.guardadoPorRecibidor">
                                                                             </td>
                                                                         </tr>
                                                                     </ng-container>
                                                                 </ng-container>
-                                                            </tbody>
+                                                            
                                                         </table>
                                                     </div>
                                                 </div>

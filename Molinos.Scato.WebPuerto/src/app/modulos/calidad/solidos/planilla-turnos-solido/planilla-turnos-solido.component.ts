@@ -1,17 +1,15 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
-import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-import { Workbook, Worksheet } from 'exceljs';
+import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { PlanillaDeTurnos, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { TurnoDetalleSolido } from '@ScatoModels/planilla-turnos/turno';
@@ -72,8 +70,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private messageService: MessageService,
-    private lineasService: LineasService,
     private session: SessionService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
@@ -165,7 +161,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           }
           //Si llegamos hasta aca es porque tenemos que crear el turno.
           let turnoNuevo: PlanillaDeTurnos = new PlanillaDeTurnos();
-          turnoNuevo.cerrado = false;
           turnoNuevo.guardadoPorRecibidor = false;
           turnoNuevo.fecha = fechaSeleccionada;
           turnoNuevo.fechaMiliseconds = fechaSeleccionada.getTime();
@@ -202,6 +197,39 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
 
   }
+  private devolverFechaHoraTurno(planillaTurno) {
+
+    let turnoFechaHora = this.getFechaFormato(new Date(planillaTurno.fecha));
+
+    switch (planillaTurno.turnoPuerto.orden) {
+      case 1:
+        turnoFechaHora = turnoFechaHora + ' 06:00';
+        break;
+      case 2:
+        turnoFechaHora = turnoFechaHora + ' 12:00';
+        break;
+      case 3:
+        turnoFechaHora = turnoFechaHora + ' 18:00';
+        break;
+      case 4:
+        turnoFechaHora = turnoFechaHora + ' 23:00';
+        break;
+    }
+    return turnoFechaHora;
+  }
+  getFechaFormato(fechaTurno: Date) {
+    const anioTurno: number = fechaTurno.getFullYear();
+    const mesTurno: number = fechaTurno.getMonth() + 1;
+    const diaTurno: number = fechaTurno.getDate();
+
+    const anioFormato: string = anioTurno.toString();
+    const mesFormato: string = mesTurno < 10 ? '0' + mesTurno.toString() : mesTurno.toString();
+    const diaFormato: string = diaTurno < 10 ? '0' + diaTurno.toString() : diaTurno.toString();
+
+    const fechaFormato = anioFormato + '-' + mesFormato + '-' + diaFormato;
+
+    return fechaFormato;
+  }
   fillPlanilla() {
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     this.diasTurno.clear();
@@ -210,14 +238,22 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     if (this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0) {
 
       //Agrego variable de milisegundos (fecha) para poder ordenar
+      console.log("fill planillaDeTurnos")
       this.planillaDeTurnos.forEach(element => {
-        element.fechaMiliseconds = new Date(element.fecha).getTime();
+        console.log(element)
+        const fechaFormateada = this.devolverFechaHoraTurno(element);
+        console.log('fechaFormateada--->>');
+        console.log(fechaFormateada);
+        console.log(new Date(fechaFormateada));
+        element.fechaMiliseconds = new Date(fechaFormateada).getTime();
       });
 
+      console.log(this.planillaDeTurnos)
       // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);
       });
+      console.log(this.planillaDeTurnos)
 
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
@@ -431,10 +467,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
   }
 
-  getTurno2(d, t): FormArray {
-    return this.getTurnos(d)['controls'][t] as FormArray;
-  }
-
   getCorteTurnos(d, t): FormArray {
     return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosCortes as FormArray;
   }
@@ -467,10 +499,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
   openModalAgregarObsCalidad(modal) {
     this.formNuevoTurno.reset();
-
-    this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte', size: 'lg', centered: true }).result.then(() => {
-
-    })
+    this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte', size: 'lg', centered: true }).result.then(() => {})
   }
 
   guardarObservacionesDeCalidad() {
@@ -617,29 +646,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let returnHorario = this.turnoPuerto.find(h => horario >= Number(h.nombre.split('-')[0]) && horario < Number(h.nombre.split('-')[1]));
     this.getTurnos(dia)['controls'][turno]['controls'].turnoPuerto.setValue(returnHorario);
     return returnHorario;
-  }
-
-  async enviarTurno(dia, turno) {
-    // this.enviarMail();
-    let turnoAEnviar = new Object;
-    turnoAEnviar['moduloDeCargaPlanillaDeTurnos'] = this.getTurnos(dia)['controls'][turno].value;
-    turnoAEnviar['fecha'] = new Date();
-    turnoAEnviar['id'] = null;
-    turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido = turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido.filter(m =>
-      m.exportador ||
-      m.bodega ||
-      m.materialPuerto ||
-      m.destino ||
-      m.cantidad)
-
-    //Si tengo detalles trato de enviar el turno.
-    if (turnoAEnviar['moduloDeCargaPlanillaDeTurnos'].moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0) {
-      //Si el turno correspondiente está abierto
-      if (!this.getTurnos(dia)['controls'][turno]['controls'].cerrado.value) {
-        //lo cierro
-        this.getTurnos(dia)['controls'][turno]['controls'].cerrado.setValue(true);
-      }
-    }
   }
 
   sendRitmos(dia, turno) {
@@ -1316,78 +1322,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
         this.hideSpinner.emit(false)
         return
-        this.hideSpinner.emit(false);
       });
-
   }
 
   calcularRestaEmbarcar(): number {
     let restaEmbarcar = this.pedidoPorPlano - this.getCantTotalABordo();
 
     return (restaEmbarcar >= 0 ? restaEmbarcar : 0);
-  }
-
-  enviarPlanillaTurno(dia, turno, mail) {
-
-    // async enviarPlanillaTurno(dia, turno, mail) {
-    // this.enviarMail();
-    var ModuloDeCargaPlanillaDeTurnos = this.getTurnos(dia)['controls'][turno].value;
-
-    ModuloDeCargaPlanillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesSolido = ModuloDeCargaPlanillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesSolido.filter(m =>
-      m.exportador ||
-      m.linea ||
-      m.bodega ||
-      m.materialPuerto ||
-      m.destino ||
-      m.cantidad)
-    ModuloDeCargaPlanillaDeTurnos.turnoPuerto = this.getTurnos(dia)['controls'][turno]['controls']['turnoPuerto'].value.turnoPuerto;
-    ModuloDeCargaPlanillaDeTurnos.cerrado = true;
-    ModuloDeCargaPlanillaDeTurnos.guardadoPorRecibidor = true;
-    ModuloDeCargaPlanillaDeTurnos.fecha = this.getTurnos(dia)['controls'][turno]['controls'].turnoPuerto.value.fecha
-
-
-    if (ModuloDeCargaPlanillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0) {
-      this.moduloCargaService.guardarPlanillaDeTurnosMail(ModuloDeCargaPlanillaDeTurnos, this.idModuloDeCarga, mail).subscribe(
-        res => {
-          if (!this.getTurnos(dia)['controls'][turno]['controls'].cerrado.value) {
-
-            this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con el turno', 'Cerrar', '', null, null, Tipoalerta.Success)
-              .then((confirmed) => {
-                if (confirmed) {
-
-                  this.sendRitmos(dia, turno);
-                  this.hideSpinner.emit(false)
-                  return
-                }
-              }).catch((
-              ) => window.location.reload());
-          }
-        },
-        error => {
-          console.log(error)
-          this.confirmationDialogService.confirm('¡Error!', 'No se pudo enviar el turno', 'Cerrar', '', null, null, Tipoalerta.Error)
-            .then((confirmed) => {
-              if (confirmed) {
-                this.hideSpinner.emit(false)
-                return
-              }
-            }).catch((
-            ) => window.location.reload());
-        });
-    }
-    else
-      this.messageService.add({ severity: 'warn', detail: 'Error de Datos', summary: 'No hay datos a enviar', key: 'enviar-turno' });
-
-  }
-
-  guardarTurno(Turno: PlanillaDeTurnos, reload: boolean = false) {
-    Turno.fecha = new Date();
-    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(Turno, this.idModuloDeCarga).subscribe(res => {
-      this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos.push(Turno);
-      this.fillPlanilla();
-    }, error => {
-      this.confirmationDialogService.confirm('¡Error!', 'No se ha podido guardar el turno.', 'Cerrar', '', null, null, Tipoalerta.Error)
-    })
   }
 
   soloEnteros(valor) {

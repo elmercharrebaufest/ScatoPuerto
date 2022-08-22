@@ -179,8 +179,23 @@ table.turnos table.tabla-embebida th{
     display: flex;
     flex-direction: column;
 }
-
-
+.basurerito{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+.tabla-fila-corte{
+    background-color: #F4F4F4;
+    height: 30px !important;
+    padding: 2px !important;
+    padding-left: 5px !important;
+    vertical-align: middle;
+}
+.celda-elimina-corte{
+    justify-content: flex-start;    
+    align-items: center;
+    text-align: center;
+}
 .divHeaderRightLeft {
     width: 100%;
     display: flex;

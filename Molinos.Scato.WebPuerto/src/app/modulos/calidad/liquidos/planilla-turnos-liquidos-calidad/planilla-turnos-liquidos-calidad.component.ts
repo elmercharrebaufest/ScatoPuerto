@@ -309,18 +309,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);// && (b.turnoPuerto.orden - a.turnoPuerto.orden);
       });
-      /*
-      this.planillaDeTurnos.forEach((dia) => {
-        console.log(dia)
-        console.log(dia.fecha.substring(0,10))
-        if (dia.turnoPuerto != undefined || dia.turnoPuerto != null){
-          if(dia.turnoPuerto.nombre == '00-06') dia.posicionTurno = 1;
-          if(dia.turnoPuerto.nombre == '06-12') 
-          if(dia.turnoPuerto.nombre == '12-18')
-          if(dia.turnoPuerto.nombre == '18-24')
-        }
-      });
-      */
+
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
         let exists: boolean = false;
@@ -1681,83 +1670,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
     return (restaEmbarcar >= 0 ? restaEmbarcar : 0);
   }
-
-  enviarPlanillaTurno(dia, turno, mail) {
-
-    // async enviarPlanillaTurno(dia, turno, mail) {
-    // this.enviarMail();
-    var ModuloDeCargaPlanillaDeTurnos = this.getTurnos(dia)['controls'][turno].value;
-
-    ModuloDeCargaPlanillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesLiquido = ModuloDeCargaPlanillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesLiquido.filter(m =>
-      m.exportador ||
-      m.linea ||
-      m.bodegaParcel ||
-      m.materialPuerto ||
-      m.tk ||
-      m.temperatura ||
-      m.medidaInicialCM ||
-      m.medidaInicialMM ||
-      m.medidaFinalCM ||
-      m.medidaFinalMM ||
-      m.destino ||
-      m.cantidad)
-    ModuloDeCargaPlanillaDeTurnos.turnoPuerto = this.getTurnos(dia)['controls'][turno]['controls']['turnoPuerto'].value.turnoPuerto;
-    ModuloDeCargaPlanillaDeTurnos.cerrado = true;
-    ModuloDeCargaPlanillaDeTurnos.enviado = true;
-    ModuloDeCargaPlanillaDeTurnos.fecha = this.getTurnos(dia)['controls'][turno]['controls'].turnoPuerto.value.fecha
-
-
-    if (ModuloDeCargaPlanillaDeTurnos.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length > 0) {
-      this.moduloCargaService.guardarPlanillaDeTurnosMail(ModuloDeCargaPlanillaDeTurnos, this.idModuloDeCarga, mail).subscribe(
-        res => {
-          if (!this.getTurnos(dia)['controls'][turno]['controls'].cerrado.value) {
-            if (this.diasTurno['controls'][dia]['controls'].turnos.length < 4) {
-              //  this.getTurnos(dia)['controls'][turno]['controls'].cerrado.setValue(true);
-              //  this.getTurnos(dia).push(this.initTurno())
-            } else {
-              //  this.getTurnos(dia)['controls'][turno]['controls'].cerrado.setValue(true);
-              //  this.diasTurno.push(this.initDia());
-            }
-
-            this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con el turno', 'Cerrar', '', null, null, Tipoalerta.Success)
-              .then((confirmed) => {
-                if (confirmed) {
-
-                  this.sendRitmos(dia, turno);
-                  this.hideSpinner.emit(false)
-                  return
-                }
-              }).catch((
-              ) => window.location.reload());
-          }
-        },
-        error => {
-          console.log(error)
-          this.confirmationDialogService.confirm('¡Error!', 'No se pudo enviar el turno', 'Cerrar', '', null, null, Tipoalerta.Error)
-            .then((confirmed) => {
-              if (confirmed) {
-                this.hideSpinner.emit(false)
-                return
-              }
-            }).catch((
-            ) => window.location.reload());
-        });
-    }
-    else
-      this.messageService.add({ severity: 'warn', detail: 'Error de Datos', summary: 'No hay datos a enviar', key: 'enviar-turno' });
-
-  }
-
-  guardarTurno(Turno: PlanillaDeTurnos, reload: boolean = false) {
-    Turno.fecha = new Date();
-    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(Turno, this.idModuloDeCarga).subscribe(res => {
-      this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos.push(Turno);
-      this.fillPlanilla();
-    }, error => {
-      console.log(error);
-      this.confirmationDialogService.confirm('¡Error!', 'No se ha podido guardar el turno.', 'Cerrar', '', null, null, Tipoalerta.Error)
-    })
-  };
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
     let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
