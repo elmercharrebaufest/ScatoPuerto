@@ -1801,9 +1801,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
           this.procesoService.setEmbarque(this.embarqueId);
-          /*this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
           const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;*/
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
           this.fillPlanilla();
         }
       });
