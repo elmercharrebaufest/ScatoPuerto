@@ -382,13 +382,15 @@ export class LineasComponent implements OnInit, OnChanges {
 
   }
 
-  onLineaSeleccionada(lineaSel: any) {
+  onLineaSeleccionada(lineaSel: FormGroup) {
     console.log('lineaSel-->>')
     console.log(lineaSel)
     const tipoLineaEmbarqueSel = lineaSel['controls']?.tipoLineaEmbarque?.value;
     lineaSel['controls']?.linea.setValue(tipoLineaEmbarqueSel?.linea);
     console.log(lineaSel)
     
+
+    //#region Elige vicentin
     let selectedVicentin: boolean;
     selectedVicentin = lineaSel['controls'].tipoLineaEmbarque.value.linea == 'Vicentin'
     if(selectedVicentin){
@@ -397,13 +399,31 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialCM.disable();
       lineaSel['controls'].alturaInicialMM.disable();
       lineaSel['controls'].temperaturaInicial.disable();
+
+
+      lineaSel['controls'].alturaFinalCM.setValue('')
+      lineaSel['controls'].alturaFinalCM.setValue('');
+      lineaSel['controls'].alturaFinalMM.setValue('');
+      lineaSel['controls'].alturaInicialCM.setValue('');
+      lineaSel['controls'].alturaInicialMM.setValue('');
+      lineaSel['controls'].temperaturaInicial.setValue('');
+      lineaSel['controls'].densidadFinal.setValue('');
+      lineaSel['controls'].litros.setValue('');
+      lineaSel['controls'].densidadFinal.setValue('');
+      lineaSel['controls'].densidadInicial.setValue('');
+      lineaSel['controls'].temperaturaFinal.setValue('');
+      lineaSel['controls'].kilos.setValue('');
+      lineaSel['controls'].kilos.disable();
+
     }else {
       lineaSel['controls'].alturaFinalCM.enable();
       lineaSel['controls'].alturaFinalMM.enable();
       lineaSel['controls'].alturaInicialCM.enable();
       lineaSel['controls'].alturaInicialMM.enable();
       lineaSel['controls'].temperaturaInicial.enable();
+      
     }
+    //#endregion
   }
 
   onFocusOutEvent(index: number) {
