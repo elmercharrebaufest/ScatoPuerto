@@ -413,7 +413,7 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].densidadInicial.setValue('');
       lineaSel['controls'].temperaturaFinal.setValue('');
       lineaSel['controls'].kilos.setValue('');
-      lineaSel['controls'].kilos.enable();
+      lineaSel['controls'].kilos.disable();
 
     }else {
       lineaSel['controls'].alturaFinalCM.enable();
@@ -421,7 +421,6 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialCM.enable();
       lineaSel['controls'].alturaInicialMM.enable();
       lineaSel['controls'].temperaturaInicial.enable();
-      lineaSel['controls'].kilos.disable();
       
     }
     //#endregion
