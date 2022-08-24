@@ -361,8 +361,21 @@ export class LineasComponent implements OnInit, OnChanges {
 
   onEliminarLineasEmbarque(pos: number) {
     if (this.esCalidad) return;
-    this.lineasEmbarque.removeAt(pos);
-    this.colorSelected.splice(pos, 1);
+    
+    this.confirmationDialogService.confirm('¡Atención!', "¿Seguro que desea eliminar la linea de embarque?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.lineasEmbarque.removeAt(pos);
+        this.colorSelected.splice(pos, 1);
+    
+        //Si no queda ninguna agrego una nueva al principio.
+        if (this.lineasEmbarque.length == 0){
+          this.lineasEmbarque.push(this.initLineasEmbarque());
+        }
+      } else return;
+    }).catch();
+
+    
   }
 
   obtenerLineasEmbarque() {
@@ -382,13 +395,15 @@ export class LineasComponent implements OnInit, OnChanges {
 
   }
 
-  onLineaSeleccionada(lineaSel: any) {
+  onLineaSeleccionada(lineaSel: FormGroup) {
     console.log('lineaSel-->>')
     console.log(lineaSel)
     const tipoLineaEmbarqueSel = lineaSel['controls']?.tipoLineaEmbarque?.value;
     lineaSel['controls']?.linea.setValue(tipoLineaEmbarqueSel?.linea);
     console.log(lineaSel)
     
+
+    //#region Elige vicentin
     let selectedVicentin: boolean;
     selectedVicentin = lineaSel['controls'].tipoLineaEmbarque.value.linea == 'Vicentin'
     if(selectedVicentin){
@@ -397,13 +412,31 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialCM.disable();
       lineaSel['controls'].alturaInicialMM.disable();
       lineaSel['controls'].temperaturaInicial.disable();
+
+
+      lineaSel['controls'].alturaFinalCM.setValue('')
+      lineaSel['controls'].alturaFinalCM.setValue('');
+      lineaSel['controls'].alturaFinalMM.setValue('');
+      lineaSel['controls'].alturaInicialCM.setValue('');
+      lineaSel['controls'].alturaInicialMM.setValue('');
+      lineaSel['controls'].temperaturaInicial.setValue('');
+      lineaSel['controls'].densidadFinal.setValue('');
+      lineaSel['controls'].litros.setValue('');
+      lineaSel['controls'].densidadFinal.setValue('');
+      lineaSel['controls'].densidadInicial.setValue('');
+      lineaSel['controls'].temperaturaFinal.setValue('');
+      lineaSel['controls'].kilos.setValue('');
+      lineaSel['controls'].kilos.disable();
+
     }else {
       lineaSel['controls'].alturaFinalCM.enable();
       lineaSel['controls'].alturaFinalMM.enable();
       lineaSel['controls'].alturaInicialCM.enable();
       lineaSel['controls'].alturaInicialMM.enable();
       lineaSel['controls'].temperaturaInicial.enable();
+      
     }
+    //#endregion
   }
 
   onFocusOutEvent(index: number) {
@@ -516,7 +549,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
       console.log('this.obtenerLineasEmbarque()---->>>');
       console.log(this.obtenerLineasEmbarque());
-
+      
       this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe(res => {
         let texto = "Se guardaron las lineas de embarque correctamente";
         this.esGuardadoActivo = true;

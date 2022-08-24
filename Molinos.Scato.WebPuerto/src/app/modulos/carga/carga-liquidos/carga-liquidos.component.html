@@ -1,7 +1,7 @@
 <!-- Plano Content PlaceHolder -->
 <div id="imprimirCargaLiquidos">
   <ng-container *ngIf="mostrarTableristaOperando">
-    <app-periodo-carga></app-periodo-carga>
+    <app-periodo-carga [ModuloDeCarga_Id]="this.embarqueSelected.moduloDeCargaId"></app-periodo-carga>
   </ng-container>
 
   <div id="element-to-hide" data-html2canvas-ignore="true">

@@ -121,8 +121,8 @@ export class ModuloDeCargaService {
     return this.http.get(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, {'withCredentials': true});
   }
 
-  guardarPeriodoDeCarga(): Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga`, {'withCredentials': true});
+  guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
   }
 
   obtenerDestinatariosPlanillaTurnos(templateMail) {
