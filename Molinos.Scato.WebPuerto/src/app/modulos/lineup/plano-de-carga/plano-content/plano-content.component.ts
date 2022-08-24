@@ -26,6 +26,7 @@ import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
+import { CargaComercial } from '@ScatoModels/carga-comercial';
 
 @Component({
   selector: 'app-plano-content',
@@ -190,17 +191,58 @@ export class PlanoContentComponent implements OnInit {
       this.fileNameSecuencia = res.planoDeCargaArchivoSecuenciaNombre != null ? res.planoDeCargaArchivoSecuenciaNombre : 'Ningun archivo elegido';
       this.filePlano = res.filePathPlano;
       this.fileSecuencia = res.filePathSecuencia;
-      for (let index = 0; index < res.cargasComerciales.length; index++) {
-        this.cargasComercialesFormArray.at(index).get('materialPuerto').setValue(
-          this.materialesPuerto.find(x => x.id == res.cargasComerciales[index].materialPuerto.id)
-        );
+      // for (let index = 0; index < res.cargasComerciales.length; index++) {
+      //   this.cargasComercialesFormArray.at(index).get('materialPuerto').setValue(
+      //     this.materialesPuerto.find(x => x.id == res.cargasComerciales[index].materialPuerto.id)
+      //   );
+      // }
+      
+      if(res.cargasComerciales && res.cargasComerciales.length > 0){
+        res.cargasComerciales.forEach((cargaComercial,index) => {
+          this.cargasComercialesFormArray.push(this.initCargaComercial(cargaComercial))
+          this.cargasComercialesFormArray.at(index).get('materialPuerto').setValue(
+                 this.materialesPuerto.find(x => x.id == cargaComercial.materialPuerto.id)
+               );
+        })
+      }else{
+        this.cargasComercialesFormArray.push(this.initCargaComercial());
       }
+      
+
       this.mostrarFumigadora = res.fumigacion;
 
       this.lineupService.obtenerEstadoPuerto().subscribe(x => { this.estadoAlturaValor = Number(x.alturaDelRio); this.calcularRecomendacionDefensas(x); });
       this.mostrarContent = true;
       this.showCargas.emit(true);
     });
+  }
+
+  initCargaComercial(cargaComercial: CargaComercial = null){
+    if(cargaComercial != null){
+      return this.formBuilder.group({
+        id: cargaComercial.id,
+        exportador: cargaComercial.exportador,
+        nombre: cargaComercial.exportador.nombre,
+        cantidad: cargaComercial.cantidad,
+        materialPuerto: cargaComercial.materialPuerto
+      })    
+    }else{
+      return this.formBuilder.group({
+        id: [],
+        exportador: [],
+        nombre: [],
+        materialPuerto: [],
+        cantidad: [],
+      })
+    }    
+  }
+  
+  agregarCargaComercial(){
+    this.cargasComercialesFormArray.push(this.initCargaComercial());
+  }
+
+  eliminarCargaComercial(index: number){
+    this.cargasComercialesFormArray.removeAt(index);
   }
 
   cargarEmbarque() {
@@ -272,15 +314,6 @@ export class PlanoContentComponent implements OnInit {
 
   cargarCargasComerciales() {
     this.cargasComercialesFormArray.clear();
-    for (let index = 0; index < 4; index++) {
-      this.cargasComercialesFormArray.push(this.formBuilder.group({
-        id: [],
-        exportador: [],
-        nombre: [],
-        materialPuerto: [],
-        cantidad: [],
-      }))
-    };
     this.cargarPlanoDeCargaBodegas();
   }
 
@@ -907,7 +940,7 @@ export class PlanoContentComponent implements OnInit {
   verificarCargaComercial(){
     let cant = 0;
     for(let i=0; i<this.cargasComercialesFormArray.controls.length; i++ ){
-      if( (( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null || 
+      if( (( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null ||
           this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
           (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== null ||
             this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== '') ) ||
