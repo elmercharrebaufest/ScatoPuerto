@@ -361,8 +361,21 @@ export class LineasComponent implements OnInit, OnChanges {
 
   onEliminarLineasEmbarque(pos: number) {
     if (this.esCalidad) return;
-    this.lineasEmbarque.removeAt(pos);
-    this.colorSelected.splice(pos, 1);
+    
+    this.confirmationDialogService.confirm('¡Atención!', "¿Seguro que desea eliminar la linea de embarque?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.lineasEmbarque.removeAt(pos);
+        this.colorSelected.splice(pos, 1);
+    
+        //Si no queda ninguna agrego una nueva al principio.
+        if (this.lineasEmbarque.length == 0){
+          this.lineasEmbarque.push(this.initLineasEmbarque());
+        }
+      } else return;
+    }).catch();
+
+    
   }
 
   obtenerLineasEmbarque() {
@@ -536,7 +549,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
       console.log('this.obtenerLineasEmbarque()---->>>');
       console.log(this.obtenerLineasEmbarque());
-
+      
       this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe(res => {
         let texto = "Se guardaron las lineas de embarque correctamente";
         this.esGuardadoActivo = true;
