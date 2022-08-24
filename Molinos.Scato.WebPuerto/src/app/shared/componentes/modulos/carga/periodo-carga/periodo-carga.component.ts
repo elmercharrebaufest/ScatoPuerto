@@ -1,6 +1,9 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 
 @Component({
   selector: 'app-periodo-carga',
@@ -10,25 +13,21 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class PeriodoCargaComponent implements OnInit {
 
   periodoCargaForm: FormGroup;
+  guardando: boolean = false;
   
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private _moduloDeCargaService: ModuloDeCargaService,
+    private _confirmationDialogService: ConfirmationDialogService
   ) { }
+
+@Input() ModuloDeCarga_Id: number;
 
   ngOnInit(): void {
     this.initFormulario();
   }
   initFormulario(){
-    // this.periodoCargaForm = this.formBuilder.group({
-    //   amarro: this.initAmarre(),
-    //   desamarro: this.initAmarre(),
-    //   habilitacion: this.initFechaHora(),
-    //   conexionManguera: this.initFechaHora(),
-    //   desconexionManguera: this.initFechaHora(),
-    //   comienzoCarga: this.initFechaHora(),
-    //   finCarga: this.initFechaHora()
-    // })
-
+    
     this.periodoCargaForm = this.formBuilder.group({
       id: "",
       fechaAmarro : "",
@@ -69,6 +68,20 @@ export class PeriodoCargaComponent implements OnInit {
   //     viento: '',
   //     direccion: ''
   //   });
+
+  guardar(){
+    this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el período de carga?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      .then( (confirmed) => {
+        if(confirmed){
+          this.guardando = true;
+          if (this.ModuloDeCarga_Id > 0)
+          this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerDatosPeriodoCarga(), this.ModuloDeCarga_Id ).subscribe((res: any) => {
+            this.guardando = false;
+          });
+        }
+      });
+    
+  }
 
   updatePeriodoCarga(periodoCarga = null){
     // console.log('periodoCarga: ', periodoCarga);
