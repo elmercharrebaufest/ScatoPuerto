@@ -173,6 +173,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         PlanoDeCarga = planoDeCarga
                     });
                 }
+                Repositorio.GuardarCambios();
             }
 
             LimpiarCarpetaDeArchivos(comando.Dto.Id);
