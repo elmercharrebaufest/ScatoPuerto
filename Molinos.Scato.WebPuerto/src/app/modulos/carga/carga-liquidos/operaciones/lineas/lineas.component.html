@@ -137,7 +137,7 @@
                               <input type="text" class="inputLineasEmbarque" formControlName="tkFinal" />
                             </div>
 
-                            <div fxFlex='4' class='full-center btn-eliminar' *ngIf='i != 0' >
+                            <div fxFlex='4' class='full-center btn-eliminar'>
                                 <img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarLineasEmbarque(i)">
                             </div>
 
@@ -157,7 +157,9 @@
     </table>
     <br/>
     <div class="text-center" >
-      <button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary" (click)="onGuardar()" [disabled]="!esGuardadoActivo" >GUARDAR</button>
+      <button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary"  
+      (click)="onGuardar()" 
+      [disabled]="!esGuardadoActivo" >GUARDAR</button>
    </div>
   </div>
 </div>
