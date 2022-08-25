@@ -14,7 +14,7 @@ import { Alert } from 'selenium-webdriver';
 })
 export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   lineasEmbarque: FormGroup;
-  exportadores: any;
+  exportadores: any[];
   bodegas: any[];
   lineas: any[];
   productos: any[];

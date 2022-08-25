@@ -144,7 +144,7 @@ export class PlanoContentComponent implements OnInit {
       this.planoDeCargaForm.patchValue({
         ...res, planoDeCargaBodegas: this.planoDeCargaForm.get('planoDeCargaBodegas').value
       });
-      this._turnoService.setExportadores(this.planoDeCargaForm.controls.cargasComerciales.value);
+      this._turnoService.setExportadores(res.cargasComerciales);
       if (res.planoDeCargaBodegas.length > 0) {
         for (let index = 0; index < 9; index++) {
           var bodega = res.planoDeCargaBodegas.find(x => x.bodegaParcel == index + 1);
@@ -228,11 +228,11 @@ export class PlanoContentComponent implements OnInit {
       })    
     }else{
       return this.formBuilder.group({
-        id: [],
+        id: '',
         exportador: [],
-        nombre: [],
+        nombre: '',
         materialPuerto: [],
-        cantidad: [],
+        cantidad: '',
       })
     }    
   }
@@ -927,13 +927,23 @@ export class PlanoContentComponent implements OnInit {
       this.planoDeCargaForm.get('cargasComerciales').value[j].exportador = null;
       (<HTMLInputElement>document.getElementsByClassName("prueba22")[j]).value = '';
     }
-
-    this._turnoService.setExportadores(this.cargasComercialesFormArray.controls[j]['controls'].exportador.value);
+    this.sendExportadores();
+    
     this.verificarCargaComercial();
   }
 
-  sendMaterialPuerto(value: any) {
-    this._turnoService.setExportadores(value);
+  sendExportadores(){
+    let exportadores: Exportador[] = []
+    var arrCargasComerciales = (this.cargasComercialesFormArray as FormArray).value;
+    arrCargasComerciales.forEach(cargaComercial => {
+      if(cargaComercial.exportador != null) exportadores.push(cargaComercial.exportador);
+    });
+
+    this._turnoService.setExportadores(exportadores);    
+  }
+
+  sendMaterialPuerto(value: any) {    
+    this.sendExportadores();
     this.verificarCargaComercial();
   }
 

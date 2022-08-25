@@ -129,7 +129,7 @@ export class CargaLiquidosComponent implements OnInit {
       if (this.enviado) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
         this.planillaEmbarqueComponent.desabilitarEmbarque();
-        localStorage.setItem("desabilitar", "true");
+        localStorage.setItem("desabilitar", "false");
       }
       if (resp.moduloDeCargaPeriodoDeCarga) {
         // console.log('resp.moduloDeCargaPeriodoDeCarga[0]: ', resp.moduloDeCargaPeriodoDeCarga[0]);
@@ -330,32 +330,17 @@ export class CargaLiquidosComponent implements OnInit {
       this.usuarioFinalizacion = null;
 
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
-      this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
-      this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
-    console.log('moduloCarga--->>')
-    console.log(moduloCarga)
+    this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
+    this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       if (finalizar) {
         this.imprimir(true, finalizar)
-        /*
-        this.confirmationDialogService.confirm('Atención!', 'Se ha finalizado el modulo de Carga con exito.', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(true, finalizar)}, 
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
-            */
       } else {
-        this.confirmationDialogService.confirm('Atención!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => { },
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload());
-
+        window.location.reload();
         this.cargaPdf = false;
       }
 
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
-      // this.hideSpinner.emit(false);
     });
   }
 
