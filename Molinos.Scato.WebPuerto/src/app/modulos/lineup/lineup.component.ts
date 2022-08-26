@@ -72,7 +72,7 @@ export class LineupComponent implements OnInit, Observador {
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
-    this.cargarEstadoLineUp();
+
 
   }
   
@@ -93,9 +93,13 @@ export class LineupComponent implements OnInit, Observador {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
       this.ubicacionDeBuquePuerto = res;
       this.estadoVicentinLp = this.estadoVicentin();
+      console.log('estadoVicentinLp '+this.estadoVicentinLp);
       this.estadoNoryonLp = this.estadoNoryon();
+      console.log('estadoNoryonLp '+this.estadoNoryonLp);
       this.estadoSanBenitoLp = this.estadoSanBenito();
+      console.log('estadoSanBenitoLp '+this.estadoSanBenitoLp);
       this.estadoOtrosLp = this.estadoOtros();
+      console.log('estadoOtrosLp '+this.estadoOtrosLp);
     });
   }
 
@@ -159,7 +163,7 @@ export class LineupComponent implements OnInit, Observador {
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     function_name = 'filtrarMuelles - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-
+    this.cargarEstadoLineUp();
   }
 
   public altaEmbarque() {
