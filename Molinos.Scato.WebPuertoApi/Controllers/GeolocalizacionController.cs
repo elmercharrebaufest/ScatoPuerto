@@ -46,8 +46,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     });
 
                     servicio.GenerarLogging("EMBARQUE", EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque, "POST");
+                    servicio.GenerarLogging("INFORMACION", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.informacion), "POST");
                     servicio.GenerarLogging("POSICION", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.posicion), "POST");
-
+                    servicio.GenerarLogging("INFORMACIONVIAJE", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.informacionViaje), "POST");
                 }
 
 
