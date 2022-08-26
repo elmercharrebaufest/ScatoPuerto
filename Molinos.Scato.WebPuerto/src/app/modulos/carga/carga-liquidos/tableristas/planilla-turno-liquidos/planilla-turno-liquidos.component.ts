@@ -1917,10 +1917,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             if (confirmed) {
               this.bGrabandoTurnoActivo = false;
               this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
-                this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
-                if (enviado) {
+                const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
+                let mensajeGuardado = guardadoPorTablerista? 'Sus cambios se enviaron a Recibidores' : 'Se guardaron los cambios en el turno correctamente';
+                mensajeGuardado = enviado ?  'El turno fue enviado a Recibidores' : mensajeGuardado;
+                this.confirmationDialogService.confirm('¡Atención!', mensajeGuardado, 'Aceptar', '', null, null, Tipoalerta.Success);
+                if (enviado)
                   this.enviarRecibidores();
-                }
+                
                 this.recargarTurnosPlanilla();
                 this.bGrabandoTurnoActivo = true;
               }, error => {
