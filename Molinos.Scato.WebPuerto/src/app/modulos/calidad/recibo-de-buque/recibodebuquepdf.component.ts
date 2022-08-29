@@ -181,8 +181,17 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       doc.setFontSize(9);
       doc.text("CANTIDAD EN LETRAS Y CLASE DE CARGA",96, 111);
       doc.setFontSize(7.5);
-      doc.text(this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 129.5, 131.2, null, 'center');
-      doc.setFontSize(12);
+      if(this.recibo.esEuropeo){
+        //lo spliteo para sacar el POINT y ponerle COMA al final del primer elemento del array
+        let arrCantLetras = this.recibo.cantidadLetrasYClaseCarga.split('POINT');
+        let conComa = arrCantLetras[0] + "COMMA" + arrCantLetras[1];
+        doc.text(conComa.toUpperCase(), 129.5, 131.2, null, 'center');
+        doc.setFontSize(12);
+      }else{
+        doc.text(this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 129.5, 131.2, null, 'center');
+        doc.setFontSize(12);
+      }
+      
   
       //ESTIBADO DE BODEGA
       if(this.recibo.incluirImpresionEstibado && this.recibo.incluirImpresionCalidad) {
