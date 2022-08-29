@@ -68,13 +68,15 @@
                                                     <span *ngFor='let bodega of bodegas'
                                                         class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
                                                         {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
-                                                        Tn.</span><br>
+                                                        Tn.</span>
                                                     <button class='btn btn btn-success'
                                                         *ngIf="!turno.value.guardadoPorRecibidor"
                                                         style="margin-top: 5px; margin-bottom: 5px"
                                                         (click)='guardarTurnoGeneral(d,t, true)'>
                                                         Cerrar turno
                                                     </button>
+                                                    <img *ngIf="turno.value.guardadoPorRecibidor"                                                    
+                                                         src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
                                         </tr>

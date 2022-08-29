@@ -1942,8 +1942,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (enviado){
         this.existenTurnosNoCerrados(Turno).subscribe( resp =>{
           const existeTurno = resp;
+          let mensaje = "No se puede enviar el turno actual a recibidores, debido a que existen turnos anteriores pendientes de cerrar";
+          mensaje += " o turnos anteriores que aun no se han enviado.";
           if (existeTurno){
-            this.confirmationDialogService.confirm("¡Atención!", "No se puede enviar el turno a Recibidores debido a que existen turnos pendientes por cerrar.", "Cerrar", "", null, null, Tipoalerta.Warning);
+            this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
             return;
           }else{
             this.guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno);
@@ -2125,27 +2127,48 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   private existenTurnosNoCerrados(turnoSel): Subject<boolean>{
     let moduloDeCargaPlanillaDeTurnos = null;
-    let existeTurnosNoCerrados = new Subject<boolean>();
+    let planillaDeTurnosRecibidores = null;
+    let planillaDeTurnosTablerista = null;
+    let subjectTurnosNoCerrados = new Subject<boolean>();
+    let bResultado = false;
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
       }
     }, error=>{}, 
     ()=>{
-      moduloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true);
-      moduloDeCargaPlanillaDeTurnos.forEach(item => {
+
+      const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
+      const idTurnoPuerto = turnoSel.turnoPuerto.value.id;
+      planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true);
+      planillaDeTurnosTablerista = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == false && x.id != idTurnoPuerto);
+
+      planillaDeTurnosRecibidores.forEach(item => {
         item.fechaMiliseconds = new Date(item.fecha).getTime()
       });
-      const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
-      moduloDeCargaPlanillaDeTurnos.filter(x=> x.fechaMiliseconds>fechaMiliseconds);
-      if (moduloDeCargaPlanillaDeTurnos != undefined || moduloDeCargaPlanillaDeTurnos != null){
-        if (moduloDeCargaPlanillaDeTurnos.length > 0) 
-          existeTurnosNoCerrados.next(true)
-          else
-          existeTurnosNoCerrados.next(false)
+
+      planillaDeTurnosTablerista.forEach(item => {
+        item.fechaMiliseconds = new Date(item.fecha).getTime()
+      });
+      console.log('planillaDeTurnosRecibidores -->>')
+      console.log(planillaDeTurnosRecibidores)
+      console.log('planillaDeTurnosTablerista -->>')
+      console.log(planillaDeTurnosTablerista)
+      if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
+        if (planillaDeTurnosRecibidores.length > 0) 
+            bResultado = true;         
       }
+
+      if (!bResultado){
+        planillaDeTurnosTablerista = planillaDeTurnosTablerista.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
+        if (planillaDeTurnosTablerista != undefined || planillaDeTurnosTablerista != null){
+          if (planillaDeTurnosTablerista.length > 0) 
+              bResultado = true;         
+        }
+      }
+      subjectTurnosNoCerrados.next(bResultado)
     });
-    return existeTurnosNoCerrados;
+    return subjectTurnosNoCerrados;
   }
 
 }
