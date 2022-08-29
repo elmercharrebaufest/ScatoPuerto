@@ -242,7 +242,15 @@ export class PlanoContentComponent implements OnInit {
   }
 
   eliminarCargaComercial(index: number){
-    this.cargasComercialesFormArray.removeAt(index);
+    const value = this.cargasComercialesFormArray.value;
+
+    this.cargasComercialesFormArray.setValue(
+      value.slice(0, index).concat(
+        value.slice(index + 1),
+      ).concat(value[index]),
+    );
+
+    this.cargasComercialesFormArray.removeAt(value.length - 1);
   }
 
   cargarEmbarque() {

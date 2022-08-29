@@ -285,6 +285,7 @@ export class CargaSolidosComponent implements OnInit {
       this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
 
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar)
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {this.imprimir(true, finalizar)},
@@ -301,7 +302,6 @@ export class CargaSolidosComponent implements OnInit {
         this.cargaPdf = false;
       }
 
-      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
     });
   }
 

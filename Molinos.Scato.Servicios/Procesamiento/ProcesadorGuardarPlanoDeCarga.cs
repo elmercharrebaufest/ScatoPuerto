@@ -165,13 +165,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 foreach (var car in comando.Dto.CargasComerciales.Where(x => x.Cantidad > 0))
                 {
-                    planoDeCarga.CargaComercial.Add(new CargaComercial
+                    if(car.MaterialPuerto != null && car.MaterialPuerto.Id > 0  && car.Exportador != null && car.Exportador.Id > 0)
                     {
-                        Cantidad = car.Cantidad,
-                        Exportador = Repositorio.Obtener<Exportador>(car.Exportador.Id),
-                        MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(car.MaterialPuerto.Id),
-                        PlanoDeCarga = planoDeCarga
-                    });
+                        planoDeCarga.CargaComercial.Add(new CargaComercial
+                        {
+                            Cantidad = car.Cantidad,
+                            Exportador = Repositorio.Obtener<Exportador>(car.Exportador.Id),
+                            MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(car.MaterialPuerto.Id),
+                            PlanoDeCarga = planoDeCarga
+                        });
+
+                    }
                 }
                 Repositorio.GuardarCambios();
             }
