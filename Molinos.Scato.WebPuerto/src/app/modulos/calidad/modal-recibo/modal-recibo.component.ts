@@ -91,6 +91,26 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     })
   }
 
+  clearForm(){
+    this.reciboDeBuqueForm.controls.exportador.setValue('MOLINOS AGRO S.A');
+    this.reciboDeBuqueForm.controls.cantidad.setValue('');
+    this.reciboDeBuqueForm.controls.puertoDestino.setValue('');
+    this.reciboDeBuqueForm.controls.fechaRecibo.setValue(new Date());
+    this.reciboDeBuqueForm.controls.puertoOrigen.setValue('San Lorenzo, ARGENTINA');
+    this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.nombreBuque);
+    this.reciboDeBuqueForm.controls.cantidadLetras.setValue('');
+    this.reciboDeBuqueForm.controls.claseCarga.setValue('');
+    this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue('');
+    this.reciboDeBuqueForm.controls.estibadoEnBodega.setValue('');
+    this.reciboDeBuqueForm.controls.calidadYCantidadDesconocida.setValue('');
+    this.reciboDeBuqueForm.controls.fechaImpresion.setValue('');
+    this.reciboDeBuqueForm.controls.incluirImpresionDestino.setValue(true);
+    this.reciboDeBuqueForm.controls.incluirImpresionCalidad.setValue(true);
+    this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(true);
+    this.reciboDeBuqueForm.controls.esEuropeo.setValue(true);
+    this.reciboDeBuqueForm.controls.valorEnKG.setValue(true);
+  }
+
   initObtenerEmbarque(){
 
     this.idEmbarque = this._datosEmbarqueProcesoService.getEmbarqueId();
@@ -179,6 +199,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => {
     console.log('200 Ok')
     this._reciboSharingService.setRefreshRecibo(true);
+    this.clearForm();
   });
     
     
