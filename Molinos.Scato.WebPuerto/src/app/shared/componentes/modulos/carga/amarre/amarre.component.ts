@@ -1,6 +1,9 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 
 @Component({
   selector: 'app-amarre',
@@ -8,9 +11,14 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   styleUrls: ['./amarre.component.css']
 })
 export class AmarreComponent implements OnInit {
+  @Input() ModuloDeCargaId: number;
   public solidosForm: FormGroup;
+  guardando: boolean = false;
+
   constructor(
-    private _builder: FormBuilder
+    private _builder: FormBuilder,
+    private _confirmationDialogService: ConfirmationDialogService,
+    private _moduloDeCargaService: ModuloDeCargaService
   ) { }
 
   ngOnInit(): void {
@@ -38,6 +46,20 @@ export class AmarreComponent implements OnInit {
   }
 
   validarAMPM(event){
+    
+  }
+
+  guardarAmarre(){
+    this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el período de carga?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+    .then( (confirmed) => {
+      if(confirmed){
+        this.guardando = true;
+        if (this.ModuloDeCargaId > 0){
+          this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerAmarre(),this.ModuloDeCargaId).subscribe((res: any) => {
+            this.guardando = false
+          });
+        }        
+      }    });
     
   }
 
