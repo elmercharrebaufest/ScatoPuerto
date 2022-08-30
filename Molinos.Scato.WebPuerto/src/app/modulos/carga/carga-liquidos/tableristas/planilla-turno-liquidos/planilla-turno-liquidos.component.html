@@ -12,7 +12,7 @@
     <br>
     <br>
 
-    <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup">
+    <form [formGroup]='formTurnos' id="formGroup">
 
         <div id="scroll-bar-turnos-liquidos" class='mt-4 px-4 pb-4'
             [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
@@ -82,7 +82,7 @@
                                                         'Guardar Turno'}}
                                                     </button>
                                                     <button id="btn-turno-enviado-liquidos"
-                                                        *ngIf="!turno.value.guardadoPorTablerista"
+                                                        *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
                                                         (click)='guardarTurnoGeneral(d,t,true)'
                                                         [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
                                                         {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :

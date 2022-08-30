@@ -128,7 +128,6 @@ export class CargaLiquidosComponent implements OnInit {
       localStorage.setItem("desabilitar", "");
       if (this.enviado) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
-        this.planillaEmbarqueComponent.desabilitarEmbarque();
         localStorage.setItem("desabilitar", "false");
       }
       if (resp.moduloDeCargaPeriodoDeCarga) {
@@ -239,7 +238,6 @@ export class CargaLiquidosComponent implements OnInit {
     if (finalizar) {
       if (this.planillaTurnoLiquidosComponent != undefined || this.planillaTurnoLiquidosComponent != null) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
-        this.planillaEmbarqueComponent.desabilitarEmbarque();
       }
     }
 
@@ -333,6 +331,7 @@ export class CargaLiquidosComponent implements OnInit {
     this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
     this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar) {
         this.imprimir(true, finalizar)
       } else {
@@ -340,7 +339,6 @@ export class CargaLiquidosComponent implements OnInit {
         this.cargaPdf = false;
       }
 
-      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
     });
   }
 

@@ -111,11 +111,16 @@
         <div class="row mb-2">
           <div class="col-4">
             <label for="observaciones" class="font-weight-bold">Observaciones</label>
-            <textarea class="form-control" formControlName="observaciones" rows="6"></textarea>
+            <textarea style="height:  100%;" class="form-control" formControlName="observaciones" rows="6"></textarea>
           </div>
-          <div class="col-8" style="max-height: 200px;">
-            <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>            
-            <perfect-scrollbar [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
+          <div class="col-8">
+            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+              <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>
+              <div class="form-group col-1" style="margin-left: inherit;">
+                <img src="assets/Mas.svg" class="cursorPointer" (click)="agregarCargaComercial()">
+              </div>            
+            </div>
+            
               <div *ngFor="let exp of planoDeCargaForm.get('cargasComerciales').value; let j = index; trackBy:trackByFn"
                   class="row" formArrayName="cargasComerciales" style="margin-bottom: -8px;">
                 <ng-container [formGroupName]="j">
@@ -150,16 +155,11 @@
                       </div>
                     </div>
                   </div>
-                  <div class="form-group col-1" style="margin-left: inherit;" *ngIf="j==0">
-                      <img src="assets/Mas.svg" class="cursorPointer" (click)="agregarCargaComercial()">
-                  </div>
-                  <div class="form-group col-1" style="margin-left: inherit;" *ngIf="j>0">
-                      <img src="assets/Menos.svg" class="cursorPointer"  (click)="eliminarCargaComercial(j)" >
+                  <div class="form-group col-1" class="tachito">
+                      <img src="assets/trashIcon-no-border.svg" class="cursorPointer"  (click)="eliminarCargaComercial(j)" >
                   </div>
                 </ng-container>
-
               </div>
-            </perfect-scrollbar>
           </div>
         </div>
 

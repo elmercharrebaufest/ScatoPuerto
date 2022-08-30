@@ -55,14 +55,11 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       this.reciboBuqueOjito = data;
       this.mostrarModalOjito();
     });
-    
+    this.initObtenerEmbarque();
   }
   //#endregion
   ngOnInit(): void {
-
-    this.initFormReciboDetalles();
-    this.initObtenerEmbarque();
-    
+    this.initFormReciboDetalles()
   }
   ngAfterViewInit(){
     this.mostrarModalOjito()
@@ -76,7 +73,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       puertoDestino: [''],
       fechaRecibo: new Date(),
       puertoOrigen: ['San Lorenzo, ARGENTINA'],
-      nombreBuque: {disabled:true},
+      nombreBuque: [this.nombreBuque],
       cantidadLetras: [''],
       claseCarga: [''],
       cantidadLetrasYClaseCarga: [' '],
@@ -100,7 +97,6 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       this._reciboBuqueService.obtenerRecibos(this.idEmbarque)
     ]).subscribe(([res1]) => {
       this.nombreBuque = res1.nombreBuque;
-      this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.nombreBuque);
       });
 
   }
@@ -156,6 +152,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   openModalEmitirRecibo(modal: any) {
     // this.enviado = false;
     // this.errorMessage = false;
+    this.initFormReciboDetalles();
     this._modalService.open(modal, { size: 'lg'});
     
   }

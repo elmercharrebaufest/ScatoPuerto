@@ -1,6 +1,9 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/amarre.component';
 
 @Component({
@@ -9,15 +12,22 @@ import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/ama
   styleUrls: ['./umap.component.css']
 })
 export class UmapComponent implements OnInit {
-  public forms: FormGroup;
   @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
-  constructor(private builder: FormBuilder) { }
+  @Input() ModuloDeCargaId: number;
 
+  guardando: boolean = false;
+  public forms: FormGroup;
+
+  constructor(private builder: FormBuilder,
+              private _confirmationDialogService: ConfirmationDialogService,
+              private _moduloDeCargaService: ModuloDeCargaService) { }
+              
   ngOnInit(): void {
     this.forms = this.builder.group({
       umap: this.builder.array([this.initUmap()])
     });
   }
+
 
   initUmap(){
     return this.builder.group({
@@ -63,7 +73,23 @@ export class UmapComponent implements OnInit {
     return this.umapFormArray.value.indexOf(form.value) != 0;
   }
 
+  guardarUMAP(){
+    this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el UMAP?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+    .then( (confirmed) => {
+      if(confirmed){
+        this.guardando = true;
+        if (this.ModuloDeCargaId > 0)
+          this._moduloDeCargaService.guardarModuloDeCargaUmap(this.obtenerUmap(), this.ModuloDeCargaId).subscribe((res: any) => {
+            this.guardando = false;
+        });
+      }
+    });
+  }
+
   deleteHorario(index: number){
     this.umapFormArray.removeAt(index);
+    if(index == 0 && this.umapFormArray.length == 0){
+      this.umapFormArray.push(this.initUmap());
+    }
   }
 }

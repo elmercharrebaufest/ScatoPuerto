@@ -32,7 +32,7 @@
                             <th class="header-fijo">Partida</th>
                             <th class="header-fijo" width="18%">Producto</th>
                             <th class="header-fijo" width="18%">Destino</th>
-                            <th class="header-fijo">Cant.</th>
+                            <th class="header-fijo">Cant. Tn</th>
                         </tr>
                     </thead>
                     
@@ -42,7 +42,7 @@
                                     <td [attr.rowspan]='getRowSpan(dia)' width="10%">
                                         <div class='column-center'>
                                             <span><b>{{getDia(d)}}</b></span>
-                                            <span class='toneladas'>{{ getCantDia(dia) }}</span>
+                                            <span class='toneladas'>{{ getCantDia(dia) }} <span class='turno'>Tn</span></span>
                                             <span class='turno'>por día</span>
                                             <span *ngFor='let bodega of bodegas' class='parcel-cantidad'>
                                                 <span *ngIf="getToneladasParcelDia(bodega.bodegaParcel, d, t) > 0">
@@ -63,18 +63,20 @@
                                                             turno.value.turnoPuerto.turnoPuerto ?
                                                             turno.value.turnoPuerto.turnoPuerto.nombre : ' ' :
                                                             ''}}</b></span>
-                                                    <span class='toneladas'>{{ getCantTurno(turno) }}</span>
+                                                    <span class='toneladas'>{{ getCantTurno(turno) }} <span class='turno'>Tn</span></span>
                                                     <span class='turno'>por turno</span>
                                                     <span *ngFor='let bodega of bodegas'
                                                         class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
                                                         {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
-                                                        Tn.</span><br>
+                                                        Tn.</span>
                                                     <button class='btn btn btn-success'
                                                         *ngIf="!turno.value.guardadoPorRecibidor"
                                                         style="margin-top: 5px; margin-bottom: 5px"
                                                         (click)='guardarTurnoGeneral(d,t, true)'>
                                                         Cerrar turno
                                                     </button>
+                                                    <img *ngIf="turno.value.guardadoPorRecibidor"                                                    
+                                                         src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
                                         </tr>

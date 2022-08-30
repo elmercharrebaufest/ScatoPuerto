@@ -10,6 +10,7 @@ import { MotivosDeCorte } from '@ScatoModels/planilla-turnos/motivo-de-corte';
 import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
 import { Nir } from '@ScatoModels/nir';
 import { FuncionesGeneralesService } from './funciones-generales.service';
+import { Umap } from '@ScatoModels/umap';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +43,7 @@ export class ModuloDeCargaService {
   guardarModuloDeCarga(moduloDeCarga: ModuloDeCarga){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCarga`, moduloDeCarga, { 'withCredentials' : true});
 }
-  
+
   obtenerModuloDeCarga(moduloDeCargaId: number) {
     return this.http.get<ModuloDeCarga>(`${this.url}ModuloDeCarga/ObtenerModuloDeCarga?id=`+moduloDeCargaId, { 'withCredentials' : true});
   }
@@ -123,6 +124,10 @@ export class ModuloDeCargaService {
 
   guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
+  }
+
+  guardarModuloDeCargaUmap(Umap: Umap[], ModuloDeCargaId) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, {'withCredentials': true});
   }
 
   obtenerDestinatariosPlanillaTurnos(templateMail) {
