@@ -23,7 +23,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   tanquesAbordo: any[];
   idModuloDeCarga: number;
   planillaDeEmbarque: PlanillaDeEmbarque[];
-  mostrarbtnGuardar:boolean=true;
+  guardando: boolean;
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
@@ -49,10 +49,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
   }
 
-  public desabilitarEmbarque()
-  {
-    this.mostrarbtnGuardar=false;
-  }
   newForm() {
     this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     
@@ -208,9 +204,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       const planillaEmbarque = this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto > '' && x.exportador > '' && x.destino != null);
       console.log('this.planillaDeEmbarque fin-->>>');
       console.log(planillaEmbarque);
-      
+      this.guardando = true;
       this.moduloCargaService.guardarPlanillaDeEmbarque( planillaEmbarque, this.idModuloDeCarga).subscribe( 
         res => {
+          this.guardando = false;
           console.log(res);
           const texto = "Se guardo la planilla de embarque correctamente";
           this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
@@ -219,9 +216,12 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
           console.log('termino');
         }, 
         err => {
+          this.guardando = false;
           console.log(err);
         }, 
         () => {
+          
+          this.guardando = false;
           this.cargarPlanilla();  
         });
   }

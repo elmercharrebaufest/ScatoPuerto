@@ -128,7 +128,6 @@ export class CargaLiquidosComponent implements OnInit {
       localStorage.setItem("desabilitar", "");
       if (this.enviado) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
-        this.planillaEmbarqueComponent.desabilitarEmbarque();
         localStorage.setItem("desabilitar", "false");
       }
       if (resp.moduloDeCargaPeriodoDeCarga) {
@@ -239,7 +238,6 @@ export class CargaLiquidosComponent implements OnInit {
     if (finalizar) {
       if (this.planillaTurnoLiquidosComponent != undefined || this.planillaTurnoLiquidosComponent != null) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
-        this.planillaEmbarqueComponent.desabilitarEmbarque();
       }
     }
 
