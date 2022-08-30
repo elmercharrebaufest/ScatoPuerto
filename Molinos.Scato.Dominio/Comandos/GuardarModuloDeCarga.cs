@@ -5,5 +5,6 @@ namespace Molinos.Scato.Dominio.Comandos
     public class GuardarModuloDeCarga : Comando
     {
         public ModuloDeCargaDto Dto { get; set; }
+        public string nombreUsuario { get; set; }
     }
 }

@@ -2551,7 +2551,7 @@ namespace Molinos.Scato.Servicios
         void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos);
 
         [OperationContract]
-        void EliminarCorteBalanza(int idCorteBalanza);
+        void EliminarCorteBalanza(int idCorteBalanza, string nombreUsuario);
         [OperationContract]
         Dictionary<string, int> ObtenerRitmos(int modulodecarga_id);
 
@@ -2664,7 +2664,7 @@ namespace Molinos.Scato.Servicios
         void CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos);
 
         [OperationContract]
-        void GenerarLogging(string service, string data, string tipo);
+        void GenerarLogging(string service, string data, string tipo, string nombreUsuario = null);
         [OperationContract]
         IList<BanderaDto> ObtenerBanderas(); 
 
