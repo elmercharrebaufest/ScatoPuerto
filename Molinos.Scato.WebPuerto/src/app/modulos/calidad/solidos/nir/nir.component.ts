@@ -63,10 +63,12 @@ export class NIRComponent implements OnInit {
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.materialesPuerto = this.datosEmbarque.listaMateriales;
-    this.materialTrigo = this.materialesPuerto.find(m => m.descripcionCorta.includes('TRIGO'));
+    // Tener en cuenta esto por si la descripcionCorta se vuelve a modificar en la DB: TRIGO = WHEAT & MAIZ = CORN
+    this.materialTrigo = this.materialesPuerto.find(m => m.descripcionCorta.includes('WHEAT'));
     if(this.materialTrigo) this.conTrigo = true;
-    this.materialMaiz = this.materialesPuerto.find(m => m.descripcionCorta.includes('MAIZ'));
+    this.materialMaiz = this.materialesPuerto.find(m => m.descripcionCorta.includes('CORN'));
     if(this.materialMaiz) this.conMaiz = true;
+    
   }
 
   ngOnInit(): void {
