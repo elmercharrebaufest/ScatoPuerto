@@ -15,6 +15,12 @@ label{ font-weight: bold; }
     padding-bottom: 30px;
     margin-top: -20px;
 }
+.lineas-detalles{
+    max-height: 400px;
+    height: 250px;
+    padding-bottom: 30px;
+    margin-top: -20px;
+}
 
 .float-down-arrow{
     position: absolute;

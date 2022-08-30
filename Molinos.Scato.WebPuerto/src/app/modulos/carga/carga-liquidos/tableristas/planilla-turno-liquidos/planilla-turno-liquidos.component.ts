@@ -26,6 +26,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
+import { Observable, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -448,7 +449,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         res.forEach((turnoPuerto: TurnoPuerto) => {
           if (turnoPuerto.id == idTurnoPuerto) {
             turno.turnoPuerto = turnoPuerto;
-            this.guardarTurno(turno);
+            this.setDia(null, turno);
           }
         });
       });
@@ -527,8 +528,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   getCombos() {
     this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
-
-
     let lineasPlanilla = [];
     this.lineas.forEach(function (item) {
       var i = lineasPlanilla.findIndex(x => x.linea == item.linea);
@@ -779,14 +778,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let controSel = this.getTurnoDetalles(dia, turno);
     const lineaSeleccionada = result['controls'].tipoLineaEmbarque.value.linea;
 
-    console.log('lineaFiltro--->>')
-    console.log(result)
-    console.log(this.lineas)
-    console.log(lineaFiltro)
-
-    console.log('asignando.....')
-    console.log(lineaFiltro)
-
     controSel['controls'][index]['controls'].linea.setValue(0)
     controSel['controls'][index]['controls'].temperatura.enable();
     controSel['controls'][index]['controls'].medidaInicialCM.enable();
@@ -794,7 +785,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     controSel['controls'][index]['controls'].medidaFinalCM.enable();
     controSel['controls'][index]['controls'].medidaFinalMM.enable();
     controSel['controls'][index]['controls'].destino.enable();
-    console.log(controSel)
+    
     if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
       controSel['controls'][index]['controls'].materialPuerto.setValue(0);
       controSel['controls'][index]['controls'].tk.setValue(0);
@@ -805,6 +796,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaFinalCM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalMM.setValue(0);
         controSel['controls'][index]['controls'].destino.setValue(0);
+        controSel['controls'][index]['controls'].tk.setValue(0);
 
         controSel['controls'][index]['controls'].temperatura.disable();
         controSel['controls'][index]['controls'].medidaInicialCM.disable();
@@ -812,6 +804,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaFinalCM.disable();
         controSel['controls'][index]['controls'].medidaFinalMM.disable();
         controSel['controls'][index]['controls'].destino.disable();
+        controSel['controls'][index]['controls'].tk.disable();
       }
     }
 
@@ -1049,9 +1042,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const filtro = this.lineaDeEmbarque.filter(x => x.id == line.linea_Id);
       if (filtro != null || filtro != undefined) {
         if (filtro.length > 0) {
-          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin') {
+          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin')
             bloqueoVicentin = true;
-          }
         }
       }
     }
@@ -1074,7 +1066,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       exportador: [{ value: line ? line.exportador : '', disabled: guardado }],
       bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: guardado }],
       materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: guardado }],
-      tk: [{ value: line ? line.tk : '', disabled: guardado }],
+      tk: [{ value: line ? line.tk : '', disabled: bloqueoVicentin? bloqueoVicentin : guardado }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin }],
       medidaInicialCM: [{ value: line ? line.medidaInicialCM : '', disabled: bloqueoVicentin }],
       medidaInicialMM: [{ value: line ? line.medidaInicialMM : '', disabled: bloqueoVicentin }],
@@ -1813,9 +1805,48 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     })
   };
 
+  guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno){
+    if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
+      var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.";
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
+        .then((confirmed) => {
+          if (confirmed)
+            return;
+          else
+            return;
+        }).catch();
+    }
+    else {
+      this.confirmationDialogService.confirm(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
+        .then((confirmed) => {
+          if (confirmed) {
+            this.bGrabandoTurnoActivo = false;
+            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
+              const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
+              let mensajeGuardado = guardadoPorTablerista? 'Sus cambios se enviaron a Recibidores' : 'Se guardaron los cambios en el turno correctamente';
+              mensajeGuardado = enviado ?  'El turno fue enviado a Recibidores' : mensajeGuardado;
+              this.confirmationDialogService.confirm('¡Atención!', mensajeGuardado, 'Aceptar', '', null, null, Tipoalerta.Success);
+              if (enviado)
+                this.enviarRecibidores();
+              
+              this.recargarTurnosPlanilla();
+              this.bGrabandoTurnoActivo = true;
+            }, error => {
+              console.log(error);
+              this.bGrabandoTurnoActivo = true;
+              this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "enviar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
+            })
+          }
+        })
+        .catch((e) => {
+          this.hideSpinner.emit(false)
+          return;
+        });
+    }
+  }
+
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
     let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
-
     try {
 
       let moduloDeCargaPlanillaDeTurnosCortes = [];
@@ -1837,7 +1868,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
         const exportadorVal = turnoDetalle['controls'].exportador.value;
         const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
-        const lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
+        const tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
+        let lineaSeleccionada = null
+        if (tipoLineaEmbarqueNombre == 'Vicentin')
+            lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
+            else
+            lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
+            
 
         if (turnoDetalle['controls'].linea.value == '' || turnoDetalle['controls'].linea.value == '0') {
           if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
@@ -1901,40 +1938,22 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         planillaTurno.fecha = null;
       }
 
-      if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
-        var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.";
-        this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
-          .then((confirmed) => {
-            if (confirmed)
-              return;
-            else
-              return;
-          }).catch();
-      }
-      else {
-        this.confirmationDialogService.confirm(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
-          .then((confirmed) => {
-            if (confirmed) {
-              this.bGrabandoTurnoActivo = false;
-              this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
-                this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
-                if (enviado) {
-                  this.enviarRecibidores();
-                }
-                this.recargarTurnosPlanilla();
-                this.bGrabandoTurnoActivo = true;
-              }, error => {
-                console.log(error);
-                this.bGrabandoTurnoActivo = true;
-                this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "enviar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
-              })
-            }
-          })
-          .catch((e) => {
-            this.hideSpinner.emit(false)
+      if (enviado){
+        this.existenTurnosNoCerrados(Turno).subscribe( resp =>{
+          const existeTurno = resp;
+          let mensaje = "No se puede enviar el turno actual a recibidores, debido a que existen turnos anteriores pendientes de cerrar";
+          mensaje += " o turnos anteriores que aun no se han enviado.";
+          if (existeTurno){
+            this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
             return;
-          });
+          }else{
+            this.guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno);
+          }
+        });
+      }else{
+        this.guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno);
       }
+
     } catch (error) {
       console.error(error);
     }
@@ -2104,4 +2123,48 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
     });
   }
+
+  private existenTurnosNoCerrados(turnoSel): Subject<boolean>{
+    let moduloDeCargaPlanillaDeTurnos = null;
+    let planillaDeTurnosRecibidores = null;
+    let planillaDeTurnosTablerista = null;
+    let subjectTurnosNoCerrados = new Subject<boolean>();
+    let bResultado = false;
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+        moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+      }
+    }, error=>{}, 
+    ()=>{
+
+      const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
+      const idTurnoPuerto = turnoSel.turnoPuerto.value.id;
+      planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true);
+      planillaDeTurnosTablerista = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == false && x.id != idTurnoPuerto);
+
+      planillaDeTurnosRecibidores.forEach(item => {
+        item.fechaMiliseconds = new Date(item.fecha).getTime()
+      });
+
+      planillaDeTurnosTablerista.forEach(item => {
+        item.fechaMiliseconds = new Date(item.fecha).getTime()
+      });
+
+      if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
+        if (planillaDeTurnosRecibidores.length > 0) 
+            bResultado = true;         
+      }
+
+      if (!bResultado){
+        planillaDeTurnosTablerista = planillaDeTurnosTablerista.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
+        if (planillaDeTurnosTablerista != undefined || planillaDeTurnosTablerista != null){
+          if (planillaDeTurnosTablerista.length > 0) 
+              bResultado = true;         
+        }
+      }
+      subjectTurnosNoCerrados.next(bResultado)
+    });
+    return subjectTurnosNoCerrados;
+  }
+
 }
