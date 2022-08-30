@@ -27,7 +27,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             else
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
 
-            ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
+            ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
             int moduloCargaId = comando.IdModuloDeCarga;
             #region Elimando
             var lineasDeEmbarque = Repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => x.ModuloDeCarga.Id == moduloCargaId);

@@ -71,7 +71,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/PlanoDeCarga/GuardarPlanoDeCarga")]
         public HttpResponseMessage GuardarPlanoDeCarga(PlanoDeCargaDto planoDeCarga)
         {
-            comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga });
+            comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga, nombreUsuario = base.nombreUsuario });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
