@@ -383,11 +383,14 @@ export class LineasComponent implements OnInit, OnChanges {
 
     if (lineas != null) {
       lineas.forEach((l, index) => {
-        if (l.tkInicial.value == undefined) {
-          lineas.splice(index, 1);
+        
+        if (l.tkInicial?.value == undefined) {
+          //lineas.splice(index, 1);
+          l.tkInicial = null;
         } else {
           l.tkInicial = l.tkInicial.value;
         }
+        
       });
     }
     return lineas;
@@ -500,6 +503,7 @@ export class LineasComponent implements OnInit, OnChanges {
         }
       }
     });
+
     filtroLineas.forEach(filtro =>{
       const selLinea = lineasEmbarque.filter(item =>{
         return (filtro.idTipoLinea == item.tipoLineaEmbarque.id &&
@@ -527,12 +531,17 @@ export class LineasComponent implements OnInit, OnChanges {
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
     lineasEmabarque.forEach(item => {
-      if (
-        (item.tkInicial == '' || item.tkInicial == undefined) ||
-        (item.materialPuerto == '' || item.materialPuerto == undefined)
-      ) {
-        erroresLinea = true;
-        return;
+      if (item.tipoLineaEmbarque.linea == 'Vicentin'){
+        if ( (item.materialPuerto == '' || item.materialPuerto == undefined)){
+          erroresLinea = true;
+          return;
+        }
+      }else{
+        if ((item.tkInicial == '' || item.tkInicial == undefined) ||
+            (item.materialPuerto == '' || item.materialPuerto == undefined)){
+          erroresLinea = true;
+          return;
+        }
       }
     });
     if (erroresLinea) {
