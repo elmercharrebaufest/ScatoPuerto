@@ -903,7 +903,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   cerrarModal(){
-    this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+    this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id, true);
   }
 
   terminarCargaExportar() {

@@ -43,3 +43,9 @@ img:hover{
 .prueba22{
     
 }
+
+.tachito {
+    margin-left: inherit; 
+    margin-left: 5px;
+    padding-top: 2px;
+}

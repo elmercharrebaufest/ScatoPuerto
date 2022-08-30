@@ -64,7 +64,7 @@ export class Balanzas78Service {
    * @memberof Balanzas78Service
    * @description Setea el Vapor para emitir las balanzadas
    */
-  setEmbarqueBalanza(idModuloDeCarga: number = 0) {
+  setEmbarqueBalanza(idModuloDeCarga: number = 0, actualizaAhora: boolean=false) {
     if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
     
     console.log('ID en setEmbarqueBalanza desde SERV', idModuloDeCarga);
@@ -72,22 +72,13 @@ export class Balanzas78Service {
     this.tiempoActualizacionBalanzas = this.parametrosService.getParametroTiempoActualizacionBalanzas();
     this.tiempoActualizacionRitmosBlzas78 = this.parametrosService.getParametroTiempoActualizacionRitmosBlzas78();
 
-    this.interval = setInterval(() => {
-      this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
-        .subscribe(resp => {          
-          this.balanzadasArray = resp.balanzas;
-          this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
-          this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
-
-          this.setBalanzada7y8(this.balanzadasArray);
-          this.setBalanzada7(this.filtroBalanza7);
-          this.setBalanzada8(this.filtroBalanza8);
-          this.setBalanzada7y8Completas(resp.balanzas);
-          this.setBalanzada7Kilos(resp.balanzas);
-          this.setBalanzada8Kilos(resp.balanzas);
-          this.setInfoAdicional(resp.informacionAdicional);
-        })
-    }, this.tiempoActualizacionBalanzas);
+    if(actualizaAhora){
+      this.sincronizarBalanzasCortes(idModuloDeCarga);
+    }else{
+      this.interval = setInterval(() => {
+        this.sincronizarBalanzasCortes(idModuloDeCarga);
+      }, this.tiempoActualizacionBalanzas);
+    }
 
     this.intervalRitmosBalanzas78 = setInterval(() => {
       this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
@@ -102,8 +93,18 @@ export class Balanzas78Service {
   setEmbarqueBalanzaCalidad(idModuloDeCarga: number = 0) {
     if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
     
+    this.sincronizarBalanzasCortes(idModuloDeCarga);
+
+    this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
+      .subscribe(resp => this.setSincRitmosBalanzas78(resp) );
+
+    this.actualizarBalanzadasEnCurso(idModuloDeCarga);
+    this.actualizarBodegas(idModuloDeCarga);
+  }
+
+  sincronizarBalanzasCortes(idModuloDeCarga: number): void {
     this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
-      .subscribe(resp => {        
+      .subscribe(resp => {
         this.balanzadasArray = resp.balanzas;
         this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
         this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
@@ -116,13 +117,6 @@ export class Balanzas78Service {
         this.setBalanzada8Kilos(resp.balanzas);
         this.setInfoAdicional(resp.informacionAdicional);
       });
-
-    this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
-      .subscribe(resp => this.setSincRitmosBalanzas78(resp) );
-
-    this.actualizarBalanzadasEnCurso(idModuloDeCarga);
-    
-    this.actualizarBodegas(idModuloDeCarga);
   }
 
   actualizarBalanzadasEnCurso(idModuloDeCarga: number){
