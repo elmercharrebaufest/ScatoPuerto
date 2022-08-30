@@ -34,7 +34,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 //Si el turno tiene id > 0 es que ya existe, por lo tanto simplemente lo actualizo.
                 if (comando.Dto != null)
                 {
-                    ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST");
+                    ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
 
                     if (comando.Dto.Id > 0)
                     {

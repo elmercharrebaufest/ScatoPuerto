@@ -50,7 +50,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                comandos.Ejecutar(new GuardarModuloDeCarga { Dto = moduloDeCarga });
+                comandos.Ejecutar(new GuardarModuloDeCarga { Dto = moduloDeCarga, nombreUsuario = base.nombreUsuario });
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -192,7 +192,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 foreach (var item in planillaDeEmbarqueDtos)
                 {
-                    comandos.Ejecutar(new GuardarPlanillaDeEmbarque { Dto = item, IdModuloDeCarga = idModuloDeCarga });
+                    comandos.Ejecutar(new GuardarPlanillaDeEmbarque { Dto = item, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
                 }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -382,7 +382,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
 
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado});
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado, nombreUsuario = base.nombreUsuario});
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -573,7 +573,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicio.EliminarCorteBalanza(idCorteBalanza);
+                servicio.EliminarCorteBalanza(idCorteBalanza, base.nombreUsuario);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -664,7 +664,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                comandos.Ejecutar(new GuardarLineasDeEmbarque { Dto = lineasDeEmbarque, IdModuloDeCarga = idModuloDeCarga });
+
+                comandos.Ejecutar(new GuardarLineasDeEmbarque { Dto = lineasDeEmbarque, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

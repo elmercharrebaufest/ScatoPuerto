@@ -9963,11 +9963,11 @@ namespace Molinos.Scato.Servicios.Impl
          
         }
 
-        public void EliminarCorteBalanza(int idCorteBalanza)
+        public void EliminarCorteBalanza(int idCorteBalanza, string nombreUsuario)
         {
             BalanzasCortes bal = repositorio.Obtener<BalanzasCortes>(x => x.Id == idCorteBalanza);
 
-            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(bal), "DELETE");
+            GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(bal), "DELETE", nombreUsuario);
 
             repositorio.Remover(bal);
             repositorio.GuardarCambios();
@@ -10709,7 +10709,6 @@ namespace Molinos.Scato.Servicios.Impl
         {
             ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad obs = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == observacion_id);
 
-            //GenerarLogging(this.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(obs), "DELETE");
             repositorio.Remover(obs);
             repositorio.GuardarCambios();
         }
@@ -10727,7 +10726,7 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        public void GenerarLogging(string service, string data, string tipo)
+        public void GenerarLogging(string service, string data, string tipo, string nombreUsuario = null)
         {
             try
             {
@@ -10739,7 +10738,7 @@ namespace Molinos.Scato.Servicios.Impl
                         Servicio = service,
                         Tipo = tipo,
                         Fecha = DateTime.Now,
-                        Usuario = "NULL"
+                        Usuario = nombreUsuario
 
                     };
 
