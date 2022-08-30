@@ -303,7 +303,7 @@ export class LineasComponent implements OnInit, OnChanges {
       id: x?.id ?? "",
       linea: [{ value: x?.linea ?? "", disabled: deshabilitar }],
       tipoLineaEmbarque: [{ value: x?.tipoLineaEmbarque ?? "", disabled: deshabilitar }],
-      tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar}],
+      tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar || esVicentin}],
       materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar}],
       temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: deshabilitar || esVicentin, }],
       alturaInicialCM: [{ value: x && x.alturaInicialCM ? x.alturaInicialCM > 0 ? x.alturaInicialCM : "" : "", disabled: deshabilitar || esVicentin }],
@@ -383,9 +383,8 @@ export class LineasComponent implements OnInit, OnChanges {
 
     if (lineas != null) {
       lineas.forEach((l, index) => {
-        
         if (l.tkInicial?.value == undefined) {
-          //lineas.splice(index, 1);
+          // lineas.splice(index, 1);
           l.tkInicial = null;
         } else {
           l.tkInicial = l.tkInicial.value;
@@ -415,20 +414,22 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialCM.disable();
       lineaSel['controls'].alturaInicialMM.disable();
       lineaSel['controls'].temperaturaInicial.disable();
+      lineaSel['controls'].tkInicial.disable();
 
 
-      lineaSel['controls'].alturaFinalCM.setValue('')
-      lineaSel['controls'].alturaFinalCM.setValue('');
-      lineaSel['controls'].alturaFinalMM.setValue('');
-      lineaSel['controls'].alturaInicialCM.setValue('');
-      lineaSel['controls'].alturaInicialMM.setValue('');
+
+      lineaSel['controls'].alturaFinalCM.setValue(0)
+      lineaSel['controls'].alturaFinalCM.setValue(0);
+      lineaSel['controls'].alturaFinalMM.setValue(0);
+      lineaSel['controls'].alturaInicialCM.setValue(0);
+      lineaSel['controls'].alturaInicialMM.setValue(0);
       lineaSel['controls'].temperaturaInicial.setValue('');
       lineaSel['controls'].densidadFinal.setValue('');
-      lineaSel['controls'].litros.setValue('');
+      lineaSel['controls'].litros.setValue(0);
       lineaSel['controls'].densidadFinal.setValue('');
       lineaSel['controls'].densidadInicial.setValue('');
       lineaSel['controls'].temperaturaFinal.setValue('');
-      lineaSel['controls'].kilos.setValue('');
+      lineaSel['controls'].kilos.setValue(0);
       lineaSel['controls'].kilos.disable();
 
     }else {
@@ -437,6 +438,7 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialCM.enable();
       lineaSel['controls'].alturaInicialMM.enable();
       lineaSel['controls'].temperaturaInicial.enable();
+      lineaSel['controls'].tkInicial.enable();
       
     }
     //#endregion
