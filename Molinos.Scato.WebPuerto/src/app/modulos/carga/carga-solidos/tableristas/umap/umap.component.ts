@@ -73,16 +73,14 @@ export class UmapComponent implements OnInit {
     return this.umapFormArray.value.indexOf(form.value) != 0;
   }
 
-  guardar(){
-    this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el período de carga y el panel de UMAP?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+  guardarUMAP(){
+    this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el UMAP?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
     .then( (confirmed) => {
       if(confirmed){
         this.guardando = true;
         if (this.ModuloDeCargaId > 0)
-        this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerAmarre(), this.ModuloDeCargaId ).subscribe((res: any) => {
           this._moduloDeCargaService.guardarModuloDeCargaUmap(this.obtenerUmap(), this.ModuloDeCargaId).subscribe((res: any) => {
             this.guardando = false;
-          });
         });
       }
     });
@@ -90,5 +88,8 @@ export class UmapComponent implements OnInit {
 
   deleteHorario(index: number){
     this.umapFormArray.removeAt(index);
+    if(index == 0 && this.umapFormArray.length == 0){
+      this.umapFormArray.push(this.initUmap());
+    }
   }
 }

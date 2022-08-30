@@ -9815,7 +9815,7 @@ namespace Molinos.Scato.Servicios.Impl
                     VelocidadDelViento = item.VelocidadDelViento,
                     DireccionDelViento = item.DireccionDelViento
                 };
-                moduloDeCarga.ModuloDeCargaUmap.Add(moduloDeCargaUmap_Db);
+                repositorio.Agregar(moduloDeCargaUmap_Db);
             }
             repositorio.GuardarCambios();
         }
@@ -9823,7 +9823,7 @@ namespace Molinos.Scato.Servicios.Impl
         public void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
         {
             ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
-            ModuloDeCargaPeriodoDeCarga moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.Id == moduloDeCargaPeriodoDeCargaDto.Id);
+            ModuloDeCargaPeriodoDeCarga moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id);
 
             if (moduloDeCargaPeriodoDeCarga_db != null)
             {
@@ -9870,8 +9870,8 @@ namespace Molinos.Scato.Servicios.Impl
                     FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga,
                     HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga
                 };
+                repositorio.Agregar(moduloDeCargaPeriodoDeCarga_db);
             }
-            moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Add(moduloDeCargaPeriodoDeCarga_db);
             repositorio.GuardarCambios();
         }       
 

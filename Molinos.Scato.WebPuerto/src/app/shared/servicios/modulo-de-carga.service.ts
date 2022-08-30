@@ -124,7 +124,7 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
   }
 
-  guardarModuloDeCargaUmap(Umap: Umap[], ModuloDeCargaId): Observable<any>{
+  guardarModuloDeCargaUmap(Umap: Umap[], ModuloDeCargaId) {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, {'withCredentials': true});
   }
 

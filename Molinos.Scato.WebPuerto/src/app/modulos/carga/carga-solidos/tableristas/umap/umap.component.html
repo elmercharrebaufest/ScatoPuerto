@@ -1,21 +1,31 @@
-<div fxLayout='row wrap'>
-    <div fxFlex='40'>
-        <app-amarre></app-amarre>
+<div style="display: flex; flex-direction: row; justify-content:space-between;" >
+    <div class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
+        <app-amarre [ModuloDeCargaId]="this.ModuloDeCargaId" ></app-amarre>
     </div>
-    <div fxFlex='60'>
+    <div  class="mt-4 px-4 pb-4 shadow ml-4" style="background-color: white; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- Title -->
+        <div style="display: flex; flex-direction: row; justify-content: space-between">
+            <h4 class='colorTitle pt-3'>UMAP</h4>
+            <div>
+                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='addUmap()'>
+                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encendido</span>
+                </div>
+            </div>
+        </div>            
+        <!-- Body -->
         <div class='container mt-1 pr-1' [formGroup]="forms">
-            <h4 class='colorTitle pt-4'>UMAP</h4>
             <perfect-scrollbar>
-                <div fxLayout='row wrap' class='max-40vh' formArrayName="umap">
-                    <form *ngFor="let item of forms.get('umap')['controls']; let i=index"
-                    [formGroupName]="i">
+                <div fxLayout='row wrap'  style="height:288px; max-height: 288px;" formArrayName="umap">
+                    <form *ngFor="let item of forms.get('umap')['controls']; let i=index" [formGroupName]="i">
                         <div fxFlex='100'>
-                            <div fxLayout='row wrap'>
+                            <div fxLayout='row' style="margin-top: 10px">
                                 <div class="form-group" fxFlex='20'>
+                                    {{i+1}} -
                                     <label>Encendido</label>
                                     <input type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" formControlName='fechaEncendido' />
                                 </div>
-                                <div class="form-group" fxFlex='14'>
+                                <div class="form-group" fxFlex='12'>
                                     <label>&nbsp;</label>
                                     <div class="input_img">
                                         <input class="form-control hora" formControlName='horaEncendido' placeholder="00:00" [ngxTimepicker]="encendidoTime"
@@ -30,7 +40,7 @@
                                     <label>Apagado</label>
                                     <input type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" formControlName='fechaApagado'/>
                                 </div>
-                                <div class="form-group" fxFlex='14'>
+                                <div class="form-group" fxFlex='12'>
                                     <label>&nbsp;</label>
                                     <div class="input_img">
                                         <input class="form-control hora" placeholder="00:00" [ngxTimepicker]="apagadoTime"
@@ -45,7 +55,7 @@
                                     <label>Viento</label>
                                     <input type="number" class="form-control" placeholder="Km/h" formControlName='velocidadDelViento'/>
                                 </div>
-                                <div class="form-group pl-1" fxFlex='18'>
+                                <div class="form-group pl-1" fxFlex='15'>
                                     <label>Dirección</label>
                                     <select class="form-control" formControlName="direccionDelViento">
                                         <option value="null"></option>
@@ -59,27 +69,20 @@
                                         <option value="sureste">Sureste</option>
                                     </select>
                                 </div>
-                                <div fxFlex='8' class='full-center' *ngIf='i != 0'>
-                                    <i class='fas fa-times' (click)='deleteHorario(i)'></i>
+                                <div fxFlex='4' class='full-center'>
+                                    <img src='assets/trashIcon-no-border.svg' (click)='deleteHorario(i)' style="margin-top: 14px">
                                 </div>
                             </div>
                         </div>
                     </form>
                     <i class='fas fa-angle-down float-down-arrow' *ngIf="forms.get('umap')['controls'].length > 2"></i>
                 </div>
-            </perfect-scrollbar>
-            <hr>
-            <div fxLayout='row wrap'>
-                <div fxFlex='80'>
-                    <div class='btn-add-container pt-btn-add' (click)='addUmap()'>
-                        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encedido</span>
-                    </div>
-                </div>
-            </div>
+            </perfect-scrollbar>            
         </div>
+
+        <!-- Footer -->
+        <div style="margin: 0 auto">
+            <button type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
+         </div>
     </div>
-    <div class="text-center" style="justify-content: center;" >
-        <button type="button" class="btn btn-primary" [disabled]="this.guardando" (click)="guardar()" >GUARDAR</button>
-     </div>
 </div>
