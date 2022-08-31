@@ -430,6 +430,8 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].densidadInicial.setValue('');
       lineaSel['controls'].temperaturaFinal.setValue('');
       lineaSel['controls'].kilos.setValue(0);
+      lineaSel['controls'].tkInicial.setValue('');
+
       lineaSel['controls'].kilos.disable();
 
     }else {
