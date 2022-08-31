@@ -101,7 +101,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
 
   }
 
-  onChangeCantidadEnLetras(cantidad: number){
+  onChangeCantidadEnLetras(cantidad: any){
     if(cantidad != null){
       const toWords = new ToWords({localeCode: 'en-US'});
       // this.reciboDeBuqueForm.controls.cantidadLetras.setValue(converter.toWords(cantidad).toUpperCase());
@@ -159,9 +159,10 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   
   guardarRecibo(modifico:boolean){
     let reciboActual = this.reciboDeBuqueForm.getRawValue();
+    let material = (reciboActual.claseCarga != undefined && reciboActual.claseCarga.length > 0) ? `OF ${reciboActual.claseCarga}` : '';
     if(reciboActual.valorEnKG == true){
-      this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} KILOS OF ${reciboActual.claseCarga}`);
-    }else this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} METRIC TONS OF ${reciboActual.claseCarga}`);
+      this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} KILOS ${material}`);
+    }else this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} METRIC TONS ${material}`);
 
     this.reciboBuqueDetalles = this.reciboDeBuqueForm.getRawValue();
     this.reciboBuque = new ReciboDeBuque();

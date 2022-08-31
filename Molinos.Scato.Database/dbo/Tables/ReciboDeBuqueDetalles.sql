@@ -3,7 +3,7 @@
 	[Id] INT IDENTITY (1, 1) NOT NULL,
     [ReciboDeBuque_Id] INT NOT NULL, 
     [Exportador] NVARCHAR(50) NOT NULL, 
-    [Cantidad] DECIMAL(10, 3) NOT NULL, 
+    [Cantidad] DECIMAL(20, 4) NOT NULL, 
     [PuertoDestino] NVARCHAR(50) NULL, 
     [FechaRecibo] DATETIME NOT NULL, 
     [PuertoOrigen] NVARCHAR(50) NOT NULL, 
