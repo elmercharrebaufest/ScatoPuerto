@@ -114,11 +114,13 @@
             <textarea style="height:  100%;" class="form-control" formControlName="observaciones" rows="6"></textarea>
           </div>
           <div class="col-8">
-            <div style="display: flex; flex-direction: row; justify-content: space-between;">
+            <div style="display: flex; flex-direction: row; justify-content: space-between; margin-bottom:10px">
               <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>
-              <div class="form-group col-1" style="margin-left: inherit;">
-                <img src="assets/Mas.svg" class="cursorPointer" (click)="agregarCargaComercial()">
-              </div>            
+              <div class='btn-add-container' (click)='agregarCargaComercial()'>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
+              </div>
+              
             </div>
             
               <div *ngFor="let exp of planoDeCargaForm.get('cargasComerciales').value; let j = index; trackBy:trackByFn"
