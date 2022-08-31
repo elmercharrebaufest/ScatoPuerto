@@ -149,7 +149,8 @@ export class LineasComponent implements OnInit, OnChanges {
         linea.controls['litros'].setValue(valResultado, { emitEvent: false });
         if (densidadInicial != undefined || densidadInicial != null) {
           const kilosInicial = (Number(valResultado) * Number(densidadInicial));
-          linea.controls['kilos'].setValue(kilosInicial, { emitEvent: false })
+          const kilosInicialDecimals = kilosInicial.toFixed(3);
+          linea.controls['kilos'].setValue(kilosInicialDecimals, { emitEvent: false })
         }
       });
   }
@@ -175,8 +176,9 @@ export class LineasComponent implements OnInit, OnChanges {
           (densidadFinal != undefined || densidadFinal != null) &&
           (kilos != undefined || kilos != null)
         ) {
-          let kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
-          linea.controls['tkFinal'].setValue(Number(kilos) - kilosFinal, { emitEvent: false })
+          const kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
+          let tkFinal = (Number(kilos) - kilosFinal).toFixed(3)
+          linea.controls['tkFinal'].setValue(tkFinal, { emitEvent: false })
         }
       });
   }
