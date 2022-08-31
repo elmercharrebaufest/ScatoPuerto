@@ -41,6 +41,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 planillaDeEmbarque.Tn = comando.Dto.Tn;
                 planillaDeEmbarque.Cantidad = comando.Dto.Cantidad;
                 planillaDeEmbarque.BodegaParcel = comando.Dto.BodegaParcel;
+
+                if(comando.Dto.Exportador != null && comando.Dto.Exportador.Id > 0)
+                {
+                    var exportador = Repositorio.Obtener<Exportador>(x => x.Id == comando.Dto.Exportador.Id);
+                    if (exportador != null) planillaDeEmbarque.Exportador = exportador;
+                }
+                
             }
             else
             {
