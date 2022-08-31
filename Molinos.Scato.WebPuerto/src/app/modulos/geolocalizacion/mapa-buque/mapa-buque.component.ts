@@ -306,8 +306,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
       " <img src='./assets/ubicacion.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'> Muelles </label> ": ubicaciones,
       " <img src='./assets/ancla.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Fondeaderos y Puertos </label> ": ancla,
       " <img src='./assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup,
-      " <img src='./assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 01 (naranja): Zona Recalada </label> ": zona01,
-      " <img src='./assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 02 (violeta): Rada San Lorenzo </label> ": zona02
+      " <img src='./assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona Recalada </label> ": zona01,
+      " <img src='./assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Rada San Lorenzo </label> ": zona02
 
     };
     this.referenciaOverlay = L.control.layers(
