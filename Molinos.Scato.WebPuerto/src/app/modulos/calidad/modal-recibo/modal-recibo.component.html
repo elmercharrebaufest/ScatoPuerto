@@ -162,7 +162,7 @@
 
       <div>
         <label for="recipient-name" class="col-form-label"
-          ><small>(Quantity to be stated in Figures and also in Words).(Cantidadesestablecidas en números y tambien en letras)</small></label
+          ><small>(Quantity to be stated in Figures and also in Words).(Cantidades establecidas en números y tambien en letras)</small></label
         >
       </div>
 
@@ -175,13 +175,11 @@
               CANTIDAD</span
             ></label
           >
-
           <input
             type="number"
             class="form-control inputCantidad"
             formControlName="cantidad"
-            (change)="
-              onChangeCantidadEnLetras(this.reciboDeBuqueForm.controls.cantidad.value)"
+            (keyup)="onChangeCantidadEnLetras(this.reciboDeBuqueForm.controls.cantidad.value)"
           />
         </div>
         <div class="col cantidadLetras">
@@ -190,8 +188,9 @@
               class="Traduccion"> CANTIDAD EN LETRAS</span></label>
           <textarea
             class="form-control resizeArea"
-            rows="2"
+            rows="3"
             cols="50"
+            disabled
             formControlName="cantidadLetras">
           </textarea>
         </div>
@@ -260,7 +259,7 @@
               ><b>Quality and Quantity unknown Said to Weigh: </b><br /><span
                 class="Traduccion"
               >
-                Calidad y cantidad desconocidas que se dice pasar</span
+                Calidad y cantidad desconocidas que se dice pesar</span
               ></label
             >
           </div>
