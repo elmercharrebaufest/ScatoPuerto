@@ -39,68 +39,37 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       console.log("RECIBIENDO DATA DESDE PDF", this.reciboBuque);
       if(this.reciboBuque !== null){
         this.recibo = this.reciboBuque.reciboDeBuqueDetalles[0];
-        this.darFormato(this.recibo.cantidad, this.recibo.esEuropeo)
         this.crearPDF();
       }
     }
 
     darFormato(cantidad: number, formatoEuropeo: boolean = false) {
-      let arrNumero = cantidad.toString().split(".");
-      if (arrNumero.length == 2) {
-        
-      }
-      let numeroEntero = arrNumero[0];
-      let numeroDecimal = arrNumero[1];
-      
+      let numeroEntero = cantidad.toString().split(".")[0]
+      let numeroDecimal = cantidad.toString().split(".")[1]
+      let numeroEnteroConPuntos: any = "";
 
-      if(numeroEntero.length == 9){
-      let part1 = numeroEntero.slice(0, 3);
-      let part2 = numeroEntero.slice(3, 6);
-      let part3 = numeroEntero.slice(6, 9);
-      this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2},${part3}` : `${part1}.${part2}.${part3}`;
-      }else if(numeroEntero.length == 8){
-          let part1 = numeroEntero.slice(0, 2);
-          let part2 = numeroEntero.slice(2, 5);
-          let part3 = numeroEntero.slice(5, 8);
-          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2},${part3}` : `${part1}.${part2}.${part3}`;
-          
-      }else if(numeroEntero.length == 7){
-          let part1 = numeroEntero.slice(0, 1);
-          let part2 = numeroEntero.slice(1, 4);
-          let part3 = numeroEntero.slice(4, 7);
-          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2},${part3}` : `${part1}.${part2}.${part3}`;
-          
-      }else if(numeroEntero.length == 6){
-          let part1 = numeroEntero.slice(0, 3);
-          let part2 = numeroEntero.slice(3, 6);
-          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2}` : `${part1}.${part2}`;
-          
-      }else if(numeroEntero.length == 5){
-          let part1 = numeroEntero.slice(0, 2);
-          let part2 = numeroEntero.slice(2, 5);
-          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2}` : `${part1}.${part2}`;
-          
-      }
-      else if(numeroEntero.length == 4){
-          let part1 = numeroEntero.slice(0, 1);
-          let part2 = numeroEntero.slice(1, 4);
-          this.cantidadFormatoEntera = !formatoEuropeo ? `${part1},${part2}` : `${part1}.${part2}`;
-      }else if(numeroEntero.length < 4){
-        this.cantidadFormatoEntera = !formatoEuropeo ? `${numeroEntero}` : `${numeroEntero}`;
-      }
-
-      if(numeroDecimal !== undefined){
-        this.cantidadAMostrar = !formatoEuropeo ? `${this.cantidadFormatoEntera}.${numeroDecimal}` : `${this.cantidadFormatoEntera},${numeroDecimal}`
-      }else{
-        if(formatoEuropeo){
-          this.cantidadAMostrar = this.cantidadFormatoEntera
-        }else{
-          this.cantidadAMostrar = `${this.cantidadFormatoEntera}.000`
-
+      if(numeroEntero.length > 0){
+        for(let i = 0; i <= numeroEntero.length -1 ; i++){
+          numeroEnteroConPuntos += numeroEntero[i];
+          if((numeroEntero.length - (i+1))%3 == 0){
+            numeroEnteroConPuntos += "."
+          }
         }
-        
       }
+
+      if(numeroEnteroConPuntos.length > 0){
+        if(numeroEnteroConPuntos.endsWith(".")){
+          numeroEnteroConPuntos = numeroEnteroConPuntos.substring(0, numeroEnteroConPuntos.length - 1)
+        }
+      }
+
+      if(!formatoEuropeo){
+        numeroEnteroConPuntos = numeroEnteroConPuntos.replaceAll(".",",");
+      }
+
+      return (numeroEnteroConPuntos + ((numeroDecimal != undefined && numeroDecimal.length > 0) ? ((formatoEuropeo ? ",": ".") + numeroDecimal) : (!formatoEuropeo ? ".000": "")))
     }
+
     crearPDF(){
       let doc = new jspdf();
       doc.text("ORIGINAL", 105, 10, null, 'center');
@@ -173,7 +142,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       doc.setFontSize(9);
       doc.text("CANTIDAD", 35, 111, null, 'center');
       doc.setFontSize(11);
-      doc.text(this.cantidadAMostrar, 35, 131.5, null, 'center');
+      doc.text(this.darFormato(this.recibo.cantidad, this.recibo.esEuropeo) , 35, 131.5, null, 'center');
   
       //CALIDAD EN LETRAS
       doc.setFontSize(12);
@@ -181,7 +150,30 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
       doc.setFontSize(9);
       doc.text("CANTIDAD EN LETRAS Y CLASE DE CARGA",96, 111);
       doc.setFontSize(7.5);
-      doc.text(this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 129.5, 131.2, null, 'center');
+      
+      let cantidadAMostrarEnLetras: string;
+
+      if(this.recibo.esEuropeo ){
+        let spliteado = this.recibo.cantidadLetrasYClaseCarga.split('POINT');
+        if(spliteado[1] != undefined){
+          let cantidadLetras = spliteado[0] + 'COMMA' + spliteado[1] 
+          cantidadAMostrarEnLetras = cantidadLetras.toUpperCase();
+        }else{
+          cantidadAMostrarEnLetras = this.recibo.cantidadLetrasYClaseCarga;
+        } 
+      }else{
+        cantidadAMostrarEnLetras = this.recibo.cantidadLetrasYClaseCarga;
+      }
+      
+      let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras, 130);
+      let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5)-5) / 2);
+      arrLineasTexto.forEach(linea => {
+        
+        doc.text(linea, 129.5, 131.2 + offSet, null, 'center')
+        offSet += 5;
+
+      })
+      // doc.text(cantidadAMostrarEnLetras.toUpperCase(), 129.5, 131.2, null, 'center');
       doc.setFontSize(12);
   
       //ESTIBADO DE BODEGA
@@ -198,7 +190,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
         doc.text("Quality And Quantity unknown Said to Weigh:", 10, 185);
         doc.text("_________________________________________", 102, 185);
         doc.setFontSize(9);
-        doc.text("Calidad y cantidad desconocidas que se dice pasar", 10, 188);
+        doc.text("Calidad y cantidad desconocidas que se dice pesar", 10, 188);
   
         doc.setFontSize(11);
         doc.text(this.recibo.calidadYCantidadDesconocida, 102, 184.5);
@@ -227,7 +219,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
         doc.text("Quality And Quantity unknown Said to Weigh:", 10, 170);
         doc.text("_________________________________________", 102, 170);
         doc.setFontSize(9);
-        doc.text("Calidad y cantidad desconocidas que se dice pasar", 10, 173);
+        doc.text("Calidad y cantidad desconocidas que se dice pesar", 10, 173);
   
         doc.setFontSize(11);
         doc.text(this.recibo.calidadYCantidadDesconocida, 102, 169.5);
