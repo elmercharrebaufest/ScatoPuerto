@@ -35,7 +35,7 @@
     [Puntal] DECIMAL(18,2) not NULL default 0,
     [FechaLibrePlatica] DATETIME NULL, 
     [HoraLibrePlatica] NVARCHAR(8) NULL,
-    [EstadoBuque_Id] INT NULL, 
+    [EstadoBuque_Id] INT NULL DEFAULT(1), 
     [filePathShipParticular] NVARCHAR(MAX) NULL, 
     [shipParticularArchivoNombre] NVARCHAR(MAX) NULL, 
     [FechaHoraInicioCarga] DATETIME NULL , 
