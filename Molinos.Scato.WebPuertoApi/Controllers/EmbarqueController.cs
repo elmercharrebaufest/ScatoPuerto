@@ -42,6 +42,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var centro = int.Parse(ConfigurationManager.AppSettings["Centro"]);
             try
             {
+             
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
                 var servicioWf = factory.CrearServicio(workflowDefinicionId);
 
@@ -49,7 +50,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 datosEmbarque = IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, true, false, false);
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, true, false);
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, false, true);
-
+                servicio.ActualizarEstadoBuque(datosEmbarque, 1);
             }
             catch(Exception ex)
             {
@@ -76,6 +77,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 ActividadXaml = "IngresarEmbarque",
                 NombreUsuario = nombreUsuario
             };
+
+   
             embarque.CentroId = centro;
             embarque.Patente = embarque.NombreBuque;
             if ((vicentin && vicentin == embarque.Vicentin) || 
