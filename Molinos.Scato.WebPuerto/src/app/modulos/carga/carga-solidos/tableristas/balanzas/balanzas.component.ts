@@ -587,6 +587,24 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       this.mensajeGenerico('La fecha-hora de inicio es menor a la fecha-hora de corte.');
       return;
     }
+
+    // TODO: Verifica que el nuevo corte no se superponga con alguno existente.
+    let bal: Balanzas[] = this.obtenerBalanzadas(balanzaCorteManual);
+    let cantCorteIncorrecto = 0;
+    for(let i in bal){
+      let fechaHoraIni = new Date(bal[i].fecha_Inicio_Inicial+' '+bal[i].hora_Inicio_Inicial);
+      let fechaHoraInicio = fechaHoraIni.getTime();
+      let fechaHoraCor = new Date(bal[i].fecha_Corte_Inicial+' '+bal[i].hora_Corte_Inicial);
+      let fechaHoraCorte = fechaHoraCor.getTime();
+
+      if( fechaHoraInicioInicial2 >= fechaHoraCorte || fechaHoraCorteInicial2 <= fechaHoraInicio ) console.log("Rango correcto");
+      else cantCorteIncorrecto += 1;
+    }
+    if( cantCorteIncorrecto > 0 ){
+      this.mensajeGenerico('El corte manual se superpone con un corte o parada existente.');
+      return;
+    }
+
     objetoNuevo = {
       ...this.corteManualForm.value,
       bodega_id: bc.listadoTotalBalanzadas.bodegaCorteManual.id,
@@ -614,6 +632,21 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         .subscribe( res => this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id) );
     this.initCorteManualForm();
     this._modalService.dismissAll(modal);
+  }
+
+  obtenerBalanzadas(balanza: number): Balanzas[]{
+    let bal: Balanzas[]
+    switch (balanza) {
+      case 7:
+        bal = this.obtenerBalanzas7();
+        break;
+      case 8:
+        bal = this.obtenerBalanzas8();
+        break;
+      default:
+        bal = [];
+    }
+    return bal;
   }
 
   guardarModal(index: number, numeroBalanza: number, modal: any) {
