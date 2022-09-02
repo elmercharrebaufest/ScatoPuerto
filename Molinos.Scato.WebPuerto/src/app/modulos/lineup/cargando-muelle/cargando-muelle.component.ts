@@ -5,6 +5,7 @@ import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cargando-muelle',
@@ -20,7 +21,8 @@ export class CargandoMuelleComponent implements OnInit {
   valorCargando: number = 0;
   tnTotales: number = 0;
   liquido: boolean;
-  fechaAmarro: any;
+  fechaAmarro: Date;
+  horaAmarro: string;
 
   constructor(
     private router: Router,
@@ -29,11 +31,16 @@ export class CargandoMuelleComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.fechaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].fechaAmarro;
+    this.horaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].horaAmarro;
+
     if(this.instanciaWorkflow){
+      this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'].forEach(x => this.tnTotales += x.cantidad );
       
       if(this.instanciaWorkflow.embarque.esLiquido){
         this.liquido = true;
         this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmosLiquidos: ', res);
           this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
@@ -41,7 +48,8 @@ export class CargandoMuelleComponent implements OnInit {
         });
       }else{
         this.liquido = false;
-      this.balanzaService.obtenerRitmos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.balanzaService.obtenerRitmos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmos: ', res);
           this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
@@ -57,6 +65,13 @@ export class CargandoMuelleComponent implements OnInit {
       });
   
       // this.balanzaService.listarBalanzadaBuque(this.instanciaWorkflow.embarque.vapor.id).subscribe(res => this.balanzas = res.balanzadasBajaCarga);
+    }
+  }
+
+  calcularPorcentaje(){
+    if(this.tnTotales != null && this.tnTotales>0){
+      this.valorRitmo = Math.round(this.valorCargando * 100 / this.tnTotales);
+      if(this.valorRitmo > 100) this.valorRitmo = 100;
     }
   }
 
