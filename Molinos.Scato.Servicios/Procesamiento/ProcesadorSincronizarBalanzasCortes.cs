@@ -176,10 +176,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     var ultimaCargaInsertada = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosUltimaActualizacion>(x => x.ModuloDeCarga.Id == moduloCarga.Id);
                     
-                    if (carga.Id == 150957 || carga.Id == 151502)
-                    {
-                        string mensaje = "xxxxx";
-                    }
                     if(ultimaCargaInsertada == null)
                     {
                         var actualizarCarga = new ModuloDeCargaPlanillaDeTurnosUltimaActualizacion
