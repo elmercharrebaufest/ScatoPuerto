@@ -52,11 +52,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (listaRegistros.Count()>0)
                 {
                     var ultimoRegistro = listaRegistros.Last();
-                    cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio > ultimoRegistro.Fecha_Corte );
+                    cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio > ultimoRegistro.Fecha_Corte && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
                 }
                 else
                 {
-                    cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 );
+                    cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == vapor_id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
                 }
 
                
