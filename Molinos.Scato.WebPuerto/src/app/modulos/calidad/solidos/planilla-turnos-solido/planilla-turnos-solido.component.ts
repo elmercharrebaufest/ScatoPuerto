@@ -655,8 +655,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     // return 0;
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
       contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
+      contador = Math.ceil(contador);
     }
     contador = contador > 0 ? contador / 1000 : 0;
+    contador = Math.round(contador);
     contador = parseInt(contador.toString());
     return contador;
   }
@@ -668,6 +670,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       contador += this.getCantTurno(turno);
     }
     contador = contador > 0 ? contador : 0;
+    contador = Math.round(contador);
     contador = parseInt(contador.toString());
     return contador;
   }
@@ -676,8 +679,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let contador = 0;
     // return 0;
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
-      contador += this.getCantDia(dia);
+      contador += Math.ceil(this.getCantDia(dia));
     }
+    contador = Math.round(contador);
     contador = parseInt(contador.toString());    
     return contador;
   }
