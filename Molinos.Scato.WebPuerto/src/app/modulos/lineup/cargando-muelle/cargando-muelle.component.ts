@@ -4,6 +4,8 @@ import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cargando-muelle',
@@ -16,30 +18,60 @@ export class CargandoMuelleComponent implements OnInit {
   valorRitmo: number = 0;
   colorRitmo: string = '#28a745';
   ritmoDeCarga: number = 0;
+  valorCargando: number = 0;
+  tnTotales: number = 0;
+  liquido: boolean;
+  fechaAmarro: Date;
+  horaAmarro: string;
 
   constructor(
     private router: Router,
-    private balanzaService: BalanzaService) { }
+    private balanzaService: BalanzaService,
+    private moduloCargaService: ModuloDeCargaService,) { }
 
   ngOnInit(): void {
 
+    this.fechaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].fechaAmarro;
+    this.horaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].horaAmarro;
+
     if(this.instanciaWorkflow){
+      this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'].forEach(x => this.tnTotales += x.cantidad );
       
       if(this.instanciaWorkflow.embarque.esLiquido){
+        this.liquido = true;
         this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmosLiquidos: ', res);
           this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
+          this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
         });
       }else{
-      this.balanzaService.obtenerRitmos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.liquido = false;
+        this.balanzaService.obtenerRitmos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmos: ', res);
           this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
+          this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
         });
       }
+
+      this.moduloCargaService.obtenerModuloDeCarga(this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+      .subscribe(res => {
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+          this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
+        }
+      });
   
       // this.balanzaService.listarBalanzadaBuque(this.instanciaWorkflow.embarque.vapor.id).subscribe(res => this.balanzas = res.balanzadasBajaCarga);
+    }
+  }
+
+  calcularPorcentaje(){
+    if(this.tnTotales != null && this.tnTotales>0){
+      this.valorRitmo = Math.round(this.valorCargando * 100 / this.tnTotales);
+      if(this.valorRitmo > 100) this.valorRitmo = 100;
     }
   }
 
