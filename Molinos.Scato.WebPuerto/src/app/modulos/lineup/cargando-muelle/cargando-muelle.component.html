@@ -11,17 +11,20 @@
                     <div class="form-group" style="text-align: left;">
                         <label class="font-weight-bold">Fecha de Amarre</label>
                         <div class="row border rounded ml-1 mr-1" [ngClass]="'border-'+ fechaRecaladaCorrecta()">
-                        <div class="col-1"><img src="assets/reloj.svg" class="icon clock" [ngClass]="'clock-'+ fechaRecaladaCorrecta()"></div>
-                        <div class="col-9">
-                            <div class="row">
-                            <div class="col-12 font-weight-bold" [ngClass]="'text-'+ fechaRecaladaCorrecta()" style="font-size: 16px;">
-                                &zwnj;
+                            <div class="col-1">
+                                <img src="assets/reloj.svg" class="icon clock" [ngClass]="'clock-'+ fechaRecaladaCorrecta()">
                             </div>
-                            <small class="col-12 mb-1" [ngClass]="'text-'+ fechaRecaladaCorrecta()">
-                                &zwnj;
-                            </small>
+                            <div class="col-9">
+                                <div class="row"> 
+                                  <div class="col-12 font-weight-bold" [ngClass]="'text-'+ fechaRecaladaCorrecta()" style="font-size: 16px;">
+                                    {{this.fechaAmarro | date}}&zwnj;
+                                  </div>
+                                  <small class="col-12 mb-1" [ngClass]="'text-'+ fechaRecaladaCorrecta()">
+                                    {{this.horaAmarro != null ? this.horaAmarro : ''}} 
+                                    {{this.horaAmarro != null && this.horaAmarro.length > 3 ? 'Hrs' : ''}}&zwnj;
+                                  </small>
+                                </div>      
                             </div>
-                        </div>
                         </div>
                     </div>
                 </div>
@@ -45,9 +48,19 @@
                 </div>
             </div>
         </div>
-        <div class="col-2 text-center align-self-center">
-            <p-knob [(ngModel)]='valorRitmo' valueTemplate="{value}%" [textColor]="colorRitmo" [valueColor]='colorRitmo' [size]='150' [min]='0' [max]='100' [strokeWidth]='5' [readonly]='true'></p-knob>
+        <!-- <div class="col-2 text-center align-self-center"> -->
+        <div class="col card-ritmo-grafico">
+            <!-- <p-knob [(ngModel)]='valorRitmo' valueTemplate="{value}%" [textColor]="colorRitmo" [valueColor]='colorRitmo' [size]='150' [min]='0' [max]='100' [strokeWidth]='5' [readonly]='true'></p-knob>
+            <p class='text-knob text-center'>de todo el buque</p> -->
+            <p-knob [(ngModel)]='valorRitmo' valueTemplate="{value}%" class='center-knob' [ngClass]="{'si-es-liquido': liquido == true}" valueColor='#5CB85C' [size]='150' [min]='0' 
+                [max]='100 > valorRitmo ? 100 : valorRitmo' 
+                [strokeWidth]='5' [readonly]='true'></p-knob>
+            <!-- <p-knob [(ngModel)]='valorCargando' class='center-knob' [ngClass]="{'si-es-liquido': liquido == true}" valueColor='#5CB85C' [size]='150' [min]='0' 
+                [max]='tnTotales > valorCargando ? tnTotales : valorCargando' 
+                [strokeWidth]='5' [readonly]='true'></p-knob> -->
+            <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas'>
             <p class='text-knob text-center'>de todo el buque</p>
+            <!-- <p class='text-knob text-center'>de {{tnTotales}} Tn totales</p> -->
         </div>
         <div class="col-2 align-self-center">
             <div class="font-weight-bold text-center tnTitle">Ritmo de carga:</div>

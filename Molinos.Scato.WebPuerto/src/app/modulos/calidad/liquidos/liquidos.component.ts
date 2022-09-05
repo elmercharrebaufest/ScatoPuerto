@@ -27,7 +27,7 @@ export class LiquidosComponent implements OnInit {
     
     let element = document.getElementById('imprimirRecibidoresLiquido');
     let opt = {
-      margin:       0,
+      margin:       .1,
       filename:     'Pantalla Recibidores.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
