@@ -3,53 +3,56 @@
 
     <h4 class="info-header colorTitle pt-4">Recibos</h4>
     <h6  id="nombreBuqueRecibo" class="colorTitle mb-4">{{nombreBuque}}</h6>
-    <div fxLayout='row wrap' class='info-desc'>
+    
+    <div id="collapseRegistroRecibos" class="collapse show">  
+      <div fxLayout='row wrap' class='info-desc'>
 
-        <table class="table table-bordered">
-          <thead>
-            <tr class="table-active">
-              <th class="alCentro"> Ver </th>
-              <th class="alCentro"> N° de recibo </th>
-              <th class="alCentro"> Exportador </th>
-              <th class="alCentro"> Estado </th>
-              <th class="alCentro"> Emitió </th>
-              <th class="alCentro"> Supervisó </th>
-              <th class="alCentro"> Fecha y hora de impresión </th>
-              <th class="alCentro"> Imprimir </th>
-            </tr>
-          </thead>
-          
-          <tbody>
-
-            <tr *ngFor="let recibo of recibosDeBuque, index as cont">
-              <td
-              class="alCentroIconos" 
-              (click)="onVerReciboSelected(recibo)"
-              >
-              <img src="assets\ojoIcon.svg" alt="">
-              </td>
-              <td class="alCentro"> {{idEmbarque}} - 0{{ cont+1 }} </td>
-              <td class="alCentro"> {{ recibo.reciboDeBuqueDetalles[0].exportador }} </td>
-              <td class="alCentro"> - </td>
-              <!-- <td class="alCentro"> <span [ngClass]="{'warn': recibo.estado == 'Pendiente'}">{{recibo.estado}} </span></td> -->
-              <td class="alCentro"> {{recibo.emitio}} </td>
-              <td class="alCentro"> - </td>
-              <!-- <td class="alCentro"> {{recibo.superviso}} </td> -->
-              <td *ngIf="recibo.fechaHoraImpresion == null" class="alCentro"> - </td>
-              <td *ngIf="recibo.fechaHoraImpresion !== null" class="alCentro"> {{recibo.fechaHoraImpresion | date:'short'}} </td>
-              <td class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
-              <!-- <td *ngIf="recibo.estado == 'Aprobado'" class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
-              <td *ngIf="recibo.estado == 'Pendiente'" class="alCentro"> <img src="assets\iconImDeshabilitada.svg" alt=""> </td> -->
-              
-            </tr>
+          <table class="table table-bordered">
+            <thead>
+              <tr class="table-active">
+                <th class="alCentro"> Ver </th>
+                <th class="alCentro"> N° de recibo </th>
+                <th class="alCentro"> Exportador </th>
+                <th class="alCentro"> Estado </th>
+                <th class="alCentro"> Emitió </th>
+                <th class="alCentro"> Supervisó </th>
+                <th class="alCentro"> Fecha y hora de impresión </th>
+                <th class="alCentro"> Imprimir </th>
+              </tr>
+            </thead>
             
-          </tbody>
-        </table>
+            <tbody>
 
-        <div><app-recibodebuquepdf></app-recibodebuquepdf></div>
+              <tr *ngFor="let recibo of recibosDeBuque, index as cont">
+                <td
+                class="alCentroIconos" 
+                (click)="onVerReciboSelected(recibo)"
+                >
+                <img src="assets\ojoIcon.svg" alt="">
+                </td>
+                <td class="alCentro"> {{idEmbarque}} - 0{{ cont+1 }} </td>
+                <td class="alCentro"> {{ recibo.reciboDeBuqueDetalles[0].exportador }} </td>
+                <td class="alCentro"> - </td>
+                <!-- <td class="alCentro"> <span [ngClass]="{'warn': recibo.estado == 'Pendiente'}">{{recibo.estado}} </span></td> -->
+                <td class="alCentro"> {{recibo.emitio}} </td>
+                <td class="alCentro"> - </td>
+                <!-- <td class="alCentro"> {{recibo.superviso}} </td> -->
+                <td *ngIf="recibo.fechaHoraImpresion == null" class="alCentro"> - </td>
+                <td *ngIf="recibo.fechaHoraImpresion !== null" class="alCentro"> {{recibo.fechaHoraImpresion | date:'short'}} </td>
+                <td class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
+                <!-- <td *ngIf="recibo.estado == 'Aprobado'" class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
+                <td *ngIf="recibo.estado == 'Pendiente'" class="alCentro"> <img src="assets\iconImDeshabilitada.svg" alt=""> </td> -->
+                
+              </tr>
+              
+            </tbody>
+          </table>
+
+          <div><app-recibodebuquepdf></app-recibodebuquepdf></div>
 
 
-        <div *ngIf="mostrarModal" > <app-modal-recibo [mostrarModal]="mostrarModal" (reciboEmitido)="reciboEmitido($event)"></app-modal-recibo> <div>
-      
-      </div>
+          <div *ngIf="mostrarModal" > <app-modal-recibo [mostrarModal]="mostrarModal" (reciboEmitido)="reciboEmitido($event)"></app-modal-recibo> <div>
+        
+        </div>
+    </div>
 </div>
