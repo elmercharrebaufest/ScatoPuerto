@@ -6,11 +6,11 @@
     <!-- <button class='btn btn-primary' (click)="fillPlanilla()">Cargar turnos </button> -->
 </div>
 <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
-    <button *ngIf="tablerista" class='btn btn-success divHeaderRight'
+    <button data-html2canvas-ignore="true" *ngIf="tablerista" class='btn btn-success divHeaderRight'
         (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
     <div style="margin-left: 1rem;">
-        <h5 *ngIf="!tablerista">Observaciones De Calidad</h5>
-        <button *ngIf="!tablerista" class='btn btn-primary'
+        <h5 data-html2canvas-ignore="true" *ngIf="!tablerista">Observaciones De Calidad</h5>
+        <button data-html2canvas-ignore="true" *ngIf="!tablerista" class='btn btn-primary'
             (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
     </div>
     <br>
@@ -69,7 +69,7 @@
                                                         class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
                                                         {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
                                                         Tn.</span>
-                                                    <button class='btn btn btn-success'
+                                                    <button data-html2canvas-ignore="true" class='btn btn btn-success'
                                                         *ngIf="!turno.value.guardadoPorRecibidor"
                                                         style="margin-top: 5px; margin-bottom: 5px"
                                                         (click)='guardarTurnoGeneral(d,t, true)'>
@@ -427,9 +427,9 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='generarExcelPorParcel(false)'>Exportar
+        <button data-html2canvas-ignore="true" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='generarExcelPorParcel(false)'>Exportar
             planilla</button>
-        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel(true)'>Enviar
+        <button data-html2canvas-ignore="true" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel(true)'>Enviar
             planilla</button>
     </div>
 </div>
