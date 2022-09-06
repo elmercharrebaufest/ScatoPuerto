@@ -283,8 +283,6 @@ export class NIRComponent implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
-  
-
   enviarMail(nir) {
     //#region variables mail
     var titulo = "Enviar NIR";
@@ -292,7 +290,6 @@ export class NIRComponent implements OnInit {
     var textoCuerpoMail = 'Cuerpo del mail';
     var inputTitle = "Destinatarios";
     var mailNir = new Mail(`NIR.`,`${textoCuerpoMail}`);
-    let destinatariosLista: string[];
 
     this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual')
     .subscribe(data => {mailNir.destinatarios = data
@@ -317,18 +314,6 @@ export class NIRComponent implements OnInit {
               });
             }
         })
-        .catch((e) => {
-          this.confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
-          .then((confirmed) => {
-            if (confirmed){
-              this.envioNir = false;
-              return
-            }
-            // this.hideSpinner.emit(false)
-            return
-            }).catch(() => window.location.reload());
-          // this.hideSpinner.emit(false);
-        });
     })
   }
   calcularPromedios(nirs : Nir[]){
