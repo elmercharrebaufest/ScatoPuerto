@@ -22,6 +22,7 @@ import { Mail } from '@ScatoModels/mail';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
+import { convertToObject } from 'typescript';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -233,27 +234,19 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   fillPlanilla() {
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     this.diasTurno.clear();
-
     //Si la planilla tiene turnos
     if (this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0) {
 
       //Agrego variable de milisegundos (fecha) para poder ordenar
-      console.log("fill planillaDeTurnos")
       this.planillaDeTurnos.forEach(element => {
-        console.log(element)
         const fechaFormateada = this.devolverFechaHoraTurno(element);
-        console.log('fechaFormateada--->>');
-        console.log(fechaFormateada);
-        console.log(new Date(fechaFormateada));
         element.fechaMiliseconds = new Date(fechaFormateada).getTime();
       });
 
-      console.log(this.planillaDeTurnos)
       // Ordenamos los turnos por fecha y turno correspondiente
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);
       });
-      console.log(this.planillaDeTurnos)
 
       this.turnoPuerto = [];
       this.planillaDeTurnos.forEach((dia, indexDia) => {
@@ -274,7 +267,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           dayIndex = this.diasTurno.length - 1;
         } else {
           //Si ya existe el día agrego 1 turno al array del día.
-
           this.setTurno(dayIndex, dia);
         }
 
@@ -464,7 +456,29 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   getTurnoDetalles(d, t): FormArray {
-    return this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
+    const turnoDetalle = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
+    return turnoDetalle;
+  }
+  getTurnoDetallesBajasClass(d, t){
+    const cantidadBajaCarga = this.getTurnoDetallesBajasCargas(d, t);
+    let detallesBajasClass = '';
+    if (cantidadBajaCarga == 1)
+      detallesBajasClass = 'fila-turno-alto';
+      else
+      detallesBajasClass = 'fila-turno-alto-defecto';
+    return detallesBajasClass;
+  }
+  getBajaCargaColor(result){
+    const idBalanzaCorte = result.controls.idBalanzaCorte.value;
+    let colorBajaCargaClass = '';
+    if (idBalanzaCorte > 0)
+      colorBajaCargaClass = 'fila-turno-baja-carga';
+    return colorBajaCargaClass;
+  }
+  getTurnoDetallesBajasCargas(d, t){
+    const turnoDetalle = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
+    const cantidadBajaCarga = turnoDetalle.value.filter(x => x.idBalanzaCorte>0);
+    return cantidadBajaCarga.length;
   }
 
   getCorteTurnos(d, t): FormArray {
@@ -654,8 +668,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let contador = 0;
     // return 0;
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
-      contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
-      contador = Math.ceil(contador);
+      const idBalanzaCorte = turno.controls.idBalanzaCorte.value;
+      if (idBalanzaCorte == 0){
+        contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
+        contador = Math.ceil(contador);
+      }
     }
     contador = contador > 0 ? contador / 1000 : 0;
     contador = Math.round(contador);
@@ -761,15 +778,18 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   initLinea(line?: any, cerrado?: boolean) {
-    return this._builder.group({
-      linea: [{ value: line ? line.linea_Id : '', disabled: cerrado }],
-      exportador: [{ value: line ? line.exportador : '', disabled: cerrado }],
-      bodega: [{ value: line ? line.bodega : '', disabled: cerrado }],
-      materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: cerrado }],
-      destino: [{ value: line ? line.destino.nombre : '', disabled: cerrado }],
-      cantidad: [{ value: line ? line.cantidad : '', disabled: cerrado }],
-      id: [{ value: line ? line.id : null, disabled: cerrado }]
-    })
+    if (line != null || line != undefined) {
+      return this._builder.group({
+        linea: [{ value: line ? line.linea_Id : '', disabled: cerrado }],
+        idBalanzaCorte: [{ value: line ? line.idBalanzaCorte : '', disabled: cerrado }],
+        exportador: [{ value: (line.exportador!=null || line.exportador!=undefined) ? line.exportador : '', disabled: cerrado }],
+        bodega: [{ value: (line.bodega!=null || line.bodega!=undefined) ? line.bodega : '', disabled: cerrado }],
+        materialPuerto: [{ value: (line.materialPuerto!=null || line.materialPuerto!=undefined) ? line.materialPuerto : '', disabled: cerrado }],
+        destino: [{ value: (line.destino!=null || line.destino!=undefined) ? line.destino.nombre : '', disabled: cerrado }],
+        cantidad: [{ value: line ? line.cantidad : '', disabled: cerrado }],
+        id: [{ value: line ? line.id : null, disabled: cerrado }]
+      })
+    }
   }
 
   initCorte(corte?: any, cerrado?: boolean) {
@@ -1076,11 +1096,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
             lineaDescripcion = lineaFiltro[0].linea != null ? lineaFiltro[0].linea : '';
           }
 
-          worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
+          worksheet.getRow(offset).getCell(3).value = turno.exportador?.nombre;
           worksheet.getRow(offset).getCell(4).value = turno.bodegaParcel;
-          worksheet.getRow(offset).getCell(5).value = turno.materialPuerto.descripcion;
-          worksheet.getRow(offset).getCell(6).value = turno.destino.nombre;
-          worksheet.getRow(offset).getCell(7).value = turno.cantidad;
+          worksheet.getRow(offset).getCell(5).value = turno.materialPuerto?.descripcion;
+          worksheet.getRow(offset).getCell(6).value = turno.destino?.nombre;
+          worksheet.getRow(offset).getCell(7).value = turno.cantidad/1000;
 
           let celdaDetalle = 2
           for (let indexCell = 1; indexCell <= 6; indexCell++) {

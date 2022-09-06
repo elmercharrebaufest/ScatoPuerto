@@ -773,19 +773,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   onLineaChange(result: any, dia: number, turno: number, index: number) {
-    const lineaFiltro = this.lineas.filter(linea => linea.id == result.value.linea);
-
     let controSel = this.getTurnoDetalles(dia, turno);
     const lineaSeleccionada = result['controls'].tipoLineaEmbarque.value.linea;
 
     controSel['controls'][index]['controls'].linea.setValue(0)
+    controSel['controls'][index]['controls'].materialPuerto.setValue(0);
     controSel['controls'][index]['controls'].temperatura.enable();
     controSel['controls'][index]['controls'].medidaInicialCM.enable();
     controSel['controls'][index]['controls'].medidaInicialMM.enable();
     controSel['controls'][index]['controls'].medidaFinalCM.enable();
     controSel['controls'][index]['controls'].medidaFinalMM.enable();
     controSel['controls'][index]['controls'].destino.enable();
-    
+    controSel['controls'][index]['controls'].tk.enable();
+
     if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
       controSel['controls'][index]['controls'].materialPuerto.setValue(0);
       controSel['controls'][index]['controls'].tk.setValue(0);
@@ -1164,6 +1164,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   getCantidadLinea(linea: any) {
 
     let lineaTurno = linea?.controls;
+    let materialPuertoSel = lineaTurno.materialPuerto.value;
+    materialPuertoSel = (materialPuertoSel == undefined || materialPuertoSel == null)? '0' : materialPuertoSel; 
+    if (materialPuertoSel == '0')
+      lineaTurno.tk.setValue(0);
+
+
 
     if (lineaTurno?.medidaInicialCM.value &&
       lineaTurno?.medidaInicialMM.value &&
@@ -1863,12 +1869,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle['controls'].destino.value)
         const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0] : 0
 
-        const tkInicial = turnoDetalle['controls'].tk.value;
-        const bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
-        const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
-        const exportadorVal = turnoDetalle['controls'].exportador.value;
-        const tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
-        const tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
+        let tkInicial = turnoDetalle['controls'].tk.value;
+        let bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
+        let materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
+        let exportadorVal = turnoDetalle['controls'].exportador.value;
+        let tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
+        let tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
+        tipoLineaEmbarqueNombre = (tipoLineaEmbarqueNombre != undefined || tipoLineaEmbarqueNombre !=null) ? tipoLineaEmbarqueNombre : '';
         let lineaSeleccionada = null
         if (tipoLineaEmbarqueNombre == 'Vicentin')
             lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
@@ -1882,18 +1889,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           }
         }
 
-        const lineaIdVal = turnoDetalle['controls'].linea.value;
+        let lineaIdVal = turnoDetalle['controls'].linea.value;
+        lineaIdVal = (lineaIdVal != null || lineaIdVal != undefined)? lineaIdVal : 0;
 
-        if ((lineaIdVal != null || lineaIdVal != undefined)) {
-          if ((lineaIdVal > '' && lineaIdVal != '0')) {
-
+        if (tipoLineaEmbarqueNombre > '') {
             let bPlanillaIncompleta: boolean = this.bValidaPlanillaOtrasLineas(turnoDetalle);
             if (bPlanillaIncompleta) {
               var mensaje = "No se ha completado todos los datos requeridos para guardar el turno.";
               this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
               return;
             }
-
+            
             let medidaFinalCM = turnoDetalle['controls'].medidaFinalCM.value;
             let medidaFinalMM = turnoDetalle['controls'].medidaFinalMM.value;
             let medidaInicialCM = turnoDetalle['controls'].medidaInicialCM.value;
@@ -1917,7 +1923,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               Tk: tkInicial
             }
             moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
-          }
         }
       }
 
@@ -1968,9 +1973,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle['controls'].destino.value)
       const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0].id : 0
       const tkVal = turnoDetalle['controls'].tk.value;
-      const bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
-      const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value.id;
-      const exportadorVal = turnoDetalle['controls'].exportador.value.id;
+      let bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
+      let materialPuertoVal = turnoDetalle['controls'].materialPuerto.value.id;
+      let exportadorVal = turnoDetalle['controls'].exportador.value.id;
       let medidaFinalCM = '';
       let medidaFinalMM = '';
       let medidaInicialCM = '';
@@ -1992,6 +1997,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (turnoDetalle['controls'].temperatura.value != null || turnoDetalle['controls'].temperatura.value != undefined)
         temperatura = turnoDetalle['controls'].temperatura.value;
 
+      materialPuertoVal = (materialPuertoVal == undefined || materialPuertoVal == null)? '' : materialPuertoVal;
+      bodegaParcelVal = (bodegaParcelVal == undefined || bodegaParcelVal == null)? '' : bodegaParcelVal;
+      
       if (lineaSeleccionada != 'Vicentin') {
         if (turnoDestinoVal == '0' ||
           (tkVal == '' || tkVal == '0') ||

@@ -10,6 +10,12 @@
     padding-top:13px;
     padding-left: 10px;
 }
+.fila-turno-alto{ 
+    height: 60px;
+}
+.fila-turno-alto-defecto{ 
+    height: auto;
+}
 .column-center{
     display: flex;
     flex-direction: column;
@@ -22,6 +28,9 @@
 }
 .bg-white{
     background-color: white;
+}
+.fila-turno-baja-carga{
+    background-color: #ffefef;
 }
 label{
     font-weight: bold;

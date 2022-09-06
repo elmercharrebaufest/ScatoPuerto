@@ -665,4 +665,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="PuertoOrigen" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="eb63eff3-4403-45c1-8496-9d0d02b59b7b" ChangeDateTime="09/05/2022 22:10:37">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido].[TipoCarga]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="EsBajaCarga" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="df2bba8b-064c-415c-9c28-9b9282dfadde" ChangeDateTime="09/05/2022 22:16:59">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido].[EsBajaCarga]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BajaCarga" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2564b05a-755e-4678-890d-6f19417089ca" ChangeDateTime="09/06/2022 04:05:51">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido].[BajaCarga]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="idBalanzaCorte" />
+  </Operation>
 </Operations>
