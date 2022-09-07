@@ -9,9 +9,8 @@
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
         <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
         <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-        <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
-        <!-- <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
-        <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button> -->
+        <!-- <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button> -->
+        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
         <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
     </div>
 
@@ -51,7 +50,8 @@
         <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
             <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
             <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-            <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button>
+            <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
+            <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
             <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
         </div>
     </div>
