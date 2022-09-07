@@ -26,7 +26,29 @@
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
     <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
     <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-    <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
+    <!-- <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button> -->
+
+    <svg id="Boton_Verde" xmlns="http://www.w3.org/2000/svg" width="116.031" height="39" viewBox="0 0 116.031 39" (click)="imprimir()" style="cursor:pointer;">
+      <g id="Rectángulo_85" data-name="Rectángulo 85" fill="#fff" stroke="#666" stroke-width="1">
+          <!-- onmouseover="evt.target.setAttribute('fill', '#F4F5FC');" 
+          onmouseout="evt.target.setAttribute('fill','#fff');"> -->
+          <rect width="116.031" height="39" rx="4" stroke="none"/>
+          <rect x="0.5" y="0.5" width="115.031" height="38" rx="3.5" fill="none"/>
+      </g>
+      <text id="IMPRIMIR" transform="translate(38.031 25.531)" fill="#666" font-size="14" font-family="Roboto-Bold, Roboto" font-weight="700">
+          <!-- onmouseover="evt.target.setAttribute('fill', '#666B8E');" 
+          onmouseout="evt.target.setAttribute('fill','#666');"> -->
+          <tspan x="0" y="0">IMPRIMIR</tspan>
+      </text>
+      <g id="Icono_Print" transform="translate(8 10)">
+          <rect id="Rectángulo_471" data-name="Rectángulo 471" width="18.459" height="16.97" transform="translate(0.572 6.03)" fill="none"/>
+          <g id="printer">
+              <path id="Trazado_414" data-name="Trazado 414" d="M2.5,8A.5.5,0,1,0,2,7.5.5.5,0,0,0,2.5,8Z" transform="translate(1 1.885)"/>
+              <path id="Trazado_415" data-name="Trazado 415" d="M7.233,1A2.893,2.893,0,0,0,4.34,3.893V6.786H2.893A2.893,2.893,0,0,0,0,9.679v4.34a2.893,2.893,0,0,0,2.893,2.893H4.34v1.447a2.893,2.893,0,0,0,2.893,2.893h8.679A2.893,2.893,0,0,0,18.8,18.358V16.912h1.447a2.893,2.893,0,0,0,2.893-2.893V9.679a2.893,2.893,0,0,0-2.893-2.893H18.8V3.893A2.893,2.893,0,0,0,15.912,1ZM5.786,3.893A1.447,1.447,0,0,1,7.233,2.447h8.679a1.447,1.447,0,0,1,1.447,1.447V6.786H5.786Zm1.447,7.233A2.893,2.893,0,0,0,4.34,14.019v1.447H2.893a1.447,1.447,0,0,1-1.447-1.447V9.679A1.447,1.447,0,0,1,2.893,8.233H20.251A1.447,1.447,0,0,1,21.7,9.679v4.34a1.447,1.447,0,0,1-1.447,1.447H18.8V14.019a2.893,2.893,0,0,0-2.893-2.893Zm10.126,2.893v4.34A1.447,1.447,0,0,1,15.912,19.8H7.233a1.447,1.447,0,0,1-1.447-1.447v-4.34a1.447,1.447,0,0,1,1.447-1.447h8.679A1.447,1.447,0,0,1,17.358,14.019Z" transform="translate(0 -1)"/>
+          </g>
+      </g>
+    </svg>
+
     <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
   </div>
 
@@ -53,7 +75,29 @@
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="mostrarTableristaOperando">
     <button name="botonesTableristaLiquidos" id="btn-cancelar-tablerista" type="button" class="btn btn-danger ocultar" [routerLink]="['/lineup']">CANCELAR</button>
     <button name="botonesTableristaLiquidos" id="btn-guardar-tablerista" type="button" class="btn btn-primary mx-5 ocultar" (click)="guardar(false)">GUARDAR</button>
-    <button name="botonesTableristaLiquidos" id="btn-imprimir-tablerista" class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button>
+    <!-- <button name="botonesTableristaLiquidos" id="btn-imprimir-tablerista" class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
+
+    <svg id="btn-imprimir-tablerista" xmlns="http://www.w3.org/2000/svg" width="116.031" height="39" viewBox="0 0 116.031 39" (click)="imprimir()" style="cursor:pointer;" name="botonesTableristaLiquidos">
+      <g id="Rectángulo_85" data-name="Rectángulo 85" fill="#fff" stroke="#666" stroke-width="1">
+          <!-- onmouseover="evt.target.setAttribute('fill', '#F4F5FC');" 
+          onmouseout="evt.target.setAttribute('fill','#fff');"> -->
+          <rect width="116.031" height="39" rx="4" stroke="none"/>
+          <rect x="0.5" y="0.5" width="115.031" height="38" rx="3.5" fill="none"/>
+      </g>
+      <text id="IMPRIMIR" transform="translate(38.031 25.531)" fill="#666" font-size="14" font-family="Roboto-Bold, Roboto" font-weight="700">
+          <!-- onmouseover="evt.target.setAttribute('fill', '#666B8E');" 
+          onmouseout="evt.target.setAttribute('fill','#666');"> -->
+          <tspan x="0" y="0">IMPRIMIR</tspan>
+      </text>
+      <g id="Icono_Print" transform="translate(8 10)">
+          <rect id="Rectángulo_471" data-name="Rectángulo 471" width="18.459" height="16.97" transform="translate(0.572 6.03)" fill="none"/>
+          <g id="printer">
+              <path id="Trazado_414" data-name="Trazado 414" d="M2.5,8A.5.5,0,1,0,2,7.5.5.5,0,0,0,2.5,8Z" transform="translate(1 1.885)"/>
+              <path id="Trazado_415" data-name="Trazado 415" d="M7.233,1A2.893,2.893,0,0,0,4.34,3.893V6.786H2.893A2.893,2.893,0,0,0,0,9.679v4.34a2.893,2.893,0,0,0,2.893,2.893H4.34v1.447a2.893,2.893,0,0,0,2.893,2.893h8.679A2.893,2.893,0,0,0,18.8,18.358V16.912h1.447a2.893,2.893,0,0,0,2.893-2.893V9.679a2.893,2.893,0,0,0-2.893-2.893H18.8V3.893A2.893,2.893,0,0,0,15.912,1ZM5.786,3.893A1.447,1.447,0,0,1,7.233,2.447h8.679a1.447,1.447,0,0,1,1.447,1.447V6.786H5.786Zm1.447,7.233A2.893,2.893,0,0,0,4.34,14.019v1.447H2.893a1.447,1.447,0,0,1-1.447-1.447V9.679A1.447,1.447,0,0,1,2.893,8.233H20.251A1.447,1.447,0,0,1,21.7,9.679v4.34a1.447,1.447,0,0,1-1.447,1.447H18.8V14.019a2.893,2.893,0,0,0-2.893-2.893Zm10.126,2.893v4.34A1.447,1.447,0,0,1,15.912,19.8H7.233a1.447,1.447,0,0,1-1.447-1.447v-4.34a1.447,1.447,0,0,1,1.447-1.447h8.679A1.447,1.447,0,0,1,17.358,14.019Z" transform="translate(0 -1)"/>
+          </g>
+      </g>
+    </svg>
+
     <button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
   </div>
 </div>
