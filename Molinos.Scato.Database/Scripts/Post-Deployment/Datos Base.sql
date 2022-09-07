@@ -398,3 +398,6 @@ IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Nueva'    ) BEGIN 
 IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vieja'    ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vieja'    ); END
 IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vicentin' ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vicentin' ); END
 IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Biodiesel') BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Biodiesel'); END
+
+--- Actualizar a cero el idBalanzarCorte cuando sea null
+update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where idBalanzaCorte is null

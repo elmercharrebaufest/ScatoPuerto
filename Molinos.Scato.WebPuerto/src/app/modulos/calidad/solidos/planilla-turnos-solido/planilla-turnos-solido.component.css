@@ -11,10 +11,10 @@
     padding-left: 10px;
 }
 .fila-turno-alto{ 
-    height: 60px;
+    height: 40px !important;
 }
 .fila-turno-alto-defecto{ 
-    height: auto;
+    height: auto !important;
 }
 .column-center{
     display: flex;
@@ -31,6 +31,11 @@
 }
 .fila-turno-baja-carga{
     background-color: #ffefef;
+    padding: 0.4rem;
+}
+.fila-turno-carga-normal{
+    background-color: #ffffff;
+    padding: 0.4rem;
 }
 label{
     font-weight: bold;
