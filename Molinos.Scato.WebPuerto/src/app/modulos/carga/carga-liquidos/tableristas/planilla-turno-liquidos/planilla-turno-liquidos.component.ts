@@ -88,6 +88,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   { id: 4, descripcion: 'PostOperativo' }];
   horaTurnoInicio;
   horaTurnoFin;
+  diaModalCorte: any;
+  turnoModalCorte: any;
+
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -822,13 +825,25 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   }
 
-  agregarCorteLiquido(dia, turno) {
+  agregarCorteLiquido(dia, turno, modal: any) {
     const horaInicio = this.formCorte.getRawValue().horaInicio;
     const horaFin = this.formCorte.getRawValue().horaFin;
+    let motivosDeCorte = this.formCorte.getRawValue().motivosDeCorte;
+    let observaciones = this.formCorte.getRawValue().observaciones;
+    
+    if (motivosDeCorte == null) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar un motivo de corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+    if (observaciones == null) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe introducir una observación para el corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
     if (horaInicio == null || horaFin == null) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar fechas para registrar un corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
+
     const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
     const turnoSeleccionado = turnoSel.turnoPuerto.value.turnoPuerto.orden;
     const horaTurnoInicio = this.ordenTurnoTipo(turnoSeleccionado, false);
@@ -837,13 +852,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     console.log('fechas 1 --> ' + horaTurnoInicio + '  ' + horaTurnoFin)
     console.log('fechas 2 --> ' + horaInicio + '  ' + horaFin)
 
-    if (horaInicio>horaFin){
-      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio no puede ser mayor a la fecha fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+    if (horaInicio>=horaFin){
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio no puede ser mayor o igual a la fecha fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
 
-    if (horaInicio < horaTurnoInicio || horaFin < horaTurnoInicio) bErrorFechas = true;
-    if (horaInicio > horaTurnoFin || horaInicio < horaTurnoInicio) bErrorFechas = true;
+    if (horaFin < horaTurnoInicio) bErrorFechas = true;
     if (horaFin > horaTurnoFin) bErrorFechas = true;
     if (bErrorFechas) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio y fin no corresponde al turno seleccionado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -854,18 +868,24 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       .then((confirmed) => {
         if (confirmed) {
           this.getCorteTurnos(dia, turno).push(this.initCorte(this.formCorte.getRawValue()));
+          this._modalService.dismissAll(modal);
         }
-      }).catch(() => {
-      });
+      })
+      .catch((res) => { console.log('Error en agregarCorteLiquido: ',res) });
   }
 
   openModalCorte(modal, dia, turno) {
+    this.diaModalCorte = dia;
+    this.turnoModalCorte = turno;
     this.formCorte.reset();
     const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
     if (!turnoSel.guardadoPorTablerista.value) {
-      this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result.then(() => {
-        this.agregarCorteLiquido(dia, turno);
+      this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
+      .then(() => {
+        console.log('_modalService.open');
+        // this.agregarCorteLiquido(dia, turno);
       })
+      .catch((res) => { console.log('Error en ModalCorte: ',res) });
     } else {
       this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un corte a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
