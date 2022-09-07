@@ -661,7 +661,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           }
         });
         this.tipoLineaEmbarque = tipoLineas;
-
         this.tipoLineaEmbarque.forEach(tipo => {
           const filtroTipoLinea = lineasEmbarque.filter(item => item.tipoLineaEmbarque.id == tipo.id);
 
@@ -676,18 +675,26 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               }
             });
 
-            filtroTipoLinea.forEach((item) => {
-              var i = tkInicialPlanilla.findIndex(x => x.tkInicial == item.tkInicial);
-              if (i <= -1) {
-                tkInicialPlanilla.push({ tkInicial: item.tkInicial });
-              }
+            materialPuerto.forEach((material)=>{
+
+                const filtroTks = lineasEmbarque.filter(item => item.tipoLineaEmbarque.id == tipo.id &&
+                                                                item.materialPuerto.id == material.id );
+                filtroTks.forEach((tks)=>{
+                  var i = tkInicialPlanilla.findIndex(x => x.tkInicial == tks.tkInicial);
+                  if (i <= -1) {
+                    tkInicialPlanilla.push({ tkInicial: tks.tkInicial });
+                  }
+                });
+                material.tkIniciales = tkInicialPlanilla
+                tkInicialPlanilla = [];
             });
 
             this.tipoLineaProductoTk.push({
               tipoLinea: tipo,
-              materialPuerto: materialPuerto,
-              tkInicial: tkInicialPlanilla,
-            })
+              materialPuerto: materialPuerto
+            });
+            console.log('tipoLineaProductoTk--->>')
+            console.log(this.tipoLineaProductoTk)
           }
         });
       });
@@ -707,15 +714,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   obtenerTkxLinea(lineaTurno) {
-    const linea = lineaTurno['controls'].tipoLineaEmbarque.value;
+    const linea = lineaTurno['controls'].tipoLineaEmbarque?.value;
+    const material = lineaTurno['controls'].materialPuerto?.value;
     let tkInicialPlanilla = [];
-    const tkIniciales = this.tipoLineaProductoTk.filter(item => item.tipoLinea?.id == linea?.id);
-    if (tkIniciales != null || tkIniciales != undefined) {
-      if (tkIniciales.length > 0) {
-        tkInicialPlanilla = tkIniciales[0].tkInicial;
-      }
-    }
 
+    this.tipoLineaProductoTk.forEach(item =>{
+      item.materialPuerto.forEach((itemMaterial) =>{
+        if (item.tipoLinea?.id == linea?.id && itemMaterial.id == material?.id){
+          itemMaterial.tkIniciales.forEach((tks)=>{
+            tkInicialPlanilla.push({tkInicial:tks.tkInicial});
+          });
+        }
+      });
+    });
     return tkInicialPlanilla;
   }
 
@@ -1946,8 +1957,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (enviado){
         this.existenTurnosNoCerrados(Turno).subscribe( resp =>{
           const existeTurno = resp;
-          let mensaje = "No se puede enviar el turno actual a recibidores, debido a que existen turnos anteriores pendientes de cerrar";
-          mensaje += " o turnos anteriores que aun no se han enviado.";
+          let mensaje = "No se puede enviar el turno actual a recibidores, debido a que existen ";
+          mensaje += " turnos anteriores que aun no se han enviado.";
           if (existeTurno){
             this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
             return;
@@ -2158,18 +2169,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         item.fechaMiliseconds = new Date(item.fecha).getTime()
       });
 
+      /*
+      // SE COMENTA LA VALIDACION EN RECIBIDORES
       if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
         if (planillaDeTurnosRecibidores.length > 0) 
             bResultado = true;         
       }
-
-      if (!bResultado){
+      */
         planillaDeTurnosTablerista = planillaDeTurnosTablerista.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
         if (planillaDeTurnosTablerista != undefined || planillaDeTurnosTablerista != null){
           if (planillaDeTurnosTablerista.length > 0) 
               bResultado = true;         
         }
-      }
+      
       subjectTurnosNoCerrados.next(bResultado)
     });
     return subjectTurnosNoCerrados;
