@@ -26,4 +26,5 @@ export class TurnoDetalleSolido{
     materialPuerto: MaterialPuerto;
     destino: Destino;
     cantidad: number;
+    idBalanzaCorte: number;
 }

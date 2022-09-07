@@ -12,6 +12,7 @@ namespace Molinos.Scato.Dominio.Dto
         public ExportadorDto Exportador { get; set; }
         
         public int Cantidad { get; set; }
-     //   public virtual DateTime? FechaCarga { get; set; }
+        public int idBalanzaCorte { get; set; }
+        //   public virtual DateTime? FechaCarga { get; set; }
     }
 }

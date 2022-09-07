@@ -22,7 +22,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int? Tn { get; set; }
         public virtual bool Cerrado { get; set; }
         public virtual bool CorteManual { get; set; }
-        
-
+        public virtual int? Exportador_Id { get; set; }
+        public virtual int? Destino_Id { get; set; }
     }
 }
