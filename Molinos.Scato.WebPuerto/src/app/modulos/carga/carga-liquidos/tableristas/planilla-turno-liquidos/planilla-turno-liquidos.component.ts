@@ -1824,7 +1824,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno){
     if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
-      var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.";
+      var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.\nConsiderar:\nPara" +
+                   " linea vicentin se debe completar linea, producto y cantidad.\nPara linea nueva, vieja o biodisel se debe completar linea, producto Tk y mediciones.\n";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
           if (confirmed)
