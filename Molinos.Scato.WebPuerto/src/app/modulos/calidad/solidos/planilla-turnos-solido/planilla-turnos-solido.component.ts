@@ -674,10 +674,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     // return 0;
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
       const idBalanzaCorte = turno.controls.idBalanzaCorte.value;
-      if (idBalanzaCorte == 0){
+      //if (idBalanzaCorte == 0){
         contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
         contador = Math.ceil(contador);
-      }
+      //}
     }
     contador = contador > 0 ? contador / 1000 : 0;
     contador = Math.round(contador);
