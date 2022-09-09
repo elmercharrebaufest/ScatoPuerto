@@ -9353,7 +9353,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
 #if (DEBUG)
                 log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  DEBUG-----");
-              //  return "10000";
+                return "10000";
 #endif
                 log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  -----");
                 string mmABuscar = cm + "," + mm;
