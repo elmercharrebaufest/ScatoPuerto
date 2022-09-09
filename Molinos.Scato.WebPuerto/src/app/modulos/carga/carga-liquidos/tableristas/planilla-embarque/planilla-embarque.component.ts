@@ -37,6 +37,13 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       this.getProductos();
       this.getTanqueAbordo();
     });
+    this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
+      if (data) {
+        this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+          this.lineas = resp.moduloDeCargaLineasDeEmbarque;
+        });
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -50,7 +57,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   }
 
   newForm() {
-    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    console.log('this.lineas...>>')
+    console.log(this.lineas)
+    if (this.lineas == undefined || this.lineas == null)
+      this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     
     // Evangelino Se considera exportadores unicos no duplicados
     //this.exportadores = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad);

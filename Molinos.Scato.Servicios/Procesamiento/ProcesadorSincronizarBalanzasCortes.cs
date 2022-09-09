@@ -361,7 +361,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 turnoDBSel.TiempoTotal = t.ToString();
                             }                           
                         }
-                        if (corte.MotivosFallasBalanza_id == 10 || corte.MotivosFallasBalanza_id == 11)
+
+                        MotivosFallasBalanza motivosFallasBalanza = Repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == corte.MotivosFallasBalanza_id);
+
+                        if (motivosFallasBalanza.Siglas.Contains("BCB") ||
+                            motivosFallasBalanza.Siglas.Contains("BCP") ||
+                            motivosFallasBalanza.Siglas.Contains("F"))
                         {
                             var moduloDetalleDB = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == turno.Id && x.Bodega.Id == corte.Bodega_id && x.MaterialPuerto.Id == corte.Material_id && x.idBalanzaCorte == corte.Id && x.Cantidad == corte.Kg);
 

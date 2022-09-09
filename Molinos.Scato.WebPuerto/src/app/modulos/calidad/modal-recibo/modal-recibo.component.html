@@ -179,7 +179,8 @@
             type="number"
             class="form-control inputCantidad"
             formControlName="cantidad"
-            (keyup)="onChangeCantidadEnLetras(this.reciboDeBuqueForm.controls.cantidad.value)"
+            (keyup)="keyUpCantidadEnLetras(this.reciboDeBuqueForm.controls.cantidad.value, $event)"
+            (keypress)="decimalOnly($event)"
           />
         </div>
         <div class="col cantidadLetras">

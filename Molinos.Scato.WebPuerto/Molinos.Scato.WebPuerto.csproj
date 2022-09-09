@@ -331,6 +331,7 @@
     <Content Include="src\index.html" />
     <Content Include="src\styles.css" />
     <Content Include="src\Readme-Puerto.md" />
+    <Content Include="src\assets\boton_imprimir.svg" />
     <!-- App TS -->
     <TypeScriptCompile Include="e2e\src\app.e2e-spec.ts" />
     <TypeScriptCompile Include="e2e\src\app.po.ts" />
