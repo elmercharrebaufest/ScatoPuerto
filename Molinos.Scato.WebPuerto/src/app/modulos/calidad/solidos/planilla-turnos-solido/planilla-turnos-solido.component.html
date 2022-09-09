@@ -213,8 +213,8 @@
         <p-toast position='top-center' key='enviar-turno'></p-toast>
     
         <div class="mt-4 text-center">
-            <button data-html2canvas-ignore="true" id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='generarExcelPorParcel(false)'> Exportar Planilla </button>
-            <button data-html2canvas-ignore="true" id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='generarExcelPorParcel(true)' > Enviar planilla </button>
+            <button data-html2canvas-ignore="true" id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
+            <button data-html2canvas-ignore="true" id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
         </div>
         </div>    
     </div>
@@ -244,9 +244,9 @@
                     </div>
                 </div>
                 <div class='modal-footer' >
-                    <div class="user">
+                    <!-- <div class="user">
                         <b><p class="color-user">Observacion cargada por: {{userCarga}}</p></b>
-                    </div>
+                    </div> -->
                     <button data-html2canvas-ignore="true" class="btn btn-danger" (click)='modal.dismiss("Cross click")'>Cancelar</button>
                     <button data-html2canvas-ignore="true" class="btn btn-primary" [disabled]="obsCalidadForm.invalid" (click)="guardarObservacionesDeCalidad()">Guardar</button>
                 </div>

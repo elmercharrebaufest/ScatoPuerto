@@ -27,7 +27,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { Observable, Subject } from 'rxjs';
-import { PlanillaTurnoExcelService } from '@ScatoServicios/planilla-turno-excel';
+import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -104,7 +104,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private messageService: MessageService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
-    private planillaTurnoExcelService: PlanillaTurnoExcelService,
+    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
     private embarqueService: EmbarqueService,
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
@@ -1250,6 +1250,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         console.log(' ', valInicial, valFinal, valDensidad)
 
         let cantidad = (Number(valInicial) - Number(valFinal)) * Number(valDensidad);
+        cantidad = cantidad / 1000
         cantidad = parseInt(cantidad.toString());
         lineaTurno.cantidad.setValue(cantidad);
       })
