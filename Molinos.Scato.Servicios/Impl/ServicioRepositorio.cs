@@ -9375,8 +9375,9 @@ namespace Molinos.Scato.Servicios.Impl
                        TanqueNum = item.LGORT,
                        LlenadoMm = item.ZCANM3.ToString()
                    }).Where(x => x.Mm == mmABuscar || x.Mm == mmABuscar1).Select(y => y.LlenadoMm).FirstOrDefault();
-                log.Info("MM3:"+mm3 );
-                return mm3;
+                string nuevoValor = mm3.Split(',')[0].ToString()+ mm3.Split(',')[1].ToString().PadRight(3,'0');
+                log.Info("MM3:"+ nuevoValor);
+                return nuevoValor;
 
 
             }
