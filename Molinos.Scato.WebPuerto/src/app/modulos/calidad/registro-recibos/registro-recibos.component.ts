@@ -84,9 +84,11 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   
   }
   generarPDF(recibo){
-    this._reciboSharingService.setReciboImpresionSubject(recibo);
     recibo.fechaHoraImpresion = new Date();
-    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {console.log('200 Ok')});
-    this.refreshRecibos();
+    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {
+      console.log('200 Ok')
+      this.refreshRecibos();
+      this._reciboSharingService.setReciboImpresionSubject(recibo);
+    });
   }
 }

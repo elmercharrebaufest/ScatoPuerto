@@ -461,8 +461,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
   getTurnoDetallesBajasClass(d, t){
     const cantidadBajaCarga = this.getTurnoDetallesBajasCargas(d, t);
+    const cantidadBajaNormal = this.getTurnoDetallesBajasCargas(d, t, true);
+    const cantidadRegistros = cantidadBajaCarga + cantidadBajaNormal;
     let detallesBajasClass = '';
-    if (cantidadBajaCarga == 1)
+    if (cantidadRegistros == 1)
       detallesBajasClass = 'fila-turno-alto';
       else
       detallesBajasClass = 'fila-turno-alto-defecto';
@@ -473,11 +475,14 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let colorBajaCargaClass = '';
     if (idBalanzaCorte > 0)
       colorBajaCargaClass = 'fila-turno-baja-carga';
+      else
+      colorBajaCargaClass = 'fila-turno-carga-normal';
     return colorBajaCargaClass;
   }
-  getTurnoDetallesBajasCargas(d, t){
+  getTurnoDetallesBajasCargas(d, t, esCargaNormales: boolean = false) {
     const turnoDetalle = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
-    const cantidadBajaCarga = turnoDetalle.value.filter(x => x.idBalanzaCorte>0);
+
+    const cantidadBajaCarga = esCargaNormales? turnoDetalle.value.filter(x => x.idBalanzaCorte == 0) : turnoDetalle.value.filter(x => x.idBalanzaCorte>0);
     return cantidadBajaCarga.length;
   }
 
@@ -669,10 +674,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     // return 0;
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
       const idBalanzaCorte = turno.controls.idBalanzaCorte.value;
-      if (idBalanzaCorte == 0){
+      //if (idBalanzaCorte == 0){
         contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
         contador = Math.ceil(contador);
-      }
+      //}
     }
     contador = contador > 0 ? contador / 1000 : 0;
     contador = Math.round(contador);

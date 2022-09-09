@@ -101,15 +101,28 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
 
   }
 
-  onChangeCantidadEnLetras(cantidad: any){
-    if(cantidad != null){
+  keyUpCantidadEnLetras(cantidad: any, event: any){
+    if(cantidad != null || event.key == 'Backspace'){
       const toWords = new ToWords({localeCode: 'en-US'});
       // this.reciboDeBuqueForm.controls.cantidadLetras.setValue(converter.toWords(cantidad).toUpperCase());
-      let convertido = toWords.convert(cantidad)
-      this.reciboDeBuqueForm.controls.cantidadLetras.setValue(convertido.toString().toUpperCase());
+      if(cantidad !=  null){
+        let convertido = toWords.convert(cantidad)
+        this.reciboDeBuqueForm.controls.cantidadLetras.setValue(convertido.toString().toUpperCase());
+      }else{
+        this.reciboDeBuqueForm.controls.cantidadLetras.setValue('');
+      }
     }
-    
   }
+
+  public decimalOnly(event): boolean {
+    var charCode = (event.which) ? event.which : event.keyCode;
+    if ((charCode > 47 && charCode < 58) || charCode == 46 || charCode == 8)
+      return true;
+    return false;
+  }
+
+  // onChangeCantidadEnLetras(value:number){
+  // }
 
   mostrarModalOjito(){
     if(this.ojitoRecibo != undefined){

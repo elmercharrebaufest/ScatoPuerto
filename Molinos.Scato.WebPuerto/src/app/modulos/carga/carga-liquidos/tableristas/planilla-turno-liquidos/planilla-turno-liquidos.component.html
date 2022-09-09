@@ -399,7 +399,8 @@
                 </div>
                 <div fxFlex='100' class='right-buttons-turnos'>
                     <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
-                    <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button>
+                    <!-- <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button -->
+                    <button class='btn btn-primary' (click)='agregarCorteLiquido(diaModalCorte, turnoModalCorte, addCorte)'>Guardar</button>
                 </div>
             </form>
         </div>
@@ -445,7 +446,7 @@
 
     <div class="mt-4 text-center">
         <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
-            (click)='generarExcelPorParcel()'>Exportar planilla</button>
+            (click)='onExportarExcelLiquido()'>Exportar planilla</button>
     </div>
 </div>
 
