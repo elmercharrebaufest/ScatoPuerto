@@ -10082,9 +10082,10 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 Dictionary<string, string> ritmosBalanzas78 = new Dictionary<string, string>();
                 DateTime? arranco = null, ultimaBalanzada = null, ultimaActualizacion = null;
-                int cargoHastaAhora = 0, ritmoDeEmbarque = 0;
+                int cargoHastaAhora = 0, ritmoDeEmbarque = 0, idUltimaBalanzadaEnCurso=0;
                 string numeroBalanzaStr = numeroBalanza.ToString();
                 double tiempoDeCarga = 0;
+                bool tieneBalanzadaEnCurso = false;
                 var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque;
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return ritmosBalanzas78;
@@ -10093,8 +10094,22 @@ namespace Molinos.Scato.Servicios.Impl
                 int idEmbarque = embarqueBase.Id;
                 int idVapor = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque).Vapor.Id;
                 var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
-                                                             x.FechaInicio > fechaFinal &&
+                                                            x.FechaInicio > fechaFinal &&
                                                             x.NumeroBalanza == numeroBalanzaStr);
+                // Obtenemos la carga en curso
+                var cargasEnCurso = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && 
+                                                                   x.FechaInicio == null && 
+                                                                   x.CargaOpuesta_Id == null &&
+                                                                   x.NumeroBalanza == numeroBalanzaStr);
+
+                if (cargasEnCurso.Count() > 0)
+                {
+                    int? idCargaEnCurso = cargasEnCurso[0].Id;
+                    idUltimaBalanzadaEnCurso = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idCargaEnCurso &&
+                                                                                  x.NumeroBalanza == numeroBalanzaStr).LastOrDefault().Id;
+
+                    if (idUltimaBalanzadaEnCurso != null) tieneBalanzadaEnCurso = true;
+                }
 
                 // Sumatoria de peso neto
                 int totalPesoNeto = 0;
@@ -10102,42 +10117,64 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     totalPesoNeto += repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id).Sum(x => x.PesoNeto);
                 }
+                // Sumatoria de peso neto para Cargas en Curso
+                foreach (Carga cargaEnCurso in cargasEnCurso)
+                {
+                    totalPesoNeto += repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == cargaEnCurso.Id && x.NumeroBalanza == numeroBalanzaStr).Sum(x => x.PesoNeto);
+                }
+
                 // Busco primer y último ID de Carga
                 var primeraCarga = repositorio.ObtenerPrimero<Carga>(x => x.Vapor.Id == idVapor &&
                                                                           x.FechaInicio > fechaFinal &&
                                                                           x.NumeroBalanza == numeroBalanzaStr);
                 if (primeraCarga == null) return ritmosBalanzas78;
                 int idPrimeraCarga = (int)primeraCarga.CargaOpuesta_Id;
-                List<Carga> UltimaCarga = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
-                                                                   x.FechaInicio >= embarqueBase.FechaHoraInicioCarga &&
-                                                                   x.NumeroBalanza == numeroBalanzaStr).ToList();
-
-                int? idUltimaCarga = UltimaCarga != null && UltimaCarga.Count > 0 ? UltimaCarga.Last().CargaOpuesta_Id : 0;
 
                 // Busco primer y último ID de Balanzada dentro de la Carga
                 int idPrimeraBalanzada = repositorio.ObtenerPrimero<Balanzada>(x => x.CargaInicial_Id == idPrimeraCarga &&
                                                                                     x.NumeroBalanza == numeroBalanzaStr).Id;
 
-                if (idUltimaCarga != null) {
-                    Balanzada UltimaBalanzada = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idUltimaCarga &&
-                                                                           x.NumeroBalanza == numeroBalanzaStr).LastOrDefault();
+                // Busco fecha de inicio
+                DateTime fechaInicialBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idPrimeraBalanzada &&
+                                                                                               x.NumeroBalanza == numeroBalanzaStr).Fecha;
 
-                    if(UltimaBalanzada != null)
-                    {
-                        int idUltimaBalanzada = UltimaBalanzada != null && UltimaBalanzada.Id > 0 ? UltimaBalanzada.Id : 0;
-                        
-                        DateTime fechafinalBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idUltimaBalanzada &&
-                                                                                             x.NumeroBalanza == numeroBalanzaStr).Fecha;
+                if (tieneBalanzadaEnCurso)
+                {
+                    // Busco fecha de fin
+                    DateTime fechaUltimaBalanzadaEnCurso = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idUltimaBalanzadaEnCurso &&
+                                                                                                      x.NumeroBalanza == numeroBalanzaStr).Fecha;
 
-                        // Busco fecha de inicio y fin
-                        DateTime fechaInicialBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idPrimeraBalanzada &&
-                                                                                                   x.NumeroBalanza == numeroBalanzaStr).Fecha;                
+                    ultimaBalanzada = fechaUltimaBalanzadaEnCurso;
+                    tiempoDeCarga = ((fechaUltimaBalanzadaEnCurso - fechaInicialBalanza).TotalMinutes) / 60;
+                    arranco = fechaInicialBalanza;
+                }
+                else
+                { 
+                    List<Carga> UltimaCarga = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor &&
+                                                                             x.FechaInicio >= embarqueBase.FechaHoraInicioCarga &&
+                                                                             x.NumeroBalanza == numeroBalanzaStr).ToList();
+
+                    int? idUltimaCarga = UltimaCarga != null && UltimaCarga.Count > 0 ? UltimaCarga.Last().CargaOpuesta_Id : 0;
+
+                    if (idUltimaCarga != null) {
+                        Balanzada UltimaBalanzada = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == idUltimaCarga &&
+                                                                                       x.NumeroBalanza == numeroBalanzaStr).LastOrDefault();
+
+                        if(UltimaBalanzada != null)
+                        {
+                            int idUltimaBalanzada = UltimaBalanzada != null && UltimaBalanzada.Id > 0 ? UltimaBalanzada.Id : 0;
+
+                            // Busco fecha de fin
+                            DateTime fechafinalBalanza = repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == idUltimaBalanzada &&
+                                                                                                         x.NumeroBalanza == numeroBalanzaStr).Fecha;                                        
                 
-                        ultimaBalanzada = fechafinalBalanza;
-                        tiempoDeCarga = ((fechafinalBalanza - fechaInicialBalanza).TotalMinutes) / 60;
-                        arranco = fechaInicialBalanza;
+                            ultimaBalanzada = fechafinalBalanza;
+                            tiempoDeCarga = ((fechafinalBalanza - fechaInicialBalanza).TotalMinutes) / 60;
+                            arranco = fechaInicialBalanza;
+                        }
                     }
                 }
+
                 cargoHastaAhora = totalPesoNeto / 1000;
                 if (tiempoDeCarga > 0) ritmoDeEmbarque = (int)(cargoHastaAhora / tiempoDeCarga);
                 ultimaActualizacion = DateTime.Now;
@@ -10146,6 +10183,7 @@ namespace Molinos.Scato.Servicios.Impl
                 ritmosBalanzas78.Add("cargoHastaAhora", Convert.ToString(cargoHastaAhora));
                 ritmosBalanzas78.Add("ritmoDeEmbarque", Convert.ToString(ritmoDeEmbarque));
                 ritmosBalanzas78.Add("ultimaActualizacion", Convert.ToString(ultimaActualizacion));
+
                 return ritmosBalanzas78;
             }
             catch (Exception ex)

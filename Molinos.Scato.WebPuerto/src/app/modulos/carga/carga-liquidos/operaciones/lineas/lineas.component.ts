@@ -149,8 +149,9 @@ export class LineasComponent implements OnInit, OnChanges {
         linea.controls['litros'].setValue(valResultado, { emitEvent: false });
         if (densidadInicial != undefined || densidadInicial != null) {
           const kilosInicial = (Number(valResultado) * Number(densidadInicial));
-          const kilosInicialDecimals = kilosInicial.toFixed(3);
+          const kilosInicialDecimals = parseInt(kilosInicial.toString());
           linea.controls['kilos'].setValue(kilosInicialDecimals, { emitEvent: false })
+          this.onCalculaKilos(linea);
         }
       });
   }
@@ -177,7 +178,8 @@ export class LineasComponent implements OnInit, OnChanges {
           (kilos != undefined || kilos != null)
         ) {
           const kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
-          let tkFinal = (Number(kilos) - kilosFinal).toFixed(3)
+          const kilosFinalRes = (Number(kilos) - kilosFinal);
+          const tkFinal = parseInt(kilosFinalRes.toString());
           linea.controls['tkFinal'].setValue(tkFinal, { emitEvent: false })
         }
       });
@@ -405,8 +407,6 @@ export class LineasComponent implements OnInit, OnChanges {
     const tipoLineaEmbarqueSel = lineaSel['controls']?.tipoLineaEmbarque?.value;
     lineaSel['controls']?.linea.setValue(tipoLineaEmbarqueSel?.linea);
     console.log(lineaSel)
-    
-
     //#region Elige vicentin
     let selectedVicentin: boolean;
     selectedVicentin = lineaSel['controls'].tipoLineaEmbarque.value.linea == 'Vicentin'
@@ -417,8 +417,7 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialMM.disable();
       lineaSel['controls'].temperaturaInicial.disable();
       lineaSel['controls'].tkInicial.disable();
-
-
+      lineaSel['controls'].kilos.disable();
 
       lineaSel['controls'].alturaFinalCM.setValue(0)
       lineaSel['controls'].alturaFinalCM.setValue(0);
@@ -434,10 +433,6 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].tkFinal.setValue('');
       lineaSel['controls'].kilos.setValue(0);
       lineaSel['controls'].tkInicial.setValue('');
-
-
-      lineaSel['controls'].kilos.disable();
-
     }else {
       lineaSel['controls'].alturaFinalCM.enable();
       lineaSel['controls'].alturaFinalMM.enable();
@@ -445,12 +440,11 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].alturaInicialMM.enable();
       lineaSel['controls'].temperaturaInicial.enable();
       lineaSel['controls'].tkInicial.enable();
-      
     }
     //#endregion
   }
 
-  onFocusOutEvent(index: number) {
+  onFocusOutEvent(index: number, linea) {
     const materialPuertoId = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['materialPuerto'].value.id;
     let temperatura = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaInicial'].value;
     temperatura = temperatura == '' ? 0 : temperatura;
@@ -477,6 +471,7 @@ export class LineasComponent implements OnInit, OnChanges {
         if (this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['litros'].value) {
           const kilosInicial = (Number(res) * Number(this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['litros'].value)).toFixed(3);
           this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['kilos'].setValue(kilosInicial, { emitEvent: false })
+          this.onCalculaLitros(linea);
         }
       });
   }
