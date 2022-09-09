@@ -30,7 +30,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { PlanillaTurnoExcelService } from '@ScatoServicios/planilla-turno-excel';
+import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
 
 
 @Component({
@@ -88,7 +88,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private planillaTurnoExcelService: PlanillaTurnoExcelService,
+    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
@@ -104,8 +104,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.embarque = res;
       //this.cargarShipParticular(res);
     });
-
-
 
     this._turnosService.sendBodega.subscribe(res => {
       this.bodegas = res;

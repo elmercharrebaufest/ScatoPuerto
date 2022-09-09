@@ -11,7 +11,7 @@ import { ModuloDeCargaService } from './modulo-de-carga.service';
 @Injectable({
     providedIn: 'root'
   })
-export class PlanillaTurnoExcelService {
+export class PlanillaTurnoLiquidoExcelService {
 
     constructor(
         private moduloCargaService: ModuloDeCargaService,
