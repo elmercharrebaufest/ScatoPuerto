@@ -1,4 +1,5 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
+import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
 
 
 @Injectable({
@@ -9,6 +10,7 @@ export class ManosEmbarqueService {
     @Output() removerResaltadoSilos = new EventEmitter<object>();
     @Output() resaltarSilo = new EventEmitter<string>();
     @Output() agregarManoDeEmbarque = new EventEmitter<object>();
+    @Output() obtenerManosDeEmbarque = new EventEmitter<ManosDeEmbarque>();
     @Output() agregarTabique = new EventEmitter<object>();
     @Output() removerTabique = new EventEmitter<string>();
 }

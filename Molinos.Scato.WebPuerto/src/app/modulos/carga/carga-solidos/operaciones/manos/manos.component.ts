@@ -8,6 +8,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 
 @Component({
   selector: 'app-manos',
@@ -29,7 +30,8 @@ export class ManosComponent implements OnInit {
   constructor(private formBuilder: FormBuilder,
     private manosEmbarqueService: ManosEmbarqueService,
     private _procesoService: DatosEmbarquesProcesoService,
-    confirmationDialogService: ConfirmationDialogService) {
+    confirmationDialogService: ConfirmationDialogService,
+    private _calidadSharedService: CalidadSharedService) {
     this.confirmationDialogService = confirmationDialogService;
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.productos = this.datosEmbarque.listaMateriales
@@ -368,6 +370,7 @@ export class ManosComponent implements OnInit {
 
   patchManosDeEmbarque(manos) {
     this.manosYTabiquesForm.get('manosDeEmbarque').patchValue(manos);
+    this._calidadSharedService.Manos.emit(manos)
   }
 
   patchTabiques(tabiques) {
