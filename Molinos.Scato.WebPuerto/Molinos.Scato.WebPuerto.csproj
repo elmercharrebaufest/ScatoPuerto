@@ -264,6 +264,8 @@
     <Content Include="src\app\modulos\calidad\solidos\solidos.component.css" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir.component.html" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir.component.css" />
+    <Content Include="ssrc\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.html" />
+    <Content Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.css" />
     <!-- Calidad Liquidos HTML/CSS -->
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.html" />
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.css" />
@@ -369,6 +371,7 @@
     <TypeScriptCompile Include="src\app\shared\servicios\embarque.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\lineup.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\plano-de-carga.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\calidad-shared.service.ts" />    
     <TypeScriptCompile Include="src\app\shared\servicios\session.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\workflow.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\modulo-de-carga.service.ts" />
@@ -508,6 +511,7 @@
     <TypeScriptCompile Include="src\app\modulos\calidad\liquidos\liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\solidos\solidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\solidos\nir\nir.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\calidad.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\calidad-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\calidad.module.ts" />

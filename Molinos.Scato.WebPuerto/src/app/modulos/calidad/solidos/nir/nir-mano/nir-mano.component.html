@@ -1,0 +1,72 @@
+<form [formGroup]="formMano">
+    <div class="mb-1">
+      <h4 class="colorTitle pt-4">NIR Mano {{queMano}}: {{mano.tipo}}  </h4>
+    </div>
+    <div>
+      <div class='btn-add-container pt-btn-add mb-3' (click)="agregarObjetoNir()">
+        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;' >+</button>
+        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
+      </div>
+    </div>
+    <div fxLayout='row wrap' >
+      <table class="table">
+        <thead>
+          <tr class="table-active">
+            <th class="thCustom">Fecha y hora</th>
+            <th class="thCustom">% HD</th>
+            <th class="thCustom">PH</th>
+            <th class="thCustom">% Prot (13,5%)</th>
+            <th class="thCustom">% Prot B/S</th>
+            <th class="thCustom">Origen</th>
+            <th class="thCustom">Bodega</th>
+            <th style="background-color: white; border-top: 0px; border-bottom: 0px; width: 50px;" ></th>
+          </tr>        
+        </thead>
+        <tbody>
+            <ng-container formArrayName='nirManualPuerto'>
+                <tr *ngFor='let nirManual of formMano.get("nirManualPuerto")["controls"]; let i = index' [formGroupName]="i">
+                    <td  class="tdCustom">
+                        <input formControlName="fecha" type="datetime-local" [value]="nirManual.fecha" class="inputLineasEmbarque"/>
+                    </td>
+                    <td class="tdCustom">  
+                        <input formControlName="hd" type="number" />              
+                    </td >
+                    <td class="tdCustom">
+                        <input formControlName="ph" type="number"/>            
+                    </td>
+                    <td class="tdCustom">
+                        <input formControlName="protBase" type="number"/>          
+                    </td>
+                    <td class="tdCustom">
+                        <input formControlName="prot_BS" type="number"/>            
+                    </td>
+                    <td class="tdCustom">
+                        <input formControlName="origen" type="text"/>
+                    </td>
+                    <td class="tdCustom">
+                        <select formControlName="bodega" class="custom-select" [compareWith]='compareBodegaItem'>
+                            <option value="0" >Seleccione una Bodega</option>
+                            <option *ngFor="let b of bodegas" [ngValue]='b'> {{ b.nombre }} </option>
+                        </select>         
+                    </td>
+                    <td style=" border-top: 0px;">
+                        <div fxFlex='4'>
+                        <img style="width: 26px; height: 26px; margin-top: -16px" id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito" (click)="eliminarObjetoNir(i)">
+                        </div>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+      </table>
+      <hr  class="hrCustom">    
+    </div>
+  </form>
+
+  <!-- Promedios -->
+  <div class="promediosJustificados">
+    <a><b>Promedio HD: </b>{{promedioHD() | number : '1.2-2'}}</a>
+    <a><b>Promedio PH: </b>{{promedioPH() | number : '1.2-2'}}</a>
+    <a *ngIf='mano.tipo == "Trigo"'><b>Promedio Prot (13,5%): </b>{{promedioProtBase() | number : '1.2-2'}}</a>
+    <a *ngIf='mano.tipo == "Trigo"'><b>Promedio Prot. Base seca: </b>{{promedioProtBS() | number : '1.2-2'}}</a>
+  </div>  
+  <hr class="hrCustom">
