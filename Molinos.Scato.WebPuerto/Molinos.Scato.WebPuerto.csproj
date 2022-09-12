@@ -264,7 +264,7 @@
     <Content Include="src\app\modulos\calidad\solidos\solidos.component.css" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir.component.html" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir.component.css" />
-    <Content Include="ssrc\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.html" />
+    <Content Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.html" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.css" />
     <!-- Calidad Liquidos HTML/CSS -->
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.html" />
