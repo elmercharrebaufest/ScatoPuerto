@@ -8,7 +8,7 @@ import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { ModuloDeCargaListado } from '@ScatoModels/modulo-carga-listado';
 import { MotivosDeCorte } from '@ScatoModels/planilla-turnos/motivo-de-corte';
 import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
-import { Nir } from '@ScatoModels/nir';
+import { Nir, NirManualPuerto } from '@ScatoModels/nir';
 import { FuncionesGeneralesService } from './funciones-generales.service';
 import { Umap } from '@ScatoModels/umap';
 
@@ -144,8 +144,8 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, planillaDeEmbarqueDtos, { 'withCredentials': true});  
   }
 
-  obtenerNir(moduloDeCarga_id: number): Observable<Nir[]>{
-    return this.http.get<Nir[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
+  obtenerNir(moduloDeCarga_id: number): Observable<NirManualPuerto[]>{
+    return this.http.get<NirManualPuerto[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
   }
   
   guardarModuloDeCargaNirManualPuerto(objetoMailNir:Object, IdModuloDeCarga: number, nombreBuque?: string){

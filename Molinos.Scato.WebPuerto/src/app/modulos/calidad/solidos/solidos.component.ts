@@ -12,6 +12,7 @@ import { GraficoCargaComponent } from 'app/modulos/carga/carga-solidos/operacion
 import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/manos/manos.component';
 import { forkJoin } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 
 @Component({
   selector: 'app-solidos',
@@ -36,7 +37,8 @@ export class SolidosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
-    private _changeDetector: ChangeDetectorRef) {
+    private _changeDetector: ChangeDetectorRef,
+    private _CalidadSharedService: CalidadSharedService) {
       
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
   }
@@ -110,6 +112,7 @@ export class SolidosComponent implements OnInit {
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchManosDeEmbarque(res.moduloDeCargaManosDeEmbarque);
+          this._CalidadSharedService.setManosDeEmbarque(res.moduloDeCargaManosDeEmbarque);
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);

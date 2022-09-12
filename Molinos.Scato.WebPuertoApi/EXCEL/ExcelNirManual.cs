@@ -22,806 +22,137 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             resultado.Archivo = workbook;
         }
 
-        private static byte[] GenerarExcel(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuerto, string nombre, byte[] dataImg)
+        private static byte[] GenerarExcel(List<ModuloDeCargaNirManualPuertoDto> moduloDeCargaNirsManualPuerto, string nombreBuque, byte[] dataImg)
         {
             var workbook = new HSSFWorkbook();
             var sheet = (HSSFSheet)workbook.CreateSheet("NIR");
 
-            ICellStyle estiloBuque = EstiloBuque(workbook);
-            ICellStyle estiloHeaderVerde = EstiloHeaderVerde(workbook);
-            ICellStyle estiloHeaderGris = EstiloHeaderGris(workbook);
-            ICellStyle lineBottom = LineBottom(workbook);
-            ICellStyle lineLeft = LineLeft(workbook);
-            ICellStyle bordesBody = BordesBody(workbook);
-            ICellStyle estiloPromediosManos = EstiloPromediosManos(workbook);
-
-
-
-
             var styleBold = workbook.CreateCellStyle();
             var fontBold = workbook.CreateFont();
-
             fontBold.Boldweight = (short)FontBoldWeight.Bold;
             styleBold.SetFont(fontBold);
 
+            string[] headerMaiz = new string[] { "Fecha y hora", "% HD", "PH", "% Prot (13,5%)", "% Prot B/S", "Origen", "Bodega" };
             //header
             var cellBorderStyle = workbook.CreateCellStyle();
             cellBorderStyle.BorderBottom = BorderStyle.Thin;
             cellBorderStyle.BorderLeft = BorderStyle.Thin;
             cellBorderStyle.BorderTop = BorderStyle.Thin;
             cellBorderStyle.BorderRight = BorderStyle.Thin;
-            var i = 6;
-            var j = 6;
-            bool tieneMaiz = false;
-            bool tieneTrigo = false;
-            int contMano1 = 0;
-            int contMano2 = 0;
-            int cantidadDeRows = 0;
-            double totalHDMano1 = 0;
-            double totalHDMano2 = 0;
-            double totalPHMano1 = 0;
-            double totalPHMano2 = 0;
-            double totalProtBaseMano1 = 0;
-            double totalProtBaseMano2 = 0;
-            double totalProtBSMano1 = 0;
-            double totalProtBSMano2 = 0;
-            double promedioPHMano1 = 0;
-            double promedioPHMano2 = 0;
-            double promedioHDMano1 = 0;
-            double promedioHDMano2 = 0;
-            double promedioProtBaseMano1 = 0;
-            double promedioProtBaseMano2 = 0;
-            double promedioProtBSMano1 = 0;
-            double promedioProtBSMano2 = 0;
+            bool hayMano1 = false;
+            bool hayMano2 = false;
 
             foreach (var mat in moduloDeCargaNirsManualPuerto)
             {
                 var materialPuerto = mat.Material_id;
-                if (materialPuerto == 11)
+
+                if (mat.Mano == "mano1")
                 {
-                    tieneMaiz = true;
-                    
+                    hayMano1 = true;
                 }
                 else
                 {
-                    tieneTrigo = true;
-                }
-                if(mat.Mano == "mano1")
-                {
-                    contMano1++;
-                }
-                else
-                {
-                    contMano2++;
+                    hayMano2 = true;
                 }
             }
-            if (contMano1 >= contMano2) { cantidadDeRows = contMano1; }
-            else if(contMano2 <= contMano1) { cantidadDeRows = contMano2; }
-            
 
-            
-            
-            foreach (var mod in moduloDeCargaNirsManualPuerto)
+            int pictureIndex = workbook.AddPicture(dataImg, PictureType.PNG);
+            ICreationHelper helper = workbook.GetCreationHelper();
+            IDrawing drawing = sheet.CreateDrawingPatriarch();
+            IClientAnchor anchor = helper.CreateClientAnchor();
+
+            anchor.Col1 = 1;//0 index based column
+            anchor.Row1 = 0;//0 index based row
+            IPicture picture = drawing.CreatePicture(anchor, pictureIndex);
+            picture.Resize();
+
+            sheet.CreateRow(0).CreateCell(1).SetCellValue("");
+            CellRangeAddress celImg = new CellRangeAddress(0, 2, 1, 2);
+            RegionUtil.SetBorderBottom(2, celImg, sheet, workbook);
+
+            sheet.AddMergedRegion(celImg);
+
+
+            var offset_y = 3;
+            var rowName = sheet.CreateRow(offset_y);
+            rowName.CreateCell(1).SetCellValue("Nombre:");
+            rowName.GetCell(1).CellStyle = EstiloHeaderVerde(workbook);
+
+            ICell celdaNombre = rowName.CreateCell(2);
+            celdaNombre.SetCellValue(nombreBuque);
+            CellRangeAddress cellNombreBuque = new CellRangeAddress(offset_y, offset_y, 2, 3);
+            RegionUtil.SetBorderBottom(2, cellNombreBuque, sheet, workbook);
+            RegionUtil.SetBorderTop(2, cellNombreBuque, sheet, workbook);
+            RegionUtil.SetBorderRight(2, cellNombreBuque, sheet, workbook);
+            RegionUtil.SetBorderLeft(2, cellNombreBuque, sheet, workbook);
+            sheet.AddMergedRegion(cellNombreBuque);
+            celdaNombre.CellStyle = BordesBodyOrange(workbook);
+
+            offset_y = 4;
+
+            List<ModuloDeCargaNirManualPuertoDto> lineasMaizMano1 = new List<ModuloDeCargaNirManualPuertoDto>();
+            List<ModuloDeCargaNirManualPuertoDto> lineasMaizMano2 = new List<ModuloDeCargaNirManualPuertoDto>();
+            List<ModuloDeCargaNirManualPuertoDto> lineasTrigoMano1 = new List<ModuloDeCargaNirManualPuertoDto>();
+            List<ModuloDeCargaNirManualPuertoDto> lineasTrigoMano2 = new List<ModuloDeCargaNirManualPuertoDto>();
+
+            if (hayMano1)
             {
-                var bodega = mod.Bodega.Nombre;
-                var fecha = mod.Fecha;
-                var hd = mod.HD;
-                var mano = mod.Mano;
-                var origen = mod.Origen;
-                var ph = mod.PH;
-                var portBase = mod.ProtBase;
-                var portBS = mod.Prot_BS;
-                var ritmo = mod.Ritmo;
-                var material = mod.Material_id;
+                lineasMaizMano1 = moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 11 && x.Mano == "mano1").ToList();
+                lineasTrigoMano1 = moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 17 && x.Mano == "mano1").ToList();
 
-
-                if (mano == "mano1")
+                if (lineasMaizMano1.Count > 0)
                 {
-                    if (material == 11)
-                    {
-                        var rowmano1 = sheet.CreateRow(i);
-
-                        var cell1 = rowmano1.CreateCell(1);
-                        cell1.SetCellValue(fecha.ToString());
-                        CellRangeAddress fechaC = new CellRangeAddress(i, i, 1, 2);
-                        sheet.AddMergedRegion(fechaC);
-                        cell1.CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(3).SetCellValue(hd);
-                        totalHDMano1 += Convert.ToDouble(hd);
-                        rowmano1.GetCell(3).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(4).SetCellValue(ph);
-                        totalPHMano1 += Convert.ToDouble(ph);
-                        rowmano1.GetCell(4).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(5).SetCellValue(origen);
-                        rowmano1.GetCell(5).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(6).SetCellValue(bodega);
-                        rowmano1.GetCell(6).CellStyle = bordesBody;
-
-                        i++;
-                    }
-                    else
-                    {
-                        var rowmano1 = sheet.CreateRow(150);
-                        if (tieneTrigo && tieneMaiz)
-                        {
-                            rowmano1 = sheet.GetRow(i);
-                        }
-                        else
-                        {
-                            rowmano1 = sheet.CreateRow(i);
-                        }
-                        
-                        var cell1 = rowmano1.CreateCell(1);
-                        cell1.SetCellValue(fecha.ToString());
-                        CellRangeAddress fechaC = new CellRangeAddress(i, i, 1, 2);
-                        sheet.AddMergedRegion(fechaC);
-                        cell1.CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(3).SetCellValue(hd);
-                        totalHDMano1 += Convert.ToDouble(hd);
-                        rowmano1.GetCell(3).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(4).SetCellValue(portBase);
-                        totalProtBaseMano1 += Convert.ToDouble(portBase);
-                        rowmano1.GetCell(4).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(5).SetCellValue(portBS);
-                        totalProtBSMano1 += Convert.ToDouble(portBS);
-                        rowmano1.GetCell(5).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(6).SetCellValue(ph);
-                        totalPHMano1 += Convert.ToDouble(ph);
-                        rowmano1.GetCell(6).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(7).SetCellValue(origen);
-                        rowmano1.GetCell(7).CellStyle = bordesBody;
-
-                        rowmano1.CreateCell(8).SetCellValue(bodega);
-                        rowmano1.GetCell(8).CellStyle = bordesBody;
-
-                        
-                        i++;
-                    }
+                    renderNir(ref sheet, lineasMaizMano1, ref workbook, ref offset_y, 1, "Maíz");
                 }
-                else
+
+                if (lineasTrigoMano1.Count > 0)
                 {
-                    
-                    if (material == 11)
-                    {
-                        var rowmano2 = sheet.CreateRow(150);
-                        if(tieneTrigo && tieneMaiz)
-                        {
-                            rowmano2 = sheet.CreateRow(j);
-
-                            var cell7 = rowmano2.CreateCell(9);
-                            cell7.SetCellValue(fecha.ToString());
-                            CellRangeAddress fechaC = new CellRangeAddress(j, j, 9, 10);
-                            sheet.AddMergedRegion(fechaC);
-                            cell7.CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(11).SetCellValue(hd);
-                            totalHDMano2 += Convert.ToDouble(hd);
-                            rowmano2.GetCell(11).CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(12).SetCellValue(ph);
-                            totalPHMano2 += Convert.ToDouble(ph);
-                            rowmano2.GetCell(12).CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(13).SetCellValue(origen);
-                            rowmano2.GetCell(13).CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(14).SetCellValue(bodega);
-                            rowmano2.GetCell(14).CellStyle = bordesBody;
-
-                            j++;
-                        }
-                        else
-                        {
-                            rowmano2 = sheet.GetRow(j);
-
-                            var cell7 = rowmano2.CreateCell(7);
-                            cell7.SetCellValue(fecha.ToString());
-                            CellRangeAddress fechaC = new CellRangeAddress(j, j, 7, 8);
-                            sheet.AddMergedRegion(fechaC);
-                            cell7.CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(9).SetCellValue(hd);
-                            totalHDMano2 += Convert.ToDouble(hd);
-                            rowmano2.GetCell(9).CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(10).SetCellValue(ph);
-                            totalPHMano2 += Convert.ToDouble(ph);
-                            rowmano2.GetCell(10).CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(11).SetCellValue(origen);
-                            rowmano2.GetCell(11).CellStyle = bordesBody;
-
-                            rowmano2.CreateCell(12).SetCellValue(bodega);
-                            rowmano2.GetCell(12).CellStyle = bordesBody;
-
-                            j++;
-
-                        }
-                        
-                    }
-                    else
-                    {
-                        
-                        var rowmano2 = sheet.GetRow(j);
-                        var cell7 = rowmano2.CreateCell(9);
-                        cell7.SetCellValue(fecha.ToString());
-                        CellRangeAddress fechaC = new CellRangeAddress(j, j, 9, 10);
-                        sheet.AddMergedRegion(fechaC);
-                        cell7.CellStyle = bordesBody;
-
-                        rowmano2.CreateCell(11).SetCellValue(hd);
-                        totalHDMano2 += Convert.ToDouble(hd);
-                        rowmano2.GetCell(11).CellStyle = bordesBody;
-
-                        rowmano2.CreateCell(12).SetCellValue(portBase);
-                        totalProtBaseMano2 += Convert.ToDouble(portBase);
-                        rowmano2.GetCell(12).CellStyle = bordesBody;
-
-                        rowmano2.CreateCell(13).SetCellValue(portBS);
-                        totalProtBSMano2 += Convert.ToDouble(portBS);
-                        rowmano2.GetCell(13).CellStyle = bordesBody;
-
-                        rowmano2.CreateCell(14).SetCellValue(ph);
-                        totalPHMano2 += Convert.ToDouble(ph);
-                        rowmano2.GetCell(14).CellStyle = bordesBody;
-
-                        rowmano2.CreateCell(15).SetCellValue(origen);
-                        rowmano2.GetCell(15).CellStyle = bordesBody;
-
-                        rowmano2.CreateCell(16).SetCellValue(bodega);
-                        rowmano2.GetCell(16).CellStyle = bordesBody;
-
-                        j++;
-                    }
+                    renderNir(ref sheet, lineasTrigoMano1, ref workbook, ref offset_y, 1, "Trigo");
                 }
+
             }
-            promedioHDMano1 = totalHDMano1 / contMano1;
-            promedioHDMano2 = totalHDMano2 / contMano2;
-            promedioPHMano1 = totalPHMano1 / contMano1;
-            promedioPHMano2 = totalPHMano2 / contMano2;
 
-            double promedioTotalProtBase = 0;
-            double promedioTotalProtBS = 0;
-            if (tieneTrigo)
+            offset_y += 1;
+
+            if (hayMano2)
             {
-                if (tieneTrigo && tieneMaiz)
+                lineasMaizMano2 = moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 11 && x.Mano == "mano2").ToList();
+                lineasTrigoMano2 = moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 17 && x.Mano == "mano2").ToList();
+
+                if (lineasMaizMano2.Count > 0)
                 {
-                    promedioProtBaseMano1 = totalProtBaseMano1 / contMano1;
-                    promedioProtBSMano1 = promedioProtBSMano1 / contMano1;
-
+                    renderNir(ref sheet, lineasMaizMano2, ref workbook, ref offset_y, 2, "Maíz");
                 }
-                else
+
+                if (lineasTrigoMano2.Count > 0)
                 {
-                    promedioProtBaseMano1 = totalProtBaseMano1 / contMano1;
-                    promedioProtBaseMano2 = totalProtBaseMano2 / contMano2;
-                    promedioProtBSMano2 = promedioProtBSMano2 / contMano2;
-                    promedioProtBSMano1 = promedioProtBSMano1 / contMano1;
+                    renderNir(ref sheet, lineasTrigoMano2, ref workbook, ref offset_y, 2, "Trigo");
                 }
-                
-
-
-                promedioTotalProtBase = (promedioProtBaseMano1 + promedioProtBaseMano2) / 2;
-                promedioTotalProtBS = (promedioProtBSMano1 + promedioProtBSMano2) / 2;
             }
 
+            offset_y += 1;
             
-
-            double promedioTotalHD = (promedioHDMano1 + promedioHDMano2) / 2;
-            double promedioTotalPH = (promedioPHMano1 + promedioPHMano2) / 2;
-            
-
-
-
-
-
-            if (tieneMaiz == true && tieneTrigo == false)
-            {
-                int pictureIndex = workbook.AddPicture(dataImg, PictureType.PNG);
-                ICreationHelper helper = workbook.GetCreationHelper();
-                IDrawing drawing = sheet.CreateDrawingPatriarch();
-                IClientAnchor anchor = helper.CreateClientAnchor();
-
-                anchor.Col1 = 1;//0 index based column
-                anchor.Row1 = 0;//0 index based row
-                IPicture picture = drawing.CreatePicture(anchor, pictureIndex);
-                picture.Resize();
-
-                sheet.CreateRow(0).CreateCell(1).SetCellValue("");
-                CellRangeAddress celImg = new CellRangeAddress(0, 2, 1, 2);
-                sheet.AddMergedRegion(celImg);
-                var row = sheet.CreateRow(2);
-                row.CreateCell(6).CellStyle = lineBottom;
-                var rowBuque = sheet.CreateRow(3);
-
-                var celda1 = rowBuque.CreateCell(1);
-                celda1.SetCellValue("Buque:");
-                celda1.CellStyle = estiloBuque;
-                //celda1.CellStyle = estiloHeader;
-
-                var celda2 = rowBuque.CreateCell(2);
-                celda2.SetCellValue(nombre);
-                CellRangeAddress cellNombreBuque = new CellRangeAddress(3, 3, 2, 3);
-                sheet.AddMergedRegion(cellNombreBuque);
-                celda2.CellStyle = estiloHeaderVerde;
-
-
-                var celda4 = rowBuque.CreateCell(4);
-                celda4.SetCellValue("MERCADERIA:");
-                sheet.AutoSizeColumn(4);
-                celda4.CellStyle = estiloBuque;
-
-                
-
-                var celda5 = rowBuque.CreateCell(5);
-                CellRangeAddress cellMaterialMaiz = new CellRangeAddress(3, 3, 5, 6);
-                sheet.AddMergedRegion(cellMaterialMaiz);
-                celda5.SetCellValue("MAÍZ");
-                celda5.CellStyle = estiloHeaderVerde;
-                rowBuque.CreateCell(7).CellStyle = lineLeft;
-                rowBuque.CreateCell(8).CellStyle = lineBottom;
-                rowBuque.CreateCell(9).CellStyle = lineBottom;
-                rowBuque.CreateCell(10).CellStyle = lineBottom;
-                rowBuque.CreateCell(11).CellStyle = lineBottom;
-                rowBuque.CreateCell(12).CellStyle = lineBottom;
-
-
-                var rowManos = sheet.CreateRow(4);
-
-                var celdaMano1 = rowManos.CreateCell(1);
-                celdaMano1.SetCellValue("Mano 1");
-                //celdaMano1.CellStyle = estiloHeader;
-                CellRangeAddress RegionceldaMano1 = new CellRangeAddress(4, 4, 1, 6);
-                sheet.AddMergedRegion(RegionceldaMano1);
-                celdaMano1.CellStyle = estiloHeaderVerde;
-
-                var celdaMano2 = rowManos.CreateCell(7);
-                celdaMano2.SetCellValue("Mano 2");
-                //celdaMano2.CellStyle = estiloHeader;
-                CellRangeAddress RegionceldaMano2 = new CellRangeAddress(4, 4, 7, 12);
-                sheet.AddMergedRegion(RegionceldaMano2);
-                celdaMano2.CellStyle = estiloHeaderVerde;
-                celdaMano2.CellStyle.BorderRight = BorderStyle.Medium;
-
-                rowManos.CreateCell(13).CellStyle = lineLeft;
-
-                var rowHeaderData = sheet.CreateRow(5);
-
-                rowHeaderData.CreateCell(1).SetCellValue("Fecha - Hora");
-                CellRangeAddress fechaHoraMaiz = new CellRangeAddress(5, 5, 1, 2);
-                sheet.AddMergedRegion(fechaHoraMaiz);
-                rowHeaderData.GetCell(1).CellStyle = estiloHeaderGris;
-                
-
-                rowHeaderData.CreateCell(3).SetCellValue("% HD");
-                rowHeaderData.GetCell(3).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(4).SetCellValue("PH");
-                rowHeaderData.GetCell(4).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(5).SetCellValue("Origen");
-                rowHeaderData.GetCell(5).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(6).SetCellValue("Bodega");
-                rowHeaderData.GetCell(6).CellStyle = estiloHeaderGris;
-
-
-
-                rowHeaderData.CreateCell(7).SetCellValue("Fecha - Hora");
-                CellRangeAddress fechaHoraMaiz2 = new CellRangeAddress(5, 5, 7, 8);
-                sheet.AddMergedRegion(fechaHoraMaiz2);
-                rowHeaderData.GetCell(7).CellStyle = estiloHeaderGris;
-
-
-                rowHeaderData.CreateCell(9).SetCellValue("% HD");
-                rowHeaderData.GetCell(9).CellStyle = estiloHeaderGris;
-
-
-                rowHeaderData.CreateCell(10).SetCellValue("PH");
-                rowHeaderData.GetCell(10).CellStyle = estiloHeaderGris;
-
-
-                rowHeaderData.CreateCell(11).SetCellValue("Origen");
-                rowHeaderData.GetCell(11).CellStyle = estiloHeaderGris;
-
-
-                rowHeaderData.CreateCell(12).SetCellValue("Bodega");
-                rowHeaderData.GetCell(12).CellStyle = estiloHeaderGris;
-
-
-
-                var rowPromedios = sheet.CreateRow(cantidadDeRows + 6);
-                rowPromedios.CreateCell(1).SetCellValue("Promedio");
-                CellRangeAddress promedio = new CellRangeAddress(cantidadDeRows + 6, cantidadDeRows + 6, 1, 2);
-                sheet.AddMergedRegion(promedio);
-                rowPromedios.GetCell(1).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(3).SetCellValue(promedioHDMano1);
-                rowPromedios.GetCell(3).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(4).SetCellValue(promedioPHMano1);
-                rowPromedios.GetCell(4).CellStyle = estiloPromediosManos;
-
-
-                rowPromedios.CreateCell(7).SetCellValue("Promedio");
-                CellRangeAddress promedio2 = new CellRangeAddress(cantidadDeRows + 6, cantidadDeRows + 6, 7, 8);
-                sheet.AddMergedRegion(promedio2);
-                rowPromedios.GetCell(7).CellStyle = estiloPromediosManos;
-
-
-                rowPromedios.CreateCell(9).SetCellValue(promedioHDMano2);
-                rowPromedios.GetCell(9).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(10).SetCellValue(promedioPHMano2);
-                rowPromedios.GetCell(10).CellStyle = estiloPromediosManos;
-
-
-                var rowProm1 = sheet.CreateRow(cantidadDeRows + 9);
-                rowProm1.CreateCell(1);
-                CellRangeAddress prom1 = new CellRangeAddress(cantidadDeRows + 9, cantidadDeRows + 9, 1, 3);
-                sheet.AddMergedRegion(prom1);
-                rowProm1.GetCell(1).SetCellValue("Promedio HD TOTAL:");
-                rowProm1.CreateCell(4).SetCellValue(promedioTotalHD);
-
-                var rowProm2 = sheet.CreateRow(cantidadDeRows + 10);
-                rowProm2.CreateCell(1);
-                CellRangeAddress prom2 = new CellRangeAddress(cantidadDeRows + 10, cantidadDeRows + 10, 1, 3);
-                sheet.AddMergedRegion(prom2);
-                rowProm2.GetCell(1).SetCellValue("Promedio PH TOTAL:");
-                rowProm2.CreateCell(4).SetCellValue(promedioTotalPH);
-            }
-            else if (tieneTrigo && tieneMaiz == false)
-            {
-
-
-                int pictureIndex = workbook.AddPicture(dataImg, PictureType.PNG);
-                ICreationHelper helper = workbook.GetCreationHelper();
-                IDrawing drawing = sheet.CreateDrawingPatriarch();
-                IClientAnchor anchor = helper.CreateClientAnchor();
-
-                anchor.Col1 = 1;//0 index based column
-                anchor.Row1 = 0;//0 index based row
-                IPicture picture = drawing.CreatePicture(anchor, pictureIndex);
-                picture.Resize();
-
-                sheet.CreateRow(0).CreateCell(1).SetCellValue("");
-                CellRangeAddress celImg = new CellRangeAddress(0, 2, 1, 2);
-                sheet.AddMergedRegion(celImg);
-
-
-                var rowBuque = sheet.CreateRow(3);
-
-                var celda1 = rowBuque.CreateCell(1);
-                celda1.SetCellValue("Buque:");
-                celda1.CellStyle = estiloBuque;
-                //celda1.CellStyle = estiloHeader;
-
-                var celda2 = rowBuque.CreateCell(2);
-                celda2.SetCellValue(nombre);
-                CellRangeAddress cellNombreBuque = new CellRangeAddress(3, 3, 2, 3);
-                sheet.AddMergedRegion(cellNombreBuque);
-                celda2.CellStyle = estiloHeaderVerde;
-
-
-                var celda4 = rowBuque.CreateCell(4);
-                CellRangeAddress cellMercTrigo = new CellRangeAddress(3, 3, 4, 6);
-                sheet.AddMergedRegion(cellMercTrigo);
-                celda4.SetCellValue("MERCADERIA:");
-                
-                celda4.CellStyle = estiloBuque;
-
-                var celda5 = rowBuque.CreateCell(7);
-                CellRangeAddress cellMaterialMaiz = new CellRangeAddress(3, 3, 7, 8);
-                sheet.AddMergedRegion(cellMaterialMaiz);
-                celda5.SetCellValue("TRIGO");
-                celda5.CellStyle = estiloHeaderVerde;
-
-                var rowManos = sheet.CreateRow(4);
-
-                var celdaMano1 = rowManos.CreateCell(1);
-                celdaMano1.SetCellValue("Mano 1");
-                CellRangeAddress RegionceldaMano1 = new CellRangeAddress(4, 4, 1, 8);
-                sheet.AddMergedRegion(RegionceldaMano1);
-                celdaMano1.CellStyle = estiloHeaderVerde;
-
-                var celdaMano2 = rowManos.CreateCell(9);
-                celdaMano2.SetCellValue("Mano 2");
-                CellRangeAddress RegionceldaMano2 = new CellRangeAddress(4, 4, 9, 16);
-                sheet.AddMergedRegion(RegionceldaMano2);
-                celdaMano2.CellStyle = estiloHeaderVerde;
-
-                var rowHeaderData = sheet.CreateRow(5);
-
-                rowHeaderData.CreateCell(1).SetCellValue("Fecha - Hora");
-                CellRangeAddress fechaHoraTrigo = new CellRangeAddress(5, 5, 1, 2);
-                sheet.AddMergedRegion(fechaHoraTrigo);
-                rowHeaderData.GetCell(1).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(3).SetCellValue("% HD");
-                rowHeaderData.GetCell(3).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(4).SetCellValue("% Prot. Base");
-                rowHeaderData.GetCell(4).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(5).SetCellValue("% Prot B/S");
-                rowHeaderData.GetCell(5).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(6).SetCellValue("PH");
-                rowHeaderData.GetCell(6).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(7).SetCellValue("Origen");
-                rowHeaderData.GetCell(7).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(8).SetCellValue("Bodega");
-                rowHeaderData.GetCell(8).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(9).SetCellValue("Fecha - Hora");
-                CellRangeAddress fechaHoraTrigo2 = new CellRangeAddress(5, 5, 9, 10);
-                sheet.AddMergedRegion(fechaHoraTrigo2);
-                rowHeaderData.GetCell(9).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(11).SetCellValue("% HD");
-                rowHeaderData.GetCell(11).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(12).SetCellValue("% Prot. Base");
-                rowHeaderData.GetCell(12).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(13).SetCellValue("% Prot B/S");
-                rowHeaderData.GetCell(13).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(14).SetCellValue("PH");
-                rowHeaderData.GetCell(14).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(15).SetCellValue("Origen");
-                rowHeaderData.GetCell(15).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(16).SetCellValue("Bodega");
-                rowHeaderData.GetCell(16).CellStyle = estiloHeaderGris;
-
-
-                var rowPromedios = sheet.CreateRow(cantidadDeRows + 6);
-                rowPromedios.CreateCell(1).SetCellValue("Promedio");
-                CellRangeAddress promedio = new CellRangeAddress(cantidadDeRows + 6, cantidadDeRows + 6, 1, 2);
-                sheet.AddMergedRegion(promedio);
-                rowPromedios.GetCell(1).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(3).SetCellValue(promedioHDMano1);
-                rowPromedios.GetCell(3).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(4).SetCellValue(promedioProtBaseMano1);
-                rowPromedios.GetCell(4).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(5).SetCellValue(promedioProtBSMano1);
-                rowPromedios.GetCell(5).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(6).SetCellValue(promedioPHMano1);
-                rowPromedios.GetCell(6).CellStyle = estiloPromediosManos;
-
-
-                rowPromedios.CreateCell(9).SetCellValue("Promedio");
-                CellRangeAddress promedio2 = new CellRangeAddress(cantidadDeRows + 6, cantidadDeRows + 6, 9, 10);
-                sheet.AddMergedRegion(promedio2);
-                rowPromedios.GetCell(9).CellStyle = estiloPromediosManos;
-
-
-                rowPromedios.CreateCell(11).SetCellValue(promedioHDMano2);
-                rowPromedios.GetCell(11).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(12).SetCellValue(promedioProtBaseMano2);
-                rowPromedios.GetCell(12).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(13).SetCellValue(promedioProtBSMano2);
-                rowPromedios.GetCell(13).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(14).SetCellValue(promedioPHMano2);
-                rowPromedios.GetCell(14).CellStyle = estiloPromediosManos;
-
-                var rowProm1 = sheet.CreateRow(cantidadDeRows + 9);
-                rowProm1.CreateCell(1);
-                CellRangeAddress prom1 = new CellRangeAddress(cantidadDeRows + 9, cantidadDeRows + 9, 1, 3);
-                sheet.AddMergedRegion(prom1);
-                rowProm1.GetCell(1).SetCellValue("Promedio HD TOTAL:");
-                rowProm1.CreateCell(4).SetCellValue(promedioTotalHD);
-
-                var rowProm2 = sheet.CreateRow(cantidadDeRows + 10);
-                rowProm2.CreateCell(1);
-                CellRangeAddress prom2 = new CellRangeAddress(cantidadDeRows + 10, cantidadDeRows + 10, 1, 3);
-                sheet.AddMergedRegion(prom2);
-                rowProm2.GetCell(1).SetCellValue("Promedio Prot. (13,5%) TOTAL:");
-                rowProm2.CreateCell(4).SetCellValue(promedioTotalProtBase);
-
-                var rowProm3 = sheet.CreateRow(cantidadDeRows + 11);
-                rowProm3.CreateCell(1);
-                CellRangeAddress prom3 = new CellRangeAddress(cantidadDeRows + 11, cantidadDeRows + 11, 1, 3);
-                sheet.AddMergedRegion(prom3);
-                rowProm3.GetCell(1).SetCellValue("Promedio Prot. B/S TOTAL:");
-                rowProm3.CreateCell(4).SetCellValue(promedioTotalProtBS);
-
-                var rowProm4 = sheet.CreateRow(cantidadDeRows + 12);
-                rowProm4.CreateCell(1);
-                CellRangeAddress prom4 = new CellRangeAddress(cantidadDeRows + 12, cantidadDeRows + 12, 1, 3);
-                sheet.AddMergedRegion(prom4);
-                rowProm4.GetCell(1).SetCellValue("Promedio PH TOTAL:");
-                rowProm4.CreateCell(4).SetCellValue(promedioTotalPH);
-
-            }
-            else if(tieneMaiz && tieneTrigo)
-            {
-                int pictureIndex = workbook.AddPicture(dataImg, PictureType.PNG);
-                ICreationHelper helper = workbook.GetCreationHelper();
-                IDrawing drawing = sheet.CreateDrawingPatriarch();
-                IClientAnchor anchor = helper.CreateClientAnchor();
-                
-                anchor.Col1 = 1;//0 index based column
-                anchor.Row1 = 0;//0 index based row
-                IPicture picture = drawing.CreatePicture(anchor, pictureIndex);
-                picture.Resize();
-
-                sheet.CreateRow(0).CreateCell(1).SetCellValue("");
-                CellRangeAddress celImg = new CellRangeAddress(0, 2, 1, 2);
-                sheet.AddMergedRegion(celImg);
-
-
-                var rowBuque = sheet.CreateRow(3);
-
-                var celda1 = rowBuque.CreateCell(1);
-                celda1.SetCellValue("Buque:");
-                celda1.CellStyle = estiloBuque;
-                //celda1.CellStyle = estiloHeader;
-
-                var celda2 = rowBuque.CreateCell(2);
-                celda2.SetCellValue(nombre);
-                CellRangeAddress cellNombreBuque = new CellRangeAddress(3, 3, 2, 3);
-                sheet.AddMergedRegion(cellNombreBuque);
-                celda2.CellStyle = estiloHeaderVerde;
-
-
-                var celda4 = rowBuque.CreateCell(4);
-                CellRangeAddress cellMercTrigo = new CellRangeAddress(3, 3, 4, 6);
-                sheet.AddMergedRegion(cellMercTrigo);
-                celda4.SetCellValue("MERCADERIA:");
-                sheet.AutoSizeColumn(4);
-                celda4.CellStyle = estiloBuque;
-
-                var celda5 = rowBuque.CreateCell(7);
-                CellRangeAddress cellMaterialMaiz = new CellRangeAddress(3, 3, 7, 8);
-                sheet.AddMergedRegion(cellMaterialMaiz);
-                celda5.SetCellValue("TRIGO/MAÍZ");
-                celda5.CellStyle = estiloHeaderVerde;
-
-                var rowManos = sheet.CreateRow(4);
-
-                var celdaMano1 = rowManos.CreateCell(1);
-                celdaMano1.SetCellValue("Mano 1(TRIGO)");
-                CellRangeAddress RegionceldaMano1 = new CellRangeAddress(4, 4, 1, 8);
-                sheet.AddMergedRegion(RegionceldaMano1);
-                celdaMano1.CellStyle = estiloHeaderVerde;
-
-                var celdaMano2 = rowManos.CreateCell(9);
-                celdaMano2.SetCellValue("Mano 2(MAÍZ)");
-                CellRangeAddress RegionceldaMano2 = new CellRangeAddress(4, 4, 9, 14);
-                sheet.AddMergedRegion(RegionceldaMano2);
-                celdaMano2.CellStyle = estiloHeaderVerde;
-
-                var rowHeaderData = sheet.CreateRow(5);
-
-                rowHeaderData.CreateCell(1).SetCellValue("Fecha - Hora");
-                CellRangeAddress fechaHoraMaiz = new CellRangeAddress(5, 5, 1, 2);
-                sheet.AddMergedRegion(fechaHoraMaiz);
-                rowHeaderData.GetCell(1).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(3).SetCellValue("% HD");
-                rowHeaderData.GetCell(3).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(4).SetCellValue("% Prot. Base");
-                rowHeaderData.GetCell(4).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(5).SetCellValue("% Prot B/S");
-                rowHeaderData.GetCell(5).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(6).SetCellValue("PH");
-                rowHeaderData.GetCell(6).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(7).SetCellValue("Origen");
-                rowHeaderData.GetCell(7).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(8).SetCellValue("Bodega");
-                rowHeaderData.GetCell(8).CellStyle = estiloHeaderGris;
-
-
-                rowHeaderData.CreateCell(9).SetCellValue("Fecha - Hora");
-                CellRangeAddress fechaHoraMaiz2 = new CellRangeAddress(5, 5, 9, 10);
-                sheet.AddMergedRegion(fechaHoraMaiz2);
-                rowHeaderData.GetCell(9).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(11).SetCellValue("% HD");
-                rowHeaderData.GetCell(11).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(12).SetCellValue("PH");
-                rowHeaderData.GetCell(12).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(13).SetCellValue("Origen");
-                rowHeaderData.GetCell(13).CellStyle = estiloHeaderGris;
-
-                rowHeaderData.CreateCell(14).SetCellValue("Bodega");
-                rowHeaderData.GetCell(14).CellStyle = estiloHeaderGris;
-
-
-
-                var rowPromedios = sheet.CreateRow(cantidadDeRows + 6);
-                rowPromedios.CreateCell(1).SetCellValue("Promedio");
-                CellRangeAddress promedio = new CellRangeAddress(cantidadDeRows + 6, cantidadDeRows + 6, 1, 2);
-                sheet.AddMergedRegion(promedio);
-                rowPromedios.GetCell(1).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(3).SetCellValue(promedioHDMano1);
-                rowPromedios.GetCell(3).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(4).SetCellValue(promedioProtBaseMano1);
-                rowPromedios.GetCell(4).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(5).SetCellValue(promedioProtBSMano1);
-                rowPromedios.GetCell(5).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(6).SetCellValue(promedioPHMano1);
-                rowPromedios.GetCell(6).CellStyle = estiloPromediosManos;
-
-
-                rowPromedios.CreateCell(9).SetCellValue("Promedio");
-                CellRangeAddress promedio2 = new CellRangeAddress(cantidadDeRows + 6, cantidadDeRows + 6, 9, 10);
-                sheet.AddMergedRegion(promedio2);
-                rowPromedios.GetCell(9).CellStyle = estiloPromediosManos;
-
-
-                rowPromedios.CreateCell(11).SetCellValue(promedioHDMano2);
-                rowPromedios.GetCell(11).CellStyle = estiloPromediosManos;
-
-                rowPromedios.CreateCell(12).SetCellValue(promedioPHMano2);
-                rowPromedios.GetCell(12).CellStyle = estiloPromediosManos;
-
-                var rowProm1 = sheet.CreateRow(cantidadDeRows + 9);
-                rowProm1.CreateCell(1);
-                CellRangeAddress prom1 = new CellRangeAddress(cantidadDeRows + 9, cantidadDeRows + 9, 1, 3);
-                sheet.AddMergedRegion(prom1);
-                rowProm1.GetCell(1).SetCellValue("Promedio HD TOTAL:");
-                rowProm1.CreateCell(4).SetCellValue(promedioTotalHD);
-
-                var rowProm2 = sheet.CreateRow(cantidadDeRows + 10);
-                rowProm2.CreateCell(1);
-                CellRangeAddress prom2 = new CellRangeAddress(cantidadDeRows + 10, cantidadDeRows + 10, 1, 3);
-                sheet.AddMergedRegion(prom2);
-                rowProm2.GetCell(1).SetCellValue("Promedio Prot. (13,5%) TOTAL:");
-                rowProm2.CreateCell(4).SetCellValue(promedioProtBaseMano1);
-
-                var rowProm3 = sheet.CreateRow(cantidadDeRows + 11);
-                rowProm3.CreateCell(1);
-                CellRangeAddress prom3 = new CellRangeAddress(cantidadDeRows + 11, cantidadDeRows + 11, 1, 3);
-                sheet.AddMergedRegion(prom3);
-                rowProm3.GetCell(1).SetCellValue("Promedio Prot. B/S TOTAL:");
-                rowProm3.CreateCell(4).SetCellValue(promedioProtBSMano1);
-
-                var rowProm4 = sheet.CreateRow(cantidadDeRows + 12);
-                rowProm4.CreateCell(1);
-                CellRangeAddress prom4 = new CellRangeAddress(cantidadDeRows + 12, cantidadDeRows + 12, 1, 3);
-                sheet.AddMergedRegion(prom4);
-                rowProm4.GetCell(1).SetCellValue("Promedio PH TOTAL:");
-                rowProm4.CreateCell(4).SetCellValue(promedioTotalPH);
+            if(hayMano1 && hayMano2 && (moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 11).ToList().Count == moduloDeCargaNirsManualPuerto.Count || moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 17).ToList().Count == moduloDeCargaNirsManualPuerto.Count)){
+                string promedioTotalHD = (moduloDeCargaNirsManualPuerto.Where(x => x.HD != "").Sum(x => Convert.ToDouble(x.HD)) / moduloDeCargaNirsManualPuerto.Where(x => x.HD != "").ToList().Count).ToString().PadRight(2, ',');
+                string promedioTotalPH = (moduloDeCargaNirsManualPuerto.Where(x => x.PH != "").Sum(x => Convert.ToDouble(x.PH)) / moduloDeCargaNirsManualPuerto.Where(x => x.PH != "").ToList().Count).ToString().PadRight(2, ',');
+                string promedioTotalProtBase = (moduloDeCargaNirsManualPuerto.Where(x => x.ProtBase != "").Sum(x => Convert.ToDouble(x.ProtBase)) / moduloDeCargaNirsManualPuerto.Where(x => x.ProtBase != "").ToList().Count).ToString().PadRight(2, ',');
+                string promedioTotalProb_BS = (moduloDeCargaNirsManualPuerto.Where(x => x.Prot_BS != "").Sum(x => Convert.ToDouble(x.Prot_BS)) / moduloDeCargaNirsManualPuerto.Where(x => x.Prot_BS != "").ToList().Count).ToString().PadRight(2, ',');
+
+                var rowPromediosTotales = sheet.CreateRow(offset_y);
+                rowPromediosTotales.CreateCell(1).SetCellValue("Promedio Total");
+                rowPromediosTotales.GetCell(1).CellStyle.Alignment = HorizontalAlignment.Center;
+                rowPromediosTotales.CreateCell(3).SetCellValue(promedioTotalHD);
+                rowPromediosTotales.CreateCell(4).SetCellValue(promedioTotalPH);
+                rowPromediosTotales.CreateCell(5).SetCellValue(promedioTotalProtBase);
+                rowPromediosTotales.CreateCell(6).SetCellValue(promedioTotalProb_BS);
+                CellRangeAddress promediosRange = new CellRangeAddress(offset_y, offset_y, 1, 2);
+                sheet.AddMergedRegion(promediosRange);
             }
 
-            //var celda9 = row.CreateCell(8);
-            //celda9.SetCellValue("Ritmo");
-            //celda9.CellStyle = estiloHeader;
-
-            //row = sheet.CreateRow(1);
-            //var cellNumber = 1;
+            for (int i = 1; i < 10; i++)
+            {
+                sheet.AutoSizeColumn(i);
+            }
 
             using (var fileData = new MemoryStream())
             {
@@ -829,37 +160,143 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 return fileData.ToArray();
             }
         }
-        
-        private static ICellStyle EstiloBuque(HSSFWorkbook workbook)
-        {
-            var fontBold = workbook.CreateFont();
-            fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
 
-            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            //cellBorderStyleColumnTitles.SetFont(fontBold);
-            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;
-            cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
-            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
-            return cellBorderStyleColumnTitles;
+        private static void renderNir(ref HSSFSheet sheet, List<ModuloDeCargaNirManualPuertoDto> nir, ref HSSFWorkbook wb, ref int offset_y, int mano, string material)
+        {
+            #region Headers
+            var rowManoData = sheet.CreateRow(offset_y);
+            rowManoData.CreateCell(1).SetCellValue("Mano " + mano + ": " + material);
+            rowManoData.GetCell(1).CellStyle.Alignment = HorizontalAlignment.Left;
+            CellRangeAddress manoRange = new CellRangeAddress(offset_y, offset_y, 1, material == "Trigo" ? 8:6);
+            rowManoData.GetCell(1).CellStyle = EstiloHeaderVerde(wb, mano);
+            RegionUtil.SetBorderBottom(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderTop(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderRight(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderLeft(2, manoRange, sheet, wb);
+            sheet.AddMergedRegion(manoRange);
+            offset_y += 1;
+
+            var rowHeaderData = sheet.CreateRow(offset_y);
+
+            var offset_x = 1;
+            rowHeaderData.CreateCell(1).SetCellValue("Fecha y hora");
+            CellRangeAddress fechaHoraHeader = new CellRangeAddress(offset_y, offset_y, 1, 2);
+            sheet.AddMergedRegion(fechaHoraHeader);
+            rowHeaderData.GetCell(1).CellStyle = EstiloHeaderGris(wb);
+
+            offset_x = 3;
+
+            rowHeaderData.CreateCell(offset_x).SetCellValue("% HD");
+            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            offset_x += 1;
+
+            rowHeaderData.CreateCell(offset_x).SetCellValue("PH");
+            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            offset_x += 1;
+
+            if (nir[0].Material_id == 17)
+            {
+                rowHeaderData.CreateCell(offset_x).SetCellValue("% Prot (13,5%)");
+                rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+                offset_x += 1;
+
+                rowHeaderData.CreateCell(offset_x).SetCellValue("% Prot B/S");
+                rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+                offset_x += 1;
+            }
+
+            rowHeaderData.CreateCell(offset_x).SetCellValue("Origen");
+            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            offset_x += 1;
+
+            rowHeaderData.CreateCell(offset_x).SetCellValue("Bodega");
+            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            offset_x += 1;
+            #endregion
+
+            offset_y += 1;
+
+            foreach (var item in nir)
+            {
+                offset_x = 1;
+
+                var rowData = sheet.CreateRow(offset_y);
+                rowData.CreateCell(1).SetCellValue(item.Fecha.ToString());
+                CellRangeAddress fechaHoraData = new CellRangeAddress(offset_y, offset_y, offset_x, offset_x + 1);
+                sheet.AddMergedRegion(fechaHoraData);
+                rowData.GetCell(1).CellStyle = BordesBody(wb);
+                offset_x = 3;
+
+                rowData.CreateCell(offset_x).SetCellValue(item.HD);
+                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                offset_x += 1;
+
+                rowData.CreateCell(offset_x).SetCellValue(item.PH);
+                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                offset_x += 1;
+
+                if (nir[0].Material_id == 17)
+                {
+                    rowData.CreateCell(offset_x).SetCellValue(item.ProtBase);
+                    rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                    offset_x += 1;
+
+                    rowData.CreateCell(offset_x).SetCellValue(item.Prot_BS);
+                    rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                    offset_x += 1;
+                }
+
+                rowData.CreateCell(offset_x).SetCellValue(item.Origen);
+                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                offset_x += 1;
+
+                rowData.CreateCell(offset_x).SetCellValue(item.Bodega.Nombre);
+                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                offset_x += 1;
+                offset_y += 1;
+            }
+
+            string promedioHD = (nir.Where(x => x.HD != "").Sum(x => Convert.ToDouble(x.HD)) / nir.Where(x => x.HD != "").ToList().Count).ToString().PadRight(2, ',');
+            string promedioPH = (nir.Where(x => x.PH != "").Sum(x => Convert.ToDouble(x.PH)) / nir.Where(x => x.PH != "").ToList().Count).ToString().PadRight(2, ',');
+            string promedioProtBase = (nir.Where(x => x.ProtBase != "").Sum(x => Convert.ToDouble(x.ProtBase)) / nir.Where(x => x.ProtBase != "").ToList().Count).ToString().PadRight(2, ',');
+            string promedioProt_BS = (nir.Where(x => x.Prot_BS != "").Sum(x => Convert.ToDouble(x.Prot_BS)) / nir.Where(x => x.Prot_BS != "").ToList().Count).ToString().PadRight(2, ',');
+            offset_x = 1;
+
+            var rowPromedios = sheet.CreateRow(offset_y);
+            rowPromedios.CreateCell(1).SetCellValue("Promedio");
+            rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
+            CellRangeAddress promediosRange = new CellRangeAddress(offset_y, offset_y, offset_x, offset_x + 1);
+            RegionUtil.SetBorderBottom(2, manoRange, sheet, wb);
+            sheet.AddMergedRegion(promediosRange);
+            rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(2);
+            rowPromedios.GetCell(2).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(3).SetCellValue(promedioHD);
+            rowPromedios.GetCell(3).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(4).SetCellValue(promedioPH);
+            rowPromedios.GetCell(4).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(5).SetCellValue(promedioProtBase);
+            rowPromedios.GetCell(5).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(6).SetCellValue(promedioProt_BS);
+            rowPromedios.GetCell(6).CellStyle = BordesBody(wb);
+            offset_y += 1;
         }
-        private static ICellStyle EstiloHeaderVerde(HSSFWorkbook workbook)
+
+        private static ICellStyle EstiloHeaderVerde(HSSFWorkbook workbook, int mano = 1)
         {
             var fontBold = workbook.CreateFont();
             fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            //cellBorderStyleColumnTitles.SetFont(fontBold);
-            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Lime.Index;
+
+            if (mano == 1)
+                cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Lime.Index;
+            else
+                cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;
+
             cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             return cellBorderStyleColumnTitles;
@@ -868,29 +305,24 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             var fontBold = workbook.CreateFont();
             fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            //cellBorderStyleColumnTitles.SetFont(fontBold);
             cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Grey25Percent.Index;
             cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             return cellBorderStyleColumnTitles;
         }
-        private static ICellStyle LineBottom(HSSFWorkbook workbook)
+        private static ICellStyle BordesBodyOrange(HSSFWorkbook workbook)
         {
+            var fontBold = workbook.CreateFont();
+            fontBold.FontHeightInPoints = 12;
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
-            return cellBorderStyleColumnTitles;
-        }
-        private static ICellStyle LineLeft(HSSFWorkbook workbook)
-        {
-            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
+            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
+            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;
+            cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             return cellBorderStyleColumnTitles;
         }
 
@@ -898,8 +330,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             var fontBold = workbook.CreateFont();
             fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Thin;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Thin;
@@ -908,25 +338,5 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             return cellBorderStyleColumnTitles;
         }
-
-        private static ICellStyle EstiloPromediosManos(HSSFWorkbook workbook)
-        {
-            var fontBold = workbook.CreateFont();
-            fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
-            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderTop = BorderStyle.Thin;
-            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
-            return cellBorderStyleColumnTitles;
-        }
-
-
     }
-
-    
-
 }

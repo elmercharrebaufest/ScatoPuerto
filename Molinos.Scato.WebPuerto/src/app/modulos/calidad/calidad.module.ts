@@ -13,6 +13,8 @@ import { PlanillaTurnoLiquidosCalidadComponent } from "./liquidos/planilla-turno
 import { ModalReciboComponent } from './modal-recibo/modal-recibo.component';
 import { RegistroRecibosComponent } from './registro-recibos/registro-recibos.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { NirManoComponent } from "./solidos/nir/nir-mano/nir-mano.component";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 
 @NgModule({
@@ -21,6 +23,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
         CalidadRoutingModule,
         SharedModule,
         CargaModule,
+        FormsModule,
+        ReactiveFormsModule,
         NgMultiSelectDropDownModule.forRoot(),
     ],
     declarations: [
@@ -32,7 +36,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
         PlanillaTurnoLiquidosCalidadComponent,
         RecibodebuquepdfComponent,
         ModalReciboComponent,
-        RegistroRecibosComponent
+        RegistroRecibosComponent,
+        NirManoComponent
     ],
 })
 

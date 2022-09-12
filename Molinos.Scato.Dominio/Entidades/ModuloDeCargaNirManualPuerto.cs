@@ -7,7 +7,7 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
-        public virtual DateTime Fecha { get; set; }
+        public virtual DateTime? Fecha { get; set; }
         public virtual string Hora { get; set; }
         public virtual string Ritmo { get; set; }
         public virtual string HD { get; set; }
