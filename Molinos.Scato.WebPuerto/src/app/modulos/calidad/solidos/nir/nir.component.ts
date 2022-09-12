@@ -13,6 +13,7 @@ import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { NirManoComponent } from './nir-mano/nir-mano.component';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 @Component({
   selector: 'app-nir',
@@ -38,6 +39,7 @@ export class NIRComponent {
   MaizMano1: boolean = false;
   MaizMano2: boolean = false;
   isLoaded: boolean = false;
+  guardando: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -123,14 +125,20 @@ export class NIRComponent {
     let nir: NirManualPuerto[] = this.obtenerNirCompleto();
     // this.calcularPromedios(nir);
     if(guardarYEnviar == true) {
-      this.enviarMail(nir);
-      
+      this.enviarMail(nir);      
     }else{
       let ObjetoMailNir = {
         nirManualPuerto : nir,
         mail: '',
       }
-      this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {console.log('200 OK')});   
+      this.guardando = true;
+      this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {
+        this.guardando = false;
+        this.confirmationDialogService.confirm('¡Atención!', 'NIR guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success).then((confirmed) => {
+          if (confirmed) {
+          }
+        }).catch()
+      });   
     }
   }
 
@@ -165,7 +173,11 @@ export class NIRComponent {
           if (confirmed) {
               console.log(ObjetoMailNir);              
               let nombreBuque = this.datosEmbarqueProcesoService.getEmbarqueSelected().nombreBuque
-              this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id, nombreBuque ).subscribe(res => {console.log('200 OK');
+              this.guardando = true;
+              this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id, nombreBuque ).subscribe(res => {
+                this.confirmationDialogService.confirm('¡Atención!', 'Mail enviado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success)
+                console.log('200 OK');
+                this.guardando = false;
               });
           }
         })

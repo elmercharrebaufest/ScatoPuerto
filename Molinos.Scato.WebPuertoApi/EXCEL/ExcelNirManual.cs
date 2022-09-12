@@ -68,28 +68,25 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             sheet.CreateRow(0).CreateCell(1).SetCellValue("");
             CellRangeAddress celImg = new CellRangeAddress(0, 2, 1, 2);
+            RegionUtil.SetBorderBottom(2, celImg, sheet, workbook);
+
             sheet.AddMergedRegion(celImg);
 
-            var rowName = sheet.CreateRow(1);
-            var celdaNombre = rowName.CreateCell(2);
 
             var offset_y = 3;
+            var rowName = sheet.CreateRow(offset_y);
+            rowName.CreateCell(1).SetCellValue("Nombre:");
+            rowName.GetCell(1).CellStyle = EstiloHeaderVerde(workbook);
+
+            ICell celdaNombre = rowName.CreateCell(2);
             celdaNombre.SetCellValue(nombreBuque);
             CellRangeAddress cellNombreBuque = new CellRangeAddress(offset_y, offset_y, 2, 3);
+            RegionUtil.SetBorderBottom(2, cellNombreBuque, sheet, workbook);
+            RegionUtil.SetBorderTop(2, cellNombreBuque, sheet, workbook);
+            RegionUtil.SetBorderRight(2, cellNombreBuque, sheet, workbook);
+            RegionUtil.SetBorderLeft(2, cellNombreBuque, sheet, workbook);
             sheet.AddMergedRegion(cellNombreBuque);
-
-
-
-            var rowNombre = sheet.CreateRow(offset_y);
-            rowNombre.CreateCell(1).SetCellValue("Nombre:");
-            rowNombre.CreateCell(2).SetCellValue(nombreBuque);
-            CellRangeAddress nombreRange = new CellRangeAddress(offset_y, offset_y, 1, 2);
-            sheet.AddMergedRegion(nombreRange);
-
-
-
-
-
+            celdaNombre.CellStyle = BordesBodyOrange(workbook);
 
             offset_y = 4;
 
@@ -115,6 +112,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             }
 
+            offset_y += 1;
+
             if (hayMano2)
             {
                 lineasMaizMano2 = moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 11 && x.Mano == "mano2").ToList();
@@ -130,6 +129,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     renderNir(ref sheet, lineasTrigoMano2, ref workbook, ref offset_y, 2, "Trigo");
                 }
             }
+
+            offset_y += 1;
             
             if(hayMano1 && hayMano2 && (moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 11).ToList().Count == moduloDeCargaNirsManualPuerto.Count || moduloDeCargaNirsManualPuerto.Where(x => x.Material_id == 17).ToList().Count == moduloDeCargaNirsManualPuerto.Count)){
                 string promedioTotalHD = (moduloDeCargaNirsManualPuerto.Where(x => x.HD != "").Sum(x => Convert.ToDouble(x.HD)) / moduloDeCargaNirsManualPuerto.Where(x => x.HD != "").ToList().Count).ToString().PadRight(2, ',');
@@ -139,12 +140,18 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 var rowPromediosTotales = sheet.CreateRow(offset_y);
                 rowPromediosTotales.CreateCell(1).SetCellValue("Promedio Total");
+                rowPromediosTotales.GetCell(1).CellStyle.Alignment = HorizontalAlignment.Center;
                 rowPromediosTotales.CreateCell(3).SetCellValue(promedioTotalHD);
                 rowPromediosTotales.CreateCell(4).SetCellValue(promedioTotalPH);
                 rowPromediosTotales.CreateCell(5).SetCellValue(promedioTotalProtBase);
                 rowPromediosTotales.CreateCell(6).SetCellValue(promedioTotalProb_BS);
                 CellRangeAddress promediosRange = new CellRangeAddress(offset_y, offset_y, 1, 2);
                 sheet.AddMergedRegion(promediosRange);
+            }
+
+            for (int i = 1; i < 10; i++)
+            {
+                sheet.AutoSizeColumn(i);
             }
 
             using (var fileData = new MemoryStream())
@@ -156,14 +163,17 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private static void renderNir(ref HSSFSheet sheet, List<ModuloDeCargaNirManualPuertoDto> nir, ref HSSFWorkbook wb, ref int offset_y, int mano, string material)
         {
-
             #region Headers
-
             var rowManoData = sheet.CreateRow(offset_y);
             rowManoData.CreateCell(1).SetCellValue("Mano " + mano + ": " + material);
+            rowManoData.GetCell(1).CellStyle.Alignment = HorizontalAlignment.Left;
             CellRangeAddress manoRange = new CellRangeAddress(offset_y, offset_y, 1, material == "Trigo" ? 8:6);
+            rowManoData.GetCell(1).CellStyle = EstiloHeaderVerde(wb, mano);
+            RegionUtil.SetBorderBottom(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderTop(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderRight(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderLeft(2, manoRange, sheet, wb);
             sheet.AddMergedRegion(manoRange);
-            rowManoData.GetCell(1).CellStyle = EstiloHeaderVerde(wb);
             offset_y += 1;
 
             var rowHeaderData = sheet.CreateRow(offset_y);
@@ -250,51 +260,43 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             string promedioPH = (nir.Where(x => x.PH != "").Sum(x => Convert.ToDouble(x.PH)) / nir.Where(x => x.PH != "").ToList().Count).ToString().PadRight(2, ',');
             string promedioProtBase = (nir.Where(x => x.ProtBase != "").Sum(x => Convert.ToDouble(x.ProtBase)) / nir.Where(x => x.ProtBase != "").ToList().Count).ToString().PadRight(2, ',');
             string promedioProt_BS = (nir.Where(x => x.Prot_BS != "").Sum(x => Convert.ToDouble(x.Prot_BS)) / nir.Where(x => x.Prot_BS != "").ToList().Count).ToString().PadRight(2, ',');
-
             offset_x = 1;
 
             var rowPromedios = sheet.CreateRow(offset_y);
             rowPromedios.CreateCell(1).SetCellValue("Promedio");
-            rowPromedios.CreateCell(3).SetCellValue(promedioHD);
-            rowPromedios.CreateCell(4).SetCellValue(promedioPH);
-            rowPromedios.CreateCell(5).SetCellValue(promedioProtBase);
-            rowPromedios.CreateCell(6).SetCellValue(promedioProt_BS);
+            rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
             CellRangeAddress promediosRange = new CellRangeAddress(offset_y, offset_y, offset_x, offset_x + 1);
+            RegionUtil.SetBorderBottom(2, manoRange, sheet, wb);
             sheet.AddMergedRegion(promediosRange);
-
+            rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(2);
+            rowPromedios.GetCell(2).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(3).SetCellValue(promedioHD);
+            rowPromedios.GetCell(3).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(4).SetCellValue(promedioPH);
+            rowPromedios.GetCell(4).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(5).SetCellValue(promedioProtBase);
+            rowPromedios.GetCell(5).CellStyle = BordesBody(wb);
+            rowPromedios.CreateCell(6).SetCellValue(promedioProt_BS);
+            rowPromedios.GetCell(6).CellStyle = BordesBody(wb);
             offset_y += 1;
         }
 
-        private static ICellStyle EstiloBuque(HSSFWorkbook workbook)
+        private static ICellStyle EstiloHeaderVerde(HSSFWorkbook workbook, int mano = 1)
         {
             var fontBold = workbook.CreateFont();
             fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            //cellBorderStyleColumnTitles.SetFont(fontBold);
-            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;
-            cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
-            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
-            return cellBorderStyleColumnTitles;
-        }
-        private static ICellStyle EstiloHeaderVerde(HSSFWorkbook workbook)
-        {
-            var fontBold = workbook.CreateFont();
-            fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
 
-            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            //cellBorderStyleColumnTitles.SetFont(fontBold);
-            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Lime.Index;
+            if (mano == 1)
+                cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Lime.Index;
+            else
+                cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;
+
             cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             return cellBorderStyleColumnTitles;
@@ -303,29 +305,24 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             var fontBold = workbook.CreateFont();
             fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
             cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            //cellBorderStyleColumnTitles.SetFont(fontBold);
             cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.Grey25Percent.Index;
             cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             return cellBorderStyleColumnTitles;
         }
-        private static ICellStyle LineBottom(HSSFWorkbook workbook)
+        private static ICellStyle BordesBodyOrange(HSSFWorkbook workbook)
         {
+            var fontBold = workbook.CreateFont();
+            fontBold.FontHeightInPoints = 12;
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
-            return cellBorderStyleColumnTitles;
-        }
-        private static ICellStyle LineLeft(HSSFWorkbook workbook)
-        {
-            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
+            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
+            cellBorderStyleColumnTitles.FillForegroundColor = IndexedColors.LightOrange.Index;
+            cellBorderStyleColumnTitles.FillPattern = FillPattern.SolidForeground;
             return cellBorderStyleColumnTitles;
         }
 
@@ -333,8 +330,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             var fontBold = workbook.CreateFont();
             fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
             var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
             cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Thin;
             cellBorderStyleColumnTitles.BorderTop = BorderStyle.Thin;
@@ -343,25 +338,5 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
             return cellBorderStyleColumnTitles;
         }
-
-        private static ICellStyle EstiloPromediosManos(HSSFWorkbook workbook)
-        {
-            var fontBold = workbook.CreateFont();
-            fontBold.FontHeightInPoints = 12;
-            //fontBold.Boldweight = (short)FontBoldWeight.Bold;
-
-            var cellBorderStyleColumnTitles = workbook.CreateCellStyle();
-            cellBorderStyleColumnTitles.BorderBottom = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderTop = BorderStyle.Thin;
-            cellBorderStyleColumnTitles.BorderLeft = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.BorderRight = BorderStyle.Medium;
-            cellBorderStyleColumnTitles.Alignment = HorizontalAlignment.Center;
-            return cellBorderStyleColumnTitles;
-        }
-
-
     }
-
-
-
 }
