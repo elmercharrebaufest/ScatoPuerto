@@ -1,9 +1,11 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -138,47 +140,62 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            Repositorio.RemoverTodos(planoDeCarga.PlanoDeCargaBodega.ToList());
+            //Remuevo los objetos eliminados o los que la cantidad sea <= 0
+            foreach (var bodega in planoDeCarga.PlanoDeCargaBodega)
+            {
+                bool exist = false;
+                foreach (var bodegaFront in comando.Dto.PlanoDeCargaBodegas)
+                {
+                    if (bodegaFront.Id <= 0) continue;
+                    if (bodegaFront.Id == bodega.Id && bodegaFront.Cantidad > 0)
+                    {
+                        exist = true;
+                    }
+                }
+                if (!exist)
+                {
+                    Repositorio.Remover(bodega);
+                }
+            }
+
             if (comando.Dto.PlanoDeCargaBodegas != null)
             {
-
                 foreach (var pla in comando.Dto.PlanoDeCargaBodegas.Where(x => x.Cantidad > 0))
                 {
                     var destino = pla.Destino != null ? Repositorio.Obtener<Destino>(pla.Destino.Id) : null;
                     var materialPuerto = pla.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(pla.MaterialPuerto.Id) : null;
-                    planoDeCarga.PlanoDeCargaBodega.Add(new PlanoDeCargaBodega
-                    {
-                        BodegaParcel = pla.BodegaParcel,
-                        Cantidad = pla.Cantidad,
-                        Condicion = pla.Condicion,
-                        Destino = destino,
-                        PlanoDeCarga = planoDeCarga,
-                        MaterialPuerto = materialPuerto,
-                        SfFull = pla.SfFull,
-                        TanqueDeAbordo = pla.TanqueDeAbordo
-                    });
-                }
-            }
+                    PlanoDeCargaBodega planoDeCargaBodega = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == pla.Id);
 
-            Repositorio.RemoverTodos(planoDeCarga.CargaComercial.ToList());
-            if (comando.Dto.CargasComerciales != null)
-            {
-                foreach (var car in comando.Dto.CargasComerciales.Where(x => x.Cantidad > 0))
-                {
-                    if(car.MaterialPuerto != null && car.MaterialPuerto.Id > 0  && car.Exportador != null && car.Exportador.Id > 0)
+                    if (planoDeCargaBodega != null)
                     {
-                        planoDeCarga.CargaComercial.Add(new CargaComercial
+                        planoDeCargaBodega.BodegaParcel = pla.BodegaParcel;
+                        planoDeCargaBodega.Cantidad = pla.Cantidad;
+                        planoDeCargaBodega.Condicion = pla.Condicion;
+                        planoDeCargaBodega.Destino = destino;
+                        planoDeCargaBodega.PlanoDeCarga = planoDeCarga;
+                        planoDeCargaBodega.MaterialPuerto = materialPuerto;
+                        planoDeCargaBodega.SfFull = pla.SfFull;
+                        planoDeCargaBodega.TanqueDeAbordo = pla.TanqueDeAbordo;
+                    }
+                    else
+                    {
+                        planoDeCarga.PlanoDeCargaBodega.Add(new PlanoDeCargaBodega
                         {
-                            Cantidad = car.Cantidad,
-                            Exportador = Repositorio.Obtener<Exportador>(car.Exportador.Id),
-                            MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(car.MaterialPuerto.Id),
-                            PlanoDeCarga = planoDeCarga
+                            BodegaParcel = pla.BodegaParcel,
+                            Cantidad = pla.Cantidad,
+                            Condicion = pla.Condicion,
+                            Destino = destino,
+                            PlanoDeCarga = planoDeCarga,
+                            MaterialPuerto = materialPuerto,
+                            SfFull = pla.SfFull,
+                            TanqueDeAbordo = pla.TanqueDeAbordo
                         });
-
                     }
                 }
                 Repositorio.GuardarCambios();
             }
+
+            ProcesarCargaComercial( comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
 
             LimpiarCarpetaDeArchivos(comando.Dto.Id);
             if (comando.Dto.FilePathPlano != null)
@@ -191,6 +208,58 @@ namespace Molinos.Scato.Servicios.Procesamiento
             else
                 planoDeCarga.FilePathSecuencia = null;
             //Repositorio.GuardarCambios();
+        }
+
+        private void ProcesarCargaComercial(List<CargaComercialDto> cargaComerciales, int planoDeCarga_Id)
+        {
+            List<CargaComercial> cargasComerciales_DB = Repositorio.Listar<CargaComercial>(x => x.PlanoDeCarga.Id == planoDeCarga_Id).ToList();
+
+            foreach (var cc_DB in cargasComerciales_DB)
+            {
+                bool exist = false;
+                foreach (var cargaComercialFront in cargaComerciales)
+                {
+                    if (cargaComercialFront.Id <= 0) continue;
+                    if (cargaComercialFront.Id == cc_DB.Id && cargaComercialFront.Cantidad > 0 && cargaComercialFront.Exportador != null && cargaComercialFront.MaterialPuerto != null)
+                    {
+                        exist = true;
+                    }
+                }
+                if (!exist)
+                {
+                    Repositorio.Remover(cc_DB);
+                }
+            }
+
+            if (cargaComerciales != null)
+            {
+                foreach (var cargaComercial in cargaComerciales.Where(x => x.Cantidad > 0))
+                {
+                    if (cargaComercial.Exportador != null && cargaComercial.MaterialPuerto != null && cargaComercial.Cantidad > 0)
+                    {
+                        CargaComercial cargaDB = Repositorio.Obtener<CargaComercial>(x => x.Id == cargaComercial.Id);
+                        if (cargaDB != null)
+                        {
+                            cargaDB.Cantidad = cargaComercial.Cantidad;
+                            cargaDB.Exportador = Repositorio.Obtener<Exportador>(cargaComercial.Exportador.Id);
+                            cargaDB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(cargaComercial.MaterialPuerto.Id);
+                            cargaDB.PlanoDeCarga = Repositorio.Obtener<PlanoDeCarga>(x => x.Id == planoDeCarga_Id);
+                        }
+                        else
+                        {
+                            CargaComercial carga = new CargaComercial()
+                            {
+                                Cantidad = cargaComercial.Cantidad,
+                                Exportador = Repositorio.Obtener<Exportador>(cargaComercial.Exportador.Id),
+                                MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(cargaComercial.MaterialPuerto.Id),
+                                PlanoDeCarga = Repositorio.Obtener<PlanoDeCarga>(x => x.Id == planoDeCarga_Id)
+                            };
+                            Repositorio.Agregar(carga);
+                        }
+                    }
+                }
+            }
+            Repositorio.GuardarCambios();
         }
 
         private void LimpiarCarpetaDeArchivos(int planoDeCargaId)
