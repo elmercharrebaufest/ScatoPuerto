@@ -122,7 +122,7 @@ export class SolidosComponent implements OnInit {
 
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
-      this.ocultarBotonesImprimir();
+      this._CalidadSharedService.ocultarBotonesImprimir();
      
      this.RecibidoresPdf = true;
  
@@ -142,29 +142,4 @@ export class SolidosComponent implements OnInit {
      }).save();
      // #endregion
   }
-
-  private ocultarBotonesImprimir(){
-    let botonExpPlanillaSolido = document.getElementById('expPlanillaSolidoCalidad');
-    let valueBotonExpPlanillaSolido = botonExpPlanillaSolido.style.display;
-    let botonEnvPlanillaSolido = document.getElementById('envPlanillaSolidoCalidad');
-    let valueBotonEnvPlanillaSolido = botonEnvPlanillaSolido.style.display;
-    // let botonEnviarNir = document.getElementById('btn-enviar-nir');
-    document.getElementsByName('expTodosPlanillas').forEach(item => {
-      item.className = "collapse show";      
-    })
-
-    botonExpPlanillaSolido.style.display = 'none';
-    botonEnvPlanillaSolido.style.display = 'none';
-    // botonEnviarNir.style.display = 'none';
-
-    setTimeout(() => {
-      botonExpPlanillaSolido.style.display = valueBotonExpPlanillaSolido;
-      botonEnvPlanillaSolido.style.display = valueBotonEnvPlanillaSolido;
-      // botonEnviarNir.style.display = 'block';
-      document.getElementsByName('expTodosPlanillas').forEach(item => {
-        item.className = "collapse";      
-      })
-    },5000)
-  }
-
 }
