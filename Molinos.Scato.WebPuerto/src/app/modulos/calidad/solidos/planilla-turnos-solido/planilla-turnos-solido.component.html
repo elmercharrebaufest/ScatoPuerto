@@ -8,7 +8,7 @@
         <div id="collapsePlanillaTurnosSolido" class="collapse show">
             <div style="margin-left: 1rem;">
                 <h5 data-html2canvas-ignore="true" *ngIf="!tablerista">Observaciones De Calidad</h5>
-                <button data-html2canvas-ignore="true" *ngIf="!tablerista" class='btn btn-primary' (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
+                <button *ngIf="!tablerista" class='btn btn-primary' (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
             </div>
         <br>
         <br>
@@ -50,8 +50,7 @@
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
                                                     <span class='toneladas'>{{ getCantTurno(turno) }} <span class='turno'>Tn</span></span>
                                                     <span class='turno'>por turno</span>
-                                                    <button data-html2canvas-ignore="true"
-                                                            class='btn btn btn-success' 
+                                                    <button class='btn btn btn-success' 
                                                             *ngIf="!turno.value.guardadoPorRecibidor"
                                                             style="margin-top: 5px; margin-bottom: 5px" 
                                                             (click)='onCerrarTurno(turno)'> 
@@ -213,8 +212,8 @@
         <p-toast position='top-center' key='enviar-turno'></p-toast>
     
         <div class="mt-4 text-center">
-            <button data-html2canvas-ignore="true" id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
-            <button data-html2canvas-ignore="true" id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
+            <button id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
+            <button id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
         </div>
         </div>    
     </div>

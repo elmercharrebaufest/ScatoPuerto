@@ -144,27 +144,17 @@ export class SolidosComponent implements OnInit {
   }
 
   private ocultarBotonesImprimir(){
-    let botonExpPlanillaSolido = document.getElementById('expPlanillaSolidoCalidad');
-    let valueBotonExpPlanillaSolido = botonExpPlanillaSolido.style.display;
-    let botonEnvPlanillaSolido = document.getElementById('envPlanillaSolidoCalidad');
-    let valueBotonEnvPlanillaSolido = botonEnvPlanillaSolido.style.display;
-    // let botonEnviarNir = document.getElementById('btn-enviar-nir');
-    document.getElementsByName('expTodosPlanillas').forEach(item => {
-      item.className = "collapse show";      
-    })
+    var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
+    var buttons = document.getElementsByTagName('button');
 
-    botonExpPlanillaSolido.style.display = 'none';
-    botonEnvPlanillaSolido.style.display = 'none';
-    // botonEnviarNir.style.display = 'none';
-
-    setTimeout(() => {
-      botonExpPlanillaSolido.style.display = valueBotonExpPlanillaSolido;
-      botonEnvPlanillaSolido.style.display = valueBotonEnvPlanillaSolido;
-      // botonEnviarNir.style.display = 'block';
-      document.getElementsByName('expTodosPlanillas').forEach(item => {
-        item.className = "collapse";      
-      })
-    },5000)
+    for (let i = 0; i < buttons.length; i++) {
+        tags.forEach(tag => {
+          // displayAnterior.push(buttons[i].style.display);
+          if (buttons[i].innerText.toLocaleLowerCase().includes(tag.toLowerCase()) ){
+            buttons[i].setAttribute("data-html2canvas-ignore", "true");
+          }
+        })
+    }
   }
 
 }

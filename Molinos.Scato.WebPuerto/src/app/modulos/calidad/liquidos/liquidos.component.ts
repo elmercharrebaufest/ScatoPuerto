@@ -41,26 +41,23 @@ export class LiquidosComponent implements OnInit {
    // #endregion
   }
 
-  private ocultarBotonesImprimir(){
-   // #region Ocultar Botones Para Impresion
-    let scrollBarPlanilla = document.getElementById('scrollbar-planilla-recibidores-liquido');
-    let valueScrollBarPlanilla = scrollBarPlanilla.style.height;
-    let botonLineasDeEmbarque = document.getElementById('guardar-conformacion-lineas-embarque');
-    let valueBotonLineasDeEmbarque = botonLineasDeEmbarque.style.display;
+  private ocultarBotonesImprimir(){     
+    var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
+    var buttons = document.getElementsByTagName('button');
+
+    for (let i = 0; i < buttons.length; i++) {
+      tags.forEach(tag => {
+        if (buttons[i].innerText.toLocaleLowerCase().includes(tag.toLowerCase()) ){
+          buttons[i].setAttribute("data-html2canvas-ignore", "true");
+        }
+      })
+    }  
 
     document.getElementsByName('expTodosPlanillas').forEach(item => {
       item.className = "collapse show";      
     })
 
-    scrollBarPlanilla.style.height = 'auto';
-    botonLineasDeEmbarque.style.display = 'none';
-   // #endregion
-    
-   //#region Mostrar Botones 
     setTimeout(() => {
-      scrollBarPlanilla.style.height = valueScrollBarPlanilla;
-      botonLineasDeEmbarque.style.display = valueBotonLineasDeEmbarque;
-
       document.getElementsByName('expTodosPlanillas').forEach(item => {
         item.className = "collapse";      
       })

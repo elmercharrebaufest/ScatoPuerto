@@ -187,9 +187,7 @@ constructor(
   getNir(): NirManualPuerto[]{
     return (this.formMano["controls"]["nirManualPuerto"] as FormArray).value
   }
-
-
-
+  
   compareBodegaItem(c1: any, c2: any){
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
 }
