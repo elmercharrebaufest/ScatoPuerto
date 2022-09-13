@@ -178,7 +178,9 @@ export class NIRComponent {
                 this.confirmationDialogService.confirm('¡Atención!', 'Mail enviado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success)
                 console.log('200 OK');
                 this.guardando = false;
-              });
+              }), (error => {
+                console.log(error);
+              })
           }
         })
     })

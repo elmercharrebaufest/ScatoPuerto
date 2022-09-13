@@ -67,7 +67,7 @@ constructor(
         protBase: [{value: nirManualPuerto?.protBase ?? '', disabled: this.mano.tipo == 'Trigo' ? false : true}],
         prot_BS: [{value: nirManualPuerto?.prot_BS ?? '',  disabled: this.mano.tipo == 'Trigo' ? false : true}],
         origen: nirManualPuerto?.origen ?? '',
-        bodega: nirManualPuerto?.bodega ?? null,
+        bodega: nirManualPuerto?.bodega ?? '0',
         mano: nirManualPuerto?.mano ?? '',
         material_id: nirManualPuerto?.material_id ? nirManualPuerto?.material_id : this.mano.tipo == "Trigo" ? 17:11,
         moduloDeCargaId: nirManualPuerto?.moduloDeCargaId ?? 0,
@@ -187,9 +187,7 @@ constructor(
   getNir(): NirManualPuerto[]{
     return (this.formMano["controls"]["nirManualPuerto"] as FormArray).value
   }
-
-
-
+  
   compareBodegaItem(c1: any, c2: any){
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
 }
