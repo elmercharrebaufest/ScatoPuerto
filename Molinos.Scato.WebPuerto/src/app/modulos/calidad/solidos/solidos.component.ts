@@ -122,7 +122,7 @@ export class SolidosComponent implements OnInit {
 
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
-      this.ocultarBotonesImprimir();
+      this._CalidadSharedService.ocultarBotonesImprimir();
      
      this.RecibidoresPdf = true;
  
@@ -142,19 +142,4 @@ export class SolidosComponent implements OnInit {
      }).save();
      // #endregion
   }
-
-  private ocultarBotonesImprimir(){
-    var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
-    var buttons = document.getElementsByTagName('button');
-
-    for (let i = 0; i < buttons.length; i++) {
-        tags.forEach(tag => {
-          // displayAnterior.push(buttons[i].style.display);
-          if (buttons[i].innerText.toLocaleLowerCase().includes(tag.toLowerCase()) ){
-            buttons[i].setAttribute("data-html2canvas-ignore", "true");
-          }
-        })
-    }
-  }
-
 }

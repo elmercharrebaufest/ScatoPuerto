@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
 
 
@@ -12,15 +13,14 @@ export class LiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   RecibidoresPdf: boolean = false;
   
-  constructor() { }
+  constructor(private _CalidadSharedService: CalidadSharedService) { }
 
   ngOnInit(): void {
     this.hideSpinner.emit(false);
   }
 
   imprimir(imprimir: boolean = false){
-   // #region Imprimir Recibidores Liquido
-    this.ocultarBotonesImprimir();
+      this._CalidadSharedService.ocultarBotonesImprimir();
     
     this.RecibidoresPdf = true;
 
@@ -38,32 +38,5 @@ export class LiquidosComponent implements OnInit {
     .then(() => {
       if (!imprimir) this.RecibidoresPdf = false
     }).save();
-   // #endregion
   }
-
-  private ocultarBotonesImprimir(){     
-    var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
-    var buttons = document.getElementsByTagName('button');
-
-    for (let i = 0; i < buttons.length; i++) {
-      tags.forEach(tag => {
-        if (buttons[i].innerText.toLocaleLowerCase().includes(tag.toLowerCase()) ){
-          buttons[i].setAttribute("data-html2canvas-ignore", "true");
-        }
-      })
-    }  
-
-    document.getElementsByName('expTodosPlanillas').forEach(item => {
-      item.className = "collapse show";      
-    })
-
-    setTimeout(() => {
-      document.getElementsByName('expTodosPlanillas').forEach(item => {
-        item.className = "collapse";      
-      })
-    },5000)
-
-   // #endregion
-  }
-
 }
