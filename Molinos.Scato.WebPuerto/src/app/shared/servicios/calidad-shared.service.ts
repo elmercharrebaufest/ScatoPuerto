@@ -45,4 +45,28 @@ export class CalidadSharedService {
   getManosDeEmbarque(){
     return this.manosDeEmbarque;
   }
+
+  ocultarBotonesImprimir(){     
+    var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
+    var buttons = document.getElementsByTagName('button');
+
+    for (let i = 0; i < buttons.length; i++) {
+      tags.forEach(tag => {
+        if (buttons[i].innerText.toLocaleLowerCase().includes(tag.toLowerCase()) ){
+          buttons[i].setAttribute("data-html2canvas-ignore", "true");
+        }
+      })
+    }  
+
+    document.getElementsByName('expTodosPlanillas').forEach(item => {
+      item.className = "collapse show";      
+    })
+
+    setTimeout(() => {
+      document.getElementsByName('expTodosPlanillas').forEach(item => {
+        item.className = "collapse";      
+      })
+    },5000)
+  }
+
 }

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
 
 
@@ -12,15 +13,14 @@ export class LiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   RecibidoresPdf: boolean = false;
   
-  constructor() { }
+  constructor(private _CalidadSharedService: CalidadSharedService) { }
 
   ngOnInit(): void {
     this.hideSpinner.emit(false);
   }
 
   imprimir(imprimir: boolean = false){
-   // #region Imprimir Recibidores Liquido
-    this.ocultarBotonesImprimir();
+      this._CalidadSharedService.ocultarBotonesImprimir();
     
     this.RecibidoresPdf = true;
 
@@ -38,35 +38,5 @@ export class LiquidosComponent implements OnInit {
     .then(() => {
       if (!imprimir) this.RecibidoresPdf = false
     }).save();
-   // #endregion
   }
-
-  private ocultarBotonesImprimir(){
-   // #region Ocultar Botones Para Impresion
-    let scrollBarPlanilla = document.getElementById('scrollbar-planilla-recibidores-liquido');
-    let valueScrollBarPlanilla = scrollBarPlanilla.style.height;
-    let botonLineasDeEmbarque = document.getElementById('guardar-conformacion-lineas-embarque');
-    let valueBotonLineasDeEmbarque = botonLineasDeEmbarque.style.display;
-
-    document.getElementsByName('expTodosPlanillas').forEach(item => {
-      item.className = "collapse show";      
-    })
-
-    scrollBarPlanilla.style.height = 'auto';
-    botonLineasDeEmbarque.style.display = 'none';
-   // #endregion
-    
-   //#region Mostrar Botones 
-    setTimeout(() => {
-      scrollBarPlanilla.style.height = valueScrollBarPlanilla;
-      botonLineasDeEmbarque.style.display = valueBotonLineasDeEmbarque;
-
-      document.getElementsByName('expTodosPlanillas').forEach(item => {
-        item.className = "collapse";      
-      })
-    },5000)
-
-   // #endregion
-  }
-
 }
