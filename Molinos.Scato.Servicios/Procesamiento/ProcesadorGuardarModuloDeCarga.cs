@@ -80,7 +80,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     foreach (var lineas in moduloDeCarga.ModuloDeCargaLineasDeEmbarque)
                     {
-                        var tipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id);
+                        var tipoLineaEmbarque = lineas.TipoLineaEmbarque != null?  Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id) : null;
                         Repositorio.Agregar(new ModuloDeCargaLineasDeEmbarqueHistorico
                         {
                             ModuloDeCargaHistorico = modulodecargahistorico,
@@ -219,7 +219,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 foreach (var lineas in comando.Dto.ModuloDeCargaLineasDeEmbarque)
                 {
                     var materialPuerto = lineas.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(lineas.MaterialPuerto.Id) : null;
-                    var tipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id);
+                    var tipoLineaEmbarque = lineas.TipoLineaEmbarque != null ?  Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id) : null;
 
                     moduloDeCarga.ModuloDeCargaLineasDeEmbarque.Add(new ModuloDeCargaLineasDeEmbarque
                     {
