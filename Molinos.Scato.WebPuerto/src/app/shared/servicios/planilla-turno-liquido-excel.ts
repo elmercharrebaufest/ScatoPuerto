@@ -73,7 +73,7 @@ export class PlanillaTurnoLiquidoExcelService {
             { width: 10 },
             { width: 9 },
             { width: 30 },
-            { width: 5 },
+            { width: 15 },
             { width: 11 },
             { width: 17 },
             { width: 17 },
@@ -144,7 +144,7 @@ export class PlanillaTurnoLiquidoExcelService {
     private setCabeceraPlanillaTurno(worksheet, offset, borders, esRecibidores: boolean = false){
         let headerDetallePlanilla = null;
         if (esRecibidores)
-            headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Destino", "Cant."];
+            headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "Cant."];
             else
             headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Cm.", "Destino", "Cant."];
         
@@ -201,9 +201,13 @@ export class PlanillaTurnoLiquidoExcelService {
             if (esRecibidores){
                 let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
                 numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
+                inicioTurnoMerge+=1;
+                finTurnoMerge    = inicioTurnoMerge;
                 finTurnoMerge += numeroObservaciones;
+            }else{
+              inicioTurnoMerge+=1;
+              finTurnoMerge = inicioTurnoMerge;
             }
-            finTurnoMerge = finTurnoMerge + 1;
             worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
             worksheet.getCell(`B${inicioTurnoMerge}`).value = nombreTurno;
             worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center' }
@@ -264,8 +268,6 @@ export class PlanillaTurnoLiquidoExcelService {
     private setDetallePlanillaTurno(lineas, turno, worksheet, offset, borders, esRecibidores: boolean) {
         let lineaDescripcion;
         const lineaFiltro = lineas.filter(linea => linea.id == turno.linea_Id);
-        console.log('lineaFiltro--->>')
-        console.log(lineaFiltro)
         if (lineaFiltro.length > 0) {
           lineaDescripcion = lineaFiltro[0].tipoLineaEmbarque != null ? lineaFiltro[0].tipoLineaEmbarque.linea : '';
         }
@@ -343,8 +345,7 @@ export class PlanillaTurnoLiquidoExcelService {
         worksheet.getRow(offset).getCell(3).value = fechaObs;
         worksheet.getRow(offset).getCell(4).value = horaObs;
         worksheet.getRow(offset).getCell(5).value = observacion.observaciones;
-        console.log('observacion--->>')
-        console.log(observacion)
+
         let celdaCorte = 3
         for (let indexCell = 1; indexCell <= 5; indexCell++) {
         worksheet.getRow(offset).getCell(celdaCorte).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
@@ -555,9 +556,6 @@ export class PlanillaTurnoLiquidoExcelService {
           }
     
           numeroTurno += 1;
-          console.log('detalle +  corte')
-          console.log(turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length)
-          console.log(turno.moduloDeCargaPlanillaDeTurnosCortes.length)
           /* Planilla de turnos */
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0)
             this.setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos,borders, esRecibidores, true);
@@ -571,9 +569,6 @@ export class PlanillaTurnoLiquidoExcelService {
             // Cargando Agrupador de Turnos
             this.setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos,borders, esRecibidores, false);
     
-            console.log('3 moduloDeCargaPlanillaDeTurnosDetallesLiquido -->>')
-            console.log(turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido)
-    
             turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach((turno: any, index) => {
               this.setDetallePlanillaTurno(lineas, turno, worksheet, offset, borders, esRecibidores)
               offset = offset + 1;
@@ -584,9 +579,6 @@ export class PlanillaTurnoLiquidoExcelService {
 
               this.setCabeceraPlanillaCortes(headerCortes, worksheet, offset, borders, esRecibidores);
               offset = offset + 1;
-      
-              console.log('3 moduloDeCargaPlanillaDeTurnosCortes -->>')
-              console.log(turno.moduloDeCargaPlanillaDeTurnosCortes)
               turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((turno: CorteTurno, index) => {
                 this.setDetallePlanillaCortes(worksheet, turno, offset, borders, esRecibidores);
                 offset = offset + 1;
