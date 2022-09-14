@@ -248,14 +248,7 @@ export class CargaLiquidosComponent implements OnInit {
     //CAMBIOS, POR LO QUE DEBERÝA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     // this.hideSpinner.emit(true);
     if (this.enviado && !finalizar) {
-      var texto = "Se ha modificado con éxito la carga. Si desea informar los cambios, haga click en FINALIZAR.";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
-        .then((confirmed) => {
-          if (confirmed)
             this.guardarContinuacion(finalizar);
-          else
-            return;
-        }).catch(() => window.location.reload());
     } else {
       this.guardarContinuacion(finalizar);
 
@@ -333,9 +326,17 @@ export class CargaLiquidosComponent implements OnInit {
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar) {
-        this.imprimir(true, finalizar)
+        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+          .then(() => {this.imprimir(true, finalizar)},
+            error => {
+              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+            }).catch(() => window.location.reload())
       } else {
-        window.location.reload();
+        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+          .then(() => {},
+            error => {
+              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+            }).catch(() => window.location.reload())
         this.cargaPdf = false;
       }
 

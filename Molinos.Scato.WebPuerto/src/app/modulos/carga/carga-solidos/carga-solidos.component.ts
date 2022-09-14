@@ -249,14 +249,7 @@ export class CargaSolidosComponent implements OnInit {
     } else {
 
       if (this.enviado && !finalizar) {
-        var texto = "Se ha modificado con éxito la carga. Si desea informar los cambios, haga click en FINALIZAR.";
-        this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then((confirmed) => {
-            if (confirmed)
               this.guardarContinuacion(finalizar);
-            else
-              return;
-          }).catch(() => window.location.reload());
       } else {
         this.guardarContinuacion(finalizar);
 
