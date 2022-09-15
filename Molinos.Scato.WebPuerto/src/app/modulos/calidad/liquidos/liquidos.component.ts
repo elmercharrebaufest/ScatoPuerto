@@ -19,6 +19,10 @@ export class LiquidosComponent implements OnInit {
     this.hideSpinner.emit(false);
   }
 
+  finalizaCalidad():void{
+    this._CalidadSharedService.emitFinalizaEnCalidad();
+  }
+
   imprimir(imprimir: boolean = false){
       this._CalidadSharedService.ocultarBotonesImprimir();
     

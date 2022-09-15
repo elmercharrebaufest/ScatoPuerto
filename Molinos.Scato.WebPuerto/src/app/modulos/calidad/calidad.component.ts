@@ -10,7 +10,10 @@ import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { takeUntil } from 'rxjs/operators';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
-
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-calidad',
@@ -44,6 +47,11 @@ export class CalidadComponent implements OnInit, OnDestroy {
   resultados: Balanzas[] = [];
   embarque: EmbarqueNav;
   moduloDeCarga_Id: number = 0;
+  confirmationDialogService: any;
+  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
+                  {id: 2, descripcion: 'Cargando'}, 
+                  {id: 3, descripcion: 'ControlCalidad'}, 
+                  {id: 4, descripcion: 'PostOperativo'}];
 
   constructor(
     private workflowService: WorkflowService,
@@ -52,7 +60,11 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private balanzas78Service: Balanzas78Service,
     private embarqueService: EmbarqueService,
     private parametrosService: ParametrosService,
+    private calidadSharedService: CalidadSharedService,
+    confirmationDialogService: ConfirmationDialogService,
+    private router: Router,
     ) {
+    this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
@@ -62,6 +74,11 @@ export class CalidadComponent implements OnInit, OnDestroy {
       this.trabajoOrdenado();
       // this.obtenerBalanzadasEnVivo();
     });
+
+    this.calidadSharedService.sendFinalizaEnCalidad.subscribe( res => {
+      console.log('Presionó FINALIZAR EN CALIDAD');
+      this.finalizaEnCalidad();
+    } );
   }
 
   ngOnInit(): void {
@@ -147,6 +164,32 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.procesoCalidadService.setNoryoun(this.buqueEnNoryon);
     this.procesoCalidadService.setVicentin(this.buqueEnVicentin);
     this.procesoCalidadService.setOtrosMuelles(this.buqueEnOtrosMuelles);
+  }
+
+  finalizaEnCalidad(){
+    let texto = "Desea cambiar el estado del embarque a PostOperativo?";
+
+    this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
+      .then((confirmed) => {
+        if (confirmed) {
+          this.modificarEstadoBuque('PostOperativo');
+          this.router.navigate(['/lineup']);
+        } else 
+          console.log('Close: Finalizar Tablerista');
+      })
+      .catch(() => {
+        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+      });
+  }
+
+  modificarEstadoBuque(estado: string){
+    try {
+      let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
+      this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => console.log(res) );
+    } catch (e) {
+      console.log(e);
+      console.log("Error al modificarEstadoBuque");
+    }
   }
 
   // obtenerBalanzadasEnVivo() {
