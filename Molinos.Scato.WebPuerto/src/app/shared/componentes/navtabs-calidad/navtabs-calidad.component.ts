@@ -182,7 +182,7 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     this.errorMessage = false;
     if (embarque != '0') {
       let buque = this.elementosSinPlano.find(e => e.id.toString() === embarque);
-      let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes('PostOperativo'));
+      let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes('ControlCalidad'));
       
       this.embarqueService.actualizarEstadoBuque(buque.id, estadoBuque.id)
         .pipe(finalize( () => {

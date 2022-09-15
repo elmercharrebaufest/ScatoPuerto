@@ -107,7 +107,10 @@ IF NOT EXISTS (select 1 from EstadoBuque where Descripcion = 'PostOperativo' and
 GO
 
 --Parámetros
-IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConsoleLog' and Id = 1) BEGIN insert into Parametros(Id, Descripcion, Activo) values (1, 'ConsoleLog', 0); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConsoleLog' and Id = 1) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (1, 'ConsoleLog', 0, 0, 0, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacionBalanzas' and Id = 2) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (2, 'tiempoActualizacionBalanzas', 0, 0, 15000, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacionRitmosBlzas78' and Id = 3) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (3, 'tiempoActualizacionRitmosBlzas78', 0, 0, 15000, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'toneladasBajaCarga' and Id = 4) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (4, 'toneladasBajaCarga', 0, 0, 950, ''); END
 GO
 
 --Correo Planilla de Turnos
@@ -389,3 +392,12 @@ if not exists(select 1 from Bandera where Nombre = 'Yemen') begin INSERT INTO Ba
 if not exists(select 1 from Bandera where Nombre = 'Yibuti') begin INSERT INTO Bandera (Abreviatura, Nombre) VALUES('DJ', 'Yibuti');  end
 if not exists(select 1 from Bandera where Nombre = 'Zambia') begin INSERT INTO Bandera (Abreviatura, Nombre) VALUES('ZM', 'Zambia');  end
 if not exists(select 1 from Bandera where Nombre = 'Zimbabue') begin INSERT INTO Bandera (Abreviatura, Nombre) VALUES('ZW', 'Zimbabue');  end
+
+--Tipo Linea de Embarque
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Nueva'    ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Nueva'    ); END
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vieja'    ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vieja'    ); END
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vicentin' ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vicentin' ); END
+IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Biodiesel') BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Biodiesel'); END
+
+--- Actualizar a cero el idBalanzarCorte cuando sea null
+update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where idBalanzaCorte is null

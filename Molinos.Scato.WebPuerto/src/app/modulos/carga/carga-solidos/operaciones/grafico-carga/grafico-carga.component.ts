@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, Input } from '@angular/core';
+import { Component, AfterViewInit, Input, Renderer2 } from '@angular/core';
 import { ElementoGrafico } from '@ScatoModels/elemento-grafico';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ManosEmbarqueService } from '@ScatoServicios/manosEmbarque.service';
@@ -20,16 +20,22 @@ export class GraficoCargaComponent implements AfterViewInit {
   lastSelectedElement: any = null;
   rotacionCheckbox: boolean = false;
   
+  @Input() esCalidad: boolean = false;
+
   constructor(private _procesoService: DatosEmbarquesProcesoService,
+              private _rederer: Renderer2,
               private _manosEmbarqueService: ManosEmbarqueService) { 
     this.makeDraggable.bind(this);
     this.datosEmbarque = this._procesoService.getDatosGrafico();
+    console.log('graficos de carga');
     console.log(this.datosEmbarque);
     this.initEventosManos();
   }
 
   ngAfterViewInit(){
     this.makeDraggable(document.getElementById('grafico-carga'));
+    this.setDeshabilitarControles();
+    
   }
   expandir()
   {
@@ -56,7 +62,19 @@ export class GraficoCargaComponent implements AfterViewInit {
     );
   }
   
-
+  setDeshabilitarControles() {
+    if (!this.esCalidad) return;
+    
+    const toggleForma = document.getElementById('toggleForma');
+    const toggleRotar = document.getElementById('toggleRotar');
+    const toggleColor = document.getElementById('toggleColor');
+    const selectMateriales = document.getElementById('selectMateriales');
+    
+    if (selectMateriales != undefined || selectMateriales != null) this._rederer.setAttribute(selectMateriales   , 'disabled', 'true');
+    if (toggleForma != undefined || toggleForma != null) this._rederer.setAttribute(toggleForma   , 'disabled', 'true');
+    if (toggleRotar != undefined || toggleRotar != null) this._rederer.setAttribute(toggleRotar   , 'disabled', 'true');
+    if (toggleColor != undefined || toggleColor != null) this._rederer.setAttribute(toggleColor   , 'disabled', 'true');
+  }
   makeDraggable(evt) {
     var svg: any = evt;
     var thisComponent = this;

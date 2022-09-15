@@ -14,7 +14,7 @@ import { Alert } from 'selenium-webdriver';
 })
 export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   lineasEmbarque: FormGroup;
-  exportadores: any;
+  exportadores: any[];
   bodegas: any[];
   lineas: any[];
   productos: any[];
@@ -23,7 +23,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   tanquesAbordo: any[];
   idModuloDeCarga: number;
   planillaDeEmbarque: PlanillaDeEmbarque[];
-  mostrarbtnGuardar:boolean=true;
+  guardando: boolean;
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
@@ -37,6 +37,13 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       this.getProductos();
       this.getTanqueAbordo();
     });
+    this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
+      if (data) {
+        this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+          this.lineas = resp.moduloDeCargaLineasDeEmbarque;
+        });
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -49,28 +56,17 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
   }
 
-  desabilitarEmbarque()
-  {
-   
-    this.mostrarbtnGuardar=false;
-  }
   newForm() {
-    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    console.log('this.lineas...>>')
+    console.log(this.lineas)
+    if (this.lineas == undefined || this.lineas == null)
+      this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     
     // Evangelino Se considera exportadores unicos no duplicados
     //this.exportadores = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad);
     const exportadoresData = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad)
     const exportadorFiltro = exportadoresData.map(item => item.exportador);
     this.exportadores = [...new Map(exportadorFiltro.map(item => [item['nombre'], item])).values()];
-/*
-    const bodegasData = this.turnosService.getBodega();
-    const bodegasFiltro = bodegasData.map(item => item.destino);
-
-    //this.bodegas = [...new Map(bodegasFiltro.map(item => [item['nombre'], item])).values()];
-
-    const productosFiltro = bodegasData.map(item => item.materialPuerto);
-    this.productos = [...new Map(productosFiltro.map(item => [item['descripcionCorta'], item])).values()];
-*/
 
     this.bodegas = this.turnosService.getBodega();
     //this.partidas = this.bodegas.map(item => ({bodegaParcel: item.bodegaParcel}));
@@ -166,7 +162,13 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     const parcelValue =  parcel.split(":");
     parcel = (parcelValue.length > 0) ? parcelValue[1] :  parcel;
     */
+    console.log('parcel--->>')
+    console.log(parcel)
     let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);
+    
+    console.log('bodega--->>')
+    console.log(bodega)
+
     l.controls.tanqueDeAbordo.setValue(bodega.tanqueDeAbordo);
     l.controls.destino.setValue(bodega.destino);
     l.controls.tn.setValue(bodega.cantidad);
@@ -212,9 +214,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       const planillaEmbarque = this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto > '' && x.exportador > '' && x.destino != null);
       console.log('this.planillaDeEmbarque fin-->>>');
       console.log(planillaEmbarque);
-      
+      this.guardando = true;
       this.moduloCargaService.guardarPlanillaDeEmbarque( planillaEmbarque, this.idModuloDeCarga).subscribe( 
         res => {
+          this.guardando = false;
           console.log(res);
           const texto = "Se guardo la planilla de embarque correctamente";
           this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
@@ -223,9 +226,12 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
           console.log('termino');
         }, 
         err => {
+          this.guardando = false;
           console.log(err);
         }, 
         () => {
+          
+          this.guardando = false;
           this.cargarPlanilla();  
         });
   }

@@ -5,7 +5,6 @@ import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.s
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
-import { Parametros } from '@ScatoModels/parametros';
 
 @Component({
   selector: 'app-balanzas-ritmos',
@@ -25,18 +24,11 @@ export class BalanzasRitmosComponent implements OnInit, OnDestroy {
   fechaHoraUltimaBal8: Date;
   ultimaActualizacion7: Date;
   ultimaActualizacion8: Date;
-  verConsoleLog: boolean = false;
-  parametros: Parametros[];
 
   constructor( private balanzas78Service: Balanzas78Service,
                private funcionesGeneralesService: FuncionesGeneralesService,
                private parametrosService: ParametrosService ) {
     this.unsubscribe = new Subject();
-    
-    this.parametrosService.obtenerParametros().subscribe( res => {
-      this.parametros = res;
-      this.verConsoleLog = this.parametros.find( e => e.descripcion.includes('ConsoleLog')).activo;
-    } );
   }
 
   ngOnInit(): void {
@@ -46,7 +38,7 @@ export class BalanzasRitmosComponent implements OnInit, OnDestroy {
     this.balanzas78Service.sendRitmosBalanzas78
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( res => {
-        if(this.verConsoleLog) console.log('===== sendRitmosBalanzas78 =====', res);
+        this.parametrosService.consola(`===== sendRitmosBalanzas78 =====:`,res);
 
         this.startBalanza7 = res.ritmosBalanza7.arranco;
         this.fechaHoraUltimaBal7 = res.ritmosBalanza7.ultimaBalanzada;

@@ -4,7 +4,7 @@
             <h5 *ngIf='liquido' class='colorTitle text-center py-3 w-100 ritmo-title' style="position: relative;bottom: 10px;">Ritmo Acumulado</h5>
             <h5 *ngIf='!liquido' class='colorTitle text-center py-3 w-100 ritmo-title' style="position: relative;bottom: 10px;">Ritmo de carga</h5>
 
-            <p-knob style="width: 150px;height: 150px;position: relative;bottom: 11px;" [(ngModel)]='valorRitmo' class='center-knob' valueColor='#5CB85C' [size]='150' [min]='0' [max]='valorRitmo' [strokeWidth]='5' [readonly]='true'></p-knob>
+            <p-knob style="width: 150px;height: 150px;position: relative;bottom: 11px;" [(ngModel)]='valorRitmo' class='center-knob' valueColor={{colorRitmo}} [size]='150' [min]='0' [max]='valorRitmo' [strokeWidth]='5' [readonly]='true'></p-knob>
             <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas'>
             <p  *ngIf='liquido' class='text-knob text-center'>por hora por mano</p>
             <p  *ngIf='!liquido' class='text-knob text-center'>por hora</p>
@@ -28,7 +28,7 @@
         <div class="col card-ritmo-grafico">
             <h5 class='colorTitle text-center py-3 w-100 ritmo-title' style="position: relative;top: 6px;">Ritmo Carga NETO</h5>
 
-            <p-knob style="width: 150px;height: 150px;position: relative;bottom: 4px;" [(ngModel)]='valorNeto' class='center-knob' valueColor='#5CB85C' [size]='150' [min]='0' [max]='valorNeto' [strokeWidth]='5' [readonly]='true'></p-knob>
+            <p-knob style="width: 150px;height: 150px;position: relative;bottom: 4px;" [(ngModel)]='valorNeto' class='center-knob' valueColor={{colorValorNeto}} [size]='150' [min]='0' [max]='valorNeto' [strokeWidth]='5' [readonly]='true'></p-knob>
             <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas img-toneladas-circulo3'>
             <p  *ngIf='liquido' class='text-knob text-center'>por hora por mano</p>
             <p  *ngIf='!liquido' class='text-knob text-center'>por hora</p>

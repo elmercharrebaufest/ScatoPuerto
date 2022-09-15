@@ -2,11 +2,13 @@
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='RecibidoresPdf' [src]='"pdf"'></ship-spinner>
     </div>
-    <app-grafico-carga id='graficoCargaCanva' class='bg-white'></app-grafico-carga>
+    <app-grafico-carga id='graficoCargaCanva' 
+                       class='bg-white'
+                       [esCalidad]="true"></app-grafico-carga>
 
-    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"></app-manos>
-
-    <!-- <app-obs-calidad></app-obs-calidad> -->
+    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" 
+               [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"
+               [esCalidad]="true"></app-manos>
 
     <div class="html2pdf__page-break"></div>
 
@@ -14,15 +16,22 @@
         <app-planilla-turnos-solido></app-planilla-turnos-solido>
     </div>
 
+    <div data-html2canvas-ignore="true" class="col text-center">
+        <app-modal-recibo></app-modal-recibo>
+    </div>
+
+    <app-registro-recibos></app-registro-recibos>
+
     <div class="html2pdf__page-break"></div>
 
     <app-nir></app-nir>
-
+    
     <div class="html2pdf__page-break"></div>
 
     <app-balanzas-ritmos></app-balanzas-ritmos>
 
     <div fxLayout='row wrap' class="mt-4 shadow" >
+        
         <div fxFlex='50'>
             <!-- <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos> -->
         </div>
@@ -31,6 +40,7 @@
         </div>
     </div>
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
-        <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
+        <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
+        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
     </div>
 </div>

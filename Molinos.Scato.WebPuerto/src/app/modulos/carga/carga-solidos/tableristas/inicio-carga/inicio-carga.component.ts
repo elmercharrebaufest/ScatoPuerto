@@ -65,7 +65,7 @@ export class InicioCargaComponent implements OnInit {
 
   preguntarGuardarInicioCarga(){
     if (this.cargaIniciada){
-      let texto = "Se perderán los datos ingresados manualmente, ¿desea continuar?";
+      let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
           if (confirmed){

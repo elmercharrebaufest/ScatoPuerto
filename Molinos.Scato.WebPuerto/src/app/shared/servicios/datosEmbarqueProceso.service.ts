@@ -23,6 +23,7 @@ export class DatosEmbarquesProcesoService {
     private direccionViento: string;
     private fechaHoraInicioCarga: Date;
     private vaporId: number;
+    private fechaComienzoCarga: Date;
     @Output() sendEstadoAltura = new EventEmitter<number>();
     @Output() sendEmbarque = new EventEmitter<EmbarqueNav>();
     @Output() sendTotalPlanoDeEmbarque = new EventEmitter<number>();
@@ -58,6 +59,7 @@ export class DatosEmbarquesProcesoService {
                 this.moduloDeCarga = res;
                 this.vientoAmarre = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].vientoAmarro : '';
                 this.direccionViento = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].direccionAmarro : '';
+                this.fechaComienzoCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga : null;
             });
 
             this.workflowService.obtenerListado().subscribe( (resp: any) => {
@@ -159,7 +161,13 @@ export class DatosEmbarquesProcesoService {
     setFechaHoraInicioCarga(fechaHoraInicioCarga){
         this.fechaHoraInicioCarga = fechaHoraInicioCarga;
     }
-
+    getFechaComienzoCarga(){
+        return this.fechaComienzoCarga;
+    }
+    setFechaComienzoCarga(fechaComienzoCarga){
+        this.fechaComienzoCarga = fechaComienzoCarga;
+    }
+    
     disposeData(){
         this.embarques = undefined;
         this.embarqueSelected = undefined;

@@ -71,7 +71,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/PlanoDeCarga/GuardarPlanoDeCarga")]
         public HttpResponseMessage GuardarPlanoDeCarga(PlanoDeCargaDto planoDeCarga)
         {
-            comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga });
+            comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga, nombreUsuario = base.nombreUsuario });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -288,18 +288,27 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
-                return Request.CreateResponse(HttpStatusCode.OK,
-                                servicio.ListarBalanzadaBuque(buque, ritmoBajaCarga)
-                            );
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarBalanzadaBuque(buque, ritmoBajaCarga));
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
-
         }
 
+        [HttpGet]
+        [Route("api/PlanoDeCarga/BalanzadasBuque")]
+        public HttpResponseMessage BalanzadasBuque(int IdModuloDeCarga)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.BalanzadasBuque(IdModuloDeCarga));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
 
         [HttpGet]
         [Route("api/PlanoDeCarga/listarCargaBalanza")]

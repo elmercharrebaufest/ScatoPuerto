@@ -270,6 +270,7 @@
                             <div class='rect-azul fw-500 h-30'>Biodiesel</div>
                         </div>
                     </div>
+                    
                     <form [formGroup]='tankGroup'>
                         <div fxLayout='row wrap' class='flex-around mt-5 tanks-responsive'>
                             <div fxFlex='70' class='flex-around'>
@@ -344,7 +345,7 @@
                                 <div fxLayout='column'>
                                     <img src='assets/tanks/t-31.png'>
                                     <div class='custom-control tank-control custom-switch'>
-                                        <input type='checkbox' class='custom-control-input' id='customSwitch31'
+                                        <input type='checkbox' class='custom-control-input' id='customSwitch31' 
                                             formControlName='Tanque31' (change)='setTankValue()'>
                                         <label class='custom-control-label' for='customSwitch31'></label>
                                     </div>

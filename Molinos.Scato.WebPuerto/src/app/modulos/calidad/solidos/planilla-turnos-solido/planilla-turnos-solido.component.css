@@ -6,7 +6,16 @@
 .center-bt{
     margin: auto !important;
 }
-
+.p-13px{
+    padding-top:13px;
+    padding-left: 10px;
+}
+.fila-turno-alto{ 
+    height: 40px !important;
+}
+.fila-turno-alto-defecto{ 
+    height: auto !important;
+}
 .column-center{
     display: flex;
     flex-direction: column;
@@ -14,7 +23,20 @@
     align-items: center;
     height: 100%;
 }
-
+.bg-grisClaro{
+    background-color: #F3F3F3;
+}
+.bg-white{
+    background-color: white;
+}
+.fila-turno-baja-carga{
+    background-color: #ffefef;
+    padding: 0.4rem;
+}
+.fila-turno-carga-normal{
+    background-color: #ffffff;
+    padding: 0.4rem;
+}
 label{
     font-weight: bold;
 }
@@ -171,8 +193,23 @@ table.turnos table.tabla-embebida th{
     display: flex;
     flex-direction: column;
 }
-
-
+.basurerito{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+.tabla-fila-corte{
+    background-color: #F4F4F4;
+    height: 30px !important;
+    padding: 2px !important;
+    padding-left: 5px !important;
+    vertical-align: middle;
+}
+.celda-elimina-corte{
+    justify-content: flex-start;    
+    align-items: center;
+    text-align: center;
+}
 .divHeaderRightLeft {
     width: 100%;
     display: flex;

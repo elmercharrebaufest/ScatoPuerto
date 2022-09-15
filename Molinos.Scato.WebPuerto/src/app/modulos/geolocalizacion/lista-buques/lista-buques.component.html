@@ -57,9 +57,9 @@
                             </td>
                             <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.etA_Reportado : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.ata : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.horaUTCPosicionRecibida : ''}}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.viaje.etA_Reportado  | date: 'dd/MM/yyyy hh:mm' }}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.viaje.ata  | date: 'dd/MM/yyyy hh:mm' }}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.posicion.horaUTCPosicionRecibida | date: 'dd/MM/yyyy hh:mm' }}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion.estado}}</td>

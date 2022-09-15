@@ -11,6 +11,9 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { Bandera } from '@ScatoModels/bandera';
+import { identifierName } from '@angular/compiler';
+import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
+import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +47,18 @@ export class EmbarqueService {
 
   obtenerListadoAgenciasMaritimas(): Observable<AgenciaMaritimaPuerto[]> {
     return this.http.get<AgenciaMaritimaPuerto[]>(`${this.url}Embarque/ListarAgenciasMaritimas`, { 'withCredentials': true });
+  }
+  
+  obtenerTipoArchivos(): Observable<TipoArchivoPuerto[]> {
+    return this.http.get<TipoArchivoPuerto[]>(`${this.url}Embarque/ObtenerTipoArchivos`, { 'withCredentials': true });
+  }
+
+  obtenerArchivos(id: number): Observable<ArchivoPuerto[]> {
+    return this.http.get<ArchivoPuerto[]>(`${this.url}Embarque/ObtenerArchivos?idEmbarque=`+ id, { 'withCredentials': true });
+  }
+
+  guardarArchivos(id: number, archivos : ArchivoPuerto[]) {
+    return this.http.post(`${this.url}Embarque/GuardarArchivos?idEmbarque=`+ id, archivos, { 'withCredentials': true });
   }
 
   obtenerListadoMotivosLimpieza(): Observable<MotivosLimpieza[]> {

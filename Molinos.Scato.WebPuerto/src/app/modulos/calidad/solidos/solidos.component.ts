@@ -12,6 +12,7 @@ import { GraficoCargaComponent } from 'app/modulos/carga/carga-solidos/operacion
 import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/manos/manos.component';
 import { forkJoin } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 
 @Component({
   selector: 'app-solidos',
@@ -36,7 +37,8 @@ export class SolidosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
-    private _changeDetector: ChangeDetectorRef) {
+    private _changeDetector: ChangeDetectorRef,
+    private _CalidadSharedService: CalidadSharedService) {
       
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
   }
@@ -79,7 +81,7 @@ export class SolidosComponent implements OnInit {
       if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
           
           // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-          this.balanzas78Service.setEmbarqueBalanza(this.embarqueSelected.moduloDeCargaId);
+          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
           this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
           this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
           this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
@@ -110,6 +112,7 @@ export class SolidosComponent implements OnInit {
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchManosDeEmbarque(res.moduloDeCargaManosDeEmbarque);
+          this._CalidadSharedService.setManosDeEmbarque(res.moduloDeCargaManosDeEmbarque);
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
@@ -119,7 +122,7 @@ export class SolidosComponent implements OnInit {
 
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
-      this.ocultarBotonesImprimir();
+      this._CalidadSharedService.ocultarBotonesImprimir();
      
      this.RecibidoresPdf = true;
  
@@ -139,27 +142,4 @@ export class SolidosComponent implements OnInit {
      }).save();
      // #endregion
   }
-
-  private ocultarBotonesImprimir(){
-    let botonExpPlanillaSolido = document.getElementById('expPlanillaSolidoCalidad');
-    let valueBotonExpPlanillaSolido = botonExpPlanillaSolido.style.display;
-    let botonEnvPlanillaSolido = document.getElementById('envPlanillaSolidoCalidad');
-    let valueBotonEnvPlanillaSolido = botonEnvPlanillaSolido.style.display;
-    let botonEnviarNir = document.getElementById('btn-enviar-nir');
-
-    botonExpPlanillaSolido.style.display = 'none';
-    botonEnvPlanillaSolido.style.display = 'none';
-    botonEnviarNir.style.display = 'none';
-
-    setTimeout(() => {
-      
-      botonExpPlanillaSolido.style.display = valueBotonExpPlanillaSolido;
-      botonEnvPlanillaSolido.style.display = valueBotonEnvPlanillaSolido;
-      botonEnviarNir.style.display = 'block';
-
-    },5000)
-
-  }
-
-
 }
