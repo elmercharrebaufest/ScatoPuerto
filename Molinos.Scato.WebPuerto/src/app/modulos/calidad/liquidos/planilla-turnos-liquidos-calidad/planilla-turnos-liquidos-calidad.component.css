@@ -1,13 +1,17 @@
 .tabla-embebida{
-    width: 100%;
+    width: auto;
     margin: 0;
     padding: 0;
 }
 .tabla-fila-corte{
-    background-color: #F4F4F4;
+    background-color: white;
 }
 .center-bt{
     margin: auto !important;
+}
+
+.alturaCollapse{
+    height:50px;
 }
 
 .column-center{
@@ -18,10 +22,44 @@
     height: 100%;
 }
 
+.anchoObs{
+    width:610px;
+}
+
+.p-13px{
+    padding-top:13px;
+    padding-left: 10px;
+}
 label{
     font-weight: bold;
 }
+.expTodosPlanillas{
 
+    /* lo uso como ID */
+}
+.basurerito{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+.celda-elimina-corte{
+    justify-content: flex-start;    
+    align-items: center;
+    text-align: center;
+}
+.tabla-fila-corte{
+    background-color: #F4F4F4;
+    height: 30px !important;
+    padding: 2px !important;
+    padding-left: 5px !important;
+    vertical-align: middle;
+}
+.bg-grisClaro{
+    background-color: #F3F3F3;
+}
+.bg-white{
+    background-color: white;
+}
 input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 0px;
     margin: 0px;
@@ -45,7 +83,9 @@ select { margin: 0; height: 30px;}
 .label-float textarea{
     width: 100%;
 }
-
+.planilla-texto-derecha{
+    text-align: right;
+}
 .right-buttons-turnos{
     margin-top: 15px;
     display: flex;
@@ -55,7 +95,9 @@ select { margin: 0; height: 30px;}
 .right-buttons-turnos button:first-child{
     margin-right: 10px;
 }
-
+.table-ancho{
+    width: 100% !important;
+}
 table {
     table-layout:fixed;
 }
@@ -91,10 +133,10 @@ table td select {
 }
 
 table.turnos th:nth-child(1) {
-    width: 120px;
+    width: auto;
 }
 table.turnos th:nth-child(2) {
-    width: 150px;
+    width: auto;
 }
 
 table.turnos table.tabla-embebida th{
@@ -134,6 +176,10 @@ table.turnos table.tabla-embebida th{
 
 .txt-blue{
     color: #2486AC;
+}
+
+.anchoTxt{
+    width:200%;
 }
 
 .right-side{

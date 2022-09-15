@@ -11,8 +11,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarLineasDeEmbarque : ProcesadorModificar<GuardarLineasDeEmbarque>
     {
-        public ProcesadorGuardarLineasDeEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarLineasDeEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -27,25 +27,44 @@ namespace Molinos.Scato.Servicios.Procesamiento
             else
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
 
+            ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
+            int moduloCargaId = comando.IdModuloDeCarga;
+            #region Elimando
+            var lineasDeEmbarque = Repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => x.ModuloDeCarga.Id == moduloCargaId);
+            foreach (var linea in lineasDeEmbarque)
+            {
+                var listaLineaDeEmbarque = comando.Dto.FindAll(x => x.Id == linea.Id);
+
+                if (listaLineaDeEmbarque.Count == 0)
+                {
+                    Repositorio.Remover<ModuloDeCargaLineasDeEmbarque>(linea);
+                }
+
+
+            }
+            #endregion
+
+            #region Guardando y Actualizando
             foreach (var linea in comando.Dto)
             {
                 var lineaDeEmbarque = Repositorio.Obtener<ModuloDeCargaLineasDeEmbarque>(x => x.Id == linea.Id);
-
                 var material = Repositorio.Obtener<MaterialPuerto>(x => x.Id == linea.MaterialPuerto.Id);
+                var tipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(x => x.Id == linea.TipoLineaEmbarque.Id);
                 if (lineaDeEmbarque != null)
                 {
                     lineaDeEmbarque.ModuloDeCarga = moduloDeCarga;
-                    lineaDeEmbarque.Linea = linea.Linea;
+                    lineaDeEmbarque.Linea = tipoLineaEmbarque.Linea;
+                    lineaDeEmbarque.TipoLineaEmbarque = tipoLineaEmbarque;
                     lineaDeEmbarque.MaterialPuerto = material;
                     lineaDeEmbarque.TkInicial = linea.TkInicial;
                     lineaDeEmbarque.TemperaturaInicial = linea.TemperaturaInicial;
-                    lineaDeEmbarque.AlturaInicialCM = linea.AlturaInicialCM ;
-                    lineaDeEmbarque.AlturaInicialMM = linea.AlturaInicialMM ;
+                    lineaDeEmbarque.AlturaInicialCM = linea.AlturaInicialCM;
+                    lineaDeEmbarque.AlturaInicialMM = linea.AlturaInicialMM;
                     lineaDeEmbarque.DensidadInicial = linea.DensidadInicial;
                     lineaDeEmbarque.TemperaturaFinal = linea.TemperaturaFinal;
                     lineaDeEmbarque.Litros = linea.Litros;
-                    lineaDeEmbarque.DensidadFinal = linea.DensidadFinal ;
-                    lineaDeEmbarque.AlturaFinalCM = linea.AlturaFinalCM ;
+                    lineaDeEmbarque.DensidadFinal = linea.DensidadFinal;
+                    lineaDeEmbarque.AlturaFinalCM = linea.AlturaFinalCM;
                     lineaDeEmbarque.AlturaFinalMM = linea.AlturaFinalMM;
                     lineaDeEmbarque.Kilos = linea.Kilos;
                     lineaDeEmbarque.TkFinal = linea.TkFinal;
@@ -53,30 +72,34 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 else
                 {
 
-                  var  lineaEmbarque = new ModuloDeCargaLineasDeEmbarque()
+                    var lineaEmbarque = new ModuloDeCargaLineasDeEmbarque()
                     {
-                    ModuloDeCarga = moduloDeCarga,
-                    Linea = linea.Linea,
-                    MaterialPuerto = material,
-                    TkInicial = linea.TkInicial,
-                    TemperaturaInicial = linea.TemperaturaInicial,
-                    AlturaInicialCM = linea.AlturaInicialCM,
-                    AlturaInicialMM = linea.AlturaInicialMM,
-                    DensidadInicial = linea.DensidadInicial,
-                    TemperaturaFinal = linea.TemperaturaFinal,
-                    Litros = linea.Litros,
-                    DensidadFinal = linea.DensidadFinal,
-                    AlturaFinalCM = linea.AlturaFinalCM,
-                    AlturaFinalMM = linea.AlturaFinalMM,
-                    Kilos = linea.Kilos,
-                    TkFinal = linea.TkFinal,
-                };
+                        ModuloDeCarga = moduloDeCarga,
+                        Linea = tipoLineaEmbarque.Linea,
+                        TipoLineaEmbarque = tipoLineaEmbarque,
+                        MaterialPuerto = material,
+                        TkInicial = linea.TkInicial,
+                        TemperaturaInicial = linea.TemperaturaInicial,
+                        AlturaInicialCM = linea.AlturaInicialCM,
+                        AlturaInicialMM = linea.AlturaInicialMM,
+                        DensidadInicial = linea.DensidadInicial,
+                        TemperaturaFinal = linea.TemperaturaFinal,
+                        Litros = linea.Litros,
+                        DensidadFinal = linea.DensidadFinal,
+                        AlturaFinalCM = linea.AlturaFinalCM,
+                        AlturaFinalMM = linea.AlturaFinalMM,
+                        Kilos = linea.Kilos,
+                        TkFinal = linea.TkFinal,
+                    };
 
                     moduloDeCarga.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);
                 }
             }
-             Repositorio.GuardarCambios();
-            
+            Repositorio.GuardarCambios();
+            #endregion
+
+
+
         }
 
         protected override void Validar(GuardarLineasDeEmbarque comando, Resultado resultado)

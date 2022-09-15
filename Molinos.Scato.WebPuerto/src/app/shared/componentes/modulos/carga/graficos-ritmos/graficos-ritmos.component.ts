@@ -19,6 +19,7 @@ export class GraficosRitmosComponent implements OnInit {
   horaActualizacion: string = '18:00hs';
   turno: any;
   colorRitmo = '';
+  colorValorNeto = '';
   cantTurnos: number = 0;
   balanzadasCompletas: any;
 
@@ -38,19 +39,24 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargarTurnosBalanzas();
+  }
+  //#e7af5ffa
+
+  private cargarTurnosBalanzas() {
     if (this.liquido)
       this.subscribeTurnos();
     else
       this.subscribeBalanzas();
   }
-
   subscribeTurnos() {
-    this.balanzaService.obtenerRitmosLiquidos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
+    this.balanzaService.obtenerRitmosLiquidos(this.vaporId, this.moduloDeCargaId).subscribe(res => {
       // console.log('==> GRAFICOS-RITMOS - Líquido: ', res);
       this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
       this.valorNeto = res?.ritmoAcumuladoNeto ? res.ritmoAcumuladoNeto : 0;
       this.valorRitmo = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
       this.colorRitmo = this.valorRitmo > 1000 ? '#1F8649' : '#F0AD4E';
+      this.colorValorNeto = this.valorNeto > 1000 ? '#1F8649' : '#F0AD4E';
     });
 
     this._turnosService.sendTnTotal.subscribe(res => {
@@ -62,11 +68,13 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeBalanzas() {
-    this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe( res => {
+    this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe(res => {
       // console.log('obtenerRitmos: ', res);
       this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
       this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
       this.valorRitmo = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
+      this.colorRitmo = this.valorRitmo > 1000 ? '#1F8649' : '#F0AD4E';
+      this.colorValorNeto = this.valorNeto > 1000 ? '#1F8649' : '#F0AD4E';
     });
 
     this._procesoService.sendTotalPlanoDeEmbarque.subscribe(res => {

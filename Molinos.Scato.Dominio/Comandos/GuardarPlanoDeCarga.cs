@@ -5,5 +5,6 @@ namespace Molinos.Scato.Dominio.Comandos
     public class GuardarPlanoDeCarga : Comando
     {
         public PlanoDeCargaDto Dto { get; set; }
+        public string nombreUsuario { get; set; }
     }
 }

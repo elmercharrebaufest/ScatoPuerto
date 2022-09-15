@@ -10,6 +10,11 @@ import { SolidosComponent } from "./solidos/solidos.component";
 import { PlanillaTurnosSolidoComponent } from "./solidos/planilla-turnos-solido/planilla-turnos-solido.component";
 import { RecibodebuquepdfComponent } from "./recibo-de-buque/recibodebuquepdf.component";
 import { PlanillaTurnoLiquidosCalidadComponent } from "./liquidos/planilla-turnos-liquidos-calidad/planilla-turnos-liquidos-calidad.component";
+import { ModalReciboComponent } from './modal-recibo/modal-recibo.component';
+import { RegistroRecibosComponent } from './registro-recibos/registro-recibos.component';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { NirManoComponent } from "./solidos/nir/nir-mano/nir-mano.component";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 
 @NgModule({
@@ -17,7 +22,10 @@ import { PlanillaTurnoLiquidosCalidadComponent } from "./liquidos/planilla-turno
         CommonModule,
         CalidadRoutingModule,
         SharedModule,
-        CargaModule
+        CargaModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgMultiSelectDropDownModule.forRoot(),
     ],
     declarations: [
         CalidadComponent,
@@ -26,7 +34,10 @@ import { PlanillaTurnoLiquidosCalidadComponent } from "./liquidos/planilla-turno
         LiquidosComponent,
         PlanillaTurnosSolidoComponent,
         PlanillaTurnoLiquidosCalidadComponent,
-        RecibodebuquepdfComponent
+        RecibodebuquepdfComponent,
+        ModalReciboComponent,
+        RegistroRecibosComponent,
+        NirManoComponent
     ],
 })
 

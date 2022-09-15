@@ -59,9 +59,16 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
             var nombreUsuario = claim.Value.Split('\\')[1];
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, nombreUsuario));
 
-            ServicioComandos.Ejecutar(new ModificarUsuarioUltimoLogin { Usuario = nombreUsuario });
+            //         ServicioComandos.Ejecutar(new ModificarUsuarioUltimoLogin { Usuario = nombreUsuario });
 
             //log.Info("Agregando claims de permisos de Scato para el usuario {0}", nombreUsuario);
+
+            var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAD(nombreUsuario);
+            foreach (string permiso in permisosAd)
+            {
+                identity.AddClaim(new Claim(ClaimTypes.Role, permiso));
+            }
+
             var permisos = ServicioRepositorio.ListarPermisosPorUsuario(nombreUsuario);
             foreach (PermisoDto permiso in permisos)
             {
@@ -70,29 +77,29 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
                     identity.AddClaim(new Claim(ClaimTypes.Role, permiso.Codigo.Value.ToString()));
                 }
             }
-            
-            try
-            {
-                var ips = (HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] ?? "");
-                var RequestIP = ips.Split(',').Last().Trim().Split(':').First();
-                //log.Info($"Ips detectados: {ips} para el usuario {nombreUsuario}");
-                IPAddress IP = IPAddress.Parse(RequestIP);
-                IPHostEntry GetIPHost = Dns.GetHostEntry(IP);
-                
-                List<string> hostName = GetIPHost.HostName.ToString().Split('.').ToList();
-                string ComputerName = hostName.First();
-                string MachineName1 = Environment.MachineName;
-                string MachineName2 = System.Net.Dns.GetHostName();
-                string MachineName3 = HttpContext.Current.Request.ServerVariables["REMOTE_HOST"].ToString();
-                string MachineName4 = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
-                //identity.AddClaim(new Claim("UserComputerName", ComputerName));
-                //log.Info("Nombre de pc detectada: {0} para el usuario {1}", String.Join(",", ComputerName, Dns.GetHostName(),MachineName1,MachineName2,MachineName3,MachineName4, RequestIP), nombreUsuario);
-            }
-            catch (Exception)
-            {
-                // identity.AddClaim(new Claim("UserComputerName", RequestIP));
-                //log.Info("Nombre de pc detectada: no se pudo detectar para el usuario {0}", nombreUsuario);
-            }
+
+            //try
+            //{
+            //    var ips = (HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"] ?? "");
+            //    var RequestIP = ips.Split(',').Last().Trim().Split(':').First();
+            //    //log.Info($"Ips detectados: {ips} para el usuario {nombreUsuario}");
+            //    IPAddress IP = IPAddress.Parse(RequestIP);
+            //    IPHostEntry GetIPHost = Dns.GetHostEntry(IP);
+
+            //    List<string> hostName = GetIPHost.HostName.ToString().Split('.').ToList();
+            //    string ComputerName = hostName.First();
+            //    string MachineName1 = Environment.MachineName;
+            //    string MachineName2 = System.Net.Dns.GetHostName();
+            //    string MachineName3 = HttpContext.Current.Request.ServerVariables["REMOTE_HOST"].ToString();
+            //    string MachineName4 = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
+            //    //identity.AddClaim(new Claim("UserComputerName", ComputerName));
+            //    //log.Info("Nombre de pc detectada: {0} para el usuario {1}", String.Join(",", ComputerName, Dns.GetHostName(),MachineName1,MachineName2,MachineName3,MachineName4, RequestIP), nombreUsuario);
+            //}
+            //catch (Exception)
+            //{
+            //    // identity.AddClaim(new Claim("UserComputerName", RequestIP));
+            //    //log.Info("Nombre de pc detectada: no se pudo detectar para el usuario {0}", nombreUsuario);
+            //}
 
             var ci = new ClaimsIdentity(((ClaimsIdentity)incomingPrincipal.Identity).Claims, "Negotiate");
 

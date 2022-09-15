@@ -5,5 +5,8 @@
         public int Id { get; set; }
         public string Nombre { get; set; }
         public string Siglas { get; set; }
+
+        public bool Liquido { get; set; }
+        public bool Corte { get; set; }
     }
 }

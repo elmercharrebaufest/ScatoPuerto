@@ -11,8 +11,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarModuloDeCarga : ProcesadorModificar<GuardarModuloDeCarga>
     {
-        public ProcesadorGuardarModuloDeCarga(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorGuardarModuloDeCarga(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -28,6 +28,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 ///// OPERACIONES/TABLERISTAS /////
                 moduloDeCarga.FechaDeModificacion = DateTime.Now;
+
+                ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
 
                 var modulodecargahistorico = Repositorio.Agregar(new ModuloDeCargaHistorico
                 {
@@ -78,10 +80,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     foreach (var lineas in moduloDeCarga.ModuloDeCargaLineasDeEmbarque)
                     {
+                        var tipoLineaEmbarque = lineas.TipoLineaEmbarque != null?  Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id) : null;
                         Repositorio.Agregar(new ModuloDeCargaLineasDeEmbarqueHistorico
                         {
                             ModuloDeCargaHistorico = modulodecargahistorico,
                             Linea = lineas.Linea,
+                            TipoLineaEmbarque = tipoLineaEmbarque,
                             MaterialPuerto = lineas.MaterialPuerto,
                             TkInicial = lineas.TkInicial,
                             TemperaturaInicial = lineas.TemperaturaInicial,
@@ -215,10 +219,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 foreach (var lineas in comando.Dto.ModuloDeCargaLineasDeEmbarque)
                 {
                     var materialPuerto = lineas.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(lineas.MaterialPuerto.Id) : null;
+                    var tipoLineaEmbarque = lineas.TipoLineaEmbarque != null ?  Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id) : null;
+
                     moduloDeCarga.ModuloDeCargaLineasDeEmbarque.Add(new ModuloDeCargaLineasDeEmbarque
                     {
                         ModuloDeCarga = moduloDeCarga,
                         Linea = lineas.Linea,
+                        TipoLineaEmbarque = tipoLineaEmbarque,
                         MaterialPuerto = materialPuerto,
                         TkInicial = lineas.TkInicial,
                         TemperaturaInicial = lineas.TemperaturaInicial,

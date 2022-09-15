@@ -34,6 +34,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 foreach (var EmbarqueGeolocalizacion in listaEmbarquesGeolocalizacion)
                 {
+                
                     comandos.Ejecutar(new ModificarEmbarqueGeolocalizacion
                     {
                         DtoInformacion = EmbarqueGeolocalizacion.informacion,
@@ -43,6 +44,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         NombreBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque,
                         TipoBuque = EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.TipoBuque
                     });
+
+                    servicio.GenerarLogging("EMBARQUE", EmbarqueGeolocalizacion.DatosEmbarqueGeolocalizacion.NombreBuque, "POST", base.nombreUsuario);
+                    servicio.GenerarLogging("INFORMACION", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.informacion), "POST", base.nombreUsuario);
+                    servicio.GenerarLogging("POSICION", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.posicion), "POST", base.nombreUsuario);
+                    servicio.GenerarLogging("INFORMACIONVIAJE", Newtonsoft.Json.JsonConvert.SerializeObject(EmbarqueGeolocalizacion.informacionViaje), "POST", base.nombreUsuario);
                 }
 
 
@@ -52,7 +58,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (System.Exception ex)
             {
 
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
 
 
@@ -74,6 +80,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 var embarquesLineUp = workflows.ListarEmbarques("LineUp");
 
+                embarquesLineUp = embarquesLineUp.GroupBy(x=>x.Embarque.NombreBuque).Select(x=>x.FirstOrDefault()).ToList();
                 List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
 
                 foreach (var embarque in embarquesLineUp)
@@ -86,7 +93,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         imo = embarque.Embarque.EmbarqueInformacion.Count() > 0 ? embarque.Embarque.EmbarqueInformacion[0].IMO:""
                     };
                     embarques.Add(embarqueLineUp);
-
+   
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, embarques);
@@ -150,7 +157,51 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
         }
-        
+
+        [HttpPost]
+        [Route("api/Geolocalizacion/RegistrarErroresGeolocalizacion")]
+        public HttpResponseMessage RegistrarErroresGeolocalizacion(List<erroresGeo> ErroresGeolocalizacion)
+        {
+            try
+            {
+                List<ErroresGeolocalizacionDto> errores = new List<ErroresGeolocalizacionDto>();
+                foreach (var item in ErroresGeolocalizacion)
+                {
+                    ErroresGeolocalizacionDto error = new ErroresGeolocalizacionDto
+                    {
+                        Bandera = item.Bandera,
+                        IMO = item.IMO,
+                        FechaError = DateTime.Now,
+                        Mensaje = item.Mensaje,
+                        NombreBuque = item.NombreBuque,
+                        TipoBuque = item.TipoBuque
+
+                    };
+                    errores.Add(error);
+                }
+
+                servicio.RegistrarErroresGeolocalizacion(errores);
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            }
+            catch (System.Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+
+     
+        }
+        public class erroresGeo
+        {
+            public string NombreBuque;
+            public string TipoBuque;
+            public string Bandera;
+            public string IMO;
+            public string Mensaje;
+        }
+
+
         #region Metodos para cargar los embarques en la pantalla de geolocalización
         private void cargarEmbarquenesLineUpPorPuerto(IList<InstanciaWorkflowPuertoDto> listaEmbarques, ref List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion,  IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto, short tipoMuelleCarga)
         {
@@ -238,6 +289,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
 
         }
+
+
+       
         private enum MuelleCarga
         {
             SanBenito = 1,

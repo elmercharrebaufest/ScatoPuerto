@@ -38,6 +38,7 @@
     "jquery": "^3.5.1",
     "jspdf": "^2.3.1",
     "leaflet": "^1.7.1",
+    "ng-multiselect-dropdown": "^0.3.8",
     "ng-sidebar": "^9.4.2",
     "ngx-chips": "^2.2.2",
     "ngx-material-timepicker": "^5.5.3",
@@ -45,8 +46,9 @@
     "number-to-words": "^1.2.4",
     "popper.js": "^1.16.1",
     "primeicons": "^4.1.0",
-    "primeng": "^11.4.2",
+    "primeng": "^11.4.5",
     "rxjs": "~6.6.0",
+    "to-words": "^3.3.0",
     "tslib": "^2.0.0",
     "xlsx": "^0.17.2",
     "zone.js": "~0.10.2"

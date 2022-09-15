@@ -9,16 +9,16 @@
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
         <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
         <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-        <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
-        <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
-        <button type="button" class="btn btn-success" (click)="modificarEstadoBuque('Cargando')">ENVIAR A TABLERISTA</button>
+        <!-- <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button> -->
+        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+        <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
     </div>
 
     <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
 
     <div  *ngIf="mostrarTableristaOperando">    
-        <div id="umap" class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
-            <app-umap></app-umap>
+        <div id="umap">
+            <app-umap [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId"></app-umap>
         </div>
 
         <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
@@ -50,7 +50,8 @@
         <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
             <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
             <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-            <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button>
+            <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
+            <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
             <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
         </div>
     </div>

@@ -1,8 +1,9 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
-import { Balanzas, InformacionAdicional } from '@ScatoModels/balanzadas/balanza';
+import { BalanzadasAgrupadas, BalanzadasBuque, Balanzas, InformacionAdicional } from '@ScatoModels/balanzadas/balanza';
 import { EmbarqueService } from './embarque.service';
 import { RitmosBalanzas78 } from '@ScatoModels/balanzadas/ritmos-balanzas78';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
   /**
@@ -17,8 +18,12 @@ export class Balanzas78Service {
   private balanzadasArray: Balanzas[];
   filtroBalanza7: Balanzas[] = [];
   filtroBalanza8: Balanzas[] = [];
+  filtroBalanzas7EnCurso: BalanzadasAgrupadas[] = [];
+  filtroBalanzas8EnCurso: BalanzadasAgrupadas[] = [];
   private interval: any;
   private intervalRitmosBalanzas78: NodeJS.Timeout;
+  private intervalBalanzadasEnCurso: NodeJS.Timeout;
+  private intervalBodegas: NodeJS.Timeout;
 
   @Output() sendDataBalanza7 = new EventEmitter<any>();
   @Output() sendDataBalanza8 = new EventEmitter<any>();
@@ -26,72 +31,122 @@ export class Balanzas78Service {
   @Output() sendDataBalanzada7y8 = new EventEmitter<Balanzas[]>();
   @Output() sendDataBalanzada7 = new EventEmitter<Balanzas[]>();
   @Output() sendDataBalanzada8 = new EventEmitter<Balanzas[]>();
+  @Output() sendDataBalanzadas7EnCurso = new EventEmitter<BalanzadasAgrupadas[]>();
+  @Output() sendDataBalanzadas8EnCurso = new EventEmitter<BalanzadasAgrupadas[]>();
   @Output() sendDataBalanzada7y8Completas = new EventEmitter<Balanzas[]>();
   @Output() sendDataBalanzada7Kilos = new EventEmitter<number>();
   @Output() sendDataBalanzada8Kilos = new EventEmitter<number>();
   
   @Output() sendDataBalanzadaAgrupada7 = new EventEmitter<Balanzas[]>();
   @Output() sendDataBalanzadaAgrupada8 = new EventEmitter<Balanzas[]>();
-
+  
   @Output() informacionAdicional = new EventEmitter<InformacionAdicional>();
   @Output() sendRitmosBalanzas78 = new EventEmitter<RitmosBalanzas78>();
+  @Output() sendBalanzadasBuque = new EventEmitter<BalanzadasBuque[]>();
 
   materialesPuerto = [];
+  tiempoActualizacionBalanzas: number = 15000; // por default
+  tiempoActualizacionRitmosBlzas78: number = 15000; // por default
 
   constructor(private _balanzaService: BalanzaService, 
-              private embarqueService: EmbarqueService){
+              private embarqueService: EmbarqueService,
+              private parametrosService: ParametrosService){
 
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
+    this.tiempoActualizacionBalanzas = this.parametrosService.getParametroTiempoActualizacionBalanzas();
+    this.tiempoActualizacionRitmosBlzas78 = this.parametrosService.getParametroTiempoActualizacionRitmosBlzas78();
   }
 
   //SETEA VAPOR SELECCIONADO PARA EMITIR LAS BALANZADAS
   /**
-   * 
    * @param {number} id id del Modulo De Carga del embarque seleccionado
    * @returns {void}
    * @memberof Balanzas78Service
    * @description Setea el Vapor para emitir las balanzadas
    */
-  setEmbarqueBalanza(idModuloDeCarga: number = 0) {
+  setEmbarqueBalanza(idModuloDeCarga: number = 0, actualizaAhora: boolean=false) {
     if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
     
     console.log('ID en setEmbarqueBalanza desde SERV', idModuloDeCarga);
     
-    // this._balanzaService.listarBalanzadaBuque(vaporId).subscribe( res => {
-    //   this.balanzadasArray = res;
-    // })
+    this.tiempoActualizacionBalanzas = this.parametrosService.getParametroTiempoActualizacionBalanzas();
+    this.tiempoActualizacionRitmosBlzas78 = this.parametrosService.getParametroTiempoActualizacionRitmosBlzas78();
 
-    this.interval = setInterval(() => {
-      this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
-        .subscribe(resp => {
-          // console.log('++++++++++++++++++++++++++++++++++');
-          // console.log('sincronizarBalanzasCortes desde SERV', resp);
-          // console.log('++++++++++++++++++++++++++++++++++');
-          
-          this.balanzadasArray = resp.balanzas;
-          this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
-          this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
-
-          this.setBalanzada7y8(this.balanzadasArray);
-          this.setBalanzada7(this.filtroBalanza7);
-          this.setBalanzada8(this.filtroBalanza8);
-          this.setBalanzada7y8Completas(resp.balanzas);
-          this.setBalanzada7Kilos(resp.balanzas);
-          this.setBalanzada8Kilos(resp.balanzas);
-          this.setInfoAdicional(resp.informacionAdicional);
-        })
-    }, 15000);
+    if(actualizaAhora){
+      this.sincronizarBalanzasCortes(idModuloDeCarga);
+    }else{
+      this.interval = setInterval(() => {
+        this.sincronizarBalanzasCortes(idModuloDeCarga);
+      }, this.tiempoActualizacionBalanzas);
+    }
 
     this.intervalRitmosBalanzas78 = setInterval(() => {
       this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
         .subscribe(resp => this.setSincRitmosBalanzas78(resp) )
-    }, 15000);
+    }, this.tiempoActualizacionRitmosBlzas78);
 
+    this.intervalBalanzadasEnCurso = setInterval(() => this.actualizarBalanzadasEnCurso(idModuloDeCarga), this.tiempoActualizacionBalanzas);
+
+    this.intervalBodegas = setInterval(() => this.actualizarBodegas(idModuloDeCarga), this.tiempoActualizacionBalanzas);
+  }
+
+  setEmbarqueBalanzaCalidad(idModuloDeCarga: number = 0) {
+    if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
+    
+    this.sincronizarBalanzasCortes(idModuloDeCarga);
+
+    this._balanzaService.sincronizarRitmosBalanzas(idModuloDeCarga)
+      .subscribe(resp => this.setSincRitmosBalanzas78(resp) );
+
+    this.actualizarBalanzadasEnCurso(idModuloDeCarga);
+    this.actualizarBodegas(idModuloDeCarga);
+  }
+
+  sincronizarBalanzasCortes(idModuloDeCarga: number): void {
+    this._balanzaService.sincronizarBalanzasCortes(idModuloDeCarga)
+      .subscribe(resp => {
+        this.balanzadasArray = resp.balanzas;
+        this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
+        this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
+
+        this.setBalanzada7y8(this.balanzadasArray);
+        this.setBalanzada7(this.filtroBalanza7);
+        this.setBalanzada8(this.filtroBalanza8);
+        this.setBalanzada7y8Completas(resp.balanzas);
+        this.setBalanzada7Kilos(resp.balanzas);
+        this.setBalanzada8Kilos(resp.balanzas);
+        this.setInfoAdicional(resp.informacionAdicional);
+      });
+  }
+
+  actualizarBalanzadasEnCurso(idModuloDeCarga: number){
+    this._balanzaService.obtenerBalanzadasEnCurso(idModuloDeCarga)
+      .subscribe(resp => {
+        if(resp.balanzadasEnCurso.balanzadasAgrupadas != null && resp.balanzadasEnCurso.balanzadasAgrupadas.length>0){
+          let balanzadasAgrupadasArray: BalanzadasAgrupadas[] = resp.balanzadasEnCurso.balanzadasAgrupadas;
+          this.filtroBalanzas7EnCurso = balanzadasAgrupadasArray.filter(x => x.numeroBalanza === '7');
+          this.filtroBalanzas8EnCurso = balanzadasAgrupadasArray.filter(x => x.numeroBalanza === '8');
+          this.setBalanzadas7EnCurso(this.filtroBalanzas7EnCurso);
+          this.setBalanzadas8EnCurso(this.filtroBalanzas8EnCurso);
+        }else{
+          this.filtroBalanzas7EnCurso = [];
+          this.filtroBalanzas8EnCurso = [];
+          this.setBalanzadas7EnCurso(this.filtroBalanzas7EnCurso);
+          this.setBalanzadas8EnCurso(this.filtroBalanzas8EnCurso);
+        }
+      })
+  }
+
+  actualizarBodegas(idModuloDeCarga: number){
+    this._balanzaService.balanzadasBuque(idModuloDeCarga)
+      .subscribe(resp => this.setBalanzadasBuque(resp.balanzadasBuque))
   }
 
   limpiarInterval(){
     clearInterval(this.interval);
     clearInterval(this.intervalRitmosBalanzas78);
+    clearInterval(this.intervalBalanzadasEnCurso);
+    clearInterval(this.intervalBodegas);
   }
 
   // TODO: Gonzalo - Nuevos emitter para consumir balanzadas en los componentes
@@ -106,6 +161,13 @@ export class Balanzas78Service {
   }
   setBalanzada7y8Completas(balanzadasCompletas: Balanzas[]){
     this.sendDataBalanzada7y8Completas.emit(balanzadasCompletas);
+  }
+
+  setBalanzadas7EnCurso(balanzada7: BalanzadasAgrupadas[]){
+    this.sendDataBalanzadas7EnCurso.emit(balanzada7);
+  }
+  setBalanzadas8EnCurso(balanzada8: BalanzadasAgrupadas[]){
+    this.sendDataBalanzadas8EnCurso.emit(balanzada8);
   }
 
   // TODO: Evangelino - Se devuelven la lista de balanzas para utilizar el componente en calidad
@@ -132,9 +194,13 @@ export class Balanzas78Service {
 
   // Usados en "balanzas" y "calidad"
   setBalanzadaAgrupada7(balanzadaAgrupada7: Balanzas[]){
+    // this.posibleLoop01 = this.posibleLoop01 + 1;
+    // console.log('setBalanzadaAgrupada7() - this.posibleLoop01: ', this.posibleLoop01);
     this.sendDataBalanzadaAgrupada7.emit(balanzadaAgrupada7);
   }
   setBalanzadaAgrupada8(balanzadaAgrupada8: Balanzas[]){
+    // this.posibleLoop02 = this.posibleLoop02 + 1;
+    // console.log('setBalanzadaAgrupada8() - this.posibleLoop02: ', this.posibleLoop02);
     this.sendDataBalanzadaAgrupada8.emit(balanzadaAgrupada8);
   }
 
@@ -146,4 +212,7 @@ export class Balanzas78Service {
     this.sendRitmosBalanzas78.emit(ritmosBalanzas78);
   }
 
+  setBalanzadasBuque(balanzadasBuque: BalanzadasBuque[]){
+    this.sendBalanzadasBuque.emit(balanzadasBuque);
+  }
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, Input, OnInit, Output, ViewChild, EventEmitter, ViewChildren, QueryList } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { Nir } from '@ScatoModels/nir';
+import { Mano, Nir, NirManualPuerto, TipoNir } from '@ScatoModels/nir';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
@@ -9,208 +9,137 @@ import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { finalize } from 'rxjs/operators';
 import { Mail } from '@ScatoModels/mail';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
+import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
+import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { NirManoComponent } from './nir-mano/nir-mano.component';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 @Component({
   selector: 'app-nir',
   templateUrl: './nir.component.html',
   styleUrls: ['./nir.component.css']
 })
-export class NIRComponent implements OnInit {
-  forms: FormGroup;
-  datosEmbarque: any;
-  materialesPuerto: MaterialPuerto[] = [];
-  materialMaiz: MaterialPuerto;
-  materialTrigo: MaterialPuerto;
-  moduloDeCarga_Id: number;
+
+export class NIRComponent {
+  @ViewChild("mano1")Mano1Component: NirManoComponent;
+  @ViewChild("mano2")Mano2Component: NirManoComponent;
   confirmationDialogService: any;
-  bodegas: Bodega[];
-  conTrigo: boolean = false;
-  conMaiz: boolean = false;
-  hideSpinner: any;
   
+  //data
+  nir: Nir;
+  manosDeEmbarque: ManosDeEmbarque;
+  moduloDeCarga_Id: number;
+
+  //Flags
+  Mano1Visible: boolean = false;
+  Mano2Visible: boolean = false;
+  TrigoMano1: boolean = false;
+  TrigoMano2: boolean = false;
+  MaizMano1: boolean = false;
+  MaizMano2: boolean = false;
+  isLoaded: boolean = false;
+  guardando: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private moduloDeCargaService: ModuloDeCargaService,
     private _procesoService: DatosEmbarquesProcesoService,
     confirmationDialogService: ConfirmationDialogService,
     private procesoCalidadService: ProcesoCalidadService,
+    private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
+    private _CalidadSharedService: CalidadSharedService
   ) {
+    this.nir = new Nir();
     this.confirmationDialogService = confirmationDialogService;
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-    this.datosEmbarque = this._procesoService.getDatosGrafico();
-    this.materialesPuerto = this.datosEmbarque.listaMateriales;
-    this.materialTrigo = this.materialesPuerto.find(m => m.descripcionCorta.includes('TRIGO'));
-    if(this.materialTrigo) this.conTrigo = true;
-    this.materialMaiz = this.materialesPuerto.find(m => m.descripcionCorta.includes('MAIZ'));
-    if(this.materialMaiz) this.conMaiz = true;
-  }
 
-  ngOnInit(): void {
-    this.initFormulario();
+    this._CalidadSharedService.Manos.subscribe((res: any) => {
+      this.manosDeEmbarque = res;
+      this.TrigoMano1 = Object.values(this.manosDeEmbarque[0].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == "WHEAT")).length > 0
+      this.TrigoMano2 = Object.values(this.manosDeEmbarque[1].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == "WHEAT")).length > 0
+      this.MaizMano1 = Object.values(this.manosDeEmbarque[0].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == "CORN")).length > 0
+      this.MaizMano2 = Object.values(this.manosDeEmbarque[1].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == "CORN")).length > 0
 
-    this.moduloDeCargaService.obtenerListadoBodegas()
-      .pipe( finalize( () => this.obtenerNir() ) )
-      .subscribe( bod => this.bodegas = bod );
-  }
-  
-  initFormulario(){
-    this.forms = this.fb.group({
-      maizMano1: this.fb.array([this.initMaiz(null, 1)]),
-      maizMano2: this.fb.array([this.initMaiz(null, 2)]),
-      trigoMano1: this.fb.array([this.initTrigo(null, 1)]),
-      trigoMano2: this.fb.array([this.initTrigo(null, 2)])
+      this.nir.tipoNir = this.getTipoNir(this.TrigoMano1, this.TrigoMano2, this.MaizMano1, this.MaizMano2);
+      this.Mano1Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 6;
+      this.Mano2Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 4 || this.nir.tipoNir == 7 || this.nir.tipoNir == 8;      
+
+      this.setTipoManos();
+      this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe((res: NirManualPuerto[]) => {
+        if(this.Mano1Visible){
+          let materialId_mano1: number;
+          //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
+          //Para no harcodear hay que refactorizar y no había tiempo (Martín)
+          materialId_mano1 = this.nir.mano1.tipo == 'Trigo' ? 17 : 11;
+          this.nir.mano1.nirManualPuerto = [];
+          this.nir.mano1.nirManualPuerto = res.filter(x => x.mano == 'mano1' && x.material_id == materialId_mano1);
+          this._CalidadSharedService.mano1 = this.nir.mano1;
+        }
+
+        if(this.Mano2Visible){
+          let materialId_mano2: number;
+          //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
+          //Para no harcodear hay que refactorizar y no había tiempo (Martín)
+          materialId_mano2 = this.nir.mano2.tipo == 'Maíz' ? 11 : 17;
+          this.nir.mano2.nirManualPuerto = [];
+          this.nir.mano2.nirManualPuerto = res.filter(x => x.mano == 'mano2' && x.material_id == materialId_mano2);
+          this._CalidadSharedService.mano2 = this.nir.mano2;
+        }
+        this.isLoaded = true;
+      })
     });
-  }
-
-  initMaiz(x: Nir = null, numeroMano?: number){
-    return this.fb.group({
-      id: x?.id ?? 0,
-      fecha: x?.fecha ? x.fecha : '',
-      hora: x?.hora ?? '',
-      hd: x?.hd ?? '',
-      ph: x?.ph ?? '',
-      origen: x?.origen ?? '',
-      bodega: x?.bodega ?? '',
-      mano: x?.mano ?? this.asignarMano(numeroMano),
-      moduloDeCargaId: x?.moduloDeCargaId ?? 0,
-      material_id: x?.material_id ?? this.materialMaiz?.id
-    });
-  }
-
-  initTrigo(x: Nir = null, numeroMano?: number){
-    return this.fb.group({
-      id: x?.id ?? 0,
-      fecha: x?.fecha ? x.fecha : '',
-      hora: x?.hora ?? '',
-      ritmo: x?.ritmo ?? '',
-      hd: x?.hd ?? '',
-      protBase: x?.protBase ?? '',
-      prot_BS: x?.prot_BS ?? '',
-      ph: x?.ph ?? '',
-      origen: x?.origen ?? '',
-      bodega: x?.bodega ?? '',
-      mano: x?.mano ?? this.asignarMano(numeroMano),
-      moduloDeCargaId: x?.moduloDeCargaId ?? 0,
-      material_id: x?.material_id ?? this.materialTrigo?.id
-    });
-  }
-
-  asignarMano(numeroMano: number):string{
-    if(!numeroMano) return '';
-
-    let mano = '';
-    if(numeroMano==1)
-      mano = 'mano1';
-    else
-      mano = 'mano2';
     
-    return mano;
   }
 
-  obtenerNir(){
-    this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe( nir => {
-      console.log('obtenerNir NIR: ', nir);
+
+  initMano(mano: Mano = null){
+    if(mano != null){
+      return this.fb.group({
+        tipo: mano?.tipo ? mano.tipo : '',
+        nirManualPuerto: this.fb.array(mano.nirManualPuerto)
+      });    
+    }else 
+      return null;
       
-      let trigoMano1 = nir.filter(n => n.material_id === this.materialTrigo?.id && n.mano=='mano1');
-      let trigoMano2 = nir.filter(n => n.material_id === this.materialTrigo?.id && n.mano=='mano2');
-      let maizMano1 = nir.filter(n => n.material_id === this.materialMaiz?.id && n.mano=='mano1');
-      let maizMano2 = nir.filter(n => n.material_id === this.materialMaiz?.id && n.mano=='mano2');
-
-      this.trigoMano1.clear();
-      trigoMano1.forEach( x => this.trigoMano1.push( this.initTrigo(x, 1) ));
-      this.trigoMano2.clear();
-      trigoMano2.forEach( x => this.trigoMano2.push( this.initTrigo(x, 2) ));
-      this.maizMano1.clear();
-      maizMano1.forEach( x => this.maizMano1.push( this.initMaiz(x, 1) ));
-      this.maizMano2.clear();
-      maizMano2.forEach( x => this.maizMano2.push( this.initMaiz(x, 2) ));
-
-    } );
   }
 
-  get trigoMano1(): FormArray {
-    return this.forms.get("trigoMano1") as FormArray;
-  }
-  get trigoMano2(): FormArray {
-    return this.forms.get("trigoMano2") as FormArray;
-  }
-  get maizMano1(): FormArray {
-    return this.forms.get("maizMano1") as FormArray;
-  }
-  get maizMano2(): FormArray {
-    return this.forms.get("maizMano2") as FormArray;
-  }
+  obtenerNirCompleto(): NirManualPuerto[]{
+    let nir: NirManualPuerto[] = [];
 
-  obtenerTrigoMano1(): []{
-    return this.forms.getRawValue().trigoMano1;
-  }
-  obtenerTrigoMano2(): []{
-    return this.forms.getRawValue().trigoMano2;
-  }
-  obtenerMaizMano1(): []{
-    return this.forms.getRawValue().maizMano1;
-  }
-  obtenerMaizMano2(): []{
-    return this.forms.getRawValue().maizMano2;
-  }
-
-  getDia(fecha: Date, formato: string = 'ES'): string{
-    let date1 = fecha.toString().substr(0, 10);
-    let aa = date1.toString().substr(0, 4);
-    let mm = date1.toString().substr(5, 2);
-    let dd = date1.toString().substr(8, 2);
-    let date = ``;
-
-    if( formato == 'EN' ){
-      date = `${aa}-${mm}-${dd}`;
-    } else {
-      date = `${dd}-${mm}-${aa}`;
+    if(this.Mano1Visible){
+       this.Mano1Component.getNir().forEach(x => {
+        nir.push(x)
+       });
     }
 
-    return date;
-  }
-
-  agregarLineasEmbarqueTrigo(numeroMano: number) {
-    if(numeroMano == 1)
-      this.trigoMano1.push(this.initTrigo(null, numeroMano));
-    else
-      this.trigoMano2.push(this.initTrigo(null, numeroMano));
-  }
-  agregarLineasEmbarqueMaiz(numeroMano: number) {
-    if(numeroMano == 1)
-      this.maizMano1.push(this.initMaiz(null, numeroMano));
-    else
-      this.maizMano2.push(this.initMaiz(null, numeroMano));
-  }
-  
-  eliminarLineasEmbarque(pos: number, productoMano: string) {
-    this[productoMano].removeAt(pos);
-  }
-
-  obtenerNirCompleto(): Nir[]{
-    let nir: Nir[] = [];
-    let maizMano1 = [], maizMano2 = [], trigoMano1 = [], trigoMano2 = [];
-
-    maizMano1 = this.obtenerMaizMano1();
-    maizMano2 = this.obtenerMaizMano2();
-    trigoMano1 = this.obtenerTrigoMano1();
-    trigoMano2 = this.obtenerTrigoMano2();
-    
-    for(let m1 of maizMano1){ nir.push(m1); }
-    for(let m2 of maizMano2){ nir.push(m2); }
-    for(let t1 of trigoMano1){ nir.push(t1); }
-    for(let t2 of trigoMano2){ nir.push(t2); }
-    
+    if(this.Mano2Visible){
+      this.Mano2Component.getNir().forEach(x => {
+       nir.push(x)
+      });
+    }
     return nir;
   }
-
-  enviarNir(){
-    let nir: Nir[] = this.obtenerNirCompleto();
-
-    this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( nir, this.moduloDeCarga_Id )
-      .subscribe( res => console.log(res) );
-
-    this.enviarMail(nir);
+  
+  enviarNir(guardarYEnviar : boolean = false) {
+    let nir: NirManualPuerto[] = this.obtenerNirCompleto();
+    // this.calcularPromedios(nir);
+    if(guardarYEnviar == true) {
+      this.enviarMail(nir);      
+    }else{
+      let ObjetoMailNir = {
+        nirManualPuerto : nir,
+        mail: '',
+      }
+      this.guardando = true;
+      this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {
+        this.guardando = false;
+        this.confirmationDialogService.confirm('¡Atención!', 'NIR guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success).then((confirmed) => {
+          if (confirmed) {
+          }
+        }).catch()
+      });   
+    }
   }
 
   compareOrigen(c1: any, c2: any) {
@@ -219,39 +148,181 @@ export class NIRComponent implements OnInit {
   compareBodega(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
-
+  compareCeldaOrigen(c1: any, c2: any) {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  }
 
   enviarMail(nir) {
-    console.log('********NIR********', nir)
-    var titulo = "Enviar turno por mail";
+    var titulo = "Enviar NIR";
     var text = "Cuerpo del Mail:"
     var textoCuerpoMail = 'Cuerpo del mail';
     var inputTitle = "Destinatarios";
-    var mail = new Mail(`NIR.`,`${textoCuerpoMail}`);
-    this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual').subscribe( res => mail.destinatarios = res)
+    var mailNir = new Mail(`NIR.`,`${textoCuerpoMail}`);
 
-    var button1 = 'Enviar';
-    var button2 = 'Cancelar';
+    this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual')
+    .subscribe(data => {mailNir.destinatarios = data
 
-    this.confirmationDialogService.confirm("titulo", text, button1, button2, 'lg', mail, null, inputTitle, true)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.hideSpinner.emit(true);
-          }
-      })
-      .catch((e) => {
-       /*  this.confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
+      var button1 = 'Enviar';
+      var button2 = 'Cancelar';
+      let ObjetoMailNir = {
+        nirManualPuerto : nir,
+        mail: mailNir
+      }
+      this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailNir, null, inputTitle, true)
         .then((confirmed) => {
-          if (confirmed){
-            this.hideSpinner.emit(false)
-            return
-          } */
-          this.hideSpinner.emit(false)
-          return
-      //  }).catch(() => window.location.reload());
+          if (confirmed) {
+              console.log(ObjetoMailNir);              
+              let nombreBuque = this.datosEmbarqueProcesoService.getEmbarqueSelected().nombreBuque
+              this.guardando = true;
+              this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id, nombreBuque ).subscribe(res => {
+                this.confirmationDialogService.confirm('¡Atención!', 'Mail enviado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success)
+                console.log('200 OK');
+                this.guardando = false;
+              }), (error => {
+                console.log(error);
+              })
+          }
+        })
+    })
+  }
 
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-        this.hideSpinner.emit(false);
+  promedioTotalHD(): number{
+    if(this.isLoaded){
+      let promedio = 0;
+      let divisor = 0;
+
+      this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.hd))){
+          promedio += parseFloat(x.hd);
+          divisor += 1;          
+        }
       });
+      
+      this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.hd))){
+          promedio += parseFloat(x.hd);
+          divisor += 1;          
+        }
+      });
+      return promedio / divisor;
+    }
+    return 0;
+  }
+  
+  promedioTotalPH(): number{
+    if(this.isLoaded){
+      let promedio = 0;
+      let divisor = 0;
+
+      this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.ph))){
+          promedio += parseFloat(x.ph);
+          divisor += 1;          
+        }
+      });
+      
+      this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.ph))){
+          promedio += parseFloat(x.ph);
+          divisor += 1;          
+        }
+      });
+      return promedio / divisor;
+    }
+    return 0;
+  }
+  
+  promedioTotalProtBS(): number{
+    if(this.isLoaded){
+      let promedio = 0;
+      let divisor = 0;
+
+      this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.prot_BS))){
+          promedio += parseFloat(x.prot_BS);
+          divisor += 1;          
+        }
+      });
+      
+      this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.prot_BS))){
+          promedio += parseFloat(x.prot_BS);
+          divisor += 1;          
+        }
+      });
+      return promedio / divisor;
+    }
+    return 0;
+  }
+
+  promedioTotalProtBase(): number{
+    if(this.isLoaded){
+      let promedio = 0;
+      let divisor = 0;
+
+      this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.protBase))){
+          promedio += parseFloat(x.protBase);
+          divisor += 1;          
+        }
+      });
+      
+      this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+        if(!isNaN(parseFloat(x.protBase))){
+          promedio += parseFloat(x.protBase);
+          divisor += 1;          
+        }
+      });
+      return promedio / divisor;
+    }
+    return 0;
+  }
+
+  getTipoNir(TrigoMano1: boolean, TrigoMano2: boolean, MaizMano1: boolean, MaizMano2: boolean): TipoNir{
+    //Si no tengo nada en conformación de lineas de embarque "El buque no posee trigo ni maíz."
+    if(!TrigoMano1 && !TrigoMano2 && !MaizMano1 && !MaizMano2){
+      return TipoNir.NoNir;
+    }else{
+      if(TrigoMano1){
+        if(TrigoMano2){
+          return TipoNir.SoloTrigo;
+        } else if(MaizMano2) {
+          return TipoNir.CombinacionTrigoMaiz;
+        } else {
+          return TipoNir.SoloTrigoMano1;
+        }
+      }
+
+      if(TrigoMano2){
+        if(MaizMano1){
+          return TipoNir.CombinacionMaizTrigo;
+        }
+        return TipoNir.SoloTrigoMano2;
+      }
+
+      if(MaizMano1){
+        if(MaizMano2){
+          return TipoNir.SoloMaiz;
+        } else if(TrigoMano2) {
+          return TipoNir.CombinacionMaizTrigo;
+        } else {
+          return TipoNir.SoloMaizMano1;
+        }
+      }
+
+      if(MaizMano2){
+        if(TrigoMano1){
+          return TipoNir.CombinacionTrigoMaiz;
+        }
+        return TipoNir.SoloMaizMano2;
+      }
+    }
+  }
+
+  setTipoManos(){
+    this.nir.mano1 = new Mano();
+    this.nir.mano1.tipo = this.Mano1Visible ? this.TrigoMano1 ? 'Trigo' : 'Maíz' : ''
+    this.nir.mano2 = new Mano();
+    this.nir.mano2.tipo = this.Mano2Visible ? this.TrigoMano2 ? 'Trigo' : 'Maíz' : ''
   }
 }

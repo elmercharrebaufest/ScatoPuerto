@@ -10,5 +10,6 @@ namespace Molinos.Scato.Dominio.Comandos
         public bool Enviado { get; set; }
         public ModuloDeCargaPlanillaDeTurnosDto Dto { get; set; }
         public DateTime? Fecha { get; set; }
+        public string nombreUsuario { get; set; }
     }
 }

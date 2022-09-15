@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="34" height="34" viewBox="0 0 34 34" xml:space="preserve">
+<desc>Created with Fabric.js 4.2.0</desc>
+<defs>
+</defs>
+<g transform="matrix(0 0 0 0 0 0)" id="61defcbc-8d9c-4e08-be21-f8dabe580db9"  >
+</g>
+<g transform="matrix(1 0 0 1 17 17)" id="38090594-bd70-4ef1-ab03-4b677292663e"  >
+<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  x="-17" y="-17" rx="0" ry="0" width="34" height="34" />
+</g>
+<g transform="matrix(0.03 0 0 0.03 16.97 16.97)" id="6960997a-bcb6-42d7-aecf-21edc941d7e2"  >
+	<image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAv9JREFUWEftlz9S20AUxr9n1qHEOUHgBDFlKnAT5ApokQDlBIETxJwg5ARRYE2LqSzSYE4QOAHkBOAyg2df5imSR5Yla+UJM2Qm29m70v722/fnE+GFDHohHPh3Qby+t44a1sBoMrhJoOVY1RsAjyAMDJmLs/dn8tt6WCviXrr7xOQDWE+9fQjCnw0ZTQBLyRyD74npg27rgQ1NKYh/5TdGv0bnCQCDL4goUK/UIGgFj9lNvEtvCwZbIOzHcwNTM4dlCs0Eia6BIBANAahz/SBoB/c2J/T7/vITPR0TaFOuzNRMaxZMIcjO951mzdR+ABgyuNN1usc2ANk1u/1dn4m/lsHkgshpRjQSiAYYLdt7LgKNrosRSCSpRbWSd6W5IF7oXUlMSLCdtk/lBYXDC71IKe3og1nr3NA9INBnAAPt6FZ27RRIHBdXYHzTbS1ZMnN4l94AjDXt6NLAd0O3JzGTd8Cph93QvZPaoFit2ARmFZD4yu8A3GhHr6ZPOAFSVQ15URUQWZ+oYmpmNZ1FWZAOCJ9A2NYbuld2LfOAxIF7DsaRbutOsscESEKrFtXrvMjOA6uqSFwgH0C41ht6XKUnFQm9BwA/taOlXFuNqiCRiqEnFfkuHSdZEM6Sxg9Kir4tIHsHYFHSsmD+NpvaefBVQD5aSTS96Ms8II8Mfug63RXbTee8minlX2iw9r1nT9+kCTL4MN1IJxQZd1zL8j5XHel7gXiVbOWe7jVx73jmEi+ZNFEipkBS/qGnHb1dFrRVgjXp6nmVu8gGiA99+zdtwPiAmYqaW+KTP+MyLJZwKducyhTKm0+pPFSsmnld3cYqwkaZIsA0hKmZ9SLfamOepQsvMTioc/3IxqMIVOw9xKtKYxvOgpD1pa4qTmmxi1GvEaAFLPROnJOLPBX2wr1NAyPObiuaJ1wro/yyA5SCJJvFEot/eJMCkC6afNGlP7xkyS0IHVtfYw2SbB4r5IPQBKMx7sqE62gN40axOi5TIKtmZZB5ssbmmf8gWZV+A0W71DKgdFk1AAAAAElFTkSuQmCC" x="-17" y="-17" width="34" height="34"></image>
+</g>
+<g transform="matrix(0.15 0 0 0.11 16.91 16.98)"  >
+<path style="stroke: rgb(218,91,88); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(218,91,88); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-50, -50)" d="M 94.75 50 C 94.75 56.213 89.514 61.25 83.054 61.25 L 16.946 61.25 C 10.486 61.25 5.25 56.213 5.25 50 L 5.25 50 C 5.25 43.787 10.486 38.75 16.945999999999998 38.75 L 83.053 38.75 C 89.514 38.75 94.75 43.787 94.75 50 L 94.75 50 z" stroke-linecap="round" />
+</g>
+<g transform="matrix(0.35 0 0 0.35 16.95 16.95)"  >
+<path style="stroke: rgb(218,91,88); stroke-width: 2; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(218,91,88); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-50, -50)" d="M 50 92.875 C 26.358 92.875 7.125 73.642 7.125 50 C 7.125 26.358000000000004 26.358 7.125 50 7.125 C 73.642 7.125 92.875 26.358 92.875 50 C 92.875 73.642 73.642 92.875 50 92.875 z M 50 9.125 C 27.461 9.125 9.125 27.461 9.125 50 C 9.125 72.538 27.461 90.875 50 90.875 C 72.538 90.875 90.875 72.538 90.875 50 C 90.875 27.461 72.538 9.125 50 9.125 z" stroke-linecap="round" />
+</g>
+</svg>

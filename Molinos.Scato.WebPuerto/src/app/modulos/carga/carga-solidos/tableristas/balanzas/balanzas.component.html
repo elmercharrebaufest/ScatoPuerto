@@ -1,3 +1,7 @@
+<div class="alert alert-warning mt-3" role="alert" *ngIf="this.nombreDiferente">
+  El nombre del Vapor ({{this.nombreVapor}}) no coincide con la patente ({{this.patenteEmbarque}})
+</div>
+
 <div class="row">
   <!-- Inicio BALANZA 7 -->
   <div class="col">
@@ -12,12 +16,8 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
           </div>
           <div class="col">
-            <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7)'>Corte Manual</button>
+            <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7, true)'>Corte Manual</button>
           </div>
-        </div>
-  
-        <div class="alert alert-warning" role="alert" *ngIf="balanza7DiferenteNombre" >
-          El nombre del buque no coincide con el registrado en balanzadas.
         </div>
 
         <table class="claseTable" id="excel-table7">
@@ -91,18 +91,12 @@
                                 </div>
 
                                 <!-- COLUMNA MOTIVO -->
-                                <!-- CARGA NORMAL -->
-                                <div class="form-group" fxFlex='15' *ngIf="balanza.value.tn>999">
-                                  <input type="text"
-                                        class="inputLineasEmbarque" 
-                                        formControlName="kg"
-                                        [attr.disabled]="true">
-                                </div>
                                 <!-- BAJA CARGA O STOP -->
-                                <div class="form-group borde-div al-medio" fxFlex='15' *ngIf="balanza.value.tn<1000">
+                                <div class="form-group borde-div al-medio" fxFlex='15'>
                                   <label *ngIf="balanza.value.observaciones" 
                                         class="m-1"
-                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': (balanza.value.tn>0 && balanza.value.tn<1000)}" > 
+                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': balanza.value.tn>0}" 
+                                        data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones"> 
                                         {{ balanza.value.listadoTotalBalanzadas.motivosFallasBalanza.siglas }}
                                   </label>
 
@@ -114,7 +108,7 @@
                                       width="28" 
                                       height="25" 
                                       viewBox="0 0 28 25"
-                                      (click)='openModalCorte(addCorte7)' 
+                                      (click)='openModalCorte(addCorte7, null, null, false)' 
                                       class="m-1 icono"
                                       fill="#F0AD4E">
                                     <path id="Trazado_31" 
@@ -134,7 +128,7 @@
                                       width="27.983" 
                                       height="27.983" 
                                       viewBox="0 0 27.983 27.983"
-                                      (click)='openModalCorte(addCorte7)' 
+                                      (click)='openModalCorte(addCorte7, null, null, true)' 
                                       class="m-1 icono"
                                       fill="#D9534F">
                                     <path id="Trazado_285" data-name="Trazado 285" d="M16.254,2.262A13.992,13.992,0,1,0,30.245,16.254,14.007,14.007,0,0,0,16.254,2.262Zm0,2.105a11.857,11.857,0,0,1,9.027,4.174L5.585,21.461A11.859,11.859,0,0,1,16.254,4.367Zm0,23.773a11.865,11.865,0,0,1-9.578-4.877l19.825-13A11.863,11.863,0,0,1,16.254,28.14Z" transform="translate(-2.262 -2.262)"/>
@@ -145,7 +139,7 @@
                                   <svg 
                                       *ngIf="balanza.value.tn>0"
                                       width="28" height="28" viewBox="0 0 28 28" 
-                                      (click)='openModalCorte(addCorte7)' 
+                                      (click)='openModalCorte(addCorte7, null, null, false)' 
                                       class="m-1 icono"
                                       fill="#F0AD4E">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
@@ -159,7 +153,7 @@
                                   <svg 
                                       *ngIf="balanza.value.tn==0"
                                       width="28" height="28" viewBox="0 0 28 28" 
-                                      (click)='openModalCorte(addCorte7)' 
+                                      (click)='openModalCorte(addCorte7, null, null, true)' 
                                       class="m-1 icono"
                                       fill="#D9534F">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
@@ -179,7 +173,7 @@
                                           </div>
                                           <div class="col corte">
                                             <button class='btn btn-outline-primary' 
-                                                    *ngIf="!balanza.value.corteManual"
+                                                    *ngIf="!balanza.value.corteManual && balanza.value.tn==0"
                                                     (click)="generarCorte()">Nuevo evento</button>
                                           </div>
                                         </div>
@@ -238,7 +232,7 @@
                                                       formControlName="motivosFallasBalanza"
                                                       [compareWith]="compareMotivosBalanzas">
                                                 <option value="" selected disabled>Selecciona un Motivo</option>
-                                                <option *ngFor='let motivo of motivosBalanzas78' 
+                                                <option *ngFor='let motivo of motivosBalanzas78sorted' 
                                                         [ngValue]='motivo'> {{motivo.siglas}} - {{motivo.nombre}} </option>
                                               </select>
                                             </ng-container>
@@ -265,7 +259,7 @@
                                                       formControlName="motivosFallasBalanza_Nueva"
                                                       [compareWith]="compareMotivosBalanzas">
                                                 <option value="" selected disabled>Selecciona un Motivo</option>
-                                                <option *ngFor='let motivo of motivosBalanzas78' 
+                                                <option *ngFor='let motivo of motivosBalanzas78sorted' 
                                                         [ngValue]='motivo'> {{motivo.siglas}} - {{motivo.nombre}} </option>
                                               </select>
                                             </ng-container>
@@ -395,6 +389,27 @@
           </div>
         </div>
 
+        <!-- <div fxLayout='row wrap' class='info-desc' *ngIf="this.mostrarInfoBalanzadasEnCurso">
+          <p fxFlex='100'><b>Información de Carga en curso:</b></p>
+          <p fxFlex='100'><b>Primera balanzada: </b>{{this.fechaInicio7EnCurso}}</p>
+          <p fxFlex='100'><b>Última balanzada: </b>{{this.fechaFin7EnCurso}}</p>
+          <p fxFlex='100'><b>Lleva cargando (Kg): </b>{{this.llevaCargando7EnCurso}}</p>
+        </div> -->
+
+        <table class="tableEnCurso info-desc" *ngIf="this.mostrarInfoBalanzadasEnCurso">
+          <tr>
+            <td><b>Estado de la balanza:</b> Carga en curso</td>
+          </tr>
+          <tr>
+            <td><b>Inicio:</b> {{this.fechaInicio7EnCurso}}</td>
+            <td><b>Lleva Cargando (Tn):</b> {{this.llevaCargando7EnCurso/1000}}</td>
+          </tr>
+          <tr>
+            <td><b>Producto:</b> {{this.producto7EnCurso}}</td>
+            <td><b>Bodega:</b> {{this.bodega7EnCurso}}</td>
+          </tr>
+        </table>
+
       </div>
 
 
@@ -418,12 +433,8 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
           </div>
           <div class="col">
-            <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8)'>Corte Manual</button>
+            <button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8, true)'>Corte Manual</button>
           </div>
-        </div>
-  
-        <div class="alert alert-warning" role="alert" *ngIf="balanza8DiferenteNombre" >
-          El nombre del buque no coincide con el registrado en balanzadas.
         </div>
 
         <table class="claseTable" id="excel-table8">
@@ -497,18 +508,12 @@
                                 </div>
 
                                 <!-- COLUMNA MOTIVO -->
-                                <!-- CARGA NORMAL -->
-                                <div class="form-group" fxFlex='15' *ngIf="balanza.value.tn>999">
-                                  <input type="text"
-                                        class="inputLineasEmbarque" 
-                                        formControlName="kg"
-                                        [attr.disabled]="true">
-                                </div>
                                 <!-- BAJA CARGA O STOP -->
-                                <div class="form-group borde-div al-medio" fxFlex='15' *ngIf="balanza.value.tn<1000">
+                                <div class="form-group borde-div al-medio" fxFlex='15'>
                                   <label *ngIf="balanza.value.observaciones" 
                                         class="m-1"
-                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': (balanza.value.tn>0 && balanza.value.tn<1000)}" > 
+                                        [ngClass]="{'stop': balanza.value.tn==0, 'bajaCarga': balanza.value.tn>0}" 
+                                        data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones"> 
                                         {{ balanza.value.listadoTotalBalanzadas.motivosFallasBalanza.siglas }}
                                   </label>
 
@@ -520,7 +525,7 @@
                                       width="28" 
                                       height="25" 
                                       viewBox="0 0 28 25"
-                                      (click)='openModalCorte(addCorte8)' 
+                                      (click)='openModalCorte(addCorte8, null, null, false)' 
                                       class="m-1 icono"
                                       fill="#F0AD4E">
                                     <path id="Trazado_31" 
@@ -540,7 +545,7 @@
                                       width="27.983" 
                                       height="27.983" 
                                       viewBox="0 0 27.983 27.983"
-                                      (click)='openModalCorte(addCorte8)' 
+                                      (click)='openModalCorte(addCorte8, null, null, true)' 
                                       class="m-1 icono"
                                       fill="#D9534F">
                                     <path id="Trazado_285" data-name="Trazado 285" d="M16.254,2.262A13.992,13.992,0,1,0,30.245,16.254,14.007,14.007,0,0,0,16.254,2.262Zm0,2.105a11.857,11.857,0,0,1,9.027,4.174L5.585,21.461A11.859,11.859,0,0,1,16.254,4.367Zm0,23.773a11.865,11.865,0,0,1-9.578-4.877l19.825-13A11.863,11.863,0,0,1,16.254,28.14Z" transform="translate(-2.262 -2.262)"/>
@@ -551,7 +556,7 @@
                                   <svg xmlns="http://www.w3.org/2000/svg" 
                                       *ngIf="balanza.value.tn>0"
                                       width="28" height="28" viewBox="0 0 28 28" 
-                                      (click)='openModalCorte(addCorte8)' 
+                                      (click)='openModalCorte(addCorte8, null, null, false)' 
                                       class="m-1 icono"
                                       fill="#F0AD4E">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
@@ -565,7 +570,7 @@
                                   <svg xmlns="http://www.w3.org/2000/svg" 
                                       *ngIf="balanza.value.tn==0"
                                       width="28" height="28" viewBox="0 0 28 28" 
-                                      (click)='openModalCorte(addCorte8)' 
+                                      (click)='openModalCorte(addCorte8, null, null, true)' 
                                       class="m-1 icono"
                                       fill="#D9534F">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
@@ -585,7 +590,7 @@
                                           </div>
                                           <div class="col corte">
                                             <button class='btn btn-outline-primary' 
-                                                    *ngIf="!balanza.value.corteManual"
+                                                    *ngIf="!balanza.value.corteManual && balanza.value.tn==0"
                                                     (click)="generarCorte()">Nuevo evento</button>
                                           </div>
                                         </div>
@@ -644,7 +649,7 @@
                                                       formControlName="motivosFallasBalanza"
                                                       [compareWith]="compareMotivosBalanzas">
                                                 <option value="" selected disabled>Selecciona un Motivo</option>
-                                                <option *ngFor='let motivo of motivosBalanzas78' 
+                                                <option *ngFor='let motivo of motivosBalanzas78sorted' 
                                                         [ngValue]='motivo'> {{motivo.siglas}} - {{motivo.nombre}} </option>
                                               </select>
                                             </ng-container>
@@ -671,7 +676,7 @@
                                                       formControlName="motivosFallasBalanza_Nueva"
                                                       [compareWith]="compareMotivosBalanzas">
                                                 <option value="" selected disabled>Selecciona un Motivo</option>
-                                                <option *ngFor='let motivo of motivosBalanzas78' 
+                                                <option *ngFor='let motivo of motivosBalanzas78sorted' 
                                                         [ngValue]='motivo'> {{motivo.siglas}} - {{motivo.nombre}} </option>
                                               </select>
                                             </ng-container>
@@ -799,6 +804,28 @@
               <li *ngFor="let res8 of resultado8" > <span class="prodToneladas">{{ res8.material_nombre }}: {{ res8.tn | number }} Tn</span> </li>
             </ul> -->
           </div>
+
+          <!-- <div fxLayout='row wrap' class='info-desc' *ngIf="this.mostrarInfoBalanzadasEnCurso">
+            <p fxFlex='100'><b>Información de Carga en curso:</b></p>
+            <p fxFlex='100'><b>Primera balanzada: </b>{{this.fechaInicio8EnCurso}}</p>
+            <p fxFlex='100'><b>Última balanzada: </b>{{this.fechaFin8EnCurso}}</p>
+            <p fxFlex='100'><b>Lleva cargando (Kg): </b>{{this.llevaCargando8EnCurso}}</p>
+          </div> -->
+
+          <table class="tableEnCurso info-desc" *ngIf="this.mostrarInfoBalanzadasEnCurso">
+            <tr>
+              <td><b>Estado de la balanza:</b> Carga en curso</td>
+            </tr>
+            <tr>
+              <td><b>Inicio:</b> {{this.fechaInicio8EnCurso}}</td>
+              <td><b>Lleva Cargando (Tn):</b> {{this.llevaCargando8EnCurso/1000}}</td>
+            </tr>
+            <tr>
+              <td><b>Producto:</b> {{this.producto8EnCurso}}</td>
+              <td><b>Bodega:</b> {{this.bodega8EnCurso}}</td>
+            </tr>
+          </table>
+
         </div>
 
       </div>
@@ -867,7 +894,7 @@
       <div class="col">
 
         <ng-container formGroupName="listadoTotalBalanzadas">
-          <div class="row">
+          <!-- <div class="row">
             <div class="col">
               <label>Producto</label>
                 <select class="custom-select w-100"
@@ -890,7 +917,7 @@
                           [ngValue]='bodega'> {{bodega.nombre}} </option>
                 </select>
             </div>
-          </div>
+          </div> -->
           <div class="row mt-3">
             <div class="col">
               <label>Motivo</label>
@@ -898,7 +925,7 @@
                       formControlName="motivosFallasBalanza"
                       [compareWith]="compareMotivosBalanzas">
                 <option value="" selected disabled>Selecciona un Motivo</option>
-                <option *ngFor='let motivo of motivosBalanzas78' 
+                <option *ngFor='let motivo of motivosBalanzas78sorted' 
                         [ngValue]='motivo'> {{motivo.siglas}} - {{motivo.nombre}} </option>
               </select>
             </div>

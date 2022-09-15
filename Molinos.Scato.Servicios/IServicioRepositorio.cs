@@ -635,6 +635,9 @@ namespace Molinos.Scato.Servicios
         IList<PermisoDto> ListarPermisosPorUsuario(string nombreUsuario);
 
         [OperationContract]
+       List<string> ListarPermisosPorUsuarioAD(string nombreUsuario);
+
+        [OperationContract]
         ExcepcionEnvioCamaraDto ObtenerExcepcionEnvioCamara(int id);
 
         [OperationContract]
@@ -2469,7 +2472,8 @@ namespace Molinos.Scato.Servicios
         ModuloDeCargaListadoDto ObtenerUltimaHabilitacionDeTanques();
 
         [OperationContract]
-        IList<MotivosDeCorteDto> ListarMotivosDeCorte();
+        //  IList<MotivosDeCorteDto> ListarMotivosDeCorte();
+        IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte();
 
         [OperationContract]
         IList<MotivosFallasBalanzaDto> ListarMotivosFallasBalanza();
@@ -2491,6 +2495,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         BalanzadasCompletasDto ListarBalanzadaBuque(int buque, int ritmoBajaCarga);
+
+        [OperationContract]
+        BalanzadasCompletasDto BalanzadasBuque(int IdModuloDeCarga);
 
         [OperationContract]
         IList<CargaDto> ListarCargaBalanzaPuerto();
@@ -2544,7 +2551,7 @@ namespace Molinos.Scato.Servicios
         void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos);
 
         [OperationContract]
-        void EliminarCorteBalanza(int idCorteBalanza);
+        void EliminarCorteBalanza(int idCorteBalanza, string nombreUsuario);
         [OperationContract]
         Dictionary<string, int> ObtenerRitmos(int modulodecarga_id);
 
@@ -2555,10 +2562,13 @@ namespace Molinos.Scato.Servicios
         Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga);
 
         [OperationContract]
+        BalanzadasCompletasDto ObtenerBalanzadasEnCurso(int IdModuloDeCarga);
+
+        [OperationContract]
         Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza);
 
         [OperationContract]
-        ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido);
+        ModuloDeCargaPlanillaDeTurnosDto ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido, string fechaTurno);
 
         [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion();
@@ -2651,6 +2661,41 @@ namespace Molinos.Scato.Servicios
         void EliminarObservacionDeCalidad(int observacion_id);
 
         [OperationContract]
+        void CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos);
+
+        [OperationContract]
+        void GenerarLogging(string service, string data, string tipo, string nombreUsuario = null);
+        [OperationContract]
         IList<BanderaDto> ObtenerBanderas(); 
+
+        [OperationContract]
+        void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque);
+
+        [OperationContract]
+        IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque);
+
+        [OperationContract]
+        IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque();
+
+        [OperationContract]
+        void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle);
+
+        [OperationContract]
+        void EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte);
+
+
+		[OperationContract]
+        void GuardarArchivos(List<ArchivosPuertoDto> archivosPuertoDto, int idEmbarque);
+        
+        [OperationContract]
+        IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque);
+
+        [OperationContract]
+        IList<TipoArchivoPuertoDto> obtenerTipoArchivos();
+
+        [OperationContract]
+        void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion);
+        
+        
     }
 }

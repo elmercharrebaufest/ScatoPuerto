@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy, AfterViewInit, Input } from '@angular/cor
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, finalize } from 'rxjs/operators';
 // Excel
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 // Models
-import { Balanzas, ListadoTotalBalanzadas, MotivosFallasBalanza, Bodega } from '@ScatoModels/balanzadas/balanza';
+import { Balanzas, ListadoTotalBalanzadas, MotivosFallasBalanza, Bodega, BalanzadasAgrupadas } from '@ScatoModels/balanzadas/balanza';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 // Services
@@ -18,8 +18,10 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Embarque } from '@ScatoModels/embarque';
 
 interface TotToneladas {
   producto: string;
@@ -35,8 +37,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   agregaCorte: boolean = false;
   balanza7Form: FormGroup;
   balanza8Form: FormGroup;
-  balanza7DiferenteNombre: boolean = false;
-  balanza8DiferenteNombre: boolean = false;
+  nombreDiferente: boolean = false;
   balanzasIncompletas: boolean = false;
   balanzaCorteManual: number = 0;
   bodegas: Bodega[] = [];
@@ -56,6 +57,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   materialesPuerto: MaterialPuerto[] = [];
   moduloDeCarga_Id: number;
   motivosBalanzas78: MotivosFallasBalanza[];
+  motivosBalanzas78sorted: MotivosFallasBalanza[];
   productos: MaterialPuerto[] = [];
   resultado7: TotToneladas[] = [];
   resultado8: TotToneladas[] = [];
@@ -67,6 +69,19 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   vaporId: number = 0;
   yaCargoModal: boolean = false;
   @Input() imprimir : boolean = false; 
+  patenteEmbarque: string;
+  nombreVapor: string;
+  fechaInicio7EnCurso: string;
+  fechaFin7EnCurso: string;
+  bodega7EnCurso: string;
+  producto7EnCurso: string;
+  llevaCargando7EnCurso: number;
+  fechaInicio8EnCurso: string;
+  fechaFin8EnCurso: string;
+  bodega8EnCurso: string;
+  producto8EnCurso: string;
+  llevaCargando8EnCurso: number;
+  mostrarInfoBalanzadasEnCurso: boolean = false;
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -77,7 +92,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
     private _balanzaService: BalanzaService,
-    private funcionesGeneralesService: FuncionesGeneralesService) {
+    private funcionesGeneralesService: FuncionesGeneralesService,
+    private parametrosService: ParametrosService) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
@@ -93,6 +109,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     
     this.cargarMotivosBalanzas78();
     this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
+    this.verificarNombresBuque();
     this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
   }
 
@@ -233,6 +250,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+
   initListadoTotalBalanzadas(x: ListadoTotalBalanzadas = null){
     if(!x){
       return this.formBuilder.group({
@@ -309,8 +327,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   obtenerBalanzadasEnVivo() {
-    console.log(` vapor: ${this.vaporId}, 
-                  moduloDeCarga: ${this.moduloDeCarga_Id} `);
+    this.parametrosService.consola(`vapor: `,this.vaporId);
+    this.parametrosService.consola(`moduloDeCarga: `,this.moduloDeCarga_Id);
 
     this.balanzas78Service.sendDataBalanzada7
       .pipe(takeUntil(this.unsubscribe))
@@ -331,11 +349,10 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             return prop;
           });
 
-         // this.startBalanza7 = `${this.getDia( blzas7[0].fecha_Inicio )} ${this.getHora( blzas7[0].fecha_Inicio )}`;
           let blzaConStartBalanza7 = blzas7.reduce( (blzas71, blzas72) => { return blzas71.fecha_Inicio < blzas72.fecha_Inicio ? blzas71 : blzas72; });
           this.startBalanza7 = `${this.getDia( blzaConStartBalanza7.fecha_Inicio )} ${this.getHora( blzaConStartBalanza7.fecha_Inicio )}`;
 
-          console.log('---- CORTES 7: ----', cortes7);
+          this.parametrosService.consola(`---- CORTES 7: ----: `,cortes7);
           
           this.actualizarBalanzadas7(cortes7);
         } else {
@@ -363,11 +380,10 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             return prop;
           });
 
-        //  this.startBalanza8 = `${this.getDia( blzas8[0].fecha_Inicio )} ${this.getHora( blzas8[0].fecha_Inicio )}`;
-        let blzaConStartBalanza8 = blzas8.reduce( (blzas81, blzas82) => { return blzas81.fecha_Inicio < blzas82.fecha_Inicio ? blzas81 : blzas82; });
-        this.startBalanza8 = `${this.getDia( blzaConStartBalanza8.fecha_Inicio )} ${this.getHora( blzaConStartBalanza8.fecha_Inicio )}`;
+          let blzaConStartBalanza8 = blzas8.reduce( (blzas81, blzas82) => { return blzas81.fecha_Inicio < blzas82.fecha_Inicio ? blzas81 : blzas82; });
+          this.startBalanza8 = `${this.getDia( blzaConStartBalanza8.fecha_Inicio )} ${this.getHora( blzaConStartBalanza8.fecha_Inicio )}`;
 
-          console.log('---- CORTES 8 : ----', cortes8);          
+          this.parametrosService.consola(`---- CORTES 8: ----: `,cortes8);
 
           this.actualizarBalanzadas8(cortes8);
         } else {
@@ -375,6 +391,52 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           this.actualizarBalanzadas8(cortes8);
         }
       } );
+
+    this.obtenerInfoBalanzadasEnCurso();
+  }
+
+  obtenerInfoBalanzadasEnCurso(){
+    this.balanzas78Service.sendDataBalanzadas7EnCurso
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe( bal7 => {
+        if(bal7.length>0){
+          this.mostrarInfoBalanzadasEnCurso = true;
+          this.bodega7EnCurso = bal7[0].bodega;
+          this.producto7EnCurso = bal7[0].producto;
+          this.fechaInicio7EnCurso = `${this.getDia( bal7[0].fechaInicio )} ${this.getHora( bal7[0].fechaInicio )}`;
+          this.fechaFin7EnCurso = `${this.getDia( bal7[bal7.length-1].fechaInicio )} ${this.getHora( bal7[bal7.length-1].fechaInicio )}`;
+          this.llevaCargando7EnCurso = 0;
+          bal7.forEach( x => this.llevaCargando7EnCurso = x.kilos+this.llevaCargando7EnCurso);
+        }else{
+          this.mostrarInfoBalanzadasEnCurso = false;
+          this.bodega7EnCurso = '';
+          this.producto7EnCurso = '';
+          this.fechaInicio7EnCurso = '';
+          this.fechaFin7EnCurso = ''
+          this.llevaCargando7EnCurso = 0;
+        }
+      });
+
+    this.balanzas78Service.sendDataBalanzadas8EnCurso
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe( (bal8:BalanzadasAgrupadas[]) => {
+        if(bal8.length>0){
+          this.mostrarInfoBalanzadasEnCurso = true;
+          this.bodega8EnCurso = bal8[0].bodega;
+          this.producto8EnCurso = bal8[0].producto;
+          this.fechaInicio8EnCurso = `${this.getDia( bal8[0].fechaInicio )} ${this.getHora( bal8[0].fechaInicio )}`;
+          this.fechaFin8EnCurso = `${this.getDia( bal8[bal8.length-1].fechaInicio )} ${this.getHora( bal8[bal8.length-1].fechaInicio )}`;
+          this.llevaCargando8EnCurso = 0;
+          bal8.forEach( x => this.llevaCargando8EnCurso = x.kilos+this.llevaCargando8EnCurso);
+        }else{
+          this.mostrarInfoBalanzadasEnCurso = false;
+          this.bodega8EnCurso = '';
+          this.producto8EnCurso = '';
+          this.fechaInicio8EnCurso = '';
+          this.fechaFin8EnCurso = ''
+          this.llevaCargando8EnCurso = 0;
+        }
+      });
   }
 
   actualizarBalanzadas8(balanzada: Balanzas[]) {
@@ -395,8 +457,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resultado8 = this.agruparProductos(balanzadasDataOK);
     // this.totalTnBodegas8 = this.agruparBodegas(balanzadasDataOK);
 
-    // this.verificarNombresBuque();
-    console.log('---- FORM BAL8 ----', this.balanzas8.value);
+    this.parametrosService.consola(`---- FORM BAL8: ----: `,this.balanzas8.value);
   }
 
   actualizarBalanzadas7(balanzada: Balanzas[]) {
@@ -415,8 +476,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resultado7 = this.agruparProductos(balanzadasDataOK);
     // this.totalTnBodegas7 = this.agruparBodegas(balanzadasDataOK);
 
-    // this.verificarNombresBuque();
-    console.log('---- FORM BAL7 ----', this.balanzas7.value);
+    this.parametrosService.consola(`---- FORM BAL7: ----: `,this.balanzas7.value);
   }
 
   agruparProductos(balanza: any): TotToneladas[] {
@@ -447,13 +507,14 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  // verificarNombresBuque() {
-  //   let balanza7Diferente = this.listadoBalanza7.find(x => x.nombreBuque != this.embarque.nombreBuque);
-  //   let balanza8Diferente = this.listadoBalanza8.find(x => x.nombreBuque != this.embarque.nombreBuque);
-
-  //   if (balanza7Diferente) this.balanza7DiferenteNombre = true;
-  //   if (balanza8Diferente) this.balanza8DiferenteNombre = true;
-  // }
+  verificarNombresBuque() {
+    this.embarqueService.obtenerEmbarque(this.embarqueId)
+    .pipe(finalize(() => this.patenteEmbarque !== this.nombreVapor ? this.nombreDiferente = true : this.nombreDiferente = false))
+    .subscribe( (resp:Embarque) => {
+      this.patenteEmbarque = resp.patente.toUpperCase();
+      this.nombreVapor = resp.vapor.nombre.toUpperCase();
+    });
+  }
 
   verificaCamposCompletos() {
     let balanza7Incompleta = this.balanzas7.value.find(x => x.toneladas < 1000 && (x.listadoTotalBalanzadas.motivosFallasBalanza == null || x.listadoTotalBalanzadas.observaciones == '') && x.id != 0);
@@ -467,9 +528,15 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   get balanzas7(): FormArray {
+    var myArray = (this.balanza7Form.get("balanzas7") as FormArray).value;
+    myArray = myArray.sort((a, b) => Number(new Date(a.fecha_Inicio)) - Number(new Date(b.fecha_Inicio)));
+    (this.balanza7Form.get("balanzas7") as FormArray).patchValue(myArray)
     return this.balanza7Form.get("balanzas7") as FormArray;
   }
   get balanzas8(): FormArray {
+    var myArray = (this.balanza8Form.get("balanzas8") as FormArray).value;
+    myArray = myArray.sort((a, b) => Number(new Date(a.fecha_Inicio)) - Number(new Date(b.fecha_Inicio)));
+    (this.balanza8Form.get("balanzas8") as FormArray).patchValue(myArray)
     return this.balanza8Form.get("balanzas8") as FormArray;
   }
 
@@ -520,6 +587,24 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       this.mensajeGenerico('La fecha-hora de inicio es menor a la fecha-hora de corte.');
       return;
     }
+
+    // TODO: Verifica que el nuevo corte no se superponga con alguno existente.
+    let bal: Balanzas[] = this.obtenerBalanzadas(balanzaCorteManual);
+    let cantCorteIncorrecto = 0;
+    for(let i in bal){
+      let fechaHoraIni = new Date(bal[i].fecha_Inicio_Inicial+' '+bal[i].hora_Inicio_Inicial);
+      let fechaHoraInicio = fechaHoraIni.getTime();
+      let fechaHoraCor = new Date(bal[i].fecha_Corte_Inicial+' '+bal[i].hora_Corte_Inicial);
+      let fechaHoraCorte = fechaHoraCor.getTime();
+
+      if( fechaHoraInicioInicial2 >= fechaHoraCorte || fechaHoraCorteInicial2 <= fechaHoraInicio ) console.log("Rango correcto");
+      else cantCorteIncorrecto += 1;
+    }
+    if( cantCorteIncorrecto > 0 ){
+      this.mensajeGenerico('El corte manual se superpone con un corte o parada existente.');
+      return;
+    }
+
     objetoNuevo = {
       ...this.corteManualForm.value,
       bodega_id: bc.listadoTotalBalanzadas.bodegaCorteManual.id,
@@ -549,15 +634,34 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this._modalService.dismissAll(modal);
   }
 
+  obtenerBalanzadas(balanza: number): Balanzas[]{
+    let bal: Balanzas[]
+    switch (balanza) {
+      case 7:
+        bal = this.obtenerBalanzas7();
+        break;
+      case 8:
+        bal = this.obtenerBalanzas8();
+        break;
+      default:
+        bal = [];
+    }
+    return bal;
+  }
+
   guardarModal(index: number, numeroBalanza: number, modal: any) {
     let balanza = 'balanzas' + numeroBalanza.toString();
     let balanzadas = this[balanza].value.filter( b => b.seleccionado);
     let cortes = [];
     let bc = this[balanza].value[index];
+    let idOriginal = bc.id
     let lfecha_Inicio = '';
     let lfecha_Corte = '';
     let fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial + ' ' + bc.hora_Inicio_Inicial;
     let fecha_Corte_Inicial = bc.fecha_Corte_Inicial + ' ' + bc.hora_Corte_Inicial;
+    let nuevoEsAnteriorAlOriginal: boolean;
+    // let tnInicial = bc.tn;
+    // let kgInicial = bc.kg;
 
     if( balanzadas.length === 0 ){ // Cuando no selecciona ninguno
       if( !bc.listadoTotalBalanzadas.motivosFallasBalanza.id ){
@@ -606,10 +710,14 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
               fechaHoraInicioInicial2 <= fechaHoraCorteNueva2 && fechaHoraCorteNueva2 <= fechaHoraCorteInicial2 && 
               fechaHoraInicioNueva2 < fechaHoraCorteNueva2 ){
 
+          // CUANDO LA DIVISIÓN NUEVA SE ANTEPONE A LA DE ORIGEN
           if( fechaHoraInicioNueva2 == fechaHoraInicioInicial2 ){
+            nuevoEsAnteriorAlOriginal = true;
             // console.log('La nueva FHi será la fechaHoraCorteNueva2');
             fecha_Inicio_Inicial = bc.fecha_Corte_Nueva+' '+bc.hora_Corte_Nueva;
             fecha_Corte_Inicial = bc.fecha_Corte_Inicial+' '+bc.hora_Corte_Inicial;
+            // tnInicial = 0;
+            // kgInicial = 0;
 
             objetoNuevo = {
               ...this[balanza].controls[index].value,
@@ -624,7 +732,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
             }
           }
 
+          // CUANDO LA DIVISIÓN NUEVA LE CONTINUA A LA DE ORIGEN
           if( fechaHoraCorteNueva2 == fechaHoraCorteInicial2 ){
+            nuevoEsAnteriorAlOriginal = false;
             // console.log('La nueva FHc será la fechaHoraInicioNueva2');
             fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial+' '+bc.hora_Inicio_Inicial;
             fecha_Corte_Inicial = bc.fecha_Inicio_Nueva+' '+bc.hora_Inicio_Nueva;
@@ -634,11 +744,13 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
               fecha_Inicio: lfecha_Inicio,
               fecha_Corte: lfecha_Corte,
               id: 0,
-              motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva.id,
               listadoTotalBalanzadas: {
                 motivosFallasBalanza_Nueva: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva
               },
+              motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza_Nueva.id,
               observaciones: bc.observaciones_Nueva,
+              // tn: 0,
+              // kg: 0,
             }
           }
 
@@ -656,6 +768,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           return;
         }
       }
+      
+      if(nuevoEsAnteriorAlOriginal) index += 1;
 
       this[balanza].controls[index].patchValue({
         fecha_Inicio: fecha_Inicio_Inicial,
@@ -665,6 +779,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         motivosFallasBalanza_id: bc.listadoTotalBalanzadas.motivosFallasBalanza.id,
         observaciones: bc.observaciones,
+        id: idOriginal,
+        // tn: tnInicial,
+        // kg: kgInicial,
       });
 
       let objetoListadoTotalBalanzadas = this.generarObjetoParaGuardado( this[balanza].controls[index].controls );
@@ -727,7 +844,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
               this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
             } );
         } else {
-          console.log('Eliminar Corte Manual cancelado.')
           this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
         }
       })
@@ -779,10 +895,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.confirmationDialogService.confirm(titulo, text, button1, button2, null, null, Tipoalerta.Success)
       .then( (confirmed) => {
         if (confirmed) {
-          console.log('Generar Corte confirmado. Muestra campos.');
           this.agregaCorte = true;
         } else {
-          console.log('Generar Corte cancelado. Oculta campos.')
           this.agregaCorte = false;
         }
       })
@@ -792,13 +906,27 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
-  openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number) {
+
+  balanzas7y8Filter(corte?: boolean){    
+    if(corte != null){
+      this.motivosBalanzas78sorted =  this.motivosBalanzas78.filter(x => x.corte == corte);   
+    }else{
+      this.motivosBalanzas78sorted = this.motivosBalanzas78;
+    }
+}
+
+  //Martín: Agrego parámetro corte a la función, el mismo es para filtrar el combo del modal
+  //siendo -> NULL = sin filtro, 1 = Motivos de corte, 2 = Bajas cargas.
+  //El comentario es porque todos los parámetros se llaman igual WTF.
+  //Si estás leyendo esto leé la linea de abajo de esta y me vas a entender. CORTEE (Con voz de Gaspi Cancelado)
+  openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number, corte?: boolean) {
     this.esCorteManual = corteManual;
     this.balanzaCorteManual = balanzaCorteManual;
     this.agregaCorte = false;
     this.balanzas78Service.limpiarInterval();
+    this.balanzas7y8Filter(corte);
 
-    console.log('this.corteManualForm.value: ', this.corteManualForm.value);
+    this.parametrosService.consola(`this.corteManualForm.value: `,this.corteManualForm.value);
     
     this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
     .then(() => {
@@ -808,7 +936,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   cerrarModal(){
-    this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+    this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id, true);
   }
 
   terminarCargaExportar() {
@@ -822,7 +950,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         if (confirmed && !this.balanzasIncompletas) {
           this.modificarEstadoBuque('ControlCalidad');
           // Hasta que el pasaje a produccion de recibidores, pasar de Cargando → Post operativo (ticket 293)
-          this.modificarEstadoBuque('PostOperativo');
+          // this.modificarEstadoBuque('PostOperativo');
           this.exportarBalanzasAExcel();
         }
         else

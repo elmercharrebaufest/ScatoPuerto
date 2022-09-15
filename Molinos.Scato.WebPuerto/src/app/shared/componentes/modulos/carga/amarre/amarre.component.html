@@ -1,8 +1,9 @@
-<div class='container mt-4 pr-1'>
+<div class='container'>
     <div>
         <form [formGroup]="solidosForm">
-            <div class="form-row">
-                <div class="form-group col-4">
+            <h4 class='colorTitle pt-3'>Período de carga</h4>
+            <div class="form-row" style="margin-top:4px">
+                <div class="form-group   col-4">
                     <label>Amarró</label>
                     <input formControlName="fechaAmarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                 </div>
@@ -81,9 +82,12 @@
                     <ngx-material-timepicker #fullTimeHabilitacion (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
                 </div>
             </div>
-            <div class='col mt-5 p-0'>
+            <div class='col mt-1 p-0'>
                 <p>Velocidad Máxima del viento para amarre 35 Km/h</p>
             </div>
+            <div  style="display: flex; flex-direction: row; justify-content: center;" >
+                <button style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
+             </div>
         </form>
     </div>
 </div>

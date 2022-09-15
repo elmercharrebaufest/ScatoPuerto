@@ -264,11 +264,16 @@
     <Content Include="src\app\modulos\calidad\solidos\solidos.component.css" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir.component.html" />
     <Content Include="src\app\modulos\calidad\solidos\nir\nir.component.css" />
+    <Content Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.html" />
+    <Content Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.css" />
     <!-- Calidad Liquidos HTML/CSS -->
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.html" />
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.css" />
     <!-- Assets -->
     <Content Include="src\assets\burgerMenu.svg" />
+    <Content Include="src\assets\ojoIcon.svg" />
+    <Content Include="src\assets\iconImDeshabilitada.svg" />
+    <Content Include="src\assets\iconoImpresion.svg" />
     <Content Include="src\assets\calendarInput.svg" />
     <Content Include="src\assets\calendario.svg" />
     <Content Include="src\assets\check.svg" />
@@ -328,6 +333,7 @@
     <Content Include="src\index.html" />
     <Content Include="src\styles.css" />
     <Content Include="src\Readme-Puerto.md" />
+    <Content Include="src\assets\boton_imprimir.svg" />
     <!-- App TS -->
     <TypeScriptCompile Include="e2e\src\app.e2e-spec.ts" />
     <TypeScriptCompile Include="e2e\src\app.po.ts" />
@@ -365,6 +371,7 @@
     <TypeScriptCompile Include="src\app\shared\servicios\embarque.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\lineup.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\plano-de-carga.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\calidad-shared.service.ts" />    
     <TypeScriptCompile Include="src\app\shared\servicios\session.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\workflow.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\modulo-de-carga.service.ts" />
@@ -377,8 +384,10 @@
     <TypeScriptCompile Include="src\app\shared\servicios\balanzas78.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\balanza.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\lineas.service.ts" />
-    <TypeScriptCompile Include="src\app\shared\servicios\pdf.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\funciones-generales.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\reciboBuque.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\recibo.shared.service.ts" />
+    
     <TypeScriptCompile Include="src\app\shared\servicios\parametros.service.ts" />
     <!-- models TS -->
     <TypeScriptCompile Include="src\app\shared\modelos\modulo-carga-listado.ts" />
@@ -424,9 +433,9 @@
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\balanza.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\periodo-carga.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\umap.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\recibo-buque.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\nir.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\reciboDeBuque.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos-balanzas78.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\ad.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\parametros.ts" />
@@ -479,6 +488,15 @@
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-embarque\planilla-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\planilla-turno-liquidos\planilla-turno-liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-liquidos\tableristas\mangueras-carga\mangueras-carga.component.ts" />
+    <!-- Modal Recibo -->
+    <TypeScriptCompile Include="src\app\modulos\calidad\modal-recibo\modal-recibo.component.css" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\modal-recibo\modal-recibo.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\modal-recibo\modal-recibo.component.ts" />
+    <!-- Registro Recibos -->
+    <TypeScriptCompile Include="src\app\modulos\calidad\registro-recibos\registro-recibos.component.css" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\registro-recibos\registro-recibos.component.html" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\registro-recibos\registro-recibos.component.ts" />
+
     <!-- carga solido TS -->
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\carga-solidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\operaciones\grafico-carga\grafico-carga.component.ts" />
@@ -493,6 +511,7 @@
     <TypeScriptCompile Include="src\app\modulos\calidad\liquidos\liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\solidos\solidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\solidos\nir\nir.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\calidad\solidos\nir\nir-mano\nir-mano.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\calidad.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\calidad-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\calidad.module.ts" />

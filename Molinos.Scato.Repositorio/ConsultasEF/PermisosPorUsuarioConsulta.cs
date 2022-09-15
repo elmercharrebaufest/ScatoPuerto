@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Molinos.Scato.Dominio.Entidades;
+using System.DirectoryServices;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {

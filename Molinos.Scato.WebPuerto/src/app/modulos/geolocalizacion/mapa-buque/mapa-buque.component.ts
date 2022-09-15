@@ -21,6 +21,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   private zoom = 8;
   private map!: L.Map;
   private iconoBuque!: L.Icon;
+  private iconoBuqueSeleccionado!: L.Icon;
   private iconoAncla!: L.Icon;
   private iconoUbicacion!: L.Icon;
   private markadorAncla!: L.Marker;
@@ -54,7 +55,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     await this.cargarPuntosInteres();
     await this.cargarBuquesMapa();
     this.map.on('zoomend', this.onMapZoomEnd.bind(this));
-    this.mostrarBuqueSeleccionado();
+ 
   }
   public ngOnDestroy(): void {
     this.puntosInteresSubject$.unsubscribe();
@@ -100,6 +101,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   }
 
   private async mostrarBuqueSeleccionado() {
+    console.log("mostrarBuqueSeleccionado");
     let embarqueSeleccionado;
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuqueSeleccionado().subscribe((data) => {
       embarqueSeleccionado = data;
@@ -108,14 +110,24 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
           const embarque = embarqueSeleccionado[0];
           const latitud = embarque.posicion.latitud;
           const longitud = embarque.posicion.longitud;
-          this.map.setView([latitud, longitud], 13);
+         this.map.setView([latitud, longitud], 9);
+
+         this.modificarIconoSeleccionado(latitud, longitud);
+
         }
+        else
+{ 
+  this.cargarPosicionPorDefectoMapa();
+}
+
       } else {
         // sino hay buque seleccionado muestra por defecto la vista general del map
-        this.map.setView([-35.340, -56.577]);
+       this.cargarPosicionPorDefectoMapa();
       }
     });
   }
+
+
 
   public async cargarPuntosInteres() {
     let layerAncla = new L.LayerGroup();
@@ -294,8 +306,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
       " <img src='./assets/ubicacion.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'> Muelles </label> ": ubicaciones,
       " <img src='./assets/ancla.svg' width='21' height='21' > <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Fondeaderos y Puertos </label> ": ancla,
       " <img src='./assets/buque.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Buques </label> ": LayerGroup,
-      " <img src='./assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 01 </label> ": zona01,
-      " <img src='./assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona 02 </label> ": zona02
+      " <img src='./assets/zona01.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Zona Recalada </label> ": zona01,
+      " <img src='./assets/zona02.svg' width='21' height='21'> <label style='font-family:roboto;font-size:12px;display:inline; margin-left:5px'>Rada San Lorenzo </label> ": zona02
 
     };
     this.referenciaOverlay = L.control.layers(
@@ -325,13 +337,10 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     let divChildsNodes = divsOverlayChilds[0].childNodes;
     let itemIndex = 1;
     divChildsNodes.forEach((item) => {
-      console.log('item---->>')
-      console.log(item)
       // Se retira el checkbox para las referencias y buques
       if (itemIndex == 1 || itemIndex == 4) {
         item.childNodes[0].childNodes[0].remove();
       } else {
-
         // Cambia la posicion de los check hacia la derecha
         const checkBoxReference = item.childNodes[0].childNodes[0];
         const spanReference = item.childNodes[0].childNodes[1];
@@ -345,7 +354,6 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         this.rederer.setStyle(item.childNodes[0], 'justify-content', 'flex-end');
         this.rederer.setStyle(item.childNodes[0].childNodes[0], 'margin-right', 'auto');
         this.rederer.setStyle(item.childNodes[0].childNodes[0], 'padding-right', '10px');
-
       }
       itemIndex++;
     })
@@ -374,13 +382,19 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   }
 
   private async agregarEmbarque() {
+    console.log("agregarEmbarque");
     this.workflowService.obtenerListado().subscribe(
       data => this.listadoEmbarques = data,
       err => console.log(err),
-      () => this.crearTarjetaBuque()
+      () => {
+              this.crearTarjetaBuque();
+              this.mostrarBuqueSeleccionado();
+            }
     );
   }
-
+  private cargarPosicionPorDefectoMapa(){
+    this.map.setView([-35.340, -56.577], this.zoom);
+  }
   private crearTarjetaBuque() {
     this.listaEmbarcacion.forEach(buque => {
 
@@ -395,7 +409,9 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
         let buqueIconUrl = '';
 
-        if (buque.sanBenito) buqueIconUrl = './assets/buque_san_benito.svg';
+       if (buque.sanBenito) buqueIconUrl = './assets/buque_san_benito.svg';
+
+     // if (buque.sanBenito) buqueIconUrl = './assets/buque_san_benito.gif';
 
         if (buque.vicentin) buqueIconUrl = './assets/buque_vicentin.svg';
 
@@ -407,30 +423,63 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
           iconUrl: buqueIconUrl,
           iconSize: [32, 37]
         });
-
+        let fechaPosicionRecibida = this.ultimaPosicionRecibida(buque.posicion.horaUTCPosicionRecibida)
+        fechaPosicionRecibida = fechaPosicionRecibida == undefined ? '' : fechaPosicionRecibida;
+        fechaPosicionRecibida = fechaPosicionRecibida == null      ? '' : fechaPosicionRecibida;
         let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent,
           (c: any) => {
             c.instance.nombreBuque = buque.nombreBuque;
             c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '';
-            c.instance.imo = buque.embarque ? buque.embarque.imo : '';
-            c.instance.bandera = buque.embarque ? buque.embarque.destino ? buque.embarque.destino.nombre : '' : '';
+            c.instance.imo = buque.informacion ? buque.informacion.imo : '';
+            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '';
             c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '';
             c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
             c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
-            c.instance.cantidadBodegas = '';
-            c.instance.eslora = buque.embarque ? buque.embarque.eslora : '';
+            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '';
+            c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '';
+            c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
         mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
-        mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
+        //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
+        mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida}</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
         markerBuque.addTo(this.map);
       }
     });
   }
+  private ultimaPosicionRecibida(fechaPosicionRecibida) {
+    const fechaActual: Date = new Date();
+    const fechaPosicion: Date = new Date(fechaPosicionRecibida);
+    const fechaActualTime = fechaActual.getTime()
+    const fechaPosicionTime = fechaPosicion.getTime()
+    const tempDays = (fechaActualTime - fechaPosicionTime) / (1000 * 60 * 60 * 24);
+    const tempHours = ((Math.abs(fechaActualTime - fechaPosicionTime) / (1000 * 60 * 60) % 24));
+    const tempMinutes = ((Math.abs(fechaActualTime - fechaPosicionTime) / (1000 * 60) % 60));
 
+    const days = parseInt(tempDays.toString())
+    const hours = parseInt(tempHours.toString())
+    const minutes = parseInt(tempMinutes.toString())
+
+    let messageDays = '';
+    let messageHours = '';
+    let messageMinutes = '';
+
+    if (days > 0)
+      messageDays = days > 1 ? days + ' dias ' : days + ' dia ';
+
+    if (hours > 0)
+      messageHours = hours > 1 ? hours + ' horas ' : hours + ' hora ';
+
+    if (minutes > 0)
+      messageMinutes = minutes > 1 ? minutes + ' minutos ' : minutes + ' minuto ';
+
+    const mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
+
+    return mensajeUltimaPosicion;
+  }
   public async limpiarMarcadores() {
     this.map.eachLayer((layer) => {
       if ((layer instanceof L.Marker) ||
@@ -465,6 +514,46 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     const latitud = event.latitud;
     const longitud = event.longitud;
     this.map.setView([latitud, longitud], 12);
+    this.modificarIconoSeleccionado(latitud, longitud);
+   
+
+  }
+
+  private modificarIconoSeleccionado(latitud?: any, longitud?: any)
+  {
+    this.map.eachLayer((layer) => {
+      if ((layer instanceof L.Marker)) {
+        if(layer.getLatLng().lat==latitud && layer.getLatLng().lng == longitud)
+        {
+          var nombreIcono = layer.getIcon().options.iconUrl;
+          this.iconoBuqueSeleccionado = new L.Icon({
+            //iconUrl: './assets/buque_san_benito.gif',
+            iconUrl:nombreIcono.replace(".svg","_seleccionado.gif"),
+            iconSize: [32, 37]
+          });
+
+       layer.getIcon().remove;
+       layer.setIcon(this.iconoBuqueSeleccionado);
+
+        }
+        else
+        {
+          var nombreIcono = layer.getIcon().options.iconUrl;
+          if(nombreIcono.includes("_seleccionado.gif"))
+            {
+              this.iconoBuqueSeleccionado = new L.Icon({
+                // iconUrl: './assets/buque_san_benito.gif',
+                iconUrl:nombreIcono.replace("_seleccionado.gif",".svg"),
+                 iconSize: [32, 37]
+               });
+ 
+            layer.getIcon().remove;
+            layer.setIcon(this.iconoBuqueSeleccionado);
+     
+            }
+        }
+      }
+    });
   }
   private onMapZoomEnd(map: L.Map): void {
     /*

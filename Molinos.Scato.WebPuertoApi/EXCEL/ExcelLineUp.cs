@@ -201,7 +201,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             return cellBorderStyleColumnTitles;
         }
-
+        
         private static ICellStyle EstiloContenido(HSSFWorkbook workbook)
         {
             var fontBold = workbook.CreateFont();

@@ -164,7 +164,7 @@ export class CargaSolidosComponent implements OnInit {
       });
   }
 
-  imprimir(imprimir: boolean = false){
+  imprimir(imprimir: boolean = false, finalizado?: boolean){
     
     this.ocultarBotonesImpresion();
 
@@ -184,44 +184,55 @@ export class CargaSolidosComponent implements OnInit {
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 
-    html2pdf().from(element).set(opt).outputPdf()
-    .then(() => {
-      if (!imprimir){ this.cargaPdf = false
-        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
-            document.getElementById('balanza7-scroll').classList.add('max-5vh');
-            document.getElementById('balanza8-scroll').classList.add('max-5vh');
-        }
-        this.terminaImprimir = true;
+    if(finalizado){
+      let fileBlobParaAdjuntar = html2pdf().from(element).set(opt).outputPdf()
+        .then(() => this.siNoImprime(imprimir) ).output('blob');
+
+      fileBlobParaAdjuntar.then(()=> this.cargarPDF(fileBlobParaAdjuntar._result));
+    }else{
+      html2pdf().from(element).set(opt).outputPdf()
+        .then(() => this.siNoImprime(imprimir) ).save();
+    }
+  }
+
+  cargarPDF(file) {
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {        
+        this.adjunto = reader.result;
+        this.enviarMail();
       }
-    }).save();
-     
+    }
+  }
+
+  siNoImprime(imprimir: boolean = false){
+    if (!imprimir){
+      this.cargaPdf = false;
+      if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+          document.getElementById('balanza7-scroll').classList.add('max-5vh');
+          document.getElementById('balanza8-scroll').classList.add('max-5vh');
+      }
+      this.terminaImprimir = true;
+    }
   }
 
   ocultarBotonesImpresion(){
-
+    let valueBotonTerminarYExportarPLanillasSolidos = '';
     let botonCorteManualBalanzasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementsByName('ocultarImpresionTableristaSolido') : null;
     let botonTerminarYExportarPLanillasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementById('btn-terminar-exportar-planillas') : null;
-    let valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display
-
-    if (botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
-    botonCorteManualBalanzasSolidos.forEach(btns => {
-      btns.style.display = 'none'
-    });
+    if(botonTerminarYExportarPLanillasSolidos != null) valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display;
+    if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
       
-      setTimeout(() => {
-        if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
-        
-          botonCorteManualBalanzasSolidos.forEach(btns => {
-            btns.style.display = 'block'
-          });
-  
-          botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
-        }
-  
-        botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    setTimeout(() => {
+      if(this.mostrarTableristaOperando == true && this.inicioCarga == true) {
+        if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'block');
+        if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
+      }
 
-      },6500);
-      
+      if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+    },6500);
   }
 
 
@@ -238,17 +249,16 @@ export class CargaSolidosComponent implements OnInit {
     } else {
 
       if (this.enviado && !finalizar) {
-        var texto = "Se ha modificado con éxito la carga. Si desea informar los cambios, haga click en FINALIZAR.";
-        this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then((confirmed) => {
-            if (confirmed)
               this.guardarContinuacion(finalizar);
-            else
-              return;
-          }).catch(() => window.location.reload());
-      }
-      else
+      } else {
         this.guardarContinuacion(finalizar);
+
+        if(finalizar){
+          this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
+            if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
+          });
+        }
+      }
     }
   }
 
@@ -263,19 +273,15 @@ export class CargaSolidosComponent implements OnInit {
 
     let elementosGraficos = this.graficoCarga.obtenerElementosGraficos();
 
-    // this.balanzadasEmbarque = this.balanzasComponent.obtenerBalanzadas78();
-    // console.log('balanzasEmbarque a guardar: ', this.balanzadasEmbarque);
-    //console.log('obtenerAmarre: ', this.umapComponent.obtenerAmarre());
-    //console.log('obtenerUmap: ', this.umapComponent.obtenerUmap());
-
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
       this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
 
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar)
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {},
+          .then(() => {this.imprimir(true, finalizar)},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
@@ -284,11 +290,11 @@ export class CargaSolidosComponent implements OnInit {
           .then(() => {},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
-            this.cargaPdf = false;
+            }).catch(() => window.location.reload());
+
+        this.cargaPdf = false;
       }
 
-      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
     });
   }
 

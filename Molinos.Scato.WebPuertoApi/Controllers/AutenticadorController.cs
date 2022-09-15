@@ -15,6 +15,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Authorize]
+        [Route("api/AutenticarUsuarioAD")]
+        public HttpResponseMessage AutenticarUsuarioAD()
+        {
+            try
+            {
+                var listadoPermisos = servicio.ListarPermisosPorUsuarioAD(nombreUsuario);
+
+                return Request.CreateResponse(HttpStatusCode.OK, new
+                {
+                    username = nombreUsuario,
+                    permisos = listadoPermisos
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        [HttpGet]
+        [Authorize]
         [Route("api/AutenticarUsuario")]
         public HttpResponseMessage AutenticarUsuario()
         {

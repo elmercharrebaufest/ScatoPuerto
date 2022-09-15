@@ -1,0 +1,334 @@
+<button
+  (click)="openModalEmitirRecibo(emitirRecibo)"
+  class="btn btn-primary m-4"
+  *ngIf="!mostrarModal"
+>
+  EMITIR RECIBO
+</button>
+
+
+
+<ng-template #emitirRecibo let-modal>
+  <form [formGroup]="reciboDeBuqueForm">
+    <div class="modal-header">
+      <label><b>Por favor, verifique los datos del recibo.</b></label>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col">
+          <label for="recipient-name" class="col-form-label"
+            ><b>Port of</b><br /><span class="Traduccion"
+              >puerto de</span
+            ></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            uppercase
+            formControlName="puertoOrigen"
+          />
+        </div>
+        <div class="col">
+          <label for="recipient-name" class="col-form-label"
+            ><b>Date</b><br /><span class="Traduccion"> fecha </span></label
+          >
+          <input
+            type="date"
+            max="3000-12-31"
+            min="1000-01-01"
+            class="form-control"
+            formControlName="fechaRecibo"
+          />
+          <!-- value="{{this.reciboBuqueDetalles.fechaRecibo}}" -->
+        </div>
+      </div>
+
+      <div><label></label></div>
+
+      <div class="row">
+        <div class="col">
+          <label for="recipient-name" class="col-form-label"
+            ><b>Received, on board the M/V/</b><br /><span class="Traduccion">
+              Recibido a bordo del vapor</span
+            ></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            formControlName="nombreBuque"
+          />
+        </div>
+        <div class="col"></div>
+      </div>
+
+      <div><label></label></div>
+
+      <div>
+        <label for="recipient-name"
+          ><b
+            >the under noted goods in apparent good order and condition from/</b
+          ><br /><span class="Traduccion">
+            las mercaderías abajo mencionadas en aparente buen orden y condición
+            de</span
+          ></label
+        >
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <input
+            type="text"
+            class="form-control"
+            uppercase
+            formControlName="exportador"
+          />
+        </div>
+        <div class="col"></div>
+      </div>
+
+      <div><label></label></div>
+
+      <div class="row">
+        <div class="col">
+          <label for="recipient-name" class="col-form-label"
+            ><b>for the Port of</b><br /><span class="Traduccion">
+              para el puerto de</span
+            ></label
+          >
+
+          <input
+            type="text"
+            class="form-control"
+            formControlName="puertoDestino"
+          />
+        </div>
+        <div class="col">
+          <div>
+            <label for="recipient-name" class="col-form-label"
+              ><b>Incluir para impresión</b></label
+            >
+          </div>
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="customSwitchDestino"
+              checked
+              formControlName="incluirImpresionDestino"
+            />
+            <label
+              class="custom-control-label"
+              for="customSwitchDestino"
+            ></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-4">
+          <label for="recipient-name" class="col-form-label"
+            ><b>Numerical format:</b><br /><span class="Traduccion">
+              formato numérico</span></label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="esEuropeo"
+                   formControlName="esEuropeo" [value]="false">
+            <label class="form-check-label" for="No">Asian</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="esEuropeo"
+                  formControlName="esEuropeo" [value]="true">
+            <label class="form-check-label" for="No">European</label>
+          </div>
+        </div>
+          <div class="col-6">
+            <label for="recipient-name" class="col-form-label"
+            ><b>Unit:</b><br /><span class="Traduccion">
+          unidad</span></label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="valorEnKG"
+                     formControlName="valorEnKG" [value]="false">
+              <label class="form-check-label" for="No">MT (metric tons)</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="valorEnKG"
+                     formControlName="valorEnKG" [value]="true">
+              <label class="form-check-label" for="No">KG (kilos)</label>
+            </div>
+          </div>
+      </div>
+      
+
+      <div><label></label></div>
+
+      <div>
+        <label for="recipient-name" class="col-form-label"
+          ><small>(Quantity to be stated in Figures and also in Words).(Cantidades establecidas en números y tambien en letras)</small></label
+        >
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label for="recipient-name" class="col-form-label"
+            ><b>QUANTITY</b
+            ><span class="Traduccion"
+              ><br />
+              CANTIDAD</span
+            ></label
+          >
+          <input
+            type="number"
+            class="form-control inputCantidad"
+            formControlName="cantidad"
+            (keyup)="keyUpCantidadEnLetras(this.reciboDeBuqueForm.controls.cantidad.value, $event)"
+            (keypress)="decimalOnly($event)"
+          />
+        </div>
+        <div class="col cantidadLetras">
+          <label for="recipient-name" class="col-form-label"
+            ><b>QUANTITY IN WORDS</b><br /><span
+              class="Traduccion"> CANTIDAD EN LETRAS</span></label>
+          <textarea
+            class="form-control resizeArea"
+            rows="3"
+            cols="50"
+            disabled
+            formControlName="cantidadLetras">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-6 cantidadLetras">
+          <label for="recipient-name" class="col-form-label">
+          <b>DESCRIPTION OF GOODS AND CLASS OF CARGO</b><br /><span class="Traduccion"> DESCRIPCIÓN DEL PRODUCTO Y CLASE DE CARGA</span></label>
+          <!-- <input type="text" class="form-control"> -->
+          <textarea
+            class="form-control"
+            rows="2"
+            cols="50"
+            formControlName="claseCarga"
+            >
+          </textarea>
+        </div>
+      </div>
+
+      <div><label></label></div>
+
+      <div class="row">
+        <div class="col">
+          <div>
+            <label for="recipient-name" class="col-form-label"
+              ><b>Stowed: </b><br /><span class="Traduccion"
+                >Estibado en bodega</span
+              ></label
+            >
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="estibadoEnBodega"
+          />
+        </div>
+        <div class="col">
+          <div>
+            <label for="recipient-name" class="col-form-label"
+              ><b>Incluir para impresión</b></label
+            >
+          </div>
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="customSwitchBodega"
+              checked
+              formControlName="incluirImpresionEstibado"
+            />
+            <label
+              class="custom-control-label"
+              for="customSwitchBodega"
+            ></label>
+          </div>
+        </div>
+      </div>
+
+      <div><label></label></div>
+
+      <div class="row">
+        <div class="col">
+          <div>
+            <label for="recipient-name" class="col-form-label"
+              ><b>Quality and Quantity unknown Said to Weigh: </b><br /><span
+                class="Traduccion"
+              >
+                Calidad y cantidad desconocidas que se dice pesar</span
+              ></label
+            >
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="calidadYCantidadDesconocida"
+          />
+        </div>
+        <div class="col">
+          <div>
+            <label for="recipient-name" class="col-form-label"
+              ><b>Incluir para impresión</b></label
+            >
+          </div>
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              id="customSwitchCalidad"
+              checked
+              formControlName="incluirImpresionCalidad"
+            />
+            <label
+              class="custom-control-label"
+              for="customSwitchCalidad"
+            ></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        *ngIf="!desdeTabla"
+        type="button"
+        class="btn btn-danger mx-5"
+        (click)="modal.dismiss('Cross click')"
+      >
+        CANCELAR
+      </button>
+      <button
+        *ngIf="desdeTabla"
+        type="button"
+        class="btn btn-danger mx-5"
+        (click)="modal.dismiss('Cross click')"
+      >
+        CERRAR
+      </button>
+      <button
+        *ngIf="!desdeTabla"
+        type="button"
+        class="btn btn-success"
+        (click)="guardarRecibo(true)"
+        (click)="modal.dismiss('Cross click')"
+      >
+        CONFIRMAR DATOS
+      </button>
+      <!-- <button
+        *ngIf="enviado"
+        type="button"
+        class="btn btn-success"
+        (click)="guardarRecibo()"
+        (click)="modal.dismiss('Cross click')"
+      >
+        CONFIRMAR DATOS
+      </button> -->
+    </div>
+  </form>
+</ng-template>
+

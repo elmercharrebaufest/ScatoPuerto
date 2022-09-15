@@ -8,8 +8,7 @@
             <feComposite in="SourceGraphic"/>
         </filter>
         <pattern id="pattern" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" viewBox="0 0 800 600">
-            <!-- <image width="800" height="600" xlink:href="data:image/jpeg;base64,/9j/4AAQyz/2Q=="/> -->
-            <image width="800" height="600" xlink:href="../../../../assets/fotos/foto_buque002.jpg"/>
+            <image width="800" height="600" id="imagenBuque" attr.xlink:href="{{fotoEmbarque}}"/>            
         </pattern>
     </defs>
     <g id="Componente_148_2" data-name="Componente 148 – 2" transform="translate(16.5)">
@@ -35,34 +34,34 @@
                 Freeboard: xxxx
                 Cantidad de bodegas/tanques: xxxx" transform="translate(492 238)" fill="#666" font-size="16" font-family="Roboto-Bold, Roboto" font-weight="700">
                     <tspan x="0" y="15">IMO: </tspan>
-                    <tspan y="15" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.imo}}</tspan>
+                    <tspan y="15" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.informacion.imo}}</tspan>
                     <tspan x="0" y="39">Bandera: </tspan>
-                    <tspan y="39" font-family="Roboto-Regular, Roboto" font-weight="400">{{buque.embarque ? buque.embarque.destino ? buque.embarque.destino.nombre : '' : ''}}</tspan>
+                    <tspan y="39" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.informacion.bandera ? buque.informacion.bandera.nombre : ''}}</tspan>
                     <tspan x="0" y="63">Tipo de buque: </tspan>
                     <tspan y="63" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400">{{buque.embarque.tipoBuque}}</tspan>
                     <tspan x="0" y="87">Porte bruto: </tspan>
-                    <tspan y="87" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> xxxx</tspan>
+                    <tspan y="87" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.porteBruto}}</tspan>
                     <tspan x="0" y="111">Porte neto (TNR): </tspan>
                     <tspan y="111" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.porteNeto}}</tspan>
                     <tspan x="0" y="135">Eslora x manga: </tspan>
-                    <tspan y="135" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400">{{buque.embarque.eslora}}</tspan>
+                    <tspan y="135" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.informacion.largoxAnchoExtremo ? buque.informacion.largoxAnchoExtremo : ''}}</tspan>
                     <tspan x="0" y="159">Puntal: </tspan>
                     <tspan y="159" xml:space="preserve" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.puntal}}</tspan>
                     <tspan x="0" y="183">Freeboard: </tspan>
-                    <tspan y="183" font-family="Roboto-Regular, Roboto" font-weight="400">{{buque.embarque.freeboard}}</tspan>
+                    <tspan y="183" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.freeboard}}</tspan>
                     <tspan x="0" y="207">Cantidad de bodegas/tanques: </tspan>
-                    <tspan y="207" font-family="Roboto-Regular, Roboto" font-weight="400">xxxx</tspan>
+                    <tspan y="207" font-family="Roboto-Regular, Roboto" font-weight="400"> {{buque.embarque.cantidadBodegasTanques}}</tspan>
                 </text>
                 <rect id="Rectángulo_503-2" data-name="Rectángulo 503" width="44" height="61" transform="translate(778 219)" fill="none"/>
             </g>
         </g>
         <path id="DJI_0175-24" d="M4,0H350a4,4,0,0,1,4,4V218a0,0,0,0,1,0,0H0a0,0,0,0,1,0,0V4A4,4,0,0,1,4,0Z" fill="url(#pattern)" 
             style="cursor:pointer;"
-            (click)='cerrarModal()'/>
+            (click)='onCerrarModal()'/>
         <g id="x" transform="translate(326.5 13.5)" 
             style="cursor:pointer;" 
-            (click)='cerrarModal()'>
-            <path id="Trazado_10" data-name="Trazado 10" d="M0,0,11.25,11.25M11.25,0,0,11.25" transform="translate(1.375 1.375)" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+            (click)='onCerrarModal()'>
+            <path id="Trazado_10" data-name="Trazado 10" d="M0,0,11.25,11.25M11.25,0,0,11.25" transform="translate(1.375 1.375)" stroke="#212529" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
         </g>
     </g>
 </svg>

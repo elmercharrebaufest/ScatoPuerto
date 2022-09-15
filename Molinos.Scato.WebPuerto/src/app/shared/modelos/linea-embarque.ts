@@ -3,6 +3,7 @@ import { MaterialPuerto } from './material-puerto';
 export class LineasDeEmbarque{
     id?: number;
     linea: string;
+    tipoLineaEmbarque: any;
     materialPuerto: MaterialPuerto[];
     tkInicial: string;
     temperaturaInicial: number;

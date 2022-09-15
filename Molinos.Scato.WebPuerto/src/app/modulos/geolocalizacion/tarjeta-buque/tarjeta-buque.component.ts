@@ -26,10 +26,20 @@ export class TarjetaBuqueComponent implements OnInit {
   @Input() freeboard!: string
   @Input() cantidadBodegas!: string
   @Input() eslora!: string
-
-  constructor() { }
+  @Input() fotoEmbarque!: string
+  
+  constructor() { 
+  }
 
   ngOnInit(): void {
+    this.setCargarFoto();
+  }
+  private setCargarFoto(){
+    if (this.fotoEmbarque != null || this.fotoEmbarque != undefined){
+      this.fotoEmbarque = this.fotoEmbarque > '' ? ('data:image/png;base64,' + this.fotoEmbarque) : null;
+    }else{
+      this.fotoEmbarque = null
+    }
   }
 
 }

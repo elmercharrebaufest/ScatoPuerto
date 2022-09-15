@@ -42,6 +42,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var centro = int.Parse(ConfigurationManager.AppSettings["Centro"]);
             try
             {
+             
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
                 var servicioWf = factory.CrearServicio(workflowDefinicionId);
 
@@ -49,7 +50,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 datosEmbarque = IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, true, false, false);
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, true, false);
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, false, true);
-
+                servicio.ActualizarEstadoBuque(datosEmbarque, 1);
             }
             catch(Exception ex)
             {
@@ -76,6 +77,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 ActividadXaml = "IngresarEmbarque",
                 NombreUsuario = nombreUsuario
             };
+
+   
             embarque.CentroId = centro;
             embarque.Patente = embarque.NombreBuque;
             if ((vicentin && vicentin == embarque.Vicentin) || 
@@ -380,7 +383,48 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerBanderas()
             );
         }
-        
+
+        [HttpPost]
+        [Route("api/Embarque/GuardarArchivos")]
+        public HttpResponseMessage GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
+        {
+            try
+            {
+                servicio.GuardarArchivos(archivosPuerto, idEmbarque);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpGet]
+        [Route("api/Embarque/ObtenerArchivos")]
+        public HttpResponseMessage obtenerArchivos(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerArchivos(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/Embarque/ObtenerTipoArchivos")]
+        public HttpResponseMessage obtenerTipoArchivos()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerTipoArchivos());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
 
         /*
         [HttpGet]
