@@ -10206,7 +10206,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var embarque = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == modulodecarga_id).Embarque;
                 int vapor_id = embarque.Vapor.Id;
 
-                if (embarque.FechaHoraInicioCarga.Value != null)
+                if (embarque.FechaHoraInicioCarga != null)
                 {
                     DateTime? fechaInicioFinal = embarque.FechaHoraInicioCarga.Value.AddDays(-1);
 
