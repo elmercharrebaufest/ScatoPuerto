@@ -1399,16 +1399,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             else
             lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
             
-
+        if (turnoDetalle['controls'].linea.value == undefined || turnoDetalle['controls'].linea.value == null){
+          turnoDetalle['controls'].linea.setValue(0)
+        }
         if (turnoDetalle['controls'].linea.value == '' || turnoDetalle['controls'].linea.value == '0') {
           if (lineaSeleccionada != null || lineaSeleccionada != undefined) {
             turnoDetalle['controls'].linea.setValue(lineaSeleccionada[0]?.id)
           }
         }
-
         let lineaIdVal = turnoDetalle['controls'].linea.value;
         lineaIdVal = (lineaIdVal != null || lineaIdVal != undefined)? lineaIdVal : 0;
-
         if (tipoLineaEmbarqueNombre > '') {
             let bPlanillaIncompleta: boolean = this.bValidaPlanillaOtrasLineas(turnoDetalle);
             if (bPlanillaIncompleta) {

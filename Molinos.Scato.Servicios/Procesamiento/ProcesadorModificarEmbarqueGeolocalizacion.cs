@@ -22,12 +22,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             try
             {
+                string[] buquesLiquidos = { "Tanker", "Oil Products Tanker", "Crude Oil Tanker", "Oil/Chemical Tanker", "Chemical Tanker", "Special Tanker", "Other Tanker" };
 
                 Bandera banderaBase = Repositorio.Obtener<Bandera>(x => x.Abreviatura.ToLower() == comando.BanderaBuque.ToLower());
 
                 DateTime fechaMinima = (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
+                string tipoBuque = comando.TipoBuque;
 
-                Embarque embarque = Repositorio.Listar<Embarque>(x => x.EmbarqueInformacion.FirstOrDefault().Bandera.Id == banderaBase.Id && x.Patente == comando.NombreBuque && x.TipoBuque == comando.TipoBuque).OrderByDescending(y=>y.Id).FirstOrDefault();
+                if (buquesLiquidos.Contains(comando.TipoBuque))
+                    tipoBuque = "Oil Tanker";
+
+                Embarque embarque = Repositorio.Listar<Embarque>(x => x.EmbarqueInformacion.FirstOrDefault().Bandera.Id == banderaBase.Id && x.Patente == comando.NombreBuque && x.TipoBuque == tipoBuque).OrderByDescending(y=>y.Id).FirstOrDefault();
 
                 if (embarque != null)
                 {
@@ -176,6 +181,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
         }
 
 
+        
+        
         protected override void Validar(ModificarEmbarqueGeolocalizacion comando, Resultado resultado)
         {
 
