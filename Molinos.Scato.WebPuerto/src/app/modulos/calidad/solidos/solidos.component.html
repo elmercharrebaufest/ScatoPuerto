@@ -1,10 +1,15 @@
+
+
 <div id="imprimirRecibidoresSolido">
+    
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='RecibidoresPdf' [src]='"pdf"'></ship-spinner>
     </div>
     <app-grafico-carga id='graficoCargaCanva' 
                        class='bg-white'
                        [esCalidad]="true"></app-grafico-carga>
+
+    <div class="html2pdf__page-break"></div>
 
     <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" 
                [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"
@@ -21,11 +26,9 @@
     </div>
 
     <app-registro-recibos></app-registro-recibos>
-
-    <div class="html2pdf__page-break"></div>
-
-    <app-nir></app-nir>
     
+    <app-nir></app-nir>
+
     <div class="html2pdf__page-break"></div>
 
     <app-balanzas-ritmos></app-balanzas-ritmos>

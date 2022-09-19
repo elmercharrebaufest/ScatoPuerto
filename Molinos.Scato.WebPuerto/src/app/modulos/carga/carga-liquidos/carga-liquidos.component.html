@@ -27,8 +27,8 @@
     <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
     <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
     <!-- <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button> -->
-    <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
-    <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
+    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;"/>
+    <button type="button" class="btn btn-success mx-5" (click)='guardar(true)'>ENVIAR A TABLERISTA</button>
   </div>
 
 
@@ -55,8 +55,8 @@
     <button name="botonesTableristaLiquidos" id="btn-cancelar-tablerista" type="button" class="btn btn-danger ocultar" [routerLink]="['/lineup']">CANCELAR</button>
     <button name="botonesTableristaLiquidos" id="btn-guardar-tablerista" type="button" class="btn btn-primary mx-5 ocultar" (click)="guardar(false)">GUARDAR</button>
     <!-- <button name="botonesTableristaLiquidos" id="btn-imprimir-tablerista" class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
-    <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" name="botonesTableristaLiquidos" id="btn-imprimir-tablerista"/>
+    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;" name="botonesTableristaLiquidos" id="btn-imprimir-tablerista"/>
 
-    <button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+    <button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" (click)='guardar(true)'>FINALIZAR</button>
   </div>
 </div>
