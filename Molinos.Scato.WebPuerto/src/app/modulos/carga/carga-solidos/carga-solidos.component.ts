@@ -252,12 +252,6 @@ export class CargaSolidosComponent implements OnInit {
               this.guardarContinuacion(finalizar);
       } else {
         this.guardarContinuacion(finalizar);
-
-        if(finalizar){
-          this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
-            if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
-          });
-        }
       }
     }
   }
@@ -337,20 +331,29 @@ export class CargaSolidosComponent implements OnInit {
                 .then((confirmed) => {
                   if (confirmed){
                     this.hideSpinner.emit(false)
+                    this.cambiarEstado();
                     return
                   }
                 }).catch(() => window.location.reload());
             }, error => {
               this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
+              this.cambiarEstado();
               this.hideSpinner.emit(false);
             })
         }
         else
+          this.cambiarEstado();
           this.hideSpinner.emit(false);
       })
       .catch(() => {
+        this.cambiarEstado();
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.hideSpinner.emit(false);
       });
+  }
+  cambiarEstado(){
+    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
+      if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
+    });
   }
 }

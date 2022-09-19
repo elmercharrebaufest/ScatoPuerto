@@ -245,19 +245,20 @@ export class CargaLiquidosComponent implements OnInit {
     if (!fechasHorasOK && this.mostrarTableristaOperando)
       return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
-    //CAMBIOS, POR LO QUE DEBERÝA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
+    //CAMBIOS, POR LO QUE DEBERIA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     // this.hideSpinner.emit(true);
     if (this.enviado && !finalizar) {
             this.guardarContinuacion(finalizar);
     } else {
       this.guardarContinuacion(finalizar);
 
-      if (finalizar) {
-        this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
-          if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
-        });
-      }
+      
     }
+  }
+  cambiarEstado(){
+      this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
+        if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
+      });
   }
 
   validarFechas(): boolean {
@@ -377,12 +378,15 @@ export class CargaLiquidosComponent implements OnInit {
                 .then((confirmed) => {
                   if (confirmed) {
                     this.hideSpinner.emit(false)
+                    this.cambiarEstado();
                     return
                   }
                   else
+                  this.cambiarEstado();
                     window.location.reload();
                 }).catch(() => window.location.reload());
             }, error => {
+              this.cambiarEstado();
               this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
               this.hideSpinner.emit(false);
             })

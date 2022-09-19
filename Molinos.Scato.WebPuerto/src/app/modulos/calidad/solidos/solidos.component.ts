@@ -133,7 +133,7 @@ export class SolidosComponent implements OnInit {
        filename:     'Pantalla Recibidores.pdf',
        image:        { type: 'jpeg', quality: 0.98 },
        html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
-       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
      };
  
      html2pdf().from(element).set(opt).outputPdf()
