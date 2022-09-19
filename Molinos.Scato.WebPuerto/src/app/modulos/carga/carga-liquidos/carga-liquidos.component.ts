@@ -197,7 +197,7 @@ export class CargaLiquidosComponent implements OnInit {
     // #endregion
   }
 
-  imprimir(imprimir: boolean = false, finalizado?: boolean, operaciones: string = "operaciones") {
+  imprimir(imprimir: boolean = false, finalizado?: boolean) {
 
     this.ocultarBotonesParaImpresion();
     this.cargaPdf = true;
@@ -312,7 +312,7 @@ export class CargaLiquidosComponent implements OnInit {
       });
   }
 
-  guardarContinuacion(finalizar: boolean, operaciones: string = "operaciones") {
+  guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
       this.enviado = finalizar;
 
@@ -328,7 +328,7 @@ export class CargaLiquidosComponent implements OnInit {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar) {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(true, finalizar, operaciones )},
+          .then(() => {this.imprimir(true, finalizar)},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
