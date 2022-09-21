@@ -13,7 +13,7 @@ export class CalidadSharedService {
   @Output() Manos = new EventEmitter<any>();
   @Output() sendMano1 = new EventEmitter<Mano>();
   @Output() sendMano2 = new EventEmitter<Mano>();
-  @Output() sendFinalizaEnCalidad = new EventEmitter<any>();
+  @Output() sendFinalizaEnCalidad = new EventEmitter<boolean>();
   private _mano1: BehaviorSubject<Mano> = new BehaviorSubject<Mano>(null); 
   private _mano2: BehaviorSubject<Mano> = new BehaviorSubject<Mano>(null); 
 
@@ -43,8 +43,8 @@ export class CalidadSharedService {
     this.sendMano2.emit(mano)
   }
 
-  emitFinalizaEnCalidad(){
-    this.sendFinalizaEnCalidad.emit();
+  emitFinalizaEnCalidad(esLiquido: boolean){
+    this.sendFinalizaEnCalidad.emit(esLiquido);
   }
 
   getManosDeEmbarque(){

@@ -121,7 +121,7 @@ export class SolidosComponent implements OnInit {
   }
 
   finalizaCalidad():void{
-    this._CalidadSharedService.emitFinalizaEnCalidad();
+    this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
 
   imprimir(imprimir: boolean = false){
