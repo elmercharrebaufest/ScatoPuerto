@@ -2686,9 +2686,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void GenerarLogging(string service, string data, string tipo, string nombreUsuario = null);
-        [OperationContract]
-        void GenerarLogging(string service, string data, string tipo);
-
+        
         [OperationContract]
         void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque);
 
