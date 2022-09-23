@@ -22,5 +22,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual double AlturaFinalMM { get; set; }
         public virtual double Kilos { get; set; }
         public virtual string TkFinal { get; set; }
+        public virtual double? KilosFinales { get; set; }
+        public virtual double? LitrosFinales { get; set; }
     }
 }

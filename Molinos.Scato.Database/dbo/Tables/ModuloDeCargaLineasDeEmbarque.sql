@@ -17,6 +17,8 @@
     [AlturaFinalMM]         FLOAT NULL,
     [Kilos]                 FLOAT NULL,
     [TkFinal]               NVARCHAR(10) NULL,   
+    [KilosFinales] FLOAT NULL, 
+    [LitrosFinales] FLOAT NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCargaLineasDeEmbarque] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaLineasDeEmbarque_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade,
     CONSTRAINT [FK_dbo.ModuloDeCargaLineasDeEmbarque_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto] ([Id]),
