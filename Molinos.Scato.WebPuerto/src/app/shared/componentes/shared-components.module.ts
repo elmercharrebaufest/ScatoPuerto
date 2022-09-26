@@ -29,6 +29,7 @@ import { ToastModule } from 'primeng/toast';
 import { IniciarSesionComponent } from './iniciar-sesion/iniciar-sesion.component';
 import { NavtabsCalidadComponent } from "./navtabs-calidad/navtabs-calidad.component";
 import { CardBuqueComponent } from './modulos/geo/card-buque/card-buque.component';
+import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
 
 const components = [
     AlertComponent,
@@ -47,7 +48,8 @@ const components = [
     PeriodoCargaComponent,
     AmarreComponent,
     NavtabsCalidadComponent,
-    CardBuqueComponent
+    CardBuqueComponent,
+    EditarCrearBuquesComponent
 ]
 const libs = [
     CommonModule,
