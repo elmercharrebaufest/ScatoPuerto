@@ -4,38 +4,29 @@ import { Router } from '@angular/router';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Observador } from '@ScatoInterfaces/observador';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LoadScreen } from '@ScatoInterfaces/load-screen';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { MessageService } from 'primeng/api';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
-import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocalizacion.component';
-import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
-import { sign } from 'crypto';
-import { LineUp } from '@ScatoModels/lineUp';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { FormGroup } from '@angular/forms';
-import { textChangeRangeIsUnchanged } from 'typescript';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
   styleUrls: ['./lineup-embarque.component.css']
 })
 export class LineupEmbarqueComponent implements OnInit {
-  @Input() buquesGeolocalizacion;
   @Input() index: number;
-  @Input() instanciaWorkflow: InstanciaWorkflowPuerto;
+  @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
 
@@ -75,7 +66,6 @@ export class LineupEmbarqueComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService,
     private _modalService: NgbModal,
     private embarqueService: EmbarqueService,
   ) {
@@ -92,30 +82,29 @@ export class LineupEmbarqueComponent implements OnInit {
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
     this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
-
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto()
-      .subscribe(res => {
-        this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
-      });
   }
   counter(i: number) {
     return new Array(i);
 }
   cargarBuqueGeolocalizacion(id: any) {
-    this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
-    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
-      this.mensajeBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? "Ver en el mapa" : "No se encontró. Completar IMO";
-      this.hayBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? true : false;
+    this.mensajeBuque = "Completar IMO";
+    if (this.instanciaWorkflow != undefined || this.instanciaWorkflow != null) {
+      if(this.instanciaWorkflow.embarque.embarqueInformacion != null){
+        if(this.instanciaWorkflow.embarque.embarqueInformacion.find(o => o.imo != '') != null){
+          if(this.instanciaWorkflow.embarque.embarquePosicion != null && this.instanciaWorkflow.embarque.embarquePosicion.length >  0){
+            this.mensajeBuque = "Ver en el mapa."
+            this.hayBuque = true;
+          } else{
+            this.mensajeBuque = "No se encontró ubicación."
+          }
+        } else{
+          this.mensajeBuque = "Completar IMO."
+        }
+      }
       this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
       this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
-    } else {
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
     }
-  }
-  setListaBuquesGeolocalizacion(BuquesGeolocalizacion) {
-    this.listaBuquesGeolocalizacion = BuquesGeolocalizacion;
   }
   getListaBuquesGeolocalizacion() {
     return this.listaBuquesGeolocalizacion;

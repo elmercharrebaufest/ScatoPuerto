@@ -205,9 +205,6 @@ namespace Molinos.Scato.Workflow
 
         public IList<InstanciaWorkflowPuertoDto> ListarEmbarques(string filtroProximaAccion = null)
         {
-
-            //var resultado = ObtenerTotalWorkflows().Where(x => x.TipoVehiculo == TipoVehiculo.Vapor && (string.IsNullOrEmpty(filtroProximaAccion) || x.ProximaAccion == filtroProximaAccion))
-            
             var resultado = ObtenerWorkFlows().Where(x => x.TipoVehiculo == TipoVehiculo.Vapor && (string.IsNullOrEmpty(filtroProximaAccion) || x.ProximaAccion == filtroProximaAccion))
                     .Select(x => new InstanciaWorkflowPuertoDto
                     {
