@@ -714,7 +714,8 @@ namespace Molinos.Scato.Dominio.Seguridad
         PuestoPausado = 605,
         [Display(ResourceType = typeof(Textos), Name = "HidraulicasEspeciales")]
         HidraulicasEspeciales = 606,
-
+        [Display(ResourceType = typeof(Textos), Name = "ModuloBuque")]
+        ModuloBuque = 609,
 
         [Display(ResourceType = typeof(Textos), Name = "VerBalanzasPesada")]
         VerBalanzasPesada = 607,

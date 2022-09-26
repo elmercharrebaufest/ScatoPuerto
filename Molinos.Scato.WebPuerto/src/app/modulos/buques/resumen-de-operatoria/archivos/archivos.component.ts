@@ -150,7 +150,7 @@ export class ArchivosComponent implements OnInit {
     this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los archivos?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
     .then((confirmed) => {
       if (confirmed) {
-        this.embarqueService.guardarArchivos(this.idEmbarque, this.listArchivosToSave, true).subscribe(res => {
+        this.embarqueService.guardarArchivos(this.idEmbarque, this.listArchivosToSave).subscribe(res => {
           this.listArchivos.push(...this.listArchivosToSave);
           this._modalService.dismissAll();
         })          

@@ -38,7 +38,7 @@ export class BalanzaService {
       return this.http.post(`${this.url}ModuloDeCarga/GuardarFechaInicioCarga?embarque_id=${embarque_id}&fechaHorastring=${fechaHorastring}`, { 'withCredentials': true});
     }
 
-    obtenerRitmos(vapor_id: any, modulodecarga_id: number): Observable<Ritmos> {
+    obtenerRitmos(modulodecarga_id: number): Observable<Ritmos> {
       return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 

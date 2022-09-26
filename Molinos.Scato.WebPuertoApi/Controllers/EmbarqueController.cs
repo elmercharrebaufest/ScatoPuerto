@@ -398,6 +398,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+
+        [HttpPost]
+        [Route("api/Embarque/GuardarTipoArchivo")]
+        public HttpResponseMessage GuardarArchivos(TipoArchivoPuertoDto archivosPuerto)
+        {
+            try
+            {
+                
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.GuardarTipoArchivo(archivosPuerto));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Embarque/EliminarArchivos")]
+        public HttpResponseMessage EliminarArchivos(List<ArchivosPuertoDto> archivosPuerto)
+        {
+            try
+            {
+                ;
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.EliminarArchivos(archivosPuerto));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpGet]
         [Route("api/Embarque/ObtenerArchivos")]
         public HttpResponseMessage obtenerArchivos(int idEmbarque)
@@ -425,6 +457,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
         }
+
+     
+        [HttpGet]
+        [Route("api/Embarque/ObtenerIdsUsuales")]
+        public HttpResponseMessage ObtenerIdsUsuales(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerIdsUsuales(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Embarque/ObtenerEmbarqueInformacion")]
+        public HttpResponseMessage obtenerEmbarqueInformacion(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerEmbarqueInformacion(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
 
         /*
         [HttpGet]

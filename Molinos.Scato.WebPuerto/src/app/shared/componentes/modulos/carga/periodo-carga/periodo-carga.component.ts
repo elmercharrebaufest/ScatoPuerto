@@ -11,7 +11,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
   styleUrls: ['./periodo-carga.component.css']
 })
 export class PeriodoCargaComponent implements OnInit {
-
+  guardando: boolean;
   periodoCargaForm: FormGroup;
   @Input() esSoloLectura: boolean = false;
   

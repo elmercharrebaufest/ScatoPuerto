@@ -2,9 +2,9 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-import { BalanzasComponent } from 'app/shared/componentes/modulos/carga/balanzas/balanzas.component';
+import { BalanzasComponent } from 'app/modulos/carga/carga-solidos/tableristas/balanzas/balanzas.component';
 import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
-import { UmapComponent } from 'app/shared/componentes/modulos/carga/umap/umap.component';
+import { UmapComponent } from 'app/modulos/carga/carga-solidos/tableristas/umap/umap.component';
 
 @Component({
   selector: 'app-navtabs-buque',
