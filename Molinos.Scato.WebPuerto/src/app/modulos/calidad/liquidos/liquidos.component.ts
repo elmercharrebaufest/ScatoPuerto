@@ -2,7 +2,6 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
 
-
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
@@ -13,10 +12,14 @@ export class LiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   RecibidoresPdf: boolean = false;
   
-  constructor(private _CalidadSharedService: CalidadSharedService) { }
+  constructor(private _CalidadSharedService: CalidadSharedService,) { }
 
   ngOnInit(): void {
     this.hideSpinner.emit(false);
+  }
+
+  finalizaCalidad():void{
+    this._CalidadSharedService.emitFinalizaEnCalidad(true);
   }
 
   imprimir(imprimir: boolean = false){

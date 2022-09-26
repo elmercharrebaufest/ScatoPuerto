@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
 import { Mano } from '@ScatoModels/nir';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,7 @@ export class CalidadSharedService {
   @Output() Manos = new EventEmitter<any>();
   @Output() sendMano1 = new EventEmitter<Mano>();
   @Output() sendMano2 = new EventEmitter<Mano>();
+  @Output() sendFinalizaEnCalidad = new EventEmitter<boolean>();
   private _mano1: BehaviorSubject<Mano> = new BehaviorSubject<Mano>(null); 
   private _mano2: BehaviorSubject<Mano> = new BehaviorSubject<Mano>(null); 
 
@@ -40,6 +41,10 @@ export class CalidadSharedService {
   
   emitMano2(mano: Mano){
     this.sendMano2.emit(mano)
+  }
+
+  emitFinalizaEnCalidad(esLiquido: boolean){
+    this.sendFinalizaEnCalidad.emit(esLiquido);
   }
 
   getManosDeEmbarque(){

@@ -5,6 +5,8 @@ import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { EmbarqueService } from './embarque.service';
 import { ModuloDeCargaService } from './modulo-de-carga.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
+import { EstadoBuque } from '@ScatoModels/embarque';
 
 @Injectable({
     providedIn: 'root'
@@ -24,11 +26,14 @@ export class DatosEmbarquesProcesoService {
     private fechaHoraInicioCarga: Date;
     private vaporId: number;
     private fechaComienzoCarga: Date;
+    private periodoDeCarga: PeriodoDeCarga;
+    private estadoBuque: EstadoBuque;
     @Output() sendEstadoAltura = new EventEmitter<number>();
     @Output() sendEmbarque = new EventEmitter<EmbarqueNav>();
     @Output() sendTotalPlanoDeEmbarque = new EventEmitter<number>();
     @Output() sendTotalCargadoBalanzas = new EventEmitter<number>();
     @Output() sendFechaHoraInicioCarga = new EventEmitter<Date>();
+    @Output() sendSeActualizoEmbarque = new EventEmitter<any>();
 
     constructor(
         private _moduloCargaService: ModuloDeCargaService,
@@ -52,11 +57,13 @@ export class DatosEmbarquesProcesoService {
             this.moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
             
             this._embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((res: Embarque) => {
-                this.fechaHoraInicioCarga = res.fechaHoraInicioCarga
+                this.fechaHoraInicioCarga = res.fechaHoraInicioCarga;
+                this.estadoBuque = res.estadoBuque;
             });
             
             this._moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe( res => {
                 this.moduloDeCarga = res;
+                this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0] : null;
                 this.vientoAmarre = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].vientoAmarro : '';
                 this.direccionViento = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].direccionAmarro : '';
                 this.fechaComienzoCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga : null;
@@ -166,6 +173,16 @@ export class DatosEmbarquesProcesoService {
     }
     setFechaComienzoCarga(fechaComienzoCarga){
         this.fechaComienzoCarga = fechaComienzoCarga;
+    }
+    getEstadoBuque(){
+        return this.estadoBuque;
+    }
+    getPeriodoDeCarga(){
+        return this.periodoDeCarga;
+    }
+
+    emitSeActualizoEmbarque(){
+        this.sendSeActualizoEmbarque.emit();
     }
     
     disposeData(){

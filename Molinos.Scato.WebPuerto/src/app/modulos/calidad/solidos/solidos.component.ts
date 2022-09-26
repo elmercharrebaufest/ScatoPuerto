@@ -32,14 +32,14 @@ export class SolidosComponent implements OnInit {
   enviado: boolean;
   usuarioFinalizacion: string;
   RecibidoresPdf: boolean = false;
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
     private _changeDetector: ChangeDetectorRef,
-    private _CalidadSharedService: CalidadSharedService) {
-      
+    private _CalidadSharedService: CalidadSharedService,) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
   }
 
@@ -118,6 +118,10 @@ export class SolidosComponent implements OnInit {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
       });
+  }
+
+  finalizaCalidad():void{
+    this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
 
   imprimir(imprimir: boolean = false){
