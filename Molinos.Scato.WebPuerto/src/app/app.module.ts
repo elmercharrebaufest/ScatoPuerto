@@ -13,6 +13,11 @@ import { SharedModule } from './shared/shared.module';
 import { RouterModule } from '@angular/router';
 import { SharedComponentModule } from './shared/componentes/shared-components.module';
 import { MessageService } from 'primeng/api';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { ProductoState } from './store/productos/material.state';
+import { BuquesState } from './store/buques/buques.state';
 registerLocaleData(localeEsAr, 'es-Ar');
 
 @NgModule({
@@ -31,7 +36,14 @@ registerLocaleData(localeEsAr, 'es-Ar');
       useFactory: adapterFactory,
     }),
     SidebarModule.forRoot(),
-    RouterModule.forRoot(routeConfig)
+    RouterModule.forRoot(routeConfig),
+    NgxsModule.forRoot([
+      ProductoState, 
+      BuquesState
+    ]),
+    NgxsReduxDevtoolsPluginModule.forRoot(),
+    NgxsLoggerPluginModule.forRoot(),
+    
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },

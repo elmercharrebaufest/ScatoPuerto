@@ -71,6 +71,21 @@ export class RoleGuard implements CanActivateChild{
                     }
                     break;
                 }
+                case 'buques': {
+                    if (permisos.find(x => x === 600)){
+                        return true;
+                    }else{
+                        this.navigate(permisos);
+                    }
+                    break;
+                }
+                case 'operatoria': {
+                    if (permisos.find(x => x === 600) && route.params.state){
+                        return true;
+                    }else{
+                        this.navigate(permisos);
+                    }
+                }
             }
         }
 

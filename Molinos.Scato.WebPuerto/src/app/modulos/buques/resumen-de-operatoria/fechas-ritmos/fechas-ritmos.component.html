@@ -1,0 +1,96 @@
+<div *ngIf="mostrarFechas" class="row">
+  <div class="col">
+    <div
+      class="mt-4 px-4 pb-4 shadow"
+      style="background-color: white; min-height: 5rem"
+    >
+      <div class="pt-3">
+        <h2 class="colorTitle">Registro de fechas</h2>
+        <hr />
+      </div>
+      <div class="col"></div>
+      <div class="col">
+        <div class="row controLinea">
+          <div class="col-md-12">
+            <div id="content">
+              <ul class="timeline">
+                <li class="event" data-date="Eta recalada">
+                  <h3>{{ registroFechas.etaRecalada }}hs</h3>
+                </li>
+                <li class="event" data-date="Obligacion carga">
+                  <h3>{{ registroFechas.obligacionCarga }}</h3>
+                </li>
+                <li class="event" data-date="Amarre">
+                  <h3>{{ registroFechas.amarre }}hs</h3>
+                </li>
+                <li class="event" data-date="Habilitación">
+                  <h3>{{ registroFechas.habilitacion }}hs</h3>
+                </li>
+                <li *ngIf="tieneLimpieza" class="event" data-date="Limpieza">
+                  <h3>
+                    Desde: {{ registroFechas.limpiezaDesde }}hs <br>Hasta:
+                    {{ registroFechas.limpiezaHasta }}hs
+                  </h3>
+                  <p>
+                    <span *ngIf="tieneMotivoLimpieza">Motivo: {{ registroFechas.motivoLimpieza}}</span>
+                        <br>
+                    <span  *ngIf="tieneObsLimpieza">Observación: {{ registroFechas.obsLimpieza }}</span>
+                  </p>
+                </li>
+                <li class="event" data-date="Comienza Carga">
+                  <h3>{{ registroFechas.cominezoCarga }}hs</h3>
+                </li>
+                <li class="event" data-date="Desamarre">
+                  <h3>{{ registroFechas.desamarre }}hs</h3>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="hspuerto">
+          <h3 class="">
+            HS EN PUERTO: {{ horasPuerto | number: "0.0-0" }} HORAS
+          </h3>
+        </div>
+      </div>
+      <div class="col"></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="row centrar">
+      <app-balanzas-ritmos
+        *ngIf="!liquido"
+        [enBuque]="enBuque"
+      ></app-balanzas-ritmos>
+    </div>
+    <div *ngIf="!liquido" class="row aLaDerecha mt-3">
+      <div Jclass="col">
+        <div class="row">
+          <app-graficos-ritmos
+            [enBuque]="enBuque"
+            [liquido]="liquido"
+          ></app-graficos-ritmos>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="liquido" class="row mt-4">
+      <div Jclass="col">
+        <div class="row aLaDerecha">
+          <app-graficos-ritmos
+            [enBuque]="enBuque"
+            [liquido]="liquido"
+          ></app-graficos-ritmos>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col">
+        <app-info-adicional
+          *ngIf="!liquido"
+          [enBuque]="enBuque"
+        ></app-info-adicional>
+      </div>
+    </div>
+  </div>
+</div>

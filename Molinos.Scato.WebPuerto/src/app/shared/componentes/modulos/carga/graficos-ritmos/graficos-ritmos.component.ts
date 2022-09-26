@@ -1,9 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
+
+
 
 @Component({
   selector: 'app-graficos-ritmos',
@@ -12,6 +16,8 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 })
 export class GraficosRitmosComponent implements OnInit {
   @Input() liquido: boolean;
+  @Input() enBuque: boolean = false;
+  
   valorRitmo: number = 0;
   valorCargando: number = 0;
   valorNeto: number = 0;
@@ -28,14 +34,20 @@ export class GraficosRitmosComponent implements OnInit {
   embarque: EmbarqueNav;
   embarqueId: number;
   barquitos: InstanciaWorkflowPuerto[] = [];
+  idsDelEmbarque: IdsDelEmbarque;
 
   constructor(
     private _turnosService: TurnosService,
     private _procesoService: DatosEmbarquesProcesoService,
     private balanzaService: BalanzaService,
-  ) {
-    this.vaporId = this._procesoService.getVaporId();
+    private embarqueSharingService: EmbarqueSharingService,
+  ) 
+  {
+    if(this.enBuque = false){
     this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
+    }else{
+      this.moduloDeCargaId = this.embarqueSharingService.getModuloDeCargaId();
+    }
   }
 
   ngOnInit(): void {
@@ -68,7 +80,11 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeBalanzas() {
-    this.balanzaService.obtenerRitmos(this.vaporId, this.moduloDeCargaId).subscribe(res => {
+
+    this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
+if(this.moduloDeCargaId>0)
+{
+    this.balanzaService.obtenerRitmos(this.moduloDeCargaId).subscribe(res => {
       // console.log('obtenerRitmos: ', res);
       this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
       this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
@@ -81,5 +97,5 @@ export class GraficosRitmosComponent implements OnInit {
       this.tnTotales = res;
     });
   }
-
+}
 }

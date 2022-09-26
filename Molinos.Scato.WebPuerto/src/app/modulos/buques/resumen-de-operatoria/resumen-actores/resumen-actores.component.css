@@ -1,0 +1,15 @@
+.colorTitle{ 
+    color: #4D60A8;
+    position: relative;
+    top: -8px;
+    font-size: x-large;
+    font-weight: 500;
+ }
+ .data{
+    font-weight: normal;
+    color: black;
+ }
+ .subTItulos{
+    font-weight: bold;
+    color: rgb(102, 101, 101);
+ }

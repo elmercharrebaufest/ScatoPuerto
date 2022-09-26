@@ -506,6 +506,29 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+[HttpGet]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ListarInformacionBalanzasCortes")]
+        public HttpResponseMessage ListarInformacionBalanzasCortes(int IdModuloDeCarga)
+        {
+            try
+            {
+                CortesRegistrados cor = new CortesRegistrados()
+                {
+                    balanzas = servicio.ObtenerCortesBalanzas(IdModuloDeCarga),
+                    informacionAdicional = servicio.ObtenerInformacionCortesBalanzas(IdModuloDeCarga)
+
+                };
+
+                return Request.CreateResponse(HttpStatusCode.OK, cor);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
         public class CortesRegistrados
         {
             public IList<BalanzasCortesDto> balanzas { get; set; }
@@ -831,6 +854,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+[HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/GuardarCapturaImagenLineUp")]
+        public HttpResponseMessage GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque)
+        {
+            servicio.GuardarCapturaImagenLineUp(embarque_Id, Embarque);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
     }

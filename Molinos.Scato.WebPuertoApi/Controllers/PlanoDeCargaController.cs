@@ -189,6 +189,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             );
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/PlanoDeCarga/obtenerPlanoDeCargaId")]
+        public HttpResponseMessage obtenerPlanoDeCargaId(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerPlanoDeCargaId(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUpExportar)]
         [Route("api/PlanoDeCarga/EnviarPorMail")]

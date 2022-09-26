@@ -1,0 +1,62 @@
+
+.centrarOp{
+    position: relative;
+    left: 40%;
+    bottom: 5.1rem;
+}
+
+.card-buque{
+    width: 0px;
+    height: 0px;
+}
+
+.colorTitle{ 
+    color: #4D60A8;
+    position: relative;
+    top: -8px;
+    font-size: x-large;
+    font-weight: 500;
+ }
+.seccionesShipImage{
+    width: 15%;
+    max-width:200px;
+}
+.seccionesB{
+    gap: 20px;
+    width: 100%;
+}
+.imgBuque{
+    height:4rem;
+    position: relative;
+    top: -8px;
+}
+.dentro{
+    width:15%;
+    padding-bottom:20px
+}
+.tipoBuque{
+    width: 20%;
+}
+.line{
+  width: 3px;
+  height: 125%;
+  max-height: 125%;
+  background-color: rgba(128, 128, 128, 0.767);
+  transform: translateY(-20%);
+
+}
+.centrarOp2{
+    text-align: center;
+}
+.color{
+    color:dimgray;
+}
+.historial-buque-contenido-modulo{
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}

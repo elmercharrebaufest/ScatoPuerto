@@ -67,6 +67,14 @@
     width: 27px;
     height: 27px;
 }
+.links-container a div.item-container div.icon-buques{
+    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
+    -webkit-mask: url('assets/sidebar-icons/buques.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/buques.svg') no-repeat center;
+    width: 27px;
+    height: 27px;
+}
 
 .links-container a div.item-container div.icon-recibidores{
     -webkit-mask: url('assets/sidebar-icons/recibidores.svg') no-repeat center;

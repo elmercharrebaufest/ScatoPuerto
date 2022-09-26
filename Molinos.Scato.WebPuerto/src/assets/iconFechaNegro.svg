@@ -1,0 +1,8 @@
+<svg id="Icono_Calendar" xmlns="http://www.w3.org/2000/svg" width="29" height="28" viewBox="0 0 29 28">
+<rect id="Rectángulo_426" data-name="Rectángulo 426" width="29" height="28" fill="none"/>
+<g id="Icon_ionic-ios-calendar" data-name="Icon ionic-ios-calendar" transform="translate(3 3)">
+<path id="Trazado_78" data-name="Trazado 78" d="M24.163,6.75H21.952V8.1a.447.447,0,0,1-.442.449h-.885a.447.447,0,0,1-.442-.449V6.75H9.567V8.1a.447.447,0,0,1-.442.449H8.24A.447.447,0,0,1,7.8,8.1V6.75H5.587A2.236,2.236,0,0,0,3.375,9V24.273a2.236,2.236,0,0,0,2.212,2.247H24.163a2.236,2.236,0,0,0,2.212-2.247V9A2.236,2.236,0,0,0,24.163,6.75ZM24.606,23.6A1.118,1.118,0,0,1,23.5,24.722H6.25A1.118,1.118,0,0,1,5.144,23.6V13.49a.447.447,0,0,1,.442-.449H24.163a.447.447,0,0,1,.442.449Z" transform="translate(-3.375 -4.519)" fill="#373a3c"/>
+<path id="Trazado_79" data-name="Trazado 79" d="M11.231,5.058a.559.559,0,0,0-.558-.558H9.558A.559.559,0,0,0,9,5.058V6.731h2.231Z" transform="translate(-4.673 -4.5)" fill="#373a3c"/>
+<path id="Trazado_80" data-name="Trazado 80" d="M26.981,5.058a.559.559,0,0,0-.558-.558H25.308a.559.559,0,0,0-.558.558V6.731h2.231Z" transform="translate(-8.308 -4.5)" fill="#373a3c"/>
+</g>
+</svg>
