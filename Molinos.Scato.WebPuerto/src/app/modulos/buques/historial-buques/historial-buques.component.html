@@ -1,0 +1,75 @@
+<ship-spinner *ngIf='buscarHistorialBuques' [src]='"pdf"'></ship-spinner>
+
+<div style="overflow-x:auto;">
+    <table class='table table-bordered lista-buque-table'>
+        <thead class="lista-buque-header">
+
+            <th>Buque</th>
+            <th>ID. op</th>
+            <th>Desamarre</th>
+            <th>Muelle</th>
+            <th>Destino</th>
+            <th>Material</th>
+            <th>Tn.</th>
+            <th>Exportador</th>
+            <th>Ritmo</th>
+            <th>Hs. muelle</th>
+            <th>Control</th>
+            <th>A.T.A</th>
+        </thead>
+        <tbody *ngFor="let historial of getListaHistorialBuques() | filtroBuque: getFiltroBuques()">
+            <tr class="lista-buque-row" *ngIf="historial.numeroPaginado == getPaginaActual()">
+                <td class="lista-buque-row-item celda-nombre-buque"
+                    (click)="onVerHistorial(historial.embarqueId, historial.vaporId, historial.moduloDeCargaId)"
+                    *ngIf="!getFiltrosSeleccionado()?.esDetalle">{{historial.nombreBuque}}</td>
+                <td class="lista-buque-row-item celda-nombre-buque-detalle" *ngIf="getFiltrosSeleccionado()?.esDetalle">
+                    {{historial.nombreBuque}}</td>
+                <td class="lista-buque-row-item">{{historial.embarqueId}}</td>
+                <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="lista-buque-row-item">
+                    <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
+                </td>
+                <td class="lista-buque-row-item">{{historial.destino}}</td>
+                <td class="lista-buque-row-item">
+                    <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreMaterial }}</div>
+                </td>
+                <td class="lista-buque-row-item">
+                    <div *ngFor="let exportador of historial.productoExportador">{{ exportador.toneladas |
+                        number:'0.3-3' }} tn</div>
+                </td>
+                <td class="lista-buque-row-item">
+                    <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreExportador }}</div>
+                </td>
+                <td class="lista-buque-row-item">
+                    <div *ngIf="historial.totalRitmoBaja   > 0" class="ritmo-baja-carga">{{historial.totalRitmoBaja | number:'0.2-2' }} tn/hs <br></div>
+                    <div *ngIf="historial.totalRitmoNormal > 0" class="ritmo-carga-normal">{{historial.totalRitmoNormal | number:'0.2-2' }} tn/hs</div>
+                </td>
+                <td class="lista-buque-row-item">{{historial.horasMuelle | number:'0.2-2' }} hs</td>
+                <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>
+                <td class="lista-buque-row-item">{{historial.nombreAta}}</td>
+            </tr>
+            <div class="lista-buque-espacio" *ngIf="historial.numeroPaginado == getPaginaActual()">
+            </div>
+        </tbody>
+    </table>
+
+    <nav aria-label="Page navigation example" class="centrado"
+        *ngIf="getListaHistorialBuques()?.length > 0 && !getFiltrosSeleccionado()?.esDetalle">
+        <ul class="pagination justify-content-center paginado-buque-fondo">
+            <li [ngClass]="{'page-item disabled': getPaginaActual() == 1 }">
+                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() - 1)">
+                    << </a>
+            </li>
+            <li *ngFor="let pagina of getListaPaginas(); let index = index"
+                [ngClass]="{'page-item disabled': getPaginaActual() == (index + 1)}">
+                <a class="page-link" [ngClass]="{'paginado-buque-activo': getPaginaActual() == (index + 1)}"
+                    href="javascript:void(0);" (click)="setPaginaActual(index + 1)">{{index + 1}}</a>
+            </li>
+            <li [ngClass]="{'page-item disabled': getPaginaActual() >= getTotalPaginas() }">
+                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() + 1)"> >>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</div>

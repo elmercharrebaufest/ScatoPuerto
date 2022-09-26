@@ -48,5 +48,9 @@ export enum PermisosScato {
   ModuloDeCalidad_Finalizar = 643,
   ModuloDeCalidad_AgregarBuque = 644,
   MModuloDeCalidad_IniciarCarga = 645,
-  ModuloDeCalidad_EnviarTurno = 646
+  ModuloDeCalidad_EnviarTurno = 646,
+
+  // Buques //
+  
+  Buques_Resumen_De_Operatoria = 600,
 }

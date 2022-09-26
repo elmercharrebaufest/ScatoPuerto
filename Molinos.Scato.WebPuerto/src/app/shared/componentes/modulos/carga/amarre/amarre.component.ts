@@ -15,6 +15,7 @@ export class AmarreComponent implements OnInit {
   public solidosForm: FormGroup;
   guardando: boolean = false;
 
+  @Input() esSoloLectura: boolean = false;
   constructor(
     private _builder: FormBuilder,
     private _confirmationDialogService: ConfirmationDialogService,
@@ -27,16 +28,16 @@ export class AmarreComponent implements OnInit {
 
   newForm(){
     this.solidosForm = this._builder.group({
-      fechaAmarro : "",
-      horaAmarro : "",
-      vientoAmarro : "",
-      direccionAmarro : "",
-      fechaDesamarro : "",
-      horaDesamarro : "",
-      vientoDesamarro : "",
-      direccionDesamarro : "",
-      fechaHabilitacion : "",
-      horaHabilitacion : "",
+      fechaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
+      horaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
     })
     // this.solidosForm = this._builder.group({
     //   amarro: this.initAmarre(),

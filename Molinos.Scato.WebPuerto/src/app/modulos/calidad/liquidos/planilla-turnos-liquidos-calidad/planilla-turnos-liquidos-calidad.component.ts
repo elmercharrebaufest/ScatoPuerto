@@ -11,6 +11,8 @@ import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 import { Workbook, Worksheet } from 'exceljs';
+import * as fs from 'file-saver';
+import { saveAs } from 'file-saver-es';
 import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Mail } from '@ScatoModels/mail';
@@ -88,6 +90,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
+    private messageService: MessageService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,

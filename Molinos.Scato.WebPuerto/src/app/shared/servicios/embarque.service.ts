@@ -14,6 +14,8 @@ import { Bandera } from '@ScatoModels/bandera';
 import { identifierName } from '@angular/compiler';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
+import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
+import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
 
 @Injectable({
   providedIn: 'root'
@@ -128,4 +130,17 @@ export class EmbarqueService {
   obtenerBanderas(): Observable<Bandera[]>{
     return this.http.get<Bandera[]>(`${this.url}Embarque/ObtenerBanderas`, { 'withCredentials' : true});
   }
+  
+   guardarCapturaImagenLineUp(embarque_id: number, embarque: Embarque){
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarCapturaImagenLineUp?embarque_id=${embarque_id}`, embarque, { 'withCredentials': true});
+  } 
+  
+  obtenerIdsUsuales(idEmbarque: number): Observable<IdsDelEmbarque>{
+    return this.http.get<IdsDelEmbarque>(`${this.url}Embarque/ObtenerIdsUsuales?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
+  }
+
+  obtenerEmbarqueInformacion(idEmbarque: number): Observable<EmbarqueInformacion>{
+    return this.http.get<EmbarqueInformacion>(`${this.url}Embarque/ObtenerEmbarqueInformacion?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
+  }
+  
 }

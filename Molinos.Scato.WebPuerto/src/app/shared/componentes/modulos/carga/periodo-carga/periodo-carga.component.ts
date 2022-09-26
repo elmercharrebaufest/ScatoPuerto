@@ -13,7 +13,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 export class PeriodoCargaComponent implements OnInit {
 
   periodoCargaForm: FormGroup;
-  guardando: boolean = false;
+  @Input() esSoloLectura: boolean = false;
   
   constructor(
     private formBuilder: FormBuilder,
@@ -29,25 +29,25 @@ export class PeriodoCargaComponent implements OnInit {
   initFormulario(){
     
     this.periodoCargaForm = this.formBuilder.group({
-      id: "",
-      fechaAmarro : "",
-      horaAmarro : "",
-      vientoAmarro : "",
-      direccionAmarro : "",
-      fechaDesamarro : "",
-      horaDesamarro : "",
-      vientoDesamarro : "",
-      direccionDesamarro : "",
-      fechaHabilitacion : "",
-      horaHabilitacion : "",
-      fechaConexionMangueras : "",
-      fechaDesconexionMangueras : "",
-      fechaComienzoCarga : "",
-      fechaFinalizacionCarga : "",
-      horaConexionMangueras : "",
-      horaDesconexionMangueras : "",
-      horaComienzoCarga : "",
-      horaFinalizacionCarga : ""
+      id: [{ value: '', disabled: this.esSoloLectura }],
+      fechaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
+      horaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
+      fechaConexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesconexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      fechaComienzoCarga : [{ value: '', disabled: this.esSoloLectura }],
+      fechaFinalizacionCarga : [{ value: '', disabled: this.esSoloLectura }],
+      horaConexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      horaDesconexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      horaComienzoCarga : [{ value: '', disabled: this.esSoloLectura }],
+      horaFinalizacionCarga :[{ value: '', disabled: this.esSoloLectura }],
     });
   }
   // this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');

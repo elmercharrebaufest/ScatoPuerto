@@ -39,7 +39,8 @@ export class Embarque {
   horaDesdeLimpieza: string;
   fechaHastaLimpieza: Date;
   horaHastaLimpieza: string;
-  motivosLimpieza: MotivosLimpieza[];
+  motivosLimpieza:  MotivosLimpieza;
+  motivosLimpiezas:  MotivosLimpieza[];
   observacionesLimpieza: string;
   destinoBuque: number;
   destino: Destino;
@@ -58,6 +59,7 @@ export class Embarque {
   usuarioInicioCarga: string;
   imo:string;
   cantidadBodegasTanques:number;
+  filePathImgLineUp: string | ArrayBuffer;
 }
 
 export class Vapor{

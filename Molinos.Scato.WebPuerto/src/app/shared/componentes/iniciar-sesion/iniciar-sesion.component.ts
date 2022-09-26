@@ -31,7 +31,7 @@ export class IniciarSesionComponent implements OnInit {
             610, 611, 612, 613, 614, 615, 616, 617, 618, 619,
             620, 621, 622, 623, 624, 625, 626, 627, 628, 629,
             630, 631, 632, 633, 634, 635, 636, 637, 638, 639,
-            640, 641, 642, 643, 644, 645, 646, 647, 648, 649]
+            640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 680]
           res.autenticado = true;
           this.session.setUser(res);
           this.router.navigateByUrl('/lineup');

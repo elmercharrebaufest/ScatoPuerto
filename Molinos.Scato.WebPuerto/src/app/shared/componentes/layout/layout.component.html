@@ -59,6 +59,15 @@
       </a>
       
 
+
+      <hr *ngIf='tienePermiso(600)'>
+      <a routerLink='/buques' *ngIf='tienePermiso(600)'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "buques"'>
+          <div class='icon-buques'></div>
+          <span *ngIf='opened'>Buque</span>
+        </div>
+      </a>
+
       <!-- <hr *ngIf='tienePermiso(650)'>
       <a routerLink='/administracion' *ngIf='tienePermiso(650)'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "administracion"'>
