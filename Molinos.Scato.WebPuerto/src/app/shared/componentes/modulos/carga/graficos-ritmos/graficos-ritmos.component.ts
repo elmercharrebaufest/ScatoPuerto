@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Ritmos, RitmosLiquido } from '@ScatoModels/balanzadas/ritmos';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Parametros } from '@ScatoModels/parametros';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
