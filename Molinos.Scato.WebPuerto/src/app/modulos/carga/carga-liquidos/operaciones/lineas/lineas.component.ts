@@ -134,31 +134,7 @@ export class LineasComponent implements OnInit, OnChanges {
     if(rg.test(str + event.key)) return true;
     return false;
     
-    
-    
-    
-    // var charCode = (event.which) ? event.which : event.keyCode;
-    // if ((charCode > 47 && charCode < 58) || charCode == 8 || charCode == 44) {
-    //   if((charCode == 44 && !this.hayComa(str)) || (charCode != 44 && this.onlyOneDecimal(str))){
-    //     return true;
-    //   }
-    // }
-    // return false;
   }
-
-  hayComa(str: string): boolean{ 
-    if(str.includes(",")) return true;
-    return false;
-  }
-
-  onlyOneDecimal(str: string){
-    if(str != ''){
-      if(str.split(",")[1] != undefined && str.split(",")[1].length > 0) return false;
-    }
-    return true;
-    
-  }
-
 
 
   private obtenerDatosModuloCarga() {
@@ -222,13 +198,10 @@ export class LineasComponent implements OnInit, OnChanges {
     let arrMedicion = medicion.toString().split(',');
     if(arrMedicion != null){
       if(arrMedicion.length == 1){
-        return [arrMedicion[0], '0']
-
+        return [arrMedicion[0] == ''? 0 :arrMedicion[0], '0']
       }
-      
       if(arrMedicion.length == 2){
         return [arrMedicion[0] != '' ? arrMedicion[0] : '0', arrMedicion[1] != '' ? arrMedicion[1] : '0']
-        
       }
     }else{
       return ['0','0'];
