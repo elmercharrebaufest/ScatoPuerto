@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Ritmos, RitmosLiquido } from '@ScatoModels/balanzadas/ritmos';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
-import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Parametros } from '@ScatoModels/parametros';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
@@ -9,8 +8,6 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-
-
 
 @Component({
   selector: 'app-graficos-ritmos',
@@ -20,7 +17,7 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 export class GraficosRitmosComponent implements OnInit {
   @Input() liquido: boolean;
   @Input() enBuque: boolean = false;
-  
+
   valorRitmo: number = 0;
   valorCargando: number = 0;
   valorNeto: number = 0;

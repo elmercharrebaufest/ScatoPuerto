@@ -5,6 +5,9 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { BalanzasComponent } from '../../../carga/carga-solidos/tableristas/balanzas/balanzas.component';
 import { UmapComponent } from '../../../carga/carga-solidos/tableristas/umap/umap.component';
 import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 
 @Component({
   selector: 'app-navtabs-buque',
@@ -22,6 +25,8 @@ export class NavtabsBuqueComponent implements OnInit {
 
 
   constructor(private moduloCargaService: ModuloDeCargaService, 
+              private procesoService: DatosEmbarquesProcesoService,
+              private embarqueService: EmbarqueService,
               private embarqueSharingService: EmbarqueSharingService) { }
 
   ngOnInit(): void {
@@ -54,6 +59,28 @@ export class NavtabsBuqueComponent implements OnInit {
         }
       });
   }
+  private cargarDatosEmbarqueSolido(){
+    this.embarqueService.obtenerEmbarque(this.paramEmbarqueSel.embarque_Id).subscribe(data => {
+      console.log('data embarqueeee-->>')
+      console.log(data);
+      const embarqueNavSel: EmbarqueNav = {
+        cargado: true,
+        esLiquido: data.esLiquido,
+        id : this.paramEmbarqueSel.embarque_Id,
+        moduloDeCargaId : this.paramEmbarqueSel.moduloDeCarga_Id,
+        nombreBuque :data.nombreBuque,
+        nombreUbicacion : '',
+        planoDeCargaId : this.paramEmbarqueSel.planoDecargaId,
+      };
+      let embarqueNavList: EmbarqueNav[] = [];
+      embarqueNavList.push(embarqueNavSel);
+      this.procesoService.setEmbarquesList(embarqueNavList);
+      this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
+      console.log('enviandoooooo');
+    });
+
+
+  }
 
   onClickHandlerClient(idElemento: string) {
 
@@ -76,15 +103,17 @@ export class NavtabsBuqueComponent implements OnInit {
     elementoSeleccionado.classList.add("active");
     var elementoSeleccionado = document.getElementById(idElementoModif);
     elementoSeleccionado.classList.add("show");
-
+    console.log('this.paramEmbarqueSel-->>');
+    console.log(this.paramEmbarqueSel);
     if (this.vistaSeleccionada == 'op-tablero-tab') {
       if (this.esEmbarqueLiquido) {
         this.setCargarPeriodoDeCarga();
       } else {
-        this.setCargarInfoUmap()
+        this.setCargarInfoUmap();
+        this.cargarDatosEmbarqueSolido();
       }
     }
-    
+
   }
 
 }

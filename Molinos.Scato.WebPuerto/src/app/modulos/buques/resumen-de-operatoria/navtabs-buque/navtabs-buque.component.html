@@ -64,7 +64,7 @@
           <app-umap></app-umap>
         </div>
         <!-- balanzadas ==> pasar a shared o componente nuevo -->
-        <div *ngIf="!esEmbarqueLiquido">
+        <div *ngIf="!esEmbarqueLiquido && paramEmbarqueSel">
           <app-balanzas [esSoloLectura]="true">
           </app-balanzas>
           <!-- bodegas =====> pasar a shared o componente nuevo -->

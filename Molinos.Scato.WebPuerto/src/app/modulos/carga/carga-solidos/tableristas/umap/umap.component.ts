@@ -49,8 +49,6 @@ export class UmapComponent implements OnInit {
   }
 
   public updateUMAP(umap){
-    console.log('entroooooo   updateUMAP---->>');
-    console.log(umap);
     while(this.umapFormArray.length < umap.length) this.umapFormArray.push(this.initUmap());
     umap.forEach(element => {
       element.fechaEncendido = element.fechaEncendido ?  formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar') : " ";

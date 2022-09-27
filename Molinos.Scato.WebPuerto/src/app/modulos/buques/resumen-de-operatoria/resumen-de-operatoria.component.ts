@@ -18,6 +18,8 @@ import { BuqueService } from '@ScatoServicios/buque.service';
 import { HistorialBuquesComponent } from '../historial-buques/historial-buques.component';
 import { isThisQuarter } from 'date-fns';
 import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 
 @Component({
   selector: 'app-resumen-de-operatoria',
@@ -35,7 +37,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   private vaporInformacion: VaporInformacion;
   private embarqueInformacion: EmbarqueInformacion;
   private filtroBuquedaForm: FormGroup;
-  paramEmbarqueSel: any;
+  paramEmbarqueSel: any = null;
   paisBuque: Pais[];
   mostrarInformacion: boolean;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -59,7 +61,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
-    private buqueService: BuqueService,
+    private buqueService: BuqueService
   ) {
     this.cargarValoresHistorial();
     this.cargarValoresOperatoria();

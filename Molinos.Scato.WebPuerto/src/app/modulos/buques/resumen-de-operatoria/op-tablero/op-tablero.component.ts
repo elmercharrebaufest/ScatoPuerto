@@ -105,7 +105,6 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
               private session: SessionService) { 
     this.makeDraggable.bind(this);
     this.datosEmbarque = this._procesoService.getDatosGrafico();
-    console.log(this.datosEmbarque);
     this.initEventosManos();
     this.confirmationDialogService = confirmationDialogService;
     this.productos = this.datosEmbarque?.listaMateriales;
@@ -754,7 +753,6 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       elementos.push(elementoGrafico);
     }
 
-    console.log(elementos);
     return elementos;
   }
 
@@ -803,8 +801,6 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
 
   
   getEmbarqueData() {
-    console.log('getEmbarqueData --->>>')
-    console.log(this._procesoService)
     this._procesoService.sendEmbarque.subscribe(res => {
       this.embarqueSelected = res;
       this.inicializarFormulario();
@@ -1103,7 +1099,6 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
     this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
     this.planoDeCargaForm.value.usuario = this.user.username;
     this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
-    console.log(this.planoDeCargaForm.value)
     try {
       this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value)
         .subscribe((res: any) => {

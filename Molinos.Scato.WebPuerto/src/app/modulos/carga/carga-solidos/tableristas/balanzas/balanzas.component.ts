@@ -70,7 +70,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   totalTnBodegas7: TotToneladas[] = [];
   totalTnBodegas8: TotToneladas[] = [];
   unsubscribe: Subject<any>;
-  vaporId: number = 0;
   yaCargoModal: boolean = false;
   @Input() imprimir : boolean = false; 
   patenteEmbarque: string;
@@ -104,29 +103,17 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     config.keyboard = false;
     this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
-    /*
-    this.embarque = this._procesoService.getEmbarqueSelected();
-    this.embarqueId = this._procesoService.getEmbarqueId();
-    this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-    this.vaporId = this._procesoService.getVaporId();
-    this.datosEmbarque = this._procesoService.getDatosGrafico();
-    this.materialesPuerto = this.datosEmbarque.listaMateriales;
-    console.log('this.moduloDeCarga_Id: ', this.moduloDeCarga_Id);
+   
     
-    this.cargarMotivosBalanzas78();
-    
-    this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
-    */
-    //this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
-    
-    this.verificarNombresBuque();
     this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
       this.paramSoloLectura = data;
     });
-    this.setCargarValoresBalanza();
+    //this.verificarNombresBuque();
+    
   }
 
   ngOnInit(): void {
+    this.setCargarValoresBalanza();
     this.balanza7Form = this.formBuilder.group({
       balanzas7: this.formBuilder.array([])
       // balanzas7: this.formBuilder.array([this.initBalanzas7()])
@@ -147,25 +134,20 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   setCargarValoresBalanza() {
-
     if (this.esSoloLectura) {
-      ///this.embarque = this._procesoService.getEmbarqueSelected();
       this.embarqueId = this.paramSoloLectura.embarque_Id;
       this.moduloDeCarga_Id = this.paramSoloLectura.moduloDeCarga_Id;
-      this.vaporId = this.paramSoloLectura.vapor_Id;
       this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
         this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
       });
-      this.cargarMotivosBalanzas78();
+      this.cargarMotivosBalanzas78();      
       this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
-      this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
-      this.balanzas78Service.setObtenerEmbarqueBalanza(this.moduloDeCarga_Id);
+      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
     } else {
       this.embarque = this._procesoService.getEmbarqueSelected();
       if (this.embarque != null || this.embarque != undefined) {
         this.embarqueId = this._procesoService.getEmbarqueId();
         this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-        this.vaporId = this._procesoService.getVaporId();
         this.datosEmbarque = this._procesoService.getDatosGrafico();
         this.materialesPuerto = this.datosEmbarque?.listaMateriales;
         this.cargarMotivosBalanzas78();
@@ -371,7 +353,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   obtenerBalanzadasEnVivo() {
-    this.parametrosService.consola(`vapor: `,this.vaporId);
     this.parametrosService.consola(`moduloDeCarga: `,this.moduloDeCarga_Id);
 
     this.balanzas78Service.sendDataBalanzada7
@@ -805,8 +786,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           }
 
           cortes.push(objetoNuevo);
-          // this._balanzaService.guardarBalanzaCorte( cortes )
-          //   .subscribe( res => console.log('se guardo correctamente') );
         } else {
           this.mensajeGenerico('La fecha y hora del nuevo Inicio y/o Corte quedó fuera del rango que está modificando.');
           return;
