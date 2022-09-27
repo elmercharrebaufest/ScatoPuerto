@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { Subject } from 'rxjs';
@@ -10,6 +10,8 @@ import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.s
 import { BalanzadasBuque, Bodega } from '@ScatoModels/balanzadas/balanza';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
 
 interface BalanzadasUnidas {
   bodega: string;
@@ -28,6 +30,9 @@ interface BalanzadasUnidas {
 })
 export class BodegasComponent implements OnInit, OnDestroy {
 
+  @Input() esSoloLectura: boolean = false;
+
+  private paramSoloLectura: any;
   unsubscribe: Subject<any>;
   materialesPuerto: MaterialPuerto[] = [];
   bodegasProductosTn = [];
@@ -35,23 +40,57 @@ export class BodegasComponent implements OnInit, OnDestroy {
   planoDeCargaBodega: PlanoDeCargaBodega[];
   bodegas: Bodega[] = [];
   datosEmbarque: any;
+  planoDeCargaId: number = 0;
 
   constructor(
     private balanzas78Service: Balanzas78Service,
     private planoDeCargaService: PlanoDeCargaService,
     private _procesoService: DatosEmbarquesProcesoService,
     private funcionesGeneralesService: FuncionesGeneralesService,
+    private embarqueSharingService: EmbarqueSharingService,
+    private embarqueService: EmbarqueService,
     private _balanzaService: BalanzaService,) {
 
     this.unsubscribe = new Subject();
+    
+    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
+      console.log('shared services embarque')
+      console.log(data)
+      this.paramSoloLectura = data;
+    });
+    this.setCargarValoresBodegas();
+    /*
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.materialesPuerto = this.datosEmbarque.listaMateriales;
     this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
+    */
   }
+  setCargarValoresBodegas() {
+    console.log('0000 paramSoloLectura--->>>')
+    console.log(this.esSoloLectura)
 
+    if (this.esSoloLectura) {
+      this.planoDeCargaId = this.paramSoloLectura.planoDeCarga_Id;
+      this.embarqueService.obtenerEmbarque(this.paramSoloLectura.embarque_Id).subscribe(res => {
+        this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
+      });
+      this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+    } else {
+      if (this.planoDeCargaId == 0) {
+        this.datosEmbarque = this._procesoService.getDatosGrafico();
+        if (this.datosEmbarque != null || this.datosEmbarque != undefined) {
+          this.materialesPuerto = this.datosEmbarque.listaMateriales;
+          this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+          this.planoDeCargaId = this.embarqueSelected.planoDeCargaId;
+          this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+        }
+      }
+    }
+  }
   ngOnInit(): void {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
+    console.log('this.embarqueSelected--->>')
+    console.log(this.embarqueSelected)
     this.planoDeCargaService.obtenerPlanoDeCarga(this.embarqueSelected.planoDeCargaId)
       .pipe(finalize( () => this.obtenerBalanzadasEnVivo() ))
       .subscribe( res => this.planoDeCargaBodega = res.planoDeCargaBodegas );

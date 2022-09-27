@@ -148,6 +148,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
           }
           this.setCargarPaginas();
           this.buscarHistorialBuques = false;
+        }else{
+          this.buscarHistorialBuques = false;
         }
       }
     }, error => { },

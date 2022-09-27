@@ -506,7 +506,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-[HttpGet]
+        [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/ListarInformacionBalanzasCortes")]
         public HttpResponseMessage ListarInformacionBalanzasCortes(int IdModuloDeCarga)

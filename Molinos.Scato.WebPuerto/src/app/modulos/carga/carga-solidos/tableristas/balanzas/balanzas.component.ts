@@ -22,6 +22,7 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Embarque } from '@ScatoModels/embarque';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 
 interface TotToneladas {
   producto: string;
@@ -34,6 +35,9 @@ interface TotToneladas {
   styleUrls: ['./balanzas.component.css']
 })
 export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
+  @Input() esSoloLectura: boolean = false;
+  private paramSoloLectura: any;
+
   agregaCorte: boolean = false;
   balanza7Form: FormGroup;
   balanza8Form: FormGroup;
@@ -90,6 +94,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     private balanzas78Service: Balanzas78Service,
     config: NgbModalConfig,
     confirmationDialogService: ConfirmationDialogService,
+    private embarqueSharingService: EmbarqueSharingService,
     private embarqueService: EmbarqueService,
     private _balanzaService: BalanzaService,
     private funcionesGeneralesService: FuncionesGeneralesService,
@@ -99,6 +104,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     config.keyboard = false;
     this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
+    /*
     this.embarque = this._procesoService.getEmbarqueSelected();
     this.embarqueId = this._procesoService.getEmbarqueId();
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
@@ -108,9 +114,16 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     console.log('this.moduloDeCarga_Id: ', this.moduloDeCarga_Id);
     
     this.cargarMotivosBalanzas78();
+    
     this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
+    */
+    //this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+    
     this.verificarNombresBuque();
-    this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
+      this.paramSoloLectura = data;
+    });
+    this.setCargarValoresBalanza();
   }
 
   ngOnInit(): void {
@@ -130,6 +143,37 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.yaCargoModal = true;
+  }
+
+
+  setCargarValoresBalanza() {
+
+    if (this.esSoloLectura) {
+      ///this.embarque = this._procesoService.getEmbarqueSelected();
+      this.embarqueId = this.paramSoloLectura.embarque_Id;
+      this.moduloDeCarga_Id = this.paramSoloLectura.moduloDeCarga_Id;
+      this.vaporId = this.paramSoloLectura.vapor_Id;
+      this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
+        this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
+      });
+      this.cargarMotivosBalanzas78();
+      this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+      this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+      this.balanzas78Service.setObtenerEmbarqueBalanza(this.moduloDeCarga_Id);
+    } else {
+      this.embarque = this._procesoService.getEmbarqueSelected();
+      if (this.embarque != null || this.embarque != undefined) {
+        this.embarqueId = this._procesoService.getEmbarqueId();
+        this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
+        this.vaporId = this._procesoService.getVaporId();
+        this.datosEmbarque = this._procesoService.getDatosGrafico();
+        this.materialesPuerto = this.datosEmbarque?.listaMateriales;
+        this.cargarMotivosBalanzas78();
+        this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+        this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+      }
+    }
+
   }
 
   initCorteManualForm(){

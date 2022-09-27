@@ -48,7 +48,9 @@ export class UmapComponent implements OnInit {
     return this.amarreComponent.obtenerAmarre();
   }
 
-  updateUMAP(umap){
+  public updateUMAP(umap){
+    console.log('entroooooo   updateUMAP---->>');
+    console.log(umap);
     while(this.umapFormArray.length < umap.length) this.umapFormArray.push(this.initUmap());
     umap.forEach(element => {
       element.fechaEncendido = element.fechaEncendido ?  formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar') : " ";
@@ -57,7 +59,7 @@ export class UmapComponent implements OnInit {
     this.umapFormArray.patchValue(umap);
   }
 
-  updateAmarre(amarre){
+  public updateAmarre(amarre){
     this.amarreComponent.updateAmarre(amarre);
   }
 

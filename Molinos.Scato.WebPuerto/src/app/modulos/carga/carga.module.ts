@@ -45,15 +45,21 @@ import { InicioCargaComponent } from "./carga-solidos/tableristas/inicio-carga/i
         InicioCargaComponent
     ],
     exports: [
-        ManosComponent,
+        CargaComponent,
+        CargaSolidosComponent,
         GraficoCargaComponent,
-        TanquesComponent,
-        PeriodoCargaComponent,
-        CargaLiquidosComponent,
-        LineasComponent,
+        ManosComponent,
+        BalanzasComponent,
+        BalanzasRitmosComponent,
         InfoAdicionalComponent,
+        UmapComponent,
+        PlanillaEmbarqueComponent,
+        CargaLiquidosComponent,
+        TanquesComponent,
+        LineasComponent,
         PlanillaTurnoLiquidosComponent,
-        BalanzasRitmosComponent
+        BodegasComponent,
+        InicioCargaComponent,
     ]
 })
 export class CargaModule {}
