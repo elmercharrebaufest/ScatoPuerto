@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -30,6 +30,7 @@ import { IniciarSesionComponent } from './iniciar-sesion/iniciar-sesion.componen
 import { NavtabsCalidadComponent } from "./navtabs-calidad/navtabs-calidad.component";
 import { CardBuqueComponent } from './modulos/geo/card-buque/card-buque.component';
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
+import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-balanzas.component";
 
 const components = [
     AlertComponent,
@@ -38,6 +39,7 @@ const components = [
     EstadosPuertoContentComponent,
     LayoutComponent,
     GraficosRitmosComponent,
+    RelojBalanzasComponent,
     ObsCalidadComponent,
     ToggleMenuOrdenComponent,
     ToggleMenuAccionesComponent,
@@ -77,7 +79,9 @@ const libs = [
     ],
     exports: [
         components,
-        libs
-    ]
+        libs,
+    ],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+
 })
 export class SharedComponentModule { }

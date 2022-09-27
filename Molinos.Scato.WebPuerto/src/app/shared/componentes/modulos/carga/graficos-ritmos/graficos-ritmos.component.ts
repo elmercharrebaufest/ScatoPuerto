@@ -43,8 +43,8 @@ export class GraficosRitmosComponent implements OnInit {
     private embarqueSharingService: EmbarqueSharingService,
   ) 
   {
-    if(this.enBuque = false){
-    this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
+    if(this.enBuque == false){
+      this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
     }else{
       this.moduloDeCargaId = this.embarqueSharingService.getModuloDeCargaId();
     }
@@ -62,13 +62,13 @@ export class GraficosRitmosComponent implements OnInit {
       this.subscribeBalanzas();
   }
   subscribeTurnos() {
-    this.balanzaService.obtenerRitmosLiquidos(this.vaporId, this.moduloDeCargaId).subscribe(res => {
+    this.balanzaService.obtenerRitmosLiquidos(this.moduloDeCargaId).subscribe(res => {
       // console.log('==> GRAFICOS-RITMOS - Líquido: ', res);
       this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
       this.valorNeto = res?.ritmoAcumuladoNeto ? res.ritmoAcumuladoNeto : 0;
       this.valorRitmo = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
-      this.colorRitmo = this.valorRitmo > 1000 ? '#1F8649' : '#F0AD4E';
-      this.colorValorNeto = this.valorNeto > 1000 ? '#1F8649' : '#F0AD4E';
+      this.colorRitmo = this.valorRitmo > 1000 ? '#5CB85C' : '#F0AD4E';
+      this.colorValorNeto = this.valorNeto > 1000 ? '#5CB85C' : '#F0AD4E';
     });
 
     this._turnosService.sendTnTotal.subscribe(res => {
@@ -82,9 +82,9 @@ export class GraficosRitmosComponent implements OnInit {
   subscribeBalanzas() {
 
     this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
-if(this.moduloDeCargaId>0)
-{
-    this.balanzaService.obtenerRitmos(this.moduloDeCargaId).subscribe(res => {
+    if(this.moduloDeCargaId>0)
+    {   
+      this.balanzaService.obtenerRitmos(this.moduloDeCargaId).subscribe(res => {
       // console.log('obtenerRitmos: ', res);
       this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
       this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;

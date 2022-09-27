@@ -46,7 +46,7 @@ export class BalanzaService {
       return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 
-    obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
+    obtenerRitmosLiquidos(modulodecarga_id: number): Observable<RitmosLiquido>{
       return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 

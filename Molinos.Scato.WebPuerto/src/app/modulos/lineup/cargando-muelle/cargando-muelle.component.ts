@@ -39,7 +39,7 @@ export class CargandoMuelleComponent implements OnInit {
       
       if(this.instanciaWorkflow.embarque.esLiquido){
         this.liquido = true;
-        this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
         .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmosLiquidos: ', res);
