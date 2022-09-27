@@ -17,4 +17,8 @@ export class LineasDeEmbarque{
     alturaFinalMM: number;
     kilos: number;
     tkFinal: string;
+    kilosFinales: number;
+    litrosFinales: number;
+    alturaInicialCMyMM:number;
+    alturaFinalCMyMM:number;
 }

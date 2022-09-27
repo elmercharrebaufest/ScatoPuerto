@@ -1,5 +1,9 @@
 .colorTitle{ color: #4D60A8; }
 
+.headerLineas{
+    position: relative;
+    top: 17px;
+}
 .inputLineasEmbarque{
     /* width: 75px;
     height: 38px; */

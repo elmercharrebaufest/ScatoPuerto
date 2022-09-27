@@ -68,6 +68,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     lineaDeEmbarque.AlturaFinalMM = linea.AlturaFinalMM;
                     lineaDeEmbarque.Kilos = linea.Kilos;
                     lineaDeEmbarque.TkFinal = linea.TkFinal;
+                    lineaDeEmbarque.KilosFinales = linea.KilosFinales;
+                    lineaDeEmbarque.LitrosFinales = linea.LitrosFinales;
+
                 }
                 else
                 {
@@ -90,7 +93,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         AlturaFinalMM = linea.AlturaFinalMM,
                         Kilos = linea.Kilos,
                         TkFinal = linea.TkFinal,
-                    };
+                        KilosFinales = linea.KilosFinales,
+                        LitrosFinales = linea.LitrosFinales,
+                };
 
                     moduloDeCarga.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);
                 }
