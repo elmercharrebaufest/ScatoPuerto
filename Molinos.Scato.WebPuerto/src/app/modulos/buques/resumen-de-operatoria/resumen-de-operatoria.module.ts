@@ -11,13 +11,15 @@ import { OpTableroComponent } from './op-tablero/op-tablero.component';
 import { BuquesModule } from "../buques.module";
 import { ResumenActoresComponent } from './resumen-actores/resumen-actores.component';
 import { ArchivosComponent } from "./archivos/archivos.component";
+import { CargaModule } from "../../carga/carga.module";
 
 @NgModule({
     imports: [
         ResumenDeOperatoriaRoutingModule,
         CommonModule,
         SharedModule,
-        BuquesModule
+        BuquesModule,
+        CargaModule,
     ],
     declarations: [
         ResumenDeOperatoriaComponent,

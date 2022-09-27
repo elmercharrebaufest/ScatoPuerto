@@ -23,8 +23,10 @@ export class LineupComponent implements OnInit, AfterViewInit {
       console.log('embarque: ', embarque);
     }) )
     .subscribe( res => {
-      embarque = res
-      this.captura = embarque.filePathImgLineUp;
+      if (res!=null){
+        embarque = res
+        this.captura = embarque.filePathImgLineUp;
+      }
     });
   }
 

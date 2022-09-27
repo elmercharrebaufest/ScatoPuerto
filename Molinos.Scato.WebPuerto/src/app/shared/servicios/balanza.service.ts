@@ -25,6 +25,10 @@ export class BalanzaService {
       return this.http.post(`${this.url}ModuloDeCarga/GuardarBalanzaCorte`, listadoTotalBalanzadas, { 'withCredentials': true });
     }
 
+    listarBalanzasCortes(IdModuloDeCarga: number): Observable<any>{
+      return this.http.get<any>(`${this.url}ModuloDeCarga/ListarInformacionBalanzasCortes?IdModuloDeCarga=${IdModuloDeCarga}`, { 'withCredentials': true });
+    }
+
     eliminarBalanzaCorte( idCorteBalanza: number ){
       console.log('eliminarBalanzaCorte - id: ', idCorteBalanza);
       return this.http.post(`${this.url}ModuloDeCarga/EliminarCorteBalanza?idCorteBalanza=${idCorteBalanza}`, { 'withCredentials': true });

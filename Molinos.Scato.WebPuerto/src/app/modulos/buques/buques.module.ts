@@ -7,11 +7,13 @@ import { FiltroBuquesComponent } from './filtro-buques/filtro-buques.component';
 import { HistorialBuquesComponent } from './historial-buques/historial-buques.component'
 import { BuqueFilterPipe } from './buques-pipe-filter';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { CargaModule } from '../carga/carga.module';
 @NgModule({
   imports: [
     CommonModule,
     SharedModule,
     BuquesRoutingModule,
+    CargaModule,
     NgMultiSelectDropDownModule.forRoot(),
   ],
   declarations: [

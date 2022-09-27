@@ -61,13 +61,12 @@
 
         <!-- SOLIDO : amarre y umap -->
         <div id="umap" class="mt-4 px-4 pb-4 shadow" style="background-color: white;" *ngIf="!esEmbarqueLiquido">
-          <app-umap [esSoloLectura]="true">
-          </app-umap>
+          <app-umap></app-umap>
         </div>
         <!-- balanzadas ==> pasar a shared o componente nuevo -->
         <div *ngIf="!esEmbarqueLiquido">
-          <app-balanzas-carga [esSoloLectura]="true">
-          </app-balanzas-carga>
+          <app-balanzas [esSoloLectura]="true">
+          </app-balanzas>
           <!-- bodegas =====> pasar a shared o componente nuevo -->
           <app-bodegas [esSoloLectura]="true">
           </app-bodegas>

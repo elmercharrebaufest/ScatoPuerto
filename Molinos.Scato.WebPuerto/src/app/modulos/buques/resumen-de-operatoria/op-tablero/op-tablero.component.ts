@@ -803,6 +803,8 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
 
   
   getEmbarqueData() {
+    console.log('getEmbarqueData --->>>')
+    console.log(this._procesoService)
     this._procesoService.sendEmbarque.subscribe(res => {
       this.embarqueSelected = res;
       this.inicializarFormulario();

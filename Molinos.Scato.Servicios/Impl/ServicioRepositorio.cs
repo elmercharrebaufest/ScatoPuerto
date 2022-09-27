@@ -11275,6 +11275,21 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 throw ex;
             }
         }
+        private string DevolverFechaHoraConcatenada(DateTime? fecha, string hora)
+        {
+            string resultado = string.Empty;
+            if (fecha != null)
+            {
+                if (!fecha.Equals(string.Empty))
+                {
+                    var fechaObtenida = fecha.ToString().Split(' ');
+                    resultado = fechaObtenida[0];
+                    if (!hora.Trim().Equals(string.Empty))
+                        resultado += '-' + hora;
+                }
+            }
+            return resultado;
+        }
         public Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque)
         {
             #region Variables
@@ -11298,20 +11313,12 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 #region EtaRecalada
                 //si fecha y hora de eta son != null entonces las paso a string y las concateno para devolver fecha y hora juntos
                 // si no devuelvo "-" para indicar que esta vacio el campo
-                if (lineUp.Embarque.FechaRecalada != null && lineUp.Embarque.HoraRecalada == null)
-                {
-                    var arrFechaRecalada = lineUp.Embarque.FechaRecalada.ToString().Split(' ');
-                    etaRecalada = arrFechaRecalada[0];
-                }
-                else if (lineUp.Embarque.FechaRecalada != null && lineUp.Embarque.HoraRecalada != null)
-                {
-                    var arrFechaRecalada = lineUp.Embarque.FechaRecalada.ToString().Split(' ');
-                    etaRecalada = arrFechaRecalada[0] +"-"+ lineUp.Embarque.HoraRecalada;
-                }
+                etaRecalada = this.DevolverFechaHoraConcatenada(lineUp.Embarque.FechaRecalada, lineUp.Embarque.HoraRecalada);
+
                 #endregion
 
                 #region OblicacionCarga
-                if(lineUp.Embarque.ObligacionCarga != null)
+                if (lineUp.Embarque.ObligacionCarga != null)
                 {
                     var arrObligacionCarga = lineUp.Embarque.ObligacionCarga.ToString().Split(' ');
                     obligacionCarga = arrObligacionCarga[0];
@@ -11321,67 +11328,25 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 #region Amarre
                 // Obtengo el periodo de carga con el id de moduloDeCarga del lineUp obtenido anteriormente.
                 ModuloDeCargaPeriodoDeCarga periodoDeCarga = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == lineUp.ModuloDeCarga.Id);
-                if (periodoDeCarga.FechaAmarro != null && periodoDeCarga.HoraAmarro == null)
-                {
-                    var arrFechaAmarre = periodoDeCarga.FechaAmarro.ToString().Split(' ');
-
-                    amarro = arrFechaAmarre[0];
-                }
-                else if (periodoDeCarga.FechaAmarro != null && periodoDeCarga.HoraAmarro != null)
-                {
-                    var arrFechaAmarre = periodoDeCarga.FechaAmarro.ToString().Split(' ');
-                    amarro = arrFechaAmarre[0] +"-"+ periodoDeCarga.HoraAmarro;
-                }
+                amarro = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaAmarro, periodoDeCarga.HoraAmarro);
                 #endregion
 
                 #region Habilitacion
-                if (periodoDeCarga.FechaHabilitacion != null && periodoDeCarga.HoraHabilitacion == null)
-                {
-                    var arrHabilitacion = periodoDeCarga.FechaHabilitacion.ToString().Split(' ');
-
-                    habilitacion = arrHabilitacion[0].ToString();
-                }
-                else if (periodoDeCarga.FechaHabilitacion != null && periodoDeCarga.HoraHabilitacion != null)
-                {
-                    var arrHabilitacion = periodoDeCarga.FechaHabilitacion.ToString().Split(' ');
-                    habilitacion = arrHabilitacion[0] +"-"+ periodoDeCarga.HoraHabilitacion;
-                }
+                habilitacion = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaHabilitacion, periodoDeCarga.HoraHabilitacion);
                 #endregion
 
                 #region Limpieza
-
-                if (lineUp.Embarque.FechaDesdeLimpieza != null && lineUp.Embarque.HoraDesdeLimpieza == null)
-                {
-                    var arrLimpiezaDesde = lineUp.Embarque.FechaDesdeLimpieza.ToString().Split(' ');
-                    limpiezaDesde = arrLimpiezaDesde[0];
-                }
-                else if (lineUp.Embarque.FechaDesdeLimpieza != null && lineUp.Embarque.HoraDesdeLimpieza != null)
-                {
-                    var arrLimpiezaDesde = lineUp.Embarque.FechaDesdeLimpieza.ToString().Split(' ');
-                    limpiezaDesde = arrLimpiezaDesde[0] +"-"+ lineUp.Embarque.HoraDesdeLimpieza;
-                }
-
-                if (lineUp.Embarque.FechaHastaLimpieza != null && lineUp.Embarque.HoraHastaLimpieza == null)
-                {
-                    var arrLimpiezaHasta = lineUp.Embarque.FechaHastaLimpieza.ToString().Split(' ');
-                    limpiezaHasta = arrLimpiezaHasta[0];
-                }
-                else if (lineUp.Embarque.FechaHastaLimpieza != null && lineUp.Embarque.HoraHastaLimpieza != null)
-                {
-                    var arrLimpiezaHasta = lineUp.Embarque.FechaHastaLimpieza.ToString().Split(' ');
-                    limpiezaHasta = arrLimpiezaHasta[0] +"-"+ lineUp.Embarque.HoraHastaLimpieza;
-                }
-
+                limpiezaDesde = this.DevolverFechaHoraConcatenada(lineUp.Embarque.FechaDesdeLimpieza, lineUp.Embarque.HoraDesdeLimpieza);
+                limpiezaHasta = this.DevolverFechaHoraConcatenada(lineUp.Embarque.FechaHastaLimpieza, lineUp.Embarque.HoraHastaLimpieza);
                 //Obtengo los motivos de limpieza si la fecha es != "-"
-                if(limpiezaHasta != "-" || limpiezaDesde != "-")
+                if (limpiezaHasta != "-" || limpiezaDesde != "-")
                 {
-                    motivoLimpieza = lineUp.Embarque.MotivosLimpieza.Nombre;
+                    motivoLimpieza = lineUp.Embarque.MotivosLimpieza!=null? lineUp.Embarque.MotivosLimpieza.Nombre : "";
                     if (lineUp.Embarque.ObservacionesLimpieza != null)
                     {
                         obsLimpieza = lineUp.Embarque.ObservacionesLimpieza;
                     }
                 }
-                
                 #endregion
 
                 #region comienzoCarga
@@ -11398,14 +11363,11 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 {
                     var turno = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == lineUp.ModuloDeCarga.Id).OrderBy(x => x.Id).First();
                     comienzoCarga = turno.Fecha.ToString();
-                }
-                
-                
-                
-                                
+                }    
                 #endregion
 
                 #region Desamarre
+                /*
                 if (periodoDeCarga.FechaDesamarro != null && periodoDeCarga.HoraDesamarro == null)
                 {
                     var arrFechaDesamarro = periodoDeCarga.FechaDesamarro.ToString().Split(' ');
@@ -11415,7 +11377,8 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 {
                     var arrFechaDesamarro = periodoDeCarga.FechaDesamarro.ToString().Split(' ');
                     desamarre = arrFechaDesamarro[0] +"-"+ periodoDeCarga.HoraDesamarro;
-                }
+                }*/
+                desamarre = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaDesamarro, periodoDeCarga.HoraDesamarro);
                 #endregion
 
                 #region TotalEnPuerto
@@ -11508,30 +11471,20 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 #endregion
 
                 #region comprobaciones
-                if (embarque.Coordinadores.Nombre != null)
-                {
-                    coordinador = embarque.Coordinadores.Nombre;
-                }
+                if (embarque.Coordinadores != null)
+                   coordinador = embarque.Coordinadores.Nombre !=null ? embarque.Coordinadores.Nombre : "";
 
-                if (embarque.ATA.Nombre != null)
-                {
-                    ata = embarque.ATA.Nombre;
-                }
+                if (embarque.ATA != null)
+                    ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
 
-                if (embarque.Agencias.Nombre != null)
-                {
-                    agenciaMaritima = embarque.Agencias.Nombre;
-                }
+                if (embarque.Agencias != null)
+                    agenciaMaritima = embarque.Agencias != null ? embarque.Agencias.Nombre : "";
 
-                if(plano.Estiba.Nombre != null)
-                {
-                    estiba = plano.Estiba.Nombre + ' ' + plano.Estiba.Apellido;
-                }
+                if(plano.Estiba != null)
+                    estiba = (plano.Estiba.Nombre !=null ? plano.Estiba.Nombre : "") + ' ' + (plano.Estiba.Apellido != null ? plano.Estiba.Apellido : "");
 
-                if (plano.AgenciaControlPrivado.Nombre != null)
-                {
-                    agenciaControlPrivado = plano.AgenciaControlPrivado.Nombre;
-                }
+                if (plano.AgenciaControlPrivado != null)
+                    agenciaControlPrivado = plano.AgenciaControlPrivado !=null ? plano.AgenciaControlPrivado.Nombre : "";
                 
                 if(plano.AgentesControlPrivado != null && plano.AgentesControlPrivado.Count != 0)
                 {
