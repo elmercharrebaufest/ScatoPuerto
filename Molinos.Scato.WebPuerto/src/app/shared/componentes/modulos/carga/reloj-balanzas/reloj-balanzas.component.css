@@ -1,0 +1,37 @@
+.img-toneladas{
+    position: absolute;
+    width: 35px;
+    margin-top: -23px;
+}
+
+.center-knob{
+    margin: 5px auto;
+}
+
+.text-knob{
+    font-size: 10px;
+    position: absolute;
+    margin-top: 106px;
+    font-weight: 500;
+}
+
+.ritmo-title{
+    border-bottom: 1px solid rgb(190, 190, 190);
+}
+
+.card-ritmo-grafico{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.footer-ritmos-text{
+    font-size: 11px;
+    margin-bottom: 0.3rem;
+    font-weight: 450;
+    display: block; 
+    width: 190px; 
+    text-align: center; 
+    font-size: 12px; 
+}
