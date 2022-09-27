@@ -10848,7 +10848,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             foreach (var embarque in embarques)
             {
-                var lineupDto = Listar<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id).First();
+                var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
                 InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
                 {
                     Embarque = embarque,

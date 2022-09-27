@@ -139,7 +139,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var listaEmbarques = workflows.ListarEmbarques();
+                var listaEmbarques = servicio.ListarEmbarques();
 
                 List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion = new List<EmbarqueGeolocalizacionDto>();
                 IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto = servicio.ListarUbicacionDeBuquePuerto();
@@ -213,7 +213,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 embarcacionGeolocalizacionDto.Embarque_Id = embarque.Embarque.Id;
                 embarcacionGeolocalizacionDto.NombreBuque = embarque.Embarque.NombreBuque;
                 embarcacionGeolocalizacionDto.Vapor_Id = embarque.Embarque.Vapor.Id;
-
                 embarcacionGeolocalizacionDto.SanBenito = embarque.Embarque.SanBenito;
                 embarcacionGeolocalizacionDto.Vicentin = embarque.Embarque.Vicentin;
                 embarcacionGeolocalizacionDto.Noryon = embarque.Embarque.Noryon;
@@ -241,51 +240,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     continue;
                 }
                 UbicacionDeBuquePuertoDto ubicacionDeBuquePuerto = listarUbicacionDeBuquePuerto.FirstOrDefault(ubicacion => ubicacion.Id == embarque.Embarque.Ubicacion);
-                embarcacionGeolocalizacionDto.UbicacionLineUp = string.Empty;
 
-                if (ubicacionDeBuquePuerto != null)
+                if (embarque.Embarque.EmbarqueInformacion.Count > 0 && embarque.Embarque.EmbarqueInformacionViaje.Count > 0 && embarque.Embarque.EmbarquePosicion.Count > 0 && ubicacionDeBuquePuerto != null)
                 {
                     embarcacionGeolocalizacionDto.UbicacionLineUp = ubicacionDeBuquePuerto.Nombre;
-                }
-
-                IList<EmbarqueInformacionDto> embarqueInformacion = embarque.Embarque.EmbarqueInformacion;
-                IList<EmbarqueInformacionViajeDto> embarqueInformacionViaje = embarque.Embarque.EmbarqueInformacionViaje;
-                IList<EmbarquePosicionDto> embarquePosicion = embarque.Embarque.EmbarquePosicion;
-
-                embarqueInformacion = embarqueInformacion.OrderByDescending(p => p.FechaRegistro).ToList();
-                embarqueInformacionViaje = embarqueInformacionViaje.OrderByDescending(p => p.FechaRegistro).ToList();
-                embarquePosicion = embarquePosicion.OrderByDescending(p => p.FechaRegistro).ToList();
-
-                if (embarqueInformacion != null)
-                {
-                    if (embarqueInformacion.Count > 0)
-                    {
-                        embarcacionGeolocalizacionDto.Informacion = embarqueInformacion[0];
-                    }
-                }
-
-                if (embarqueInformacionViaje != null)
-                {
-                    if (embarqueInformacionViaje.Count > 0)
-                    {
-                        embarcacionGeolocalizacionDto.Viaje = embarqueInformacionViaje[0];
-                    }
-                }
-
-                if (embarquePosicion != null)
-                {
-                    if (embarquePosicion.Count > 0)
-                    {
-                        embarcacionGeolocalizacionDto.Posicion = embarquePosicion[0];
-                    }
-                }
-
-                if (embarqueInformacion.Count > 0 && embarqueInformacionViaje.Count > 0 && embarquePosicion.Count > 0)
-                {
+                    embarcacionGeolocalizacionDto.Informacion = embarque.Embarque.EmbarqueInformacion[0];
+                    embarcacionGeolocalizacionDto.Viaje = embarque.Embarque.EmbarqueInformacionViaje[0];
+                    embarcacionGeolocalizacionDto.Posicion = embarque.Embarque.EmbarquePosicion[0];
                     listaEmbarcacionGeolocalizacion.Add(embarcacionGeolocalizacionDto);
                 }
-
-
             }
 
         }

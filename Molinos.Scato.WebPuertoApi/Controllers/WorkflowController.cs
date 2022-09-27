@@ -28,9 +28,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Autorizacion(PermisosScato.LineUpLectura)]
         [HttpGet]
         [Route("api/Workflow/Listar")]
-        public HttpResponseMessage Listar()
+        public HttpResponseMessage Listar() 
         {
-            var embarques = workflows.ListarEmbarques();
+            //var embarques = workflows.ListarEmbarques();
+            var embarques = servicio.ListarEmbarques();
             return Request.CreateResponse(HttpStatusCode.OK, embarques);
         }
 
@@ -39,7 +40,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/Workflow/ListarEnLineUp")]
         public HttpResponseMessage ListarEnLineUp()
         {
-            var embarques = workflows.ListarEmbarques("LineUp");
+            var embarques = servicio.ListarEmbarques();
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
 
             return Request.CreateResponse(HttpStatusCode.OK,

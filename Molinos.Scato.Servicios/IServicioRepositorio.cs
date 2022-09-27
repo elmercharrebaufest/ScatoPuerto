@@ -2711,8 +2711,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void RegistrarErroresGeolocalizacion(List<ErroresGeolocalizacionDto> ErroresGeolocalizacion);
         
-           [OperationContract]
+        [OperationContract]
         int obtenerPlanoDeCargaId(int idEmbarque);
+        
         [OperationContract]
         Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque);
         
@@ -2733,5 +2734,8 @@ namespace Molinos.Scato.Servicios
         bool EliminarArchivos(List<ArchivosPuertoDto> archivosPuerto);
 
       
+
+        [OperationContract]
+        IList<InstanciaWorkflowPuertoDto> ListarEmbarques();
     }
 }

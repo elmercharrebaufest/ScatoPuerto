@@ -53,7 +53,6 @@ export class LineupComponent implements OnInit, Observador {
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
   estadoOtrosLp: string;
-  buquesGeolocalizacion: any;
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -77,16 +76,7 @@ export class LineupComponent implements OnInit, Observador {
   }
   
   cargarGeolocalizacionLineUp() {
-    this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(data => {
-      this.buquesGeolocalizacion = data;
-    },
-      err => {
-        console.log(err);
-        this.cargarWorkflows();
-      },
-      () => {
-        this.cargarWorkflows();
-      });
+    this.cargarWorkflows();
   }
 
   cargarEstadoLineUp() {
@@ -124,7 +114,7 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
   }
 
-  ListarEmbarques(): InstanciaWorkflowPuerto[] {
+  ListarEmbarques(): any[] {
     return this.listadoEmbarques;
   }
 
