@@ -12,6 +12,10 @@ import { BuquesModule } from "../buques.module";
 import { ResumenActoresComponent } from './resumen-actores/resumen-actores.component';
 import { ArchivosComponent } from "./archivos/archivos.component";
 import { CargaModule } from "../../carga/carga.module";
+import { FechasPuertoComponent } from './fechas-puerto/fechas-puerto.component';
+import { OperacionesComponent } from './operaciones/operaciones.component';
+import { RecibidoresComponent } from './recibidores/recibidores.component';
+import { CalidadModule } from "../../calidad/calidad.module";
 
 @NgModule({
     imports: [
@@ -20,6 +24,7 @@ import { CargaModule } from "../../carga/carga.module";
         SharedModule,
         BuquesModule,
         CargaModule,
+        CalidadModule,
     ],
     declarations: [
         ResumenDeOperatoriaComponent,
@@ -29,7 +34,10 @@ import { CargaModule } from "../../carga/carga.module";
         ClimaComponent,
         OpTableroComponent,
         ResumenActoresComponent,
-        ArchivosComponent
+        ArchivosComponent,
+        FechasPuertoComponent,
+        OperacionesComponent,
+        RecibidoresComponent
     ],
 })
 export class ResumenDeOperatoriaModule {

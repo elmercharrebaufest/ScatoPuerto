@@ -90,7 +90,9 @@ export class DatosEmbarquesProcesoService {
     setPlanoDeCarga(id: number) {
         this.planoCargaId = id;
         if (this.embarques) {
+            console.log('setPlanoDeCargadddddddd')
             this.embarqueSelected = this.embarques.find(e => e.planoDeCargaId === this.planoCargaId);
+            console.log(this.embarqueSelected);
             this.moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
             this.embarqueId = this.embarqueSelected.id;
         }
@@ -99,7 +101,11 @@ export class DatosEmbarquesProcesoService {
     //GUARDA LOS DATOS DE MODULO DE CARGA Y SETEA EL EMBARQUE SELECTED POR EL MODULO
     setModulodDeCarga(id: number) {
         this.moduloDeCargaId = id;
-        this.embarqueSelected = this.embarques.find(e => e.planoDeCargaId === this.moduloDeCargaId);
+        console.log('setModulodDeCargaddddddddddd')
+
+        this.embarqueSelected = this.embarques.find(e => e.moduloDeCargaId === this.moduloDeCargaId);
+        console.log(this.embarqueSelected);
+
         this.planoCargaId = this.embarqueSelected.planoDeCargaId;
         this.embarqueId = this.embarqueSelected.id;
     }

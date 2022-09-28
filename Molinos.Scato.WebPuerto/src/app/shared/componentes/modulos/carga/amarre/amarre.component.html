@@ -86,7 +86,7 @@
                 <p>Velocidad Máxima del viento para amarre 35 Km/h</p>
             </div>
             <div  style="display: flex; flex-direction: row; justify-content: center;" >
-                <button style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
+                <button *ngIf="!esSoloLectura" style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
              </div>
         </form>
     </div>

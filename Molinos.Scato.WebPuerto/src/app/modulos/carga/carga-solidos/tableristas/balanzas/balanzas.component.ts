@@ -943,6 +943,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   //El comentario es porque todos los parámetros se llaman igual WTF.
   //Si estás leyendo esto leé la linea de abajo de esta y me vas a entender. CORTEE (Con voz de Gaspi Cancelado)
   openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number, corte?: boolean) {
+    if (this.esSoloLectura) return; 
     this.esCorteManual = corteManual;
     this.balanzaCorteManual = balanzaCorteManual;
     this.agregaCorte = false;

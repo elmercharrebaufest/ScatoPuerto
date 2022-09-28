@@ -21,7 +21,7 @@ export class NavtabsBuqueComponent implements OnInit {
   @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
   @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
-  vistaSeleccionada: string = 'programa-embarque-tab';
+  vistaSeleccionada: string = 'lineup-tab';
 
 
   constructor(private moduloCargaService: ModuloDeCargaService, 

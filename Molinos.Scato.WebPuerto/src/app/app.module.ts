@@ -40,10 +40,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
     NgxsModule.forRoot([
       ProductoState, 
       BuquesState
-    ]),
-    NgxsReduxDevtoolsPluginModule.forRoot(),
-    NgxsLoggerPluginModule.forRoot(),
-    
+    ]),   
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },

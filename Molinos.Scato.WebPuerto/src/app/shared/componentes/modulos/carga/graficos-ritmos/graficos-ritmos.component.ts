@@ -44,11 +44,7 @@ export class GraficosRitmosComponent implements OnInit {
     private embarqueSharingService: EmbarqueSharingService,
     private _parametros: ParametrosService) 
   {
-    if(this.enBuque == false){
-      this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-    }else{
-      this.moduloDeCargaId = this.embarqueSharingService.getModuloDeCargaId();
-    }
+    
   }
 
   ngOnInit(): void {

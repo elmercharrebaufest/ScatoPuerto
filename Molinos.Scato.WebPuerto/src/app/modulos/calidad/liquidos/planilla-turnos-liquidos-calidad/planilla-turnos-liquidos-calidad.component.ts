@@ -42,6 +42,9 @@ import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno
 export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
+  @Input() tablerista: boolean;
+  @Input() esSoloLectura: boolean = false;
+
   formTurnos: FormGroup;
   formCorte: FormGroup;
   formNuevoTurno: FormGroup;
@@ -76,7 +79,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   valorCargado: number;
   pedidoPorPlano: number;
   destinoPuerto: Destino[];
-  @Input() tablerista: boolean;
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
   constructor(
@@ -125,10 +127,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     }, 2000);
 
     this.initFormularioObs();
-    //this.initShipParticular();
-
-
-
   }
 
   expandir() {

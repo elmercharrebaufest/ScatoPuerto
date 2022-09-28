@@ -14,6 +14,7 @@ import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/ama
 export class UmapComponent implements OnInit {
   @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
   @Input() ModuloDeCargaId: number;
+  @Input() esSoloLectura: boolean = false;
 
   guardando: boolean = false;
   public forms: FormGroup;
@@ -31,12 +32,12 @@ export class UmapComponent implements OnInit {
 
   initUmap(){
     return this.builder.group({
-      fechaEncendido: '',
-      horaEncendido: '',
-      fechaApagado:'',
-      horaApagado: '',
-      velocidadDelViento: '',
-      direccionDelViento: ''
+      fechaEncendido: [{ value: '', disabled: this.esSoloLectura }],
+      horaEncendido : [{ value: '', disabled: this.esSoloLectura }],
+      fechaApagado      : [{ value: '', disabled: this.esSoloLectura }],
+      horaApagado       : [{ value: '', disabled: this.esSoloLectura }],
+      velocidadDelViento: [{ value: '', disabled: this.esSoloLectura }],
+      direccionDelViento: [{ value: '', disabled: this.esSoloLectura }]
     });
   }
 

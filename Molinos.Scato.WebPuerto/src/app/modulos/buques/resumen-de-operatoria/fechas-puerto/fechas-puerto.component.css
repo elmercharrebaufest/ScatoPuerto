@@ -1,0 +1,280 @@
+.ritmo-title{
+    border-bottom: 1px solid rgb(190, 190, 190);
+}
+.fechas-ritmo-fondo{ 
+    background-color: white; 
+    min-height: 5rem;
+}
+.text-knob{
+    font-size: 10px;
+    position: absolute;
+    margin-top: 108px;
+    font-weight: 500;
+}
+
+::ng-deep .p-knob-text{
+    font-size: 0.9rem !important;
+    padding-bottom: 18px;
+}
+
+.footer-ritmos-text{
+    font-size: 11px;
+    margin-bottom: 0.3rem;
+    font-weight: 450;
+}
+
+.img-toneladas{
+    position: absolute;
+    width: 35px;
+    margin-top: -25px;
+}
+
+.referencia-carga-neto{
+    font-size: 11px;
+    text-align: center;
+}
+
+@media screen and (min-width: 1284px) and (max-width: 1632px){
+    .img-toneladas-circulo3{
+        margin-top: -60px;
+    }
+}
+@media screen and (min-width: 1266px) and (max-width: 1282px){
+    .img-toneladas-circulo3{
+        margin-top: -35px;
+    }
+}
+@media screen and (min-width: 756px) and (max-width: 1262px){
+    .img-toneladas-circulo3{
+        margin-top: -50px;
+    }
+}
+@media screen and (min-width: 440px) and (max-width: 748px){
+    .img-toneladas-circulo3{
+        margin-top: -65px;
+    }
+}
+
+.espacio-izq{
+    margin-left: 15px;
+}
+.info-header{
+    padding: 0.9rem 0;
+    margin: 0 1.3rem;
+    border-bottom: 1px solid rgb(179, 179, 179);
+}
+
+.info-desc{
+    margin-top: 1.3rem;
+    padding-left: 1.3rem;
+    padding-bottom: 0.5rem;
+    line-height: 16px;
+    color: #666;
+}
+.ritmo-title{
+    border-bottom: 1px solid rgb(190, 190, 190);
+}
+
+.ritmo-title{
+    border-bottom: 1px solid rgb(190, 190, 190);
+}
+
+.subTitulos {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-14)/var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--tipografia-principal);
+    text-align: left;
+    font: normal normal bold 14px/24px Roboto;
+    letter-spacing: 0px;
+    color: #1A1A1A;
+}
+
+.contenido {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) var(--unnamed-font-size-14)/var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--tipografia-principal);
+    text-align: left;
+    font: normal normal normal 14px/24px Roboto;
+    letter-spacing: 0px;
+    color: #1A1A1A;
+}
+
+.cargaHastaAhora {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) 26px/45px var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--save);
+    text-align: left;
+    font: normal normal bold 26px/45px Roboto;
+    letter-spacing: 0px;
+    color: #5CB85C;
+}
+.contenidoCargaHastaAhora {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) 26px/39px var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--save);
+    text-align: left;
+    font: normal normal normal 26px/39px Roboto;
+    letter-spacing: 0px;
+    color: #5CB85C;
+}
+
+.ultimaActualiz {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) var(--unnamed-font-size-12)/var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
+    letter-spacing: var(--unnamed-character-spacing-0);
+    color: var(--tipografia-principal);
+    text-align: left;
+    font: normal normal normal 12px/24px Roboto;
+    letter-spacing: 0px;
+    color: #1A1A1A;
+    opacity: 1;
+}
+.colorTitle{
+    color: #4D60A8;
+}
+
+body{margin-top:20px;}
+.timeline {
+    border-left: 2px solid #c4c4c4;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    background: white;
+    /* background: rgba(114, 124, 245, 0.09); */
+
+    margin: 0 auto;
+    letter-spacing: 0.2px;
+    position: relative;
+    line-height: 1.4em;
+    font-size: 1.03em;
+    padding: 50px;
+    list-style: none;
+    text-align: left;
+    max-width: 40%;
+}
+
+@media (max-width: 767px) {
+    .timeline {
+        max-width: 98%;
+        padding: 25px;
+    }
+}
+
+.timeline h1 {
+    font-weight: 300;
+    font-size: 1.4em;
+}
+
+.timeline h2,
+.timeline h3 {
+    font-weight: normal;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.timeline .event {
+    /* border-bottom: 1px dashed #5CB85C; */
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+@media (max-width: 767px) {
+    .timeline .event {
+        padding-top: 30px;
+    }
+}
+
+.timeline .event:last-of-type {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border: none;
+}
+
+.timeline .event:before,
+.timeline .event:after {
+    position: absolute;
+    display: block;
+    top: 0;
+}
+
+.timeline .event:before {
+    left: -207px;
+    content: attr(data-date);
+    text-align: right;
+    color: rgb(85, 85, 85);
+    font-weight: 600;
+    font-size: 1.1em;
+    min-width: 120px;
+}
+
+@media (max-width: 767px) {
+    .timeline .event:before {
+        left: 0px;
+        text-align: left;
+    }
+}
+
+.timeline .event:after {
+    -webkit-box-shadow: 0 0 0 3px #5CB85C;
+    box-shadow: 0 0 0 3px #5CB85C;
+    left: -55.8px;
+    background: #5CB85C;
+    border-radius: 50%;
+    height: 9px;
+    width: 9px;
+    content: "";
+    top: 5px;
+}
+
+@media (max-width: 767px) {
+    .timeline .event:after {
+        left: -31.8px;
+    }
+}
+
+.rtl .timeline {
+    border-left: 0;
+    text-align: right;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    border-right: 3px solid #5CB85C
+}
+
+.rtl .timeline .event::before {
+    left: 0;
+    right: -170px;
+}
+
+.rtl .timeline .event::after {
+    left: 0;
+    right: -55.8px;
+}
+
+.controLinea{
+    position:relative;
+    left:16%
+}
+.hspuerto{
+    position:relative;
+    left:26%;
+
+    color: #666666;
+
+}
+
+.aLaDerecha{
+    position:relative;
+    left: 45px
+}
+.wi{
+    max-width:30%;
+}
+.centrar{
+    position:relative;
+    left: 14.5px;
+}
+
+.maxx{
+    max-width:555px
+}

@@ -12,10 +12,11 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 })
 export class AmarreComponent implements OnInit {
   @Input() ModuloDeCargaId: number;
+  @Input() esSoloLectura: boolean = false;
+
   public solidosForm: FormGroup;
   guardando: boolean = false;
 
-  @Input() esSoloLectura: boolean = false;
   constructor(
     private _builder: FormBuilder,
     private _confirmationDialogService: ConfirmationDialogService,
