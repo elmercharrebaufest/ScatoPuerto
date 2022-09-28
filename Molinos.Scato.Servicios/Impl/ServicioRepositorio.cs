@@ -10213,7 +10213,7 @@ namespace Molinos.Scato.Servicios.Impl
                     kgNetosBalanza7 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > fechaInicioFinal);
                     kgNetosBalanza8 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > fechaInicioFinal);
                     
-                    if (kgNetosBalanza7 != 0 && kgNetosBalanza8 != 0)
+                    if (kgNetosBalanza7 > 0 || kgNetosBalanza8 > 0)
                     {
                         totalCargado = (kgNetosBalanza7 + kgNetosBalanza8) / 1000;
                     }
