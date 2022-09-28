@@ -2650,6 +2650,9 @@ namespace Molinos.Scato.Servicios
         IList<ParametrosDto> ObtenerParametros();
 
         [OperationContract]
+        ParametrosDto ObtenerParametro(string descripcion);
+
+        [OperationContract]
         IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado);
       
         //[OperationContract]
