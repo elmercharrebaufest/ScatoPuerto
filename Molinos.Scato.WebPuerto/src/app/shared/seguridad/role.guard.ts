@@ -50,21 +50,23 @@ export class RoleGuard implements CanActivateChild{
                 }else{
                     this.navigate(permisos, "alta-embarque");
                 }
-                case 'buques': {
-                    if (permisos.find(x => x === 600)){
-                        return true;
-                    }else{
-                        this.navigate(permisos);
-                    }
-                    break;
+                break;
+            }
+            case 'buques': {
+                if (permisos.find(x => x === 'Buque_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "buque");
                 }
-                case 'operatoria': {
-                    if (permisos.find(x => x === 600) && route.params.state){
-                        return true;
-                    }else{
-                        this.navigate(permisos);
-                    }
+                break;
+            }
+            case 'operatoria': {
+                if (permisos.find(x => x === 'Buque_Operatoria_Ver') && route.params.state){
+                    return true;
+                }else{
+                    this.navigate(permisos, "operatoria de buque");
                 }
+                break;
             }
             case 'plano-de-carga': {
                 if (permisos.find(x => x === 'PlanoDeCarga_Ver') && route.params.id){
@@ -72,6 +74,7 @@ export class RoleGuard implements CanActivateChild{
                 }else{
                     this.navigate(permisos, "plano-de-carga");
                 }
+                break;
             }
             case "carga": {
                 if (permisos.find(x => x === 'PlanoDeCarga_Ver')){
@@ -96,7 +99,7 @@ export class RoleGuard implements CanActivateChild{
     navigate(permisos, navegarHacia: string=''){
         this.msjeAdvertencia(navegarHacia);
 
-        let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'PlanoDeCarga_Ver' || p == 'Recibidores_Ver');
+        let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'PlanoDeCarga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
         switch(primerPermiso){
             case 'LineUp_Ver': {
                 this.router.navigate(['/lineup']);
@@ -108,6 +111,14 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'Recibidores_Ver': {
                 this.router.navigate(['/calidad']);
+                break;
+            }
+            case 'Geolocalizacion_Ver': {
+                this.router.navigate(['/geolocalizacion']);
+                break;
+            }
+            case 'Buque_Ver': {
+                this.router.navigate(['/buques']);
                 break;
             }
         }
@@ -142,6 +153,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'calidad': {
                 msje = 'No tiene permiso para Recibidores';
+                break;
+            }
+            case 'buque': {
+                msje = 'No tiene permiso para Buque';
                 break;
             }
         }

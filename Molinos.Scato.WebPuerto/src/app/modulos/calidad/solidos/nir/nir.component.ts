@@ -352,14 +352,4 @@ export class NIRComponent {
   hasPermisoRecibidores_Nir_GuardarNir() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_GuardarNir);
   }
-
-  hasPermisoRecibidores_Nir_AgregarNuevaFila() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
-  }
-  hasPermisoRecibidores_Nir_EliminarFila() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
-  }
-  hasPermisoRecibidores_Nir_EnviarNir() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EnviarNir);
-  }
 }

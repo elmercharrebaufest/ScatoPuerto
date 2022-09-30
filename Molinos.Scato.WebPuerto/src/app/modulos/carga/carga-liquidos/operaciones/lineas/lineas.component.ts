@@ -23,14 +23,6 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 
-import { Usuario } from '@ScatoInterfaces/usuario';
-import { PermisosScato } from '@ScatoEnums/permisos-scato';
-import { SessionService } from '@ScatoServicios/session.service';
-
-import { Usuario } from '@ScatoInterfaces/usuario';
-import { PermisosScato } from '@ScatoEnums/permisos-scato';
-import { SessionService } from '@ScatoServicios/session.service';
-
 @Component({
   selector: 'app-lineas',
   templateUrl: './lineas.component.html',

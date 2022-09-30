@@ -349,10 +349,12 @@ export class CargaSolidosComponent implements OnInit {
         this.hideSpinner.emit(false);
       });
   }
-  cambiarEstado(){
-    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
-      if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
+
+  cambiarEstado() {
+    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
+      if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
     });
+  }
 
   hasPermisoPlanoDeCarga_Guardar() {
     return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Guardar);

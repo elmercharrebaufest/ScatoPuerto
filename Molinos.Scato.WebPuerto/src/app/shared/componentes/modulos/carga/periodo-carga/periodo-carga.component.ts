@@ -119,4 +119,3 @@ export class PeriodoCargaComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.Liquido_EditarPeriodoDeCarga);
   }
 }
-}

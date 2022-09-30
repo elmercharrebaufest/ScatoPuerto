@@ -107,4 +107,3 @@ export class CargandoMuelleComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarEmbarqueEnCalidad);
   }
 }
-}
