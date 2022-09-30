@@ -195,24 +195,24 @@
           Adjuntar archivos
         </button> -->
     </div>
-    <svg style="margin-top: 10px; margin-left:4px" id="choose_file" data-name="Chose file" xmlns="http://www.w3.org/2000/svg" width="153" height="37" viewBox="0 0 153 37" (click)="openModalFiles(appendFiles)">
-      <g id="Rectángulo_199" data-name="Rectángulo 199" fill="#fff" stroke="#95989a" stroke-width="1">
-      <rect width="153" height="37" rx="4" stroke="none"/>
-      <rect x="0.5" y="0.5" width="152" height="36" rx="3.5" fill="none"/>
-      </g>
-      <text id="Adjuntar_archivos" data-name="Adjuntar archivos" transform="translate(14 24.6)" fill="#666" font-size="16" font-family="Roboto-Regular, Roboto"><tspan x="0" y="0">Adjuntar archivos</tspan></text>
-    </svg>
+    <ng-container *ngIf="hasPermisoLineUp_Adjuntar()">
+      <svg style="margin-top: 10px; margin-left:4px" id="choose_file" data-name="Chose file" xmlns="http://www.w3.org/2000/svg" width="153" height="37" viewBox="0 0 153 37" (click)="openModalFiles(appendFiles)">
+        <g id="Rectángulo_199" data-name="Rectángulo 199" fill="#fff" stroke="#95989a" stroke-width="1">
+        <rect width="153" height="37" rx="4" stroke="none"/>
+        <rect x="0.5" y="0.5" width="152" height="36" rx="3.5" fill="none"/>
+        </g>
+        <text id="Adjuntar_archivos" data-name="Adjuntar archivos" transform="translate(14 24.6)" fill="#666" font-size="16" font-family="Roboto-Regular, Roboto"><tspan x="0" y="0">Adjuntar archivos</tspan></text>
+      </svg>
+    </ng-container>
+
     <div class="row">
-      
       <div class="container" *ngIf="nombreUbicacionDeBuquePuerto(instanciaWorkflow.embarque.ubicacion)==''?false:true">
         <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA -->
-        
         <img  id="imgLineup" [ngStyle]="{'cursor': hayBuque ? 'pointer' : 'default'}"  [src]="ruta" class="float-left" (click)="verGeolocalizacion(hayBuque,instanciaWorkflow.embarque.id)">
         <div class="right">
           <p [ngClass]="colorMapa" class="float-left">{{mensajeBuque}}</p>
         </div>   
-        
-    </div>
+      </div>
     </div>
     
   </div>
@@ -228,7 +228,7 @@
     <p class="text-left mb-0 overflow-auto"><strong>Observaciones: </strong>{{instanciaWorkflow.embarque.observaciones}}</p>
   </div>
   <div class="col-md-3 col-xs-6 mt-4">
-    <ng-container *ngIf="hasPermisoLineUp_EditarPlanoDeCarga()">
+    <ng-container *ngIf="hasPermisoPDC_Ver()">
       <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.cargado == false && instanciaWorkflow.embarque.sanBenito">
         <button type="button" class="btn btn-success btn-md float-right"
                 (click)="armarPlanoCarga()">ARMAR PLANO DE CARGA</button>
@@ -237,11 +237,11 @@
         <button type="button" class="btn btn-outline-success btn-md float-right"
                 (click)="armarPlanoCarga()">EDITAR PLANO DE CARGA</button>
       </div>
-    </ng-container>
-    <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.enviado && instanciaWorkflow.lineUp.planoDeCarga.cargado && instanciaWorkflow.embarque.sanBenito">
-      <img float-right src="assets/planoDeCargaEnviadoButton.svg" onmouseover="this.src='assets/planoDeCargaEnviadoButtonInvertido.svg';" 
+      <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.enviado && instanciaWorkflow.lineUp.planoDeCarga.cargado && instanciaWorkflow.embarque.sanBenito">
+        <img float-right src="assets/planoDeCargaEnviadoButton.svg" onmouseover="this.src='assets/planoDeCargaEnviadoButtonInvertido.svg';" 
         onmouseout="this.src='assets/planoDeCargaEnviadoButton.svg';" class="cursorPointer float-right" (click)="armarPlanoCarga()">
-    </div>
+      </div>
+    </ng-container>
   </div>
 </div>
 

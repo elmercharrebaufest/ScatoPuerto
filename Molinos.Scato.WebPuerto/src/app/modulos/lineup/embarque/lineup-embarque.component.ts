@@ -165,8 +165,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public armarPlanoCarga() {
-    // if (this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Editar))
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPlanoDeCarga))
+    if (this.user.permisos.find(p => p === this.permisosScato.PDC_Ver))
       this.router.navigate([`/lineup/plano-de-carga/${this.instanciaWorkflow.embarque.id}`]);
     else
       this.showWarning();
@@ -349,16 +348,10 @@ export class LineupEmbarqueComponent implements OnInit {
     this.messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
   }
 
-  // hasPermisoRadios() {
-  //   // return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks);
-  //   return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
-  // }
   hasPermisoLineUp_EliminarBuque() {
-    // return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EliminarBuque);
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EliminarBuque);
   }
   hasPermisoLineUp_EditarBuque() {
-    // return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarBuque);
   }
   hasPermisoLineUp_EditarChecksEmbarque() {
@@ -370,8 +363,17 @@ export class LineupEmbarqueComponent implements OnInit {
   hasPermisoLineUp_EditarOrdenEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
   }
-  hasPermisoLineUp_EditarPlanoDeCarga() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPlanoDeCarga);
+  // hasPermisoLineUp_EditarPlanoDeCarga() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPlanoDeCarga);
+  // }
+  // hasPermisoLineUp_VerPlanoDeCarga() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerPlanoDeCarga);
+  // }
+  hasPermisoPDC_Ver() {
+    return this.user.permisos.find(p => p === this.permisosScato.PDC_Ver);
+  }
+  hasPermisoLineUp_Adjuntar() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_Adjuntar);
   }
 
 //------------------------------------------------------------------------------------------------------------

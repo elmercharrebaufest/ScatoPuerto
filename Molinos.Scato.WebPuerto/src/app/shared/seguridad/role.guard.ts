@@ -69,7 +69,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'plano-de-carga': {
-                if (permisos.find(x => x === 'PlanoDeCarga_Ver') && route.params.id){
+                if (permisos.find(x => x === 'PDC_Ver') && route.params.id){
                     return true;
                 }else{
                     this.navigate(permisos, "plano-de-carga");
@@ -77,7 +77,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case "carga": {
-                if (permisos.find(x => x === 'PlanoDeCarga_Ver')){
+                if (permisos.find(x => x === 'Carga_Ver')){
                     return true;
                 }else{
                     this.navigate(permisos, "carga");
@@ -99,13 +99,13 @@ export class RoleGuard implements CanActivateChild{
     navigate(permisos, navegarHacia: string=''){
         this.msjeAdvertencia(navegarHacia);
 
-        let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'PlanoDeCarga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+        let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
         switch(primerPermiso){
             case 'LineUp_Ver': {
                 this.router.navigate(['/lineup']);
                 break;
             };
-            case 'PlanoDeCarga_Ver': {
+            case 'Carga_Ver': {
                 this.router.navigate(['/carga']);
                 break;
             }

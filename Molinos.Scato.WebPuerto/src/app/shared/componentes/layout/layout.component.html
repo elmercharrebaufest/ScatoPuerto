@@ -31,8 +31,8 @@
         </div>
       </a>
 
-      <hr *ngIf='tienePermiso("PlanoDeCarga_Ver")'>
-      <a routerLink='/carga' *ngIf='tienePermiso("PlanoDeCarga_Ver")'>
+      <hr *ngIf='tienePermiso("Carga_Ver")'>
+      <a routerLink='/carga' *ngIf='tienePermiso("Carga_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>
           <div class='icon-operaciones'></div>
           <span *ngIf='opened'>Operaciones</span>
