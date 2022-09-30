@@ -81,7 +81,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   bodega8EnCurso: string;
   producto8EnCurso: string;
   llevaCargando8EnCurso: number;
-  mostrarInfoBalanzadasEnCurso: boolean = false;
+  mostrarInfoBalanzadasEnCurso7: boolean = false;
+  mostrarInfoBalanzadasEnCurso8: boolean = false;
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -400,7 +401,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( bal7 => {
         if(bal7.length>0){
-          this.mostrarInfoBalanzadasEnCurso = true;
+          this.mostrarInfoBalanzadasEnCurso7 = true;
           this.bodega7EnCurso = bal7[0].bodega;
           this.producto7EnCurso = bal7[0].producto;
           this.fechaInicio7EnCurso = `${this.getDia( bal7[0].fechaInicio )} ${this.getHora( bal7[0].fechaInicio )}`;
@@ -408,7 +409,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           this.llevaCargando7EnCurso = 0;
           bal7.forEach( x => this.llevaCargando7EnCurso = x.kilos+this.llevaCargando7EnCurso);
         }else{
-          this.mostrarInfoBalanzadasEnCurso = false;
+          this.mostrarInfoBalanzadasEnCurso7 = false;
           this.bodega7EnCurso = '';
           this.producto7EnCurso = '';
           this.fechaInicio7EnCurso = '';
@@ -421,7 +422,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( (bal8:BalanzadasAgrupadas[]) => {
         if(bal8.length>0){
-          this.mostrarInfoBalanzadasEnCurso = true;
+          this.mostrarInfoBalanzadasEnCurso8 = true;
           this.bodega8EnCurso = bal8[0].bodega;
           this.producto8EnCurso = bal8[0].producto;
           this.fechaInicio8EnCurso = `${this.getDia( bal8[0].fechaInicio )} ${this.getHora( bal8[0].fechaInicio )}`;
@@ -429,7 +430,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           this.llevaCargando8EnCurso = 0;
           bal8.forEach( x => this.llevaCargando8EnCurso = x.kilos+this.llevaCargando8EnCurso);
         }else{
-          this.mostrarInfoBalanzadasEnCurso = false;
+          this.mostrarInfoBalanzadasEnCurso8 = false;
           this.bodega8EnCurso = '';
           this.producto8EnCurso = '';
           this.fechaInicio8EnCurso = '';

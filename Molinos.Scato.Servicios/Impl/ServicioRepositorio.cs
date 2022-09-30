@@ -9463,6 +9463,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                     foreach (Balanzada balanzada in balanzadas)
                     {
+                        balanzadasAgrupadas = new BalanzadasAgrupadas();
                         balanzadasAgrupadas.Bodega = carga.Bodega.Nombre;
                         balanzadasAgrupadas.Producto = carga.Material.DescripcionCorta;
                         balanzadasAgrupadas.NumeroBalanza = carga.NumeroBalanza;
@@ -9471,13 +9472,12 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzadasAgrupadas.FechaInicio = FechaInicioBalanzadaAgrupada;
                         balanzadasAgrupadas.HoraInicio = Convert.ToString((FechaInicioBalanzadaAgrupada.Hour).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Minute).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Second).ToString().PadLeft(2, '0'));
 
-                        balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
-                        balanzadasAgrupadas = new BalanzadasAgrupadas();
                         balanzadasAgrupadas.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
                         balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
 
                         balanzadasAgrupadas.Kilos = balanzada.PesoNeto;
                         balanzadasAgrupadas.Toneladas = Math.Round(Convert.ToDecimal(balanzada.PesoNeto) / 1000, 2);
+                        balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
                     }
                 }
                 return balanzadasCompletas;
