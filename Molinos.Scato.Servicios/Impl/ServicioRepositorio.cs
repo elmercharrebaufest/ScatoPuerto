@@ -9921,14 +9921,9 @@ namespace Molinos.Scato.Servicios.Impl
                     BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
                     if (balanzasCortes_db != null)
                     {
-                        //balanzasCortes_db.Cerrado = item.Cerrado;
                         balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
                         balanzasCortes_db.Fecha_Inicio = item.Fecha_Inicio;
-                        //balanzasCortes_db.Kg = item.Kg;
-                        //balanzasCortes_db.NumeroBalanza = item.NumeroBalanza;
                         balanzasCortes_db.Observaciones = item.Observaciones;
-                        //balanzasCortes_db.Material_id = item.Material_id;
-                        //balanzasCortes_db.Tn = item.Tn;
                         balanzasCortes_db.CorteManual = item.CorteManual;
                         balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
                     }
@@ -9956,7 +9951,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
          

@@ -29,8 +29,13 @@
 .bg-white{
     background-color: white;
 }
+
 .fila-turno-baja-carga{
-    background-color: #ffefef;
+    background-color: lightyellow;
+    padding: 0.4rem;
+}
+.fila-turno-corte{
+    background-color: lightcoral;
     padding: 0.4rem;
 }
 .fila-turno-carga-normal{

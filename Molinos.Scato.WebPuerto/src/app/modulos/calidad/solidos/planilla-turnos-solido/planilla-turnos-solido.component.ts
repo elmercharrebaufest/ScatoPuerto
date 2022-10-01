@@ -475,10 +475,12 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   getBajaCargaColor(result){
     const idBalanzaCorte = result.controls.idBalanzaCorte.value;
     let colorBajaCargaClass = '';
-    if (idBalanzaCorte > 0)
+    if (idBalanzaCorte == 0)
+      colorBajaCargaClass = 'fila-turno-normal';
+    else if (idBalanzaCorte == 1)
       colorBajaCargaClass = 'fila-turno-baja-carga';
-      else
-      colorBajaCargaClass = 'fila-turno-carga-normal';
+    else
+      colorBajaCargaClass = 'fila-turno-baja-corte';
     return colorBajaCargaClass;
   }
   getTurnoDetallesBajasCargas(d, t, esCargaNormales: boolean = false) {
