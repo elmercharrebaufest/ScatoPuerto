@@ -26,12 +26,13 @@ import { style } from '@angular/animations';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Destino } from '@ScatoModels/destino';
-import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 
 
 @Component({
@@ -74,68 +75,63 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
   embarqueId: number;
   embarque: Embarque;
-  vientoAmarre: string;
-  direccionViento: string;
   valorCargado: number;
-  pedidoPorPlano: number;
   destinoPuerto: Destino[];
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
-    private _procesoService: DatosEmbarquesProcesoService,
     private datePipe: DatePipe,
     private procesoCalidadService: ProcesoCalidadService,
     private session: SessionService,
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private messageService: MessageService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
-    private embarqueService: EmbarqueService,
+    private embarqueSharingService: EmbarqueSharingService,
     private planoDeCargaService: PlanoDeCargaService,
+    private workflowService: WorkflowService,
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
-    this.planoDeCargaService.obtenerDestinos().subscribe(res => this.destinoPuerto = res);
-    this.pedidoPorPlano = this._turnosService.getTnTotales()
-    this.embarqueId = this.procesoService.getEmbarqueId();
-
-    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
-      this.embarque = res;
-      //this.cargarShipParticular(res);
-    });
-
-    this._turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;
-      if (this.formExportarExcel) this.addParcelChecks();
-      this.getProductos();
-
-      this.getDestinos();
-    });
-
   }
   ngOnInit(): void {
-    this.user = this.session.getUser();
+    this.setCargarValoresPlanilla();
+  }
+
+  private setCargarFormularioPlanilla(){
     this.newForm()
-    // this.fillPlanilla();
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
-
     this.initFormularioObs();
+  }  
+
+  private setCargarValoresPlanilla(){
+    this.user = this.session.getUser();
+    if(!this.esSoloLectura){
+        this.embarqueId = this.procesoService.getEmbarqueId();
+        this._turnosService.sendBodega.subscribe(res => {
+        this.bodegas = res;
+        if (this.formExportarExcel) this.addParcelChecks();
+        this.getProductos();
+        this.getDestinos();
+        });
+        this.setCargarFormularioPlanilla();
+    }else{
+        this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data=>{
+          this.embarqueId = data.embarque_Id;
+        });
+        this.setCargarFormularioPlanilla();
+    }
   }
 
   expandir() {
     document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
   }
-
-  // expandirObsCalidad(t : number) {
-  //   document.getElementById(`collapseObsDeCalidad_${t}`).className = "collapse show";
-  // }
 
   desabilitarTurno() {
     this.mostrarBtn = false;
@@ -151,17 +147,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       fechaLibrePlatica: [''],
       horaLibrePlatica: [],
     })
-  }
-
-  cargarShipParticular(embarque: Embarque) {
-    this.formShipParticular.patchValue(embarque);
-
-    if (embarque.fechaLibrePlatica != null)
-      this.formShipParticular.get('fechaLibrePlatica').setValue(new Date(embarque.fechaLibrePlatica).toISOString().slice(0, 10));
-    else
-      this.formShipParticular.get('fechaLibrePlatica').setValue('');
-
-    this.formShipParticular.get('destino').setValue(this.destinoPuerto.find(x => x.id == embarque.destino?.id));
   }
 
   isInvalidDate(date: Date): boolean {
@@ -284,25 +269,18 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
   fillPlanilla() {
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true && x.guardadoPorTablerista == true);
-    console.log('this.planillaDeTurnos -->>')
-    console.log(this.planillaDeTurnos)
-
     this.diasTurno.clear();
 
     //Si la planilla tiene turnos
     if (this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0) {
       this.cantidadTurnos = this.planillaDeTurnos.length;
-      console.log('this.cantidadTurnos--->>>>')
-      console.log(this.cantidadTurnos)
 
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
         element.fechaMiliseconds = new Date(element.fecha).getTime();       
       });
-      //filtroTurno.sort((a,b) => a.turnoPuerto.orden-b.turnoPuerto.orden)
 
       // Ordenamos los turnos por fecha y turno correspondiente
-      console.log('Ordenando.....')
       this.planillaDeTurnos = this.planillaDeTurnos.sort((a, b) => {
         return (b.fechaMiliseconds - a.fechaMiliseconds);// && (b.turnoPuerto.orden - a.turnoPuerto.orden);
       });
@@ -433,7 +411,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   }
 
   getCombos() {
-    this.lineas = this._procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
+    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     this.arrLineas = this.lineas;
     this.arrLineas = this.arrLineas.map(l => { return l = l.linea });
     this.arrLineas.filter((value, index, array) => {
@@ -446,15 +425,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       if (e.exportador) this.exportadores.push(e.exportador);
     }
 
-    this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
     this.bodegas = this._turnosService.getBodega();
     this.addParcelChecks();
 
-    this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
-    this.vientoAmarre = this.procesoService.getVientoAmarre();
-    this.direccionViento = this.procesoService.getDireccionViento();
-    let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
-    planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
     this.getDestinos();
     this.getProductos();
     this.getMotivosCorte();
@@ -1065,12 +1038,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         ("00" + fechaHora.getMinutes()).slice(-2)
     }
     return formatoFecha;
-  }
-
-  calcularRestaEmbarcar(): number {
-    let restaEmbarcar = this.pedidoPorPlano - this.getCantTotalABordo();
-
-    return (restaEmbarcar >= 0 ? restaEmbarcar : 0);
   }
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {

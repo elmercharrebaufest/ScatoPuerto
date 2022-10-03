@@ -101,29 +101,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       this.embarqueId = this.procesoService.getEmbarqueId();
       this.setCargarFormularioPlanilla();
     }else{
-      console.log('entro setCargarValoresPlanilla -->>');
-
-      this.workflowService.listarEmbarquesEnLineUp()
-      .subscribe(res => {
-        console.log('entro listarEmbarquesEnLineUp -->>');
-        console.log(res);
-        this.procesoService.setEmbarquesList(res);
-      }, 
-      err => { console.log(err); },
-      () => { 
-        console.log('entro getParametrosIdsEmbarque -->>');
-
-        this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data=>{
-          this.embarqueId = data.embarque_Id;
-          console.log(data);
-          this.procesoService.setEmbarque(data.embarque_Id);
-          this.procesoService.setPlanoDeCarga(data.planoDecarga_Id);
-          this.procesoService.setModulodDeCarga(data.moduloDeCarga_Id);
-          console.log('setModulodDeCarga -->>' + this.esSoloLectura);
-          console.log(this.procesoService.getModuloDeCarga())
-          this.setCargarFormularioPlanilla();
-        });
+      this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data=>{
+        this.embarqueId = data.embarque_Id;
+        this.setCargarFormularioPlanilla();
       });
+
     }
   }
   expandir() {

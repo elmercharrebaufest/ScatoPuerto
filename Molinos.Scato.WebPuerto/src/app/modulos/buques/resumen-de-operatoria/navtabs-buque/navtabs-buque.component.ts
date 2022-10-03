@@ -8,6 +8,9 @@ import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/peri
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { TurnosService } from '@ScatoServicios/turnos.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 
 @Component({
   selector: 'app-navtabs-buque',
@@ -27,12 +30,39 @@ export class NavtabsBuqueComponent implements OnInit {
   constructor(private moduloCargaService: ModuloDeCargaService, 
               private procesoService: DatosEmbarquesProcesoService,
               private embarqueService: EmbarqueService,
+              private workflowService: WorkflowService,
+              private turnosService: TurnosService,
+              private planoDeCargaService: PlanoDeCargaService,
               private embarqueSharingService: EmbarqueSharingService) { }
 
   ngOnInit(): void {
-
+    this.setCargarEmbarquesWorklow();
   }
 
+  private setCargarEmbarquesWorklow(){
+    this.workflowService.listarEmbarquesEnLineUp()
+      .subscribe(res => {
+        this.procesoService.setEmbarquesList(res);
+        this.setCargarEmbarquesPlanillas()
+      });
+  }
+
+  private setCargarEmbarquesPlanillas(){
+      this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
+      this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDecarga_Id);
+      this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
+
+      this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe( res => {
+        this.procesoService.setModuloDeCarga(res);
+      });
+
+      this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).subscribe(res => {
+        this.turnosService.setExportadores(res.cargasComerciales);
+        this.turnosService.setBodega(res.planoDeCargaBodegas);
+      });
+
+  }
+  
   private setCargarPeriodoDeCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id)
       .subscribe(res => {
@@ -59,10 +89,9 @@ export class NavtabsBuqueComponent implements OnInit {
         }
       });
   }
+
   private cargarDatosEmbarqueSolido(){
     this.embarqueService.obtenerEmbarque(this.paramEmbarqueSel.embarque_Id).subscribe(data => {
-      console.log('data embarqueeee-->>')
-      console.log(data);
       const embarqueNavSel: EmbarqueNav = {
         cargado: true,
         esLiquido: data.esLiquido,
@@ -70,7 +99,7 @@ export class NavtabsBuqueComponent implements OnInit {
         moduloDeCargaId : this.paramEmbarqueSel.moduloDeCarga_Id,
         nombreBuque :data.nombreBuque,
         nombreUbicacion : '',
-        planoDeCargaId : this.paramEmbarqueSel.planoDecargaId,
+        planoDeCargaId : this.paramEmbarqueSel.planoDecarga_Id,
       };
       let embarqueNavList: EmbarqueNav[] = [];
       embarqueNavList.push(embarqueNavSel);
@@ -108,6 +137,7 @@ export class NavtabsBuqueComponent implements OnInit {
     if (this.vistaSeleccionada == 'op-tablero-tab') {
       if (this.esEmbarqueLiquido) {
         this.setCargarPeriodoDeCarga();
+        this.cargarDatosEmbarqueSolido();
       } else {
         this.setCargarInfoUmap();
         this.cargarDatosEmbarqueSolido();
