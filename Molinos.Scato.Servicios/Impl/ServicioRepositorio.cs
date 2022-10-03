@@ -10498,6 +10498,18 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public ParametrosDto ObtenerParametro(string descripcion)
+        {
+            try
+            {
+                return Obtener<Parametros, ParametrosDto>(x => x.Descripcion == descripcion);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion)
         {
             var consulta = new MonitorCPEsCacheadasConsulta(filtro, paginacion);

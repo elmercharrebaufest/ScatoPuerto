@@ -1,10 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Ritmos, RitmosLiquido } from '@ScatoModels/balanzadas/ritmos';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { Parametros } from '@ScatoModels/parametros';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 
 
@@ -22,7 +25,6 @@ export class GraficosRitmosComponent implements OnInit {
   valorCargando: number = 0;
   valorNeto: number = 0;
   tnTotales: number = 0;
-  horaActualizacion: string = '18:00hs';
   turno: any;
   colorRitmo = '';
   colorValorNeto = '';
@@ -35,13 +37,14 @@ export class GraficosRitmosComponent implements OnInit {
   embarqueId: number;
   barquitos: InstanciaWorkflowPuerto[] = [];
   idsDelEmbarque: IdsDelEmbarque;
+  tiempoActualizacionRelojes: number;
 
   constructor(
     private _turnosService: TurnosService,
     private _procesoService: DatosEmbarquesProcesoService,
     private balanzaService: BalanzaService,
     private embarqueSharingService: EmbarqueSharingService,
-  ) 
+    private _parametros: ParametrosService) 
   {
     if(this.enBuque == false){
       this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
@@ -51,51 +54,69 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarTurnosBalanzas();
+    this._parametros.obtenerParametro("tiempoActualizacionRelojes").subscribe((res: Parametros) => {
+      this.tiempoActualizacionRelojes = res.parametro2 != null && res.parametro2 > 0? res.parametro2 : 0;
+      this.cargarTurnosBalanzas();
+    })    
   }
-  //#e7af5ffa
-
-  private cargarTurnosBalanzas() {
+  
+  cargarTurnosBalanzas() {
+    this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
     if (this.liquido)
       this.subscribeTurnos();
     else
       this.subscribeBalanzas();
   }
-  subscribeTurnos() {
-    this.balanzaService.obtenerRitmosLiquidos(this.moduloDeCargaId).subscribe(res => {
-      // console.log('==> GRAFICOS-RITMOS - Líquido: ', res);
-      this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
-      this.valorNeto = res?.ritmoAcumuladoNeto ? res.ritmoAcumuladoNeto : 0;
-      this.valorRitmo = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
-      this.colorRitmo = this.valorRitmo > 1000 ? '#5CB85C' : '#F0AD4E';
-      this.colorValorNeto = this.valorNeto > 1000 ? '#5CB85C' : '#F0AD4E';
-    });
 
+  subscribeTurnos() { 
+
+    if(this.moduloDeCargaId > 0){
+      this.setRitmosRelojesLiquidos();    
+      setInterval(() => {
+        this.setRitmosRelojesLiquidos();    
+      }, this.tiempoActualizacionRelojes > 0 ? this.tiempoActualizacionRelojes: 15000)      
+    }
+    
     this._turnosService.sendTnTotal.subscribe(res => {
       this.tnTotales = res;
     });
-
-    let fecha = new Date();
-    this.horaActualizacion = `${fecha.getHours()}:${fecha.getMinutes()}hs`;
   }
 
-  subscribeBalanzas() {
+  subscribeBalanzas() {    
 
-    this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
-    if(this.moduloDeCargaId>0)
+    if(this.moduloDeCargaId > 0)
     {   
-      this.balanzaService.obtenerRitmos(this.moduloDeCargaId).subscribe(res => {
-      // console.log('obtenerRitmos: ', res);
+      this.setRitmosRelojesSolidos();    
+      setInterval(() => {
+        this.setRitmosRelojesSolidos();    
+      }, this.tiempoActualizacionRelojes > 0 ? this.tiempoActualizacionRelojes: 15000)      
+    }
+
+    this._procesoService.sendTotalPlanoDeEmbarque.subscribe(res => {
+      this.tnTotales = res;
+    });
+  }
+
+  setRitmosRelojesSolidos(){
+    this.balanzaService.obtenerRitmos(this.moduloDeCargaId).subscribe((res: Ritmos) => {
       this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
       this.valorNeto = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
       this.valorRitmo = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
       this.colorRitmo = this.valorRitmo > 1000 ? '#1F8649' : '#F0AD4E';
       this.colorValorNeto = this.valorNeto > 1000 ? '#1F8649' : '#F0AD4E';
     });
-
-    this._procesoService.sendTotalPlanoDeEmbarque.subscribe(res => {
-      this.tnTotales = res;
-    });
+        
   }
-}
+
+  setRitmosRelojesLiquidos(){
+    this.balanzaService.obtenerRitmosLiquidos(this.moduloDeCargaId).subscribe((res: RitmosLiquido) => {
+      this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
+      this.valorNeto = res?.ritmoAcumuladoNeto ? res.ritmoAcumuladoNeto : 0;
+      this.valorRitmo = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
+      this.colorRitmo = this.valorRitmo > 1000 ? '#5CB85C' : '#F0AD4E';
+      this.colorValorNeto = this.valorNeto > 1000 ? '#5CB85C' : '#F0AD4E';
+    });
+    
+  }
+
 }
