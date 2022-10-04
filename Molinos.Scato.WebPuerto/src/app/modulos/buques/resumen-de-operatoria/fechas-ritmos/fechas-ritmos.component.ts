@@ -61,11 +61,14 @@ export class FechasRitmosComponent implements OnInit, AfterViewInit {
   }
 
   initRitmos(){
+    console.log('initRitmos this.embarqueId--->>>');
+    console.log(this.embarqueId)
     forkJoin([
       this.embarqueService.obtenerIdsUsuales(this.embarqueId),  //uso obtenerIdsUsuales para encontrar el ModuloDeCargaID para tal embarque
       this.embarqueService.obtenerEmbarque(this.embarqueId),    //con ese ID puedo setear los ritmos 
     ]).subscribe(([res1, res2]) => {                            //obtengo embarque para saber si el embarque == liquido
       this.moduloDeCargaId= res1.moduloDeCargaId;
+      console.log('ingresadoooo initRitmos')
       if(res2.esLiquido === true) this.liquido = true;
 
       this.embarqueSharingService.setModuloDeCargaId(this.moduloDeCargaId);

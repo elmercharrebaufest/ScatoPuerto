@@ -16,7 +16,7 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
   styleUrls: ['./graficos-ritmos.component.css']
 })
 export class GraficosRitmosComponent implements OnInit {
-  @Input() liquido: boolean;
+  @Input() liquido: boolean = false;
   @Input() enBuque: boolean = false;
 
   valorRitmo: number = 0;

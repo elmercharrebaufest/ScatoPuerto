@@ -2,7 +2,6 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { SharedModule } from "app/shared/shared.module";
 import { ClimaComponent } from "./clima/clima.component";
-import { FechasRitmosComponent } from "./fechas-ritmos/fechas-ritmos.component";
 import { LineupComponent } from "./lineup/lineup.component";
 import { NavtabsBuqueComponent } from "./navtabs-buque/navtabs-buque.component";
 import { ResumenDeOperatoriaRoutingModule } from "./resumen-de-operatoria-routing.module";
@@ -16,6 +15,7 @@ import { FechasPuertoComponent } from './fechas-puerto/fechas-puerto.component';
 import { OperacionesComponent } from './operaciones/operaciones.component';
 import { RecibidoresComponent } from './recibidores/recibidores.component';
 import { CalidadModule } from "../../calidad/calidad.module";
+import { FechasRitmosComponent } from "./fechas-ritmos/fechas-ritmos.component";
 
 @NgModule({
     imports: [
