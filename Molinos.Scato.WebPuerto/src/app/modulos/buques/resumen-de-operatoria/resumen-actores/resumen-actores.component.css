@@ -13,3 +13,6 @@
     font-weight: bold;
     color: rgb(102, 101, 101);
  }
+ .alto-minimo{ 
+   min-height: 200px;
+ }

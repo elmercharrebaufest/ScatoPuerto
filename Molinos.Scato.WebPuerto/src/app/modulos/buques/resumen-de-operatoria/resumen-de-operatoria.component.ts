@@ -20,6 +20,7 @@ import { isThisQuarter } from 'date-fns';
 import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { browserRefresh } from '../../../app.component';
 
 @Component({
   selector: 'app-resumen-de-operatoria',
@@ -45,6 +46,8 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   esEmbarqueLiquido: boolean = false;
   moduloDeCargaId: number = 0;
   buque: any;
+  private browserRefresh: boolean;
+
   // #endregion
 
   // #region Observable
@@ -71,6 +74,11 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   // #region Eventos del Componente
   ngOnInit(): void {
     this.initOperatoria();
+    this.browserRefresh = browserRefresh;
+    console.log('this.browserRefresh---->>')
+    console.log(this.browserRefresh)
+    if (this.browserRefresh)
+      this.cargarValoresHistorial();
   }
   // #endregion
 
@@ -90,8 +98,13 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.embarqueService.obtenerIdsUsuales(this.idEmbarqueOp).subscribe(data => {
       this.paramEmbarqueSel = { embarque_Id: this.idEmbarqueOp, moduloDeCarga_Id: data.moduloDeCargaId, vapor_Id: data.vaporId, planoDecarga_Id: data.planoDecargaId };
     });
+    console.log('idEmbarqueOp-->>' + this.idEmbarqueOp)
+    console.log('idVaporOp-->>' + this.idVaporOp)
 
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
+      console.log('data-->>')
+      console.log(data)
+
       if (data !== undefined) {
         if (data !== null) {
           this.filtroBuquedaForm = data;
