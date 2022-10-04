@@ -55,7 +55,11 @@ export class GraficosRitmosComponent implements OnInit {
   }
   
   cargarTurnosBalanzas() {
+    if (this._procesoService.getModuloDeCargaId() !=undefined || this._procesoService.getModuloDeCargaId() !=null)
+      this.moduloDeCargaId = this._procesoService.getModuloDeCargaId(); 
+    
     this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
+    this.liquido = false;
     if (this.liquido)
       this.subscribeTurnos();
     else
@@ -77,7 +81,6 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeBalanzas() {    
-
     if(this.moduloDeCargaId > 0)
     {   
       this.setRitmosRelojesSolidos();    
