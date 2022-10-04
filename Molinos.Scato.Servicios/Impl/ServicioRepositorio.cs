@@ -9479,6 +9479,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                     foreach (Balanzada balanzada in balanzadas)
                     {
+                        balanzadasAgrupadas = new BalanzadasAgrupadas();
                         balanzadasAgrupadas.Bodega = carga.Bodega.Nombre;
                         balanzadasAgrupadas.Producto = carga.Material.DescripcionCorta;
                         balanzadasAgrupadas.NumeroBalanza = carga.NumeroBalanza;
@@ -9487,13 +9488,12 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzadasAgrupadas.FechaInicio = FechaInicioBalanzadaAgrupada;
                         balanzadasAgrupadas.HoraInicio = Convert.ToString((FechaInicioBalanzadaAgrupada.Hour).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Minute).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzadaAgrupada.Second).ToString().PadLeft(2, '0'));
 
-                        balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
-                        balanzadasAgrupadas = new BalanzadasAgrupadas();
                         balanzadasAgrupadas.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
                         balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
 
                         balanzadasAgrupadas.Kilos = balanzada.PesoNeto;
                         balanzadasAgrupadas.Toneladas = Math.Round(Convert.ToDecimal(balanzada.PesoNeto) / 1000, 2);
+                        balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
                     }
                 }
                 return balanzadasCompletas;
@@ -10242,7 +10242,7 @@ namespace Molinos.Scato.Servicios.Impl
                     kgNetosBalanza7 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "7" && x.FechaInicio > fechaInicioFinal);
                     kgNetosBalanza8 = repositorio.Sumar<Carga>(x => x.ToneladasAW, x => x.Vapor.Id == vapor_id && x.NumeroBalanza == "8" && x.FechaInicio > fechaInicioFinal);
                     
-                    if (kgNetosBalanza7 != 0 && kgNetosBalanza8 != 0)
+                    if (kgNetosBalanza7 > 0 || kgNetosBalanza8 > 0)
                     {
                         totalCargado = (kgNetosBalanza7 + kgNetosBalanza8) / 1000;
                     }
