@@ -10,19 +10,19 @@ namespace Molinos.Scato.Dominio.Dto
     public class VaporInformacionDto
     {
         public int Id { get; set; }
-        public int vapor_id { get; set; }
-        public int PaisPuerto_id { get; set; }
-        public string nombreBuque { get; set; }
-        public string tipoBuque { get; set; }
-        public string categoriaBuque { get; set; }
-        public string imoVapor { get; set; }
-        public decimal freeboard { get; set; }
-        public decimal eslora { get; set; }
-        public decimal porteNeto { get; set; }
-        public decimal porteBruto { get; set; }
-        public decimal manga { get; set; }
-        public decimal puntual { get; set; }
-        public int cantidadBodegasTks { get; set; }
+        public int Vapor_Id { get; set; }
+        public int Bandera_Id { get; set; }
+        public string NombreBuque { get; set; }
+        public string TipoBuque { get; set; }
+        public string CategoriaBuque { get; set; }
+        public string ImoVapor { get; set; }
+        public decimal Freeboard { get; set; }
+        public decimal Eslora { get; set; }
+        public decimal PorteNeto { get; set; }
+        public decimal PorteBruto { get; set; }
+        public decimal Manga { get; set; }
+        public decimal Puntual { get; set; }
+        public int CantidadBodegasTks { get; set; }
 
     }
 }

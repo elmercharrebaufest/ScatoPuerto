@@ -30,16 +30,22 @@ export class CargandoMuelleComponent implements OnInit {
     private moduloCargaService: ModuloDeCargaService,) { }
 
   ngOnInit(): void {
+    const moduloDeCargaPeriodoDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'];
 
-    this.fechaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].fechaAmarro;
-    this.horaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].horaAmarro;
+    if (moduloDeCargaPeriodoDeCarga.length > 0)
+      this.fechaAmarro = moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
+    
+      if (moduloDeCargaPeriodoDeCarga.length > 0)
+      this.horaAmarro = moduloDeCargaPeriodoDeCarga[0].horaAmarro;
 
     if(this.instanciaWorkflow){
-      this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'].forEach(x => this.tnTotales += x.cantidad );
+      const moduloDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga'];
+      const planoDeCargaBodegas = this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'];
+      planoDeCargaBodegas.forEach(x => this.tnTotales += x.cantidad );
       
       if(this.instanciaWorkflow.embarque.esLiquido){
         this.liquido = true;
-        this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.balanzaService.obtenerRitmosLiquidos(moduloDeCarga.id)
         .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmosLiquidos: ', res);
@@ -48,7 +54,7 @@ export class CargandoMuelleComponent implements OnInit {
         });
       }else{
         this.liquido = false;
-        this.balanzaService.obtenerRitmos( this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.balanzaService.obtenerRitmos( moduloDeCarga.id)
         .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmos: ', res);
@@ -57,7 +63,7 @@ export class CargandoMuelleComponent implements OnInit {
         });
       }
 
-      this.moduloCargaService.obtenerModuloDeCarga(this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+      this.moduloCargaService.obtenerModuloDeCarga(moduloDeCarga.id)
       .subscribe(res => {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;

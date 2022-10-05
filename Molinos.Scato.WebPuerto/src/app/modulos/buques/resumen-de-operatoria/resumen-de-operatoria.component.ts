@@ -145,7 +145,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
           this.vaporInformacion = res
           if (this.vaporInformacion !== null)
             this.buqueService.obtenerPaises().subscribe(res => {
-              this.paisBuque = res.filter(p => p.id == this.vaporInformacion.paisPuerto_id);
+              this.paisBuque = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
             })
             this.mostrarInformacion = true;
         });

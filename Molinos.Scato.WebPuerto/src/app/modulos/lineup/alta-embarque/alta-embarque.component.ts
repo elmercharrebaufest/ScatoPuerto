@@ -71,6 +71,8 @@ export class AltaEmbarqueComponent implements OnInit {
   @ViewChild('horaDesdeLimpieza') horaDesdeLimpieza: ElementRef;
   @ViewChild('horaHastaLimpieza') horaHastaLimpieza: ElementRef;
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
+  private id_buque: number = 0;
+  private nombre_buque: string = '';
   // #endregion
 
   // #region Constructor
@@ -468,7 +470,28 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.value
       this.embarqueForm.value.esLiquido = this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido;
       this.state === 'modulo-carga' ? this.embarqueForm.value['sanBenito'] = true : '';
-      this.embarqueService.altaEmbarque(this.embarqueForm.value)
+      console.log('this.embarqueForm.value-->>>>');
+      console.log(this.embarqueForm.value);
+      console.log('this.vaporInfo-->>>>');
+      console.log(this.vaporInfo)
+      let altaEmbarque = this.embarqueForm.value;
+
+      if (this.vaporInfo == null){
+        altaEmbarque.Patente = this.nombre_buque;
+        altaEmbarque.nombrebuque = this.nombre_buque;
+        altaEmbarque.Vapor = {
+          id : this.id_buque,
+          nombre : this.nombre_buque
+        }
+      }else{
+        altaEmbarque.patente = this.vaporInfo.nombreBuque;
+        altaEmbarque.nombrebuque = this.vaporInfo.nombreBuque;
+        altaEmbarque.Vapor = {
+          id : this.vaporInfo.vapor_Id,
+          nombre : this.vaporInfo.nombreBuque
+        }
+      }
+      this.embarqueService.altaEmbarque(altaEmbarque)
         .subscribe((res: any) => {
           if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, mostramos el confirm solo con el boton volver
             setTimeout(() => {
@@ -1083,7 +1106,14 @@ export class AltaEmbarqueComponent implements OnInit {
   public selectedVapor($event) {
     let { id, nombre } = $event.item
     // this.editarBuque = true
+    console.log('id-->>' + id);
+    console.log('nombre-->>' + nombre);
+    console.log($event);
+    this.id_buque  = id;
+    this.nombre_buque = nombre;
+
     this.buqueService.obtenerVaporInformaconion(id).subscribe((res: VaporInformacion) => {
+      console.log('entro a obtenerVaporInformaconion-->>');
       this.vaporInfo = res;
       this.embarqueForm.controls.nombreBuque.disable();
       console.log("SELECTED VAPOR",this.vaporInfo);
@@ -1113,8 +1143,8 @@ export class AltaEmbarqueComponent implements OnInit {
 
   setinfoSelected(){
     let pais;
-      if(this.vaporInfo.paisPuerto_id !== undefined || this.vaporInfo.paisPuerto_id !== null){
-        pais = this.paisesPuerto.filter(p => p.id == this.vaporInfo.paisPuerto_id)
+      if(this.vaporInfo.bandera_Id !== undefined || this.vaporInfo.bandera_Id !== null){
+        pais = this.paisesPuerto.filter(p => p.id == this.vaporInfo.bandera_Id)
       }
     
       let tipoBuqueBD = this.tipoDeBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfo.tipoBuque)

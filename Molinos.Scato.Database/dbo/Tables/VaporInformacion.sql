@@ -3,19 +3,19 @@
 	[Id] INT NOT NULL  IDENTITY , 
 
 
-    [vapor_Id] INT NOT NULL, 
-    [PaisPuerto_id] INT NOT NULL, 
-    [nombreBuque] VARCHAR(50) NOT NULL, 
-    [tipoBuque] VARCHAR(50) NOT NULL, 
-    [categoriaBuque] VARCHAR(50) NULL, 
-    [imoVapor] VARCHAR(50) NULL, 
-    [freeboard] DECIMAL(18, 2) NULL, 
-    [eslora] DECIMAL(18, 2) NULL, 
-    [porteNeto] DECIMAL(18, 2) NULL, 
-    [porteBruto] DECIMAL(18, 2) NULL, 
-    [manga] DECIMAL(18, 2) NULL, 
-    [puntual] DECIMAL(18, 2) NULL, 
-    [cantidadBodegasTks] INT NULL, 
+    [Vapor_Id] INT NOT NULL, 
+    [Bandera_Id] INT NOT NULL, 
+    [NombreBuque] VARCHAR(50) NOT NULL, 
+    [TipoBuque] VARCHAR(50) NOT NULL, 
+    [CategoriaBuque] VARCHAR(50) NULL, 
+    [ImoVapor] VARCHAR(50) NULL, 
+    [Freeboard] DECIMAL(18, 2) NULL, 
+    [Eslora] DECIMAL(18, 2) NULL, 
+    [PorteNeto] DECIMAL(18, 2) NULL, 
+    [PorteBruto] DECIMAL(18, 2) NULL, 
+    [Manga] DECIMAL(18, 2) NULL, 
+    [Puntual] DECIMAL(18, 2) NULL, 
+    [CantidadBodegasTks] INT NULL, 
     CONSTRAINT [PK_VaporInformacion] PRIMARY KEY ([Id]) 
 
 

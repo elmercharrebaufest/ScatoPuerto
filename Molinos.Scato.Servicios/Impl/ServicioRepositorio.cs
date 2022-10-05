@@ -1643,7 +1643,7 @@ namespace Molinos.Scato.Servicios.Impl
                     embarqueDto.filePathShipParticular = Convert.ToBase64String(ms.ToArray());
                 }
             }
-
+                /*
                 if (File.Exists(embarqueDto.FilePathImgLineUp))
                 {
                     MemoryStream ms = new MemoryStream();
@@ -1652,7 +1652,7 @@ namespace Molinos.Scato.Servicios.Impl
                         file.CopyTo(ms);
                         embarqueDto.FilePathImgLineUp = Convert.ToBase64String(ms.ToArray());
                     }
-                }
+                }*/
             }
 
             return embarqueDto;
@@ -11182,11 +11182,11 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
 
             foreach (var item in VaporInformacionDto)
             {
-                if (item.vapor_id == null || item.vapor_id == 0)
+                if (item.Vapor_Id == null || item.Vapor_Id == 0)
                 {
                     var NuevoVapor = new Vapor
                     {
-                        Nombre = item.nombreBuque
+                        Nombre = item.NombreBuque
                     };
                     repositorio.Agregar(NuevoVapor);
                     repositorio.GuardarCambios();
@@ -11195,44 +11195,44 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 }
                 else
                 {
-                    vapor = repositorio.Obtener<Vapor>(x => x.Id == item.vapor_id);
+                    vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor_Id);
                 }
-                Pais pais = repositorio.Obtener<Pais>(x => x.Id == item.PaisPuerto_id);
-                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.vapor_id == item.vapor_id);
+                Pais pais = repositorio.Obtener<Pais>(x => x.Id == item.Bandera_Id);
+                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor_Id == item.Vapor_Id);
 
 
                 if (vaporInformacion_Db != null)
                 {
-                    vaporInformacion_Db.PaisPuerto_id = pais.Id;
-                    vaporInformacion_Db.nombreBuque = item.nombreBuque;
-                    vaporInformacion_Db.tipoBuque = item.tipoBuque;
-                    vaporInformacion_Db.categoriaBuque = item.categoriaBuque;
-                    vaporInformacion_Db.imoVapor = item.imoVapor;
-                    vaporInformacion_Db.freeboard = item.freeboard;
-                    vaporInformacion_Db.eslora = item.eslora;
-                    vaporInformacion_Db.porteNeto = item.porteNeto;
-                    vaporInformacion_Db.porteBruto = item.porteBruto;
-                    vaporInformacion_Db.manga = item.manga;
-                    vaporInformacion_Db.puntual = item.puntual;
-                    vaporInformacion_Db.cantidadBodegasTks = item.cantidadBodegasTks;
+                    vaporInformacion_Db.Bandera_Id = pais.Id;
+                    vaporInformacion_Db.NombreBuque = item.NombreBuque;
+                    vaporInformacion_Db.TipoBuque = item.TipoBuque;
+                    vaporInformacion_Db.CategoriaBuque = item.CategoriaBuque;
+                    vaporInformacion_Db.ImoVapor = item.ImoVapor;
+                    vaporInformacion_Db.Freeboard = item.Freeboard;
+                    vaporInformacion_Db.Eslora = item.Eslora;
+                    vaporInformacion_Db.PorteNeto = item.PorteNeto;
+                    vaporInformacion_Db.PorteBruto = item.PorteBruto;
+                    vaporInformacion_Db.Manga = item.Manga;
+                    vaporInformacion_Db.Puntual = item.Puntual;
+                    vaporInformacion_Db.CantidadBodegasTks = item.CantidadBodegasTks;
                 }
                 else
                 {
                     vaporInformacion_Db = new VaporInformacion()
                     {
-                        vapor_id = vapor.Id,
-                        PaisPuerto_id = pais.Id,
-                        nombreBuque = item.nombreBuque,
-                        tipoBuque = item.tipoBuque,
-                        categoriaBuque = item.categoriaBuque,
-                        imoVapor = item.imoVapor,
-                        freeboard = item.freeboard,
-                        eslora = item.eslora,
-                        porteNeto = item.porteNeto,
-                        porteBruto = item.porteBruto,
-                        manga = item.manga,
-                        puntual = item.puntual,
-                        cantidadBodegasTks = item.cantidadBodegasTks,
+                        Vapor_Id = vapor.Id,
+                        Bandera_Id = pais.Id,
+                        NombreBuque = item.NombreBuque,
+                        TipoBuque = item.TipoBuque,
+                        CategoriaBuque = item.CategoriaBuque,
+                        ImoVapor = item.ImoVapor,
+                        Freeboard = item.Freeboard,
+                        Eslora = item.Eslora,
+                        PorteNeto = item.PorteNeto,
+                        PorteBruto = item.PorteBruto,
+                        Manga = item.Manga,
+                        Puntual = item.Puntual,
+                        CantidadBodegasTks = item.CantidadBodegasTks,
                     };
                     repositorio.Agregar(vaporInformacion_Db);
                 }
@@ -11245,7 +11245,7 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
         {
             try
             {
-                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.vapor_id == vapor_id);
+                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor_Id == vapor_id);
                 return infoVapor;
             }
             catch (Exception ex)
@@ -11257,11 +11257,11 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
         public void GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque)
         {
             Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
-
+            /*
             if (embarque != null)
             {
                 embarque.FilePathImgLineUp = Embarque.FilePathImgLineUp;
-            }
+            }*/
             repositorio.GuardarCambios();
         }
 

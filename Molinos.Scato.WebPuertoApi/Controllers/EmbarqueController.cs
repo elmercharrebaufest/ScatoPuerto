@@ -46,6 +46,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
                 var servicioWf = factory.CrearServicio(workflowDefinicionId);
 
+
+
+
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, true, false, false, false);
                 datosEmbarque = IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, true, false, false);
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, true, false);
