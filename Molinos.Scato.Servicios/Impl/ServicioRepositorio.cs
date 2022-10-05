@@ -1643,7 +1643,7 @@ namespace Molinos.Scato.Servicios.Impl
                     embarqueDto.filePathShipParticular = Convert.ToBase64String(ms.ToArray());
                 }
             }
-                /*
+                
                 if (File.Exists(embarqueDto.FilePathImgLineUp))
                 {
                     MemoryStream ms = new MemoryStream();
@@ -1652,7 +1652,7 @@ namespace Molinos.Scato.Servicios.Impl
                         file.CopyTo(ms);
                         embarqueDto.FilePathImgLineUp = Convert.ToBase64String(ms.ToArray());
                     }
-                }*/
+                }
             }
 
             return embarqueDto;
