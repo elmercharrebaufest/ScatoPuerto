@@ -19,7 +19,6 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
-import { forkJoin } from 'rxjs';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 
 @Component({
@@ -164,7 +163,7 @@ export class LineupComponent implements OnInit, Observador {
     let actualDate = new Date();
     let function_name = 'altaEmbarque';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_AltaEmbarque)) {
+    if (this.hasPermisoAltaEmbarque()) {
       localStorage.removeItem('embarque');
       this.router.navigate(['/lineup/alta-embarque/0/line-up']);
     } else {

@@ -1,15 +1,11 @@
-import { Component, Input, OnInit, Output, ViewChild, EventEmitter, ViewChildren, QueryList } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { Mano, Nir, NirManualPuerto, TipoNir } from '@ScatoModels/nir';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-import { Bodega } from '@ScatoModels/balanzadas/balanza';
-import { finalize } from 'rxjs/operators';
 import { Mail } from '@ScatoModels/mail';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
-import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { NirManoComponent } from './nir-mano/nir-mano.component';
@@ -43,13 +39,6 @@ export class NIRComponent {
   MaizMano2: boolean = false;
   isLoaded: boolean = false;
   guardando: boolean = false;
-  bodegas: Bodega[];
-  hideSpinner: any;
-  envioNir:boolean = false;
-  objetoMailNir: object;
-  celdasManoDeEmbarque: CeldaManoDeEmbarque[];
-  file:any;
-  public configListaMultiple: any;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
 

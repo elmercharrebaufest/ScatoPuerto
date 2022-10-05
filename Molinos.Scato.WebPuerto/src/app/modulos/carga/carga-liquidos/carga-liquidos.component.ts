@@ -7,8 +7,6 @@ import { Alerta } from '@ScatoModels/alerta';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
-import html2canvas from 'html2canvas';
-import jspdf from 'jspdf';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { LineasComponent } from './operaciones/lineas/lineas.component';
 import { AlertService } from '@ScatoServicios/alert.service';

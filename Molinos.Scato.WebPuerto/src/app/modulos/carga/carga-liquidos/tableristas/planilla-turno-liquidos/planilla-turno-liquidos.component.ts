@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
@@ -10,9 +10,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-import { Workbook, Worksheet } from 'exceljs';
 // import * as fs from 'file-saver';
-import { saveAs } from 'file-saver-es';
 import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { PlanillaDeTurnos, TurnoDetalleLiquido, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
@@ -25,9 +23,8 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
-import { convertToObject } from 'typescript';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
@@ -103,7 +100,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private messageService: MessageService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
@@ -111,11 +107,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
-    /*this.planoDeCargaService.obtenerDestinos().subscribe(res => {
-      this.destinoPuerto = res
-      console.log('this.destinoPuerto -->>')
-      console.log(this.destinoPuerto)
-    });*/
     this.user = this.session.getUser();
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
