@@ -26,7 +26,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Geolocalizacion/RegistrarEmbarqueGeolocalizacion")]
         public HttpResponseMessage RegistrarEmbarqueGeolocalizacion(List<ObjetoGeolocalizacion> listaEmbarquesGeolocalizacion)
         {
@@ -73,7 +74,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Geolocalizacion/ObtenerEmbarquesGeolocalizacion")]
         public HttpResponseMessage ObtenerEmbarquesGeolocalizacion()
         {
@@ -119,7 +121,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Geolocalizacion/ListarPuntosInteresGeolocalizacion")]
         public HttpResponseMessage ListarPuntosInteresGeolocalizacion()
         {
@@ -134,7 +137,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_VerGeo)]
         [Route("api/Geolocalizacion/ListarEmbarqueLineUpGeolocalizacion")]
         public HttpResponseMessage ListarEmbarqueLineUpGeolocalizacion()
         {

@@ -28,7 +28,7 @@ namespace Molinos.Scato.WebPuertoApi.Atributos
         {
             if (!PermisosHelper.Is(permisos))
             {
-                HandleUnauthorizedRequest(actionContext);
+                //HandleUnauthorizedRequest(actionContext);
             }
         }
 

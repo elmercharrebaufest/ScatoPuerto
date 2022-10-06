@@ -11,7 +11,7 @@ import { CargandoMuelleComponent } from './cargando-muelle/cargando-muelle.compo
     imports: [
         LineUpRoutingModule,
         CommonModule,
-        SharedModule
+        SharedModule,
     ],
     declarations: [
         LineupComponent,

@@ -1,5 +1,3 @@
-
-
 <div id="imprimirRecibidoresSolido">
     
     <div id="element-to-hide" data-html2canvas-ignore="true">
@@ -43,8 +41,9 @@
         </div>
     </div>
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
-        <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
-        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+    	<ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
+	        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+        </ng-container>
         <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
     </div>
 </div>

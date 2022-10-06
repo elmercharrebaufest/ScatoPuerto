@@ -26,7 +26,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ListarSentidoManoDeEmbarques")]
         public HttpResponseMessage ListarSentidoManoDeEmbarques()
         {
@@ -35,7 +36,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ListarCeldaManoDeEmbarques")]
         public HttpResponseMessage ListarCeldaManoDeEmbarques()
         {
@@ -44,7 +46,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCarga")]
         public HttpResponseMessage GuardarModuloDeCarga(ModuloDeCargaDto moduloDeCarga)
         {
@@ -60,7 +63,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerModuloDeCarga")]
         public HttpResponseMessage ObtenerModuloDeCarga(int id)
         {
@@ -84,7 +88,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ListarMotivosDeCorte")]
         public HttpResponseMessage ListarMotivosDeCorte()
         {
@@ -93,7 +98,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ListarMotivosFallasBalanza")]
         public HttpResponseMessage ListarMotivosFallasBalanza()
         {
@@ -102,7 +108,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ListarTurnoPuerto")]
         public HttpResponseMessage ListarTurnoPuerto()
         {
@@ -111,7 +118,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerCantidadCubitacionDeTanques")]
         public HttpResponseMessage ObtenerCantidadCubitacionDeTanques(string tk, double altura)
         {
@@ -120,7 +128,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerLlenadoMilimetroPorTanque")]
         public HttpResponseMessage ObtenerLlenadoMilimetroPorTanque(int cm, int mm, string tanqueNum)
         {
@@ -139,7 +148,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerDensidadPorTemperaturaDeMaterial")]
         public HttpResponseMessage ObtenerDensidadPorTemperaturaDeMaterial(int materialPuertoId, int grado)
         {
@@ -156,7 +166,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ActualizarEstadoBuque")]
         public HttpResponseMessage ActualizarEstadoBuque(int Embarque_Id, int Estado)
         {
@@ -165,7 +176,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaUmap")]
         public HttpResponseMessage GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmaps, int ModuloDeCarga_Id)
         {
@@ -174,7 +186,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
         [Route("api/ModuloDeCarga/GuardarPeriodoDeCarga")]
         public HttpResponseMessage GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
         {
@@ -251,7 +264,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.Recibidores_Nir_EnviarNir)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto")]
         public HttpResponseMessage GuardarModuloDeCargaNirManualPuerto(int IdModuloDeCarga, ObjetoMailNir ObjetoMailNir, string nombreBuque)
         {
@@ -301,7 +315,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerDestinatariosPlanillaTurnos")]
         public HttpResponseMessage ObtenerDestinatariosPlanillaTurnos()
         {
@@ -320,7 +335,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerDestinatariosNirManual")]
         public HttpResponseMessage ObtenerDestinatariosNirManual()
         {
@@ -339,7 +355,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerSupervisoresDeRecibo")]
         public HttpResponseMessage ObtenerSupervisoresDeRecibo()
         {
@@ -358,7 +375,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos")]
         public HttpResponseMessage ObtenerModuloDeCargaPlanillaDeTurnos(int turnoPuerto_id, int moduloDeCarga_id, bool esLiquido, string fechaTurno)
         {
@@ -375,7 +393,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
         public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false)
         {
@@ -392,7 +411,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosMail")]
         public HttpResponseMessage GuardarPlanillaDeTurnosMail(int IdModuloDeCarga,  ObjetoMail ObjetoMail)
         {
@@ -445,7 +465,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosEnviarMail")]
         public HttpResponseMessage GuardarPlanillaDeTurnosEnviarMail(int IdModuloDeCarga, ObjetoEnvioPlanillaTurno objetoEnvioPlanillaTurno)
         {
@@ -592,6 +613,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroSolido_MotivoCorte_Editar)]
         [Route("api/ModuloDeCarga/EliminarCorteBalanza")]
         public HttpResponseMessage EliminarCorteBalanza(int idCorteBalanza)
         {
@@ -647,7 +669,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //}
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroSolido_IniciarCargaBalanzas)]
         [Route("api/ModuloDeCarga/GuardarFechaInicioCarga")]
         public HttpResponseMessage GuardarFechaInicioCarga(int embarque_Id, string fechaHorastring)
         {
@@ -658,7 +681,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroSolido_CorteManualBalanzas)]
         [Route("api/ModuloDeCarga/GuardarBalanzaCorte")]
         public HttpResponseMessage GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos)
         {
@@ -667,7 +691,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerRitmos")]
         public HttpResponseMessage ObtenerRitmos(int modulodecarga_id)
         {
@@ -702,7 +727,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/GuardarObservacionesDeCalidad")]
         public HttpResponseMessage GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto)
         {
@@ -710,7 +736,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerRitmosLiquidos")]
         public HttpResponseMessage ObtenerRitmosLiquidos(int modulodecarga_id)
         {
@@ -725,7 +752,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto")]
         public HttpResponseMessage ObtenerModuloDeCargaNirManualPuerto(int moduloDeCarga_id)
         {
@@ -740,7 +768,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerParametros")]
         public HttpResponseMessage ObtenerParametros()
         {
@@ -786,7 +815,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerCargasPlanillaDeTurnosSolido")]
         public HttpResponseMessage ObtenerCargasPlanillaDeTurnosSolido(int moduloDeCarga_id)
         {
@@ -843,7 +873,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ListarRecibosDeBuque")]
         public HttpResponseMessage ListarRecibosDeBuque(int idEmbarque)
         {

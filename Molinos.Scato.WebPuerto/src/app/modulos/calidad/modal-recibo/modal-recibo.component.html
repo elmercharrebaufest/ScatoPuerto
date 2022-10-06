@@ -1,10 +1,12 @@
-<button
-  (click)="openModalEmitirRecibo(emitirRecibo)"
-  class="btn btn-primary m-4"
-  *ngIf="!mostrarModal"
->
-  EMITIR RECIBO
-</button>
+<ng-container *ngIf="hasPermisoRecibidores_EmitirRecibo()">
+  <button
+    (click)="openModalEmitirRecibo(emitirRecibo)"
+    class="btn btn-primary m-4"
+    *ngIf="!mostrarModal"
+  >
+    EMITIR RECIBO
+  </button>
+</ng-container>
 
 
 
@@ -310,15 +312,17 @@
       >
         CERRAR
       </button>
-      <button
-        *ngIf="!desdeTabla"
-        type="button"
-        class="btn btn-success"
-        (click)="guardarRecibo(true)"
-        (click)="modal.dismiss('Cross click')"
-      >
-        CONFIRMAR DATOS
-      </button>
+      <ng-container *ngIf="hasPermisoRecibidores_Recibo_ConfirmarDatos()">
+	      <button
+	        *ngIf="!desdeTabla"
+	        type="button"
+	        class="btn btn-success"
+	        (click)="guardarRecibo(true)"
+	        (click)="modal.dismiss('Cross click')"
+	      >
+	        CONFIRMAR DATOS
+	      </button>
+      </ng-container>
       <!-- <button
         *ngIf="enviado"
         type="button"

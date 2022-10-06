@@ -4,6 +4,10 @@ import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EstadoTanquesService } from '@ScatoServicios/estado-tanques.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
+
 @Component({
   selector: 'app-tanques',
   templateUrl: './tanques.component.html',
@@ -17,19 +21,25 @@ export class TanquesComponent implements OnInit {
   moduloDeCarga: any;
   @Output() tanquesSeleccionados = new EventEmitter<any>();
   @Input() esCalidad: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   
   constructor(
     private _tanksService: EstadoTanquesService,
     private _procesoService: DatosEmbarquesProcesoService,
     private _moduloCargaService: ModuloDeCargaService,
     private rederer: Renderer2,
+    private session: SessionService,
   ) {
     this.hoy = new Date();
+    this.user = this.session.getUser();
   }
 
   ngOnInit(): void {
     this.newForm();
     this.setDeshabilitarTankes();
+
+    if(!this.hasPermisoLiquido_EditarHabilitacionTanques()) this.tankGroup.disable();
   }
 
   newForm() {
@@ -133,6 +143,10 @@ export class TanquesComponent implements OnInit {
     if (tanqueSel20 != undefined || tanqueSel20 != null) this.rederer.setAttribute(tanqueSel20, 'disabled', 'true');
     if (tanqueSel40 != undefined || tanqueSel40 != null) this.rederer.setAttribute(tanqueSel40, 'disabled', 'true');
 
+  }
+
+  hasPermisoLiquido_EditarHabilitacionTanques() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_EditarHabilitacionTanques);
   }
 
 }

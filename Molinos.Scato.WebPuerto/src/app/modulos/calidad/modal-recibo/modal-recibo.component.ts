@@ -11,6 +11,8 @@ import { finalize } from 'rxjs/operators';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Mail } from '@ScatoModels/mail';
 import { SessionService } from '@ScatoServicios/session.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { ToWords } from 'to-words';
 import { formatDate } from '@angular/common';
 
@@ -34,6 +36,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   // enviado: boolean;
   @Input() mostrarModal:boolean = false;
   @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo:TemplateRef<any>;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   //#endregion
 
@@ -51,6 +55,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   { 
     this.desdeTabla = false;
     // session.getUser().username
+    this.user = this.session.getUser();
     this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
       this.reciboBuqueOjito = data;
       this.mostrarModalOjito();
@@ -61,6 +66,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.initFormReciboDetalles()
   }
+
   ngAfterViewInit(){
     this.mostrarModalOjito()
   }
@@ -228,4 +234,11 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   //       console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
   //     });
   // }
+
+  hasPermisoRecibidores_EmitirRecibo() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_EmitirRecibo);
+  }
+  hasPermisoRecibidores_Recibo_ConfirmarDatos() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Recibo_ConfirmarDatos);
+  }
 }

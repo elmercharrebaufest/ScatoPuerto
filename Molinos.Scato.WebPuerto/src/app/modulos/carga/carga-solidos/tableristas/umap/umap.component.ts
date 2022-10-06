@@ -5,6 +5,9 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/amarre.component';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-umap',
@@ -14,6 +17,8 @@ import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/ama
 export class UmapComponent implements OnInit {
   @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
   @Input() ModuloDeCargaId: number;
+	private user: Usuario;
+	permisosScato: typeof PermisosScato = PermisosScato;
   @Input() esSoloLectura: boolean = false;
 
   guardando: boolean = false;
@@ -21,12 +26,17 @@ export class UmapComponent implements OnInit {
 
   constructor(private builder: FormBuilder,
               private _confirmationDialogService: ConfirmationDialogService,
-              private _moduloDeCargaService: ModuloDeCargaService) { }
+              private _moduloDeCargaService: ModuloDeCargaService,
+              private session: SessionService,) { 
+  this.user = this.session.getUser();
+  }
               
   ngOnInit(): void {
     this.forms = this.builder.group({
       umap: this.builder.array([this.initUmap()])
     });
+
+    if(!this.hasPermisoTableroSolido_Umap_Modificar()) this.forms.get('umap').disable();
   }
 
 
@@ -92,5 +102,15 @@ export class UmapComponent implements OnInit {
     if(index == 0 && this.umapFormArray.length == 0){
       this.umapFormArray.push(this.initUmap());
     }
+  }
+
+  hasPermisoUmap_AgregarEncendido() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Umap_AgregarEncendido);
+  }
+  hasPermisoUmap_EliminarRegistro() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Umap_EliminarRegistro);
+  }
+  hasPermisoTableroSolido_Umap_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Umap_Modificar);
   }
 }

@@ -13,6 +13,9 @@ import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/mano
 import { forkJoin } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-solidos',
@@ -32,6 +35,8 @@ export class SolidosComponent implements OnInit {
   enviado: boolean;
   usuarioFinalizacion: string;
   RecibidoresPdf: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
@@ -39,7 +44,9 @@ export class SolidosComponent implements OnInit {
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
     private _changeDetector: ChangeDetectorRef,
-    private _CalidadSharedService: CalidadSharedService,) {
+    private _CalidadSharedService: CalidadSharedService,
+    private session: SessionService,) {
+    this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
   }
 
@@ -146,4 +153,8 @@ export class SolidosComponent implements OnInit {
      }).save();
      // #endregion
   }
+
+	hasPermisoRecibidores_Imprimir() {
+    	return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
+	}
 }

@@ -33,7 +33,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_AltaEmbarque)]
         [Route("api/Embarque/AltaEmbarque")]
         public HttpResponseMessage AltaEmbarque(EmbarqueDto embarque)
         {
@@ -103,7 +104,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarMateriales")]
         public HttpResponseMessage ListarMateriales()
         {
@@ -113,7 +115,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarAgenciasMaritimas")]
         public HttpResponseMessage ListarAgenciasMaritimas()
         {
@@ -123,7 +126,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarCoordinadores")]
         public HttpResponseMessage ListarCoordinadores()
         {
@@ -133,7 +137,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ObtenerEmbarque")]
         public HttpResponseMessage ObtenerEmbarque(int id)
         {
@@ -145,7 +150,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_EditarBuque)]
         [Route("api/Embarque/ModificarEmbarque")]
         public HttpResponseMessage ModificarEmbarque(EmbarqueDto embarque)
         {
@@ -241,7 +247,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarATAPuerto")]
         public HttpResponseMessage ListarATAPuerto()
         {
@@ -251,7 +258,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarTipoDeBuquePuerto")]
         public HttpResponseMessage ListarTipoDeBuquePuerto()
         {
@@ -261,7 +269,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarUbicacionDeBuquePuerto")]
         public HttpResponseMessage ListarUbicacionDeBuquePuerto()
         {
@@ -280,7 +289,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/AgregarAgenciaMaritimaPuerto")]
         public HttpResponseMessage AgregarAgenciaMaritimaPuerto(AgenciaMaritimaPuertoDto agencia)
         {
@@ -288,7 +298,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ModificarAgenciaMaritimaPuerto")]
         public HttpResponseMessage ModificarAgenciaMaritimaPuerto(AgenciaMaritimaPuertoDto agencia)
         {
@@ -296,7 +307,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/EliminarAgenciaMaritimaPuerto")]
         public HttpResponseMessage EliminarAgenciaMaritimaPuerto(int agenciaId)
         {
@@ -306,7 +318,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/AgregarCoordinadorPuerto")]
         public HttpResponseMessage AgregarCoordinadorPuerto(CoordinadorPuertoDto coordinador)
         {
@@ -314,7 +327,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ModificarCoordinadorPuerto")]
         public HttpResponseMessage ModificarCoordinadorPuerto(CoordinadorPuertoDto coordinador)
         {
@@ -322,7 +336,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/EliminarCoordinadorPuerto")]
         public HttpResponseMessage EliminarCoordinadorPuerto(int coordinadorId)
         {
@@ -332,7 +347,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/AgregarATAPuerto")]
         public HttpResponseMessage AgregarATAPuerto(ATAPuertoDto ata)
         {
@@ -340,7 +356,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ModificarATAPuerto")]
         public HttpResponseMessage ModificarATAPuerto(ATAPuertoDto ata)
         {
@@ -348,7 +365,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/EliminarATAPuerto")]
         public HttpResponseMessage EliminarATAPuerto(int ataId)
         {

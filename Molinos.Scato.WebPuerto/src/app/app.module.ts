@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { routeConfig } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
@@ -19,6 +19,9 @@ import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { ProductoState } from './store/productos/material.state';
 import { BuquesState } from './store/buques/buques.state';
 registerLocaleData(localeEsAr, 'es-Ar');
+import { NgxPermissionsModule, NgxPermissionsService } from 'ngx-permissions';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
+import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 
 @NgModule({
   declarations: [
@@ -44,8 +47,13 @@ registerLocaleData(localeEsAr, 'es-Ar');
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },
+    // { 
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: InterceptorADService,
+    //   multi: true // para que esté atento a todas las peticiones
+    // },
     DatePipe,
-    MessageService
+    MessageService,
   ],
   bootstrap: [AppComponent]
 })

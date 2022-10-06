@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-periodo-carga',
@@ -14,18 +17,26 @@ export class PeriodoCargaComponent implements OnInit {
   guardando: boolean;
   periodoCargaForm: FormGroup;
   @Input() esSoloLectura: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   
   constructor(
     private formBuilder: FormBuilder,
     private _moduloDeCargaService: ModuloDeCargaService,
-    private _confirmationDialogService: ConfirmationDialogService
-  ) { }
+    private _confirmationDialogService: ConfirmationDialogService,
+    private session: SessionService,
+  ) { 
+  this.user = this.session.getUser();
+  }
 
 @Input() ModuloDeCarga_Id: number;
 
   ngOnInit(): void {
     this.initFormulario();
+
+    if(!this.hasPermisoLiquido_EditarPeriodoDeCarga()) this.periodoCargaForm.disable();
   }
+
   initFormulario(){
     
     this.periodoCargaForm = this.formBuilder.group({
@@ -102,5 +113,9 @@ export class PeriodoCargaComponent implements OnInit {
 
   clForm(){
     console.log(this.periodoCargaForm.getRawValue());
+  }
+
+  hasPermisoLiquido_EditarPeriodoDeCarga() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_EditarPeriodoDeCarga);
   }
 }

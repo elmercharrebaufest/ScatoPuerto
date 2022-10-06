@@ -23,6 +23,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { convertToObject } from 'typescript';
 import { PlanillaTurnoSolidoExcelService } from '@ScatoServicios/planilla-turno-solido-excel';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 
@@ -63,6 +64,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   mostrarBtn: boolean = true;
   selectedNewTurno: number;
   private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   exportaPlanilla: boolean = false;
 
   constructor(
@@ -80,6 +82,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private embarqueSharingService: EmbarqueSharingService,
     private workflowService: WorkflowService,
   ) {
+    this.user = this.session.getUser();
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
 
   }
@@ -951,4 +954,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     }
   }
 
+  hasPermisoRecibidores_ExportarEnviarPlanillas() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
+  }
 }

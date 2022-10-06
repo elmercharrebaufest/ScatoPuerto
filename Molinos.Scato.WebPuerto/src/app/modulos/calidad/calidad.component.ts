@@ -17,6 +17,8 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { takeUntil } from 'rxjs/operators';
 import { EstadoBuque } from '@ScatoModels/embarque';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
+
 
 @Component({
   selector: 'app-calidad',
@@ -69,7 +71,9 @@ export class CalidadComponent implements OnInit, OnDestroy {
     confirmationDialogService: ConfirmationDialogService,
     private router: Router,
     private moduloDeCargaService: ModuloDeCargaService,
+    private auth: AutenticadorService
     ) {
+    this.auth.renovarAuthUsuario();
     this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
     this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );

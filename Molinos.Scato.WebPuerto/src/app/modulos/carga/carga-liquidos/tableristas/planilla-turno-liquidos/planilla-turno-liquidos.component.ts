@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
@@ -10,9 +10,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-import { Workbook, Worksheet } from 'exceljs';
 // import * as fs from 'file-saver';
-import { saveAs } from 'file-saver-es';
 import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { PlanillaDeTurnos, TurnoDetalleLiquido, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
@@ -25,8 +23,9 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -66,6 +65,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   cortesTurno: CorteTurno[] = [];
   private user: Usuario
   mostrarBtn: boolean = true;
+  permisosScato: typeof PermisosScato = PermisosScato;
   fechaHoraInicioCarga: Date;
 
   embarqueId: number;
@@ -100,7 +100,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private messageService: MessageService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
@@ -108,7 +107,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
-
+    this.user = this.session.getUser();
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
     console.log('xxxx')
@@ -123,7 +122,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
@@ -131,13 +129,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }, 2000);
     this.initFormularioObs();
     this.initShipParticular();
+
+    setTimeout(() => {
+      this.controlarPermisos();
+    }, 3000);
   }
+  
   private obtenerTipoLineaEmbarque() {
     this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
       this.tipoLineaEmbarque = res;
       this.obtenerLineaProductoTk();
     });
   }
+
   cargarEmbarqueShipParticular() {
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
       this.embarque = res;
@@ -1735,4 +1739,35 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
     linea.controls['medidaFinalMM'].setValue(mm);
   }
+  
+  hasPermisoTableroLiquido_AgregarTurno() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarTurno);
+  }
+  hasPermisoTableroLiquido_EnviarARecibidores() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EnviarARecibidores);
+  }
+  hasPermisoTableroLiquido_AgregarCorte() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarCorte);
+  }
+  hasPermisoTableroLiquido_Exportar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Exportar);
+  }
+  hasPermisoTableroLiquido_Planilla_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Planilla_Editar);
+  }
+  hasPermisoTableroLiquido_GuardarTurno() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_GuardarTurno);
+  }
+
+  controlarPermisos(){
+    if(!this.hasPermisoTableroLiquido_Planilla_Editar()){
+      this.diasTurno.controls.forEach(dia => {
+        const turnos = dia['controls']['turnos']['controls'];
+        turnos.forEach(turno => {
+          turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].disable();
+        });
+      });
+    }
+  }
+
 }

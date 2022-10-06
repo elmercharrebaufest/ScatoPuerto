@@ -16,7 +16,9 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
           </div>
           <div class="col">
-            <button *ngIf="!esSoloLectura" name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7, true)'>Corte Manual</button>
+          	<ng-container *ngIf="hasPermisoCorteManualBalanzas()">
+            	<button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7, true)'>Corte Manual</button>
+			</ng-container>
           </div>
         </div>
 
@@ -433,7 +435,9 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
           </div>
           <div class="col">
-            <button *ngIf="!esSoloLectura" name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8, true)'>Corte Manual</button>
+          	<ng-container *ngIf="hasPermisoCorteManualBalanzas()">
+            	<button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8, true)'>Corte Manual</button>
+			</ng-container>
           </div>
         </div>
 
@@ -589,9 +593,11 @@
                                             <h4 class="modal-title" id="modal-basic-title"> Evento </h4>
                                           </div>
                                           <div class="col corte">
-                                            <button class='btn btn-outline-primary' 
-                                                    *ngIf="!balanza.value.corteManual && balanza.value.tn==0"
-                                                    (click)="generarCorte()">Nuevo evento</button>
+                                          	<ng-container *ngIf="hasPermisoTableroSolido_MotivoCorte_Editar()">
+	                                            <button class='btn btn-outline-primary' 
+	                                                    *ngIf="!balanza.value.corteManual && balanza.value.tn==0"
+	                                                    (click)="generarCorte()">Nuevo evento</button>
+											</ng-container>
                                           </div>
                                         </div>
 
@@ -739,12 +745,14 @@
                                         <div class="row mt-3">
                                           <div class="col flex-between">
                                             <button class='btn btn-outline-danger' (click)='modal.dismiss(cerrarModal())'>Cancelar</button>
-                                            <button name ="ocultarImpresionTableristaSolido" class='btn btn-danger' 
-                                                    (click)="eliminarCorteManual(i, balanza.value.numeroBalanza, addCorte8)"
-                                                    *ngIf="balanza.value.corteManual">Eliminar Corte Manual</button>
-                                            <!-- <button class='btn btn-primary' (click)='modal.close(guardarModal(i, balanza.value.numeroBalanza))'>Guardar</button> -->
-                                            <button class='btn btn-primary' 
-                                                    (click)='guardarModal(i, balanza.value.numeroBalanza, addCorte8)'>Guardar</button>
+                                            <ng-container *ngIf="hasPermisoTableroSolido_MotivoCorte_Editar()">
+                                              <button name ="ocultarImpresionTableristaSolido" class='btn btn-danger' 
+                                                      (click)="eliminarCorteManual(i, balanza.value.numeroBalanza, addCorte8)"
+                                                      *ngIf="balanza.value.corteManual">Eliminar Corte Manual</button>
+                                              <!-- <button class='btn btn-primary' (click)='modal.close(guardarModal(i, balanza.value.numeroBalanza))'>Guardar</button> -->
+                                              <button class='btn btn-primary' 
+                                                      (click)='guardarModal(i, balanza.value.numeroBalanza, addCorte8)'>Guardar</button>
+                                            </ng-container>
                                           </div>
                                         </div>
 
@@ -836,7 +844,9 @@
 </div>
 
 <div class="col text-center">
-  <button *ngIf="!esSoloLectura" id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR CARGA Y EXPORTAR PLANILLAS</button>
+  <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar()">
+    <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR CARGA Y EXPORTAR PLANILLAS</button>
+  </ng-container>
 </div>
 
 <ng-template #addCorteManual let-modal>

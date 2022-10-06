@@ -6,8 +6,9 @@ import { SessionService } from "@ScatoServicios/session.service";
 @Injectable()
 export class LoginGuard implements CanActivate {
   user: any;
-  constructor(private router: Router, private session: SessionService) {
-  }
+
+  constructor(private router: Router, 
+              private session: SessionService) {}
 
   canActivate() {
     this.user = this.session.getUser();
