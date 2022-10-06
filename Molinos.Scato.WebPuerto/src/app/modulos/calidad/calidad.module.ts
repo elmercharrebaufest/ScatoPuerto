@@ -26,7 +26,7 @@ const components = [
     RecibodebuquepdfComponent,
     ModalReciboComponent,
     RegistroRecibosComponent,
-    NirManoComponent
+    NirManoComponent,
 ]
 @NgModule({
     imports: [
