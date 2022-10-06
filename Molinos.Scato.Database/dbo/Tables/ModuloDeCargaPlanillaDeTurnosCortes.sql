@@ -2,7 +2,7 @@
 (
 	[Id]                                        INT IDENTITY (1, 1) NOT NULL,
     [ModuloDeCargaPlanillaDeTurnos_Id]    INT NOT NULL,
-    [MotivosDeCorte_Id]                         INT NOT NULL,
+    [MotivosDeCorte_Id]                         INT NULL,
     [HoraInicio]                                NVARCHAR (8),
     [HoraFin]                                   NVARCHAR (8),
     [TiempoTotal]                               NVARCHAR (8),
