@@ -427,10 +427,12 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelLiquido(false)'>Exportar
-            planilla</button>
-        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelLiquido(true)'>Enviar
-            planilla</button>
+    	<ng-container *ngIf="hasPermisoRecibidores_ExportarEnviarPlanillas()">
+	        <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelLiquido(false)'>Exportar
+	            planilla</button>
+	        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelLiquido(true)'>Enviar
+	            planilla</button>
+		</ng-container>
     </div>
 </div>
 

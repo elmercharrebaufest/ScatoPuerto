@@ -5,6 +5,9 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { ReciboBuqueService } from '@ScatoServicios/reciboBuque.service';
 import { forkJoin } from 'rxjs';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-registro-recibos',
@@ -21,6 +24,8 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   mostrarModal:boolean = false;
   reciboAImprimir: ReciboDeBuqueDetalles;
   // impresion:boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor
   (
@@ -28,9 +33,10 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     private _embarqueService: EmbarqueService,
     private _reciboBuqueService: ReciboBuqueService,
     private _reciboSharingService: ReciboSharingService,
-
+    private session: SessionService,
   ) 
   {
+    this.user = this.session.getUser();
     this.refreshRecibos();
     this._reciboSharingService.getFiltroRecibos().subscribe((data:ReciboDeBuque) => {
       this.recibo = data;
@@ -84,11 +90,18 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   
   }
   generarPDF(recibo){
+    if(!this.hasPermisoRecibidores_Recibo_Imprimir())
+      return;
+      
     recibo.fechaHoraImpresion = new Date();
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {
       console.log('200 Ok')
       this.refreshRecibos();
       this._reciboSharingService.setReciboImpresionSubject(recibo);
     });
+  }
+
+  hasPermisoRecibidores_Recibo_Imprimir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Recibo_Imprimir);
   }
 }

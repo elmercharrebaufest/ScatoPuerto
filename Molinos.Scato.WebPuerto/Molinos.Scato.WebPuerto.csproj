@@ -412,6 +412,7 @@
     
     <TypeScriptCompile Include="src\app\shared\servicios\parametros.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\embarque.shared.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\interceptors\interceptor-ad.service.ts" />    
     <!-- models TS -->
     <TypeScriptCompile Include="src\app\shared\modelos\modulo-carga-listado.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\agencia-control-privado.ts" />

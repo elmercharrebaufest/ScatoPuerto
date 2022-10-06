@@ -7,8 +7,6 @@ import { Alerta } from '@ScatoModels/alerta';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
-import html2canvas from 'html2canvas';
-import jspdf from 'jspdf';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { LineasComponent } from './operaciones/lineas/lineas.component';
 import { AlertService } from '@ScatoServicios/alert.service';
@@ -27,6 +25,8 @@ import { TanquesComponent } from './operaciones/tanques/tanques.component';
 import * as html2pdf from 'html2pdf.js';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
 import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+
 @Component({
   selector: 'app-carga-liquidos',
   templateUrl: './carga-liquidos.component.html',
@@ -58,6 +58,7 @@ export class CargaLiquidosComponent implements OnInit {
   mostrarTableristaOperando = true;
   tanquesSeleccionados: any;
   private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
   { id: 2, descripcion: 'Cargando' },
   { id: 3, descripcion: 'ControlCalidad' },
@@ -408,6 +409,22 @@ export class CargaLiquidosComponent implements OnInit {
     if (recargar) {
       this.graficosRitmosComponent.ngOnInit();
     }
+  }
+
+  hasPermisoPlanoDeCarga_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Guardar);
+  }
+  hasPermisoPlanoDeCarga_Finalizar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Finalizar);
+  }
+  hasPermisoPlanoDeCarga_Imprimir() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Imprimir);
+  }
+  hasPermisoPlanoDeCarga_Cancelar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Cancelar);
+  }
+  hasPermisoEnviarATablerista() {
+    return this.user.permisos.find(p => p === this.permisosScato.Operadores_EnviarATablerista);
   }
 
 }

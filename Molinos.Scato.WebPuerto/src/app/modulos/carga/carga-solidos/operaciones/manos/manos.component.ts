@@ -9,6 +9,9 @@ import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-manos',
@@ -26,12 +29,16 @@ export class ManosComponent implements OnInit {
   productos: MaterialPuerto[] = [];
   
   @Input() esCalidad: boolean = false; 
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(private formBuilder: FormBuilder,
     private manosEmbarqueService: ManosEmbarqueService,
     private _procesoService: DatosEmbarquesProcesoService,
     confirmationDialogService: ConfirmationDialogService,
-    private _calidadSharedService: CalidadSharedService) {
+    private _calidadSharedService: CalidadSharedService,
+    private session: SessionService,) {
+    this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.productos = this.datosEmbarque.listaMateriales
@@ -44,6 +51,10 @@ export class ManosComponent implements OnInit {
     }else{
       this.cargarManosTabiques();
     }
+
+    setTimeout(() => {
+      this.controlarPermisos();
+    }, 1000);
   }
 
   private cargarManosTabiquesCalidad(){
@@ -375,5 +386,21 @@ export class ManosComponent implements OnInit {
 
   patchTabiques(tabiques) {
     this.manosYTabiquesForm.get('tabiques').patchValue(tabiques);
+  }
+
+  hasPermisoConformacionManosEmbarque_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.ConformacionManosEmbarque_Modificar);
+  }
+  hasPermisoTabiques_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Tabiques_Modificar);
+  }
+
+  controlarPermisos(){
+    if(!this.hasPermisoConformacionManosEmbarque_Modificar()){
+      this.manosYTabiquesForm.get('manosDeEmbarque').disable();
+    }
+    if(!this.hasPermisoTabiques_Modificar()){
+      this.manosYTabiquesForm.get('tabiques').disable();
+    }
   }
 }

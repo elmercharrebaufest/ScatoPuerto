@@ -1,12 +1,14 @@
 <div *ngIf="mostrarBoton" class='w-100 prl-10 m-0 pb-15'>
-    <div class='btn-add-container' id='addButton' (click)='openModalAddBuque(addBuque)' *ngIf='elementos.length > 0 || elementosSinPlano.length > 0'>
-        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
-    </div>
-    <div class='btn-add-container' id='addButton' (click)='openModalAddBuque(addBuqueAux)' *ngIf='elementos.length == 0 && elementosSinPlano.length == 0'>
-        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
-    </div>
+    <ng-container *ngIf="hasPermisoAgregarNuevoBuque()">
+        <div class='btn-add-container' id='addButton' (click)='openModalAddBuque(addBuque)' *ngIf='elementos.length > 0 || elementosSinPlano.length > 0'>
+            <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+            <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
+        </div>
+        <div class='btn-add-container' id='addButton' (click)='openModalAddBuque(addBuqueAux)' *ngIf='elementos.length == 0 && elementosSinPlano.length == 0'>
+            <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+            <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
+        </div>
+    </ng-container>
 </div>
 <section class="flex-container">
     <ng-container *ngFor="let elemento of elementos|slice:0:show let i = index; let last = last" >

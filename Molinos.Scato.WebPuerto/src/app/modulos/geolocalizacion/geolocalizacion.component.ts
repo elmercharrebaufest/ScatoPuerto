@@ -1,5 +1,6 @@
 import { Component, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
@@ -30,7 +31,9 @@ export class GeolocalizacionComponent implements OnInit {
     private geolocalizacionSharingService: GeolocalizacionSharingService,
     private router: Router,
     private route: ActivatedRoute,
-    private parametrosService: ParametrosService) {
+    private parametrosService: ParametrosService,
+    private auth: AutenticadorService) {
+    this.auth.renovarAuthUsuario();
     this.user = this.session.getUser();
     this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
     this.cargarPuntosInteres();

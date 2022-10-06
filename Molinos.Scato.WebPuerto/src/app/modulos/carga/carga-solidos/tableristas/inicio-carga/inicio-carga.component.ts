@@ -6,6 +6,9 @@ import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-inicio-carga',
@@ -20,6 +23,8 @@ export class InicioCargaComponent implements OnInit {
   cargaIniciada: boolean = false;
   editandoFecha: boolean = false;
   @Output() inicioCarga = new EventEmitter<boolean>();
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -27,13 +32,17 @@ export class InicioCargaComponent implements OnInit {
     private balanzaService: BalanzaService,
     private funcionesGeneralesService: FuncionesGeneralesService,
     confirmationDialogService: ConfirmationDialogService,
+    private session: SessionService,
   ) {
+    this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.embarque_Id = this.procesoService.getEmbarqueId();
   }
 
   ngOnInit(): void {
     this.initInicioCarga();
+
+    if(!this.hasPermisoIniciarCargaBalanzas()) this.inicioCargaForm.disable();
   }
 
   initInicioCarga(){
@@ -117,5 +126,9 @@ export class InicioCargaComponent implements OnInit {
           this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Error);
         });
     }
+  }
+
+  hasPermisoIniciarCargaBalanzas() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_IniciarCargaBalanzas);
   }
 }

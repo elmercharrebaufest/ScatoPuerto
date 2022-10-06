@@ -19,6 +19,10 @@ import { forkJoin } from 'rxjs';
 import { cpuUsage } from 'process';
 import { regExpEscape } from '@ng-bootstrap/ng-bootstrap/util/util';
 
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
+
 @Component({
   selector: 'app-lineas',
   templateUrl: './lineas.component.html',
@@ -43,6 +47,9 @@ export class LineasComponent implements OnInit, OnChanges {
   @Input() tanquesSeleccionados;
   @Input() esCalidad: boolean = false;
 
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
+
   constructor(
     private formBuilder: FormBuilder,
     confirmationDialogService: ConfirmationDialogService,
@@ -51,7 +58,9 @@ export class LineasComponent implements OnInit, OnChanges {
     private moduloCargaService: ModuloDeCargaService,
     private _tanquesService: EstadoTanquesService,
     private _lineasService: LineasService,
+    private session: SessionService,
   ) {
+    this.user = this.session.getUser();
     this.creaFormLineasEmbarque();
     this._tanquesService.sendData.subscribe(resObj => {
       let tanks = new Array();
@@ -61,11 +70,11 @@ export class LineasComponent implements OnInit, OnChanges {
       }
 
       this.tanquesOption = tanks;
-
     });
     this.confirmationDialogService = confirmationDialogService;
     this.obtenerTipoLineaEmbarque();
   }
+
   ngOnChanges() {
     this._tanquesService.sendData.subscribe(resObj => {
       let tanks = new Array();
@@ -90,6 +99,8 @@ export class LineasComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.cargarDatosLineas();
+
+    if(!this.hasPermisoLiquido_ConformacionLineasEmb_Editar()) this.lineasDeEmbarqueForm.disable();
   }
 
   expandir() {
@@ -675,4 +686,10 @@ export class LineasComponent implements OnInit, OnChanges {
     }
   }
 
+  hasPermisoLiquido_ConformacionLineasEmb_Eliminar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_ConformacionLineasEmb_Eliminar);
+  }
+  hasPermisoLiquido_ConformacionLineasEmb_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_ConformacionLineasEmb_Editar);
+  }
 }

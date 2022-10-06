@@ -2297,13 +2297,13 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Info("----- Inicio ListarPermisosPorUsuarioAD Modo Debug: " + nombreUsuario + " -----");
                 List<string> gruposPermisosDebug = new List<string>();
                 var permisoGrupoDebug = from a in repositorio.Listar<ADPuertoGruposAd>()
-                                   join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
-                                   join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
-                                   join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
-                                   join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
-                                   where a.NombreGrupoAd == "SWDEV"
+                                        join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                        join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                        join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                        join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                        where a.NombreGrupoAd == "SWDEV"
                                         select (e.NombrePermiso);
-       
+
                 gruposPermisosDebug.AddRange(permisoGrupoDebug);
                 log.Info("----- Fin ListarPermisosPorUsuarioAD Modo Debug -----");
                 return gruposPermisosDebug;
@@ -10057,7 +10057,8 @@ namespace Molinos.Scato.Servicios.Impl
 
                 string[] listaBC = new string[] { "BCB", "BCP", "F" };
                 var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
-                var tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == IdModuloDeCarga);
+                //var tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == IdModuloDeCarga);
+                var tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => y.Tn != null ? (int)y.Tn : 0, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == IdModuloDeCarga);
 
 
                 int embarque = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == IdModuloDeCarga).Embarque.Id;

@@ -1,8 +1,9 @@
-import { Routes, RouterModule } from '@angular/router';
+import { Routes } from '@angular/router';
 import { IniciarSesionComponent } from './shared/componentes/iniciar-sesion/iniciar-sesion.component';
 import { LayoutComponent } from "./shared/componentes/layout/layout.component";
 import { LoginGuard } from './shared/seguridad/login.guard';
 import { RoleGuard } from './shared/seguridad/role.guard';
+
 export const routeConfig: Routes = [
   {
     path: "",

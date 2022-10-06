@@ -32,7 +32,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
-
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-planilla-turnos-liquidos-calidad',
@@ -67,6 +67,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   nuevoTurno: PlanillaDeTurnos;
   cortesTurno: CorteTurno[] = [];
   private user: Usuario
+  permisosScato: typeof PermisosScato = PermisosScato;
   mostrarBtn: boolean = true;
 
   embarqueId: number;
@@ -96,6 +97,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private planoDeCargaService: PlanoDeCargaService,
   ) {
+    this.user = this.session.getUser();
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
     this.planoDeCargaService.obtenerDestinos().subscribe(res => this.destinoPuerto = res);
@@ -114,10 +116,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
       this.getDestinos();
     });
-
   }
+
   ngOnInit(): void {
-    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
@@ -1165,5 +1166,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       console.error(error);
     }
   };
+
+  hasPermisoRecibidores_ExportarEnviarPlanillas() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
+  }
 
 }
