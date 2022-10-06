@@ -11197,13 +11197,13 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 {
                     vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor_Id);
                 }
-                Pais pais = repositorio.Obtener<Pais>(x => x.Id == item.Bandera_Id);
+                Bandera bandera = repositorio.Obtener<Bandera>(x => x.Id == item.Bandera_Id);
                 VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor_Id == item.Vapor_Id);
 
 
                 if (vaporInformacion_Db != null)
                 {
-                    vaporInformacion_Db.Bandera_Id = pais.Id;
+                    vaporInformacion_Db.Bandera_Id = bandera.Id;
                     vaporInformacion_Db.NombreBuque = item.NombreBuque;
                     vaporInformacion_Db.TipoBuque = item.TipoBuque;
                     vaporInformacion_Db.CategoriaBuque = item.CategoriaBuque;
@@ -11221,7 +11221,7 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                     vaporInformacion_Db = new VaporInformacion()
                     {
                         Vapor_Id = vapor.Id,
-                        Bandera_Id = pais.Id,
+                        Bandera_Id = bandera.Id,
                         NombreBuque = item.NombreBuque,
                         TipoBuque = item.TipoBuque,
                         CategoriaBuque = item.CategoriaBuque,

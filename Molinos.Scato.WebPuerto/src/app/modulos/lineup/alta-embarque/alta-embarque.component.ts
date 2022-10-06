@@ -65,7 +65,7 @@ export class AltaEmbarqueComponent implements OnInit {
   arrVapores:Vapor[]
   embarqueInformacion: EmbarqueInformacion[] = [];
   vaporInfo: VaporInformacion
-  paisesPuerto: Pais[];
+  banderasBuque: Bandera[];
   listadoBanderaModificada: boolean = false;
   @ViewChild('horaRecalada') horaRecalada: ElementRef;
   @ViewChild('horaDesdeLimpieza') horaDesdeLimpieza: ElementRef;
@@ -186,13 +186,13 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueService.obtenerListadoUbicacionDeBuquePuerto(),
       this.planoDeCargaService.obtenerDestinos(),
       this.buqueService.obtenerVapores(),
-      this.buqueService.obtenerPaises(),
+      this.embarqueService.obtenerBanderas(),
     ]).subscribe(([res1, res2, res3, res4, res5]) => {
       this.tipoDeBuquePuerto = res1.filter(a => a.nombre == "Bulk Carrier" || a.nombre == "Oil Tanker");
       this.ubicacionDeBuquePuerto = res2;
       this.destinoPuerto = res3;
       this.vaporesList = res4;
-      this.paisesPuerto = res5
+      this.banderasBuque = res5
       this.cargarListadoMateriales();
     }, err => { console.log(err); });
   }
@@ -226,11 +226,16 @@ export class AltaEmbarqueComponent implements OnInit {
           })).forEach(x => {
             res.materialesPuertoCantidad.push(x);
           });
-
           this.embarqueForm.patchValue(res);
           this.checkLiquidOrSolid(res.materialesPuertoCantidad.find(x => x.cantidad != 0));
+          const buqueSel = this.vaporesList.find(x => x.id == res.vapor.id);
+          this.embarqueForm.controls.nombreBuque.setValue(buqueSel);
+          this.embarqueForm.get('nombreBuque').setValue(buqueSel);
+          this.embarqueForm.controls.nombreBuque.disable();
+          this.id_buque  = buqueSel.id;
+          this.nombre_buque = buqueSel.nombre;
 
-          if (res.tipoBuque != null && res.tipoBuque != '' && typeof this.tipoDeBuquePuerto != 'undefined')
+          if (this.tipoDeBuquePuerto != undefined)
             this.embarqueForm.get('tipoDeBuque').setValue(
               this.tipoDeBuquePuerto.find(x => x.nombre == res.tipoBuque.toString()));
           else
@@ -343,6 +348,8 @@ export class AltaEmbarqueComponent implements OnInit {
             }));
           }
           this.mostrarSpinner = false;
+          this.embarqueForm.controls.tipoDeBuque.disable();
+
         },
         errmess => {
           this.confirmationDialogService.confirm('¡Error!', 'Error al cargar el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
@@ -470,12 +477,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.value
       this.embarqueForm.value.esLiquido = this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido;
       this.state === 'modulo-carga' ? this.embarqueForm.value['sanBenito'] = true : '';
-      console.log('this.embarqueForm.value-->>>>');
-      console.log(this.embarqueForm.value);
-      console.log('this.vaporInfo-->>>>');
-      console.log(this.vaporInfo)
       let altaEmbarque = this.embarqueForm.value;
-
       if (this.vaporInfo == null){
         altaEmbarque.Patente = this.nombre_buque;
         altaEmbarque.nombrebuque = this.nombre_buque;
@@ -588,8 +590,13 @@ export class AltaEmbarqueComponent implements OnInit {
         this.embarqueInformacionFormArray.controls[0].get('bandera').setValue(this.embarqueForm.value.bandera);
         this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
       }
+      let altaEmbarque = this.embarqueForm.value
+      altaEmbarque.nombreBuque = this.nombre_buque;
+      const tipoBuqueSel = this.tipoDeBuquePuerto.filter(x => x.nombre == altaEmbarque.tipoBuque);
+      if (tipoBuqueSel.length > 0)
+        altaEmbarque.tipoDeBuque= tipoBuqueSel[0];
 
-      this.embarqueService.modificarEmbarque(this.embarqueForm.value)
+      this.embarqueService.modificarEmbarque(altaEmbarque)
         .subscribe((res: any) => {
           this.mostrarSpinner = false;
           this.openConfirmationDialog('¡Felicitaciones!',
@@ -1105,19 +1112,14 @@ export class AltaEmbarqueComponent implements OnInit {
 
   public selectedVapor($event) {
     let { id, nombre } = $event.item
-    // this.editarBuque = true
-    console.log('id-->>' + id);
-    console.log('nombre-->>' + nombre);
-    console.log($event);
     this.id_buque  = id;
     this.nombre_buque = nombre;
-
     this.buqueService.obtenerVaporInformaconion(id).subscribe((res: VaporInformacion) => {
-      console.log('entro a obtenerVaporInformaconion-->>');
-      this.vaporInfo = res;
-      this.embarqueForm.controls.nombreBuque.disable();
-      console.log("SELECTED VAPOR",this.vaporInfo);
-      this.setinfoSelected();
+      if (res!=null){
+        this.vaporInfo = res;
+        this.embarqueForm.controls.nombreBuque.disable();
+        this.setinfoSelected();
+      }
     });
   }
   public formatterVapores = (v: Vapor) => v.nombre;
@@ -1126,12 +1128,12 @@ export class AltaEmbarqueComponent implements OnInit {
     this.listadoBanderaModificada = !this.embarqueForm.value.bandera;
   }
 
-  public formatterPaises = (p: Pais) => p.descripcion;
+  public formatterBanderas = (p: Bandera) => p.nombre;
 
-  public searchPaises = (text$: Observable<string>) => text$.pipe(
+  public searchBanderas = (text$: Observable<string>) => text$.pipe(
     debounceTime(200),
     distinctUntilChanged(),
-    map(term => this.paisesPuerto.filter(b => b.descripcion.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    map(term => this.banderasBuque.filter(b => b.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
   );
 
   public sendBandera(value: any) {
@@ -1142,9 +1144,9 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   setinfoSelected(){
-    let pais;
+    let bandera;
       if(this.vaporInfo.bandera_Id !== undefined || this.vaporInfo.bandera_Id !== null){
-        pais = this.paisesPuerto.filter(p => p.id == this.vaporInfo.bandera_Id)
+        bandera = this.banderasBuque.filter(p => p.id == this.vaporInfo.bandera_Id)
       }
     
       let tipoBuqueBD = this.tipoDeBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfo.tipoBuque)
@@ -1156,7 +1158,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.vaporInfo.manga !== null && this.embarqueForm.controls.manga.setValue(this.vaporInfo.manga);
       this.vaporInfo.puntual !== null && this.embarqueForm.controls.puntal.setValue(this.vaporInfo.puntual);
       this.vaporInfo.cantidadBodegasTks !== null && this.embarqueForm.controls.cantidadBodegasTanques.setValue(this.vaporInfo.cantidadBodegasTks);
-      pais !== null && this.embarqueForm.controls.bandera.setValue(pais[0] != null ? pais[0] : null);
+      bandera !== null && this.embarqueForm.controls.bandera.setValue(bandera[0] != null ? bandera[0] : null);
       tipoBuqueBD !== null && this.embarqueForm.controls.tipoDeBuque.setValue(tipoBuqueBD[0]);
       this.vaporInfo.imoVapor !== null && this.embarqueForm.controls.imo.setValue(this.vaporInfo.imoVapor);
   }
