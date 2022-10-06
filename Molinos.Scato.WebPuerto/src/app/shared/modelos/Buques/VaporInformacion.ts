@@ -4,9 +4,9 @@ import { Pais } from "./Pais";
 
 
 export class VaporInformacion {
-    vapor_id: number;
-    paisPuerto_id: number;
-    nombrebuque: string;
+    vapor_Id: number;
+    bandera_Id: number;
+    nombreBuque: string;
     tipoBuque: string;
     categoriaBuque: string;
     imoVapor: string;

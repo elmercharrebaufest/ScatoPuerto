@@ -35,21 +35,21 @@
         <p>
           <b>IMO: </b>{{
           vaporInformacion == null || vaporInformacion.imoVapor == null
-          ? "XXXXXXX"
+          ? "-"
           : vaporInformacion.imoVapor
-          }}<br /><b>Eslora: </b>{{ vaporInformacion == null ? "XXXX" : vaporInformacion.eslora }}
+          }}<br /><b>Eslora: </b>{{ vaporInformacion == null ? "-" : vaporInformacion.eslora }}
         </p>
       </div>
       <div class="dentro">
         <p>
           <b>Bandera: </b>{{
           vaporInformacion == null || vaporInformacion.paisPuerto_id == null
-          ? "XXXXXXX"
+          ? "-"
           : paisBuque[0].descripcion
           }}<br />
           <b>Freeboard: </b>{{
           vaporInformacion == null || vaporInformacion.freeboard == null
-          ? "XXXX"
+          ? "-"
           : vaporInformacion.freeboard
           }}
         </p>
@@ -58,13 +58,13 @@
         <p>
           <b>Tipo de buque: </b>{{
           vaporInformacion == null || vaporInformacion.tipoBuque == null
-          ? "XXXXXX"
+          ? "-"
           : vaporInformacion.tipoBuque
           }}<br />
           <b>Cant.bodegas/tanques:</b>{{
           vaporInformacion == null ||
           vaporInformacion.cantidadBodegasTks == null
-          ? "XX"
+          ? "-"
           : vaporInformacion.cantidadBodegasTks
           }}
         </p>

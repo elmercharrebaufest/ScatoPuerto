@@ -369,10 +369,10 @@
                          formControlName="bandera"
                          maxlength="50"
                          placeholder="Buscar bandera"
-                         [ngbTypeahead]="searchPaises"
+                         [ngbTypeahead]="searchBanderas"
                          [editable]='false'
-                         [inputFormatter]="formatterPaises"
-                         [resultFormatter]="formatterPaises"
+                         [inputFormatter]="formatterBanderas"
+                         [resultFormatter]="formatterBanderas"
                          (blur)="onBlurBandera()"
                          (change)='sendBandera($event.target.value)'
                          [ngClass]="{'input-error': submitted && f.bandera.invalid}" required

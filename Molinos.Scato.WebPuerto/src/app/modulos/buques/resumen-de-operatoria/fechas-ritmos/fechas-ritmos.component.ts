@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
@@ -12,7 +12,7 @@ import { forkJoin } from 'rxjs';
   templateUrl: './fechas-ritmos.component.html',
   styleUrls: ['./fechas-ritmos.component.css']
 })
-export class FechasRitmosComponent implements OnInit {
+export class FechasRitmosComponent implements OnInit, AfterViewInit {
   //#region variables
   moduloDeCargaId: number = 0;
   embarqueId: number;
@@ -39,9 +39,13 @@ export class FechasRitmosComponent implements OnInit {
     this.embarqueSharingService.setEmbarqueId(this.embarqueId);                      
     this.vaporId = parseInt(this.route.snapshot.paramMap.get('vaporid'));      //consigo el vaporID que esta en la ruta y lo seteo
   }
+
   //#endregion
   //#region metodos
+
+
   ngOnInit(): void {
+    console.log('Iniciaa componente FechasRitmosComponent');
     this.initRegistroFechas();
     this.initRitmos()
   }
@@ -57,11 +61,14 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   initRitmos(){
+    console.log('initRitmos this.embarqueId--->>>');
+    console.log(this.embarqueId)
     forkJoin([
       this.embarqueService.obtenerIdsUsuales(this.embarqueId),  //uso obtenerIdsUsuales para encontrar el ModuloDeCargaID para tal embarque
       this.embarqueService.obtenerEmbarque(this.embarqueId),    //con ese ID puedo setear los ritmos 
     ]).subscribe(([res1, res2]) => {                            //obtengo embarque para saber si el embarque == liquido
       this.moduloDeCargaId= res1.moduloDeCargaId;
+      console.log('ingresadoooo initRitmos')
       if(res2.esLiquido === true) this.liquido = true;
 
       this.embarqueSharingService.setModuloDeCargaId(this.moduloDeCargaId);
@@ -73,5 +80,9 @@ export class FechasRitmosComponent implements OnInit {
       this.mostrarFechas = true;
     }, err => { console.log(err); });
   }
+  ngAfterViewInit(): void {
+    console.log('Terminar componente FechasRitmosComponent');
+  }
+
   //#endregion
 }

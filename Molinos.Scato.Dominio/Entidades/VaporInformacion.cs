@@ -11,19 +11,19 @@ namespace Molinos.Scato.Dominio.Entidades
 
         [Key]
         public virtual int Id { get; set; }
-        public virtual int vapor_id { get; set; }
-        public virtual int PaisPuerto_id { get; set; }
-        public virtual string nombreBuque { get; set; }
-        public virtual string tipoBuque { get; set; }
-        public virtual string categoriaBuque { get; set; }
-        public virtual string imoVapor { get; set; }
-        public virtual decimal freeboard { get; set; }
-        public virtual decimal eslora { get; set; }
-        public virtual decimal porteNeto { get; set; }
-        public virtual decimal porteBruto { get; set; }
-        public virtual decimal manga { get; set; }
-        public virtual decimal puntual { get; set; }
-        public virtual int cantidadBodegasTks { get; set; }
+        public virtual int Vapor_Id { get; set; }
+        public virtual int Bandera_Id { get; set; }
+        public virtual string NombreBuque { get; set; }
+        public virtual string TipoBuque { get; set; }
+        public virtual string CategoriaBuque { get; set; }
+        public virtual string ImoVapor { get; set; }
+        public virtual decimal Freeboard { get; set; }
+        public virtual decimal Eslora { get; set; }
+        public virtual decimal PorteNeto { get; set; }
+        public virtual decimal PorteBruto { get; set; }
+        public virtual decimal Manga { get; set; }
+        public virtual decimal Puntual { get; set; }
+        public virtual int CantidadBodegasTks { get; set; }
 
         
     }

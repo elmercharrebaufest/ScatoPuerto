@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { Pais } from '@ScatoModels/Buques/Pais';
+import { Bandera } from '@ScatoModels/bandera';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { Vapor } from '@ScatoModels/vapor';
@@ -28,7 +28,7 @@ export class EditarCrearBuquesComponent implements OnInit {
   submitted = false;
   nombreBuque: string;
   tipoBuquePuerto: TipoDeBuquePuerto[];
-  paisesPuerto: Pais[];
+  banderasBuque: Bandera[];
   vaporesPuerto: Vapor[];
   categoriasBuque: TipoDeBuquePuerto[];
   nombresBuquesLineUp: string[];
@@ -43,7 +43,6 @@ export class EditarCrearBuquesComponent implements OnInit {
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
-    private buqueSharingService: BuqueSharingService,
     private buqueService: BuqueService,
   ) {
 
@@ -80,13 +79,13 @@ export class EditarCrearBuquesComponent implements OnInit {
   private initListas() {
     forkJoin([
       this.embarqueService.obtenerListadoTipoDeBuquePuerto(),
-      this.buqueService.obtenerPaises(),
+      this.embarqueService.obtenerBanderas(),
       this.buqueService.obtenerVapores()
     ]).subscribe(([res1, res2, res3]) => {
       this.tipoBuquePuerto = res1.filter(a => a.nombre == "Bulk Carrier" || a.nombre == "Oil Tanker");
       this.categoriasBuque = res1.filter(cat => cat.nombre == "Handy-max" || cat.nombre == "Handy-sized" || cat.nombre == "Wood-chip carriers" || cat.nombre == "WPanamax");
 
-      this.paisesPuerto = res2;
+      this.banderasBuque = res2;
       this.vaporesPuerto = res3;
 
     }, err => { console.log(err); });
@@ -126,12 +125,12 @@ export class EditarCrearBuquesComponent implements OnInit {
     }
   }
 
-  public formatterPaises = (p: Pais) => p.descripcion;
+  public formatterBanderas= (p: Bandera) => p.nombre;
 
-  public searchPaises = (text$: Observable<string>) => text$.pipe(
+  public searchBanderas = (text$: Observable<string>) => text$.pipe(
     debounceTime(200),
     distinctUntilChanged(),
-    map(term => this.paisesPuerto.filter(b => b.descripcion.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    map(term => this.banderasBuque.filter(b => b.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
   )
 
   public selectedVapor($event) {
@@ -141,9 +140,9 @@ export class EditarCrearBuquesComponent implements OnInit {
     this.buqueService.obtenerVaporInformaconion(id).subscribe((res: VaporInformacion) => {
       this.vaporInfoBD = res;
       // console.log(this.vaporInfoBD);
-      let pais;
-      if(this.vaporInfoBD.paisPuerto_id != null){
-        pais = this.paisesPuerto.filter(p => p.id == this.vaporInfoBD.paisPuerto_id)
+      let bandera;
+      if(this.vaporInfoBD.bandera_Id != null){
+        bandera = this.banderasBuque.filter(p => p.id == this.vaporInfoBD.bandera_Id)
       }
       let tipoBuqueBD = this.tipoBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfoBD.tipoBuque)
       let categoriaBuqueBD = this.categoriasBuque.filter(tipo => tipo.nombre == this.vaporInfoBD.categoriaBuque)
@@ -155,7 +154,7 @@ export class EditarCrearBuquesComponent implements OnInit {
       this.vaporInfoBD.manga !== null && this.crearEditarBuqueForm.controls.manga.setValue(this.vaporInfoBD.manga);
       this.vaporInfoBD.puntual !== null && this.crearEditarBuqueForm.controls.puntual.setValue(this.vaporInfoBD.puntual);
       this.vaporInfoBD.cantidadBodegasTks !== null && this.crearEditarBuqueForm.controls.cantBodegastks.setValue(this.vaporInfoBD.cantidadBodegasTks);
-      pais !== null && this.crearEditarBuqueForm.controls.bandera.setValue(pais[0] != null ? pais[0] : null);
+      bandera !== null && this.crearEditarBuqueForm.controls.bandera.setValue(bandera[0] != null ? bandera[0] : null);
       tipoBuqueBD !== null && this.crearEditarBuqueForm.controls.tipoBuque.setValue(tipoBuqueBD[0]);
       categoriaBuqueBD !== null && this.crearEditarBuqueForm.controls.categoriaBuque.setValue(categoriaBuqueBD[0]);
       this.vaporInfoBD.imoVapor !== null && this.crearEditarBuqueForm.controls.imoVapor.setValue(this.vaporInfoBD.imoVapor);
@@ -181,8 +180,8 @@ export class EditarCrearBuquesComponent implements OnInit {
     let buque = this.crearEditarBuqueForm.getRawValue();
     const objVapor = [
       {
-        vapor_id: buque.nombreBuque.id,
-        paisPuerto_id: buque.bandera.id,
+        vapor_Id: buque.nombreBuque.id,
+        bandera_Id: buque.bandera.id,
         nombrebuque: buque.nombreBuque.nombre,
         tipoBuque: buque.tipoBuque.nombre,
         categoriaBuque: buque.categoriaBuque.nombre,
@@ -211,9 +210,9 @@ export class EditarCrearBuquesComponent implements OnInit {
     let buque = this.crearEditarBuqueForm.getRawValue();
     const objVapor = [
       {
-        vapor_id: 0,
+        vapor_Id: 0,
         // nombrebuque: typeof buque.nombreBuque.nombre !== 'object'  ? buque.nombreBuque : buque.nombreBuque.nombre,
-        paisPuerto_id: buque.bandera.id,
+        bandera_Id: buque.bandera.id,
         nombrebuque: buque.nombreBuque,
         tipoBuque: buque.tipoBuque.nombre,
         categoriaBuque: buque.categoriaBuque.nombre,

@@ -523,6 +523,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
+                servicio.GenerarLogging("SincronizarBalanzasCortes", ex.InnerException.ToString(), "POST", base.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }

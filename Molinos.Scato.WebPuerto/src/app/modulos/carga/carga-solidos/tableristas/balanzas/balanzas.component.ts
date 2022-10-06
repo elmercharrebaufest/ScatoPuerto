@@ -73,7 +73,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   totalTnBodegas7: TotToneladas[] = [];
   totalTnBodegas8: TotToneladas[] = [];
   unsubscribe: Subject<any>;
-  vaporId: number = 0;
   yaCargoModal: boolean = false;
   @Input() imprimir : boolean = false; 
   patenteEmbarque: string;
@@ -88,6 +87,8 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   bodega8EnCurso: string;
   producto8EnCurso: string;
   llevaCargando8EnCurso: number;
+  mostrarInfoBalanzadasEnCurso7: boolean = false;
+  mostrarInfoBalanzadasEnCurso8: boolean = false;
   mostrarInfoBalanzadasEnCurso: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -111,29 +112,17 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
-    /*
-    this.embarque = this._procesoService.getEmbarqueSelected();
-    this.embarqueId = this._procesoService.getEmbarqueId();
-    this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-    this.vaporId = this._procesoService.getVaporId();
-    this.datosEmbarque = this._procesoService.getDatosGrafico();
-    this.materialesPuerto = this.datosEmbarque.listaMateriales;
-    console.log('this.moduloDeCarga_Id: ', this.moduloDeCarga_Id);
+   
     
-    this.cargarMotivosBalanzas78();
-    
-    this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
-    */
-    //this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
-    
-    this.verificarNombresBuque();
     this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
       this.paramSoloLectura = data;
     });
-    this.setCargarValoresBalanza();
+    //this.verificarNombresBuque();
+    
   }
 
   ngOnInit(): void {
+    this.setCargarValoresBalanza();
     this.balanza7Form = this.formBuilder.group({
       balanzas7: this.formBuilder.array([])
       // balanzas7: this.formBuilder.array([this.initBalanzas7()])
@@ -154,25 +143,20 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   setCargarValoresBalanza() {
-
     if (this.esSoloLectura) {
-      ///this.embarque = this._procesoService.getEmbarqueSelected();
       this.embarqueId = this.paramSoloLectura.embarque_Id;
       this.moduloDeCarga_Id = this.paramSoloLectura.moduloDeCarga_Id;
-      this.vaporId = this.paramSoloLectura.vapor_Id;
       this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
         this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
       });
-      this.cargarMotivosBalanzas78();
+      this.cargarMotivosBalanzas78();      
       this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
-      this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
-      this.balanzas78Service.setObtenerEmbarqueBalanza(this.moduloDeCarga_Id);
+      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
     } else {
       this.embarque = this._procesoService.getEmbarqueSelected();
       if (this.embarque != null || this.embarque != undefined) {
         this.embarqueId = this._procesoService.getEmbarqueId();
         this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-        this.vaporId = this._procesoService.getVaporId();
         this.datosEmbarque = this._procesoService.getDatosGrafico();
         this.materialesPuerto = this.datosEmbarque?.listaMateriales;
         this.cargarMotivosBalanzas78();
@@ -378,7 +362,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   obtenerBalanzadasEnVivo() {
-    this.parametrosService.consola(`vapor: `,this.vaporId);
     this.parametrosService.consola(`moduloDeCarga: `,this.moduloDeCarga_Id);
 
     this.balanzas78Service.sendDataBalanzada7
@@ -451,7 +434,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( bal7 => {
         if(bal7.length>0){
-          this.mostrarInfoBalanzadasEnCurso = true;
+          this.mostrarInfoBalanzadasEnCurso7 = true;
           this.bodega7EnCurso = bal7[0].bodega;
           this.producto7EnCurso = bal7[0].producto;
           this.fechaInicio7EnCurso = `${this.getDia( bal7[0].fechaInicio )} ${this.getHora( bal7[0].fechaInicio )}`;
@@ -459,7 +442,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           this.llevaCargando7EnCurso = 0;
           bal7.forEach( x => this.llevaCargando7EnCurso = x.kilos+this.llevaCargando7EnCurso);
         }else{
-          this.mostrarInfoBalanzadasEnCurso = false;
+          this.mostrarInfoBalanzadasEnCurso7 = false;
           this.bodega7EnCurso = '';
           this.producto7EnCurso = '';
           this.fechaInicio7EnCurso = '';
@@ -472,7 +455,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( (bal8:BalanzadasAgrupadas[]) => {
         if(bal8.length>0){
-          this.mostrarInfoBalanzadasEnCurso = true;
+          this.mostrarInfoBalanzadasEnCurso8 = true;
           this.bodega8EnCurso = bal8[0].bodega;
           this.producto8EnCurso = bal8[0].producto;
           this.fechaInicio8EnCurso = `${this.getDia( bal8[0].fechaInicio )} ${this.getHora( bal8[0].fechaInicio )}`;
@@ -480,7 +463,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           this.llevaCargando8EnCurso = 0;
           bal8.forEach( x => this.llevaCargando8EnCurso = x.kilos+this.llevaCargando8EnCurso);
         }else{
-          this.mostrarInfoBalanzadasEnCurso = false;
+          this.mostrarInfoBalanzadasEnCurso8 = false;
           this.bodega8EnCurso = '';
           this.producto8EnCurso = '';
           this.fechaInicio8EnCurso = '';
@@ -812,8 +795,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           }
 
           cortes.push(objetoNuevo);
-          // this._balanzaService.guardarBalanzaCorte( cortes )
-          //   .subscribe( res => console.log('se guardo correctamente') );
         } else {
           this.mensajeGenerico('La fecha y hora del nuevo Inicio y/o Corte quedó fuera del rango que está modificando.');
           return;
@@ -971,6 +952,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   //El comentario es porque todos los parámetros se llaman igual WTF.
   //Si estás leyendo esto leé la linea de abajo de esta y me vas a entender. CORTEE (Con voz de Gaspi Cancelado)
   openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number, corte?: boolean) {
+    if (this.esSoloLectura) return; 
     this.esCorteManual = corteManual;
     this.balanzaCorteManual = balanzaCorteManual;
     this.agregaCorte = false;

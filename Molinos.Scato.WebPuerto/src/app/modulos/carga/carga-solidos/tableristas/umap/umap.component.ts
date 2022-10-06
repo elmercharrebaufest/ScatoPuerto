@@ -19,6 +19,7 @@ export class UmapComponent implements OnInit {
   @Input() ModuloDeCargaId: number;
 	private user: Usuario;
 	permisosScato: typeof PermisosScato = PermisosScato;
+  @Input() esSoloLectura: boolean = false;
 
   guardando: boolean = false;
   public forms: FormGroup;
@@ -41,12 +42,12 @@ export class UmapComponent implements OnInit {
 
   initUmap(){
     return this.builder.group({
-      fechaEncendido: '',
-      horaEncendido: '',
-      fechaApagado:'',
-      horaApagado: '',
-      velocidadDelViento: '',
-      direccionDelViento: ''
+      fechaEncendido: [{ value: '', disabled: this.esSoloLectura }],
+      horaEncendido : [{ value: '', disabled: this.esSoloLectura }],
+      fechaApagado      : [{ value: '', disabled: this.esSoloLectura }],
+      horaApagado       : [{ value: '', disabled: this.esSoloLectura }],
+      velocidadDelViento: [{ value: '', disabled: this.esSoloLectura }],
+      direccionDelViento: [{ value: '', disabled: this.esSoloLectura }]
     });
   }
 
@@ -59,8 +60,6 @@ export class UmapComponent implements OnInit {
   }
 
   public updateUMAP(umap){
-    console.log('entroooooo   updateUMAP---->>');
-    console.log(umap);
     while(this.umapFormArray.length < umap.length) this.umapFormArray.push(this.initUmap());
     umap.forEach(element => {
       element.fechaEncendido = element.fechaEncendido ?  formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar') : " ";

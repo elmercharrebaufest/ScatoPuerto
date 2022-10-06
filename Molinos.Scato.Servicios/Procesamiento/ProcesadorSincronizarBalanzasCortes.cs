@@ -63,7 +63,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 Log.Info("ModificarEntidad: error 1" + ex.Message);
                 Log.Info("ModificarEntidad: error 2" + ex.StackTrace);
-
                 throw ex;
             }
         }
@@ -340,8 +339,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             var turnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes
                             {
                                 ModuloDeCargaPlanillaDeTurnos = turno,
-                                HoraInicio = corte.Fecha_Inicio.Value.ToShortTimeString(),
-                                HoraFin = corte.Fecha_Corte.Value.ToShortTimeString(),
+                                HoraInicio = corte.Fecha_Inicio.Value.ToString("HH:mm"),
+                                HoraFin = corte.Fecha_Corte.Value.ToString("HH:mm"),
                                 Observaciones = corte.Observaciones,
                                 TiempoTotal = t.ToString(),
                                 //  MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(x => x.Id == corte.MotivosFallasBalanza_id),
@@ -356,8 +355,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             if (turnoDB.Count > 0)
                             {
                                 ModuloDeCargaPlanillaDeTurnosCortes turnoDBSel = turnoDB[0];
-                                turnoDBSel.HoraInicio = corte.Fecha_Inicio.Value.ToShortTimeString();
-                                turnoDBSel.HoraFin = corte.Fecha_Corte.Value.ToShortTimeString();
+                                turnoDBSel.HoraInicio = corte.Fecha_Inicio.Value.ToString("HH:mm");
+                                turnoDBSel.HoraFin = corte.Fecha_Corte.Value.ToString("HH:mm");
                                 turnoDBSel.Observaciones = corte.Observaciones;
                                 turnoDBSel.TiempoTotal = t.ToString();
                             }                           

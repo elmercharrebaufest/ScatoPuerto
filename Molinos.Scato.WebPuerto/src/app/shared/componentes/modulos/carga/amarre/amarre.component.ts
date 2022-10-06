@@ -15,10 +15,11 @@ import { SessionService } from '@ScatoServicios/session.service';
 })
 export class AmarreComponent implements OnInit {
   @Input() ModuloDeCargaId: number;
+  @Input() esSoloLectura: boolean = false;
+
   public solidosForm: FormGroup;
   guardando: boolean = false;
 
-  @Input() esSoloLectura: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   

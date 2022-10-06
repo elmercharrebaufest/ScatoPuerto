@@ -16,7 +16,18 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { NirManoComponent } from "./solidos/nir/nir-mano/nir-mano.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
-
+const components = [
+    CalidadComponent,
+    NIRComponent,
+    SolidosComponent,
+    LiquidosComponent,
+    PlanillaTurnosSolidoComponent,
+    PlanillaTurnoLiquidosCalidadComponent,
+    RecibodebuquepdfComponent,
+    ModalReciboComponent,
+    RegistroRecibosComponent,
+    NirManoComponent,
+]
 @NgModule({
     imports: [
         CommonModule,
@@ -28,17 +39,11 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
         NgMultiSelectDropDownModule.forRoot(),
     ],
     declarations: [
-        CalidadComponent,
-        NIRComponent,
-        SolidosComponent,
-        LiquidosComponent,
-        PlanillaTurnosSolidoComponent,
-        PlanillaTurnoLiquidosCalidadComponent,
-        RecibodebuquepdfComponent,
-        ModalReciboComponent,
-        RegistroRecibosComponent,
-        NirManoComponent
+        components,
     ],
+    exports: [
+        components,
+    ]
 })
 
 export class CalidadModule {}

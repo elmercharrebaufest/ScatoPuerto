@@ -24,6 +24,8 @@ import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { convertToObject } from 'typescript';
 import { PlanillaTurnoSolidoExcelService } from '@ScatoServicios/planilla-turno-solido-excel';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { WorkflowService } from '@ScatoServicios/workflow.service';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -32,7 +34,10 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 })
 export class PlanillaTurnosSolidoComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
+  @Input() esSoloLectura: boolean = false;
+  @Input() tablerista: boolean;
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
+
   formTurnos: FormGroup;
   formCorte: FormGroup;
   formNuevoTurno: FormGroup;
@@ -56,10 +61,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   vientoAmarre: string;
   direccionViento: string;
   valorCargado: number;
-  pedidoPorPlano: number;
   mostrarBtn: boolean = true;
   selectedNewTurno: number;
-  @Input() tablerista: boolean;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   exportaPlanilla: boolean = false;
@@ -67,7 +70,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
-    private _procesoService: DatosEmbarquesProcesoService,
     private datePipe: DatePipe,
     private procesoCalidadService: ProcesoCalidadService,
     private _turnosService: TurnosService,
@@ -76,22 +78,38 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private session: SessionService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
-    private planillaTurnoExcelService: PlanillaTurnoSolidoExcelService
+    private planillaTurnoExcelService: PlanillaTurnoSolidoExcelService,
+    private embarqueSharingService: EmbarqueSharingService,
+    private workflowService: WorkflowService,
   ) {
     this.user = this.session.getUser();
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
-    this.pedidoPorPlano = this._turnosService.getTnTotales()
-    this.embarqueId = this.procesoService.getEmbarqueId();
-    this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => this.embarque = res);
+
   }
 
   ngOnInit(): void {
+    this.setCargarValoresPlanilla();
+  }
+  private setCargarFormularioPlanilla(){
     this.newForm()
-    // this.fillPlanilla();
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
     this.initFormularioObs();
+  }
+
+  private setCargarValoresPlanilla(){
+    this.user = this.session.getUser();
+    if(!this.esSoloLectura){
+      this.embarqueId = this.procesoService.getEmbarqueId();
+      this.setCargarFormularioPlanilla();
+    }else{
+      this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data=>{
+        this.embarqueId = data.embarque_Id;
+        this.setCargarFormularioPlanilla();
+      });
+
+    }
   }
   expandir() {
     document.getElementById('collapsePlanillaTurnosSolido').className = "collapse show";
@@ -122,7 +140,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     });
 
     this.formCorte.get('tiempoTotal').disable();
-    this.getCombos();
+    //this.getCombos();
   }
 
 
@@ -235,7 +253,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return fechaFormato;
   }
   fillPlanilla() {
+    console.log('entroooo fillPlanilla')
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
+    console.log(this.planillaDeTurnos)
     this.diasTurno.clear();
     //Si la planilla tiene turnos
     if (this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0) {
@@ -358,7 +378,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   getCombos() {
-    this.lineas = this._procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     this.arrLineas = this.lineas;
     this.arrLineas = this.arrLineas.map(l => { return l = l.linea });
     this.arrLineas.filter((value, index, array) => {
@@ -922,12 +942,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     this.exportaPlanilla = true;
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.planillaDeTurnos, this.procesoService,  this.lineas, esEnviarPlanilla);
     this.exportaPlanilla = false;
-  }
-
-  calcularRestaEmbarcar(): number {
-    let restaEmbarcar = this.pedidoPorPlano - this.getCantTotalABordo();
-
-    return (restaEmbarcar >= 0 ? restaEmbarcar : 0);
   }
 
   soloEnteros(valor) {

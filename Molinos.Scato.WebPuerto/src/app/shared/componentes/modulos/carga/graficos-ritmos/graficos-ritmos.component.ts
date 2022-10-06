@@ -10,17 +10,15 @@ import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service'
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 
-
-
 @Component({
   selector: 'app-graficos-ritmos',
   templateUrl: './graficos-ritmos.component.html',
   styleUrls: ['./graficos-ritmos.component.css']
 })
 export class GraficosRitmosComponent implements OnInit {
-  @Input() liquido: boolean;
+  @Input() liquido: boolean = false;
   @Input() enBuque: boolean = false;
-  
+
   valorRitmo: number = 0;
   valorCargando: number = 0;
   valorNeto: number = 0;
@@ -46,11 +44,7 @@ export class GraficosRitmosComponent implements OnInit {
     private embarqueSharingService: EmbarqueSharingService,
     private _parametros: ParametrosService) 
   {
-    if(this.enBuque == false){
-      this.moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-    }else{
-      this.moduloDeCargaId = this.embarqueSharingService.getModuloDeCargaId();
-    }
+    
   }
 
   ngOnInit(): void {
@@ -61,6 +55,9 @@ export class GraficosRitmosComponent implements OnInit {
   }
   
   cargarTurnosBalanzas() {
+    if (this._procesoService.getModuloDeCargaId() !=undefined || this._procesoService.getModuloDeCargaId() !=null)
+      this.moduloDeCargaId = this._procesoService.getModuloDeCargaId(); 
+    
     this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
     if (this.liquido)
       this.subscribeTurnos();
@@ -69,6 +66,12 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeTurnos() { 
+    console.log('entroo subscribeTurnos')
+    console.log('this.moduloDeCargaId-->' + this.moduloDeCargaId)
+    console.log('this._procesoService.getModuloDeCargaId-->' + this._procesoService.getModuloDeCargaId())
+
+    if (this._procesoService.getModuloDeCargaId() !=undefined || this._procesoService.getModuloDeCargaId() !=null)
+      this.moduloDeCargaId = this._procesoService.getModuloDeCargaId(); 
 
     if(this.moduloDeCargaId > 0){
       this.setRitmosRelojesLiquidos();    
@@ -83,7 +86,6 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   subscribeBalanzas() {    
-
     if(this.moduloDeCargaId > 0)
     {   
       this.setRitmosRelojesSolidos();    

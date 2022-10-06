@@ -1,6 +1,6 @@
 <ship-spinner *ngIf='buscarHistorialBuques' [src]='"pdf"'></ship-spinner>
 
-<div style="overflow-x:auto;">
+<div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
         <thead class="lista-buque-header">
 
@@ -35,14 +35,14 @@
                 </td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.toneladas |
-                        number:'0.3-3' }} tn</div>
+                        number:'0.0-0' }} tn</div>
                 </td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreExportador }}</div>
                 </td>
                 <td class="lista-buque-row-item">
-                    <div *ngIf="historial.totalRitmoBaja   > 0" class="ritmo-baja-carga">{{historial.totalRitmoBaja | number:'0.2-2' }} tn/hs <br></div>
-                    <div *ngIf="historial.totalRitmoNormal > 0" class="ritmo-carga-normal">{{historial.totalRitmoNormal | number:'0.2-2' }} tn/hs</div>
+                    <div *ngIf="historial.totalRitmoBaja   > 0" class="ritmo-baja-carga">{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div>
+                    <div *ngIf="historial.totalRitmoNormal > 0" class="ritmo-carga-normal">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div>
                 </td>
                 <td class="lista-buque-row-item">{{historial.horasMuelle | number:'0.2-2' }} hs</td>
                 <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>

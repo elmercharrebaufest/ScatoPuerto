@@ -985,6 +985,8 @@ export class PlanoContentComponent implements OnInit {
 
   sendDataParcel(bodegas) {
     let bodegasFull = bodegas.filter(b => b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo);
+    console.log('bodegasFull-->>')
+    console.log(bodegasFull);
     this._turnoService.sendBodega.emit(bodegasFull);
   }
 

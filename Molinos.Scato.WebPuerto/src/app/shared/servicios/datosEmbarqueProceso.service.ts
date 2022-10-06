@@ -60,7 +60,6 @@ export class DatosEmbarquesProcesoService {
                 this.fechaHoraInicioCarga = res.fechaHoraInicioCarga;
                 this.estadoBuque = res.estadoBuque;
             });
-            
             this._moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe( res => {
                 this.moduloDeCarga = res;
                 this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0] : null;
@@ -96,10 +95,16 @@ export class DatosEmbarquesProcesoService {
         }
     }
 
+    // OBJETO MODULO DE CARGANDO
+    setModuloDeCarga(moduloDeCarga: ModuloDeCarga){
+        this.moduloDeCarga = moduloDeCarga;
+    }
     //GUARDA LOS DATOS DE MODULO DE CARGA Y SETEA EL EMBARQUE SELECTED POR EL MODULO
     setModulodDeCarga(id: number) {
         this.moduloDeCargaId = id;
-        this.embarqueSelected = this.embarques.find(e => e.planoDeCargaId === this.moduloDeCargaId);
+
+        this.embarqueSelected = this.embarques.find(e => e.moduloDeCargaId === this.moduloDeCargaId);
+
         this.planoCargaId = this.embarqueSelected.planoDeCargaId;
         this.embarqueId = this.embarqueSelected.id;
     }
