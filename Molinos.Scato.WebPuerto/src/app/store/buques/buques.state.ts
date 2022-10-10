@@ -37,8 +37,8 @@ export class BuquesState {
             const state = getState();
             setState({
                 ...state,
-                buques: JSON.parse(JSON.stringify(result)),
-                buquesAll: JSON.parse(JSON.stringify(result))
+                buques: result.length > 0? JSON.parse(JSON.stringify(result)) : null,
+                buquesAll: result.length > 0? JSON.parse(JSON.stringify(result)) : null
             });
         }));
     }

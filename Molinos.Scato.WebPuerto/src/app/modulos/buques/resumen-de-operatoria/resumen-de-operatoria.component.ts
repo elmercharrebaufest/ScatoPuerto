@@ -118,6 +118,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   private cargarValoresOperatoria() {
     if (this.filtroBuquedaForm == null || this.filtroBuquedaForm === undefined) {
       this.filtroBuquedaForm = this.formBuilder.group({
+        esResumenOperatoria: true,
         esBusqueda: true,
         esDetalle: true,
         esLimpiarBusqueda: false,
@@ -171,6 +172,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
 
   private limpiarFiltrosHistorial() {
     if (this.filtroBuquedaForm != null) {
+      this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
       this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
       this.filtroBuquedaForm.controls.esDetalle.setValue(false);
       this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(false);
@@ -200,6 +202,9 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.router.navigate(['/buques']);
   }
   public onVolver() {
+    console.log('entroooo onVolver')
+    console.log('permisos Buques_Resumen_De_Operatoria',this.permisosScato.Buques_Resumen_De_Operatoria)
+    console.log('this.user.permisos',this.user.permisos)
     if (this.user.permisos.find(p => p === this.permisosScato.Buques_Resumen_De_Operatoria)) {
       this.limpiarDatosOperatoria();
     } else {
@@ -216,6 +221,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   // }
   public onVerOtrasOperaciones() {
     //this.otrasOperacionesBuque = true;
+    this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
     this.filtroBuquedaForm.controls.mostrarOtrasOperaciones.setValue(true);
     this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(false);
     this.filtroBuquedaForm.controls.esDetalle.setValue(false);
