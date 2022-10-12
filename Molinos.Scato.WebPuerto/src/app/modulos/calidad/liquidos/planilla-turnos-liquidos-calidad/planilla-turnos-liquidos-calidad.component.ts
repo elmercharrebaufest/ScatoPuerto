@@ -34,6 +34,7 @@ import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -1025,8 +1026,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   }
 
   async onExportarExcelLiquido(esEnviarPlanilla: boolean = false){
+    const planillaTurnosCerrado = this.planillaDeTurnos.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
+    if (planillaTurnosCerrado.length == 0){
+      const mensaje = esEnviarPlanilla ? "No se encontraron turnos cerrados para enviar la planilla." : "No se encontraron turnos cerrados para exportar la planilla.";
+      this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+      return false;
+    }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, esEnviarPlanilla, true);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true);
     this.exportaPlanilla = false;
   }
 
@@ -1042,6 +1049,37 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         ("00" + fechaHora.getMinutes()).slice(-2)
     }
     return formatoFecha;
+  }
+
+  private validaTurnosNoCerrados(turnoSel): Subject<boolean>{
+    let moduloDeCargaPlanillaDeTurnos = null;
+    let planillaDeTurnosRecibidores = null;
+    let subjectTurnosNoCerrados = new Subject<boolean>();
+    let bResultado = false;
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+        moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+      }
+    }, error=>{}, 
+    ()=>{
+
+      const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
+      const turnoSelId = turnoSel.id.value;
+      planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.id != turnoSelId);
+
+      planillaDeTurnosRecibidores.forEach(item => {
+        item.fechaMiliseconds = new Date(item.fecha).getTime()
+      });
+      
+      planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
+      if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
+        if (planillaDeTurnosRecibidores.length > 0) 
+            bResultado = true;         
+      }
+
+      subjectTurnosNoCerrados.next(bResultado)
+    });
+    return subjectTurnosNoCerrados;
   }
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
@@ -1090,8 +1128,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
           moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
         }
       }
-      console.log('Turno--->>>')
-      console.log(Turno)
+
       let planillaTurno = {
         Fecha: Turno.turnoPuerto['value'].fecha,
         esLiquido: true,
@@ -1103,38 +1140,51 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         turnoPuerto: Turno.turnoPuerto['value'].turnoPuerto
       }
 
-      this.confirmationDialogService.confirm(enviado ? "Cerrar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "cerrar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
-        .then((confirmed) => {
-          if (confirmed) {
-            planillaTurno.guardadoPorRecibidor = true;
-            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
-
-              this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
-
-              this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-                if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-                  this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
-                  const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-                  this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
-                  this.fillPlanilla();
-                }
-              });
-            }, error => {
-              console.log(error);
-              this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "cerrar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
-            })
-          }
-        })
-        .catch((e) => {
-          this.hideSpinner.emit(false)
+      this.validaTurnosNoCerrados(Turno).subscribe( resp =>{
+        
+        const existeTurno = resp;
+        let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
+        mensaje += " turnos anteriores que aun no se han sido cerrados.";
+        if (existeTurno){
+          this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
           return;
-        });
+        }else{
+          this.guardarTurnoDetallado(enviado, planillaTurno);
+        }
+      });
 
     } catch (error) {
       console.error(error);
     }
   };
+  guardarTurnoDetallado(enviado, planillaTurno){
+    this.confirmationDialogService.confirm(enviado ? "Cerrar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "cerrar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
+    .then((confirmed) => {
+      if (confirmed) {
+        planillaTurno.guardadoPorRecibidor = true;
+        this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
 
+          this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+
+          this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+            if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+              this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+              const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+              this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+              this.fillPlanilla();
+            }
+          });
+        }, error => {
+          console.log(error);
+          this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "cerrar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
+        })
+      }
+    })
+    .catch((e) => {
+      this.hideSpinner.emit(false)
+      return;
+    });
+  }
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
   }
