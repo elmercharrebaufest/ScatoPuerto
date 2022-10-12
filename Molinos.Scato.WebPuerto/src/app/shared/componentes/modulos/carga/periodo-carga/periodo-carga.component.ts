@@ -6,6 +6,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
@@ -25,6 +26,7 @@ export class PeriodoCargaComponent implements OnInit {
     private _moduloDeCargaService: ModuloDeCargaService,
     private _confirmationDialogService: ConfirmationDialogService,
     private session: SessionService,
+    private _procesoService: DatosEmbarquesProcesoService,
   ) { 
   this.user = this.session.getUser();
   }
@@ -83,12 +85,21 @@ export class PeriodoCargaComponent implements OnInit {
   guardar(){
     this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el período de carga?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then( (confirmed) => {
-        if(confirmed){
+        if (confirmed) {
           this.guardando = true;
-          if (this.ModuloDeCarga_Id > 0)
-          this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerDatosPeriodoCarga(), this.ModuloDeCarga_Id ).subscribe((res: any) => {
-            this.guardando = false;
-          });
+          if (this.ModuloDeCarga_Id > 0) {
+            const datosPeriodoCarga = this.obtenerDatosPeriodoCarga();
+            this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerDatosPeriodoCarga(), this.ModuloDeCarga_Id).subscribe((res: any) => {
+              this.guardando = false;
+              const splitFecha = datosPeriodoCarga.fechaComienzoCarga.split('-');
+              const anio = parseInt(splitFecha[0]);
+              const mes = parseInt(splitFecha[1]) - 1;
+              const dia = parseInt(splitFecha[2]);
+              const fechaComienzoCarga = new Date(anio, mes, dia);
+              this._procesoService.setFechaComienzoCarga(fechaComienzoCarga);
+              this._moduloDeCargaService.actualizarPlanillaLiquido = true;
+            });
+          }
         }
       });
     
