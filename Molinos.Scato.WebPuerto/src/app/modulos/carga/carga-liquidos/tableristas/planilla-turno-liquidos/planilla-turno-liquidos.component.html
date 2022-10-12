@@ -7,8 +7,10 @@
     <!-- <button class='btn btn-primary' (click)="fillPlanilla()">Cargar turnos </button> -->
 </div>
 <div id="collapsePlanillaTurnosLiquidos" class="collapse show">
-    <button *ngIf="tablerista" id="btn-agregar-turnos-liquidos" class='btn btn-success divHeaderRight'
-        (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
+    <ng-container *ngIf="hasPermisoTableroLiquido_AgregarTurno()">
+        <button *ngIf="tablerista" id="btn-agregar-turnos-liquidos" class='btn btn-success divHeaderRight'
+            (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
+    </ng-container>
     <br>
     <br>
 
@@ -24,16 +26,16 @@
                             <th class="header-fijo tabla-border-resaltado">Día</th>
                             <th class="header-fijo tabla-border-resaltado">Turno</th>
                             <th class="header-fijo tabla-border-resaltado" width="12%">Exportador</th>
-                            <th class="header-fijo tabla-border-resaltado">Destino</th>
+                            <th class="header-fijo tabla-border-resaltado" width="10%">Destino</th>
                             <th class="header-fijo tabla-border-resaltado" width="7%">Partida</th>
-                            <th class="header-fijo tabla-border-resaltado">Línea</th>
+                            <th class="header-fijo tabla-border-resaltado" width="10%">Línea</th>
                             <th class="header-fijo tabla-border-resaltado" width="12%">Producto</th>
-                            <th class="header-fijo tabla-border-resaltado" width="4%">Tk</th>
+                            <th class="header-fijo tabla-border-resaltado" width="5%">Tk</th>
                             <th class="header-fijo tabla-border-resaltado" width="4%">°C</th>
-                            <th class="header-fijo tabla-border-resaltado">Med.Ini. CM</th>
-                            <th class="header-fijo tabla-border-resaltado">Med.Ini. MM</th>
-                            <th class="header-fijo tabla-border-resaltado">Med.fin. CM</th>
-                            <th class="header-fijo tabla-border-resaltado">Med.fin. MM</th>
+                            <th class="header-fijo tabla-border-resaltado" width="10%">Medición Inicial</th>
+                            <!-- <th class="header-fijo tabla-border-resaltado">Med.Ini. MM</th> -->
+                            <th class="header-fijo tabla-border-resaltado" width="10%">Medición final</th>
+                            <!-- <th class="header-fijo tabla-border-resaltado">Med.fin. MM</th> -->
                             <th class="header-fijo tabla-border-resaltado" width="5%">Cant.</th>
                             <th class="header-fijo tabla-border-resaltado" width="4%"></th>
                         </tr>
@@ -73,21 +75,27 @@
                                                             {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.
                                                         </span>
                                                     </span>
-                                                    <button id="btn-guardar-turno-liquidos"
-                                                        class='btn btn-success btn-sm'
-                                                        style="margin-right: 5px; margin-bottom: 5px"
-                                                        (click)='guardarTurnoGeneral(d,t)'
-                                                        [disabled]="!bGrabandoTurnoActivo">
-                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
-                                                        'Guardar Turno'}}
-                                                    </button>
-                                                    <button id="btn-turno-enviado-liquidos"
-                                                        *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
-                                                        (click)='guardarTurnoGeneral(d,t,true)'
-                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-                                                        {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
-                                                        'Turno enviado'}}
-                                                    </button>
+                                                    <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_GuardarTurno()) || 
+                                                    turno.value.guardadoPorTablerista">
+	                                                    <button id="btn-guardar-turno-liquidos"
+	                                                        class='btn btn-success btn-sm'
+	                                                        style="margin-right: 5px; margin-bottom: 5px"
+	                                                        (click)='guardarTurnoGeneral(d,t)'
+	                                                        [disabled]="!bGrabandoTurnoActivo">
+	                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
+	                                                        'Guardar Turno'}}
+	                                                    </button>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_EnviarARecibidores()) ||
+                                                    turno.value.guardadoPorTablerista">
+	                                                    <button id="btn-turno-enviado-liquidos"
+	                                                        *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
+	                                                        (click)='guardarTurnoGeneral(d,t,true)'
+	                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
+	                                                        {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
+	                                                        'Turno enviado'}}
+	                                                    </button>
+													</ng-container>
                                                     <span class='parcel-cantidad'
                                                         *ngIf="turno.value.guardadoPorTablerista"><b>Turno en
                                                             recibidores</b></span>
@@ -167,18 +175,23 @@
                                                     <td><input type="number" formControlName='temperatura'
                                                             (change)='getCantidadLinea(result)'
                                                             class='planilla-text-derecha'></td>
-                                                    <td><input type="number" formControlName='medidaInicialCM'
+                                                    <td><input type="text" formControlName='medidaInicialCMyMM'
+                                                            (keypress)="validateMedicion($event, result, true)"
+                                                            (focusout)="setMediciones(result, true)"
                                                             (blur)='getCantidadLinea(result)'
                                                             class='planilla-text-derecha'></td>
-                                                    <td><input type="number" formControlName='medidaInicialMM'
+                                                    <!-- <td><input type="number" formControlName='medidaInicialMM'
+                                                            (blur)='getCantidadLinea(result)'
+                                                            class='planilla-text-derecha'></td> -->
+                                                    <td><input type="text" formControlName='medidaFinalCMyMM'
+                                                            (keypress)="validateMedicion($event, result, false)"
+                                                            (focusout)="setMediciones(result, false)"
                                                             (blur)='getCantidadLinea(result)'
                                                             class='planilla-text-derecha'></td>
-                                                    <td><input type="number" formControlName='medidaFinalCM'
+                                                    <!-- <td><input type="number" formControlName='medidaFinalMM'
                                                             (blur)='getCantidadLinea(result)'
-                                                            class='planilla-text-derecha'></td>
-                                                    <td><input type="number" formControlName='medidaFinalMM'
-                                                            (blur)='getCantidadLinea(result)'
-                                                            class='planilla-text-derecha'></td>
+                                                            class='planilla-text-derecha'></td> -->
+ <!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
                                                     <td><input type="number" formControlName='cantidad'
                                                             class='planilla-text-derecha'></td>
                                                     <td>
@@ -207,9 +220,11 @@
                                             <td colspan="13" class='btn-add-cell'>
                                                 <div class='btn-add-container center-bt' 
                                                     (click)='openModalCorte(addCorte, d, t)' #addButton>
-                                                    <button type='button' class='btn btn-primary bt-circle'
-                                                        style='margin-top: -5px;'>+</button>
-                                                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                                    <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
+                                                        <button type='button' class='btn btn-primary bt-circle'
+                                                            style='margin-top: -5px;'>+</button>
+                                                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                                    </ng-container>
                                                 </div>
                                             </td>
                                         </tr>
@@ -445,8 +460,10 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-        <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
-            (click)='onExportarExcelLiquido()'>Exportar planilla</button>
+    	<ng-container *ngIf="hasPermisoTableroLiquido_Exportar()">
+	        <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
+	            (click)='onExportarExcelLiquido()'>Exportar planilla</button>
+		</ng-container>
     </div>
 </div>
 

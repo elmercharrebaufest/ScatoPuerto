@@ -19,7 +19,7 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
-import { forkJoin } from 'rxjs';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 
 @Component({
   selector: 'app-lineup',
@@ -53,7 +53,6 @@ export class LineupComponent implements OnInit, Observador {
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
   estadoOtrosLp: string;
-  buquesGeolocalizacion: any;
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -65,8 +64,11 @@ export class LineupComponent implements OnInit, Observador {
     private _messageService: MessageService,
     private parametrosService: ParametrosService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService
+    private geolocalizacionService: GeolocalizacionService,
+    private auth: AutenticadorService
   ) {
+    this.auth.renovarAuthUsuario();
+    
     this.user = this.session.getUser()
     this.sanBenito = new Array();
     this.noryon = new Array();
@@ -77,16 +79,7 @@ export class LineupComponent implements OnInit, Observador {
   }
   
   cargarGeolocalizacionLineUp() {
-    this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(data => {
-      this.buquesGeolocalizacion = data;
-    },
-      err => {
-        console.log(err);
-        this.cargarWorkflows();
-      },
-      () => {
-        this.cargarWorkflows();
-      });
+    this.cargarWorkflows();
   }
 
   cargarEstadoLineUp() {
@@ -111,7 +104,6 @@ export class LineupComponent implements OnInit, Observador {
     this.cargarGeolocalizacionLineUp();
     function_name = 'LINEUP - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-
   }
 
   Actualizar(subject?: any) {
@@ -124,7 +116,7 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
   }
 
-  ListarEmbarques(): InstanciaWorkflowPuerto[] {
+  ListarEmbarques(): any[] {
     return this.listadoEmbarques;
   }
 
@@ -162,16 +154,16 @@ export class LineupComponent implements OnInit, Observador {
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     function_name = 'filtrarMuelles - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
     this.cargarEstadoLineUp();
-  }
+   }
 
   public altaEmbarque() {
 
     let actualDate = new Date();
     let function_name = 'altaEmbarque';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-    if (this.user.permisos.find(p => p === this.permisosScato.PreLineUp_CrearBuque)) {
+    if (this.hasPermisoAltaEmbarque()) {
       localStorage.removeItem('embarque');
       this.router.navigate(['/lineup/alta-embarque/0/line-up']);
     } else {
@@ -365,13 +357,17 @@ export class LineupComponent implements OnInit, Observador {
   }
 
   hasPermisoAltaEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_CrearBuque);
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_AltaEmbarque);
   }
-
+  hasPermisoVerCalendario(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerCalendario);
+  }
+  hasPermisoVerGeo(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerGeo);
+  }
   hasPermisoMail() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EnviarMail);
   }
-
   hasPermisoExcel() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_Exportar);
   }

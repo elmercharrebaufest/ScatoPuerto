@@ -1,0 +1,11 @@
+<div style="display: flex; flex-direction: column">
+    <div class="col card-ritmo-grafico">
+        <h5 class='colorTitle text-center py-3 ritmo-title'>{{titulo}}</h5>
+        <p-knob style="width: 150px; height: 150px;position: relative; bottom: 11px;" [(ngModel)]='valor' class='center-knob' valueColor={{color}} [size]='150' [min]='0' [max]='maximo' [strokeWidth]='5' [readonly]='true'></p-knob>
+        <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas'>
+        <p class='text-knob text-center'>{{descripcion}}</p>
+    </div>
+    <div style="align-self: center; margin-top: -20px;">
+        <p class="footer-ritmos-text">{{footer}}</p>
+    </div>    
+</div>

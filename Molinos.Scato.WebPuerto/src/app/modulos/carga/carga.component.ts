@@ -6,6 +6,7 @@ import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { PlanoContentComponent } from '../lineup/plano-de-carga/plano-content/plano-content.component';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 
 
 @Component({
@@ -29,7 +30,9 @@ export class CargaComponent implements OnInit, OnDestroy {
     private workflowService: WorkflowService,
     private _procesoService: DatosEmbarquesProcesoService,
     private parametrosService: ParametrosService,
+    private auth: AutenticadorService
   ) {
+    this.auth.renovarAuthUsuario();
     this.unsubscribe = new Subject();
     this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
   }

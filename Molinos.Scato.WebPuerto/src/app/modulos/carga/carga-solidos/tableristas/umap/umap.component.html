@@ -1,16 +1,18 @@
 <div style="display: flex; flex-direction: row; justify-content:space-between;" >
     <div class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
-        <app-amarre [ModuloDeCargaId]="this.ModuloDeCargaId" ></app-amarre>
+        <app-amarre [ModuloDeCargaId]="this.ModuloDeCargaId" [esSoloLectura]="true"></app-amarre>
     </div>
     <div  class="mt-4 px-4 pb-4 shadow ml-4" style="background-color: white; display: flex; flex-direction: column; justify-content: space-between;">
         <!-- Title -->
         <div style="display: flex; flex-direction: row; justify-content: space-between">
             <h4 class='colorTitle pt-3'>UMAP</h4>
             <div>
-                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='addUmap()'>
-                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encendido</span>
-                </div>
+	            <ng-container *ngIf="hasPermisoUmap_AgregarEncendido()">
+	                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='addUmap()'>
+	                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+	                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encendido</span>
+	                </div>
+	            </ng-container>
             </div>
         </div>            
         <!-- Body -->
@@ -70,7 +72,9 @@
                                     </select>
                                 </div>
                                 <div fxFlex='4' class='full-center'>
-                                    <img src='assets/trashIcon-no-border.svg' (click)='deleteHorario(i)' style="margin-top: 14px">
+                                	<ng-container *ngIf="hasPermisoUmap_EliminarRegistro()">
+                                    	<img src='assets/trashIcon-no-border.svg' (click)='deleteHorario(i)' style="margin-top: 14px">
+									</ng-container>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +86,7 @@
 
         <!-- Footer -->
         <div style="margin: 0 auto">
-            <button type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
+            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
          </div>
     </div>
 </div>

@@ -51,9 +51,11 @@ export class ParametrosService {
   getParametroConsoleLog() {
     return this.verConsoleLog;
   }
+
   getParametroTiempoActualizacionBalanzas() {
     return this.msTiempoActualizacionBalanzas;
   }
+
   getParametroTiempoActualizacionRitmosBlzas78() {
     return this.msTiempoActualizacionRitmosBlzas78;
   }
@@ -76,5 +78,9 @@ export class ParametrosService {
   // TODO: aún no implementado en back
   actualizarParametro(idParametro: number, activo: boolean){
     return this.http.post(`${this.url}ModuloDeCarga/actualizarParametro?idParametro=${idParametro}`, activo, { 'withCredentials': true});
+  }
+
+  obtenerParametro(descripcion: string): Observable<Parametros> {
+    return this.http.get<Parametros>(`${this.url}ModuloDeCarga/obtenerParametro?descripcion=${descripcion}`, { 'withCredentials' : true});
   }
 }

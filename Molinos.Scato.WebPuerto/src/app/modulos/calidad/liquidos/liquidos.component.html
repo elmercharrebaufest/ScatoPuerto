@@ -14,10 +14,9 @@
       </div>
     </div>
   </div>
-
-  <app-obs-calidad></app-obs-calidad>
   <div class="html2pdf__page-break"></div>
 
+  <app-obs-calidad></app-obs-calidad>
 
   <div class="bg-white px-4 min-h5 shadow mt-4">
     <app-planilla-turnos-liquidos-calidad></app-planilla-turnos-liquidos-calidad>
@@ -26,9 +25,6 @@
   <div class="col text-center">
     <app-modal-recibo></app-modal-recibo>
   </div>
-
-  <div class="html2pdf__page-break"></div>
-
 
   <app-registro-recibos></app-registro-recibos>
   
@@ -39,8 +35,8 @@
   -->
 
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
-    <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
     <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+    <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
   </div>
 
 </div>

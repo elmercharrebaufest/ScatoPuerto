@@ -13,6 +13,9 @@ import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/mano
 import { forkJoin } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-solidos',
@@ -32,14 +35,18 @@ export class SolidosComponent implements OnInit {
   enviado: boolean;
   usuarioFinalizacion: string;
   RecibidoresPdf: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
     private balanzas78Service: Balanzas78Service,
     private _changeDetector: ChangeDetectorRef,
-    private _CalidadSharedService: CalidadSharedService) {
-      
+    private _CalidadSharedService: CalidadSharedService,
+    private session: SessionService,) {
+    this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
   }
 
@@ -120,6 +127,10 @@ export class SolidosComponent implements OnInit {
       });
   }
 
+  finalizaCalidad():void{
+    this._CalidadSharedService.emitFinalizaEnCalidad(false);
+  }
+
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
       this._CalidadSharedService.ocultarBotonesImprimir();
@@ -133,7 +144,7 @@ export class SolidosComponent implements OnInit {
        filename:     'Pantalla Recibidores.pdf',
        image:        { type: 'jpeg', quality: 0.98 },
        html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
-       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
      };
  
      html2pdf().from(element).set(opt).outputPdf()
@@ -142,4 +153,8 @@ export class SolidosComponent implements OnInit {
      }).save();
      // #endregion
   }
+
+	hasPermisoRecibidores_Imprimir() {
+    	return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
+	}
 }

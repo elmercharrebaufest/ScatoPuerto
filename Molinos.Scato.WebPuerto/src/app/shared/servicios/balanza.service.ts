@@ -25,6 +25,10 @@ export class BalanzaService {
       return this.http.post(`${this.url}ModuloDeCarga/GuardarBalanzaCorte`, listadoTotalBalanzadas, { 'withCredentials': true });
     }
 
+    listarBalanzasCortes(IdModuloDeCarga: number): Observable<any>{
+      return this.http.get<any>(`${this.url}ModuloDeCarga/ListarInformacionBalanzasCortes?IdModuloDeCarga=${IdModuloDeCarga}`, { 'withCredentials': true });
+    }
+
     eliminarBalanzaCorte( idCorteBalanza: number ){
       console.log('eliminarBalanzaCorte - id: ', idCorteBalanza);
       return this.http.post(`${this.url}ModuloDeCarga/EliminarCorteBalanza?idCorteBalanza=${idCorteBalanza}`, { 'withCredentials': true });
@@ -38,11 +42,11 @@ export class BalanzaService {
       return this.http.post(`${this.url}ModuloDeCarga/GuardarFechaInicioCarga?embarque_id=${embarque_id}&fechaHorastring=${fechaHorastring}`, { 'withCredentials': true});
     }
 
-    obtenerRitmos(vapor_id: any, modulodecarga_id: number): Observable<Ritmos> {
+    obtenerRitmos(modulodecarga_id: number): Observable<Ritmos> {
       return this.http.get<Ritmos>(`${this.url}ModuloDeCarga/ObtenerRitmos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 
-    obtenerRitmosLiquidos(vapor_id: number, modulodecarga_id: number): Observable<RitmosLiquido>{
+    obtenerRitmosLiquidos(modulodecarga_id: number): Observable<RitmosLiquido>{
       return this.http.get<RitmosLiquido>(`${this.url}ModuloDeCarga/ObtenerRitmosLiquidos?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
     }
 

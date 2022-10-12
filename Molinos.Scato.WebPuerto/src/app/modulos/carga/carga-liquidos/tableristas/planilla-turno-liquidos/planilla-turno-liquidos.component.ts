@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
@@ -10,13 +10,10 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-import { Workbook, Worksheet } from 'exceljs';
 // import * as fs from 'file-saver';
-import { saveAs } from 'file-saver-es';
 import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { PlanillaDeTurnos, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
-import { TurnoDetalleLiquido } from '@ScatoModels/planilla-turnos/turno';
+import { PlanillaDeTurnos, TurnoDetalleLiquido, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { CorteTurno } from '@ScatoModels/planilla-turnos/corte-turno';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { Embarque } from '@ScatoModels/embarque';
@@ -26,8 +23,9 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -67,6 +65,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   cortesTurno: CorteTurno[] = [];
   private user: Usuario
   mostrarBtn: boolean = true;
+  permisosScato: typeof PermisosScato = PermisosScato;
   fechaHoraInicioCarga: Date;
 
   embarqueId: number;
@@ -101,7 +100,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private messageService: MessageService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
@@ -109,7 +107,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
-
+    this.user = this.session.getUser();
     this.pedidoPorPlano = this._turnosService.getTnTotales()
     this.embarqueId = this.procesoService.getEmbarqueId();
     console.log('xxxx')
@@ -120,11 +118,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.obtenerTipoLineaEmbarque();
     this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
       if (data) this.obtenerTipoLineaEmbarque();
+      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
+      console.log('this.fechaHoraInicioCarga--->', this.fechaHoraInicioCarga);
     });
   }
 
   ngOnInit(): void {
-    this.user = this.session.getUser();
     this.newForm()
     // this.fillPlanilla();
     setTimeout(() => {
@@ -132,13 +131,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }, 2000);
     this.initFormularioObs();
     this.initShipParticular();
+
+    setTimeout(() => {
+      this.controlarPermisos();
+    }, 3000);
   }
+  
   private obtenerTipoLineaEmbarque() {
     this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
       this.tipoLineaEmbarque = res;
       this.obtenerLineaProductoTk();
     });
   }
+
   cargarEmbarqueShipParticular() {
     this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
       this.embarque = res;
@@ -546,7 +551,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let exportadoresForm = this._turnosService.getExportadores();
     this.exportadores = new Array();
     for (let e of exportadoresForm) {
-      if (e.exportador) this.exportadores.push(e.exportador);
+      //if (e.exportador) this.exportadores.push(e.exportador);
+      var i = this.exportadores.findIndex(x => x.id == e.exportador.id);
+      if (i <= -1) {
+        this.exportadores.push(e.exportador);
+      }
     }
 
     this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
@@ -1101,10 +1110,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: guardado }],
       tk: [{ value: line ? line.tk : '', disabled: bloqueoVicentin? bloqueoVicentin : guardado }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin }],
-      medidaInicialCM: [{ value: line ? line.medidaInicialCM : '', disabled: bloqueoVicentin }],
-      medidaInicialMM: [{ value: line ? line.medidaInicialMM : '', disabled: bloqueoVicentin }],
-      medidaFinalCM: [{ value: line ? line.medidaFinalCM : '', disabled: bloqueoVicentin }],
-      medidaFinalMM: [{ value: line ? line.medidaFinalMM : '', disabled: bloqueoVicentin }],
+      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` :`${line.medidaInicialCM},0`:"", disabled: guardado }],
+      medidaInicialCM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialCM : 0, }],
+      medidaInicialMM: [{ value: line?.medidaInicialMM >= 0 ? line.medidaInicialMM : 0, }],
+      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= 0 ? `${line.medidaFinalCM},${line.medidaFinalMM}` :`${line.medidaFinalCM},0`:"", disabled: guardado }],
+      medidaFinalCM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalCM : 0, }],
+      medidaFinalMM: [{ value: line?.medidaFinalMM >= 0 ? line.medidaFinalMM : 0, }],
       destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
       cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
@@ -1203,7 +1214,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       lineaTurno.tk.setValue(0);
 
 
-
+    lineaTurno.cantidad.setValue(0);
     if (lineaTurno?.medidaInicialCM.value &&
       lineaTurno?.medidaInicialMM.value &&
       lineaTurno?.medidaFinalCM.value &&
@@ -1497,6 +1508,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       let medidaFinalMM = '';
       let medidaInicialCM = '';
       let medidaInicialMM = '';
+      let medidaInicialCMyMM = '';
+      let medidaFinalCMyMM = '';
       let temperatura = '';
 
       if (turnoDetalle['controls'].medidaFinalCM.value != null || turnoDetalle['controls'].medidaFinalCM.value != undefined)
@@ -1510,10 +1523,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
       if (turnoDetalle['controls'].medidaInicialMM.value != null || turnoDetalle['controls'].medidaInicialMM.value != undefined)
         medidaInicialMM = turnoDetalle['controls'].medidaInicialMM.value;
+      
+      if (turnoDetalle['controls'].medidaInicialCMyMM.value != null || turnoDetalle['controls'].medidaInicialCMyMM.value != undefined)
+        medidaInicialCMyMM = turnoDetalle['controls'].medidaInicialMM.value;
+
+      if (turnoDetalle['controls'].medidaFinalCMyMM.value != null || turnoDetalle['controls'].medidaFinalCMyMM.value != undefined)
+        medidaFinalCMyMM = turnoDetalle['controls'].medidaInicialMM.value;
 
       if (turnoDetalle['controls'].temperatura.value != null || turnoDetalle['controls'].temperatura.value != undefined)
         temperatura = turnoDetalle['controls'].temperatura.value;
-
+      
       materialPuertoVal = (materialPuertoVal == undefined || materialPuertoVal == null)? '' : materialPuertoVal;
       bodegaParcelVal = (bodegaParcelVal == undefined || bodegaParcelVal == null)? '' : bodegaParcelVal;
       
@@ -1523,10 +1542,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           (bodegaParcelVal == '' || bodegaParcelVal == '0') ||
           (materialPuertoVal == '' || materialPuertoVal == '0') ||
           (exportadorVal == '' || exportadorVal == '0') ||
-          (medidaFinalCM == '' || medidaFinalCM == '0') ||
-          (medidaFinalMM == '' || medidaFinalMM == '0') ||
-          (medidaInicialCM == '' || medidaInicialCM == '0') ||
-          (medidaInicialMM == '' || medidaInicialMM == '0') ||
+          (medidaFinalCMyMM == '' || medidaFinalCMyMM == '0') ||
+          (medidaInicialCMyMM == '' || medidaInicialCMyMM == '0') ||
           (temperatura == '' || temperatura == '0')) {
           console.log('No es Vicentin')
           bPlanillaIncompleta = true;
@@ -1691,6 +1708,72 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       subjectTurnosNoCerrados.next(bResultado)
     });
     return subjectTurnosNoCerrados;
+  }
+  public validateMedicion(event, linea, inicial:boolean): boolean {
+    var rg = new RegExp(/^(\d)*(\,)?([0-9]{1})?$/);
+    var str = inicial ? linea.controls.medidaInicialCMyMM.value.toString() : linea.controls.medidaFinalCMyMM.value.toString();
+    if(rg.test(str + event.key)) return true;
+    return false;
+  }
+
+  splitMediciones(medicion:Number): any[] {
+    let arrMedicion = medicion.toString().split(',');
+    if(arrMedicion != null){
+      if(arrMedicion.length == 1){
+        return [arrMedicion[0] == ''? 0 :arrMedicion[0], '0']
+      }
+      if(arrMedicion.length == 2){
+        return [arrMedicion[0] != '' ? arrMedicion[0] : '0', arrMedicion[1] != '' ? arrMedicion[1] : '0']
+      }
+    }else{
+      return ['0','0'];
+    }
+  }
+  setMediciones(linea, inicial:boolean){
+    let altura = inicial ? linea.controls['medidaInicialCMyMM'].value : linea.controls['medidaFinalCMyMM'].value;
+    let arrMediciones = this.splitMediciones(altura);
+    let cm = parseInt(arrMediciones[0]);
+    let mm = parseInt(arrMediciones[1]);
+    if(inicial){
+      linea.controls['medidaInicialCM'].setValue(cm);
+      linea.controls['medidaInicialMM'].setValue(mm);
+      linea.controls['medidaInicialCMyMM'].setValue(cm + ',' + mm);
+    }else{
+      linea.controls['medidaFinalCM'].setValue(cm);
+      linea.controls['medidaFinalMM'].setValue(mm);
+      linea.controls['medidaFinalCMyMM'].setValue(cm + ',' + mm);
+    }
+    linea.controls['medidaFinalMM'].setValue(mm);
+  }
+  
+  hasPermisoTableroLiquido_AgregarTurno() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarTurno);
+  }
+  hasPermisoTableroLiquido_EnviarARecibidores() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EnviarARecibidores);
+  }
+  hasPermisoTableroLiquido_AgregarCorte() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarCorte);
+  }
+  hasPermisoTableroLiquido_Exportar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Exportar);
+  }
+  hasPermisoTableroLiquido_Planilla_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Planilla_Editar);
+  }
+  hasPermisoTableroLiquido_GuardarTurno() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_GuardarTurno);
+  }
+
+  controlarPermisos(){
+    if(!this.hasPermisoTableroLiquido_Planilla_Editar()){
+      this.diasTurno.controls.forEach(dia => {
+        const turnos = dia['controls']['turnos']['controls'];
+        turnos.forEach(turno => {
+          turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].disable();
+        });
+      });
+    }
   }
 
 }

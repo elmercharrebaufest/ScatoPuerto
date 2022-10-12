@@ -1,19 +1,18 @@
-import { Component, Input, OnInit, Output, ViewChild, EventEmitter, ViewChildren, QueryList } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { Mano, Nir, NirManualPuerto, TipoNir } from '@ScatoModels/nir';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-import { Bodega } from '@ScatoModels/balanzadas/balanza';
-import { finalize } from 'rxjs/operators';
 import { Mail } from '@ScatoModels/mail';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
-import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { ManosDeEmbarque } from '@ScatoModels/mano-embarque';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { NirManoComponent } from './nir-mano/nir-mano.component';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-nir',
@@ -40,6 +39,8 @@ export class NIRComponent {
   MaizMano2: boolean = false;
   isLoaded: boolean = false;
   guardando: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private fb: FormBuilder,
@@ -48,9 +49,11 @@ export class NIRComponent {
     confirmationDialogService: ConfirmationDialogService,
     private procesoCalidadService: ProcesoCalidadService,
     private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
-    private _CalidadSharedService: CalidadSharedService
+    private _CalidadSharedService: CalidadSharedService,
+    private session: SessionService,
   ) {
     this.nir = new Nir();
+    this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
 
@@ -324,5 +327,18 @@ export class NIRComponent {
     this.nir.mano1.tipo = this.Mano1Visible ? this.TrigoMano1 ? 'Trigo' : 'Maíz' : ''
     this.nir.mano2 = new Mano();
     this.nir.mano2.tipo = this.Mano2Visible ? this.TrigoMano2 ? 'Trigo' : 'Maíz' : ''
+  }
+
+  hasPermisoRecibidores_Nir_AgregarNuevaFila() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
+  }
+  hasPermisoRecibidores_Nir_EliminarFila() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
+  }
+  hasPermisoRecibidores_Nir_EnviarNir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EnviarNir);
+  }
+  hasPermisoRecibidores_Nir_GuardarNir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_GuardarNir);
   }
 }

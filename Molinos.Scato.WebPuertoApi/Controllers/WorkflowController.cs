@@ -25,21 +25,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicioComandos = servicioComandos;
         }
 
-        [Autorizacion(PermisosScato.LineUpLectura)]
+        //[Autorizacion(PermisosScato.LineUpLectura)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [HttpGet]
         [Route("api/Workflow/Listar")]
-        public HttpResponseMessage Listar()
+        public HttpResponseMessage Listar() 
         {
-            var embarques = workflows.ListarEmbarques();
+            //var embarques = workflows.ListarEmbarques();
+            var embarques = servicio.ListarEmbarques();
             return Request.CreateResponse(HttpStatusCode.OK, embarques);
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Workflow/ListarEnLineUp")]
         public HttpResponseMessage ListarEnLineUp()
         {
-            var embarques = workflows.ListarEmbarques("LineUp");
+            var embarques = servicio.ListarEmbarques();
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
 
             return Request.CreateResponse(HttpStatusCode.OK,
@@ -59,7 +62,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/Workflow/Eliminar")]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         public HttpResponseMessage Eliminar(Guid id)
         {
             var resultado = Eliminar(servicio, servicioComandos, workflows, nombreUsuario, id);

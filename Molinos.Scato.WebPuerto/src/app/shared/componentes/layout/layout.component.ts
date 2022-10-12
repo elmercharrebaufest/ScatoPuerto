@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent, Event } from '@angular/router';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { filter } from 'rxjs/operators';
 
@@ -18,7 +19,8 @@ export class LayoutComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private session: SessionService
+    private session: SessionService,
+    private buqueSharingService: BuqueSharingService,
   ) {
     this.user = this.session.getUser();
     this.rutaActual = this.router.url.replace('/', '');
@@ -53,12 +55,16 @@ export class LayoutComponent implements OnInit {
   }
 
   goHome() {
-    if (this.user.permisos.find(x => x === 600))
+    if (this.user.permisos.find(x => x === 'LineUp_Ver'))
       this.router.navigate(['/lineup']);
-    if (this.user.permisos.find(x => x === 630))
+    if (this.user.permisos.find(x => x === 'Carga_Ver'))
       this.router.navigate(['/carga'])
-    if (this.user.permisos.find(x => x === 640))
+    if (this.user.permisos.find(x => x === 'Recibidores_Ver'))
       this.router.navigate(['/calidad'])
+    if (this.user.permisos.find(x => x === 'Geolocalizacion_Ver'))
+      this.router.navigate(['/geolocalizacion'])
+    if (this.user.permisos.find(x => x === 'Buque_Ver'))
+      this.router.navigate(['/buques'])
     this.opened = false;
   }
 
@@ -68,6 +74,10 @@ export class LayoutComponent implements OnInit {
   }
 
   closeSubmenus(menu: HTMLElement, submenu?: HTMLElement) {
+    // limpiando datos comportidos para buque
+    this.buqueSharingService.setFiltroBusques(null);
+    this.buqueSharingService.setFiltroBusques(null);
+
     for (let child of menu.children) {
       if (child != submenu)
         child.classList.contains('submenu-active') ? child.classList.remove('submenu-active') : '';
@@ -76,7 +86,7 @@ export class LayoutComponent implements OnInit {
       this.opened = false;
   }
 
-  tienePermiso(permiso: number) {
+  tienePermiso(permiso: string) {
     return this.user.permisos.find(x => x === permiso);
   }
 

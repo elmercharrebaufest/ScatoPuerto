@@ -2,7 +2,6 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
 
-
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
@@ -13,10 +12,14 @@ export class LiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   RecibidoresPdf: boolean = false;
   
-  constructor(private _CalidadSharedService: CalidadSharedService) { }
+  constructor(private _CalidadSharedService: CalidadSharedService,) { }
 
   ngOnInit(): void {
     this.hideSpinner.emit(false);
+  }
+
+  finalizaCalidad():void{
+    this._CalidadSharedService.emitFinalizaEnCalidad(true);
   }
 
   imprimir(imprimir: boolean = false){
@@ -30,7 +33,7 @@ export class LiquidosComponent implements OnInit {
       margin:       .1,
       filename:     'Pantalla Recibidores.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
+      html2canvas:  { scale: 2},                                               //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 

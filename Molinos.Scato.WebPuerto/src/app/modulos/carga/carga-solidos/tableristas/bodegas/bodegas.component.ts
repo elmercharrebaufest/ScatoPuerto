@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { Subject } from 'rxjs';
@@ -10,6 +10,8 @@ import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.s
 import { BalanzadasBuque, Bodega } from '@ScatoModels/balanzadas/balanza';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
 
 interface BalanzadasUnidas {
   bodega: string;
@@ -28,6 +30,9 @@ interface BalanzadasUnidas {
 })
 export class BodegasComponent implements OnInit, OnDestroy {
 
+  @Input() esSoloLectura: boolean = false;
+
+  private paramSoloLectura: any;
   unsubscribe: Subject<any>;
   materialesPuerto: MaterialPuerto[] = [];
   bodegasProductosTn = [];
@@ -35,26 +40,58 @@ export class BodegasComponent implements OnInit, OnDestroy {
   planoDeCargaBodega: PlanoDeCargaBodega[];
   bodegas: Bodega[] = [];
   datosEmbarque: any;
+  planoDeCargaId: number = 0;
 
   constructor(
     private balanzas78Service: Balanzas78Service,
     private planoDeCargaService: PlanoDeCargaService,
     private _procesoService: DatosEmbarquesProcesoService,
     private funcionesGeneralesService: FuncionesGeneralesService,
+    private embarqueSharingService: EmbarqueSharingService,
+    private embarqueService: EmbarqueService,
     private _balanzaService: BalanzaService,) {
-
     this.unsubscribe = new Subject();
+    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
+      this.paramSoloLectura = data;
+    });
+    
+    /*
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.materialesPuerto = this.datosEmbarque.listaMateriales;
     this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
+    */
   }
-
+  setCargarValoresBodegas() {
+    if (this.esSoloLectura) {
+      this.planoDeCargaId = this.paramSoloLectura.planoDecarga_Id;
+      this.embarqueService.obtenerEmbarque(this.paramSoloLectura.embarque_Id).subscribe(res => {
+        this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
+      });
+      this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+    } else {
+      if (this.planoDeCargaId == 0) {
+        this.datosEmbarque = this._procesoService.getDatosGrafico();
+        if (this.datosEmbarque != null || this.datosEmbarque != undefined) {
+          this.materialesPuerto = this.datosEmbarque.listaMateriales;
+          this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+          this.planoDeCargaId = this.embarqueSelected.planoDeCargaId;
+          this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+        }
+      }
+    }
+  }
   ngOnInit(): void {
-    this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
-    this.planoDeCargaService.obtenerPlanoDeCarga(this.embarqueSelected.planoDeCargaId)
-      .pipe(finalize( () => this.obtenerBalanzadasEnVivo() ))
-      .subscribe( res => this.planoDeCargaBodega = res.planoDeCargaBodegas );
+    this.setCargarValoresBodegas();
+    if (this.esSoloLectura) {
+      this.planoDeCargaService.obtenerPlanoDeCarga(this.planoDeCargaId)
+        .pipe(finalize( () => this.obtenerBalanzadasEnVivo() ))
+        .subscribe( res => this.planoDeCargaBodega = res.planoDeCargaBodegas );  
+    }else{
+      this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+      this.planoDeCargaService.obtenerPlanoDeCarga(this.embarqueSelected.planoDeCargaId)
+        .pipe(finalize( () => this.obtenerBalanzadasEnVivo() ))
+        .subscribe( res => this.planoDeCargaBodega = res.planoDeCargaBodegas );
+    }
   }
 
   obtenerBalanzadasEnVivo() {
@@ -63,9 +100,7 @@ export class BodegasComponent implements OnInit, OnDestroy {
     this.balanzas78Service.sendBalanzadasBuque
       .pipe(takeUntil(this.unsubscribe))
       .subscribe( blzas => {
-        // let blzas7y8: BalanzadasBuque[] = blzas.balanzadasBuque;
         let balanzadasUnidas: BalanzadasUnidas[] = [];
-        // let balanzadasDataOK = blzas7y8.filter( x => x.material_Id > 0 && x.pesoNeto > 0 && x.bodega_Id > 0 );
         let balanzadasDataOK = blzas.filter( x => x.material_Id > 0 && x.pesoNeto > 0 && x.bodega_Id > 0 );
         balanzadasUnidas = this.unirBalanzadasParaBodegas(balanzadasDataOK);
 
@@ -76,12 +111,9 @@ export class BodegasComponent implements OnInit, OnDestroy {
           for(let bodega in this.bodegasProductosTn){
             for(let plano in this.planoDeCargaBodega){
               if(this.bodegasProductosTn[bodega].nroBodega == this.planoDeCargaBodega[plano].bodegaParcel){
-
                 this.bodegasProductosTn[bodega].cantidadEsperada = this.planoDeCargaBodega[plano].cantidad * 1000;
-
                 this.bodegasProductosTn[bodega].restaCargar = this.bodegasProductosTn[bodega].kilos == 0 ? this.bodegasProductosTn[bodega].cantidadEsperada : 
                   (this.bodegasProductosTn[bodega].cantidadEsperada - this.bodegasProductosTn[bodega].kilos) > 0 ? (this.bodegasProductosTn[bodega].cantidadEsperada - this.bodegasProductosTn[bodega].kilos) : 0;
-
                 this.bodegasProductosTn[bodega].excedente = this.bodegasProductosTn[bodega].kilos == 0 ? 0 : 
                   ((this.bodegasProductosTn[bodega].kilos - this.bodegasProductosTn[bodega].cantidadEsperada) > 0 ? (this.bodegasProductosTn[bodega].kilos - this.bodegasProductosTn[bodega].cantidadEsperada) : 0);
               }

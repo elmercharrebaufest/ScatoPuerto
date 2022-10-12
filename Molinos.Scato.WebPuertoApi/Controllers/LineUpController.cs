@@ -72,7 +72,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //}
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUpLectura)]
+        //[Autorizacion(PermisosScato.LineUpLectura)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/LineUp/ObtenerEstadoPuerto")]
         public HttpResponseMessage ObtenerEstadoPuerto()
         {
@@ -88,7 +89,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/LineUp/Modificar")]
         public HttpResponseMessage Modificar(LineUpDto lineUp)
         {
@@ -124,7 +126,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/LineUp/ModificarOrden")]
         public HttpResponseMessage ModificarOrden(Dictionary<int,int> idsYOrden)
         {           
@@ -140,7 +143,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/LineUp/ExportarEmbarques")]
         public HttpResponseMessage ExportarEmbarques()
         {
@@ -171,7 +175,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/LineUp/EnviarPorMail")]
         public void EnviarPorMail(MailDto mail)
         {
@@ -212,7 +217,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/LineUp/ObtenerDestinatariosLineUp")]
         public HttpResponseMessage ObtenerDestinatariosLineUp()
         {
@@ -222,7 +228,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/LineUp/ModificarEstadosPuerto")]
         public HttpResponseMessage ModificarEstadosPuerto(EstadoPuertoDto estadoPuerto)
         {

@@ -10,4 +10,5 @@ export class ArchivoPuerto{
     fecha: Date;
     size: number;
     extension: string;
+    isSelected: boolean;
 }

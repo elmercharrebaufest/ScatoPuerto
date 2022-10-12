@@ -4,6 +4,9 @@ import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { Subject } from 'rxjs';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-navtabs',
@@ -22,16 +25,20 @@ export class NavtabsComponent implements OnInit, OnChanges {
   _unsubscribe: Subject<any>;
   show: number = 7;
   desplegado: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private _modalService: NgbModal,
     private _moduloCargaService: ModuloDeCargaService,
     private _procesoService: DatosEmbarquesProcesoService,
+    private session: SessionService,
   ) {
     this._unsubscribe = new Subject();
     this.elementos = new Array();
     this.elementosSinPlano = new Array();
     this.elementos = this._procesoService.getEmbarquesList();
+    this.user = this.session.getUser();
   }
 
   ngOnInit(): void {
@@ -157,5 +164,9 @@ export class NavtabsComponent implements OnInit, OnChanges {
   imgSolidoLiquido(elemento) {
     if (elemento)
       return elemento.esLiquido ? "icono-liquido" : "icono-solido";
+  }
+
+  hasPermisoAgregarNuevoBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_AgregarNuevoBuque);
   }
 }
