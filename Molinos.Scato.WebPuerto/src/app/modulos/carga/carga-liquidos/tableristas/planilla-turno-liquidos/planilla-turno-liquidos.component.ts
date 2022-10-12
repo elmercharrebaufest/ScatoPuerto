@@ -118,6 +118,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.obtenerTipoLineaEmbarque();
     this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
       if (data) this.obtenerTipoLineaEmbarque();
+      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
+      console.log('this.fechaHoraInicioCarga--->', this.fechaHoraInicioCarga);
     });
   }
 
@@ -549,7 +551,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let exportadoresForm = this._turnosService.getExportadores();
     this.exportadores = new Array();
     for (let e of exportadoresForm) {
-      if (e.exportador) this.exportadores.push(e.exportador);
+      //if (e.exportador) this.exportadores.push(e.exportador);
+      var i = this.exportadores.findIndex(x => x.id == e.exportador.id);
+      if (i <= -1) {
+        this.exportadores.push(e.exportador);
+      }
     }
 
     this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
@@ -1208,7 +1214,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       lineaTurno.tk.setValue(0);
 
 
-
+    lineaTurno.cantidad.setValue(0);
     if (lineaTurno?.medidaInicialCM.value &&
       lineaTurno?.medidaInicialMM.value &&
       lineaTurno?.medidaFinalCM.value &&

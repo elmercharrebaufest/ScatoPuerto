@@ -26,6 +26,7 @@ import { PlanillaTurnoSolidoExcelService } from '@ScatoServicios/planilla-turno-
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -399,7 +400,39 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
   }
-  onCerrarTurno (turnoSeleccionado: any) {
+
+  private validaTurnosNoCerrados(turnoSel): Subject<boolean>{
+    let moduloDeCargaPlanillaDeTurnos = null;
+    let planillaDeTurnosRecibidores = null;
+    let subjectTurnosNoCerrados = new Subject<boolean>();
+    let bResultado = false;
+    this.idModuloDeCarga = this.idModuloDeCarga != undefined ? this.idModuloDeCarga : this.procesoService.getModuloDeCargaId();
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+        moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+      }
+    }, error=>{}, 
+    ()=>{
+      const fechaMiliseconds = turnoSel.value.turnoPuerto.fechaMiliseconds;
+      const turnoSelId = turnoSel.value.id;
+      planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.id != turnoSelId);
+
+      planillaDeTurnosRecibidores.forEach(item => {
+        item.fechaMiliseconds = new Date(item.fecha).getTime()
+      });
+      
+      planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
+      if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
+        if (planillaDeTurnosRecibidores.length > 0) 
+            bResultado = true;         
+      }
+
+      subjectTurnosNoCerrados.next(bResultado)
+    });
+    return subjectTurnosNoCerrados;
+  }
+
+  guardarTurnoDetallado(turnoSeleccionado: any){
     const idPlanillaDeTurnos = turnoSeleccionado['controls'].id.value; 
     this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
     .then((confirmed) => {
@@ -423,7 +456,21 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     .catch(() => {
       console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
     });
+  }
 
+  onCerrarTurno (turnoSeleccionado: any) {   
+    this.validaTurnosNoCerrados(turnoSeleccionado).subscribe( resp =>{
+      const existeTurno = resp;
+      let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
+      mensaje += " turnos anteriores que aun no se han sido cerrados.";
+      console.log('existeTurno--->>', existeTurno);
+      if (existeTurno){
+        this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+        return;
+      }else{
+        this.guardarTurnoDetallado(turnoSeleccionado);
+      }
+    });
   }
   deleteObsCalidad(obsCalidad: any) {
     this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
@@ -939,6 +986,12 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   async onExportarExcelSolido(esEnviarPlanilla: boolean = false){
+    const planillaTurnosCerrado = this.planillaDeTurnos.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
+    if (planillaTurnosCerrado.length == 0){
+      const mensaje = esEnviarPlanilla ? "No se encontraron turnos cerrados para enviar la planilla." : "No se encontraron turnos cerrados para exportar la planilla.";
+      this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+      return false;
+    }
     this.exportaPlanilla = true;
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.planillaDeTurnos, this.procesoService,  this.lineas, esEnviarPlanilla);
     this.exportaPlanilla = false;

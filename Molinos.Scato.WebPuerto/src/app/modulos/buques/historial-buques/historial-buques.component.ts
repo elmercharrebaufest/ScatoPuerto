@@ -26,6 +26,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   private totalPaginas: number = 0;
   private listaPaginas: any;
   public buscarHistorialBuques: boolean = false;
+  public esNoExisteRegistros = false;
+  public esResumenOperatoria = false;
   // #endregion
 
   // #region Observable
@@ -39,6 +41,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     private route: Router) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
       this.filtroBuquedaForm = data;
+      
+
       if (this.esRegresar) {
         this.filtroBuquedaForm?.controls?.esBusqueda?.setValue(true);
         this.esRegresar = false;
@@ -50,7 +54,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
   // #region Eventos del Componente
   ngOnInit() {
-    this.setListaHistorialBuques();
+    console.log('entrooo ngOnInit --->>', )
+
+    //this.setListaHistorialBuques();
   }
 
   ngOnDestroy() {
@@ -65,22 +71,31 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
   // #region Metodos
   private setCargarHistorialBuque() {
+    console.log('setCargarHistorialBuque this.filtroBuquedaForm--->>', this.filtroBuquedaForm)
+    
+    this.esResumenOperatoria = this.filtroBuquedaForm?.controls?.esResumenOperatoria.value;
     const esBusqueda = this.filtroBuquedaForm?.controls?.esBusqueda.value;
     const esLimpiarBusqueda = this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.value;
     if (esLimpiarBusqueda) {
+      this.esNoExisteRegistros = false;
       this.listaHistorialBuques = null;
       this.listaHistorialBuquesFiltro = null;
-      this.store.dispatch(new LoadingHistorialBuques());
       this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.setValue(false);
       return;
     }
 
-    if (esBusqueda) {
+    if (esBusqueda && !esLimpiarBusqueda) {
       const anio = this.filtroBuquedaForm?.controls.anio?.value;
       const mes = this.filtroBuquedaForm?.controls?.mes.value;
-      if (anio > '' && mes > '') {
-        this.buscarHistorialBuques = true
+      this.listaHistorialBuques = null;
+      this.listaHistorialBuquesFiltro = null;
+
+      if (this.esResumenOperatoria){
         this.setObtenerHistorialBuques();
+      }else{
+        if (anio > '' && mes > '') {
+          this.setObtenerHistorialBuques();
+        }
       }
     } else {
       if (this.listaHistorialBuquesFiltro != null) {
@@ -99,27 +114,46 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       const filVaporId = filtro.controls.vaporId.value;
       const filAnio = filtro.controls.anio.value;
       const filMes = filtro.controls.mes.value;
-
+      this.buscarHistorialBuques = true
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
       let anio: number = filAnio > '' ? parseInt(filAnio, 0) : 0;
       let mes: number = filMes > '' ? parseInt(filMes, 0) : 0;
       if (vaporId > 0) {
         anio = 0;
         mes = 0;
-
         this.store.dispatch(new LoadingHistorialBuques());
         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId));
+        this.setListaHistorialBuques();
       } else {
         if (anio > 0 && mes > 0) {
-          this.store.dispatch(new LoadingHistorialBuques());
-          this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId));
+         this.store.dispatch(new LoadingHistorialBuques());
+         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId)).subscribe(result => {
+          this.setListaHistorialBuques();
+         });
         }
       }
     }
   }
 
   public setListaHistorialBuques() {
+    this.esNoExisteRegistros = false;
+    if (this.filtroBuquedaForm == null || this.filtroBuquedaForm == undefined) {
+      this.buscarHistorialBuques = false;
+      return;
+    }
     this.storeBuques = this.historialBuques$.subscribe(data => {
+      if (data == null || data == undefined){
+       this.buscarHistorialBuques = false;
+       this.esNoExisteRegistros = true;
+        return;
+      }
+      if (data.length == 0){
+        this.buscarHistorialBuques = false;
+        this.esNoExisteRegistros = true;
+        return;
+      }
+
+
       if (data !== null || data !== undefined) {
         if (data.length > 0) {
           data.forEach(item => {
@@ -174,6 +208,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
   // #region Eventos Controles
   onVerHistorial(embarqueId, vaporId, moduloDeCargaId) {
+    this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
     this.filtroBuquedaForm.controls.esDetalle.setValue(true);
     this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(true);

@@ -1,4 +1,5 @@
-<ship-spinner *ngIf='buscarHistorialBuques' [src]='"pdf"'></ship-spinner>
+
+<ship-spinner [message]="'Cargando Historial de buque. Por favor, espere...'" *ngIf='buscarHistorialBuques'></ship-spinner>
 
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
@@ -71,5 +72,10 @@
             </li>
         </ul>
     </nav>
+    <div *ngIf="esNoExisteRegistros && !esResumenOperatoria">
+        No se encontraron registros para los filtros ingresados.
+    </div>
+    
+
 
 </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent, Event } from '@angular/router';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { filter } from 'rxjs/operators';
 
@@ -18,7 +19,8 @@ export class LayoutComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private session: SessionService
+    private session: SessionService,
+    private buqueSharingService: BuqueSharingService,
   ) {
     this.user = this.session.getUser();
     this.rutaActual = this.router.url.replace('/', '');
@@ -72,6 +74,10 @@ export class LayoutComponent implements OnInit {
   }
 
   closeSubmenus(menu: HTMLElement, submenu?: HTMLElement) {
+    // limpiando datos comportidos para buque
+    this.buqueSharingService.setFiltroBusques(null);
+    this.buqueSharingService.setFiltroBusques(null);
+
     for (let child of menu.children) {
       if (child != submenu)
         child.classList.contains('submenu-active') ? child.classList.remove('submenu-active') : '';

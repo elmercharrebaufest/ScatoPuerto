@@ -69,6 +69,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
 
   public setFiltroBuquedaForm() {
     this.filtroBuquedaForm = this.formBuilder.group({
+      esResumenOperatoria : false,
       esBusqueda: false,
       esDetalle: false,
       esLimpiarBusqueda: false,
