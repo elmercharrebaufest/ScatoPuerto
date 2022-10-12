@@ -60,6 +60,8 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
 
     if(this.buqueSanBenito){
       this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
+      console.log('ID EMBARQUE - NavTabs: ',this.buqueSanBenito.embarque.id);
+      this._procesoService.emitSeActualizoEmbarque();
     }
 
     this.elementos = this._procesoService.getEmbarquesList();

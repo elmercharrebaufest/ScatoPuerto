@@ -89,7 +89,25 @@ export class Balanzas78Service {
 
     this.intervalBodegas = setInterval(() => this.actualizarBodegas(idModuloDeCarga), this.tiempoActualizacionBalanzas);
   }
+  setObtenerEmbarqueBalanza(idModuloDeCarga: number = 0) {
+    if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
+    
+    this._balanzaService.listarBalanzasCortes(idModuloDeCarga).subscribe(resp => {
+      
+      this.balanzadasArray = resp.balanzas;
+      this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
+      this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
+  
+      this.setBalanzada7y8(this.balanzadasArray);
+      this.setBalanzada7(this.filtroBalanza7);
+      this.setBalanzada8(this.filtroBalanza8);
+      this.setBalanzada7y8Completas(resp.balanzas);
+      this.setBalanzada7Kilos(resp.balanzas);
+      this.setBalanzada8Kilos(resp.balanzas);
+      this.setInfoAdicional(resp.informacionAdicional);
 
+    } );
+  }
   setEmbarqueBalanzaCalidad(idModuloDeCarga: number = 0) {
     if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
     

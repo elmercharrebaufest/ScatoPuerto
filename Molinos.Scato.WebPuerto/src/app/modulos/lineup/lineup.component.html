@@ -56,18 +56,22 @@
       </table>
     </div>
     <div class="col-lg-1 col-md-2 text-center">
-      <button type="button" class="btn btn-light btn-circle " (click)="cambiarVista()">
-        <i class="fa fa-calendar fa-2x c-celeste" [ngClass]="{'fa-calendar': !mostrarCalendario, 'fa-list-ul': mostrarCalendario}"></i>
-      </button>
+      <ng-container *ngIf="hasPermisoVerCalendario()">
+        <button type="button" class="btn btn-light btn-circle " (click)="cambiarVista()">
+          <i class="fa fa-calendar fa-2x c-celeste" [ngClass]="{'fa-calendar': !mostrarCalendario, 'fa-list-ul': mostrarCalendario}"></i>
+        </button>
+      </ng-container>
       <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA -->
 
-      <button type="button" class="btn btn-light btn-circle" (click)="cambiarGeolocalizacion()">
-        <i class="fa fa-map-marker fa-2x c-celeste"></i>
-      </button>
-
+      <ng-container *ngIf="hasPermisoVerGeo()">
+        <button type="button" class="btn btn-light btn-circle" (click)="cambiarGeolocalizacion()">
+          <i class="fa fa-map-marker fa-2x c-celeste"></i>
+        </button>
+      </ng-container>
 
       <!--<input class="form-control search" type="search" placeholder="&#xF002; Buscar" aria-label="Search">-->
     </div>
+
     <div class="col pr-0">
       <div class="row">
         <div class="col text-sm-center text-md-right">
@@ -78,6 +82,7 @@
       </div>
       <app-estados-puerto-content></app-estados-puerto-content>
     </div>
+    
   </div>
 
   <app-cargando-muelle *ngIf="sanBenitoCargandoMuelle" [instanciaWorkflow]="sanBenitoCargandoMuelle"></app-cargando-muelle>
@@ -85,12 +90,11 @@
   <div fxFlex *ngIf="listadoEmbarques">
     <div *ngIf="!mostrarCalendario">
       <div class="row m-lg-4" *ngFor="let instanciaWorkflow of sanBenito; let i = index;" #puertoSanBenito>
-        <app-lineup-embarque *ngIf="!(sanBenitoCargandoMuelle?.id == instanciaWorkflow.id) && instanciaWorkflow.embarque.ubicacion !=1"
+        <app-lineup-embarque *ngIf="!(sanBenitoCargandoMuelle?.embarque.nombreBuque == instanciaWorkflow.embarque.nombreBuque) && instanciaWorkflow.embarque.ubicacion !=1"
                              [instanciaWorkflow]="instanciaWorkflow"
                              [observador]="observador"
                              [index]="i"
-                             class="w-100 mb-4"
-                             [buquesGeolocalizacion]="buquesGeolocalizacion"></app-lineup-embarque>
+                             class="w-100 mb-4"></app-lineup-embarque>
       </div>
       <div class="row">
         <div class="col align-self-start">
@@ -100,7 +104,7 @@
             <button class="btn btn-success" (click)="altaEmbarque()">Agregar otro embarque</button>
           </ng-container>
         </div>
-        <div class="col m-lg-4 align-self-end text-right">
+        <div class="col m-lg-2 align-self-center text-right">
           <ng-container *ngIf="hasPermisoMail()">
             <button class="btn btn-light mr-3" (click)="enviarPorMail()">ENVIAR POR MAIL</button>
           </ng-container>
@@ -131,8 +135,7 @@
                                [instanciaWorkflow]="instanciaWorkflow"
                                [observador]="observador"
                                [index]="i"
-                               class="w-100 mb-4"
-                               [buquesGeolocalizacion]="buquesGeolocalizacion"></app-lineup-embarque>
+                               class="w-100 mb-4"></app-lineup-embarque>
         </div>
         <div class="row">
           <div class="col align-self-start">
@@ -142,7 +145,7 @@
               <button class="btn btn-success" (click)="altaEmbarque()">Agregar otro embarque</button>
             </ng-container>
           </div>
-          <div class="col m-lg-4 align-self-end text-right">
+          <div class="col m-lg-2 align-self-center text-right">
             <ng-container *ngIf="hasPermisoMail()">
               <button class="btn btn-light mr-3" (click)="enviarPorMail()">ENVIAR POR MAIL</button>
             </ng-container>
@@ -174,8 +177,7 @@
                                [instanciaWorkflow]="instanciaWorkflow"
                                [observador]="observador"
                                [index]="i"
-                               class="w-100 mb-4"
-                               [buquesGeolocalizacion]="buquesGeolocalizacion"></app-lineup-embarque>
+                               class="w-100 mb-4"></app-lineup-embarque>
         </div>
         <div class="row">
           <div class="col align-self-start">
@@ -185,7 +187,7 @@
               <button class="btn btn-success" (click)="altaEmbarque()">Agregar otro embarque</button>
             </ng-container>
           </div>
-          <div class="col m-lg-4 align-self-end text-right">
+          <div class="col m-lg-2 align-self-center text-right">
             <ng-container *ngIf="hasPermisoMail()">
               <button class="btn btn-light mr-3" (click)="enviarPorMail()">ENVIAR POR MAIL</button>
             </ng-container>
@@ -215,8 +217,7 @@
                                [instanciaWorkflow]="instanciaWorkflow"
                                [observador]="observador"
                                [index]="i"
-                               class="w-100 mb-4"
-                               [buquesGeolocalizacion]="buquesGeolocalizacion"></app-lineup-embarque>
+                               class="w-100 mb-4"></app-lineup-embarque>
         </div>
         <div class="row">
           <div class="col align-self-start">
@@ -226,7 +227,7 @@
               <button class="btn btn-success" (click)="altaEmbarque()">Agregar otro embarque</button>
             </ng-container>
           </div>
-          <div class="col m-lg-4 align-self-end text-right">
+          <div class="col m-lg-2 align-self-center text-right">
             <ng-container *ngIf="hasPermisoMail()">
               <button class="btn btn-light mr-3" (click)="enviarPorMail()">ENVIAR POR MAIL</button>
             </ng-container>
@@ -251,3 +252,5 @@
 </div>
 
 <p-toast position='top-center' key='access-lineup'></p-toast>
+
+<!-- </ng-container> -->

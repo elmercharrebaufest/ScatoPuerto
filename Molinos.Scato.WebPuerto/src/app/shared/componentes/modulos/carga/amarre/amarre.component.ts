@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-amarre',
@@ -12,31 +15,41 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 })
 export class AmarreComponent implements OnInit {
   @Input() ModuloDeCargaId: number;
+  @Input() esSoloLectura: boolean = false;
+
   public solidosForm: FormGroup;
   guardando: boolean = false;
 
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
+  
   constructor(
     private _builder: FormBuilder,
     private _confirmationDialogService: ConfirmationDialogService,
-    private _moduloDeCargaService: ModuloDeCargaService
-  ) { }
+    private _moduloDeCargaService: ModuloDeCargaService,
+    private session: SessionService,
+  ) { 
+  this.user = this.session.getUser();
+  }
 
   ngOnInit(): void {
     this.newForm();
+
+    if(!this.hasPermisoTableroSolido_Amarre_Modificar()) this.solidosForm.disable();
   }
 
   newForm(){
     this.solidosForm = this._builder.group({
-      fechaAmarro : "",
-      horaAmarro : "",
-      vientoAmarro : "",
-      direccionAmarro : "",
-      fechaDesamarro : "",
-      horaDesamarro : "",
-      vientoDesamarro : "",
-      direccionDesamarro : "",
-      fechaHabilitacion : "",
-      horaHabilitacion : "",
+      fechaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
+      horaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
     })
     // this.solidosForm = this._builder.group({
     //   amarro: this.initAmarre(),
@@ -72,5 +85,9 @@ export class AmarreComponent implements OnInit {
 
   obtenerAmarre(){
     return this.solidosForm.getRawValue();
+  }
+
+  hasPermisoTableroSolido_Amarre_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Amarre_Modificar);
   }
 }

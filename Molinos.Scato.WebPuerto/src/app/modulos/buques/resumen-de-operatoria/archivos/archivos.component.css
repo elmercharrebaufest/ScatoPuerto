@@ -1,0 +1,11 @@
+
+.buttonsStylesChetos {
+    border-radius: 5px;
+    border-style: solid;
+    border-color: lightgray;
+    border-width: 1px;
+    width: 33px;
+    height: 33px;
+    padding: 3px;
+    margin-left: 5px;
+}

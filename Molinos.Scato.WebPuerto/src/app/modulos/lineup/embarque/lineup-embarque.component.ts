@@ -1,41 +1,32 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Observador } from '@ScatoInterfaces/observador';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LoadScreen } from '@ScatoInterfaces/load-screen';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { MessageService } from 'primeng/api';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
-import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocalizacion.component';
-import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
-import { sign } from 'crypto';
-import { LineUp } from '@ScatoModels/lineUp';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { FormGroup } from '@angular/forms';
-import { textChangeRangeIsUnchanged } from 'typescript';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
   styleUrls: ['./lineup-embarque.component.css']
 })
 export class LineupEmbarqueComponent implements OnInit {
-  @Input() buquesGeolocalizacion;
   @Input() index: number;
-  @Input() instanciaWorkflow: InstanciaWorkflowPuerto;
+  @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
 
@@ -55,8 +46,6 @@ export class LineupEmbarqueComponent implements OnInit {
   ArchivosPuerto: ArchivoPuerto[];
   ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
-
-
   imagePath: any;
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
@@ -66,6 +55,7 @@ export class LineupEmbarqueComponent implements OnInit {
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
+
   constructor(
     private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
@@ -75,7 +65,6 @@ export class LineupEmbarqueComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService,
     private _modalService: NgbModal,
     private embarqueService: EmbarqueService,
   ) {
@@ -92,30 +81,29 @@ export class LineupEmbarqueComponent implements OnInit {
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
     this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
-
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto()
-      .subscribe(res => {
-        this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
-      });
   }
   counter(i: number) {
     return new Array(i);
 }
   cargarBuqueGeolocalizacion(id: any) {
-    this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
-    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
-      this.mensajeBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? "Ver en el mapa" : "No se encontró. Completar IMO";
-      this.hayBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? true : false;
+    this.mensajeBuque = "Completar IMO";
+    if (this.instanciaWorkflow != undefined || this.instanciaWorkflow != null) {
+      if(this.instanciaWorkflow.embarque.embarqueInformacion != null){
+        if(this.instanciaWorkflow.embarque.embarqueInformacion.find(o => o.imo != '') != null){
+          if(this.instanciaWorkflow.embarque.embarquePosicion != null && this.instanciaWorkflow.embarque.embarquePosicion.length >  0){
+            this.mensajeBuque = "Ver en el mapa."
+            this.hayBuque = true;
+          } else{
+            this.mensajeBuque = "No se encontró ubicación."
+          }
+        } else{
+          this.mensajeBuque = "Completar IMO."
+        }
+      }
       this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
       this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
-    } else {
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
     }
-  }
-  setListaBuquesGeolocalizacion(BuquesGeolocalizacion) {
-    this.listaBuquesGeolocalizacion = BuquesGeolocalizacion;
   }
   getListaBuquesGeolocalizacion() {
     return this.listaBuquesGeolocalizacion;
@@ -126,7 +114,7 @@ export class LineupEmbarqueComponent implements OnInit {
     }
   }
   public modificarLineUp(campo: string) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
+    if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       switch (campo) {
         case "CartaDeSubidaEnviada": {
           this.instanciaWorkflow.lineUp.cartaDeSubidaEnviada = !this.instanciaWorkflow.lineUp.cartaDeSubidaEnviada;
@@ -175,7 +163,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public armarPlanoCarga() {
-    if (this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Editar))
+    if(this.hasPermisoPDC_Ver())
       this.router.navigate([`/lineup/plano-de-carga/${this.instanciaWorkflow.embarque.id}`]);
     else
       this.showWarning();
@@ -217,7 +205,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public onSelectAction(accion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacion)) {
+    if (this.hasPermisoLineUp_EditarUbicacionEmbarque()) {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
       if (accion == 2) {
@@ -265,7 +253,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   actualizarOrden(posicion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {  
+    if (this.hasPermisoLineUp_EditarOrdenEmbarque()) {
         var cantidadDeLineUps = this.embarquesPuerto.length;
         //1,2,3,4,5,6,7,8
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
@@ -314,8 +302,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public guardarFechaCarta() {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
-
+    if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       console.log(this.fechaCarta + ' ' + this.horaCarta)
       if (this.fechaCarta && this.horaCarta) {
         this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada = this.fechaCarta + ' ' + this.horaCarta;
@@ -355,16 +342,26 @@ export class LineupEmbarqueComponent implements OnInit {
     this.messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
   }
 
-  hasPermisoRadios() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks);
+  hasPermisoLineUp_EliminarBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EliminarBuque);
   }
-
-  hasPermisoDeleteEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EliminarBuque);
+  hasPermisoLineUp_EditarBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarBuque);
   }
-
-  hasPermisoEditEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
+  hasPermisoLineUp_EditarChecksEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
+  }
+  hasPermisoLineUp_EditarUbicacionEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacionEmbarque);
+  }
+  hasPermisoLineUp_EditarOrdenEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
+  }
+  hasPermisoPDC_Ver() {
+    return this.user.permisos.find(p => p === this.permisosScato.PDC_Ver);
+  }
+  hasPermisoLineUp_Adjuntar() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_Adjuntar);
   }
 
 //------------------------------------------------------------------------------------------------------------

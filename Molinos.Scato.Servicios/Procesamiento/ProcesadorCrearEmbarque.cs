@@ -51,53 +51,48 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     Repositorio.Agregar(recorrido);
                     Log.Info("Se creó exitosamente el recorrido para el workflow {0}", comando.NombreWorkflow);
-                    var embarque = new Embarque
-                    {
-                        Vapor = vapor,
-                        FechaRecalada = comando.Embarque.FechaRecalada,
-                        HoraRecalada = comando.Embarque.HoraRecalada,
-                        Coordinadores = (comando.Embarque.Coordinadores != null)
-                            ? Repositorio.Obtener<CoordinadorPuerto>(comando.Embarque.Coordinadores.Id) : null,
-                        Agencias = (comando.Embarque.Agencias != null)
-                            ? Repositorio.Obtener<AgenciaMaritimaPuerto>(comando.Embarque.Agencias.Id) : null,
-                        ObligacionCarga = comando.Embarque.ObligacionCarga,
-                        Senasa = comando.Embarque.Senasa,
-                        Observaciones = comando.Embarque.Observaciones,
-                        Vicentin = comando.Embarque.Vicentin,
-                        Noryon = comando.Embarque.Noryon,
-                        OtrosMuelles = comando.Embarque.OtrosMuelles,
-                        Recorrido = recorrido,
-                        Centro = centro,
-                        Patente = comando.Embarque.Patente,
-                        TipoBuque = comando.Embarque.TipoDeBuque != null ? comando.Embarque.TipoDeBuque.Nombre : "",
-                        Freeboard = comando.Embarque.Freeboard,
-                        Ubicacion = comando.Embarque.UbicacionDeBuque != null ? comando.Embarque.UbicacionDeBuque.Id : 0,
-                        SanBenito = comando.Embarque.SanBenito,
-                        ATA = (comando.Embarque.ATA != null)
-                            ? Repositorio.Obtener<ATAPuerto>(comando.Embarque.ATA.Id) : null,
-                        EsLiquido = comando.Embarque.EsLiquido,
-                        //HORAS A LA ESPERA DE LIMPIEZA
-                        FechaDesdeLimpieza = comando.Embarque.FechaDesdeLimpieza,
-                        HoraDesdeLimpieza = comando.Embarque.HoraDesdeLimpieza,
-                        FechaHastaLimpieza = comando.Embarque.FechaHastaLimpieza,
-                        HoraHastaLimpieza = comando.Embarque.HoraHastaLimpieza,
-                        MotivosLimpieza = (comando.Embarque.MotivosLimpieza != null)
-                            ? Repositorio.Obtener<MotivosLimpieza>(comando.Embarque.MotivosLimpieza.Id) : null,
-                        ObservacionesLimpieza = comando.Embarque.ObservacionesLimpieza,
-                        //SHIP PARTICULAR
-                        Destino = (comando.Embarque.Destino != null)
-                            ? Repositorio.Obtener<Destino>(comando.Embarque.Destino.Id) : null,
-                        PorteNeto = comando.Embarque.PorteNeto,
-                        PorteBruto = comando.Embarque.PorteBruto,
-                        Eslora = comando.Embarque.Eslora,
-                        Manga = comando.Embarque.Manga,
-                        Puntal = comando.Embarque.Puntal,
-                        FechaLibrePlatica = comando.Embarque.FechaLibrePlatica,
-                        HoraLibrePlatica = comando.Embarque.HoraLibrePlatica,
-                        //Imo = comando.Embarque.Imo,
-                        CantidadBodegasTanques = comando.Embarque.CantidadBodegasTanques,
-                        //embarque bandera
-                    };
+                    var embarque = new Embarque();
+
+                    embarque.Vapor = vapor;
+                    embarque.FechaRecalada = comando.Embarque.FechaRecalada;
+                    embarque.HoraRecalada = comando.Embarque.HoraRecalada;
+                    embarque.Coordinadores = (comando.Embarque.Coordinadores != null) ? Repositorio.Obtener<CoordinadorPuerto>(comando.Embarque.Coordinadores.Id) : null;
+                    embarque.Agencias = (comando.Embarque.Agencias != null) ? Repositorio.Obtener<AgenciaMaritimaPuerto>(comando.Embarque.Agencias.Id) : null;
+                    embarque.ObligacionCarga = comando.Embarque.ObligacionCarga;
+                    embarque.Senasa = comando.Embarque.Senasa;
+                    embarque.Observaciones = comando.Embarque.Observaciones;
+                    embarque.Vicentin = comando.Embarque.Vicentin;
+                    embarque.Noryon = comando.Embarque.Noryon;
+                    embarque.OtrosMuelles = comando.Embarque.OtrosMuelles;
+                    embarque.Recorrido = recorrido;
+                    embarque.Centro = centro;
+                    embarque.Patente = comando.Embarque.Patente;
+                    embarque.TipoBuque = comando.Embarque.TipoDeBuque != null ? comando.Embarque.TipoDeBuque.Nombre : "";
+                    embarque.Freeboard = comando.Embarque.Freeboard;
+                    embarque.Ubicacion = comando.Embarque.UbicacionDeBuque != null ? comando.Embarque.UbicacionDeBuque.Id : 0;
+                    embarque.SanBenito = comando.Embarque.SanBenito;
+                    embarque.ATA = (comando.Embarque.ATA != null) ? Repositorio.Obtener<ATAPuerto>(comando.Embarque.ATA.Id) : null;
+                    embarque.EsLiquido = comando.Embarque.EsLiquido;
+                    //HORAS A LA ESPERA DE LIMPIEZA
+                    embarque.FechaDesdeLimpieza = comando.Embarque.FechaDesdeLimpieza;
+                    embarque.HoraDesdeLimpieza = comando.Embarque.HoraDesdeLimpieza;
+                    embarque.FechaHastaLimpieza = comando.Embarque.FechaHastaLimpieza;
+                    embarque.HoraHastaLimpieza = comando.Embarque.HoraHastaLimpieza;
+                    embarque.MotivosLimpieza = (comando.Embarque.MotivosLimpieza != null) ? Repositorio.Obtener<MotivosLimpieza>(comando.Embarque.MotivosLimpieza.Id) : null;
+                    embarque.ObservacionesLimpieza = comando.Embarque.ObservacionesLimpieza;
+                    //SHIP PARTICULAR
+                    embarque.Destino = (comando.Embarque.Destino != null) ? Repositorio.Obtener<Destino>(comando.Embarque.Destino.Id) : null;
+                    embarque.PorteNeto = comando.Embarque.PorteNeto;
+                    embarque.PorteBruto = comando.Embarque.PorteBruto;
+                    embarque.Eslora = comando.Embarque.Eslora;
+                    embarque.Manga = comando.Embarque.Manga;
+                    embarque.Puntal = comando.Embarque.Puntal;
+                    embarque.FechaLibrePlatica = comando.Embarque.FechaLibrePlatica;
+                    embarque.HoraLibrePlatica = comando.Embarque.HoraLibrePlatica;
+                    //Imo = comando.Embarque.Imo;
+                    embarque.CantidadBodegasTanques = comando.Embarque.CantidadBodegasTanques;
+                    //embarque bandera
+
                     foreach (var mat in comando.Embarque.MaterialesPuertoCantidad.Where(y => y.Cantidad > 0))
                     {
                         Repositorio.Agregar(new MaterialPuertoCantidad

@@ -27,6 +27,7 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { CargaComercial } from '@ScatoModels/carga-comercial';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-plano-content',
@@ -57,19 +58,16 @@ export class PlanoContentComponent implements OnInit {
   tituloABM: string;
   listadoExportadoresModificado: boolean = false;
   cargaComercialIncompleto: boolean = false;
-
   esLiquido: boolean = false;
-
   filePlano: string | ArrayBuffer;
   fileNamePlano: string = 'Ningun archivo elegido';
   fileSecuencia: string | ArrayBuffer;
   fileNameSecuencia: string = 'Ningun archivo elegido';
   mostrarFumigadora: boolean = false;
   datosGrafico: any;
-
   state: string;
-
-  private user: Usuario
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private lineupService: LineupService,
@@ -111,6 +109,10 @@ export class PlanoContentComponent implements OnInit {
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
     }
     this.inicializarFormulario();
+
+    setTimeout(() => {
+      this.controlarPermisos();
+    }, 3000);
   }
 
   inicializarFormulario() {
@@ -983,6 +985,84 @@ export class PlanoContentComponent implements OnInit {
 
   sendDataParcel(bodegas) {
     let bodegasFull = bodegas.filter(b => b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo);
+    console.log('bodegasFull-->>')
+    console.log(bodegasFull);
     this._turnoService.sendBodega.emit(bodegasFull);
   }
+
+  hasPermisoAdjuntar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Adjuntar);
+  }
+  hasPermisoPlanoDeCarga_AMB() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_AMB);
+  }
+  hasPermisoPlanoDeCarga_Bodegas_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Bodegas_Modificar);
+  }
+  hasPermisoPlanoDeCarga_CargasComerciales_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_CargasComerciales_Modificar);
+  }
+  hasPermisoPlanoDeCarga_DefensasMoviles_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_DefensasMoviles_Modificar);
+  }
+  hasPermisoPlanoDeCarga_Fumigacion_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Fumigacion_Modificar);
+  }
+  hasPermisoPlanoDeCarga_Estiba_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Estiba_Modificar);
+  }
+  hasPermisoPlanoDeCarga_AgenciaControlPrivado_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_AgenciaControlPrivado_Modificar);
+  }
+  hasPermisoPlanoDeCarga_AgentesControlPrivado_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_AgentesControlPrivado_Modificar);
+  }
+  hasPermisoPlanoDeCarga_Observaciones_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Observaciones_Modificar);
+  }
+  hasPermisoPlanoDeCarga_CaladoSalida_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_CaladoSalida_Modificar);
+  }
+
+  controlarPermisos(){
+    if(!this.hasPermisoPlanoDeCarga_Bodegas_Modificar()){
+      if(this.esLiquido){
+        this.planoDeCargaBodegasFormArray.disable();
+      }else{
+        this.planoDeCargaForm.get('planoDeCargaBodegas').disable();
+      }
+    }
+
+    if(!this.hasPermisoPlanoDeCarga_CargasComerciales_Modificar())
+        this.planoDeCargaForm.get('cargasComerciales').disable();
+
+    if(!this.hasPermisoPlanoDeCarga_DefensasMoviles_Modificar())
+        this.planoDeCargaForm.get('defensasMoviles').disable();
+
+    if(!this.hasPermisoPlanoDeCarga_Fumigacion_Modificar()){
+        this.planoDeCargaForm.get('fumigacion').disable();
+        this.planoDeCargaForm.get('empresaFumigadora').disable();
+    }
+    // TODO: INI - no están impactando
+    if(!this.hasPermisoPlanoDeCarga_Estiba_Modificar()){
+        this.planoDeCargaForm.get('estiba').disable();
+        this.planoDeCargaForm.get('estibasList').disable();
+    }
+    if(!this.hasPermisoPlanoDeCarga_AgenciaControlPrivado_Modificar()){
+        this.planoDeCargaForm.get('agenciaControlPrivado').disable();
+        this.planoDeCargaForm.get('agenciasControlPrivadoList').disable();
+    }
+    if(!this.hasPermisoPlanoDeCarga_AgentesControlPrivado_Modificar()){
+        this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').disable();
+        this.planoDeCargaForm.get('agentesControlPrivadoList').disable();
+    }
+    // FIN - no están impactando
+    if(!this.hasPermisoPlanoDeCarga_Observaciones_Modificar()){
+        this.planoDeCargaForm.get('observaciones').disable();
+    }
+    if(!this.hasPermisoPlanoDeCarga_CaladoSalida_Modificar()){
+        this.planoDeCargaForm.get('caladoSalida').disable();
+    }
+  }
+
 }

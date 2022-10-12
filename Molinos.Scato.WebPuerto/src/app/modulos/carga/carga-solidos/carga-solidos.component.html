@@ -2,16 +2,22 @@
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='cargaPdf' [src]='"pdf"'></ship-spinner>
     </div>
-    <app-grafico-carga id='graficoCargaCanva'
-        class='bg-white'></app-grafico-carga>
+    <app-grafico-carga id='graficoCargaCanva' class='bg-white'></app-grafico-carga>
     <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"></app-manos>
 
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
-        <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
-        <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-        <!-- <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button> -->
-        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
-        <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
+    	<ng-container *ngIf="hasPermisoPlanoDeCarga_Cancelar()">
+        	<button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+        </ng-container>
+        <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
+        	<button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+        </ng-container>
+        <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
+	        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+        </ng-container>
+        <ng-container *ngIf="hasPermisoEnviarATablerista()">
+        	<button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
+		</ng-container>
     </div>
 
     <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
@@ -29,30 +35,43 @@
 
         <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
-        <app-balanzas-ritmos *ngIf="inicioCarga"></app-balanzas-ritmos>
+        <ng-container *ngIf="hasPermisoTableroSolido_VerRitmosEmbarqueBlzas78()">
+            <app-balanzas-ritmos *ngIf="inicioCarga"></app-balanzas-ritmos>
+        </ng-container>
 
         
-
-        <app-bodegas *ngIf="inicioCarga"></app-bodegas>
+        <ng-container *ngIf="hasPermisoTableroSolido_VerCargasBodegas()">
+            <app-bodegas *ngIf="inicioCarga"></app-bodegas>
+        </ng-container>
 
         <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
         <div class="row mt-3" *ngIf="inicioCarga">
             <div class="col espacio-izq">
-                <app-graficos-ritmos></app-graficos-ritmos>
+                <ng-container *ngIf="hasPermisoTableroSolido_VerRitmos()">
+                    <app-graficos-ritmos></app-graficos-ritmos>
+                </ng-container>
             </div>
             <div class="col">
-                
-                <app-info-adicional></app-info-adicional>
+                <ng-container *ngIf="hasPermisoTableroSolido_VerInformacionAdicional()">
+                    <app-info-adicional></app-info-adicional>
+                </ng-container>
             </div>
         </div>
 
         <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
-            <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
-            <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-            <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
-            <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
-            <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+        	<ng-container *ngIf="hasPermisoPlanoDeCarga_Cancelar()">
+            	<button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+            </ng-container>
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
+            	<button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+            </ng-container>
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
+	            <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+            </ng-container>
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
+            	<button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+			</ng-container>
         </div>
     </div>
 </div>

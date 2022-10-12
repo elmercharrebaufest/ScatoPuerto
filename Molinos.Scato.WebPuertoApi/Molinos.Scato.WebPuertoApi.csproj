@@ -215,6 +215,7 @@
     <Compile Include="Atributos\AutorizacionAttribute.cs" />
     <Compile Include="Controllers\AutenticadorController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\BuqueController.cs" />
     <Compile Include="Controllers\GeolocalizacionController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />
     <Compile Include="Controllers\PlanoDeCargaController.cs" />

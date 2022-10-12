@@ -4,6 +4,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-periodo-carga',
@@ -11,43 +15,52 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
   styleUrls: ['./periodo-carga.component.css']
 })
 export class PeriodoCargaComponent implements OnInit {
-
+  guardando: boolean;
   periodoCargaForm: FormGroup;
-  guardando: boolean = false;
+  @Input() esSoloLectura: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   
   constructor(
     private formBuilder: FormBuilder,
     private _moduloDeCargaService: ModuloDeCargaService,
-    private _confirmationDialogService: ConfirmationDialogService
-  ) { }
+    private _confirmationDialogService: ConfirmationDialogService,
+    private session: SessionService,
+    private _procesoService: DatosEmbarquesProcesoService,
+  ) { 
+  this.user = this.session.getUser();
+  }
 
 @Input() ModuloDeCarga_Id: number;
 
   ngOnInit(): void {
     this.initFormulario();
+
+    if(!this.hasPermisoLiquido_EditarPeriodoDeCarga()) this.periodoCargaForm.disable();
   }
+
   initFormulario(){
     
     this.periodoCargaForm = this.formBuilder.group({
-      id: "",
-      fechaAmarro : "",
-      horaAmarro : "",
-      vientoAmarro : "",
-      direccionAmarro : "",
-      fechaDesamarro : "",
-      horaDesamarro : "",
-      vientoDesamarro : "",
-      direccionDesamarro : "",
-      fechaHabilitacion : "",
-      horaHabilitacion : "",
-      fechaConexionMangueras : "",
-      fechaDesconexionMangueras : "",
-      fechaComienzoCarga : "",
-      fechaFinalizacionCarga : "",
-      horaConexionMangueras : "",
-      horaDesconexionMangueras : "",
-      horaComienzoCarga : "",
-      horaFinalizacionCarga : ""
+      id: [{ value: '', disabled: this.esSoloLectura }],
+      fechaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionAmarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      horaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      vientoDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      direccionDesamarro : [{ value: '', disabled: this.esSoloLectura }],
+      fechaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
+      horaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
+      fechaConexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesconexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      fechaComienzoCarga : [{ value: '', disabled: this.esSoloLectura }],
+      fechaFinalizacionCarga : [{ value: '', disabled: this.esSoloLectura }],
+      horaConexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      horaDesconexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
+      horaComienzoCarga : [{ value: '', disabled: this.esSoloLectura }],
+      horaFinalizacionCarga :[{ value: '', disabled: this.esSoloLectura }],
     });
   }
   // this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
@@ -72,12 +85,21 @@ export class PeriodoCargaComponent implements OnInit {
   guardar(){
     this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el período de carga?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then( (confirmed) => {
-        if(confirmed){
+        if (confirmed) {
           this.guardando = true;
-          if (this.ModuloDeCarga_Id > 0)
-          this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerDatosPeriodoCarga(), this.ModuloDeCarga_Id ).subscribe((res: any) => {
-            this.guardando = false;
-          });
+          if (this.ModuloDeCarga_Id > 0) {
+            const datosPeriodoCarga = this.obtenerDatosPeriodoCarga();
+            this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerDatosPeriodoCarga(), this.ModuloDeCarga_Id).subscribe((res: any) => {
+              this.guardando = false;
+              const splitFecha = datosPeriodoCarga.fechaComienzoCarga.split('-');
+              const anio = parseInt(splitFecha[0]);
+              const mes = parseInt(splitFecha[1]) - 1;
+              const dia = parseInt(splitFecha[2]);
+              const fechaComienzoCarga = new Date(anio, mes, dia);
+              this._procesoService.setFechaComienzoCarga(fechaComienzoCarga);
+              this._moduloDeCargaService.actualizarPlanillaLiquido = true;
+            });
+          }
         }
       });
     
@@ -102,5 +124,9 @@ export class PeriodoCargaComponent implements OnInit {
 
   clForm(){
     console.log(this.periodoCargaForm.getRawValue());
+  }
+
+  hasPermisoLiquido_EditarPeriodoDeCarga() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_EditarPeriodoDeCarga);
   }
 }

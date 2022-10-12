@@ -1,0 +1,52 @@
+<div >
+    <label class="titulo-historial-buque-letra">Historial de embarques</label>
+</div>
+<form id="filtroBuquedaForm" [formGroup]="getFiltroBuquedaForm()">
+    <div class="form-row">
+        <div class="form-group col-md-1">
+            <select class="form-control" formControlName="anio" (change)="onChangeBusqueda($event)">
+                <option *ngFor="let anio of getListaAnios()" [ngValue]="anio.numeroAnio">{{anio.nombreAnio}}</option>
+            </select>
+        </div>
+        <div class="form-group col-md-1">
+            <select class="custom-select" formControlName="mes" (change)="onChangeBusqueda($event)">
+                <option *ngFor="let meses of getListaMeses()" [ngValue]="meses.numeroMes">{{meses.nombreMes}}</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+
+            <ng-multiselect-dropdown *ngIf="getListaProductos()"
+                                     formControlName="producto" 
+                                     [placeholder]="'Seleccione'"
+                                     [settings]="getConfigListaMultiple()"
+                                     [data]="getListaProductos()"
+                                     (onDeSelect)="onChangeValues($event)"
+                                     (onDropDownClose)="onChangeValues($event)"
+                                     (onSelect)="onChangeValues($event)"
+                                     (onSelectAll)="onChangeValues($event)"
+                                    >
+            </ng-multiselect-dropdown>
+
+        </div>
+        <div class="form-group col-md-2">
+            <input type="text" class="form-control" placeholder="Buque" formControlName="buque"
+                (keyup)="onChangeValues($event)">
+        </div>
+        <div class="form-group col-md-1">
+            <input type="text" class="form-control" placeholder="Destino" formControlName="destino"
+                (keyup)="onChangeValues($event)">
+        </div>
+        <div class="form-group col-md-1">
+            <input type="text" class="form-control" placeholder="Control privado" formControlName="control"
+                (keyup)="onChangeValues($event)">
+        </div>
+        <div class="form-group col-md-1">
+            <input type="text" class="form-control" placeholder="A.T.A" formControlName="ata"
+                (keyup)="onChangeValues($event)">
+        </div>
+        <div class="form-group col-md-2">
+            <button class="btn btn-success" (click)="onLimpiarFiltros()">Limpiar Filtros</button>
+        </div>
+    </div>
+
+</form>

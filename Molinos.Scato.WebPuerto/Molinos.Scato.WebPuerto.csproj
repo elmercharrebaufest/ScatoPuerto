@@ -269,6 +269,24 @@
     <!-- Calidad Liquidos HTML/CSS -->
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.html" />
     <Content Include="src\app\modulos\calidad\liquidos\liquidos.component.css" />
+    <!-- BUQUES HTML/CSS -->
+    <Content Include="src\app\modulos\buques\buques.component.html" />
+    <Content Include="src\app\modulos\buques\buques.component.css" />
+    <Content Include="src\app\modulos\buques\editar-crear-buques\editar-crear-buques.component.css" />
+    <Content Include="src\app\modulos\buques\editar-crear-buques\editar-crear-buques.component.html" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\resumen-de-operatoria.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\resumen-de-operatoria.component.html" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\navtabs-buque\navtabs-buque.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\navtabs-buque\navtabs-buque.component.html" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\lineup\lineup.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\lineup\lineup.component.html" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\clima\clima.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\clima\clima.component.html" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\fechas-ritmos\fechas-ritmos.component.html" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\fechas-ritmos\fechas-ritmos.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\op-tablero\op-tablero.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\resumen-actores\resumen-actores.component.css" />
+    <Content Include="src\app\modulos\buques\resumen-de-operatoria\resumen-actores\resumen-actores.component.html" />
     <!-- Assets -->
     <Content Include="src\assets\burgerMenu.svg" />
     <Content Include="src\assets\ojoIcon.svg" />
@@ -296,6 +314,7 @@
     <Content Include="src\assets\radioButtonGrey.svg" />
     <Content Include="src\assets\reloj.svg" />
     <Content Include="src\assets\ship.svg" />
+    <Content Include="src\assets\shipAzul.svg" />
     <Content Include="src\assets\trashIcon.svg" />
     <Content Include="src\assets\user.svg" />
     <Content Include="src\assets\liquido-drop-of-liquid.svg" />
@@ -334,6 +353,9 @@
     <Content Include="src\styles.css" />
     <Content Include="src\Readme-Puerto.md" />
     <Content Include="src\assets\boton_imprimir.svg" />
+    <Content Include="src\assets\relojNegroIcon.svg" />
+    <Content Include="src\assets\iconFechaNegro.svg" />
+    <Content Include="src\assets\calendarAzul.svg" />
     <!-- App TS -->
     <TypeScriptCompile Include="e2e\src\app.e2e-spec.ts" />
     <TypeScriptCompile Include="e2e\src\app.po.ts" />
@@ -389,6 +411,8 @@
     <TypeScriptCompile Include="src\app\shared\servicios\recibo.shared.service.ts" />
     
     <TypeScriptCompile Include="src\app\shared\servicios\parametros.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\embarque.shared.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\interceptors\interceptor-ad.service.ts" />    
     <!-- models TS -->
     <TypeScriptCompile Include="src\app\shared\modelos\modulo-carga-listado.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\agencia-control-privado.ts" />
@@ -428,7 +452,6 @@
     <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\corte-turno.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\motivo-de-corte.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\planilla-de-turnos.ts" />
-    <TypeScriptCompile Include="src\app\shared\modelos\planilla-turnos\turno.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\obs-calidad.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\balanza.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\periodo-carga.ts" />
@@ -439,6 +462,7 @@
     <TypeScriptCompile Include="src\app\shared\modelos\balanzadas\ritmos-balanzas78.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\ad.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\parametros.ts" />
+    <TypeScriptCompile Include="src\app\shared\modelos\Buques\Actores.ts" />
     <!-- enums TS -->
     <TypeScriptCompile Include="src\app\shared\enums\permisos-scato.ts" />
     <TypeScriptCompile Include="src\app\shared\enums\tipo-alerta.ts" />
@@ -507,6 +531,22 @@
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\umap\umap.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\bodegas\bodegas.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\carga\carga-solidos\tableristas\inicio-carga\inicio-carga.component.ts" />
+    <!-- MODULO DE BUQUE -->
+    <TypeScriptCompile Include="src\app\modulos\buques\buques.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\buques.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\buques-routing.module.ts" />
+    <!-- CREAR EDITAR BUQUE -->
+    <TypeScriptCompile Include="src\app\modulos\buques\editar-crear-buques\editar-crear-buques.component.ts" />
+    <!-- RESUMEN DE OPERATORIA MODULO DE BUQE -->
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\resumen-de-operatoria-routing.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\resumen-de-operatoria.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\resumen-de-operatoria.module.ts" />
+    <!-- OPERATORIA (menu y componentes) -->
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\navtabs-buque\navtabs-buque.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\lineup\lineup.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\clima\clima.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\op-tablero\op-tablero.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\buques\resumen-de-operatoria\resumen-actores\resumen-actores.component.ts" />
     <!-- Calidad TS -->
     <TypeScriptCompile Include="src\app\modulos\calidad\liquidos\liquidos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\calidad\solidos\solidos.component.ts" />

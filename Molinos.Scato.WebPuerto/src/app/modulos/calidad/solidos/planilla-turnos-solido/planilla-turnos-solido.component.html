@@ -5,8 +5,8 @@
         <div class="divHeaderRightLeft">
             <h4 class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos sólidos Recibidores</h4>
         </div>
-        <div id="collapsePlanillaTurnosSolido" class="collapse show">
-            <div style="margin-left: 1rem;">
+        <div id="collapsePlanillaTurnosSolido" class="collapse show" >
+            <div style="margin-left: 1rem;" *ngIf="!esSoloLectura">
                 <h5 data-html2canvas-ignore="true" *ngIf="!tablerista">Observaciones De Calidad</h5>
                 <button *ngIf="!tablerista" class='btn btn-primary' (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
             </div>
@@ -14,7 +14,7 @@
         <br>
         
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
-            <div class='mt-4 px-4 pb-4' style="height: 800px;">
+            <div id="scrollbar-planilla-recibidores-solido" class='mt-4 px-4 pb-4' style="height: 800px;">
                 <!-- ACA VA LA SCROLLBAR -->
                 <perfect-scrollbar  [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
                 <table class='table table-bordered turnos'>
@@ -51,12 +51,12 @@
                                                     <span class='toneladas'>{{ getCantTurno(turno) }} <span class='turno'>Tn</span></span>
                                                     <span class='turno'>por turno</span>
                                                     <button class='btn btn btn-success' 
-                                                            *ngIf="!turno.value.guardadoPorRecibidor"
+                                                            *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
                                                             style="margin-top: 5px; margin-bottom: 5px" 
                                                             (click)='onCerrarTurno(turno)'> 
                                                             Cerrar turno
                                                     </button>
-                                                    <img  *ngIf="turno.value.guardadoPorRecibidor"                                                    
+                                                    <img  *ngIf="turno.value.guardadoPorRecibidor" 
                                                             src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
@@ -136,8 +136,6 @@
                                         <tr *ngIf='getCorteTurnos(d, t).controls.length == 0'>
                                             <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                         </tr>
-
-
                                         <tr *ngIf='getObservacionTurnos(d, t).length > 0'>
                                             <td colspan="6" class='p-0 bg-grisClaro'>
                                                 <div *ngIf='getObservacionTurnos(d, t).length > 0' class="div-active">
@@ -209,9 +207,9 @@
             </div>
         </div>        
     
-        <p-toast position='top-center' key='enviar-turno'></p-toast>
+        <p-toast data-html2canvas-ignore="true" position='top-center' key='enviar-turno'></p-toast>
     
-        <div class="mt-4 text-center">
+        <div data-html2canvas-ignore="true" class="mt-4 text-center" *ngIf="!esSoloLectura">
             <button id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
             <button id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
         </div>

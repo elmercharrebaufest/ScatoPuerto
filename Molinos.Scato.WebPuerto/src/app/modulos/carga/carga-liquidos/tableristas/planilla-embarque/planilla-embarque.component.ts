@@ -7,6 +7,11 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Alert } from 'selenium-webdriver';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
+
+
 @Component({
   selector: 'app-planilla-embarque',
   templateUrl: './planilla-embarque.component.html',
@@ -24,13 +29,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   idModuloDeCarga: number;
   planillaDeEmbarque: PlanillaDeEmbarque[];
   guardando: boolean;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
+
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
-    private procesoService: DatosEmbarquesProcesoService
+    private procesoService: DatosEmbarquesProcesoService,
+    private session: SessionService,
   ) {
+    this.user = this.session.getUser();
     this.turnosService.sendExportadores.subscribe(res => this.exportadores = res);
     this.turnosService.sendBodega.subscribe(res => {
       this.bodegas = res;
@@ -48,9 +58,13 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
   }
+
   ngOnInit(): void {
     this.newForm();
+
+    if(!this.hasPermisoLiquido_PlanillaEmbarque_Editar()) this.lineasEmbarque.disable();
   }
+
   expandir()
   {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
@@ -234,5 +248,9 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
           this.guardando = false;
           this.cargarPlanilla();  
         });
+  }
+
+  hasPermisoLiquido_PlanillaEmbarque_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_PlanillaEmbarque_Editar);
   }
 }

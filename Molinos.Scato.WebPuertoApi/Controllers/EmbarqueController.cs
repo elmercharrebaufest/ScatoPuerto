@@ -33,7 +33,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_AltaEmbarque)]
         [Route("api/Embarque/AltaEmbarque")]
         public HttpResponseMessage AltaEmbarque(EmbarqueDto embarque)
         {
@@ -45,6 +46,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
              
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
                 var servicioWf = factory.CrearServicio(workflowDefinicionId);
+
+
+
 
                 IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, true, false, false, false);
                 datosEmbarque = IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, true, false, false);
@@ -100,7 +104,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarMateriales")]
         public HttpResponseMessage ListarMateriales()
         {
@@ -110,7 +115,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarAgenciasMaritimas")]
         public HttpResponseMessage ListarAgenciasMaritimas()
         {
@@ -120,7 +126,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarCoordinadores")]
         public HttpResponseMessage ListarCoordinadores()
         {
@@ -130,7 +137,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ObtenerEmbarque")]
         public HttpResponseMessage ObtenerEmbarque(int id)
         {
@@ -142,7 +150,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_EditarBuque)]
         [Route("api/Embarque/ModificarEmbarque")]
         public HttpResponseMessage ModificarEmbarque(EmbarqueDto embarque)
         {
@@ -238,7 +247,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarATAPuerto")]
         public HttpResponseMessage ListarATAPuerto()
         {
@@ -248,7 +258,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarTipoDeBuquePuerto")]
         public HttpResponseMessage ListarTipoDeBuquePuerto()
         {
@@ -258,7 +269,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.PreLineUp)]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarUbicacionDeBuquePuerto")]
         public HttpResponseMessage ListarUbicacionDeBuquePuerto()
         {
@@ -277,7 +289,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/AgregarAgenciaMaritimaPuerto")]
         public HttpResponseMessage AgregarAgenciaMaritimaPuerto(AgenciaMaritimaPuertoDto agencia)
         {
@@ -285,7 +298,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ModificarAgenciaMaritimaPuerto")]
         public HttpResponseMessage ModificarAgenciaMaritimaPuerto(AgenciaMaritimaPuertoDto agencia)
         {
@@ -293,7 +307,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/EliminarAgenciaMaritimaPuerto")]
         public HttpResponseMessage EliminarAgenciaMaritimaPuerto(int agenciaId)
         {
@@ -303,7 +318,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/AgregarCoordinadorPuerto")]
         public HttpResponseMessage AgregarCoordinadorPuerto(CoordinadorPuertoDto coordinador)
         {
@@ -311,7 +327,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ModificarCoordinadorPuerto")]
         public HttpResponseMessage ModificarCoordinadorPuerto(CoordinadorPuertoDto coordinador)
         {
@@ -319,7 +336,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/EliminarCoordinadorPuerto")]
         public HttpResponseMessage EliminarCoordinadorPuerto(int coordinadorId)
         {
@@ -329,7 +347,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/AgregarATAPuerto")]
         public HttpResponseMessage AgregarATAPuerto(ATAPuertoDto ata)
         {
@@ -337,7 +356,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ModificarATAPuerto")]
         public HttpResponseMessage ModificarATAPuerto(ATAPuertoDto ata)
         {
@@ -345,7 +365,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/EliminarATAPuerto")]
         public HttpResponseMessage EliminarATAPuerto(int ataId)
         {
@@ -398,6 +419,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+
+        [HttpPost]
+        [Route("api/Embarque/GuardarTipoArchivo")]
+        public HttpResponseMessage GuardarArchivos(TipoArchivoPuertoDto archivosPuerto)
+        {
+            try
+            {
+                
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.GuardarTipoArchivo(archivosPuerto));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Embarque/EliminarArchivos")]
+        public HttpResponseMessage EliminarArchivos(List<ArchivosPuertoDto> archivosPuerto)
+        {
+            try
+            {
+                ;
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.EliminarArchivos(archivosPuerto));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpGet]
         [Route("api/Embarque/ObtenerArchivos")]
         public HttpResponseMessage obtenerArchivos(int idEmbarque)
@@ -425,6 +478,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
             }
         }
+
+     
+        [HttpGet]
+        [Route("api/Embarque/ObtenerIdsUsuales")]
+        public HttpResponseMessage ObtenerIdsUsuales(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerIdsUsuales(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Embarque/ObtenerEmbarqueInformacion")]
+        public HttpResponseMessage obtenerEmbarqueInformacion(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerEmbarqueInformacion(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
 
         /*
         [HttpGet]
