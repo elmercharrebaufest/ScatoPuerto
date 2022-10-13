@@ -2310,15 +2310,17 @@ namespace Molinos.Scato.Servicios.Impl
 #else
 
 
-                log.Info("----- Inicio ListarPermisosPorUsuarioAD: " + nombreUsuario + " -----");
+             
                 Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
                 //var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
                 //var name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName;
-                var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
-                var usuario = userPrincipal1.SamAccountName;
-                List<string> gruposPermisos = new List<string>();
+                //var userPrincipal1 = System.DirectoryServices.AccountManagement.UserPrincipal.Current;
+                //var usuario = userPrincipal1.SamAccountName;
 
+                var usuario = nombreUsuario;
+                List<string> gruposPermisos = new List<string>();
+                   log.Info("----- Inicio ListarPermisosPorUsuarioAD: " + usuario + " -----");
                 System.Collections.ArrayList groups01 = new System.Collections.ArrayList();
                 System.Collections.ArrayList arrPermisosUsuario = new System.Collections.ArrayList();
 
