@@ -31,8 +31,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/Workflow/Listar")]
         public HttpResponseMessage Listar() 
         {
-            var embarques = workflows.ListarEmbarques();
-            //var embarques = servicio.ListarEmbarques();
+            //var embarques = workflows.ListarEmbarques();
+
+            var embarques = servicio.ListarEmbarques();
             return Request.CreateResponse(HttpStatusCode.OK, embarques);
         }
 
