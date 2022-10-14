@@ -10866,20 +10866,28 @@ namespace Molinos.Scato.Servicios.Impl
         }
         public IList<InstanciaWorkflowPuertoDto> ListarEmbarques()
         {
-
-            var embarques = Listar<Embarque, EmbarqueDto>();
-            List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
-
-            foreach (var embarque in embarques)
+            try
             {
-                var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
-                InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                var embarques = Listar<Embarque, EmbarqueDto>();
+                List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
+
+                foreach (var embarque in embarques)
                 {
-                    Embarque = embarque,
-                    LineUp = lineupDto
-                });
+                    var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
+                    InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                    {
+                        Embarque = embarque,
+                        LineUp = lineupDto
+                    });
+                }
+                return InstanciaWorkflowPuertoDtos;
             }
-            return InstanciaWorkflowPuertoDtos;
+            catch (Exception ex)
+            {
+                log.Error(ex.InnerException.ToString());
+                throw ex;
+            }
+           
         }
 
         public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
