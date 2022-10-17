@@ -2,6 +2,7 @@
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Impl;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
     {
         public List<registrosPuerto> listaBalanza7 = new List<registrosPuerto>();
         public List<registrosPuerto> listaBalanza8 = new List<registrosPuerto>();
-        public ProcesadorSincronizarBalanzasCortes(IRepositorio repositorio, IConversor conversor, ILogger log)
-            : base(repositorio, conversor, log)
+        public ProcesadorSincronizarBalanzasCortes(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
+            : base(repositorio, conversor, log, servicioRepositorio)
         {
         }
 
@@ -98,223 +99,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             
             
-        }
-        public void ProcesarCargasPlanillaSolidosOriginal(int vapor_id, int IdModuloDeCarga, DateTime? fechaInicio)
-        {
-            try
-            {
-                int horaInicio = 0;
-                int horaFin = 0;
-
-                # region Obtengo las planillas para el modulodecarga
-                var moduloCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == IdModuloDeCarga);            
-                #endregion
-
-                #region Obtengo el ultimo detalle insertado
-                var planillaturnosdetalle = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == IdModuloDeCarga).LastOrDefault();
-                #endregion
-
-                #region Obtengo las cargas del vapor
-                IList<Carga> cargaPlanillaSolido = new List<Carga>();
-                if (planillaturnosdetalle == null)
-                {
-                    cargaPlanillaSolido = Repositorio.Listar<Carga>(x => vapor_id == x.Vapor.Id && x.FechaInicio > fechaInicio && x.CargaOpuesta_Id > 0 && x.ToneladasAW != 0).OrderBy(x => x.FechaInicio).ThenBy(x => x.NumeroBalanza).ToList();
-
-                }
-                else
-                {
-                    var ultima = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosUltimaActualizacion>(x => x.ModuloDeCarga.Id == moduloCarga.Id).FirstOrDefault().Fecha;
-                    cargaPlanillaSolido = Repositorio.Listar<Carga>(x => vapor_id == x.Vapor.Id && x.CargaOpuesta_Id > 0 && x.ToneladasAW != 0 && x.FechaInicio > ultima);
-
-                }
-                #endregion
-
-                #region Obtengo una lista de turnos del puerto
-                var turnos = Repositorio.Listar<TurnoPuerto>();
-                var listaTurnos = new List<turnoMemoria>();
-
-                foreach (var item in turnos)
-                {
-                    var horas = item.Nombre.Split('-');
-
-                    horaInicio = Convert.ToInt32(horas[0]);
-                    horaFin = Convert.ToInt32(horas[1]);
-
-                    var memoria = new turnoMemoria
-                    {
-                        idTurno = item.Id,
-                        horaInicio = horaInicio,
-                        horaFin = horaFin,
-                    };
-
-                    listaTurnos.Add(memoria);
-
-                }
-                #endregion
-                
-                int exportador = 0;
-                int bodega = 0;
-                int destino = 0;
-                int ultimoTurno = -1;
-                int cantidad = 0;
-
-                foreach (var carga in cargaPlanillaSolido)
-                {
-
-                    cantidad = 0;
-                    bool crearModulo = false;
-
-                    var registrosPuerto = Repositorio.Listar<RegistroBalanzaPuerto>(x => x.Id > carga.CargaOpuesta_Id && x.Id < carga.Id && x.NumeroBalanza == carga.NumeroBalanza && x.Tipo == "balanzada");
-
-                    var ultimaCargaInsertada = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosUltimaActualizacion>(x => x.ModuloDeCarga.Id == moduloCarga.Id);
-                    
-                    if(ultimaCargaInsertada == null)
-                    {
-                        var actualizarCarga = new ModuloDeCargaPlanillaDeTurnosUltimaActualizacion
-                        {
-                            Carga_Id = carga.Id,
-                            Fecha = carga.FechaInicio,
-                            ModuloDeCarga = moduloCarga
-                        };
-
-                        Repositorio.Agregar(actualizarCarga);
-                        Repositorio.GuardarCambios();
-                    }
-                    else 
-                    {
-                        ultimaCargaInsertada.Fecha = carga.FechaInicio;
-                        ultimaCargaInsertada.Carga_Id = carga.Id;
-                        Repositorio.GuardarCambios();
-                    }
-
-                    var fechaInicial = carga.FechaInicio.Value;
-                    var horaInicial = registrosPuerto.FirstOrDefault().Fecha.Hour;
-                    var turnoInicial = listaTurnos.Where(x => x.horaInicio <= horaInicial && x.horaFin > horaInicial).FirstOrDefault();
-
-                    if (exportador > 0 || bodega > 0 || destino > 0)
-                    {
-                        if (ultimoTurno > 0 && ultimoTurno != turnoInicial.idTurno)
-                            crearModulo = true;
-                    }
-                    else
-                        crearModulo = true;
-
-                    #region creacion ModuloDeCargaPlanillaDeTurnos
-                    if (crearModulo)
-                    {
-                        exportador = carga.Exportador == null ? 0 : carga.Exportador.Id;
-                        bodega = carga.Bodega == null ? 0 : carga.Bodega.Id;
-                        destino = carga.Destino == null ? 0 : carga.Destino.Id;
-                        ultimoTurno = turnoInicial.idTurno;
-                        //CrearModuloDeCargaPlanillaDeTurnos(moduloCarga.Id, fechaInicial, turnoInicial.idTurno);
-
-                    }
-                    #endregion
-                    foreach (var regPuerto in registrosPuerto)
-                    {
-                        if (regPuerto.Fecha.TimeOfDay.Hours >= turnoInicial.horaInicio && regPuerto.Fecha.TimeOfDay.Hours <= turnoInicial.horaFin)
-                        {
-                            var bal = Repositorio.Obtener<Balanzada>(x => x.Id == regPuerto.Id && x.NumeroBalanza == regPuerto.NumeroBalanza && x.Tipo == "balanzada");
-
-                            if (bal != null)
-                                cantidad += bal.PesoNeto;
-                            turnoInicial = listaTurnos.Where(x => x.horaInicio <= regPuerto.Fecha.TimeOfDay.Hours && x.horaFin > regPuerto.Fecha.TimeOfDay.Hours).FirstOrDefault();
-                            CrearModuloDeCargaPlanillaDeTurnos(moduloCarga.Id, regPuerto.Fecha, turnoInicial.idTurno);
-                        }
-                        else
-                        {
-                            var moduloTurnoDb = new ModuloDeCargaPlanillaDeTurnos();
-                            var moduloTurnoDblista = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.TurnoPuerto.Id == turnoInicial.idTurno &&
-                                x.Fecha.Value >= fechaInicial.Date && x.ModuloDeCarga.Id == IdModuloDeCarga);
-
-                            foreach (var item in moduloTurnoDblista)
-                            {
-
-                                if (item.Fecha.Value.Date == fechaInicial.Date)
-                                    moduloTurnoDb = item;
-
-
-                            }
-
-
-                            var moduloDetalleDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == moduloTurnoDb.Id &&
-                            (x.Exportador.Id == carga.Exportador.Id && x.Bodega.Id == carga.Bodega.Id && x.Destino.Id == carga.Destino.Id && x.MaterialPuerto.Id == carga.Material.Id));
-
-                            if (moduloDetalleDB == null)
-                            {
-                                CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(moduloTurnoDb, carga.Bodega, carga.Material, carga.Destino,
-                                 carga.Exportador, cantidad);
-                                cantidad = 0;
-                            }
-                            else
-                            {
-                                moduloDetalleDB.Cantidad += cantidad;
-                                cantidad = 0;
-
-                            }
-                            Repositorio.GuardarCambios();
-                            cantidad += Repositorio.Obtener<Balanzada>(x => x.Id == regPuerto.Id && x.NumeroBalanza == regPuerto.NumeroBalanza).PesoNeto;
-
-                            
-                            turnoInicial = listaTurnos.Where(x => x.horaInicio <= regPuerto.Fecha.TimeOfDay.Hours && x.horaFin > regPuerto.Fecha.TimeOfDay.Hours).FirstOrDefault();
-                                CrearModuloDeCargaPlanillaDeTurnos(moduloCarga.Id, regPuerto.Fecha, turnoInicial.idTurno);
-                            
-                        }
-                    }
-
-
-                    var moduloTurnoDblista1 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.TurnoPuerto.Id == turnoInicial.idTurno &&
-                              x.Fecha.Value >= fechaInicial.Date && x.ModuloDeCarga.Id == IdModuloDeCarga);
-                    var moduloTurnoDb1 = new ModuloDeCargaPlanillaDeTurnos();
-                    foreach (var item in moduloTurnoDblista1)
-                    {
-                        if (item.Fecha.Value.Date == fechaInicial.Date)
-                            moduloTurnoDb1 = item;
-                    }
-
-                    if (moduloTurnoDb1.Id == 0)
-                    {
-                        CrearModuloDeCargaPlanillaDeTurnos(moduloCarga.Id, fechaInicial, turnoInicial.idTurno);
-                        var moduloTurnoDblista2 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.TurnoPuerto.Id == turnoInicial.idTurno &&
-                              x.Fecha.Value >= fechaInicial.Date && x.ModuloDeCarga.Id == IdModuloDeCarga);
-                        moduloTurnoDb1 = new ModuloDeCargaPlanillaDeTurnos();
-                        foreach (var item in moduloTurnoDblista2)
-                        {
-                            if (item.Fecha.Value.Date == fechaInicial.Date)
-                                moduloTurnoDb1 = item;
-                        }
-                    }
-
-                    var moduloDetalleDb1 = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == moduloTurnoDb1.Id &&
-                     (x.Exportador.Id == carga.Exportador.Id && x.Bodega.Id == carga.Bodega.Id && x.Destino.Id == carga.Destino.Id && x.MaterialPuerto.Id == carga.Material.Id));
-
-                    
-
-                    if (moduloDetalleDb1 == null)
-                    {
-                        CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(moduloTurnoDb1, carga.Bodega, carga.Material, carga.Destino,
-                            carga.Exportador, cantidad);
-                        cantidad = 0;
-                    }
-                    else
-                    {
-                        moduloDetalleDb1.Cantidad += cantidad;
-
-                    }
-                    Repositorio.GuardarCambios();
-
-                }
-                Repositorio.GuardarCambios();
-
-
-                CrearModuloDeCargaPlanillaDeTurnosCortes(IdModuloDeCarga);
-            }
-            catch (Exception ex)
-            {
-                Log.Info("ProcesadorSincronizarBalanzasCortes: Error al generar la planilla de solido" + ex.Message);
-                throw ex;
-            }
-        }
+        }    
 
 
         public void ProcesarCargasPlanillaSolidos(int IdModuloDeCarga)
@@ -322,32 +107,33 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 //Recorro todos los registros de Balanzas cortes
-                var balanzasCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == IdModuloDeCarga);
+                var balanzasCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == IdModuloDeCarga).OrderBy(x => x.Fecha_Inicio).ToList();
 
                 if (balanzasCortes != null && balanzasCortes.Count > 0)
                 {
                     foreach (var cb in balanzasCortes)
                     {
-                        ModuloDeCargaPlanillaDeTurnosUltimaActualizacion moduloDeCargaPlanillaDeTurnosUltimaActualizacion = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosUltimaActualizacion>(x => x.ModuloDeCarga.Id == IdModuloDeCarga && x.Carga_Id == 0);
+                        ModuloDeCargaPlanillaDeTurnosUltimaActualizacion moduloDeCargaPlanillaDeTurnosUltimaActualizacion = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosUltimaActualizacion>(x => x.ModuloDeCarga.Id == IdModuloDeCarga);
                         List<RegistroBalanzaPuerto> registroBalanzaPuerto = new List<RegistroBalanzaPuerto>();
                         //obtengo todos los RegistroBalanzaPuerto                            
                             
                         if(moduloDeCargaPlanillaDeTurnosUltimaActualizacion != null)
                         {
                             registroBalanzaPuerto = Repositorio.Listar<RegistroBalanzaPuerto>(x => x.Fecha >= cb.Fecha_Inicio && x.Fecha <= cb.Fecha_Corte && x.NumeroBalanza == cb.NumeroBalanza && x.Id > moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id ).ToList();
-                            moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = registroBalanzaPuerto.Last().Id;
+                            if(registroBalanzaPuerto != null && registroBalanzaPuerto.Count > 0) 
+                                moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = registroBalanzaPuerto.Last().Id;
                         }
                         else
                         {
                             registroBalanzaPuerto = Repositorio.Listar<RegistroBalanzaPuerto>(x => x.Fecha >= cb.Fecha_Inicio && x.Fecha <= cb.Fecha_Corte && x.NumeroBalanza == cb.NumeroBalanza).ToList();
                             moduloDeCargaPlanillaDeTurnosUltimaActualizacion = new ModuloDeCargaPlanillaDeTurnosUltimaActualizacion();
-                            moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = registroBalanzaPuerto.Last().Id ;
                             moduloDeCargaPlanillaDeTurnosUltimaActualizacion.ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == IdModuloDeCarga);
+                            if (registroBalanzaPuerto != null && registroBalanzaPuerto.Count > 0) 
+                                moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = registroBalanzaPuerto.Last().Id;
                             Repositorio.Agregar(moduloDeCargaPlanillaDeTurnosUltimaActualizacion);
                         }
                         Repositorio.GuardarCambios();
-
-                        CrearPlanillaDeTurnos(registroBalanzaPuerto, cb, IdModuloDeCarga);   
+                        if(registroBalanzaPuerto != null && registroBalanzaPuerto.Count > 0) CrearPlanillaDeTurnos(registroBalanzaPuerto, cb, IdModuloDeCarga);   
                     }
                 }
             }
@@ -367,24 +153,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 int idTurno = (rbp[0].Fecha.Hour / 6) + 1;
 
                 int idInicio = rbp[0].Id;
-                int idFin = rbp[0].Id;
-                foreach (var item in rbp)
-                {
-                    if((item.Fecha.Hour /6) + 1 == idTurno){
-                        idFin = item.Id;
-                    }else
-                    {
-                        ProcesarPlanilla(cb, ModuloDeCargaId, idTurno, idInicio, idFin);
-                        idInicio = item.Id;
-                        idFin = item.Id;
-                    }
-                    idTurno = (item.Fecha.Hour / 6) + 1;
-                }
-                
-                if(idFin > idInicio)
-                {
-                    ProcesarPlanilla(cb, ModuloDeCargaId, idTurno, idInicio, idFin);
-                }
+                int idFin = rbp[rbp.Count - 1].Id;
+
+                ProcesarPlanilla(cb, ModuloDeCargaId, idTurno, idInicio, idFin);
+
+                return;           
             }
 
         }
@@ -393,7 +166,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             try
             {
-                decimal pesoNeto = Repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.Id >= idInicio && x.Id <= idFin && x.NumeroBalanza == cb.NumeroBalanza);
+
 
                 Bodega bodega = cb.Bodega_id != null ? Repositorio.Obtener<Bodega>(x => x.Id == cb.Bodega_id) : null;
                 MaterialPuerto materialPuerto = cb.Material_id != null ? Repositorio.Obtener<MaterialPuerto>(x => x.Id == cb.Material_id) : null;
@@ -405,28 +178,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     case true: //Carga normal
                                //Crear turno en ModuloDeCargaPlanillaDeTurnosSolido
-                        turno = CrearModuloDeCargaPlanillaDeTurnos2(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
+                        turno = this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnos(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
                         //Creo el Detalle
-                        CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(turno, bodega, materialPuerto, destino, exportador, Convert.ToInt32(pesoNeto), 0);
+                        this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(turno, bodega, materialPuerto, destino, exportador, Convert.ToInt32(cb.Kg), Convert.ToInt32(cb.CargaNormal));
                         break;
 
                     case false: //Baja carga
                                 //Crear turno en ModuloDeCargaPlanillaDeTurnosSolido
-                        turno = CrearModuloDeCargaPlanillaDeTurnos2(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
+                        turno = this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnos(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
 
                         //Creo el Detalle                               
-                        CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(turno, bodega, materialPuerto, destino, exportador, Convert.ToInt32(pesoNeto), 0);
+                        this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(turno, bodega, materialPuerto, destino, exportador, Convert.ToInt32(cb.Kg), Convert.ToInt32(cb.CargaNormal));
 
                         //Crear turno en ModuloDeCargaPlanillaDeTurnosCortes
-                        CrearModuloDeCargaPlanillaDeTurnosCortes(turno, cb);
+                        this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnosCortes(turno, cb);
                         break;
 
                     case null: //Corte
                                //Crear turno en ModuloDeCargaPlanillaDeTurnosSolido
-                        turno = CrearModuloDeCargaPlanillaDeTurnos2(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
+                        turno = this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnos(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
 
                         //Crear turno en ModuloDeCargaPlanillaDeTurnosCortes
-                        CrearModuloDeCargaPlanillaDeTurnosCortes(turno, cb);
+                        this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnosCortes(turno, cb);
                         break;
                 }
             }
@@ -446,253 +219,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
             public string NumeroBalanza { get; set; }
             public int ModuloDeCargaPlanillaDeTurnos_Id { get; set; }
             public int PesoNeto { get; set; }
+        }  
 
-        }
+       
 
-        public void CrearModuloDeCargaPlanillaDeTurnosCortes(int idModulodeCarga)
-        {
-            try
-            {
-                var moduloTurnoDblista1 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModulodeCarga);
+       
 
-                foreach (var turno in moduloTurnoDblista1)
-                {
-                    string[] horariosTurno = turno.TurnoPuerto.Nombre.Split('-');
-
-                    int fechaInicio = Convert.ToInt32(horariosTurno[0]);
-                    int fechaFin = Convert.ToInt32(horariosTurno[1]);
-                    DateTime fechaCort = turno.Fecha.Value;
-                    //var ListadoCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.Fecha_Inicio >= fechaCort.Date && x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Corte.Value.Hour < fechaFin && x.MotivosFallasBalanza_id >0);
-
-                    var listaCortes = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == idModulodeCarga && x.MotivosFallasBalanza_id > 0);
-                    var ListadoCortes = listaCortes.Where(x => x.Fecha_Inicio.Value.Hour >= fechaInicio && x.Fecha_Inicio.Value.Hour < fechaFin && x.Fecha_Inicio.Value.Date == fechaCort.Date);
-
-
-
-                    foreach (var corte in ListadoCortes)
-                    {
-
-                        var turnoDB = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == turno.Id &&  x.idBalanzaCorte == corte.Id);
-                        double tiempo = corte.Fecha_Corte.Value.Subtract(corte.Fecha_Inicio.Value).TotalMinutes;
-                        TimeSpan t = new TimeSpan(0, (int)tiempo, 0);
-                        if (turnoDB.Count == 0)
-                        {
-                            var turnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes
-                            {
-                                ModuloDeCargaPlanillaDeTurnos = turno,
-                                HoraInicio = corte.Fecha_Inicio.Value.ToString("HH:mm"),
-                                HoraFin = corte.Fecha_Corte.Value.ToString("HH:mm"),
-                                Observaciones = corte.Observaciones,
-                                TiempoTotal = t.ToString(),
-                                //  MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(x => x.Id == corte.MotivosFallasBalanza_id),
-                                MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == corte.MotivosFallasBalanza_id),
-                                idBalanzaCorte = corte.Id,
-                            };
-                            Repositorio.Agregar(turnosCortes);
-                            Repositorio.GuardarCambios();
-                        }
-                        else
-                        {
-                            if (turnoDB.Count > 0)
-                            {
-                                ModuloDeCargaPlanillaDeTurnosCortes turnoDBSel = turnoDB[0];
-                                turnoDBSel.HoraInicio = corte.Fecha_Inicio.Value.ToString("HH:mm");
-                                turnoDBSel.HoraFin = corte.Fecha_Corte.Value.ToString("HH:mm");
-                                turnoDBSel.Observaciones = corte.Observaciones;
-                                turnoDBSel.TiempoTotal = t.ToString();
-                            }                           
-                        }
-
-                        MotivosFallasBalanza motivosFallasBalanza = Repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == corte.MotivosFallasBalanza_id);
-
-                        if (motivosFallasBalanza.Siglas.Contains("BCB") ||
-                            motivosFallasBalanza.Siglas.Contains("BCP") ||
-                            motivosFallasBalanza.Siglas.Contains("F"))
-                        {
-                            var moduloDetalleDB = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == turno.Id && x.Bodega.Id == corte.Bodega_id && x.MaterialPuerto.Id == corte.Material_id && x.idBalanzaCorte == corte.Id && x.Cantidad == corte.Kg);
-
-                            if (moduloDetalleDB.Count == 0)
-                            {
-                                Bodega bodega = corte.Bodega_id !=null? Repositorio.Obtener<Bodega>(x => x.Id == corte.Bodega_id) : null;
-                                MaterialPuerto materialPuerto = corte.Material_id !=null? Repositorio.Obtener<MaterialPuerto>(x => x.Id == corte.Material_id) : null;
-                                Exportador exportador = corte.Exportador_Id != null? Repositorio.Obtener<Exportador>(x => x.Id == corte.Exportador_Id) : null ;
-                                Destino destino = Repositorio.Obtener<Destino>(x => x.Id == corte.Destino_Id);
-                                CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(turno, bodega, materialPuerto, destino, exportador, (int)corte.Kg, corte.Id);
-                                Repositorio.GuardarCambios();
-                            }
-
-                        }
-
-                        
-                    }
-
-                    Repositorio.GuardarCambios();
-
-                }
-
-                var listadoBC = Repositorio.Listar<BalanzasCortes, int>(x => x.Id, x => x.ModuloDeCarga_id == idModulodeCarga);
-                var listadoTC = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == idModulodeCarga);
-
-                foreach (var itemTC in listadoTC)
-                {
-                    var existe = listadoBC.Where(x => x == itemTC.idBalanzaCorte).Count();
-
-                    if (existe < 1)
-                        Repositorio.Remover(itemTC);
-                }
-                Repositorio.GuardarCambios();
-            }
-            catch (Exception ex)
-            {
-                Log.Info("ProcesadorSincronizarBalanzasCortes: Error al generar los cortes en solido" + ex.InnerException);
-                throw ex;
-            }
-           
-        }
-
-
-        public void CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(ModuloDeCargaPlanillaDeTurnos planilla, Bodega bodega, MaterialPuerto material, Destino destino,
-            Exportador exportador, int cantidad, int idBalanzaCorte = 0)
-        {
-            try
-            {
-                ModuloDeCargaPlanillaDeTurnosDetallesSolido moduloSolido = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == planilla.Id &&
-                x.Bodega.Id == bodega.Id && x.Exportador.Id == exportador.Id && x.Destino.Id == destino.Id).FirstOrDefault();
-
-                if(moduloSolido != null)
-                {
-                    moduloSolido.Cantidad += cantidad;
-                }
-                else
-                {
-                    moduloSolido = new ModuloDeCargaPlanillaDeTurnosDetallesSolido();
-
-                    if (bodega != null)
-                        moduloSolido.Bodega = bodega;
-                    if (material != null)
-                        moduloSolido.MaterialPuerto = material;
-                    if (destino != null)
-                        moduloSolido.Destino = destino;
-                    if (exportador != null)
-                        moduloSolido.Exportador = exportador;
-                    if(planilla != null)
-                        moduloSolido.ModuloDeCargaPlanillaDeTurnos = planilla;
-                    moduloSolido.Cantidad = cantidad;
-                    moduloSolido.idBalanzaCorte = idBalanzaCorte;
-                    Repositorio.Agregar(moduloSolido);
-                }
-                Repositorio.GuardarCambios();
-
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        public void CrearModuloDeCargaPlanillaDeTurnosCortes(ModuloDeCargaPlanillaDeTurnos turno, BalanzasCortes bc)
-        {
-            try
-            {
-                ModuloDeCargaPlanillaDeTurnosCortes ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
-                {
-                    HoraFin = bc.Fecha_Corte.Value.ToString("HH:mm"),
-                    HoraInicio = bc.Fecha_Inicio.Value.ToString("HH:mm"),
-                    idBalanzaCorte = bc.Id,
-                    ModuloDeCargaPlanillaDeTurnos = turno,
-                    MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == bc.MotivosFallasBalanza_id),
-                    Observaciones = bc.Observaciones,
-                    TiempoTotal = Convert.ToDateTime(bc.Fecha_Corte.Value.Subtract(bc.Fecha_Inicio.Value).ToString()).ToString("HH:mm")
-                };
-
-                Repositorio.Agregar(ModuloDeCargaPlanillaDeTurnosCortes);
-                Repositorio.GuardarCambios();
-            }
-            catch (Exception ex)
-            {
-                Log.Info("ProcesadorSincronizarBalanzasCortes: Error al generar los cortes en solido" + ex.InnerException);
-                throw ex;
-            }
-
-        }
-
-        public void CrearModuloDeCargaPlanillaDeTurnos(int idModuloCarga, DateTime fechaInicial, int idTurno)
-        {
-            try
-            {
-                bool existe = false;
-                var moduloTurnoDblista1 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.TurnoPuerto.Id == idTurno &&
-                             x.Fecha.Value >= fechaInicial.Date && x.ModuloDeCarga.Id == idModuloCarga);
-               // var moduloTurnoDb1 = new ModuloDeCargaPlanillaDeTurnos();
-                foreach (var item in moduloTurnoDblista1)
-                {
-
-                    if (item.Fecha.Value.Date == fechaInicial.Date)
-                        existe = true;
-                }
-
-                if(!existe)
-                {
-                    var planillaDeTurnos = new ModuloDeCargaPlanillaDeTurnos
-                    {
-                        ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == idModuloCarga),
-                        EsLiquido = false,
-                        Fecha = fechaInicial,
-                        Enviado = false,
-                        Cerrado = false,
-                        TurnoPuerto = Repositorio.Obtener<TurnoPuerto>(x => x.Id == idTurno)
-
-                    };
-
-                Repositorio.Agregar(planillaDeTurnos);
-                Repositorio.GuardarCambios();
-                }
-               
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        public ModuloDeCargaPlanillaDeTurnos CrearModuloDeCargaPlanillaDeTurnos2(int idModuloCarga, DateTime fechaInicial, int idTurno)
-        {
-            try
-            {
-                var moduloTurnoDblista1 = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.TurnoPuerto.Id == idTurno &&
-                             x.Fecha.Value >= fechaInicial.Date && x.ModuloDeCarga.Id == idModuloCarga);
-
-                // var moduloTurnoDb1 = new ModuloDeCargaPlanillaDeTurnos();
-                foreach (var item in moduloTurnoDblista1)
-                {
-                    if (item.Fecha.Value.Date == fechaInicial.Date)
-                    {
-                        return item;
-                    }
-                }
-
-                var planillaDeTurnos = new ModuloDeCargaPlanillaDeTurnos
-                {
-                    ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == idModuloCarga),
-                    EsLiquido = false,
-                    Fecha = fechaInicial,
-                    Enviado = false,
-                    Cerrado = false,
-                    TurnoPuerto = Repositorio.Obtener<TurnoPuerto>(x => x.Id == idTurno)
-                };
-
-                Repositorio.Agregar(planillaDeTurnos);
-                Repositorio.GuardarCambios();
-                return planillaDeTurnos;
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+       
 
         public void ValidarBajaCarga(int idModulodeCarga)
         {
@@ -709,7 +242,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var fechasInicio = reg.fechaInicio;
                     var fechasFin = reg.fechaFin;
 
-                    var PesoTotal = (int)Repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.Id >= reg.idInicio && x.Id <= reg.idFin && x.NumeroBalanza == reg.numeroBalanza);
+                    var PesoTotal = reg.kilosTotalesCarga;
                     var car = Repositorio.Obtener<Carga>(x => x.Id == reg.numeroCarga);
 
                     double tiempo = fechasFin.Subtract(fechasInicio).TotalMinutes;
@@ -722,8 +255,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Fecha_Corte = fechasFin,
                         ModuloDeCarga_id = mod.Id,
                         NumeroBalanza = reg.numeroBalanza,
-                        Kg = PesoTotal,
-                        Tn = PesoTotal / 1000,
+                        Kg = reg.fechaError.Count == 0?  PesoTotal: 0,
+                        Tn = reg.fechaError.Count == 0 ? PesoTotal / 1000: 0,
                         Bodega_id = car.Bodega == null ? 0 : car.Bodega.Id,
                         Material_id = car.Material == null ? 0 : car.Material.Id,
                         Exportador_Id = car.Exportador == null ? 0 : car.Exportador.Id,
@@ -739,7 +272,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var fechasInicio = reg.fechaInicio;
                     var fechasFin = reg.fechaFin;
 
-                    var PesoTotal = (int)Repositorio.Sumar<Balanzada>(x => x.PesoNeto, x => x.Id >= reg.idInicio && x.Id <= reg.idFin && x.NumeroBalanza == reg.numeroBalanza);
+                    var PesoTotal = reg.kilosTotalesCarga;
                     var car = Repositorio.Obtener<Carga>(x => x.Id == reg.numeroCarga);
 
                     double tiempo = fechasFin.Subtract(fechasInicio).TotalMinutes;
@@ -898,12 +431,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     registrosPuerto regP = new registrosPuerto();
                     var balanzadasCarga = new List<RegistroBalanzaPuerto>();
+                    var balanzadas = new List<Balanzada>();
                     bool vieneError = false;
 
                     balanzadasCarga = Repositorio.Listar<RegistroBalanzaPuerto>(x => x.Id >= car.CargaOpuesta_Id && x.Id <= car.Id && x.NumeroBalanza == car.NumeroBalanza).OrderBy(x => x.Id).ToList();
-
+                    balanzadas = Repositorio.Listar<Balanzada>(x => x.Id >= car.CargaOpuesta_Id && x.Id <= car.Id && x.NumeroBalanza == car.NumeroBalanza).ToList();
                     regP.numeroBalanza = car.NumeroBalanza;
                     regP.numeroCarga = car.Id;
+                    regP.kilosTotalesCarga = balanzadas.Sum(x => x.PesoNeto);
                     regP.fechaError = new List<Dictionary<DateTime, DateTime>>();
                     DateTime fechaSiguiente = new DateTime();
                     DateTime fechaError = new DateTime();
@@ -918,6 +453,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             regP.numeroCarga = car.Id;
                             regP.fechaError = new List<Dictionary<DateTime, DateTime>>();
                             regP.fechaInicio = inicioNuevo;
+                            regP.kilosTotalesCarga = balanzadas.Sum(x => x.PesoNeto);
                             regP.idInicio = registro.Id;
                             vieneError = false;
                         }
@@ -994,6 +530,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             public string numeroBalanza { get; set; }
             public DateTime fechaInicio { get; set; }
             public DateTime fechaFin { get; set; }
+
+            public int kilosTotalesCarga { get; set; }
 
             public int idInicio { get; set; }
             public int idFin { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Filtros;
 using Molinos.Scato.Dominio.Seguridad;
@@ -2549,6 +2550,16 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos);
+
+        [OperationContract]
+        ModuloDeCargaPlanillaDeTurnos CrearModuloDeCargaPlanillaDeTurnos(int idModuloCarga, DateTime fechaInicial, int idTurno);
+
+        [OperationContract]
+        void CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(ModuloDeCargaPlanillaDeTurnos planilla, Bodega bodega, MaterialPuerto material, Destino destino,
+           Exportador exportador, int cantidad, int idBalanzaCorte = 0);
+
+        [OperationContract]
+        void CrearModuloDeCargaPlanillaDeTurnosCortes(ModuloDeCargaPlanillaDeTurnos turno, BalanzasCortes bc);
 
         [OperationContract]
         void EliminarCorteBalanza(int idCorteBalanza, string nombreUsuario);

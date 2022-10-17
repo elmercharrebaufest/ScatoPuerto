@@ -33,6 +33,7 @@ using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager
 using System.DirectoryServices;
 using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
+using NPOI.SS.Formula.Functions;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -9916,9 +9917,10 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
+                BalanzasCortes balanzasCortes_db;
                 foreach (var item in balanzasCortesDtos)
                 {
-                    BalanzasCortes balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
+                    balanzasCortes_db = repositorio.Obtener<BalanzasCortes>(x => x.Id == item.Id);
                     if (balanzasCortes_db != null)
                     {
                         balanzasCortes_db.Fecha_Corte = item.Fecha_Corte;
@@ -9945,6 +9947,30 @@ namespace Molinos.Scato.Servicios.Impl
                             Bodega_id = item.Bodega_id
                         };
                         repositorio.Agregar(balanzasCortes_db);
+                        repositorio.GuardarCambios();
+                    }
+                    ModuloDeCargaPlanillaDeTurnosCortes moduloDeCargaPlanillaDeTurnosCortes = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.idBalanzaCorte == balanzasCortes_db.Id);
+                    if(moduloDeCargaPlanillaDeTurnosCortes == null)
+                    {
+                        int id_turno = (balanzasCortes_db.Fecha_Inicio.Value.Hour / 6) + 1;
+                        ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnos =  CrearModuloDeCargaPlanillaDeTurnos(balanzasCortes_db.ModuloDeCarga_id, Convert.ToDateTime(balanzasCortes_db.Fecha_Inicio), id_turno);
+                        moduloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes();
+                        moduloDeCargaPlanillaDeTurnosCortes.idBalanzaCorte = balanzasCortes_db.Id;
+                        moduloDeCargaPlanillaDeTurnosCortes.ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos;
+                        moduloDeCargaPlanillaDeTurnosCortes.Observaciones = balanzasCortes_db.Observaciones;
+                        moduloDeCargaPlanillaDeTurnosCortes.HoraFin = balanzasCortes_db.Fecha_Corte.Value.ToString("HH:mm");
+                        moduloDeCargaPlanillaDeTurnosCortes.HoraInicio = balanzasCortes_db.Fecha_Inicio.Value.ToString("HH:mm");
+                        moduloDeCargaPlanillaDeTurnosCortes.TiempoTotal = Convert.ToDateTime(balanzasCortes_db.Fecha_Corte.Value.Subtract(balanzasCortes_db.Fecha_Inicio.Value).ToString()).ToString("HH:mm");
+                        moduloDeCargaPlanillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == balanzasCortes_db.MotivosFallasBalanza_id);
+                        repositorio.Agregar(moduloDeCargaPlanillaDeTurnosCortes);
+                    }
+                    else
+                    {
+                        moduloDeCargaPlanillaDeTurnosCortes.Observaciones = balanzasCortes_db.Observaciones;
+                        moduloDeCargaPlanillaDeTurnosCortes.HoraFin = balanzasCortes_db.Fecha_Corte.Value.ToString("HH:mm");
+                        moduloDeCargaPlanillaDeTurnosCortes.HoraInicio = balanzasCortes_db.Fecha_Inicio.Value.ToString("HH:mm");
+                        moduloDeCargaPlanillaDeTurnosCortes.TiempoTotal = Convert.ToDateTime(balanzasCortes_db.Fecha_Corte.Value.Subtract(balanzasCortes_db.Fecha_Inicio.Value).ToString()).ToString("HH:mm");
+                        moduloDeCargaPlanillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == balanzasCortes_db.MotivosFallasBalanza_id);
                     }
                 }
                 repositorio.GuardarCambios();
@@ -9954,6 +9980,107 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
          
+        }
+
+        public ModuloDeCargaPlanillaDeTurnos CrearModuloDeCargaPlanillaDeTurnos(int idModuloCarga, DateTime fechaInicial, int idTurno)
+        {
+            try
+            {
+                var moduloTurnoDblista1 = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.TurnoPuerto.Id == idTurno &&
+                             x.Fecha.Value >= fechaInicial.Date && x.ModuloDeCarga.Id == idModuloCarga);
+
+                foreach (var item in moduloTurnoDblista1)
+                {
+                    if (item.Fecha.Value.Date == fechaInicial.Date)
+                    {
+                        return item;
+                    }
+                }
+
+                var planillaDeTurnos = new ModuloDeCargaPlanillaDeTurnos
+                {
+                    ModuloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == idModuloCarga),
+                    EsLiquido = false,
+                    Fecha = fechaInicial,
+                    Enviado = false,
+                    Cerrado = false,
+                    TurnoPuerto = repositorio.Obtener<TurnoPuerto>(x => x.Id == idTurno)
+                };
+
+                repositorio.Agregar(planillaDeTurnos);
+                repositorio.GuardarCambios();
+                return planillaDeTurnos;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void CrearModuloDeCargaPlanillaDeTurnosDetallesSolido(ModuloDeCargaPlanillaDeTurnos planilla, Bodega bodega, MaterialPuerto material, Destino destino,
+           Exportador exportador, int cantidad, int idBalanzaCorte = 0)
+        {
+            try
+            {
+                ModuloDeCargaPlanillaDeTurnosDetallesSolido moduloSolido = repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == planilla.Id &&
+                x.Bodega.Id == bodega.Id && x.Exportador.Id == exportador.Id && x.Destino.Id == destino.Id && x.idBalanzaCorte == idBalanzaCorte).FirstOrDefault();
+
+                if (moduloSolido != null)
+                {
+                    moduloSolido.Cantidad += cantidad;
+                }
+                else
+                {
+                    moduloSolido = new ModuloDeCargaPlanillaDeTurnosDetallesSolido();
+
+                    if (bodega != null)
+                        moduloSolido.Bodega = bodega;
+                    if (material != null)
+                        moduloSolido.MaterialPuerto = material;
+                    if (destino != null)
+                        moduloSolido.Destino = destino;
+                    if (exportador != null)
+                        moduloSolido.Exportador = exportador;
+                    if (planilla != null)
+                        moduloSolido.ModuloDeCargaPlanillaDeTurnos = planilla;
+                    moduloSolido.Cantidad = cantidad;
+                    moduloSolido.idBalanzaCorte = idBalanzaCorte;
+                    repositorio.Agregar(moduloSolido);
+                }
+                repositorio.GuardarCambios();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public void CrearModuloDeCargaPlanillaDeTurnosCortes(ModuloDeCargaPlanillaDeTurnos turno, BalanzasCortes bc)
+        {
+            try
+            {
+                ModuloDeCargaPlanillaDeTurnosCortes ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
+                {
+                    HoraFin = bc.Fecha_Corte.Value.ToString("HH:mm"),
+                    HoraInicio = bc.Fecha_Inicio.Value.ToString("HH:mm"),
+                    idBalanzaCorte = bc.Id,
+                    ModuloDeCargaPlanillaDeTurnos = turno,
+                    MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == bc.MotivosFallasBalanza_id),
+                    Observaciones = bc.Observaciones,
+                    TiempoTotal = Convert.ToDateTime(bc.Fecha_Corte.Value.Subtract(bc.Fecha_Inicio.Value).ToString()).ToString("HH:mm")
+                };
+
+                repositorio.Agregar(ModuloDeCargaPlanillaDeTurnosCortes);
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
         public void EliminarCorteBalanza(int idCorteBalanza, string nombreUsuario)

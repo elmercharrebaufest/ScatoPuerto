@@ -475,14 +475,27 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   getBajaCargaColor(result){
     const idBalanzaCorte = result.controls.idBalanzaCorte.value;
     let colorBajaCargaClass = '';
-    if (idBalanzaCorte == 0)
+    if (idBalanzaCorte == 1)
       colorBajaCargaClass = 'fila-turno-normal';
-    else if (idBalanzaCorte == 1)
+    else if (idBalanzaCorte == 0)
       colorBajaCargaClass = 'fila-turno-baja-carga';
     else
-      colorBajaCargaClass = 'fila-turno-baja-corte';
+      colorBajaCargaClass = 'fila-turno-corte';
     return colorBajaCargaClass;
   }
+
+  getCorteColor(result){
+    const idBalanzaCorte = result.controls.idBalanzaCorte;
+    let colorBajaCargaClass = '';
+    if (idBalanzaCorte == 1)
+      colorBajaCargaClass = 'fila-turno-normal';
+    else if (idBalanzaCorte == 0)
+      colorBajaCargaClass = 'fila-turno-baja-carga';
+    else
+      colorBajaCargaClass = 'fila-turno-corte';
+    return colorBajaCargaClass;
+  }
+
   getTurnoDetallesBajasCargas(d, t, esCargaNormales: boolean = false) {
     const turnoDetalle = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosDetallesSolido as FormArray;
 
@@ -807,7 +820,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         horaFin: [{ value: corte.horaFin, disabled: true }, Validators.required],
         tiempoTotal: [{ value: corte.tiempoTotal, disabled: true }, Validators.required],
         observaciones: [{ value: corte.observaciones, disabled: true }, Validators.required],
-        id: [{ value: corte.id, disabled: true }, Validators.required]
+        id: [{ value: corte.id, disabled: true }, Validators.required],
+        idBalanzaCorte: [{ value: corte ? corte.idBalanzaCorte : '', disabled: true }],
       })
     }
   }
