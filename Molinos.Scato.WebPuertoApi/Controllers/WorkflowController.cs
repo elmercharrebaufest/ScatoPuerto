@@ -42,7 +42,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/Workflow/ListarEnLineUp")]
         public HttpResponseMessage ListarEnLineUp()
         {
-            var embarques = servicio.ListarEmbarques();
+            //  var embarques = servicio.ListarEmbarques();
+            var embarques = workflows.ListarEmbarques();
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
 
             return Request.CreateResponse(HttpStatusCode.OK,
