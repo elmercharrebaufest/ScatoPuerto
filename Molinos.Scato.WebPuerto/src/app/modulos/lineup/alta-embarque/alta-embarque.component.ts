@@ -478,16 +478,16 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.value.esLiquido = this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido;
       this.state === 'modulo-carga' ? this.embarqueForm.value['sanBenito'] = true : '';
       let altaEmbarque = this.embarqueForm.value;
-      if (this.vaporInfo == null){
+      if (this.vaporInfo == null || this.vaporInfo == undefined) {
         altaEmbarque.Patente = this.nombre_buque;
-        altaEmbarque.nombrebuque = this.nombre_buque;
+        altaEmbarque.nombreBuque = this.nombre_buque;
         altaEmbarque.Vapor = {
           id : this.id_buque,
           nombre : this.nombre_buque
         }
       }else{
         altaEmbarque.patente = this.vaporInfo.nombreBuque;
-        altaEmbarque.nombrebuque = this.vaporInfo.nombreBuque;
+        altaEmbarque.nombreBuque = this.vaporInfo.nombreBuque;
         altaEmbarque.Vapor = {
           id : this.vaporInfo.vapor_Id,
           nombre : this.vaporInfo.nombreBuque
