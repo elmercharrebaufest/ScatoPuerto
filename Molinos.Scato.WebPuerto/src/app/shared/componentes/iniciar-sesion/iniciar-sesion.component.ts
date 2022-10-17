@@ -11,6 +11,7 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./iniciar-sesion.component.css']
 })
 export class IniciarSesionComponent implements OnInit {
+  permisos: any;
 
   constructor(
     private router: Router,
@@ -30,11 +31,39 @@ export class IniciarSesionComponent implements OnInit {
           this.session.clear();
           res.autenticado = true;
           this.session.setUser(res);
-          this.router.navigateByUrl('/lineup');
+          // this.router.navigateByUrl('/lineup');
+          this.navigate(res.permisos);
         } else {
           this.messageService.add({ severity: 'error', detail: 'Error al iniciar sesión', summary: 'No se ha encontrado el usuario' })
         }
       }
     )
   }
+
+  navigate(permisos){
+    let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+    switch(primerPermiso){
+        case 'LineUp_Ver': {
+            this.router.navigate(['/lineup']);
+            break;
+        };
+        case 'Carga_Ver': {
+            this.router.navigate(['/carga']);
+            break;
+        }
+        case 'Recibidores_Ver': {
+            this.router.navigate(['/calidad']);
+            break;
+        }
+        case 'Geolocalizacion_Ver': {
+            this.router.navigate(['/geolocalizacion']);
+            break;
+        }
+        case 'Buque_Ver': {
+            this.router.navigate(['/buques']);
+            break;
+        }
+    }
+  }
+
 }
