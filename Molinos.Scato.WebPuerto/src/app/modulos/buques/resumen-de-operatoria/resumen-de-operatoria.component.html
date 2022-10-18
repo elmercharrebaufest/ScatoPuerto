@@ -43,9 +43,9 @@
       <div class="dentro">
         <p>
           <b>Bandera: </b>{{
-          vaporInformacion == null || vaporInformacion.bandera_Id == null
+            banderasBuque == null || banderasBuque == undefined
           ? "-"
-          : paisBuque[0].descripcion
+          : banderasBuque.nombre
           }}<br />
           <b>Freeboard: </b>{{
           vaporInformacion == null || vaporInformacion.freeboard == null

@@ -54,9 +54,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
   // #region Eventos del Componente
   ngOnInit() {
-    console.log('entrooo ngOnInit --->>', )
 
-    //this.setListaHistorialBuques();
   }
 
   ngOnDestroy() {
@@ -70,9 +68,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Metodos
-  private setCargarHistorialBuque() {
-    console.log('setCargarHistorialBuque this.filtroBuquedaForm--->>', this.filtroBuquedaForm)
-    
+  private setCargarHistorialBuque() {   
     this.esResumenOperatoria = this.filtroBuquedaForm?.controls?.esResumenOperatoria.value;
     const esBusqueda = this.filtroBuquedaForm?.controls?.esBusqueda.value;
     const esLimpiarBusqueda = this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.value;
