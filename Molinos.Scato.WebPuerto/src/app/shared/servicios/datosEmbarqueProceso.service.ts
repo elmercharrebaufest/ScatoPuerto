@@ -70,7 +70,8 @@ export class DatosEmbarquesProcesoService {
 
             this.workflowService.obtenerListado().subscribe( (resp: any) => {
                 let barquitos = resp.find(x => x.embarque.id === this.embarqueId);
-                this.vaporId = barquitos['embarque'].vapor.id;
+                if (barquitos!=null && barquitos !== undefined)
+                    this.vaporId = barquitos['embarque'].vapor.id;
             });
         }
     }
