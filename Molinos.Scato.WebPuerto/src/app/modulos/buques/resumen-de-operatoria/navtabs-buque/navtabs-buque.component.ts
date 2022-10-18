@@ -40,11 +40,31 @@ export class NavtabsBuqueComponent implements OnInit {
   }
 
   private setCargarEmbarquesWorklow(){
+    
+    this.embarqueService.obtenerEmbarque(this.paramEmbarqueSel.embarque_Id).subscribe(result => {
+      let embarqueItem:EmbarqueNav = new EmbarqueNav();
+      let embarqueList:EmbarqueNav[] = new Array();
+
+      embarqueItem.cargado = true;
+      embarqueItem.esLiquido = result.esLiquido;
+      embarqueItem.id = result.id;
+      embarqueItem.moduloDeCargaId = this.paramEmbarqueSel.moduloDeCarga_Id;
+      embarqueItem.nombreBuque = result.nombre;
+      embarqueItem.nombreUbicacion = '';
+      embarqueItem.planoDeCargaId = this.paramEmbarqueSel.planoDecarga_Id;
+      embarqueList.push(embarqueItem);
+
+      this.procesoService.setEmbarquesList(embarqueList);
+      this.setCargarEmbarquesPlanillas()
+    })
+    /*
     this.workflowService.listarEmbarquesEnLineUp()
       .subscribe(res => {
         this.procesoService.setEmbarquesList(res);
+        console.log('res work', res)
         this.setCargarEmbarquesPlanillas()
       });
+      */
   }
 
   private setCargarEmbarquesPlanillas(){
