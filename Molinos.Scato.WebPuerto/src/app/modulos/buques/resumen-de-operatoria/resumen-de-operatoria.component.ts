@@ -21,6 +21,7 @@ import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { browserRefresh } from '../../../app.component';
+import { Bandera } from '@ScatoModels/bandera';
 
 @Component({
   selector: 'app-resumen-de-operatoria',
@@ -39,7 +40,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   private embarqueInformacion: EmbarqueInformacion;
   private filtroBuquedaForm: FormGroup;
   paramEmbarqueSel: any = null;
-  paisBuque: Pais[];
+  banderasBuque: Bandera;
   mostrarInformacion: boolean;
   permisosScato: typeof PermisosScato = PermisosScato;
   otrasOperacionesBuque: boolean = false;
@@ -98,13 +99,8 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.embarqueService.obtenerIdsUsuales(this.idEmbarqueOp).subscribe(data => {
       this.paramEmbarqueSel = { embarque_Id: this.idEmbarqueOp, moduloDeCarga_Id: data.moduloDeCargaId, vapor_Id: data.vaporId, planoDecarga_Id: data.planoDecargaId };
     });
-    console.log('idEmbarqueOp-->>' + this.idEmbarqueOp)
-    console.log('idVaporOp-->>' + this.idVaporOp)
-
+   
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
-      console.log('data-->>')
-      console.log(data)
-
       if (data !== undefined) {
         if (data !== null) {
           this.filtroBuquedaForm = data;
@@ -143,10 +139,13 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.idEmbarqueOp)
       .pipe(finalize(() => {
         this.buqueService.obtenerVaporInformaconion(this.embarqueOp.vapor.id).subscribe(res => {
+          console.log('res-->>', res)
           this.vaporInformacion = res
           if (this.vaporInformacion !== null)
-            this.buqueService.obtenerPaises().subscribe(res => {
-              this.paisBuque = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
+            this.embarqueService.obtenerBanderas().subscribe(res => {
+              const banderaSel = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
+              if (banderaSel.length >0)
+              this.banderasBuque =  banderaSel[0];
             })
             this.mostrarInformacion = true;
         });
@@ -173,7 +172,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   private limpiarFiltrosHistorial() {
     if (this.filtroBuquedaForm != null) {
       this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
-      this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
+      this.filtroBuquedaForm.controls.esBusqueda.setValue(false);
       this.filtroBuquedaForm.controls.esDetalle.setValue(false);
       this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(false);
       this.filtroBuquedaForm.controls.mostrarOtrasOperaciones.setValue(false);
@@ -202,14 +201,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.router.navigate(['/buques']);
   }
   public onVolver() {
-    console.log('entroooo onVolver')
-    console.log('permisos Buques_Resumen_De_Operatoria',this.permisosScato.Buques_Resumen_De_Operatoria)
-    console.log('this.user.permisos',this.user.permisos)
-    if (this.user.permisos.find(p => p === this.permisosScato.Buques_Resumen_De_Operatoria)) {
       this.limpiarDatosOperatoria();
-    } else {
-      this.messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
-    }
   }
   //click de boton para ocultar nuevamente las otras operaciones del buque desde "volver"
   public onVolverOtrasOperaciones() {
