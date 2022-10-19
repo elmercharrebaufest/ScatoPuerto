@@ -20,6 +20,7 @@ namespace Molinos.Scato.Dominio.Dto
         public bool CorteManual { get; set; }
         public int? Exportador_Id { get; set; }
         public int? Destino_Id { get; set; }
+        public bool? CargaNormal { get; set; }
         public object Clone()
         {
             return this.MemberwiseClone();
