@@ -694,8 +694,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     let fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial + ' ' + bc.hora_Inicio_Inicial;
     let fecha_Corte_Inicial = bc.fecha_Corte_Inicial + ' ' + bc.hora_Corte_Inicial;
     let nuevoEsAnteriorAlOriginal: boolean;
-    // let tnInicial = bc.tn;
-    // let kgInicial = bc.kg;
 
     if( balanzadas.length === 0 ){ // Cuando no selecciona ninguno
       if( !bc.listadoTotalBalanzadas.motivosFallasBalanza.id ){

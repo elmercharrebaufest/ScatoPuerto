@@ -85,7 +85,7 @@
                                                         {{ soloEnteros(result.controls.cantidad.value / 1000) }}
                                                     </td>
                                                     <td [ngClass]="getBajaCargaColor(result)">
-                                                        {{result.controls.idBalanzaCorte.value > 0 ? 'Baja Carga' : 'Carga Normal'}}
+                                                        {{result.controls.idBalanzaCorte.value > 0 ? 'Carga Normal' : 'Baja Carga'}}
                                                     </td>
                                                 </tr>
                                             </ng-container>
@@ -109,20 +109,20 @@
                                                             </thead>
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                     <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
-                                                                        <tr>
-                                                                            <td colspan="4" class="bg-white tabla-fila-corte">
+                                                                        <tr *ngIf='corte.controls.observaciones.value != null && corte.controls.observaciones.value != ""'>
+                                                                            <td colspan="4"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                             </td>
-                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
+                                                                            <td colspan="1"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.horaInicio.value}} hs
                                                                             </td>
-                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
+                                                                            <td colspan="1"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.horaFin.value}} hs
                                                                             </td>
-                                                                            <td colspan="1" class="bg-white tabla-fila-corte">
+                                                                            <td colspan="1"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.tiempoTotal.value | slice:0:5}} hs
                                                                             </td>
-                                                                            <td colspan="5" class="bg-white tabla-fila-corte">
+                                                                            <td colspan="5"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.observaciones.value}}
                                                                             </td>
                                                                         </tr>
