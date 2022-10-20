@@ -6,6 +6,7 @@ import * as L from 'leaflet';
 import { TarjetaBuqueComponent } from '../tarjeta-buque/tarjeta-buque.component';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-mapa-buque',
@@ -54,6 +55,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     await this.inicializarMapa();
     await this.cargarPuntosInteres();
     await this.cargarBuquesMapa();
+    let element = document.getElementsByClassName('buque-lerp')[0];
     this.map.on('zoomend', this.onMapZoomEnd.bind(this));
  
   }
@@ -75,12 +77,12 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
     this.iconoUbicacion = new L.Icon({
       iconUrl: './assets/ubicacion.svg',
-      iconSize: [24, 40]
+      iconSize: [21, 21]
     });
 
     this.iconoAncla = new L.Icon({
       iconUrl: './assets/ancla.svg',
-      iconSize: [24, 40]
+      iconSize: [21, 21]
     });
   }
 
@@ -421,7 +423,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
         this.iconoBuque = new L.Icon({
           iconUrl: buqueIconUrl,
-          iconSize: [32, 37]
+          iconSize: [32, 32]
         });
         let fechaPosicionRecibida = this.ultimaPosicionRecibida(buque.posicion.horaUTCPosicionRecibida)
         fechaPosicionRecibida = fechaPosicionRecibida == undefined ? '' : fechaPosicionRecibida;
@@ -446,10 +448,17 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida}</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
+        markerBuque.on('click', this.markerOnClick, this);
         markerBuque.addTo(this.map);
       }
     });
   }
+
+  markerOnClick(e)
+  {
+    this.modificarIconoSeleccionado(e.latlng.lat, e.latlng.lng);
+  }
+
   private ultimaPosicionRecibida(fechaPosicionRecibida) {
     const fechaActual: Date = new Date();
     const fechaPosicion: Date = new Date(fechaPosicionRecibida);
@@ -525,31 +534,22 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
       if ((layer instanceof L.Marker)) {
         if(layer.getLatLng().lat==latitud && layer.getLatLng().lng == longitud)
         {
-          var nombreIcono = layer.getIcon().options.iconUrl;
-          this.iconoBuqueSeleccionado = new L.Icon({
-            //iconUrl: './assets/buque_san_benito.gif',
-            iconUrl:nombreIcono.replace(".svg","_seleccionado.gif"),
-            iconSize: [32, 37]
-          });
-
-       layer.getIcon().remove;
-       layer.setIcon(this.iconoBuqueSeleccionado);
+          var icon = layer.getIcon();
+          icon.options.iconSize = [48,48];
+          (layer as any)._icon .style.animation = 'a 1s infinite alternate'
+          layer.getIcon().remove;
+          layer.setIcon(icon);
 
         }
         else
         {
-          var nombreIcono = layer.getIcon().options.iconUrl;
-          if(nombreIcono.includes("_seleccionado.gif"))
-            {
-              this.iconoBuqueSeleccionado = new L.Icon({
-                // iconUrl: './assets/buque_san_benito.gif',
-                iconUrl:nombreIcono.replace("_seleccionado.gif",".svg"),
-                 iconSize: [32, 37]
-               });
- 
-            layer.getIcon().remove;
-            layer.setIcon(this.iconoBuqueSeleccionado);
-     
+          var icon = layer.getIcon();
+          if(icon.options.iconUrl.includes("buque_"))
+            {                  
+              icon.options.iconSize = [32,32];
+              (layer as any)._icon .style.animation = ''
+              layer.getIcon().remove;
+              layer.setIcon(icon);   
             }
         }
       }
