@@ -85,8 +85,10 @@
         </div>
 
         <!-- Footer -->
-        <div style="margin: 0 auto">
-            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
-         </div>
+        <ng-container *ngIf="hasPermisoTableroSolido_Umap_Modificar()">
+            <div style="margin: 0 auto">
+                <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
+            </div>
+        </ng-container>
     </div>
 </div>
