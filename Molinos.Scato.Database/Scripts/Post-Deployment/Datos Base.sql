@@ -399,5 +399,10 @@ IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vieja'    ) BEGIN 
 IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Vicentin' ) BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Vicentin' ); END
 IF NOT EXISTS (select 1 from TipoLineaEmbarque where Linea = 'Biodiesel') BEGIN insert into dbo.TipoLineaEmbarque(Linea)values('Biodiesel'); END
 
+-- PERMISOS AD
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Recibidores_Finalizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Recibidores_Finalizar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Recibidores') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Finalizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Recibidores'), (select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Finalizar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Finalizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Finalizar')); end
+
 --- Actualizar a cero el idBalanzarCorte cuando sea null
 update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where idBalanzaCorte is null

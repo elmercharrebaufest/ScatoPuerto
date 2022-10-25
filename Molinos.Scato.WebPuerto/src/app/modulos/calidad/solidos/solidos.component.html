@@ -44,6 +44,8 @@
     	<ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
 	        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
         </ng-container>
-        <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
+        <ng-container *ngIf="hasPermisoRecibidores_Finalizar()">
+            <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
+        </ng-container>
     </div>
 </div>

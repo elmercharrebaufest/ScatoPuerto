@@ -88,6 +88,7 @@ export enum PermisosScato {
   Recibidores_Recibo_Imprimir = "Recibidores_Recibo_Imprimir",
   Recibidores_Recibo_ConfirmarDatos = "Recibidores_Recibo_ConfirmarDatos",
   Recibidores_Imprimir = "Recibidores_Imprimir",
+  Recibidores_Finalizar = "Recibidores_Finalizar",
 
   // Geolocalizacion
   Geolocalizacion_Ver = 'Geolocalizacion_Ver',
