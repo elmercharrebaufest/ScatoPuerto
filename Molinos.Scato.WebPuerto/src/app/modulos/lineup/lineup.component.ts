@@ -77,16 +77,7 @@ export class LineupComponent implements OnInit, Observador {
   }
   
   cargarGeolocalizacionLineUp() {
-    this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(data => {
-      this.buquesGeolocalizacion = data;
-    },
-      err => {
-        console.log(err);
-        this.cargarWorkflows();
-      },
-      () => {
-        this.cargarWorkflows();
-      });
+    this.cargarWorkflows();
   }
 
   cargarEstadoLineUp() {
