@@ -80,11 +80,20 @@ export class LineupEmbarqueComponent implements OnInit {
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
+    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { 
+      this.ubicacionDeBuquePuerto = res;
+    });
+
+    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto()
+      .subscribe(res => {
+        this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
+      });
   }
+
   counter(i: number) {
     return new Array(i);
-}
+  }
+
   cargarBuqueGeolocalizacion(id: any) {
     this.hayBuque = false;
     this.mensajeBuque = "Completar IMO";
@@ -105,14 +114,17 @@ export class LineupEmbarqueComponent implements OnInit {
       this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
     }
   }
+
   getListaBuquesGeolocalizacion() {
     return this.listaBuquesGeolocalizacion;
   }
+
   verGeolocalizacion(flagVerGeo: any, embarque_Id: number) {
     if (flagVerGeo) {
       this.router.navigate(['/geolocalizacion'], { queryParams: { embarque_id: embarque_Id, tipo: 'zoom' } });
     }
   }
+  
   public modificarLineUp(campo: string) {
     if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       switch (campo) {
