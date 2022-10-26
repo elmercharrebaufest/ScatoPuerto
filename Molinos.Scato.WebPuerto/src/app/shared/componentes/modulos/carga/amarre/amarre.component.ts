@@ -22,13 +22,13 @@ export class AmarreComponent implements OnInit {
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  
+
   constructor(
     private _builder: FormBuilder,
     private _confirmationDialogService: ConfirmationDialogService,
     private _moduloDeCargaService: ModuloDeCargaService,
     private session: SessionService,
-  ) { 
+  ) {
   this.user = this.session.getUser();
   }
 
@@ -59,7 +59,7 @@ export class AmarreComponent implements OnInit {
   }
 
   validarAMPM(event){
-    
+
   }
 
   guardarAmarre(){
@@ -71,9 +71,9 @@ export class AmarreComponent implements OnInit {
           this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerAmarre(),this.ModuloDeCargaId).subscribe((res: any) => {
             this.guardando = false
           });
-        }        
+        }
       }    });
-    
+
   }
 
   updateAmarre(amarre){

@@ -30,7 +30,7 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
 
-  
+
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
@@ -72,15 +72,20 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
     if (this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada) {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
     }
+
     this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
+
+
+
+
   }
   counter(i: number) {
     return new Array(i);
@@ -257,7 +262,7 @@ export class LineupEmbarqueComponent implements OnInit {
         var cantidadDeLineUps = this.embarquesPuerto.length;
         //1,2,3,4,5,6,7,8
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
-        
+
         if (posicion > posicionActual){
           this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion + 0.5
         }else{
@@ -271,18 +276,18 @@ export class LineupEmbarqueComponent implements OnInit {
         this.embarquesPuerto.forEach(embarquePuerto => {
           embarquePuerto.lineUp.orden = index;
           index += 1;
-        }); 
+        });
         let idsYorden: { [key: number]: number; } = {};
         this.embarquesPuerto.forEach( embarquePuerto => {
           idsYorden[embarquePuerto.lineUp.id] = embarquePuerto.lineUp.orden;
-        });        
+        });
 
         this.instanciaWorkflow.lineUp.orden = posicion;
-        
+
         this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
-          if (this.observador) this.observador.Actualizar(); 
+          if (this.observador) this.observador.Actualizar();
         });
-    }    
+    }
   }
   /**ubicacion == 2 --> Muelle de Carga**/
   BarcoEnMuelleActualmente(listado: InstanciaWorkflowPuerto[]): boolean {
@@ -369,15 +374,15 @@ export class LineupEmbarqueComponent implements OnInit {
 //------------------------------------------------------------------------------------------------------------
 
   openModalFiles(Modal: any){
-    //embarqueid 
+    //embarqueid
     this.initializeModalArchivos();
      this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(
         res => this.ArchivosPuerto = res)
-      ; 
+      ;
      this.embarqueService.obtenerTipoArchivos().subscribe(res => {
       this.TipoArchivosDbList = res
-    }); 
-    
+    });
+
     this._modalService.open(Modal);
   }
 
@@ -392,24 +397,24 @@ export class LineupEmbarqueComponent implements OnInit {
     //En caso de no ser, le aviso que no se puede descargar.
     }else{
       this.confirmationDialogService.confirm('¡Atención!', "El archivo tiene un formato inválido para la acción que desea realizar.", 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }    
+    }
   }
-  
+
   previewFile(Modal: any, file: ArchivoPuerto){
     if(file.archivo.includes("data:image")){
       this.convertB64ToImg(file);
       this._modalService.open(Modal);
-    }else if(file.archivo.includes("data:application/pdf")){      
+    }else if(file.archivo.includes("data:application/pdf")){
       let pdfWindow = window.open("");
       pdfWindow.document.write(
       "<iframe width='100%' height='100%' src='" +
       encodeURI(file.archivo) + "'></iframe>"
-      )      
+      )
     }else{
       this.confirmationDialogService.confirm('¡Atención!', "El tipo de archivo no se puede mostrar", 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }    
+    }
   }
-    
+
   convertB64ToImg(file: ArchivoPuerto) {
     this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl(file.archivo);
   }
@@ -417,7 +422,7 @@ export class LineupEmbarqueComponent implements OnInit {
   initializeModalArchivos(){
     this.nombreArchivo = null;
   }
-    
+
   guardarArchivos(){
 
     this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los cambios?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
@@ -425,14 +430,14 @@ export class LineupEmbarqueComponent implements OnInit {
       if (confirmed) {
         this.embarqueService.guardarArchivos(this.instanciaWorkflow.embarque.id, this.ArchivosPuerto).subscribe(res => {
           this._modalService.dismissAll();
-        })          
+        })
       }
     })
   }
 
 
   eliminarArchivo(reg: ArchivoPuerto){
-    if(reg.id > 0){  
+    if(reg.id > 0){
       this.ArchivosPuerto.forEach((element,index)=>{
         if(element.id ==reg.id) this.ArchivosPuerto.splice(index,1);
      });
@@ -459,25 +464,25 @@ addFileToSave(){
   }
 
   if(!this.nombreArchivo[0] || this.nombreArchivo[0].tipoArchivo == undefined || this.nombreArchivo[0].tipoArchivo == ""){
-    this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
-    return;
-  }
-  
-  if (this.fileToUpload.name  == "" ){
-    this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+    this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
     return;
   }
 
-  if(this.fileToUpload.size >= 5000000){  
+  if (this.fileToUpload.name  == "" ){
+    this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+    return;
+  }
+
+  if(this.fileToUpload.size >= 5000000){
     this.confirmationDialogService.confirm('Atención','El tamaño del archivo debe ser menor a 5MB.', 'Cerrar', '', null, null, Tipoalerta.Warning);
     return;
-  }    
+  }
 
-  
+
   const reader = new FileReader();
   reader.readAsDataURL(this.fileToUpload);
   reader.onload = () => {
-    var file = reader.result.toString(); 
+    var file = reader.result.toString();
       if(file.includes("data:image") || file.includes("openxmlformats") || file.includes("data:application/pdf") || file.includes("text/plain")){
 
         let fileToAdd = new ArchivoPuerto;
@@ -485,7 +490,7 @@ addFileToSave(){
         fileToAdd.archivo = file;
         fileToAdd.fecha = new Date;
         fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
-        fileToAdd.nombreArchivo = this.fileToUpload.name        
+        fileToAdd.nombreArchivo = this.fileToUpload.name
         fileToAdd.tipoArchivoPuerto = this.nombreArchivo[0];
         fileToAdd.id = 0;
 
@@ -493,16 +498,16 @@ addFileToSave(){
         this.ArchivosPuerto = this.ArchivosPuerto.sort((a,b) => a.id - b.id)
         this.nombreArchivo = null;
         this.fileToUpload = null
-  
+
     }else{
-      //Salgo y no lo dejo agregar 
+      //Salgo y no lo dejo agregar
       this.confirmationDialogService.confirm('Atención','El archivo tiene un formato inválido.', 'Cerrar', '', null, null, Tipoalerta.Warning);
     }
   }
-    
+
     //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
     //Primero valido que esté toda la data necesaria completa
-   
+
 }
 
 

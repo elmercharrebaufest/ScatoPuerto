@@ -9811,6 +9811,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var estadoBuq = repositorio.Obtener<EstadoBuque>(x => x.Id == Estado);
                     embarque.EstadoBuque = estadoBuq;
+                    
                     repositorio.GuardarCambios();
                 }
             }
@@ -11128,7 +11129,8 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
             }
             else
             {
-                var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>(x => x.FechaDesamarro.Value.Year == anio && x.FechaDesamarro.Value.Month == mes);
+                //   var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>(x => x.FechaDesamarro.Value.Year == anio && x.FechaDesamarro.Value.Month == mes);
+                var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>();
                 listaEmbarques = new List<Embarque>();
                 foreach (var item in moduloCargaPeriodo)
                 {

@@ -1,15 +1,15 @@
 <div id="imprimirRecibidoresSolido">
-    
+
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='RecibidoresPdf' [src]='"pdf"'></ship-spinner>
     </div>
-    <app-grafico-carga id='graficoCargaCanva' 
+    <app-grafico-carga id='graficoCargaCanva'
                        class='bg-white'
                        [esCalidad]="true"></app-grafico-carga>
 
     <div class="html2pdf__page-break"></div>
 
-    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" 
+    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque"
                [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"
                [esCalidad]="true"></app-manos>
 
@@ -24,7 +24,7 @@
     </div>
 
     <app-registro-recibos></app-registro-recibos>
-    
+
     <app-nir></app-nir>
 
     <div class="html2pdf__page-break"></div>
@@ -32,7 +32,7 @@
     <app-balanzas-ritmos></app-balanzas-ritmos>
 
     <div fxLayout='row wrap' class="mt-4 shadow" >
-        
+
         <div fxFlex='50'>
             <!-- <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos> -->
         </div>
@@ -45,5 +45,57 @@
 	        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
         </ng-container>
         <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
+        <button (click)='openModalCargarAmarre(CargarAmarre)' class="btn btn-success" >FINALIZAR LUCAS</button>
+
+
+        <ng-template #CargarAmarre let-modal >
+          <!-- <div class='container'> -->
+            <form [formGroup]="amarreForm">
+           <div class="form-row" style="margin-top:4px">
+                  <div class="form-group  col-6" style="padding-left:30px;">
+                      <label>Amarró</label>
+                      <input formControlName="fechaAmarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                  </div>
+                  <div class="form-group col-6" style="padding-right:30px;">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control hora" formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
+                            [format]="24" >
+                        <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeAmarro style="z-index: 1000000 !important;" >
+                    </ngx-material-timepicker>
+                </div>
+
+            </div>
+            <div class="form-row">
+              <div class="form-group  col-6" style="padding-left:30px;">
+                      <label>Desamarró</label>
+                      <input formControlName="fechaDesamarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                  </div>
+                  <div class="form-group col-6" style="padding-right:30px;">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control hora" formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
+                            [format]="24" >
+                        <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeDesamarro>
+                    </ngx-material-timepicker>
+                  </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group  col-6" style="padding-left:30px;text-align:center">
+                <button  style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
+              </div>
+              <div class="form-group col-6" style="padding-right:30px;text-align:center">
+                <button style="margin-top: 18px;" type="button" class="btn btn-danger" [disabled]="" (click)="modal.dismiss('Cross click')" >CANCELAR</button>
+              </div>
+            </div>
+
+            </form>
+          <!-- </div> -->
+        </ng-template>
+       <!--<app-amarre></app-amarre>-->
     </div>
 </div>
