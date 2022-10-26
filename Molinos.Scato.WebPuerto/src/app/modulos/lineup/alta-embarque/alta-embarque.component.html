@@ -29,7 +29,7 @@
               </div> -->
               <div class="form-group col-md-6">
                 <label class="">Nombre buque</label>
-                    <input 
+                    <input
                          type="text"
                          class="form-control"
                          formControlName="nombreBuque"
@@ -137,6 +137,7 @@
                             min="1000-01-01" class="form-control" formControlName="fechaRecalada">
                       <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
                     </div>
+
 
                   </div>
                   <div class="form-group col-md-4">
@@ -408,22 +409,22 @@
                   </div>
                 </div>
 
-                <div class="row">                      
+                <div class="row">
                   <div class="form-group col">
                     <label for="eslora" class="font-weight-bold">Eslora</label>
                     <input type="text" class="form-control" formControlName="eslora"
                           placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
                   </div>
-  
+
                   <div class="form-group col">
                     <label for="manga" class="font-weight-bold">Manga</label>
                     <input type="text" class="form-control" formControlName="manga"
                           placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
                   </div>
 
-                  
-                  
-               
+
+
+
                 </div>
 
                 <!-- <div class="row">
@@ -486,7 +487,7 @@
             <div class="row">
                 <div class="form-group col-6">
                     <label for="nombre">Nombre</label>
-                    <input id="nombre" ngbAutofocus class="form-control" autocomplete="off" 
+                    <input id="nombre" ngbAutofocus class="form-control" autocomplete="off"
                     value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto()}}">
                 </div>
             </div>

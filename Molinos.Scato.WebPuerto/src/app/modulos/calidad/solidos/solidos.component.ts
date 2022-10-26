@@ -16,6 +16,13 @@ import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { formatDate } from '@angular/common';
+import { time } from 'console';
+import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
+import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
+
 
 @Component({
   selector: 'app-solidos',
@@ -23,12 +30,15 @@ import { SessionService } from '@ScatoServicios/session.service';
   styleUrls: ['./solidos.component.css']
 })
 export class SolidosComponent implements OnInit {
+
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
 
+  public amarreForm: FormGroup;
   embarqueSelected: EmbarqueNav;
   celdasManoDeEmbarque: CeldaManoDeEmbarque[];
+  periodoDeCarga: PeriodoDeCarga;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
   embarque: Embarque;
   materialesPuerto: MaterialPuerto[];
@@ -37,8 +47,14 @@ export class SolidosComponent implements OnInit {
   RecibidoresPdf: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-
+  errorMessage: boolean = false;
+  fechaAmarro: Date;
+  horaAmarro: string;
+  fechaDesamarro: Date;
+  horaDesamarro: string;
   constructor(
+    private _builder: FormBuilder,
+    private modalService: NgbModal,
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
@@ -48,9 +64,11 @@ export class SolidosComponent implements OnInit {
     private session: SessionService,) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+
   }
 
   ngOnInit(): void {
+
     this._procesoService.sendEmbarque.subscribe(
       res => {
         this.embarqueSelected = res;
@@ -58,7 +76,7 @@ export class SolidosComponent implements OnInit {
     )
     if (!this.embarqueSelected)
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
+      this.newFormAmarre();
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
@@ -74,6 +92,7 @@ export class SolidosComponent implements OnInit {
         }));
       });
     this.drawGraphic();
+
   }
 
   drawGraphic() {
@@ -84,9 +103,9 @@ export class SolidosComponent implements OnInit {
       this.sentidosManoDeEmbarque = res1;
       this.celdasManoDeEmbarque = res2;
       this._changeDetector.detectChanges();
-      
+
       if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
-          
+
           // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
           this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
           this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
@@ -98,6 +117,37 @@ export class SolidosComponent implements OnInit {
     this.hideSpinner.emit(false);
   }
 
+  guardarAmarre()
+  {
+    // let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
+    // periodoCargarActualizar.horaAmarro="";
+    // periodoCargarActualizar.fechaAmarro="";
+    // periodoCargarActualizar.horaDesamarro="";
+    // periodoCargarActualizar.fechaDesamarro="";
+
+    // this.moduloDeCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga'].id).subscribe((res: any) => {
+
+  //   });
+  }
+  cargarHorasDesamarro(amarre)
+  {
+    var newDate = new Date();
+    var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
+
+    amarre.fechaAmarro = this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : "";
+    amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
+    amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+    amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
+
+    this.amarreForm.patchValue(amarre);
+    if(this.amarreForm.value.fechaAmarro!='')
+      this.amarreForm.controls.fechaAmarro.disable();
+
+    if(this.amarreForm.value.horaAmarro!='')
+       this.amarreForm.controls.horaAmarro.disable();
+
+  }
+
   agregarTabique(tabique, entreColumna, yColumna) {
     this.graficoCarga.agregarTabique(tabique, entreColumna, yColumna);
   }
@@ -106,6 +156,13 @@ export class SolidosComponent implements OnInit {
     let { celda, sentido } = item;
     this.graficoCarga.agregarManoDeEmbarque(celda, sentido);
   }
+  public openModalCargarAmarre(modal: any) {
+    this.cargarHorasDesamarro(this.amarreForm);
+        this.errorMessage = false;
+        this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
+
+  }
+
 
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
@@ -114,6 +171,13 @@ export class SolidosComponent implements OnInit {
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+          this.periodoDeCarga=res.moduloDeCargaPeriodoDeCarga[0];
+          this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
+          this.horaAmarro = res.moduloDeCargaPeriodoDeCarga[0].horaAmarro;
+          this.fechaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].fechaDesamarro;
+          this.horaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].horaDesamarro;
+        }
         if (res.moduloDeCargaElementoGrafico) {
           this.graficoCarga.agregarElementosGraficos(res.moduloDeCargaElementoGrafico);
         }
@@ -130,14 +194,22 @@ export class SolidosComponent implements OnInit {
   finalizaCalidad():void{
     this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
+  newFormAmarre(){
+    this.amarreForm = this._builder.group({
+      fechaAmarro : [{ value: ''}],
+      horaAmarro :'',
+      fechaDesamarro : [{ value: ''}],
+      horaDesamarro : '',
+    })
+  }
 
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
       this._CalidadSharedService.ocultarBotonesImprimir();
-     
+
      this.RecibidoresPdf = true;
- 
-     
+
+
      let element = document.getElementById('imprimirRecibidoresSolido');
      let opt = {
        margin:       0,
@@ -146,7 +218,7 @@ export class SolidosComponent implements OnInit {
        html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
      };
- 
+
      html2pdf().from(element).set(opt).outputPdf()
      .then(() => {
        if (!imprimir) this.RecibidoresPdf = false
