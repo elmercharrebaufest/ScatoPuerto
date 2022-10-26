@@ -1764,6 +1764,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   hasPermisoTableroLiquido_GuardarTurno() {
     return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_GuardarTurno);
   }
+  hasPermisoTableroLiquido_AgregarLinea() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarLinea);
+  }
+  hasPermisoTableroLiquido_EliminarLinea() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EliminarLinea);
+  }
 
   controlarPermisos(){
     if(!this.hasPermisoTableroLiquido_Planilla_Editar()){
