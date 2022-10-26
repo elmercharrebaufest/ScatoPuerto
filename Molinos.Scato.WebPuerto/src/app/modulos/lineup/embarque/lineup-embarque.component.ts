@@ -104,9 +104,15 @@ export class LineupEmbarqueComponent implements OnInit {
   cargarBuqueGeolocalizacion(id: any) {
     this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
+    
     if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
-      this.mensajeBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? "Ver en el mapa" : "No se encontró. Completar IMO";
-      this.hayBuque = this.buquesGeolocalizacion.find(o => o.embarque_Id == id) != null ? true : false;
+      const embarqueInformacion = this.buquesGeolocalizacion.embarque?.embarqueInformacion;
+      this.mensajeBuque = "No se encontró. Completar IMO";
+      this.hayBuque = false;
+      if (embarqueInformacion !=  undefined || embarqueInformacion!= null) {
+        this.mensajeBuque = embarqueInformacion.length > 0 ? "Ver en el mapa" : "No se encontró. Completar IMO";
+        this.hayBuque =  embarqueInformacion.length > 0 ? true : false;
+      }
       this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
       this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
     } else {
@@ -114,12 +120,7 @@ export class LineupEmbarqueComponent implements OnInit {
       this.hayBuque = false;
     }
   }
-  setListaBuquesGeolocalizacion(BuquesGeolocalizacion) {
-    this.listaBuquesGeolocalizacion = BuquesGeolocalizacion;
-  }
-  getListaBuquesGeolocalizacion() {
-    return this.listaBuquesGeolocalizacion;
-  }
+
   verGeolocalizacion(flagVerGeo: any, embarque_Id: number) {
     if (flagVerGeo) {
       this.router.navigate(['/geolocalizacion'], { queryParams: { embarque_id: embarque_Id, tipo: 'zoom' } });

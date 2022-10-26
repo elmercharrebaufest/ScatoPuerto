@@ -75,19 +75,6 @@ export class LineupComponent implements OnInit, Observador {
 
 
   }
-  
-  cargarGeolocalizacionLineUp() {
-    this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(data => {
-      this.buquesGeolocalizacion = data;
-    },
-      err => {
-        console.log(err);
-        this.cargarWorkflows();
-      },
-      () => {
-        this.cargarWorkflows();
-      });
-  }
 
   cargarEstadoLineUp() {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
@@ -106,12 +93,7 @@ export class LineupComponent implements OnInit, Observador {
 
   ngOnInit(): void {
     let actualDate = new Date();
-    let function_name = 'LINEUP INICIO';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-    this.cargarGeolocalizacionLineUp();
-    function_name = 'LINEUP - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-
+    this.cargarWorkflows();
   }
 
   Actualizar(subject?: any) {
@@ -129,6 +111,7 @@ export class LineupComponent implements OnInit, Observador {
   }
 
   private cargarWorkflows(blockUI: boolean = false) {
+    console.log('INICIO LINEUP ', new Date())
     this.workflowService.obtenerListado()
       .subscribe(
         ret => {
@@ -137,13 +120,13 @@ export class LineupComponent implements OnInit, Observador {
           if (!blockUI) {
             setTimeout(x => this.cargarWorkflows(), 120000);
           }
-          this.filtrarMuelles();
-
         },
         errmess => this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error)),
         () => {
           this.mostrarContent = true;
           this.mostrarSpinner = false;
+          this.filtrarMuelles();
+          console.log('FIN LINEUP ', new Date())
         }
       );
   }
