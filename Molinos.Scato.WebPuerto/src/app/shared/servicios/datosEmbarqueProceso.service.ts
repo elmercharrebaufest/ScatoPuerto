@@ -50,9 +50,9 @@ export class DatosEmbarquesProcesoService {
             this.sendEmbarque.emit(this.embarqueSelected);
             this.planoCargaId = this.embarqueSelected.planoDeCargaId;
             this.moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
-            
             this._embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((res: Embarque) => {
                 this.fechaHoraInicioCarga = res.fechaHoraInicioCarga
+                this.vaporId = res.vapor.id;
             });
             
             this._moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe( res => {
@@ -62,10 +62,12 @@ export class DatosEmbarquesProcesoService {
                 this.fechaComienzoCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga : null;
             });
 
+            /*
             this.workflowService.obtenerListado().subscribe( (resp: any) => {
                 let barquitos = resp.find(x => x.embarque.id === this.embarqueId);
                 this.vaporId = barquitos['embarque'].vapor.id;
             });
+            */
         }
     }
 
