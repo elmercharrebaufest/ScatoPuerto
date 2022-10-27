@@ -11317,7 +11317,20 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
             return listarHistorialDeBusques;
         }
 
-     public void GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto)
+        public List<HistoricoActoresDto> ListarOperadores(int Embarque_Id)
+        {
+            try
+            {
+                List<HistoricoActoresDto> actores = Listar<HistoricoActores, HistoricoActoresDto>(x => x.Embarque.Id == Embarque_Id).ToList();
+                return actores;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto)
         {
             Vapor vapor = null;
 

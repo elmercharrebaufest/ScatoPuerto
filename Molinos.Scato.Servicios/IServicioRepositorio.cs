@@ -2673,6 +2673,8 @@ namespace Molinos.Scato.Servicios
 
   [OperationContract]
         List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId);
+        [OperationContract]
+        List<HistoricoActoresDto> ListarOperadores(int Embarque_Id);
 
         [OperationContract]
         IList<VaporDto> ObtenerVapores();

@@ -540,6 +540,7 @@
     <Build Include="dbo\Tables\Logging.sql" />
     <Build Include="dbo\Tables\ErroresGeolocalizacion.sql" />
     <Build Include="dbo\Tables\VaporInformacion.sql" />
+    <Build Include="dbo\Tables\HistoricoActores.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
