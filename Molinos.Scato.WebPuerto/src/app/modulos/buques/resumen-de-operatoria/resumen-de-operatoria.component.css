@@ -32,10 +32,13 @@
 }
 .dentro{
     width:15%;
-    padding-bottom:20px
 }
 .tipoBuque{
     width: 20%;
+}
+.parrafo-espacio{
+    padding:0px !important;
+    margin: 0px !important;
 }
 .line{
   width: 3px;
@@ -59,4 +62,17 @@
     padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
+}
+.margenes-historial{
+    margin-top: 10px;
+    margin-left: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+.espacio-izquierda-historial{
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }

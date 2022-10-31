@@ -21,7 +21,7 @@
         <tbody *ngFor="let historial of getListaHistorialBuques() | filtroBuque: getFiltroBuques()">
             <tr class="lista-buque-row" *ngIf="historial.numeroPaginado == getPaginaActual()">
                 <td class="lista-buque-row-item celda-nombre-buque"
-                    (click)="onVerHistorial(historial.embarqueId, historial.vaporId, historial.moduloDeCargaId)"
+                    (click)="onVerHistorial(historial.embarqueId, historial.vaporId, historial.moduloDeCargaId, historial.nombreBuque, historial.esLiquido)"
                     *ngIf="!getFiltrosSeleccionado()?.esDetalle">{{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item celda-nombre-buque-detalle" *ngIf="getFiltrosSeleccionado()?.esDetalle">
                     {{historial.nombreBuque}}</td>

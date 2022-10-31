@@ -1114,7 +1114,7 @@ export class AltaEmbarqueComponent implements OnInit {
     let { id, nombre } = $event.item
     this.id_buque  = id;
     this.nombre_buque = nombre;
-    this.buqueService.obtenerVaporInformaconion(id).subscribe((res: VaporInformacion) => {
+    this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
       if (res!=null){
         this.vaporInfo = res;
         this.embarqueForm.controls.nombreBuque.disable();

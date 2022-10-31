@@ -134,7 +134,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.initCorteManualForm();
-    this.obtenerBalanzadasEnVivo();
+    if (!this.esSoloLectura) {
+      this.obtenerBalanzadasEnVivo();
+    }
   }
 
   ngAfterViewInit(): void {
