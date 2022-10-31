@@ -13,6 +13,7 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
+import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 
 @Component({
   selector: 'app-navtabs-buque',
@@ -28,13 +29,14 @@ export class NavtabsBuqueComponent implements OnInit {
   @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
   vistaSeleccionada: string = 'lineup-tab';
   cargandoInformacion: boolean = false;
-
+  moduloDeCargaManosDeEmbarque;
 
   constructor(private moduloCargaService: ModuloDeCargaService, 
               private procesoService: DatosEmbarquesProcesoService,
               private balanzas78Service: Balanzas78Service,
               private turnosService: TurnosService,
               private planoDeCargaService: PlanoDeCargaService,
+              private calidadSharedService: CalidadSharedService,
               private embarqueSharingService: EmbarqueSharingService) { }
 
   ngOnInit(): void {
@@ -77,6 +79,12 @@ export class NavtabsBuqueComponent implements OnInit {
         this.procesoService.setModuloDeCarga(res);
         console.log('2 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
         this.cargandoInformacion = false;
+        console.log('5 -->', res.moduloDeCargaManosDeEmbarque)
+        if (res.moduloDeCargaManosDeEmbarque.length > 0) {
+          this.moduloDeCargaManosDeEmbarque = res.moduloDeCargaManosDeEmbarque;
+          this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
+          this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
+        }
     });
     this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
   }
@@ -132,12 +140,19 @@ export class NavtabsBuqueComponent implements OnInit {
     elementoSeleccionado.classList.add("show");
     console.log('this.paramEmbarqueSel-->>');
     console.log(this.paramEmbarqueSel);
+    
     if (this.vistaSeleccionada == 'op-tablero-tab') {
       if (this.esEmbarqueLiquido) {
         this.setCargarPeriodoDeCarga();
       } else {
         this.setCargarInfoUmap();
       }
+    }
+    
+    if (this.vistaSeleccionada === 'recibidores-tab'){
+      console.log('this.moduloDeCargaManosDeEmbarque--->>', this.moduloDeCargaManosDeEmbarque)
+      this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
+      this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
     }
 
   }

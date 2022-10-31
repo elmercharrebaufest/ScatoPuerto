@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Alerta } from '@ScatoModels/alerta';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
@@ -73,6 +73,9 @@ export class AltaEmbarqueComponent implements OnInit {
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
   private id_buque: number = 0;
   private nombre_buque: string = '';
+  private embarqueSeleccionado;
+  private vaporSeleccionado;
+  private parametrosSel;
   // #endregion
 
   // #region Constructor
@@ -207,8 +210,10 @@ export class AltaEmbarqueComponent implements OnInit {
     if (!this.destinoPuerto)
       this.planoDeCargaService.obtenerDestinos().subscribe(res => { this.destinoPuerto = res; });
     if (this.embarqueId != 0) {
+      this.embarqueService.obtenerIdsUsuales(this.embarqueId).subscribe(res => this.parametrosSel = res);
       this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(
         res => {
+          this.embarqueSeleccionado = JSON.parse(JSON.stringify(res));
           console.log('obtenerEmbarque: ', res);
           console.log('obtenerEmbarque xxxxxx: ', res);
           var filtered = this.listadoMateriales.filter(
@@ -231,7 +236,7 @@ export class AltaEmbarqueComponent implements OnInit {
           const buqueSel = this.vaporesList.find(x => x.id == res.vapor.id);
           this.embarqueForm.controls.nombreBuque.setValue(buqueSel);
           this.embarqueForm.get('nombreBuque').setValue(buqueSel);
-          this.embarqueForm.controls.nombreBuque.disable();
+          //this.embarqueForm.controls.nombreBuque.disable();
           this.id_buque  = buqueSel.id;
           this.nombre_buque = buqueSel.nombre;
 
@@ -348,7 +353,7 @@ export class AltaEmbarqueComponent implements OnInit {
             }));
           }
           this.mostrarSpinner = false;
-          this.embarqueForm.controls.tipoDeBuque.disable();
+          //this.embarqueForm.controls.tipoDeBuque.disable();
 
         },
         errmess => {
@@ -398,10 +403,121 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   //#region Finalizar Alta
-  finalizarAlta() {
-    this.submitted = true;
 
-    if (this.embarqueId == 0) {
+  private validaAltaEmbarque(): Subject<boolean>{
+    let subjectModificarAlta = new Subject<boolean>();
+    let moduloDeCargaPlanillaDeTurnos = null; 
+    let esValido = true;
+    this.moduloCargaService.obtenerModuloDeCarga(this.parametrosSel.moduloDeCargaId).subscribe(res => {
+      moduloDeCargaPlanillaDeTurnos = res.moduloDeCargaPlanillaDeTurnos; 
+    }, error => {}
+     , () => {
+        if (moduloDeCargaPlanillaDeTurnos != null && moduloDeCargaPlanillaDeTurnos != undefined){
+          if (moduloDeCargaPlanillaDeTurnos.length == 0)
+            esValido = true;
+          else 
+            esValido = false;
+        }
+        subjectModificarAlta.next(esValido);
+    });
+    return subjectModificarAlta;
+  }
+
+  private modificarAltaEmbarque(){
+    
+    if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid) {
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      if (this.invalidRequiredMaterial()) {
+        this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+      }
+      return
+    }
+    else {
+      if (this.invalidRequiredMaterial()) {
+        this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+        return;
+      }
+    }
+
+    this.mostrarSpinner = true;
+    this.embarqueForm.get('fechaRecalada').setValue(
+      this.embarqueForm.value.fechaRecalada + ' ' + this.horaRecalada.nativeElement.value);
+
+    this.embarqueForm.get('horaREcalada').setValue(
+      this.horaRecalada.nativeElement.value ?
+        this.horaRecalada.nativeElement.value :
+        this.embarqueForm.value.meridiemRecalada);
+
+    this.embarqueForm.get('fechaDesdeLimpieza').setValue(
+      this.embarqueForm.value.fechaDesdeLimpieza + ' ' + this.horaDesdeLimpieza.nativeElement.value);
+
+    this.embarqueForm.get('horaDesdeLimpieza').setValue(
+      this.horaDesdeLimpieza.nativeElement.value ? this.horaDesdeLimpieza.nativeElement.value : '');
+
+    this.embarqueForm.get('fechaHastaLimpieza').setValue(
+      this.embarqueForm.value.fechaHastaLimpieza + ' ' + this.horaHastaLimpieza.nativeElement.value);
+
+    this.embarqueForm.get('horaHastaLimpieza').setValue(
+      this.horaHastaLimpieza.nativeElement.value ? this.horaHastaLimpieza.nativeElement.value : '');
+
+    this.embarqueForm.get('motivosLimpieza').setValue(
+      this.embarqueForm.value.motivosLimpiezaList != null && this.embarqueForm.value.motivosLimpiezaList.length > 0 ?
+        this.motivosLimpiezaList.find(x => x.id == this.embarqueForm.value.motivosLimpiezaList[0].id) : '');
+
+    this.embarqueForm.get('agencias').setValue(
+      this.embarqueForm.value.agenciasList != null && this.embarqueForm.value.agenciasList.length > 0 ?
+        this.agenciasList.find(x => x.id == this.embarqueForm.value.agenciasList[0].id) : '');
+
+    this.embarqueForm.get('coordinadores').setValue(
+      this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
+        this.coordinadoresList.find(x => x.id == this.embarqueForm.value.coordinadoresList[0].id) : '');
+
+    this.embarqueForm.get('ata').setValue(
+      this.embarqueForm.value.ataList != null && this.embarqueForm.value.ataList.length > 0 ?
+        this.ataList.find(x => x.id == this.embarqueForm.value.ataList[0].id) : '');
+
+    this.embarqueForm.get('esLiquido').setValue(this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido);
+
+    this.embarqueForm.get('filePathShipParticular').setValue(this.fileShipParticular);
+    this.embarqueForm.get('shipParticularArchivoNombre').setValue(this.fileNameShipParticular);
+
+    if (this.embarqueInformacionFormArray.length == 0) {
+      this.embarqueInformacionFormArray.push(this.formBuilder.group({
+        imo: this.embarqueForm.value.imo,
+        bandera: this.embarqueForm.value.bandera,
+        embarque_id: this.embarqueForm.value.id,
+        fechaRegistro: Date.now(),
+      }));
+    } else {
+      this.embarqueInformacionFormArray.controls[0].get('imo').setValue(this.embarqueForm.value.imo);
+      this.embarqueInformacionFormArray.controls[0].get('bandera').setValue(this.embarqueForm.value.bandera);
+      this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
+    }
+    let altaEmbarque = this.embarqueForm.value
+    altaEmbarque.nombreBuque = this.nombre_buque;
+    const tipoBuqueSel = this.tipoDeBuquePuerto.filter(x => x.nombre == altaEmbarque.tipoBuque);
+    if (tipoBuqueSel.length > 0)
+      altaEmbarque.tipoDeBuque= tipoBuqueSel[0];
+
+    console.log('altaEmbarque', altaEmbarque)
+    console.log('embarqueSeleccionado', this.embarqueSeleccionado)
+
+    this.embarqueService.modificarEmbarque(altaEmbarque)
+      .subscribe((res: any) => {
+        this.mostrarSpinner = false;
+        this.openConfirmationDialog('¡Felicitaciones!',
+          'Ha modificado con éxito el buque',
+          'Ver line up',
+          'Seguir modificando');
+      },
+        errmess => {
+          this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error));
+          this.mostrarSpinner = false;
+        });
+  }
+
+  private guardarAltaEmbarque(){
       if (this.embarqueForm.invalid) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
         if (this.invalidRequiredMaterial()) {
@@ -417,7 +533,6 @@ export class AltaEmbarqueComponent implements OnInit {
         }
       }
       this.mostrarSpinner = true;
-
       this.embarqueForm.get('fechaRecalada').setValue(
         this.embarqueForm.value.fechaRecalada + ' ' + this.horaRecalada.nativeElement.value);
 
@@ -519,95 +634,38 @@ export class AltaEmbarqueComponent implements OnInit {
             this.confirmationDialogService.confirm('¡Error!', 'Error al crear el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             this.mostrarSpinner = false;
           });
+    
+  }
+
+  finalizarAlta() {
+    this.submitted = true;
+    if (this.embarqueId == 0) {
+      this.guardarAltaEmbarque();
     }
-    else {
-      if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid) {
-        this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-        if (this.invalidRequiredMaterial()) {
-          this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
+    else{
+      console.log('embarqueSeleccionado-->>', this.embarqueSeleccionado);
+      console.log('this.vaporSeleccionado-->>', this.vaporSeleccionado);
+      // Sino se cambiado el embarque
+      if (this.vaporSeleccionado === undefined || this.vaporSeleccionado == null){
+        this.modificarAltaEmbarque();
+      }else{
+        // Si se cambiado el embarque y selecciono el mismo embarque
+        if (this.embarqueSeleccionado.vapor.id == this.vaporSeleccionado.id){
+          this.modificarAltaEmbarque();
         }
-        return
-      }
-      else {
-        if (this.invalidRequiredMaterial()) {
-          this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-          this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
-          return;
-        }
-      }
-
-      this.mostrarSpinner = true;
-      this.embarqueForm.get('fechaRecalada').setValue(
-        this.embarqueForm.value.fechaRecalada + ' ' + this.horaRecalada.nativeElement.value);
-
-      this.embarqueForm.get('horaREcalada').setValue(
-        this.horaRecalada.nativeElement.value ?
-          this.horaRecalada.nativeElement.value :
-          this.embarqueForm.value.meridiemRecalada);
-
-      this.embarqueForm.get('fechaDesdeLimpieza').setValue(
-        this.embarqueForm.value.fechaDesdeLimpieza + ' ' + this.horaDesdeLimpieza.nativeElement.value);
-
-      this.embarqueForm.get('horaDesdeLimpieza').setValue(
-        this.horaDesdeLimpieza.nativeElement.value ? this.horaDesdeLimpieza.nativeElement.value : '');
-
-      this.embarqueForm.get('fechaHastaLimpieza').setValue(
-        this.embarqueForm.value.fechaHastaLimpieza + ' ' + this.horaHastaLimpieza.nativeElement.value);
-
-      this.embarqueForm.get('horaHastaLimpieza').setValue(
-        this.horaHastaLimpieza.nativeElement.value ? this.horaHastaLimpieza.nativeElement.value : '');
-
-      this.embarqueForm.get('motivosLimpieza').setValue(
-        this.embarqueForm.value.motivosLimpiezaList != null && this.embarqueForm.value.motivosLimpiezaList.length > 0 ?
-          this.motivosLimpiezaList.find(x => x.id == this.embarqueForm.value.motivosLimpiezaList[0].id) : '');
-
-      this.embarqueForm.get('agencias').setValue(
-        this.embarqueForm.value.agenciasList != null && this.embarqueForm.value.agenciasList.length > 0 ?
-          this.agenciasList.find(x => x.id == this.embarqueForm.value.agenciasList[0].id) : '');
-
-      this.embarqueForm.get('coordinadores').setValue(
-        this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
-          this.coordinadoresList.find(x => x.id == this.embarqueForm.value.coordinadoresList[0].id) : '');
-
-      this.embarqueForm.get('ata').setValue(
-        this.embarqueForm.value.ataList != null && this.embarqueForm.value.ataList.length > 0 ?
-          this.ataList.find(x => x.id == this.embarqueForm.value.ataList[0].id) : '');
-
-      this.embarqueForm.get('esLiquido').setValue(this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido);
-
-      this.embarqueForm.get('filePathShipParticular').setValue(this.fileShipParticular);
-      this.embarqueForm.get('shipParticularArchivoNombre').setValue(this.fileNameShipParticular);
-
-      if (this.embarqueInformacionFormArray.length == 0) {
-        this.embarqueInformacionFormArray.push(this.formBuilder.group({
-          imo: this.embarqueForm.value.imo,
-          bandera: this.embarqueForm.value.bandera,
-          embarque_id: this.embarqueForm.value.id,
-          fechaRegistro: Date.now(),
-        }));
-      } else {
-        this.embarqueInformacionFormArray.controls[0].get('imo').setValue(this.embarqueForm.value.imo);
-        this.embarqueInformacionFormArray.controls[0].get('bandera').setValue(this.embarqueForm.value.bandera);
-        this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
-      }
-      let altaEmbarque = this.embarqueForm.value
-      altaEmbarque.nombreBuque = this.nombre_buque;
-      const tipoBuqueSel = this.tipoDeBuquePuerto.filter(x => x.nombre == altaEmbarque.tipoBuque);
-      if (tipoBuqueSel.length > 0)
-        altaEmbarque.tipoDeBuque= tipoBuqueSel[0];
-
-      this.embarqueService.modificarEmbarque(altaEmbarque)
-        .subscribe((res: any) => {
-          this.mostrarSpinner = false;
-          this.openConfirmationDialog('¡Felicitaciones!',
-            'Ha modificado con éxito el buque',
-            'Ver line up',
-            'Seguir modificando');
-        },
-          errmess => {
-            this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error));
+        if (this.embarqueSeleccionado.vapor.id != this.vaporSeleccionado.id){
+          this.mostrarSpinner = true;
+          this.validaAltaEmbarque().subscribe(esValido =>{
             this.mostrarSpinner = false;
+            let mensaje = "No se pude modificar el embarque porque ya tiene cargas asociadas.";
+            if (esValido)
+              this.modificarAltaEmbarque();
+            else
+              this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
           });
+        }
+      }
+
     }
   }
 
@@ -1114,10 +1172,12 @@ export class AltaEmbarqueComponent implements OnInit {
     let { id, nombre } = $event.item
     this.id_buque  = id;
     this.nombre_buque = nombre;
+    this.vaporSeleccionado = {id: id, nombre: nombre, tipoBuque: ''};
     this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
       if (res!=null){
         this.vaporInfo = res;
-        this.embarqueForm.controls.nombreBuque.disable();
+        this.vaporSeleccionado.tipoBuque = res.tipoBuque;
+        //this.embarqueForm.controls.nombreBuque.disable();
         this.setinfoSelected();
       }
     });

@@ -25,6 +25,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./lineup-embarque.component.css']
 })
 export class LineupEmbarqueComponent implements OnInit {
+  @Input() buquesGeolocalizacion;
   @Input() index: number;
   @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
@@ -91,23 +92,22 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   cargarBuqueGeolocalizacion(id: any) {
+    this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
-    this.mensajeBuque = "Completar IMO";
-    if (this.instanciaWorkflow != undefined || this.instanciaWorkflow != null) {
-      if(this.instanciaWorkflow.embarque.embarqueInformacion != null){
-        if(this.instanciaWorkflow.embarque.embarqueInformacion.find(o => o.imo != '') != null){
-          if(this.instanciaWorkflow.embarque.embarquePosicion != null && this.instanciaWorkflow.embarque.embarquePosicion.length >  0){
-            this.mensajeBuque = "Ver en el mapa."
-            this.hayBuque = true;
-          } else{
-            this.mensajeBuque = "No se encontró ubicación."
-          }
-        } else{
-          this.mensajeBuque = "Completar IMO."
-        }
+    
+    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
+      const embarqueInformacion = this.buquesGeolocalizacion.embarque?.embarqueInformacion;
+      this.mensajeBuque = "No se encontró. Completar IMO";
+      this.hayBuque = false;
+      if (embarqueInformacion !=  undefined || embarqueInformacion!= null) {
+        this.mensajeBuque = embarqueInformacion.length > 0 ? "Ver en el mapa" : "No se encontró. Completar IMO";
+        this.hayBuque =  embarqueInformacion.length > 0 ? true : false;
       }
       this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
       this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
+    } else {
+      this.mensajeBuque = "No se encontró. Completar IMO";
+      this.hayBuque = false;
     }
   }
 
