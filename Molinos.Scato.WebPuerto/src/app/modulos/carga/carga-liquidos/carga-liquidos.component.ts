@@ -26,6 +26,7 @@ import * as html2pdf from 'html2pdf.js';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
 import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { BuqueService } from '@ScatoServicios/buque.service';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -73,7 +74,8 @@ export class CargaLiquidosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private planoDeCargaService: PlanoDeCargaService,
     private alertService: AlertService,
-    private _procesoGuardar: ProcesoGuardarService
+    private _procesoGuardar: ProcesoGuardarService,
+    private _buqueService: BuqueService
   ) {
     this.user = this.session.getUser();
   }
@@ -329,7 +331,11 @@ export class CargaLiquidosComponent implements OnInit {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar) {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(true, finalizar)},
+          .then(() => {            
+            this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+            this.imprimir(true, finalizar)
+            
+          },
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
