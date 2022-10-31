@@ -217,6 +217,10 @@ export class PlanoContentComponent implements OnInit {
       this.mostrarContent = true;
       this.showCargas.emit(true);
     });
+
+    setTimeout(() => {
+      this.controlarPermisos();
+    }, 3000);
   }
 
   initCargaComercial(cargaComercial: CargaComercial = null){

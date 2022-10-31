@@ -89,6 +89,7 @@ export enum PermisosScato {
   Recibidores_Nir_EliminarFila = "Recibidores_Nir_EliminarFila",
   Recibidores_Nir_EnviarNir = "Recibidores_Nir_EnviarNir",
   Recibidores_Nir_GuardarNir = "Recibidores_Nir_GuardarNir",
+  Recibidores_Nir_Modificar = "Recibidores_Nir_Modificar",
   Recibidores_Recibo_Imprimir = "Recibidores_Recibo_Imprimir",
   Recibidores_Recibo_ConfirmarDatos = "Recibidores_Recibo_ConfirmarDatos",
   Recibidores_Imprimir = "Recibidores_Imprimir",
