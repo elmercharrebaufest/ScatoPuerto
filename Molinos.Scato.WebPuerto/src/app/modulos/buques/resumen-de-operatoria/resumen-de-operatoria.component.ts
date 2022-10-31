@@ -39,6 +39,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   private vaporInformacion: VaporInformacion;
   private embarqueInformacion: EmbarqueInformacion;
   private filtroBuquedaForm: FormGroup;
+  private embarqueBuqueSel;
   paramEmbarqueSel: any = null;
   banderasBuque: Bandera;
   mostrarInformacion: boolean;
@@ -47,6 +48,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   esEmbarqueLiquido: boolean = false;
   moduloDeCargaId: number = 0;
   buque: any;
+  nombreBuque: string = null;
   private browserRefresh: boolean;
 
   // #endregion
@@ -69,6 +71,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   ) {
     this.cargarValoresHistorial();
     this.cargarValoresOperatoria();
+    this.setValoresEmbarque();
   }
   // #endregion
 
@@ -87,7 +90,13 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   //con en id de embarque que obtuve, me obtengo el vaporInformacion una vez termine el subscribe con el .pipe(finalize () =>);
   //donde tambien me obtengo el pais filtrandolo por el id que tenog en vaporInformacion
   // utilizo el mostrarInformacion = true. ya que es asncrono y rompe el front
-
+  private setValoresEmbarque(){
+    //, JSON.stringify(embarqueBuque)
+    if (localStorage.getItem("embarqueBuque") !=null && localStorage.getItem("embarqueBuque")!=undefined){
+      this.embarqueBuqueSel = localStorage.getItem("embarqueBuque"); 
+      this.embarqueBuqueSel = JSON.parse(this.embarqueBuqueSel)
+    }
+  }
   private cargarValoresHistorial() {
     this.mostrarInformacion = false;
     this.user = this.session.getUser()
@@ -97,7 +106,12 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.idEmbarqueOp = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
     this.idVaporOp = parseInt(this.route.snapshot.paramMap.get('vaporid'));
     this.embarqueService.obtenerIdsUsuales(this.idEmbarqueOp).subscribe(data => {
-      this.paramEmbarqueSel = { embarque_Id: this.idEmbarqueOp, moduloDeCarga_Id: data.moduloDeCargaId, vapor_Id: data.vaporId, planoDecarga_Id: data.planoDecargaId };
+      this.paramEmbarqueSel = { 
+        embarque_Id: this.idEmbarqueOp, 
+        moduloDeCarga_Id: data.moduloDeCargaId, 
+        vapor_Id: data.vaporId, 
+        planoDeCarga_Id: data.planoDeCargaId,
+        esLiquido: data.esLiquido ==1? true : false};
     });
    
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
@@ -136,35 +150,24 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   }
 
   private initOperatoria() {
-    this.embarqueService.obtenerEmbarque(this.idEmbarqueOp)
-      .pipe(finalize(() => {
-        this.buqueService.obtenerVaporInformaconion(this.embarqueOp.vapor.id).subscribe(res => {
-          console.log('res-->>', res)
-          this.vaporInformacion = res
-          if (this.vaporInformacion !== null)
-            this.embarqueService.obtenerBanderas().subscribe(res => {
-              const banderaSel = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
-              if (banderaSel.length >0)
-              this.banderasBuque =  banderaSel[0];
-            })
-            this.mostrarInformacion = true;
-        });
-        // console.log("--::::EMBARQUE DE OPERACION::::-- ", this.embarqueOp, this.idEmbarqueOp);
-      }))
-      .subscribe(res => {
-        this.embarqueOp = res;
-        this.esEmbarqueLiquido =  this.embarqueOp.esLiquido;
-        
-        this.embarqueService.obtenerEmbarqueInformacion(this.idEmbarqueOp).subscribe((res1:EmbarqueInformacion) => {
-          this.embarqueInformacion = res1
-          this.buque = {
-            nombreBuque: this.embarqueOp.patente,
-            embarque: this.embarqueOp,
-            informacion: this.embarqueInformacion,
-          }
-        })
+    if (this.embarqueBuqueSel != null && this.embarqueBuqueSel !=undefined) {
+      this.nombreBuque = this.embarqueBuqueSel.nombreBuque;
+      this.esEmbarqueLiquido = this.embarqueBuqueSel.esLiquido;
+    }else{
+      this.embarqueService.obtenerEmbarque(this.idEmbarqueOp).subscribe(res => {
+          this.nombreBuque = res.patente;
       });
-      console.log("BUQUEEEE",this.buque);
+    }
+    this.buqueService.obtenerVaporInformacion(this.idVaporOp).subscribe(res => {
+      if (this.vaporInformacion != null && this.vaporInformacion != undefined){
+        this.embarqueService.obtenerBanderas().subscribe(res => {
+          const banderaSel = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
+          if (banderaSel.length >0)
+          this.banderasBuque =  banderaSel[0];
+        })
+      }
+      this.mostrarInformacion = true;
+    });
   
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }

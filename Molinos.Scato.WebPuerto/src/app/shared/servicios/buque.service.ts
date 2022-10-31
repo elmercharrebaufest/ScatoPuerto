@@ -40,7 +40,7 @@ export class BuqueService {
     return this.http.post(`${this.url}Buque/GuardarVaporInformacion`, objVaporInformacion, { 'withCredentials': true });
   }
 
-  public obtenerVaporInformaconion(Vapor_Id: number): Observable<VaporInformacion> {
+  public obtenerVaporInformacion(Vapor_Id: number): Observable<VaporInformacion> {
     return this.http.get<VaporInformacion>(`${this.url}Buque/ObtenerVaporInformacion?Vapor_Id=${Vapor_Id}`, { 'withCredentials': true });
   }
 

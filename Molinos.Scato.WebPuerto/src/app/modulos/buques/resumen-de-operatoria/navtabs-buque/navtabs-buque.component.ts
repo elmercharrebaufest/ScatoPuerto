@@ -11,6 +11,8 @@ import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
+import { BalanzaService } from '@ScatoServicios/balanza.service';
 
 @Component({
   selector: 'app-navtabs-buque',
@@ -25,12 +27,12 @@ export class NavtabsBuqueComponent implements OnInit {
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
   @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;
   vistaSeleccionada: string = 'lineup-tab';
+  cargandoInformacion: boolean = false;
 
 
   constructor(private moduloCargaService: ModuloDeCargaService, 
               private procesoService: DatosEmbarquesProcesoService,
-              private embarqueService: EmbarqueService,
-              private workflowService: WorkflowService,
+              private balanzas78Service: Balanzas78Service,
               private turnosService: TurnosService,
               private planoDeCargaService: PlanoDeCargaService,
               private embarqueSharingService: EmbarqueSharingService) { }
@@ -39,48 +41,44 @@ export class NavtabsBuqueComponent implements OnInit {
     this.setCargarEmbarquesWorklow();
   }
 
-  private setCargarEmbarquesWorklow(){
-    
-    this.embarqueService.obtenerEmbarque(this.paramEmbarqueSel.embarque_Id).subscribe(result => {
+  private setCargarEmbarquesWorklow(){   
+    console.log('Ini setCargarEmbarquesWorklow..>', this.paramEmbarqueSel, new Date());
       let embarqueItem:EmbarqueNav = new EmbarqueNav();
       let embarqueList:EmbarqueNav[] = new Array();
-
       embarqueItem.cargado = true;
-      embarqueItem.esLiquido = result.esLiquido;
-      embarqueItem.id = result.id;
+      embarqueItem.esLiquido = this.paramEmbarqueSel.esLiquido;
+      embarqueItem.id = this.paramEmbarqueSel.embarque_Id;
       embarqueItem.moduloDeCargaId = this.paramEmbarqueSel.moduloDeCarga_Id;
-      embarqueItem.nombreBuque = result.nombre;
+      embarqueItem.nombreBuque = '';
       embarqueItem.nombreUbicacion = '';
-      embarqueItem.planoDeCargaId = this.paramEmbarqueSel.planoDecarga_Id;
+      embarqueItem.planoDeCargaId = this.paramEmbarqueSel.planoDeCarga_Id;
       embarqueList.push(embarqueItem);
-
       this.procesoService.setEmbarquesList(embarqueList);
-      this.setCargarEmbarquesPlanillas()
-    })
-    /*
-    this.workflowService.listarEmbarquesEnLineUp()
-      .subscribe(res => {
-        this.procesoService.setEmbarquesList(res);
-        console.log('res work', res)
-        this.setCargarEmbarquesPlanillas()
-      });
-      */
+      this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
+      this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
+      this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
+      console.log('Fin setCargarEmbarquesWorklow..>', this.paramEmbarqueSel, new Date());
+      this.setCargarEmbarquesPlanillas();
   }
 
   private setCargarEmbarquesPlanillas(){
-      this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
-      this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDecarga_Id);
-      this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
-
-      this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe( res => {
+    this.cargandoInformacion = true;
+    console.log('Fin setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
+    
+    this.planoDeCargaService.obtenerPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id).subscribe(res => {
+      this.turnosService.setExportadores(res.cargasComerciales);
+      this.turnosService.setBodega(res.planoDeCargaBodegas);
+      console.log('3 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
+    });
+    this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
+    console.log('4 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
+    
+    this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id).subscribe( res => {
         this.procesoService.setModuloDeCarga(res);
-      });
-
-      this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).subscribe(res => {
-        this.turnosService.setExportadores(res.cargasComerciales);
-        this.turnosService.setBodega(res.planoDeCargaBodegas);
-      });
-
+        console.log('2 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
+        this.cargandoInformacion = false;
+    });
+    this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
   }
   
   private setCargarPeriodoDeCarga() {
@@ -110,27 +108,7 @@ export class NavtabsBuqueComponent implements OnInit {
       });
   }
 
-  private cargarDatosEmbarqueSolido(){
-    this.embarqueService.obtenerEmbarque(this.paramEmbarqueSel.embarque_Id).subscribe(data => {
-      const embarqueNavSel: EmbarqueNav = {
-        cargado: true,
-        esLiquido: data.esLiquido,
-        id : this.paramEmbarqueSel.embarque_Id,
-        moduloDeCargaId : this.paramEmbarqueSel.moduloDeCarga_Id,
-        nombreBuque :data.nombreBuque,
-        nombreUbicacion : '',
-        planoDeCargaId : this.paramEmbarqueSel.planoDecarga_Id,
-      };
-      let embarqueNavList: EmbarqueNav[] = [];
-      embarqueNavList.push(embarqueNavSel);
-      this.procesoService.setEmbarquesList(embarqueNavList);
-      this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
-      console.log('enviandoooooo');
-    });
-
-
-  }
-
+ 
   onClickHandlerClient(idElemento: string) {
 
     this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
@@ -157,10 +135,8 @@ export class NavtabsBuqueComponent implements OnInit {
     if (this.vistaSeleccionada == 'op-tablero-tab') {
       if (this.esEmbarqueLiquido) {
         this.setCargarPeriodoDeCarga();
-        this.cargarDatosEmbarqueSolido();
       } else {
         this.setCargarInfoUmap();
-        this.cargarDatosEmbarqueSolido();
       }
     }
 

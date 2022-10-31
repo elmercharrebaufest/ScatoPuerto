@@ -11155,6 +11155,7 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                         historialDeBusquesDto.NombreBuque = embarque.Vapor.Nombre;
                         historialDeBusquesDto.EmbarqueId = embarque.Id;
                         historialDeBusquesDto.VaporId = embarque.Vapor.Id;
+                        historialDeBusquesDto.EsLiquido = embarque.EsLiquido;
 
                         List<string> listaMuelles = new List<string>();
                         List<string> listaProductos = new List<string>();
@@ -11585,6 +11586,7 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
             int idModuloDeCarga = 0;
             int idPlanoDeCarga = 0;
             int idVapor = 0;
+            int esLiquido = 0;
             Dictionary<string, int> idsUsuales = new Dictionary<string, int>();
             try
             {
@@ -11602,10 +11604,13 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
                 {
                     idVapor = lineUp.Embarque.Vapor.Id;
                 }
+                if (lineUp.Embarque.EsLiquido != null)
+                    esLiquido = lineUp.Embarque.EsLiquido ? 1 : 0;
 
                 idsUsuales.Add("moduloDeCargaId", idModuloDeCarga);
-                idsUsuales.Add("planoDecargaId", idPlanoDeCarga);
+                idsUsuales.Add("planoDeCargaId", idPlanoDeCarga);
                 idsUsuales.Add("vaporId", idVapor);
+                idsUsuales.Add("esLiquido", esLiquido);
 
                 return idsUsuales;
             }

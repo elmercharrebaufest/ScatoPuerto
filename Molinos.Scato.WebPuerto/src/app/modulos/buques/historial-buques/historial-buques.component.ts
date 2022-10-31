@@ -203,7 +203,16 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Eventos Controles
-  onVerHistorial(embarqueId, vaporId, moduloDeCargaId) {
+  onVerHistorial(embarqueId, vaporId, moduloDeCargaId, nombreBuque, esLiquido) {
+    const embarqueBuque = {
+      embarqueId      : embarqueId,
+      vaporId         : vaporId,
+      moduloDeCargaId : moduloDeCargaId,
+      nombreBuque     : nombreBuque,
+      esLiquido       : esLiquido
+    }
+    localStorage.setItem("embarqueBuque", JSON.stringify(embarqueBuque));
+    
     this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
     this.filtroBuquedaForm.controls.esDetalle.setValue(true);

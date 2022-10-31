@@ -11,6 +11,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int EmbarqueId { get; set; }
         public int VaporId { get; set; }
+        public bool EsLiquido { get; set; }
         public string NombreBuque { get; set; }
         public string NombreAta { get; set; }
         public string Destino { get; set; }

@@ -63,7 +63,7 @@ export class BodegasComponent implements OnInit, OnDestroy {
   }
   setCargarValoresBodegas() {
     if (this.esSoloLectura) {
-      this.planoDeCargaId = this.paramSoloLectura.planoDecarga_Id;
+      this.planoDeCargaId = this.paramSoloLectura.planoDeCarga_Id;
       this.embarqueService.obtenerEmbarque(this.paramSoloLectura.embarque_Id).subscribe(res => {
         this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
       });
@@ -84,8 +84,11 @@ export class BodegasComponent implements OnInit, OnDestroy {
     this.setCargarValoresBodegas();
     if (this.esSoloLectura) {
       this.planoDeCargaService.obtenerPlanoDeCarga(this.planoDeCargaId)
-        .pipe(finalize( () => this.obtenerBalanzadasEnVivo() ))
-        .subscribe( res => this.planoDeCargaBodega = res.planoDeCargaBodegas );  
+        .subscribe( res => {
+          this.planoDeCargaBodega = res.planoDeCargaBodegas;
+          this.balanzas78Service.actualizarBodegas(this.paramSoloLectura.moduloDeCarga_Id);
+          this.obtenerBalanzadasEnVivo()
+        });  
     }else{
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
       this.planoDeCargaService.obtenerPlanoDeCarga(this.embarqueSelected.planoDeCargaId)

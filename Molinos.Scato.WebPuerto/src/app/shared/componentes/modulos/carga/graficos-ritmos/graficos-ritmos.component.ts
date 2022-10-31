@@ -48,6 +48,12 @@ export class GraficosRitmosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.enBuque){
+      this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
+        this.moduloDeCargaId = data.moduloDeCarga_Id;
+        this.cargarTurnosBalanzas();
+      })
+    }
     this._parametros.obtenerParametro("tiempoActualizacionRelojes").subscribe((res: Parametros) => {
       this.tiempoActualizacionRelojes = res.parametro2 != null && res.parametro2 > 0? res.parametro2 : 0;
       this.cargarTurnosBalanzas();
