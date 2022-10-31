@@ -1009,7 +1009,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.planillaDeTurnos, this.procesoService,  this.lineas, esEnviarPlanilla);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService,  this.planillaDeTurnos, esEnviarPlanilla);
     this.exportaPlanilla = false;
   }
 
