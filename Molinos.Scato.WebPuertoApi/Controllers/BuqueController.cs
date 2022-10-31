@@ -25,11 +25,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/Buque/ListarHistorialDeBuques")]
-        public HttpResponseMessage ListarHistorialDeBuques(int anio, int mes, int vaporId)
+        public HttpResponseMessage ListarHistorialDeBuques(int anio, int mes, int vaporId, DateTime? desde, DateTime? hasta)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeBuques(anio, mes, vaporId));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeBuques(anio, mes, vaporId, desde, hasta));
             }
             catch (Exception ex)
             {
