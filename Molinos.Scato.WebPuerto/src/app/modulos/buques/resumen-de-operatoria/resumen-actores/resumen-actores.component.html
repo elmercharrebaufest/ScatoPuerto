@@ -20,38 +20,31 @@
             <p class="subTItulos pb-4">Empresa fumigadora: <span class="data">Próximamente en COMEX</span></p>
         </div>
     </div>
-    <div class="col-8">
-        <div class="bg-white shadow m-4 px-4 pt-4 alto-minimo">
+    <div class="col-8" >
+        <div class="bg-white shadow m-4 px-4 pt-4 alto-minimo" style="padding-bottom: 10px">
             <h2 class="colorTitle">Operadores de puerto</h2>
             <hr class="mt-0">
             <table class="table table-bordered">
                 <thead>
                     <tr class="table-active">
-                        <th><img src='assets/iconFechaNegro.svg' class='imgClockInput1 color-black'>Día</th>
-                        <th><img src='assets/relojNegroIcon.svg' class='imgClockInput1 color-black'>Turno</th>
-                        <th>Tablerista</th>
-                        <th>Recibidor</th>
-                        <th>Supervisor</th>
+                        <!-- <th><img src='assets/iconFechaNegro.svg' class='imgClockInput1 color-black'>Día</th>
+                        <th><img src='assets/relojNegroIcon.svg' class='imgClockInput1 color-black'>Turno</th> -->
+                        <th style="width: 30%;">Fecha y hora</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody *ngFor="let operador of operadores">
                     <tr>
                         <td>
-                            
+                            {{operador.fecha}}
                         </td>
                         <td>
-                            
+                            {{operador.usuario}}
                         </td>
                         <td>
-                            
-                        </td>
-                        <td>
-                            
-                        </td>
-                        <td>
-                            
-                        </td>
-                        
+                            {{operador.accion}}
+                        </td>                        
                     </tr>
                 </tbody>
             </table>

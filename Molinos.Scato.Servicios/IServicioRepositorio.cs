@@ -2671,10 +2671,14 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
 
-  [OperationContract]
+        [OperationContract]
         List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId);
+
         [OperationContract]
         List<HistoricoActoresDto> ListarOperadores(int Embarque_Id);
+
+        [OperationContract]
+        void GuardarHistoricoActor(int Embarque_Id, string accion, string nombreUsuario);
 
         [OperationContract]
         IList<VaporDto> ObtenerVapores();

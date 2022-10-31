@@ -11330,6 +11330,36 @@ public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, in
             }
         }
 
+        public void GuardarHistoricoActor(int Embarque_Id, string accion, string nombreUsuario)
+        {
+            try
+            {
+                if(accion != "")
+                {
+                    Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == Embarque_Id);
+
+                    if(embarque != null)
+                    {
+                        HistoricoActores HA = new HistoricoActores()
+                        {
+                            Accion = accion,
+                            Embarque = embarque,
+                            Fecha = DateTime.Now,
+                            Usuario = nombreUsuario
+                        };
+
+                        repositorio.Agregar(HA);
+                        repositorio.GuardarCambios();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
         public void GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto)
         {
             Vapor vapor = null;

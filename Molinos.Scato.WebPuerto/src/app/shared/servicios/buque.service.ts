@@ -7,6 +7,7 @@ import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { Vapor } from '@ScatoModels/vapor';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
 import { Actores } from '@ScatoModels/Buques/Actores';
+import { Operador } from '@ScatoModels/Buques/Operador';
 @Injectable({
   providedIn: 'root'
 })
@@ -50,6 +51,14 @@ export class BuqueService {
 
   public obtenerActores(idEmbarque: number): Observable<Actores> {
     return this.http.get<Actores>(`${this.url}Buque/ObtenerActores?idEmbarque=${idEmbarque}`, { 'withCredentials': true });
+  }
+
+  public GuardarHistoricoOperador(idEmbarque: number, accion: string){
+    return this.http.post(`${this.url}Buque/GuardarHistoricoOperador?idEmbarque=${idEmbarque}&accion=${accion}`, { 'withCredentials': true });
+  }
+
+  public obtenerOperadores(idEmbarque: number): Observable<Operador[]>{
+    return this.http.get<Operador[]>(`${this.url}Buque/ListarOperadores?Embarque_Id=${idEmbarque}`, { 'withCredentials': true });
   }
   // #endregion
 }

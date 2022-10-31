@@ -9,6 +9,7 @@ import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.s
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { BuqueService } from '@ScatoServicios/buque.service';
 
 @Component({
   selector: 'app-inicio-carga',
@@ -33,6 +34,7 @@ export class InicioCargaComponent implements OnInit {
     private funcionesGeneralesService: FuncionesGeneralesService,
     confirmationDialogService: ConfirmationDialogService,
     private session: SessionService,
+    private _buqueService: BuqueService
   ) {
     this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
@@ -117,6 +119,7 @@ export class InicioCargaComponent implements OnInit {
             texto = "Se inició la carga correctamente";
             this.cargaIniciada = true;
             document.getElementById("FIC").setAttribute("disabled","true");
+            this._buqueService.GuardarHistoricoOperador(this.embarque_Id, "Inició carga").subscribe();
           }
   
           this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);

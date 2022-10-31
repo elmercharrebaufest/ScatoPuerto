@@ -37,6 +37,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Buque/ListarOperadores")]
+        public HttpResponseMessage ListarOperadores(int Embarque_Id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarOperadores(Embarque_Id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Buque/GuardarHistoricoOperador")]
+        public HttpResponseMessage ListarOperadores(int idEmbarque, string accion)
+        {
+            try
+            {
+                servicio.GuardarHistoricoActor(idEmbarque, accion, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
