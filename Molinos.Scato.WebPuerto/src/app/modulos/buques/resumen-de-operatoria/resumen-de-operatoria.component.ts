@@ -49,6 +49,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   moduloDeCargaId: number = 0;
   buque: any;
   nombreBuque: string = null;
+  mostrarCardBuque: boolean = false;
   private browserRefresh: boolean;
 
   // #endregion
@@ -223,13 +224,41 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.filtroBuquedaForm.controls.embarqueId.setValue(0);
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
-  public openModalShipParticular(modal) {
-    
+  private cargaModalShipParticular(modal){
     this.modalService.open(modal, { windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
       .then(() => {
         console.log('_modalService.open');
       })
       .catch((res) => { console.log(res) });
+      this.mostrarCardBuque = false;
+  }
+  public openModalShipParticular(modal) {
+    this.mostrarCardBuque = true;
+    if (this.buque == null || this.buque == undefined) {
+      this.embarqueService.obtenerEmbarque(this.idEmbarqueOp).subscribe(res => {
+        console.log('res--->>', res)
+        this.buque = {
+          nombreBuque : res.patente,
+          informacion : {
+            fotoEmbarque       : res.embarqueInformacion[0].fotoEmbarque,
+            imo                : res.embarqueInformacion[0].imo,
+            bandera            : res.embarqueInformacion[0].bandera,
+            largoxAnchoExtremo : res.embarqueInformacion[0].largoxAnchoExtremo
+          },
+          embarque : { 
+            tipoBuque              : res.tipoBuque, 
+            porteBruto             : res.porteBruto,
+            porteNeto              : res.porteNeto,
+            puntal                 : res.puntal,
+            freeboard              : res.freeboard,
+            cantidadBodegasTanques : res.cantidadBodegasTanques
+          }
+        }
+        this.cargaModalShipParticular(modal);
+      });
+    }else{
+      this.cargaModalShipParticular(modal);
+    }
   }
   // #endregion
 

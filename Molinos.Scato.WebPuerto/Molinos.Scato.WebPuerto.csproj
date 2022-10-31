@@ -317,6 +317,7 @@
     <Content Include="src\assets\buque.svg" />
     <Content Include="src\assets\buque_nouryon.svg" />
     <Content Include="src\assets\buque_nouryon_seleccionado.gif" />
+    <Content Include="src\assets\buque_no_encontrado.png" />
     <Content Include="src\assets\buque_otro_muelle.svg" />
     <Content Include="src\assets\buque_otro_muelle_seleccionado.gif" />
     <Content Include="src\assets\buque_san_benito.svg" />

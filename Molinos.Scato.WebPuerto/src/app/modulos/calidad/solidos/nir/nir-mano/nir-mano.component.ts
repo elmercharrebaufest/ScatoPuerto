@@ -15,6 +15,7 @@ import { SessionService } from '@ScatoServicios/session.service';
   
 })
 export class NirManoComponent implements OnInit {
+  @Input() esSoloLectura: boolean = false;
   @Input() mano : Mano;
   @Input() queMano : number;
   bodegas: Bodega[] = [];
@@ -37,7 +38,6 @@ constructor(
       tipo: '',
       nirManualPuerto: this.fb.array([])
     });
-    this.loaded = true
     this.obtenerBodegas();
     this.obtenerNir();
 
@@ -59,6 +59,7 @@ constructor(
           })
         })
       }
+      this.loaded = true
     }
   }
   
@@ -67,17 +68,17 @@ constructor(
 
     if(nirManualPuerto){
       fa = this.fb.group({
-        id: nirManualPuerto?.id ? nirManualPuerto.id : 0,
-        fecha: nirManualPuerto?.fecha ? nirManualPuerto.fecha : null,
-        hd: nirManualPuerto?.hd ?? '',
-        ph: nirManualPuerto?.ph ?? '',
-        protBase: [{value: nirManualPuerto?.protBase ?? '', disabled: this.mano.tipo == 'Trigo' ? false : true}],
-        prot_BS: [{value: nirManualPuerto?.prot_BS ?? '',  disabled: this.mano.tipo == 'Trigo' ? false : true}],
-        origen: nirManualPuerto?.origen ?? '',
-        bodega: nirManualPuerto?.bodega ?? '0',
-        mano: nirManualPuerto?.mano ?? '',
-        material_id: nirManualPuerto?.material_id ? nirManualPuerto?.material_id : this.mano.tipo == "Trigo" ? 17:11,
-        moduloDeCargaId: nirManualPuerto?.moduloDeCargaId ?? 0,
+        id             : [{value: nirManualPuerto?.id ? nirManualPuerto.id : 0, disabled: this.esSoloLectura}],
+        fecha          : [{value: nirManualPuerto?.fecha ? nirManualPuerto.fecha : null, disabled: this.esSoloLectura}],
+        hd             : [{value: nirManualPuerto?.hd ?? '', disabled: this.esSoloLectura}],
+        ph             : [{value: nirManualPuerto?.ph ?? '', disabled: this.esSoloLectura}],
+        protBase       : [{value: nirManualPuerto?.protBase ?? '', disabled: this.mano.tipo == 'Trigo' ? (this.esSoloLectura? true: false) : true}],
+        prot_BS        : [{value: nirManualPuerto?.prot_BS ?? '',  disabled: this.mano.tipo == 'Trigo' ? (this.esSoloLectura? true: false): true}],
+        origen         : [{value: nirManualPuerto?.origen ?? '', disabled: this.esSoloLectura}],
+        bodega         : [{value: nirManualPuerto?.bodega ?? '0', disabled: this.esSoloLectura}],
+        mano           : [{value: nirManualPuerto?.mano ?? '', disabled: this.esSoloLectura}],
+        material_id    : [{value: nirManualPuerto?.material_id ? nirManualPuerto?.material_id : this.mano.tipo == "Trigo" ? 17:11, disabled: this.esSoloLectura}],
+        moduloDeCargaId: [{value: nirManualPuerto?.moduloDeCargaId ?? 0, disabled: this.esSoloLectura}],
       })
     } else { 
       fa = this.fb.group({

@@ -4,7 +4,7 @@
     </div>
     <div>
       <ng-container *ngIf="hasPermisoRecibidores_Nir_Modificar()">
-        <div class='btn-add-container pt-btn-add mb-3' (click)="agregarObjetoNir()">
+        <div class='btn-add-container pt-btn-add mb-3' (click)="agregarObjetoNir()" *ngIf="!esSoloLectura">
           <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;' >+</button>
           <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nueva fila</span>
         </div>
@@ -54,7 +54,7 @@
                     <td style=" border-top: 0px;">
                       <div fxFlex='4'>
                         <ng-container *ngIf="hasPermisoRecibidores_Nir_Modificar()">
-                          <img style="width: 26px; height: 26px; margin-top: -16px" id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito" (click)="eliminarObjetoNir(i)">
+                          <img style="width: 26px; height: 26px; margin-top: -16px" id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito" (click)="eliminarObjetoNir(i)"  *ngIf="!esSoloLectura">
                         </ng-container>
                       </div>
                     </td>
