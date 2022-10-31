@@ -329,12 +329,12 @@ export class NIRComponent {
     this.nir.mano2.tipo = this.Mano2Visible ? this.TrigoMano2 ? 'Trigo' : 'Maíz' : ''
   }
 
-  hasPermisoRecibidores_Nir_AgregarNuevaFila() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
-  }
-  hasPermisoRecibidores_Nir_EliminarFila() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
-  }
+  // hasPermisoRecibidores_Nir_AgregarNuevaFila() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
+  // }
+  // hasPermisoRecibidores_Nir_EliminarFila() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
+  // }
   hasPermisoRecibidores_Nir_EnviarNir() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EnviarNir);
   }
