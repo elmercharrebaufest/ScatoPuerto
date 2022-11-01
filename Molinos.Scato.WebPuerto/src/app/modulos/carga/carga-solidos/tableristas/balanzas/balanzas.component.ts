@@ -152,7 +152,11 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
         this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
       });
       this.cargarMotivosBalanzas78();      
-      this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+      this._balanzaService.obtenerListadoBodegas().subscribe(b => {
+        this.bodegas = b;
+        this.obtenerBalanzadasEnVivo();
+
+      });
       this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
     } else {
       this.embarque = this._procesoService.getEmbarqueSelected();
