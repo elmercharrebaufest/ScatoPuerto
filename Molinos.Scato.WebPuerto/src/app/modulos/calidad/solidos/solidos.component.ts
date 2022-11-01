@@ -157,4 +157,7 @@ export class SolidosComponent implements OnInit {
 	hasPermisoRecibidores_Imprimir() {
     	return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
 	}
+  hasPermisoRecibidores_Finalizar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Finalizar);
+  }
 }

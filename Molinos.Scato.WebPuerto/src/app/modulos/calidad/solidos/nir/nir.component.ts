@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Mano, Nir, NirManualPuerto, TipoNir } from '@ScatoModels/nir';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -20,7 +20,8 @@ import { SessionService } from '@ScatoServicios/session.service';
   styleUrls: ['./nir.component.css']
 })
 
-export class NIRComponent {
+export class NIRComponent  implements OnInit {
+  @Input() esSoloLectura: boolean = false;
   @ViewChild("mano1")Mano1Component: NirManoComponent;
   @ViewChild("mano2")Mano2Component: NirManoComponent;
   confirmationDialogService: any;
@@ -95,6 +96,54 @@ export class NIRComponent {
     
   }
 
+  ngOnInit(){
+    console.log('manos embarque', this.moduloDeCarga_Id)
+    if (this.esSoloLectura){
+      this.cargarInformacionNIR(this._CalidadSharedService.getManosDeEmbarque());
+    }else{
+      this._CalidadSharedService.Manos.subscribe((res: any) => {
+        this.cargarInformacionNIR(res);
+      });
+    }
+  }
+
+  private cargarInformacionNIR(listaNIRs){
+    this.isLoaded = false;
+
+    this.manosDeEmbarque = listaNIRs;
+    this.TrigoMano1 = Object.values(this.manosDeEmbarque[0].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == 'WHEAT' || x.materialPuerto?.descripcionCorta == 'TRIGO')).length > 0
+    this.TrigoMano2 = Object.values(this.manosDeEmbarque[1].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == 'WHEAT' || x.materialPuerto?.descripcionCorta == 'TRIGO')).length > 0
+    this.MaizMano1 = Object.values(this.manosDeEmbarque[0].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == "CORN"  || x.materialPuerto?.descripcionCorta == 'MAIZ')).length > 0
+    this.MaizMano2 = Object.values(this.manosDeEmbarque[1].moduloDeCargaManosDeEmbarqueDetalle.filter(x => x.materialPuerto?.descripcionCorta == "CORN"  || x.materialPuerto?.descripcionCorta == 'MAIZ')).length > 0
+
+    this.nir.tipoNir = this.getTipoNir(this.TrigoMano1, this.TrigoMano2, this.MaizMano1, this.MaizMano2);
+    this.Mano1Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 6;
+    this.Mano2Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 4 || this.nir.tipoNir == 7 || this.nir.tipoNir == 8;      
+
+    this.setTipoManos();
+    this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe((res: NirManualPuerto[]) => {
+      if(this.Mano1Visible){
+        let materialId_mano1: number;
+        //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
+        //Para no harcodear hay que refactorizar y no había tiempo (Martín)
+        materialId_mano1 = this.nir.mano1.tipo == 'Trigo' ? 17 : 11;
+        this.nir.mano1.nirManualPuerto = [];
+        this.nir.mano1.nirManualPuerto = res.filter(x => x.mano == 'mano1' && x.material_id == materialId_mano1);
+        this._CalidadSharedService.mano1 = this.nir.mano1;
+      }
+
+      if(this.Mano2Visible){
+        let materialId_mano2: number;
+        //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
+        //Para no harcodear hay que refactorizar y no había tiempo (Martín)
+        materialId_mano2 = this.nir.mano2.tipo == 'Maíz' ? 11 : 17;
+        this.nir.mano2.nirManualPuerto = [];
+        this.nir.mano2.nirManualPuerto = res.filter(x => x.mano == 'mano2' && x.material_id == materialId_mano2);
+        this._CalidadSharedService.mano2 = this.nir.mano2;
+      }
+      this.isLoaded = true;
+    })
+  }
 
   initMano(mano: Mano = null){
     if(mano != null){
@@ -193,21 +242,26 @@ export class NIRComponent {
     if(this.isLoaded){
       let promedio = 0;
       let divisor = 0;
-
-      this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
-        if(!isNaN(parseFloat(x.hd))){
-          promedio += parseFloat(x.hd);
-          divisor += 1;          
-        }
-      });
-      
-      this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
-        if(!isNaN(parseFloat(x.hd))){
-          promedio += parseFloat(x.hd);
-          divisor += 1;          
-        }
-      });
-      return promedio / divisor;
+      const mano1 = this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value;
+      const mano2 = this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value;
+      if (mano1 !=  undefined && mano2 != undefined){
+        mano1.forEach(x => {
+          if(!isNaN(parseFloat(x.hd))){
+            promedio += parseFloat(x.hd);
+            divisor += 1;          
+          }
+        });
+        
+        mano2.forEach(x => {
+          if(!isNaN(parseFloat(x.hd))){
+            promedio += parseFloat(x.hd);
+            divisor += 1;          
+          }
+        });
+        return promedio / divisor;
+      }else{
+        return 0;
+      }
     }
     return 0;
   }
@@ -329,12 +383,12 @@ export class NIRComponent {
     this.nir.mano2.tipo = this.Mano2Visible ? this.TrigoMano2 ? 'Trigo' : 'Maíz' : ''
   }
 
-  hasPermisoRecibidores_Nir_AgregarNuevaFila() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
-  }
-  hasPermisoRecibidores_Nir_EliminarFila() {
-    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
-  }
+  // hasPermisoRecibidores_Nir_AgregarNuevaFila() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
+  // }
+  // hasPermisoRecibidores_Nir_EliminarFila() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
+  // }
   hasPermisoRecibidores_Nir_EnviarNir() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EnviarNir);
   }

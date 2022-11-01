@@ -129,4 +129,7 @@ export class PeriodoCargaComponent implements OnInit {
   hasPermisoLiquido_EditarPeriodoDeCarga() {
     return this.user.permisos.find(p => p === this.permisosScato.Liquido_EditarPeriodoDeCarga);
   }
+  hasPermisoLiquido_PeriodoDeCarga_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Liquido_PeriodoDeCarga_Guardar);
+  }
 }

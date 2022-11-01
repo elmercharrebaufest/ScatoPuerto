@@ -83,6 +83,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     if (esBusqueda && !esLimpiarBusqueda) {
       const anio = this.filtroBuquedaForm?.controls.anio?.value;
       const mes = this.filtroBuquedaForm?.controls?.mes.value;
+      const desde = this.filtroBuquedaForm?.controls.desde?.value;
+      const hasta = this.filtroBuquedaForm?.controls?.hasta.value;
       this.listaHistorialBuques = null;
       this.listaHistorialBuquesFiltro = null;
 
@@ -110,6 +112,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       const filVaporId = filtro.controls.vaporId.value;
       const filAnio = filtro.controls.anio.value;
       const filMes = filtro.controls.mes.value;
+      const desde = filtro.controls.desde.value;
+      const hasta = filtro.controls.hasta.value;
       this.buscarHistorialBuques = true
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
       let anio: number = filAnio > '' ? parseInt(filAnio, 0) : 0;
@@ -118,12 +122,12 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         anio = 0;
         mes = 0;
         this.store.dispatch(new LoadingHistorialBuques());
-        this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId));
+        this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, desde, hasta));
         this.setListaHistorialBuques();
       } else {
         if (anio > 0 && mes > 0) {
          this.store.dispatch(new LoadingHistorialBuques());
-         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId)).subscribe(result => {
+         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, desde, hasta)).subscribe(result => {
           this.setListaHistorialBuques();
          });
         }
@@ -203,7 +207,16 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Eventos Controles
-  onVerHistorial(embarqueId, vaporId, moduloDeCargaId) {
+  onVerHistorial(embarqueId, vaporId, moduloDeCargaId, nombreBuque, esLiquido) {
+    const embarqueBuque = {
+      embarqueId      : embarqueId,
+      vaporId         : vaporId,
+      moduloDeCargaId : moduloDeCargaId,
+      nombreBuque     : nombreBuque,
+      esLiquido       : esLiquido
+    }
+    localStorage.setItem("embarqueBuque", JSON.stringify(embarqueBuque));
+    
     this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
     this.filtroBuquedaForm.controls.esDetalle.setValue(true);

@@ -25,11 +25,43 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/Buque/ListarHistorialDeBuques")]
-        public HttpResponseMessage ListarHistorialDeBuques(int anio, int mes, int vaporId)
+        public HttpResponseMessage ListarHistorialDeBuques(int anio, int mes, int vaporId, DateTime? desde, DateTime? hasta)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeBuques(anio, mes, vaporId));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeBuques(anio, mes, vaporId, desde, hasta));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Buque/ListarOperadores")]
+        public HttpResponseMessage ListarOperadores(int Embarque_Id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarOperadores(Embarque_Id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Buque/GuardarHistoricoOperador")]
+        public HttpResponseMessage ListarOperadores(int idEmbarque, string accion)
+        {
+            try
+            {
+                servicio.GuardarHistoricoActor(idEmbarque, accion, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {

@@ -32,6 +32,23 @@ export class BuqueFilterPipe implements PipeTransform {
       }
     }
 
+    if (filtroBuques.controls.nombreExportador != undefined) {
+      historialBuquesFiltro = historialBuques.filter(item => {
+        let bEncontrado = false;
+        if (item.productoExportador != null) {
+          for (let exportador of item.productoExportador) {
+            var filExportador = filtroBuques.controls.nombreExportador.value.toUpperCase();
+            var itemExportador = exportador.nombreExportador.toUpperCase();
+            bEncontrado = (filExportador.length > 0 ? itemExportador.indexOf(filExportador) !== -1 : itemExportador.indexOf(itemExportador) !== -1);
+            break;
+
+          }
+          return bEncontrado;
+
+        }
+      });
+    }
+
     return historialBuquesFiltro.filter(item => {
 
       if (filtroBuques != undefined) {
@@ -45,6 +62,7 @@ export class BuqueFilterPipe implements PipeTransform {
         const filDestino = filtroBuques.controls.destino.value != null ? filtroBuques.controls.destino.value.toUpperCase() : '';
         const filControl = filtroBuques.controls.control.value != null ? filtroBuques.controls.control.value.toUpperCase() : '';
         const filATA = filtroBuques.controls.ata.value != null ? filtroBuques.controls.ata.value.toUpperCase() : '';
+
         return (
           (filDestino.length > 0 ? itemDestino.indexOf(filDestino) !== -1 : itemDestino.indexOf(itemDestino) !== -1) &&
           (filBuque.length > 0 ? itemBuque.indexOf(filBuque) !== -1 : itemBuque.indexOf(itemBuque) !== -1) &&

@@ -137,7 +137,7 @@ export class EditarCrearBuquesComponent implements OnInit {
     let { id, nombre } = $event.item
     this.editarBuque = true
 
-    this.buqueService.obtenerVaporInformaconion(id).subscribe((res: VaporInformacion) => {
+    this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
       this.vaporInfoBD = res;
       // console.log(this.vaporInfoBD);
       let bandera;

@@ -1,5 +1,5 @@
-.multiselect-dropdown{
-    background-color: #ffffff !important;
+:host ::ng-deep .multiselect-dropdown .dropdown-btn{
+    background: #ffffff !important;
 }
 .titulo-historial-buque-letra{
     font-family: roboto;
@@ -7,4 +7,9 @@
     font-size: 36px;
     text-align: left;
     color: #1A1A1A;
+}
+
+.colorGris{
+    color: gray !important;
+
 }

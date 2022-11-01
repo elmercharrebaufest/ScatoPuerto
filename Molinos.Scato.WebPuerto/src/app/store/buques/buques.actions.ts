@@ -1,6 +1,7 @@
 export class GetObtenerHistorialBuques {
     static readonly type = '[Todo] Get Listar Buques';
-    constructor(public anio: number, public mes: number, public vaporId: number) {}
+    constructor(public anio: number, public mes: number, public vaporId: number, 
+        public desde: Date, public hasta: Date) {}
 }
 export class GetObtenerHistorialBuquesSel {
     static readonly type = '[Todo] Get Listar Buques Sel';

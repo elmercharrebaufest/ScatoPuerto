@@ -29,13 +29,19 @@ export class FechasRitmosComponent implements OnInit, AfterViewInit {
 //#region constructor
   constructor(
     private balanzas78Service: Balanzas78Service,
-    private embarqueService: EmbarqueService,
     private route: ActivatedRoute,
     private buqueService: BuqueService,
     private embarqueSharingService: EmbarqueSharingService,
   ) {
     this.enBuque = true;
     this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));  
+    
+    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data =>{
+      this.moduloDeCargaId = data.moduloDeCarga_Id;
+      this.embarqueId = data.embarque_Id;
+      this.liquido = data.esLiquido;
+      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
+    });
     this.embarqueSharingService.setEmbarqueId(this.embarqueId);                      
     this.vaporId = parseInt(this.route.snapshot.paramMap.get('vaporid'));      //consigo el vaporID que esta en la ruta y lo seteo
   }
@@ -57,28 +63,17 @@ export class FechasRitmosComponent implements OnInit, AfterViewInit {
       if(this.registroFechas.motivoLimpieza != "-") this.tieneMotivoLimpieza = true;  //en el registro de fechas
       if(this.registroFechas.obsLimpieza != "-") this.tieneObsLimpieza = true;
       this.horasPuerto= parseInt(this.registroFechas.hsEnPuerto);
+      this.mostrarFechas = true;
+
     });
   }
 
   initRitmos(){
-    console.log('initRitmos this.embarqueId--->>>');
-    console.log(this.embarqueId)
-    forkJoin([
-      this.embarqueService.obtenerIdsUsuales(this.embarqueId),  //uso obtenerIdsUsuales para encontrar el ModuloDeCargaID para tal embarque
-      this.embarqueService.obtenerEmbarque(this.embarqueId),    //con ese ID puedo setear los ritmos 
-    ]).subscribe(([res1, res2]) => {                            //obtengo embarque para saber si el embarque == liquido
-      this.moduloDeCargaId= res1.moduloDeCargaId;
-      console.log('ingresadoooo initRitmos')
-      if(res2.esLiquido === true) this.liquido = true;
-
-      this.embarqueSharingService.setModuloDeCargaId(this.moduloDeCargaId);
-      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
-      this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
-      this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
-      this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
-      this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
-      this.mostrarFechas = true;
-    }, err => { console.log(err); });
+    this.embarqueSharingService.setModuloDeCargaId(this.moduloDeCargaId);
+    this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
+    this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
+    this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
+    this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
   }
   ngAfterViewInit(): void {
     console.log('Terminar componente FechasRitmosComponent');

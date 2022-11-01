@@ -1,8 +1,10 @@
 import { Component, AfterViewInit, Input, Renderer2 } from '@angular/core';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { ElementoGrafico } from '@ScatoModels/elemento-grafico';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ManosEmbarqueService } from '@ScatoServicios/manosEmbarque.service';
-
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-grafico-carga',
@@ -19,14 +21,17 @@ export class GraficoCargaComponent implements AfterViewInit {
   materialDictionary: object = {};
   lastSelectedElement: any = null;
   rotacionCheckbox: boolean = false;
-  
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   @Input() esCalidad: boolean = false;
 
   constructor(private _procesoService: DatosEmbarquesProcesoService,
               private _rederer: Renderer2,
-              private _manosEmbarqueService: ManosEmbarqueService) { 
+              private _manosEmbarqueService: ManosEmbarqueService,
+              private session: SessionService,) { 
     this.makeDraggable.bind(this);
     this.datosEmbarque = this._procesoService.getDatosGrafico();
+    this.user = this.session.getUser();
     console.log('graficos de carga');
     console.log(this.datosEmbarque);
     this.initEventosManos();
@@ -481,5 +486,9 @@ export class GraficoCargaComponent implements AfterViewInit {
 
   obtenerFecha(){
     return new Date().toLocaleDateString();
+  }
+
+  hasPermisoGraficoDeCeldas_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.GraficoDeCeldas_Modificar);
   }
 }

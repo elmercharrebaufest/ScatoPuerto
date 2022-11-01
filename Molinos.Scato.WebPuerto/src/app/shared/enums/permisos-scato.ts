@@ -62,6 +62,7 @@ export enum PermisosScato {
   // Liquido
   Liquido_VerPeriodoDeCarga = 'Liquido_VerPeriodoDeCarga',
   Liquido_EditarPeriodoDeCarga = 'Liquido_EditarPeriodoDeCarga',
+  Liquido_PeriodoDeCarga_Guardar = 'Liquido_PeriodoDeCarga_Guardar',
   Liquido_VerHabilitacionTanques = 'Liquido_VerHabilitacionTanques',
   Liquido_EditarHabilitacionTanques = 'Liquido_EditarHabilitacionTanques',
   Liquido_ConformacionLineasEmb_Editar = 'Liquido_ConformacionLineasEmb_Editar',
@@ -72,6 +73,8 @@ export enum PermisosScato {
   TableroLiquido_Planilla_Editar = 'TableroLiquido_Planilla_Editar',
   TableroLiquido_AgregarTurno = 'TableroLiquido_AgregarTurno',
   TableroLiquido_GuardarTurno = 'TableroLiquido_GuardarTurno',
+  TableroLiquido_AgregarLinea = 'TableroLiquido_AgregarLinea',
+  TableroLiquido_EliminarLinea = 'TableroLiquido_EliminarLinea',
   TableroLiquido_EnviarARecibidores = 'TableroLiquido_EnviarARecibidores',
   TableroLiquido_AgregarCorte = 'TableroLiquido_AgregarCorte',
   TableroLiquido_Exportar = 'TableroLiquido_Exportar',
@@ -80,14 +83,17 @@ export enum PermisosScato {
   // Recibidores / Calidad
   Recibidores_Ver = 'Recibidores_Ver',
   Recibidores_ExportarEnviarPlanillas = "Recibidores_ExportarEnviarPlanillas",
+  Recibidores_ObsCalidad_Agregar = "Recibidores_ObsCalidad_Agregar",
   Recibidores_EmitirRecibo = "Recibidores_EmitirRecibo",
   Recibidores_Nir_AgregarNuevaFila = "Recibidores_Nir_AgregarNuevaFila",
   Recibidores_Nir_EliminarFila = "Recibidores_Nir_EliminarFila",
   Recibidores_Nir_EnviarNir = "Recibidores_Nir_EnviarNir",
   Recibidores_Nir_GuardarNir = "Recibidores_Nir_GuardarNir",
+  Recibidores_Nir_Modificar = "Recibidores_Nir_Modificar",
   Recibidores_Recibo_Imprimir = "Recibidores_Recibo_Imprimir",
   Recibidores_Recibo_ConfirmarDatos = "Recibidores_Recibo_ConfirmarDatos",
   Recibidores_Imprimir = "Recibidores_Imprimir",
+  Recibidores_Finalizar = "Recibidores_Finalizar",
 
   // Geolocalizacion
   Geolocalizacion_Ver = 'Geolocalizacion_Ver',

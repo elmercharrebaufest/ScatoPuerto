@@ -1,5 +1,6 @@
 export class IdsDelEmbarque {
     moduloDeCargaId : number;
-    planoDecargaId : number;
+    planoDeCargaId : number;
     vaporId : number;
+    esLiquido : number;
 }

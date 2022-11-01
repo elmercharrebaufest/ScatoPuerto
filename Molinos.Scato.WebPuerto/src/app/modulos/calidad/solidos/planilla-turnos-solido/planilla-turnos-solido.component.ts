@@ -1009,7 +1009,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.planillaDeTurnos, this.procesoService,  this.lineas, esEnviarPlanilla);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService,  this.planillaDeTurnos, esEnviarPlanilla);
     this.exportaPlanilla = false;
   }
 
@@ -1023,6 +1023,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     }
   }
 
+  hasPermisoRecibidores_ObsCalidad_Agregar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ObsCalidad_Agregar);
+  }
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
   }
