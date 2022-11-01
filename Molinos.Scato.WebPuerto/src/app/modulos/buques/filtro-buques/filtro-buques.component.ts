@@ -23,6 +23,10 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   private listaMeses;
   private listaProductos$: any;
   private configListaMultiple;
+  mes: string ;
+  anio: string;
+  desde: string = this.AnioMesActual();
+  hasta: string = this.AnioMesActual();
   // #endregion
 
   // #region Observables
@@ -43,6 +47,10 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.setListaAnios();
     this.setListaMeses();
     this.setListaProductos();
+    this.getMesActual();
+    this.getAnioActual();   
+    this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
+    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     //this.setCargarFiltroBusqueda();
 
   }
@@ -78,13 +86,16 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
       vaporId: 0,
       embarqueId: 0,
       moduloDeCargaId: 0,
-      anio: '',
-      mes: '',
+      anio: this.getAnioActual(),
+      mes: this.getMesActual(),
       producto: '',
       buque: '',
       destino: '',
       control: '',
-      ata: ''
+      ata: '',
+      nombreExportador: '',
+      desde: this.AnioMesActual(),
+      hasta: this.AnioMesActual()
     });
   }
 
@@ -104,9 +115,21 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     return this.listaAnios;
   }
 
+  public AnioMesActual(){
+    return new Date().getFullYear() + '-' +(new Date().getMonth()+1);   
+  }
   public getListaMeses() {
     return this.listaMeses;
   }
+
+  public getMesActual() {
+    return this.mes = (new Date().getMonth() + 1).toString();
+  }
+
+  public getAnioActual() {
+    return this.anio = new Date().getFullYear().toString();
+  }
+
 
   public setListaProductos() {
     this.listaProductos$ = this.productos$.subscribe(data => {
@@ -138,7 +161,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   onChangeBusqueda(event) {
     if (event != undefined) {
       this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
-      this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(false);
+      this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(false); 
       this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     }
   }
@@ -164,8 +187,11 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.filtroBuquedaForm.controls.esDetalle.setValue(false);
     this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(true);
     this.filtroBuquedaForm.controls.embarqueId.setValue(0);
+    this.filtroBuquedaForm.controls.nombreExportador.setValue('');
+    this.filtroBuquedaForm.controls.desde.setValue('');
+    this.filtroBuquedaForm.controls.hasta.setValue('');
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
-  // #endregion
+  // #endregion 
 
 }

@@ -29,7 +29,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [HttpGet]
         [Route("api/Workflow/Listar")]
-        public HttpResponseMessage Listar() 
+        public HttpResponseMessage Listar()
         {
             var embarques = workflows.ListarEmbarques();
             //var embarques = servicio.ListarEmbarques();
@@ -45,11 +45,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             //  var embarques = servicio.ListarEmbarques();
             var embarques = workflows.ListarEmbarques();
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
-
             return Request.CreateResponse(HttpStatusCode.OK,
                             embarques
                                 .Where(y => y.Embarque.SanBenito)
-                                .Select(x => new EmbarqueNavDto {
+                                .Select(x => new EmbarqueNavDto
+                                {
                                     Id = x.Embarque.Id,
                                     PlanoDeCargaId = x.LineUp.PlanoDeCarga.Id,
                                     ModuloDeCargaId = x.LineUp.ModuloDeCarga.Id,
@@ -68,7 +68,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public HttpResponseMessage Eliminar(Guid id)
         {
             var resultado = Eliminar(servicio, servicioComandos, workflows, nombreUsuario, id);
-            return string.IsNullOrEmpty(resultado) ? Request.CreateResponse(HttpStatusCode.OK): Request.CreateResponse(HttpStatusCode.InternalServerError, resultado);
+            return string.IsNullOrEmpty(resultado) ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.InternalServerError, resultado);
         }
 
         public static string Eliminar(IServicioRepositorio servicio, IServicioComandos servicioComandos, IListaDeWorkflows workflows, string nombreUsuario, Guid id)
