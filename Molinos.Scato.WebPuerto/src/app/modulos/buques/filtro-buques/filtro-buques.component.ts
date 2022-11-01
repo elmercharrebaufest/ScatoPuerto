@@ -177,8 +177,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   }
 
   onLimpiarFiltros() {
-    this.filtroBuquedaForm.controls.anio.setValue('');
-    this.filtroBuquedaForm.controls.mes.setValue('');
+   
     this.filtroBuquedaForm.controls.producto.setValue('');
     this.filtroBuquedaForm.controls.buque.setValue('');
     this.filtroBuquedaForm.controls.destino.setValue('');
@@ -190,6 +189,11 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.filtroBuquedaForm.controls.nombreExportador.setValue('');
     this.filtroBuquedaForm.controls.desde.setValue('');
     this.filtroBuquedaForm.controls.hasta.setValue('');
+    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
+  }
+  onBuscar(){
+    this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
+    this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(false); 
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
   // #endregion 
