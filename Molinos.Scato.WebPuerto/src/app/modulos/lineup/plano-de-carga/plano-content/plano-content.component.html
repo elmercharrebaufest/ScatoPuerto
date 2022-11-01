@@ -52,12 +52,12 @@
               </ng-container>
             </tr>
 
-                    </tbody>
-                    <tfoot>
-                        <td>Total:</td>
-                        <td>{{calcularTotal()}}</td>
-                    </tfoot>
-                </table>
+          </tbody>
+          <tfoot>
+            <td>Total:</td>
+            <td>{{calcularTotal()}}</td>
+          </tfoot>
+        </table>
 
 
         <table class="table table-bordered" *ngIf="esLiquido">
@@ -116,11 +116,12 @@
           <div class="col-8">
             <div style="display: flex; flex-direction: row; justify-content: space-between; margin-bottom:10px">
               <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>
-              <div class='btn-add-container' (click)='agregarCargaComercial()'>
-                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
-              </div>
-              
+              <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+                <div class='btn-add-container' (click)='agregarCargaComercial()'>
+                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
+                </div>
+              </ng-container>
             </div>
             
               <div *ngFor="let exp of planoDeCargaForm.get('cargasComerciales').value; let j = index; trackBy:trackByFn"
@@ -157,9 +158,11 @@
                       </div>
                     </div>
                   </div>
-                  <div class="form-group col-1" class="tachito">
-                      <img src="assets/trashIcon-no-border.svg" class="cursorPointer"  (click)="eliminarCargaComercial(j)" >
-                  </div>
+                  <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+                    <div class="form-group col-1" class="tachito">
+                        <img src="assets/trashIcon-no-border.svg" class="cursorPointer"  (click)="eliminarCargaComercial(j)" >
+                    </div>
+                  </ng-container>
                 </ng-container>
               </div>
           </div>

@@ -7,7 +7,7 @@
         <div style="display: flex; flex-direction: row; justify-content: space-between">
             <h4 class='colorTitle pt-3'>UMAP</h4>
             <div>
-	            <ng-container *ngIf="hasPermisoUmap_AgregarEncendido()">
+	            <ng-container *ngIf="hasPermisoUmap_AgregarEncendido() && !esSoloLectura">
 	                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='addUmap()'>
 	                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
 	                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encendido</span>
@@ -72,7 +72,7 @@
                                     </select>
                                 </div>
                                 <div fxFlex='4' class='full-center'>
-                                	<ng-container *ngIf="hasPermisoUmap_EliminarRegistro()">
+                                	<ng-container *ngIf="hasPermisoUmap_EliminarRegistro() && !esSoloLectura">
                                     	<img src='assets/trashIcon-no-border.svg' (click)='deleteHorario(i)' style="margin-top: 14px">
 									</ng-container>
                                 </div>
@@ -85,8 +85,10 @@
         </div>
 
         <!-- Footer -->
-        <div style="margin: 0 auto">
-            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
-         </div>
+        <ng-container *ngIf="hasPermisoTableroSolido_Umap_Modificar()">
+            <div style="margin: 0 auto">
+                <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
+            </div>
+        </ng-container>
     </div>
 </div>

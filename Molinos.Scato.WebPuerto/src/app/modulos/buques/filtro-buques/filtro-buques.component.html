@@ -1,23 +1,38 @@
-<div >
-    <label class="titulo-historial-buque-letra">Historial de embarques</label>
+
+
+<div class="row">
+    
+    <div class="col-md-10"><label class="titulo-historial-buque-letra">Historial de embarques</label></div>
+    <div class="text-md-right margen-boton-buque col-md-2" style="margin-top: 10px;">
+        <app-editar-crear-buques></app-editar-crear-buques>
+    </div>
 </div>
+<br>
 <form id="filtroBuquedaForm" [formGroup]="getFiltroBuquedaForm()">
     <div class="form-row">
-        <div class="form-group col-md-1">
-            <select class="form-control" formControlName="anio" (change)="onChangeBusqueda($event)">
-                <option *ngFor="let anio of getListaAnios()" [ngValue]="anio.numeroAnio">{{anio.nombreAnio}}</option>
+       <!--  <div class="form-group col-md-1">
+            <select class="form-control" formControlName="anio" (change)="onChangeBusqueda($event)" [(ngModel)]="anio">
+                <option *ngFor="let anio of getListaAnios()" [value]="anio.numeroAnio">{{anio.nombreAnio}}</option>
             </select>
         </div>
         <div class="form-group col-md-1">
-            <select class="custom-select" formControlName="mes" (change)="onChangeBusqueda($event)">
-                <option *ngFor="let meses of getListaMeses()" [ngValue]="meses.numeroMes">{{meses.nombreMes}}</option>
+            <select class="custom-select" formControlName="mes" (change)="onChangeBusqueda($event)" [(ngModel)]="mes" >
+                <option *ngFor="let meses of getListaMeses()" [value]="meses.numeroMes">{{meses.nombreMes}}</option>
             </select>
-        </div>
-        <div class="form-group col-md-2">
+        </div> -->
+        <div class="form-group col-md-2 input_img">
+            <input type="month" placeholder="Desde" class="form-control colorGris" [value]="desde" (change)="onChangeBusqueda($event)"  formControlName="desde">
+            <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
+          </div>
+          <div class="form-group col-md-2 input_img">
+            <input type="month" placeholder="Hasta" class="form-control colorGris" [value]="hasta" (change)="onChangeBusqueda($event)" (clear)="onChangeBusqueda($event)"  formControlName="hasta">
+            <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
+          </div>
+        <div class="form-group col-md-2 colorGris">
 
-            <ng-multiselect-dropdown *ngIf="getListaProductos()"
+            <ng-multiselect-dropdown  *ngIf="getListaProductos()"
                                      formControlName="producto" 
-                                     [placeholder]="'Seleccione'"
+                                     [placeholder]="'Producto'"
                                      [settings]="getConfigListaMultiple()"
                                      [data]="getListaProductos()"
                                      (onDeSelect)="onChangeValues($event)"
@@ -28,22 +43,26 @@
             </ng-multiselect-dropdown>
 
         </div>
-        <div class="form-group col-md-2">
+        <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Buque" formControlName="buque"
                 (keyup)="onChangeValues($event)">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Destino" formControlName="destino"
                 (keyup)="onChangeValues($event)">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2 colorGris">
+            <input type="text" class="form-control" placeholder="Exportador" formControlName="nombreExportador"           
+                (keyup)="onChangeValues($event)">
+        </div>
+        <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Control privado" formControlName="control"
                 (keyup)="onChangeValues($event)">
         </div>
-        <div class="form-group col-md-1">
-            <input type="text" class="form-control" placeholder="A.T.A" formControlName="ata"
+       <!--  <div class="form-group col-md-1">
+            <input type="text" class="form-control" placeholder="A.T.A" formControlName="ata"           
                 (keyup)="onChangeValues($event)">
-        </div>
+        </div> -->      
         <div class="form-group col-md-2">
             <button class="btn btn-success" (click)="onLimpiarFiltros()">Limpiar Filtros</button>
         </div>

@@ -11,10 +11,12 @@
             </div>
         </div>
         <div data-html2canvas-ignore="true">
-            <select  id="selectMateriales" class="form-control" [(ngModel)]="materialSeleccionado" style="padding: 0.1rem;">
-                <option [ngValue]="null">Seleccione producto:</option>
-                <ng-container *ngIf="datosEmbarque"><option *ngFor="let p of datosEmbarque.listaMateriales" [ngValue]="p">{{ p.descripcionCorta }}</option></ng-container>
-            </select>
+            <ng-container *ngIf="hasPermisoGraficoDeCeldas_Modificar()">
+                <select  id="selectMateriales" class="form-control" [(ngModel)]="materialSeleccionado" style="padding: 0.1rem;">
+                    <option [ngValue]="null">Seleccione producto:</option>
+                    <ng-container *ngIf="datosEmbarque"><option *ngFor="let p of datosEmbarque.listaMateriales" [ngValue]="p">{{ p.descripcionCorta }}</option></ng-container>
+                </select>
+            </ng-container>
             <div id='colorLabel'>Color</div>
             <div class='custom-control tank-control custom-switch' id='toggleColorContainer'>
                 <input type='checkbox' class='custom-control-input' id='toggleColor'

@@ -195,12 +195,14 @@
                                                     <td><input type="number" formControlName='cantidad'
                                                             class='planilla-text-derecha'></td>
                                                     <td>
-                                                        <div fxFlex='2' class='full-right'
-                                                            *ngIf="!turno.value.guardadoPorTablerista">
-                                                            <img src="assets/trashIcon.svg" class="basurerito"
-                                                                (click)="onEliminarDetalleTurno(result, d, t, i)"
-                                                                title="Eliminar Detalle">
-                                                        </div>
+                                                        <ng-container *ngIf="hasPermisoTableroLiquido_EliminarLinea()">
+                                                            <div fxFlex='2' class='full-right'
+                                                                *ngIf="!turno.value.guardadoPorTablerista">
+                                                                <img src="assets/trashIcon.svg" class="basurerito"
+                                                                    (click)="onEliminarDetalleTurno(result, d, t, i)"
+                                                                    title="Eliminar Detalle">
+                                                            </div>
+                                                        </ng-container>
                                                     </td>
 
                                                 </tr>
@@ -208,12 +210,14 @@
                                         </ng-container>
                                         <tr>
                                             <td colspan="13" class='btn-add-cell'>
-                                                <div class='btn-add-container center-bt' 
-                                                    (click)='onAgregarDetalleTurno(turno, d)' #addButton>
-                                                    <button type='button' class='btn btn-primary bt-circle'
-                                                        style='margin-top: -5px;'>+</button>
-                                                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar linea</span>
-                                                </div>
+                                                <ng-container *ngIf="hasPermisoTableroLiquido_AgregarLinea()">
+                                                    <div class='btn-add-container center-bt' 
+                                                        (click)='onAgregarDetalleTurno(turno, d)' #addButton>
+                                                        <button type='button' class='btn btn-primary bt-circle'
+                                                            style='margin-top: -5px;'>+</button>
+                                                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar linea</span>
+                                                    </div>
+                                                </ng-container>
                                             </td>
                                         </tr>
                                         <tr class="tabla-fila-corte-boton">

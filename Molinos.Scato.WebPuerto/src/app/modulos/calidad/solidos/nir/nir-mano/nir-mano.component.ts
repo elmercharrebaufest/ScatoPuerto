@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { Mano, NirManualPuerto } from '@ScatoModels/nir';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-import { parse } from 'path';
-import { finalize } from 'rxjs/operators';
+import { SessionService } from '@ScatoServicios/session.service';
+
 @Component({
   selector: 'app-nir-mano',
   templateUrl: './nir-mano.component.html',
@@ -13,18 +15,22 @@ import { finalize } from 'rxjs/operators';
   
 })
 export class NirManoComponent implements OnInit {
-
-@Input() mano : Mano;
-@Input() queMano : number;
-bodegas: Bodega[] = [];
-formMano: FormGroup;
-loaded: boolean = false;
+  @Input() esSoloLectura: boolean = false;
+  @Input() mano : Mano;
+  @Input() queMano : number;
+  bodegas: Bodega[] = [];
+  formMano: FormGroup;
+  loaded: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
 constructor(
     private moduloDeCargaService: ModuloDeCargaService,
     private calidadSharedService: CalidadSharedService,
+    private session: SessionService,
     private fb: FormBuilder) {
-      this.obtenerNir() 
+      this.user = this.session.getUser();
+      this.obtenerNir();
     }
 
   ngOnInit(): void {
@@ -32,9 +38,10 @@ constructor(
       tipo: '',
       nirManualPuerto: this.fb.array([])
     });
-    this.loaded = true
     this.obtenerBodegas();
-    this.obtenerNir() 
+    this.obtenerNir();
+
+    if(!this.hasPermisoRecibidores_Nir_Modificar()) this.formMano.disable();
   }
 
   obtenerNir(){
@@ -52,6 +59,7 @@ constructor(
           })
         })
       }
+      this.loaded = true
     }
   }
   
@@ -60,17 +68,17 @@ constructor(
 
     if(nirManualPuerto){
       fa = this.fb.group({
-        id: nirManualPuerto?.id ? nirManualPuerto.id : 0,
-        fecha: nirManualPuerto?.fecha ? nirManualPuerto.fecha : null,
-        hd: nirManualPuerto?.hd ?? '',
-        ph: nirManualPuerto?.ph ?? '',
-        protBase: [{value: nirManualPuerto?.protBase ?? '', disabled: this.mano.tipo == 'Trigo' ? false : true}],
-        prot_BS: [{value: nirManualPuerto?.prot_BS ?? '',  disabled: this.mano.tipo == 'Trigo' ? false : true}],
-        origen: nirManualPuerto?.origen ?? '',
-        bodega: nirManualPuerto?.bodega ?? '0',
-        mano: nirManualPuerto?.mano ?? '',
-        material_id: nirManualPuerto?.material_id ? nirManualPuerto?.material_id : this.mano.tipo == "Trigo" ? 17:11,
-        moduloDeCargaId: nirManualPuerto?.moduloDeCargaId ?? 0,
+        id             : [{value: nirManualPuerto?.id ? nirManualPuerto.id : 0, disabled: this.esSoloLectura}],
+        fecha          : [{value: nirManualPuerto?.fecha ? nirManualPuerto.fecha : null, disabled: this.esSoloLectura}],
+        hd             : [{value: nirManualPuerto?.hd ?? '', disabled: this.esSoloLectura}],
+        ph             : [{value: nirManualPuerto?.ph ?? '', disabled: this.esSoloLectura}],
+        protBase       : [{value: nirManualPuerto?.protBase ?? '', disabled: this.mano.tipo == 'Trigo' ? (this.esSoloLectura? true: false) : true}],
+        prot_BS        : [{value: nirManualPuerto?.prot_BS ?? '',  disabled: this.mano.tipo == 'Trigo' ? (this.esSoloLectura? true: false): true}],
+        origen         : [{value: nirManualPuerto?.origen ?? '', disabled: this.esSoloLectura}],
+        bodega         : [{value: nirManualPuerto?.bodega ?? '0', disabled: this.esSoloLectura}],
+        mano           : [{value: nirManualPuerto?.mano ?? '', disabled: this.esSoloLectura}],
+        material_id    : [{value: nirManualPuerto?.material_id ? nirManualPuerto?.material_id : this.mano.tipo == "Trigo" ? 17:11, disabled: this.esSoloLectura}],
+        moduloDeCargaId: [{value: nirManualPuerto?.moduloDeCargaId ?? 0, disabled: this.esSoloLectura}],
       })
     } else { 
       fa = this.fb.group({
@@ -190,6 +198,16 @@ constructor(
   
   compareBodegaItem(c1: any, c2: any){
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
-}
+  }
+
+  // hasPermisoRecibidores_Nir_AgregarNuevaFila() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_AgregarNuevaFila);
+  // }
+  // hasPermisoRecibidores_Nir_EliminarFila() {
+  //   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_EliminarFila);
+  // }
+  hasPermisoRecibidores_Nir_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_Modificar);
+  }
 
 }

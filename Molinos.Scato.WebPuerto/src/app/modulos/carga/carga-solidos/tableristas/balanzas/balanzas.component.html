@@ -16,7 +16,7 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
           </div>
           <div class="col">
-          	<ng-container *ngIf="hasPermisoCorteManualBalanzas()">
+          	<ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
             	<button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7, true)'>Corte Manual</button>
 			</ng-container>
           </div>
@@ -435,7 +435,7 @@
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
           </div>
           <div class="col">
-          	<ng-container *ngIf="hasPermisoCorteManualBalanzas()">
+          	<ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
             	<button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8, true)'>Corte Manual</button>
 			</ng-container>
           </div>
@@ -844,7 +844,7 @@
 </div>
 
 <div class="col text-center">
-  <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar()">
+  <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar() && !esSoloLectura">
     <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR CARGA Y EXPORTAR PLANILLAS</button>
   </ng-container>
 </div>

@@ -9,7 +9,7 @@
       </div>
       <div class="col-4 centrarOp2">
         <button class="btn btn-outline-secondary" (click)="onVerOtrasOperaciones()">
-          Ver otras operaciones de {{ embarqueOp.patente }}
+          Ver otras operaciones de {{ nombreBuque }}
         </button>
       </div>
       <div class="col-4"></div>
@@ -18,79 +18,78 @@
 
 
   <!-- CARD CON INFORMACION DEL BUQUE -->
+  <div class="form">
+    <div class="row">
+      <div class="form-group col-md-12 margenes-historial">
+        <div class="bg-white espacio-izquierda-historial">
+          <div class="seccionesShipImage">
+            <img class="imgBuque" src="./assets/ShipAzul.svg" alt="" />
+          </div>
+          <div class="dentro borde">
+            <p class="parrafo-espacio">
+              <span class="colorTitle">{{ nombreBuque }}</span> <br /><span>
+                <b>Capitan:</b>-</span>
+            </p>
+          </div>
+          <div class="line"></div>
+          <div class="dentro">
+            <p class="parrafo-espacio">
+              <b>IMO: </b>{{
+              vaporInformacion == null || vaporInformacion.imoVapor == null
+              ? "-"
+              : vaporInformacion.imoVapor
+              }}<br /><b>Eslora: </b>{{ vaporInformacion == null ? "-" : vaporInformacion.eslora }}
+            </p>
+          </div>
+          <div class="dentro">
+            <p class="parrafo-espacio">
+              <b>Bandera: </b>{{
+                banderasBuque == null || banderasBuque == undefined
+              ? "-"
+              : banderasBuque.nombre
+              }}<br />
+              <b>Freeboard: </b>{{
+              vaporInformacion == null || vaporInformacion.freeboard == null
+              ? "-"
+              : vaporInformacion.freeboard
+              }}
+            </p>
+          </div>
+          <div class="dentro tipoBuque">
+            <p class="parrafo-espacio">
+              <b>Tipo de buque: </b>{{
+              vaporInformacion == null || vaporInformacion.tipoBuque == null
+              ? "-"
+              : vaporInformacion.tipoBuque
+              }}<br />
+              <b>Cant.bodegas/tanques:</b>{{
+              vaporInformacion == null ||
+              vaporInformacion.cantidadBodegasTks == null
+              ? "-"
+              : vaporInformacion.cantidadBodegasTks
+              }}
+            </p>
+          </div>
+          <div class="dentro">
+            <p class="parrafo-espacio"><b>TRN: </b>XXXX<br /></p>
+          </div>
+          <div class="dentro">
+            <button type="button" class="btn btn-outline-secondary" (click)="openModalShipParticular(addGeo)">
+              Ver ship particular
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-12 margenes-historial">
+        <app-historial-buques></app-historial-buques>
+      </div>
+      <div class="form-group col-md-12 margenes-historial">
+        <app-navtabs-buque [esEmbarqueLiquido]="esEmbarqueLiquido" [paramEmbarqueSel]="paramEmbarqueSel" *ngIf="paramEmbarqueSel">
+        </app-navtabs-buque>
+      </div>
+    </div>
+  </div>
 
-  <div class="bg-white shadow m-4 px-4 pt-4 d-flex">
-    <div class="seccionesShipImage d-flex">
-      <img class="imgBuque" src="../../../../assets/ShipAzul.svg" alt="" />
-    </div>
-    <div class="seccionesB d-flex">
-      <div class="dentro borde">
-        <p>
-          <span class="colorTitle">{{ embarqueOp.patente }}</span> <br /><span>
-            <b>Capitan:</b>Jhonny Deep</span>
-        </p>
-      </div>
-      <div class="line"></div>
-      <div class="dentro">
-        <p>
-          <b>IMO: </b>{{
-          vaporInformacion == null || vaporInformacion.imoVapor == null
-          ? "-"
-          : vaporInformacion.imoVapor
-          }}<br /><b>Eslora: </b>{{ vaporInformacion == null ? "-" : vaporInformacion.eslora }}
-        </p>
-      </div>
-      <div class="dentro">
-        <p>
-          <b>Bandera: </b>{{
-            banderasBuque == null || banderasBuque == undefined
-          ? "-"
-          : banderasBuque.nombre
-          }}<br />
-          <b>Freeboard: </b>{{
-          vaporInformacion == null || vaporInformacion.freeboard == null
-          ? "-"
-          : vaporInformacion.freeboard
-          }}
-        </p>
-      </div>
-      <div class="dentro tipoBuque">
-        <p>
-          <b>Tipo de buque: </b>{{
-          vaporInformacion == null || vaporInformacion.tipoBuque == null
-          ? "-"
-          : vaporInformacion.tipoBuque
-          }}<br />
-          <b>Cant.bodegas/tanques:</b>{{
-          vaporInformacion == null ||
-          vaporInformacion.cantidadBodegasTks == null
-          ? "-"
-          : vaporInformacion.cantidadBodegasTks
-          }}
-        </p>
-      </div>
-      <div class="dentro">
-        <p><b>TRN: </b>XXXX<br /></p>
-      </div>
-      <div class="dentro">
-        <button type="button" class="btn btn-outline-secondary" (click)="openModalShipParticular(addGeo)">
-          Ver ship particular
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="bg-white shadow m-4 px-4 pt-4 d-flex" >
-    <div class="historial-buque-contenido-modulo">
-      <app-historial-buques></app-historial-buques>
-    </div>
-  </div>
-
-  <div class="container-fluid fondo" id="buque-body" *ngIf="!otrasOperacionesBuque">
-    <div class="mt-5">
-      <app-navtabs-buque [esEmbarqueLiquido]="esEmbarqueLiquido" [paramEmbarqueSel]="paramEmbarqueSel" *ngIf="paramEmbarqueSel">
-      </app-navtabs-buque>
-    </div>
-  </div>
 </div>
 
 <!-- ↓ MODAL SHIP PARTICULAR ↓ -->
@@ -99,48 +98,4 @@
   <app-card-buque [buque]="buque" (cerrar)="modal.dismiss()" class="card-buque"></app-card-buque>
 </ng-template>
 
-
-
-<!-- <ng-template #shipParticularCard let-d="dismiss">
-  <div class="modal-header">
-    <button type="button" class="btn-close" aria-label="Close" (click)="d('Cross click')">
-      X
-    </button>
-    <p>
-      IMAGEN
-      <br />
-      <br />
-      <b>{{ embarqueOp.patente.toUpperCase() }}</b>
-    </p>
-  </div>
-  <div class="modal-body">
-    <div class="row ml-2">
-      <span class="color font-weight-bold mr-1">IMO:</span>{{ vaporInformacion.imoVapor }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Bandera:</span>{{ vaporInformacion.imoVapor }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Tipo de buque:</span>{{ vaporInformacion.tipoBuque }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Porte Bruto:</span>{{ vaporInformacion.porteBruto }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Porte Neto:</span>{{ vaporInformacion.porteNeto }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Eslora x manga:</span>{{ vaporInformacion.eslora }} x {{
-      vaporInformacion.manga }}m
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Puntual:</span>{{ vaporInformacion.puntual }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1">Freeboard:</span>{{ vaporInformacion.freeboard }}
-    </div>
-    <div class="row mt-2 ml-2">
-      <span class="color font-weight-bold mr-1 mb-4">Cant. Bodegas/tks:</span>{{ vaporInformacion.cantidadBodegasTks }}
-    </div>
-  </div>
-</ng-template> -->
+<ship-spinner [message]="'Cargando información de ship particular. Por favor, espere...'" *ngIf='mostrarCardBuque'></ship-spinner>

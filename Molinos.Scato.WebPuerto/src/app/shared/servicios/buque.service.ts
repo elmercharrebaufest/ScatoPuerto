@@ -7,6 +7,7 @@ import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { Vapor } from '@ScatoModels/vapor';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
 import { Actores } from '@ScatoModels/Buques/Actores';
+import { Operador } from '@ScatoModels/Buques/Operador';
 @Injectable({
   providedIn: 'root'
 })
@@ -24,8 +25,8 @@ export class BuqueService {
   // #endregion
 
   // #region Metodos  
-  public obtenerListarHistorialDeBuques(anio: number, mes: number, vaporId: number): Observable<any> {
-    return this.http.get<any>(`${this.url}Buque/ListarHistorialDeBuques?anio=${anio}&mes=${mes}&vaporId=${vaporId}`, { 'withCredentials': true });
+  public obtenerListarHistorialDeBuques(anio: number, mes: number, vaporId: number, desde: Date, hasta: Date): Observable<any> {
+    return this.http.get<any>(`${this.url}Buque/ListarHistorialDeBuques?anio=${anio}&mes=${mes}&vaporId=${vaporId}&desde=${desde}&hasta=${hasta}`, { 'withCredentials': true });
   }
 
   public obtenerPaises(): Observable<Pais[]> {
@@ -40,7 +41,7 @@ export class BuqueService {
     return this.http.post(`${this.url}Buque/GuardarVaporInformacion`, objVaporInformacion, { 'withCredentials': true });
   }
 
-  public obtenerVaporInformaconion(Vapor_Id: number): Observable<VaporInformacion> {
+  public obtenerVaporInformacion(Vapor_Id: number): Observable<VaporInformacion> {
     return this.http.get<VaporInformacion>(`${this.url}Buque/ObtenerVaporInformacion?Vapor_Id=${Vapor_Id}`, { 'withCredentials': true });
   }
 
@@ -50,6 +51,14 @@ export class BuqueService {
 
   public obtenerActores(idEmbarque: number): Observable<Actores> {
     return this.http.get<Actores>(`${this.url}Buque/ObtenerActores?idEmbarque=${idEmbarque}`, { 'withCredentials': true });
+  }
+
+  public GuardarHistoricoOperador(idEmbarque: number, accion: string){
+    return this.http.post(`${this.url}Buque/GuardarHistoricoOperador?idEmbarque=${idEmbarque}&accion=${accion}`, { 'withCredentials': true });
+  }
+
+  public obtenerOperadores(idEmbarque: number): Observable<Operador[]>{
+    return this.http.get<Operador[]>(`${this.url}Buque/ListarOperadores?Embarque_Id=${idEmbarque}`, { 'withCredentials': true });
   }
   // #endregion
 }

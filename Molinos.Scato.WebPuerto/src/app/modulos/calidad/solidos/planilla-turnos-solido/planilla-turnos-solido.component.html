@@ -6,10 +6,12 @@
             <h4 class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos sólidos Recibidores</h4>
         </div>
         <div id="collapsePlanillaTurnosSolido" class="collapse show" >
-            <div style="margin-left: 1rem;" *ngIf="!esSoloLectura">
-                <h5 data-html2canvas-ignore="true" *ngIf="!tablerista">Observaciones De Calidad</h5>
-                <button *ngIf="!tablerista" class='btn btn-primary' (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
-            </div>
+            <ng-container *ngIf="hasPermisoRecibidores_ObsCalidad_Agregar()">
+                <div style="margin-left: 1rem;" *ngIf="!esSoloLectura">
+                    <h5 data-html2canvas-ignore="true" *ngIf="!tablerista">Observaciones De Calidad</h5>
+                    <button *ngIf="!tablerista" class='btn btn-primary' (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
+                </div>
+            </ng-container>
         <br>
         <br>
         
