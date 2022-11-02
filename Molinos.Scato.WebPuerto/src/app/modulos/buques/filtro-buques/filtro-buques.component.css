@@ -13,3 +13,15 @@
     color: gray !important;
 
 }
+
+.buscar{
+background-color: #1C7CD5;
+border-color: #1C7CD5;
+color: white;
+}
+
+.limpiar{
+    color: #1C7CD5;
+    background: white;
+    border-color: #1C7CD5;
+}

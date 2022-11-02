@@ -22,16 +22,12 @@
                         <tr>
                             <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
                             <th class="header-geo-fijo sticky-head header-geo-letra">Nombre Buque</th>
-                            <th class="header-geo-fijo header-geo-letra">Puerto de Partida</th>
-                            <th class="header-geo-fijo header-geo-letra">Puerto de Destino</th>
-                            <th class="header-geo-fijo header-geo-letra">Eta Reportada</th>
-                            <th class="header-geo-fijo header-geo-letra">Arribó</th>
                             <th class="header-geo-fijo header-geo-letra">Última posición recibida</th>
                             <th class="header-geo-fijo header-geo-letra">Área</th>
-                            <th class="header-geo-fijo header-geo-letra">Puerto actual</th>
-                            <th class="header-geo-fijo header-geo-letra">Estado</th>
-                            <th class="header-geo-fijo header-geo-letra">Muelle de carga</th>
-                            <th class="header-geo-fijo header-geo-letra">Ubicación del barco Line Up</th>
+                            <th class="header-geo-fijo header-geo-letra">Ubicación actual</th>
+                            <th class="header-geo-fijo header-geo-letra">Estado del barco</th>
+                            <th class="header-geo-fijo header-geo-letra" style="background: darkgray">Muelle de carga</th>
+                            <th class="header-geo-fijo header-geo-letra" style="background: darkgray">Ubicación del barco Line Up</th>
                         </tr> 
                     </thead>
                     <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
@@ -55,11 +51,7 @@
                             <td class="sticky lista-nombre-buque row-geo-letra" (click)='onOpenModalGeo(addGeo, geolocalizacion)'>
                                 {{geolocalizacion.nombreBuque}}
                             </td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje.etA_Reportado  | date: 'dd/MM/yyyy hh:mm' }}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje.ata  | date: 'dd/MM/yyyy hh:mm' }}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.posicion.horaUTCPosicionRecibida | date: 'dd/MM/yyyy hh:mm' }}</td>
+                            <td class="row-geo-letra">{{geolocalizacion.posicion.horaUTCPosicionRecibida | date: 'dd/MM/yyyy h:mm a' }}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion.estado}}</td>

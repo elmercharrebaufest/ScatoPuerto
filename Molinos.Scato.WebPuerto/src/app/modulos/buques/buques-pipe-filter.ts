@@ -32,18 +32,18 @@ export class BuqueFilterPipe implements PipeTransform {
       }
     }
 
-    if (filtroBuques.controls.nombreExportador != undefined) {
+    if (filtroBuques.controls.nombreExportador != undefined && filtroBuques.controls.nombreExportador.value != "") {
       historialBuquesFiltro = historialBuques.filter(item => {
-        let bEncontrado = false;
+        let hayExportador = false;
         if (item.productoExportador != null) {
           for (let exportador of item.productoExportador) {
             var filExportador = filtroBuques.controls.nombreExportador.value.toUpperCase();
             var itemExportador = exportador.nombreExportador.toUpperCase();
-            bEncontrado = (filExportador.length > 0 ? itemExportador.indexOf(filExportador) !== -1 : itemExportador.indexOf(itemExportador) !== -1);
+            hayExportador = (filExportador.length > 0 ? itemExportador.indexOf(filExportador) !== -1 : itemExportador.indexOf(itemExportador) !== -1);
             break;
 
           }
-          return bEncontrado;
+          return hayExportador;
 
         }
       });
