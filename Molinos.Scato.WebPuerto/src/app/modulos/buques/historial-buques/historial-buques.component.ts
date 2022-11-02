@@ -108,13 +108,12 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     const filtro = this.filtroBuquedaForm;
 
     if (filtro != null) {
-
+      this.buscarHistorialBuques = true;
       const filVaporId = filtro.controls.vaporId.value;
       const filAnio = filtro.controls.anio.value;
       const filMes = filtro.controls.mes.value;
       const desde = filtro.controls.desde.value;
-      const hasta = filtro.controls.hasta.value;
-      this.buscarHistorialBuques = true
+      const hasta = filtro.controls.hasta.value;     
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
       let anio: number = filAnio > '' ? parseInt(filAnio, 0) : 0;
       let mes: number = filMes > '' ? parseInt(filMes, 0) : 0;
@@ -183,7 +182,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
           this.setCargarPaginas();
           this.buscarHistorialBuques = false;
         }else{
-          this.buscarHistorialBuques = false;
+         this.buscarHistorialBuques = false;
         }
       }
     }, error => { },

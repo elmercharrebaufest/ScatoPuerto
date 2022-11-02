@@ -21,11 +21,11 @@
             </select>
         </div> -->
         <div class="form-group col-md-2 input_img">
-            <input type="month" placeholder="Desde" class="form-control colorGris" [value]="desde" (change)="onChangeBusqueda($event)"  formControlName="desde">
+            <input type="month" placeholder="Desde" class="form-control colorGris" [value]="desde" formControlName="desde">
             <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
           </div>
           <div class="form-group col-md-2 input_img">
-            <input type="month" placeholder="Hasta" class="form-control colorGris" [value]="hasta" (change)="onChangeBusqueda($event)" (clear)="onChangeBusqueda($event)"  formControlName="hasta">
+            <input type="month" placeholder="Hasta" class="form-control colorGris" [value]="hasta" formControlName="hasta">
             <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
           </div>
         <div class="form-group col-md-2 colorGris">
@@ -34,37 +34,36 @@
                                      formControlName="producto" 
                                      [placeholder]="'Producto'"
                                      [settings]="getConfigListaMultiple()"
-                                     [data]="getListaProductos()"
-                                     (onDeSelect)="onChangeValues($event)"
-                                     (onDropDownClose)="onChangeValues($event)"
-                                     (onSelect)="onChangeValues($event)"
-                                     (onSelectAll)="onChangeValues($event)"
+                                     [data]="getListaProductos()"                                    
                                     >
             </ng-multiselect-dropdown>
 
         </div>
         <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Buque" formControlName="buque"
-                (keyup)="onChangeValues($event)">
+                >
         </div>
         <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Destino" formControlName="destino"
-                (keyup)="onChangeValues($event)">
+               >
         </div>
         <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Exportador" formControlName="nombreExportador"           
-                (keyup)="onChangeValues($event)">
+                >
         </div>
         <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Control privado" formControlName="control"
-                (keyup)="onChangeValues($event)">
+               >
         </div>
        <!--  <div class="form-group col-md-1">
             <input type="text" class="form-control" placeholder="A.T.A" formControlName="ata"           
                 (keyup)="onChangeValues($event)">
         </div> -->      
+        <div class="form-group col-md-1" >
+            <button class="btn buscar" style="width: 100%;" (click)="onBuscar()" >Buscar</button>
+        </div>
         <div class="form-group col-md-2">
-            <button class="btn btn-success" (click)="onLimpiarFiltros()">Limpiar Filtros</button>
+            <button class="btn limpiar" (click)="onLimpiarFiltros()">Limpiar Búsqueda</button>
         </div>
     </div>
 
