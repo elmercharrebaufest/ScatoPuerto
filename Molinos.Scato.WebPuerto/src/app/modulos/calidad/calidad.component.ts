@@ -20,6 +20,7 @@ import { Embarque, EstadoBuque } from '@ScatoModels/embarque';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { LineupService } from '@ScatoServicios/lineup.service';
+import { BuqueService } from '@ScatoServicios/buque.service';
 
 
 @Component({
@@ -66,7 +67,9 @@ export class CalidadComponent implements OnInit, OnDestroy {
                   {id: 4, descripcion: 'PostOperativo'}];
 
 
+
   constructor(
+    private _buqueService: BuqueService,
     private lineUpService: LineupService,
     private workflowService: WorkflowService,
     private procesoCalidadService: ProcesoCalidadService,
@@ -208,6 +211,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
         if (confirmed) {
           this.modificarEstadoBuque('PostOperativo');
       //    this.zarparEmbarque(this.embarque);
+     //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
+
 
           InstanciaWorkflowPuerto
           this.router.navigate(['/lineup']);
