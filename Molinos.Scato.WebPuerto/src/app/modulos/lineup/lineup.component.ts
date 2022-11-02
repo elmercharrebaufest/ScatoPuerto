@@ -21,6 +21,7 @@ import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { ErroresGeolocalizacionEmbarque } from '@ScatoModels/geolocalizacion/errores-geolocalizacion-embarque';
+import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
 
 @Component({
   selector: 'app-lineup',
@@ -49,7 +50,7 @@ export class LineupComponent implements OnInit, Observador {
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   LogCount: number = 0;
   private user: Usuario;
-
+  listaEmbarqueSinPosicion:ErroresGeolocalizacionEmbarque[];
   estadoVicentinLp: string;
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
@@ -66,6 +67,7 @@ export class LineupComponent implements OnInit, Observador {
     private parametrosService: ParametrosService,
     private session: SessionService,
     private geolocalizacionService: GeolocalizacionService,
+    private erroresGeolocalizacionEmbarqueService: ErroresGeolocalizacionEmbarqueService,
     private auth: AutenticadorService
   ) {
     this.auth.renovarAuthUsuario();
@@ -138,18 +140,9 @@ export class LineupComponent implements OnInit, Observador {
       );
   }
   cargarErroresGeolocalizacion(){
-    let listaEmabarSinPosicion = Array<ErroresGeolocalizacionEmbarque>();
-    this.listadoEmbarques.forEach(item =>{
-      const embarqueSel: any = item.embarque;
-      if (embarqueSel.embarquePosicion.length == 0){
-        const embarquePos:ErroresGeolocalizacionEmbarque = {
-          idEmbarque : item.embarque.id,
-          mensaje : '',
-        };
-        listaEmabarSinPosicion.push(embarquePos);
-      }
-    });
-    console.log('listaEmabarSinPosicion-->>', listaEmabarSinPosicion);
+    console.log('this.listadoEmbarques--->>', this.listadoEmbarques);
+    this.listaEmbarqueSinPosicion = this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(this.listadoEmbarques);
+    console.log('listaEmabarSinPosicion-->>', this.listaEmbarqueSinPosicion);
   }
   filtrarMuelles() {
 
