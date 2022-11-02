@@ -20,6 +20,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
+import { ErroresGeolocalizacionEmbarque } from '@ScatoModels/geolocalizacion/errores-geolocalizacion-embarque';
 
 @Component({
   selector: 'app-lineup',
@@ -131,11 +132,25 @@ export class LineupComponent implements OnInit, Observador {
           this.mostrarContent = true;
           this.mostrarSpinner = false;
           this.filtrarMuelles();
+          this.cargarErroresGeolocalizacion();
           console.log('FIN LINEUP ', new Date())
         }
       );
   }
-
+  cargarErroresGeolocalizacion(){
+    let listaEmabarSinPosicion = Array<ErroresGeolocalizacionEmbarque>();
+    this.listadoEmbarques.forEach(item =>{
+      const embarqueSel: any = item.embarque;
+      if (embarqueSel.embarquePosicion.length == 0){
+        const embarquePos:ErroresGeolocalizacionEmbarque = {
+          idEmbarque : item.embarque.id,
+          mensaje : '',
+        };
+        listaEmabarSinPosicion.push(embarquePos);
+      }
+    });
+    console.log('listaEmabarSinPosicion-->>', listaEmabarSinPosicion);
+  }
   filtrarMuelles() {
 
     let actualDate = new Date();

@@ -11889,5 +11889,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
         }
+
+        public IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
+        {
+            IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x=> x.Embarque_id == idEmbarque);
+            return erroresGeolocalizacion;
+        }
     }
 }

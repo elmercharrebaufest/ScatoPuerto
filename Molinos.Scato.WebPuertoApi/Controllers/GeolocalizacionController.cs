@@ -163,6 +163,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_VerGeo)]
+        [Route("api/Geolocalizacion/ListarErroresGeolocalizacionPorEmbarque")]
+        public HttpResponseMessage ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
+        {
+            try
+            {
+                var erroresGeolocalizacion = servicio.ListarErroresGeolocalizacionPorEmbarque(idEmbarque);
+                return Request.CreateResponse(HttpStatusCode.OK, erroresGeolocalizacion);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
+            }
+        }
+
         [HttpPost]
         [Route("api/Geolocalizacion/RegistrarErroresGeolocalizacion")]
         public HttpResponseMessage RegistrarErroresGeolocalizacion(List<erroresGeo> ErroresGeolocalizacion)

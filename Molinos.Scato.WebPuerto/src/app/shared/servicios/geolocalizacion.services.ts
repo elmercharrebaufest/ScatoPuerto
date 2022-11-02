@@ -24,4 +24,7 @@ export class GeolocalizacionService {
       return this.http.get(`${this.url}Geolocalizacion/ListarEmbarqueLineUpGeolocalizacion`, { 'withCredentials': true });
     }
     
+    ListarErroresGeolocalizacionPorEmbarque(idEmbarque: number): Observable<any> {
+      return this.http.get(`${this.url}Geolocalizacion/ListarErroresGeolocalizacionPorEmbarque?idEmbarque=${idEmbarque}`, { 'withCredentials': true });
+    }
 }

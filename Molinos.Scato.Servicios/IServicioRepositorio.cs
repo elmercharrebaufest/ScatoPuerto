@@ -2755,9 +2755,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         bool EliminarArchivos(List<ArchivosPuertoDto> archivosPuerto);
 
-
-
         [OperationContract]
         IList<InstanciaWorkflowPuertoDto> ListarEmbarques();
+
+        [OperationContract]
+        IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
+
     }
 }
