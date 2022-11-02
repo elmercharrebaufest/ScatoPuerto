@@ -11119,208 +11119,214 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, DateTime? desde, DateTime? hasta)
+        public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, DateTime? desde=null, DateTime? hasta=null)
         {
             IList<Embarque> listaEmbarques;
-
-            if (vaporId > 0)
+            try
             {
-                listaEmbarques = repositorio.Listar<Embarque>(x => x.Vapor.Id == vaporId && x.SanBenito == true);
-            }
-            else
-            {
-                var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>(x =>
-                (desde == null || (desde.Value.Month <= x.FechaDesamarro.Value.Month && desde.Value.Year <= x.FechaDesamarro.Value.Year))
-                 && (hasta == null || (hasta.Value.Month >= x.FechaDesamarro.Value.Month && hasta.Value.Year >= x.FechaDesamarro.Value.Year)));
-
-
-                listaEmbarques = new List<Embarque>();
-                foreach (var item in moduloCargaPeriodo)
+                if (vaporId > 0)
                 {
-                    var lineUps = repositorio.Listar<LineUp>(x => x.ModuloDeCarga.Id == item.ModuloDeCarga.Id);
-                    foreach (var lineup in lineUps)
+                    listaEmbarques = repositorio.Listar<Embarque>(x => x.Vapor.Id == vaporId && x.SanBenito == true);
+                }
+                else
+                {
+                    var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>(x =>
+                    (desde == null || (x.FechaDesamarro.HasValue && desde.Value.Month <= x.FechaDesamarro.Value.Month && desde.Value.Year <= x.FechaDesamarro.Value.Year))
+                     && (hasta == null || (x.FechaDesamarro.HasValue && hasta.Value.Month >= x.FechaDesamarro.Value.Month && hasta.Value.Year >= x.FechaDesamarro.Value.Year)));
+
+
+                    listaEmbarques = new List<Embarque>();
+                    foreach (var item in moduloCargaPeriodo)
                     {
-                        var embarque = repositorio.Obtener<Embarque>(x => x.Id == lineup.Embarque.Id && x.SanBenito == true);
-                        listaEmbarques.Add(embarque);
+                        var lineUps = repositorio.Listar<LineUp>(x => x.ModuloDeCarga.Id == item.ModuloDeCarga.Id);
+                        foreach (var lineup in lineUps)
+                        {
+                            var embarque = repositorio.Obtener<Embarque>(x => x.Id == lineup.Embarque.Id && x.SanBenito == true);
+                            listaEmbarques.Add(embarque);
+                        }
                     }
                 }
-            }
 
-            List<HistorialDeBusquesDto> listarHistorialDeBusques = new List<HistorialDeBusquesDto>();
-            ProductoExportadorDto productoExportadorDto = new ProductoExportadorDto();
+                List<HistorialDeBusquesDto> listarHistorialDeBusques = new List<HistorialDeBusquesDto>();
+                ProductoExportadorDto productoExportadorDto = new ProductoExportadorDto();
 
-            HistorialDeBusquesDto historialDeBusquesDto;
-            if (listaEmbarques != null)
-            {
-                if (listaEmbarques.Count > 0)
+                HistorialDeBusquesDto historialDeBusquesDto;
+                if (listaEmbarques != null)
                 {
-                    foreach (var embarque in listaEmbarques)
+                    if (listaEmbarques.Count > 0)
                     {
-                        historialDeBusquesDto = new HistorialDeBusquesDto();
-                        historialDeBusquesDto.NombreBuque = embarque.Vapor.Nombre;
-                        historialDeBusquesDto.EmbarqueId = embarque.Id;
-                        historialDeBusquesDto.VaporId = embarque.Vapor.Id;
-                        historialDeBusquesDto.EsLiquido = embarque.EsLiquido;
-
-                        List<string> listaMuelles = new List<string>();
-                        List<string> listaProductos = new List<string>();
-
-                        #region Muelle de Carga / Destino
-                        if (embarque.Vicentin) listaMuelles.Add("Vicentin");
-                        if (embarque.OtrosMuelles) listaMuelles.Add("Otros Muelles");
-                        if (embarque.Noryon) listaMuelles.Add("Noryon");
-                        if (embarque.SanBenito) listaMuelles.Add("San Benito");
-                        historialDeBusquesDto.MuelleCarga = listaMuelles;
-                        historialDeBusquesDto.Destino = embarque.Destino != null ? embarque.Destino.Nombre : string.Empty;
-                        #endregion
-
-                        #region Material Puerto
-                        foreach (var materialCantidad in embarque.MaterialPuertoCantidad)
+                        foreach (var embarque in listaEmbarques)
                         {
-                            listaProductos.Add(materialCantidad.MaterialPuerto.DescripcionCorta);
-                        }
-                        historialDeBusquesDto.Productos = listaProductos;
-                        #endregion
+                            historialDeBusquesDto = new HistorialDeBusquesDto();
+                            historialDeBusquesDto.NombreBuque = embarque.Vapor.Nombre;
+                            historialDeBusquesDto.EmbarqueId = embarque.Id;
+                            historialDeBusquesDto.VaporId = embarque.Vapor.Id;
+                            historialDeBusquesDto.EsLiquido = embarque.EsLiquido;
 
-                        var listaBuquesLineuUp = repositorio.Listar<LineUp>(x => x.Embarque.Id == embarque.Id);
+                            List<string> listaMuelles = new List<string>();
+                            List<string> listaProductos = new List<string>();
 
-                        foreach (var lineUp in listaBuquesLineuUp)
-                        {
-                            historialDeBusquesDto.ModuloDeCargaId = lineUp.ModuloDeCarga.Id;
-
-                            var moduloCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == lineUp.ModuloDeCarga.Id);
-                            List<ProductoExportadorDto> listaProductoExportador = new List<ProductoExportadorDto>();
-
-                            foreach (var planillaDeTurnos in moduloCarga.ModuloDeCargaPlanillaDeTurnos)
-                            {
-                                #region Planilla de Liquido
-                                if (planillaDeTurnos.EsLiquido)
-                                {
-                                    foreach (var detalleLiquido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                                    {
-                                        productoExportadorDto = new ProductoExportadorDto();
-                                        productoExportadorDto.Exportador_Id = detalleLiquido.Exportador != null ? detalleLiquido.Exportador.Id : 0;
-                                        productoExportadorDto.NombreExportador = detalleLiquido.Exportador != null ? detalleLiquido.Exportador.Nombre : string.Empty;
-                                        productoExportadorDto.MaterialPuerto_Id = detalleLiquido.MaterialPuerto != null ? detalleLiquido.MaterialPuerto.Id : 0;
-                                        productoExportadorDto.NombreMaterial = detalleLiquido.MaterialPuerto != null ? detalleLiquido.MaterialPuerto.DescripcionCorta : string.Empty;
-                                        productoExportadorDto.Toneladas = detalleLiquido.Cantidad != null ? detalleLiquido.Cantidad : 0;
-                                        productoExportadorDto.Toneladas = productoExportadorDto.Toneladas > 0 ? productoExportadorDto.Toneladas / 1000 : 0;
-                                        listaProductoExportador.Add(productoExportadorDto);
-                                        historialDeBusquesDto.ProductoExportador = listaProductoExportador;
-                                    }
-                                }
-                                #endregion
-
-                                #region Planilla de Solido
-                                if (!planillaDeTurnos.EsLiquido)
-                                {
-                                    foreach (var detalleSolido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                                    {
-                                        productoExportadorDto = new ProductoExportadorDto();
-                                        productoExportadorDto.Exportador_Id = detalleSolido.Exportador != null ? detalleSolido.Exportador.Id : 0;
-                                        productoExportadorDto.NombreExportador = detalleSolido.Exportador != null ? detalleSolido.Exportador.Nombre : string.Empty;
-                                        productoExportadorDto.MaterialPuerto_Id = detalleSolido.MaterialPuerto != null ? detalleSolido.MaterialPuerto.Id : 0;
-                                        productoExportadorDto.NombreMaterial = detalleSolido.MaterialPuerto != null ? detalleSolido.MaterialPuerto.DescripcionCorta : string.Empty;
-                                        productoExportadorDto.Toneladas = detalleSolido.Cantidad != null ? detalleSolido.Cantidad : 0;
-                                        productoExportadorDto.Toneladas = productoExportadorDto.Toneladas > 0 ? productoExportadorDto.Toneladas / 1000 : 0;
-                                        listaProductoExportador.Add(productoExportadorDto);
-                                        historialDeBusquesDto.ProductoExportador = listaProductoExportador;
-                                    }
-                                }
-                                #endregion
-
-                                #region Plano de Carga
-                                if (lineUp.PlanoDeCarga != null)
-                                {
-                                    foreach (var agenciaControlPrivado in lineUp.PlanoDeCarga.AgentesControlPrivado)
-                                    {
-                                        historialDeBusquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
-                                    }
-
-                                }
-                                #endregion
-
-                                #region Modulo de Carga de Periodo de Carga
-                                foreach (var moduloCargaPeriodoCarga in moduloCarga.ModuloDeCargaPeriodoDeCarga)
-                                {
-                                    DateTime fechaHoraDesamarro;
-                                    DateTime fechaHoraAmarro;
-                                    if (moduloCargaPeriodoCarga.FechaDesamarro != null)
-                                    {
-                                        string fechaDesamarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaDesamarro).ToString("yyyy-MM-dd");
-                                        if (moduloCargaPeriodoCarga.HoraDesamarro.Length > 0)
-                                        {
-                                            fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, moduloCargaPeriodoCarga.HoraDesamarro);
-                                        }
-
-                                        fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
-                                        historialDeBusquesDto.FechaDesamarro = fechaHoraDesamarro;
-                                    }
-                                    if (moduloCargaPeriodoCarga.FechaAmarro != null)
-                                    {
-                                        string fechaAmarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaAmarro).ToString("yyyy-MM-dd");
-                                        if (moduloCargaPeriodoCarga.HoraAmarro.Length > 0)
-                                        {
-                                            fechaAmarro = string.Format("{0} {1}", fechaAmarro, moduloCargaPeriodoCarga.HoraAmarro);
-                                        }
-
-                                        fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
-                                        historialDeBusquesDto.FechaAmarro = fechaHoraAmarro;
-                                    }
-                                    if (historialDeBusquesDto.FechaDesamarro != null && historialDeBusquesDto.FechaAmarro != null)
-                                    {
-                                        TimeSpan? diferencia = historialDeBusquesDto.FechaDesamarro - historialDeBusquesDto.FechaAmarro;
-                                        historialDeBusquesDto.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
-                                    }
-
-                                }
-                                #endregion
-
-                            }
-                            #region Ritmos
-                            if (lineUp.Embarque.EsLiquido)
-                            {
-                                Dictionary<string, int> resultado = ObtenerRitmosLiquidos(lineUp.ModuloDeCarga.Id);
-                                if (resultado != null)
-                                {
-                                    if (resultado.Count > 0)
-                                    {
-                                        int ritmoAcumuladoNeto = 0;
-                                        resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
-                                        historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
-                                    }
-                                }
-                            }
-                            if (!lineUp.Embarque.EsLiquido)
-                            {
-                                Dictionary<string, int> resultado = ObtenerRitmos(lineUp.ModuloDeCarga.Id);
-                                if (resultado != null)
-                                {
-                                    if (resultado.Count > 0)
-                                    {
-                                        int ritmoCargaNeto = 0;
-                                        resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
-                                        historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
-                                    }
-                                }
-                                #region Ritmos Baja Carga
-                                string[] listaBC = new string[] { "BCB", "BCP", "F" };
-                                var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
-                                int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == lineUp.ModuloDeCarga.Id);
-                                historialDeBusquesDto.TotalRitmoBaja = 0;
-                                historialDeBusquesDto.TotalRitmoBaja = Convert.ToDecimal(tnBc);
-                                #endregion
-                            }
+                            #region Muelle de Carga / Destino
+                            if (embarque.Vicentin) listaMuelles.Add("Vicentin");
+                            if (embarque.OtrosMuelles) listaMuelles.Add("Otros Muelles");
+                            if (embarque.Noryon) listaMuelles.Add("Noryon");
+                            if (embarque.SanBenito) listaMuelles.Add("San Benito");
+                            historialDeBusquesDto.MuelleCarga = listaMuelles;
+                            historialDeBusquesDto.Destino = embarque.Destino != null ? embarque.Destino.Nombre : string.Empty;
                             #endregion
 
+                            #region Material Puerto
+                            foreach (var materialCantidad in embarque.MaterialPuertoCantidad)
+                            {
+                                listaProductos.Add(materialCantidad.MaterialPuerto.DescripcionCorta);
+                            }
+                            historialDeBusquesDto.Productos = listaProductos;
+                            #endregion
 
+                            var listaBuquesLineuUp = repositorio.Listar<LineUp>(x => x.Embarque.Id == embarque.Id);
+
+                            foreach (var lineUp in listaBuquesLineuUp)
+                            {
+                                historialDeBusquesDto.ModuloDeCargaId = lineUp.ModuloDeCarga.Id;
+
+                                var moduloCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == lineUp.ModuloDeCarga.Id);
+                                List<ProductoExportadorDto> listaProductoExportador = new List<ProductoExportadorDto>();
+
+                                foreach (var planillaDeTurnos in moduloCarga.ModuloDeCargaPlanillaDeTurnos)
+                                {
+                                    #region Planilla de Liquido
+                                    if (planillaDeTurnos.EsLiquido)
+                                    {
+                                        foreach (var detalleLiquido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                                        {
+                                            productoExportadorDto = new ProductoExportadorDto();
+                                            productoExportadorDto.Exportador_Id = detalleLiquido.Exportador != null ? detalleLiquido.Exportador.Id : 0;
+                                            productoExportadorDto.NombreExportador = detalleLiquido.Exportador != null ? detalleLiquido.Exportador.Nombre : string.Empty;
+                                            productoExportadorDto.MaterialPuerto_Id = detalleLiquido.MaterialPuerto != null ? detalleLiquido.MaterialPuerto.Id : 0;
+                                            productoExportadorDto.NombreMaterial = detalleLiquido.MaterialPuerto != null ? detalleLiquido.MaterialPuerto.DescripcionCorta : string.Empty;
+                                            productoExportadorDto.Toneladas = detalleLiquido.Cantidad != null ? detalleLiquido.Cantidad : 0;
+                                            productoExportadorDto.Toneladas = productoExportadorDto.Toneladas > 0 ? productoExportadorDto.Toneladas / 1000 : 0;
+                                            listaProductoExportador.Add(productoExportadorDto);
+                                            historialDeBusquesDto.ProductoExportador = listaProductoExportador;
+                                        }
+                                    }
+                                    #endregion
+
+                                    #region Planilla de Solido
+                                    if (!planillaDeTurnos.EsLiquido)
+                                    {
+                                        foreach (var detalleSolido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                                        {
+                                            productoExportadorDto = new ProductoExportadorDto();
+                                            productoExportadorDto.Exportador_Id = detalleSolido.Exportador != null ? detalleSolido.Exportador.Id : 0;
+                                            productoExportadorDto.NombreExportador = detalleSolido.Exportador != null ? detalleSolido.Exportador.Nombre : string.Empty;
+                                            productoExportadorDto.MaterialPuerto_Id = detalleSolido.MaterialPuerto != null ? detalleSolido.MaterialPuerto.Id : 0;
+                                            productoExportadorDto.NombreMaterial = detalleSolido.MaterialPuerto != null ? detalleSolido.MaterialPuerto.DescripcionCorta : string.Empty;
+                                            productoExportadorDto.Toneladas = detalleSolido.Cantidad != null ? detalleSolido.Cantidad : 0;
+                                            productoExportadorDto.Toneladas = productoExportadorDto.Toneladas > 0 ? productoExportadorDto.Toneladas / 1000 : 0;
+                                            listaProductoExportador.Add(productoExportadorDto);
+                                            historialDeBusquesDto.ProductoExportador = listaProductoExportador;
+                                        }
+                                    }
+                                    #endregion
+
+                                    #region Plano de Carga
+                                    if (lineUp.PlanoDeCarga != null)
+                                    {
+                                        foreach (var agenciaControlPrivado in lineUp.PlanoDeCarga.AgentesControlPrivado)
+                                        {
+                                            historialDeBusquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
+                                        }
+
+                                    }
+                                    #endregion
+
+                                    #region Modulo de Carga de Periodo de Carga
+                                    foreach (var moduloCargaPeriodoCarga in moduloCarga.ModuloDeCargaPeriodoDeCarga)
+                                    {
+                                        DateTime fechaHoraDesamarro;
+                                        DateTime fechaHoraAmarro;
+                                        if (moduloCargaPeriodoCarga.FechaDesamarro != null)
+                                        {
+                                            string fechaDesamarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaDesamarro).ToString("yyyy-MM-dd");
+                                            if (moduloCargaPeriodoCarga.HoraDesamarro.Length > 0)
+                                            {
+                                                fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, moduloCargaPeriodoCarga.HoraDesamarro);
+                                            }
+
+                                            fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
+                                            historialDeBusquesDto.FechaDesamarro = fechaHoraDesamarro;
+                                        }
+                                        if (moduloCargaPeriodoCarga.FechaAmarro != null)
+                                        {
+                                            string fechaAmarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaAmarro).ToString("yyyy-MM-dd");
+                                            if (moduloCargaPeriodoCarga.HoraAmarro.Length > 0)
+                                            {
+                                                fechaAmarro = string.Format("{0} {1}", fechaAmarro, moduloCargaPeriodoCarga.HoraAmarro);
+                                            }
+
+                                            fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
+                                            historialDeBusquesDto.FechaAmarro = fechaHoraAmarro;
+                                        }
+                                        if (historialDeBusquesDto.FechaDesamarro != null && historialDeBusquesDto.FechaAmarro != null)
+                                        {
+                                            TimeSpan? diferencia = historialDeBusquesDto.FechaDesamarro - historialDeBusquesDto.FechaAmarro;
+                                            historialDeBusquesDto.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
+                                        }
+
+                                    }
+                                    #endregion
+
+                                }
+                                #region Ritmos
+                                if (lineUp.Embarque.EsLiquido)
+                                {
+                                    Dictionary<string, int> resultado = ObtenerRitmosLiquidos(lineUp.ModuloDeCarga.Id);
+                                    if (resultado != null)
+                                    {
+                                        if (resultado.Count > 0)
+                                        {
+                                            int ritmoAcumuladoNeto = 0;
+                                            resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
+                                            historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
+                                        }
+                                    }
+                                }
+                                if (!lineUp.Embarque.EsLiquido)
+                                {
+                                    Dictionary<string, int> resultado = ObtenerRitmos(lineUp.ModuloDeCarga.Id);
+                                    if (resultado != null)
+                                    {
+                                        if (resultado.Count > 0)
+                                        {
+                                            int ritmoCargaNeto = 0;
+                                            resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
+                                            historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
+                                        }
+                                    }
+                                    #region Ritmos Baja Carga
+                                    string[] listaBC = new string[] { "BCB", "BCP", "F" };
+                                    var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
+                                    int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == lineUp.ModuloDeCarga.Id);
+                                    historialDeBusquesDto.TotalRitmoBaja = 0;
+                                    historialDeBusquesDto.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                                    #endregion
+                                }
+                                #endregion
+
+
+                            }
+
+                            listarHistorialDeBusques.Add(historialDeBusquesDto);
                         }
-
-                        listarHistorialDeBusques.Add(historialDeBusquesDto);
                     }
                 }
+                return listarHistorialDeBusques.OrderBy(x => x.FechaDesamarro).ToList();
             }
-            return listarHistorialDeBusques.OrderBy(x => x.FechaDesamarro).ToList();
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public List<HistoricoActoresDto> ListarOperadores(int Embarque_Id)
