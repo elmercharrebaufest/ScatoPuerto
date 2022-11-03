@@ -20,8 +20,6 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
-import { ErroresGeolocalizacionEmbarque } from '@ScatoModels/geolocalizacion/errores-geolocalizacion-embarque';
-import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
 
 @Component({
   selector: 'app-lineup',
@@ -50,7 +48,6 @@ export class LineupComponent implements OnInit, Observador {
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   LogCount: number = 0;
   private user: Usuario;
-  listaEmbarqueSinPosicion:ErroresGeolocalizacionEmbarque[];
   estadoVicentinLp: string;
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
@@ -66,8 +63,6 @@ export class LineupComponent implements OnInit, Observador {
     private _messageService: MessageService,
     private parametrosService: ParametrosService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService,
-    private erroresGeolocalizacionEmbarqueService: ErroresGeolocalizacionEmbarqueService,
     private auth: AutenticadorService
   ) {
     this.auth.renovarAuthUsuario();
@@ -134,15 +129,9 @@ export class LineupComponent implements OnInit, Observador {
           this.mostrarContent = true;
           this.mostrarSpinner = false;
           this.filtrarMuelles();
-          this.cargarErroresGeolocalizacion();
           console.log('FIN LINEUP ', new Date())
         }
       );
-  }
-  cargarErroresGeolocalizacion(){
-    console.log('this.listadoEmbarques--->>', this.listadoEmbarques);
-    this.listaEmbarqueSinPosicion = this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(this.listadoEmbarques);
-    console.log('listaEmabarSinPosicion-->>', this.listaEmbarqueSinPosicion);
   }
   filtrarMuelles() {
 
@@ -152,7 +141,6 @@ export class LineupComponent implements OnInit, Observador {
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
-    console.log('this.sanBenito: ', this.sanBenito);
 
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
