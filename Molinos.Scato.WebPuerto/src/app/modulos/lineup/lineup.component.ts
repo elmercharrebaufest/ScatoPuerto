@@ -48,7 +48,6 @@ export class LineupComponent implements OnInit, Observador {
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   LogCount: number = 0;
   private user: Usuario;
-
   estadoVicentinLp: string;
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
@@ -64,7 +63,6 @@ export class LineupComponent implements OnInit, Observador {
     private _messageService: MessageService,
     private parametrosService: ParametrosService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService,
     private auth: AutenticadorService
   ) {
     this.auth.renovarAuthUsuario();
@@ -135,7 +133,6 @@ export class LineupComponent implements OnInit, Observador {
         }
       );
   }
-
   filtrarMuelles() {
 
     let actualDate = new Date();
@@ -144,7 +141,6 @@ export class LineupComponent implements OnInit, Observador {
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
-    console.log('this.sanBenito: ', this.sanBenito);
 
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();

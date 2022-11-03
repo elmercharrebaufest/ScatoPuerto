@@ -19,6 +19,7 @@ import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -68,6 +69,7 @@ export class LineupEmbarqueComponent implements OnInit {
     private session: SessionService,
     private _modalService: NgbModal,
     private embarqueService: EmbarqueService,
+    private erroresGeolocalizacionEmbarqueService: ErroresGeolocalizacionEmbarqueService,
   ) {
     this.user = this.session.getUser();
   }
@@ -91,24 +93,25 @@ export class LineupEmbarqueComponent implements OnInit {
     return new Array(i);
   }
 
-  cargarBuqueGeolocalizacion(id: any) {
+  cargarBuqueGeolocalizacion(id: number) {
     this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
-    
-    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
-      const embarqueInformacion = this.buquesGeolocalizacion.embarque?.embarqueInformacion;
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
-      if (embarqueInformacion !=  undefined || embarqueInformacion!= null) {
-        this.mensajeBuque = embarqueInformacion.length > 0 ? "Ver en el mapa" : "No se encontró. Completar IMO";
-        this.hayBuque =  embarqueInformacion.length > 0 ? true : false;
-      }
-      this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
-      this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
-    } else {
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
+    const embarquePosicion = this.buquesGeolocalizacion.embarque?.embarquePosicion;
+    if (embarquePosicion.length == 0) {
+      this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(id).subscribe(errores =>{
+        if (errores != null){
+          this.mensajeBuque = errores.mensaje;
+          this.hayBuque =  false;
+        }else{
+          this.mensajeBuque = "No se encontró. Completar IMO";
+          this.hayBuque =  false;
+        }
+      });
+    }else{
+      this.hayBuque =  true;
     }
+    this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
+    this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';  
   }
 
   getListaBuquesGeolocalizacion() {

@@ -87,10 +87,10 @@
 
   <app-cargando-muelle *ngIf="sanBenitoCargandoMuelle" [instanciaWorkflow]="sanBenitoCargandoMuelle"></app-cargando-muelle>
 
-  <div fxFlex *ngIf="listadoEmbarques">
+  <div fxFlex *ngIf="listadoEmbarques && mostrarContent">
     <div *ngIf="!mostrarCalendario">
       <div class="row m-lg-4" *ngFor="let instanciaWorkflow of sanBenito; let i = index;" #puertoSanBenito>
-        <app-lineup-embarque *ngIf="!(sanBenitoCargandoMuelle?.embarque.nombreBuque == instanciaWorkflow.embarque.nombreBuque) && instanciaWorkflow.embarque.ubicacion !=1"
+        <app-lineup-embarque *ngIf="!(sanBenitoCargandoMuelle?.embarque.nombreBuque == instanciaWorkflow.embarque.nombreBuque) && instanciaWorkflow.embarque.ubicacion !=1 && mostrarContent"
                              [instanciaWorkflow]="instanciaWorkflow"
                              [observador]="observador"
                              [index]="i"
