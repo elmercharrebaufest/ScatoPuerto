@@ -445,7 +445,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
         //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
-        mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida}</span><br>`;
+       
+        mensajeToolTip += `<span>Ultima posición recibida: ${fechaPosicionRecibida }</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
         markerBuque.on('click', this.markerOnClick, this);
@@ -484,9 +485,14 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
     if (minutes > 0)
       messageMinutes = minutes > 1 ? minutes + ' minutos ' : minutes + ' minuto ';
+      var mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
 
-    const mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
-
+    var hoy = new Date();
+    hoy.setHours(hoy.getHours() - 3);    
+    if(fechaPosicion < hoy){
+       mensajeUltimaPosicion = 'El buque está fuera de alcance';
+    }
+  
     return mensajeUltimaPosicion;
   }
   public async limpiarMarcadores() {

@@ -7,14 +7,14 @@
         <div class="col pl-0">
           <div class="row">
             <div class="col">
-              <label class="texto-geolocalizacion-letra" *ngIf="getListaBuquesGeolocalizacion() && mostrarListaBuque">Actualizado: {{getUltimaActualizacion() | date : 'dd/MM/yyyy HH:mm'}}hs</label>
+              <label class="texto-geolocalizacion-letra" *ngIf="getListaBuquesGeolocalizacion() && mostrarListaBuque">Ultima consulta de posiciones realizada: {{getUltimaActualizacion() | date : 'dd/MM/yyyy HH:mm'}}hs</label>
             </div>
           </div>
         </div>
         <div class="col pl-0">
           <div class="row">
             <div class="col">
-                <button type="button" class="btn btn-light btn-circle " >
+                <button type="button" class="btn btn-light btn-circle" style="color:#3376A1" >
                   <i class="fa fa-list-ul fa-2x c-celeste" (click)="onCambiarLineUp()"></i>
                 </button>
             </div>
@@ -25,19 +25,19 @@
     <div class="row m-lg-4" >
         <div class="col pl-0">
           <div class="row">
-            <div class="col">
+            <div class="col-md-6">
               <label class="titulo-geolocalizacion-letra">Geolocalización</label>
             </div>
           </div>
         </div>
-        <div class="col pl-0">
+        
           <div class="row">
-            <div class="col"></div>
+            <div class="col-md-1"></div>
           </div>
-        </div>
+        
         <div class="col pl-0">
-            <div class="row">
-              <div class="col">
+            <div class="row" style="text-align: end;">
+              <div class="col-md-12">
                 <button class="btn btn-muelles color-muelle-sanbenito">San Benito</button>
                 <button style="margin-left: 10px;" class="btn btn-muelles color-muelle-nouryon" >Nouryon</button>
                 <button style="margin-left: 10px;" class="btn btn-muelles color-muelle-vicentin" >Vicentin</button>
