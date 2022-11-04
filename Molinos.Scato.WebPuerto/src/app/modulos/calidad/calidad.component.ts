@@ -183,7 +183,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean){
+  finalizaEnCalidad(esLiquido: boolean ){
 
     if(esLiquido){
       let fechaFinalizacionCarga  = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
@@ -204,13 +204,14 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   consultaCambioDeEstado(){
-    let texto = "Desea cambiar el estado del embarque a PostOperativo?";
+    //let texto = "Desea cambiar el estado del embarque a PostOperativo?";
+    let texto = "Desea zarpar el embarque?";
 
     this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed) {
           this.modificarEstadoBuque('PostOperativo');
-      //    this.zarparEmbarque(this.embarque);
+          this.zarparEmbarque();
      //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
 
 
@@ -224,24 +225,13 @@ export class CalidadComponent implements OnInit, OnDestroy {
       });
   }
 
-  zarparEmbarque(fechaAmarro: string, horaAmarro: string, fechaDesamarro: string, horaDesamarro: string)
+  zarparEmbarque()
   {
-
-    let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
-    periodoCargarActualizar.horaAmarro="";
-    periodoCargarActualizar.fechaAmarro="";
-    periodoCargarActualizar.horaDesamarro="";
-    periodoCargarActualizar.fechaDesamarro="";
-
-    this.moduloDeCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga'].id).subscribe((res: any) => {
-
-     });
-
 
     let ubicacionBuque = this.ubicacionDeBuquePuerto.find( e => e.id=9);
     let embarqueActualizar = this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['embarque'];
     embarqueActualizar.ubicacionDeBuque =ubicacionBuque;
-    this.embarqueService.modificarEmbarque(embarqueActualizar);
+    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe( res => console.log(res) );
 
   }
   modificarEstadoBuque(estado: string){

@@ -17,7 +17,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { time } from 'console';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
@@ -117,36 +117,7 @@ export class SolidosComponent implements OnInit {
     this.hideSpinner.emit(false);
   }
 
-  guardarAmarre()
-  {
-    // let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
-    // periodoCargarActualizar.horaAmarro="";
-    // periodoCargarActualizar.fechaAmarro="";
-    // periodoCargarActualizar.horaDesamarro="";
-    // periodoCargarActualizar.fechaDesamarro="";
 
-    // this.moduloDeCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga'].id).subscribe((res: any) => {
-
-  //   });
-  }
-  cargarHorasDesamarro(amarre)
-  {
-    var newDate = new Date();
-    var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
-
-    amarre.fechaAmarro = this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : "";
-    amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
-    amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
-    amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
-
-    this.amarreForm.patchValue(amarre);
-    if(this.amarreForm.value.fechaAmarro!='')
-      this.amarreForm.controls.fechaAmarro.disable();
-
-    if(this.amarreForm.value.horaAmarro!='')
-       this.amarreForm.controls.horaAmarro.disable();
-
-  }
 
   agregarTabique(tabique, entreColumna, yColumna) {
     this.graficoCarga.agregarTabique(tabique, entreColumna, yColumna);
@@ -194,14 +165,7 @@ export class SolidosComponent implements OnInit {
   finalizaCalidad():void{
     this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
-  newFormAmarre(){
-    this.amarreForm = this._builder.group({
-      fechaAmarro : [{ value: ''}],
-      horaAmarro :'',
-      fechaDesamarro : [{ value: ''}],
-      horaDesamarro : '',
-    })
-  }
+
 
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
@@ -232,4 +196,54 @@ export class SolidosComponent implements OnInit {
   hasPermisoRecibidores_Finalizar() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Finalizar);
   }
+
+  /* SECCION GUARDAR FECHA DESAMARRE Y ZARPAR */
+  newFormAmarre(){
+    this.amarreForm = this._builder.group({
+      fechaAmarro : ['',  [Validators.required]],
+      horaAmarro : ['',  [Validators.required]],
+      fechaDesamarro :  ['',  [Validators.required]],
+      horaDesamarro : ['',  [Validators.required]],
+    })
+  }
+
+  guardarAmarre()
+  {
+    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+
+      let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
+      //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
+      periodoCargarActualizar.horaAmarro=this.amarreForm.value.horaAmarro;
+      periodoCargarActualizar.fechaAmarro=this.amarreForm.value.fechaAmarro;
+      periodoCargarActualizar.horaDesamarro=this.amarreForm.value.horaDesamarro;
+      periodoCargarActualizar.fechaDesamarro=this.amarreForm.value.fechaDesamarro;
+
+
+      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+        this.modalService.dismissAll();
+        this.finalizaCalidad();
+      });
+
+       });
+
+  }
+  cargarHorasDesamarro(amarre)
+  {
+    var newDate = new Date();
+    var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
+
+    amarre.fechaAmarro = this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : "";
+    amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
+    amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+    amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
+
+    this.amarreForm.patchValue(amarre);
+    if(this.amarreForm.value.fechaAmarro!='')
+      this.amarreForm.controls.fechaAmarro.disable();
+
+    if(this.amarreForm.value.horaAmarro!='')
+       this.amarreForm.controls.horaAmarro.disable();
+
+  }
+
 }

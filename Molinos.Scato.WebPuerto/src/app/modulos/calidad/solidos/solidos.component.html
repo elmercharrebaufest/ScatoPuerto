@@ -44,8 +44,8 @@
     	<ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
 	        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
         </ng-container>
-        <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
-        <button (click)='openModalCargarAmarre(CargarAmarre)' class="btn btn-success" >FINALIZAR LUCAS</button>
+      <!--  <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>-->
+        <button type="button" class="btn btn-success mx-5"  (click)='openModalCargarAmarre(CargarAmarre)' >FINALIZAR</button>
 
 
         <ng-template #CargarAmarre let-modal >
@@ -54,12 +54,12 @@
            <div class="form-row" style="margin-top:4px">
                   <div class="form-group  col-6" style="padding-left:30px;">
                       <label>Amarró</label>
-                      <input formControlName="fechaAmarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                      <input formControlName="fechaAmarro" required type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                   </div>
                   <div class="form-group col-6" style="padding-right:30px;">
                     <label>&nbsp;</label>
                     <div class="input_img">
-                        <input class="form-control hora" formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
+                        <input class="form-control hora" required formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
                             [format]="24" >
                         <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
                     </div>
@@ -71,12 +71,12 @@
             <div class="form-row">
               <div class="form-group  col-6" style="padding-left:30px;">
                       <label>Desamarró</label>
-                      <input formControlName="fechaDesamarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                      <input formControlName="fechaDesamarro" required type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                   </div>
                   <div class="form-group col-6" style="padding-right:30px;">
                     <label>&nbsp;</label>
                     <div class="input_img">
-                        <input class="form-control hora" formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
+                        <input class="form-control hora" required formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
                             [format]="24" >
                         <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
                     </div>
