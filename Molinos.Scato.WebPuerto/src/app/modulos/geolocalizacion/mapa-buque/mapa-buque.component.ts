@@ -435,7 +435,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
             c.instance.imo = buque.informacion ? buque.informacion.imo : '-';
             c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '-';
             c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '-';
-            c.instance.porteNeto = buque.embarque ? buque.embarque.porteBruto : '-';
+            c.instance.porteBruto = buque.embarque ? buque.embarque.porteBruto : '-';
             c.instance.puntal = buque.embarque ? buque.embarque.puntal : '-';
             c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '-';
             c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '-';
