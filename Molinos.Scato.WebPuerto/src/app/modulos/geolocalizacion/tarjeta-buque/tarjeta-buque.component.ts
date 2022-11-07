@@ -22,13 +22,14 @@ export class TarjetaBuqueComponent implements OnInit {
   @Input() imo!: string
   @Input() bandera!: string
   @Input() porteNeto!: string
+  @Input() porteBruto!: string
   @Input() puntal!: string
   @Input() freeboard!: string
   @Input() cantidadBodegas!: string
   @Input() eslora!: string
   @Input() fotoEmbarque!: string
-  
-  constructor() { 
+
+  constructor() {
   }
 
   ngOnInit(): void {

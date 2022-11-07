@@ -57,7 +57,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     await this.cargarBuquesMapa();
     let element = document.getElementsByClassName('buque-lerp')[0];
     this.map.on('zoomend', this.onMapZoomEnd.bind(this));
- 
+
   }
   public ngOnDestroy(): void {
     this.puntosInteresSubject$.unsubscribe();
@@ -119,7 +119,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
         }
         else
-{ 
+{
   this.cargarPosicionPorDefectoMapa();
 }
 
@@ -432,18 +432,19 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent,
           (c: any) => {
             c.instance.nombreBuque = buque.nombreBuque;
-            c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '';
-            c.instance.imo = buque.informacion ? buque.informacion.imo : '';
-            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '';
-            c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '';
-            c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
-            c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
-            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '';
-            c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '';
-            c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '';
+            c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '-';
+            c.instance.imo = buque.informacion ? buque.informacion.imo : '-';
+            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '-';
+            c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '-';
+            c.instance.porteBruto = buque.embarque ? buque.embarque.porteBruto : '-';
+            c.instance.puntal = buque.embarque ? buque.embarque.puntal : '-';
+            c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '-';
+            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '-';
+            c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '-';
+            c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '-';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
-        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
+        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.bandera.descripcionCorta}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
         //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
         mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida}</span><br>`;
@@ -525,7 +526,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     const longitud = event.longitud;
     this.map.setView([latitud, longitud], 12);
     this.modificarIconoSeleccionado(latitud, longitud);
-   
+
 
   }
 
@@ -546,11 +547,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         {
           var icon = layer.getIcon();
           if(icon.options.iconUrl.includes("buque_"))
-            {                  
+            {
               icon.options.iconSize = [32,32];
               (layer as any)._icon .style.animation = ''
               layer.getIcon().remove;
-              layer.setIcon(icon);   
+              layer.setIcon(icon);
             }
         }
       }
@@ -559,18 +560,18 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   private onMapZoomEnd(map: L.Map): void {
     /*
     if (this.map.getZoom() <= 5){
-      
+
       this.map.eachLayer((layer) => {
         if (layer instanceof L.Marker || layer instanceof L.Circle){
             this.map.removeLayer(layer)
         }
       });
       this.map.removeControl(this.referenciaOverlay)
-      
+
       this.recargarMarkadores = true;
     }else {
       if (this.recargarMarkadores){
-          
+
           this.map.removeControl(this.referenciaOverlay)
           this.cargarPuntosInteres();
           this.cargarBuquesMapa();
