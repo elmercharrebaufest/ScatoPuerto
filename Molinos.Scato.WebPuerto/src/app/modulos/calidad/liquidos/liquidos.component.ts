@@ -7,6 +7,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
@@ -24,6 +25,7 @@ export class LiquidosComponent implements OnInit {
   public amarreForm: FormGroup;
   errorMessage: boolean;
   embarqueSelected: any;
+  confirmationDialogService: any;
   constructor(private _CalidadSharedService: CalidadSharedService,
   private _procesoService: DatosEmbarquesProcesoService,
   private _builder: FormBuilder,
@@ -84,23 +86,32 @@ public openModalCargarAmarre(modal: any) {
 
 guardarAmarre()
 {
-  this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+  if(this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
+    this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
+    this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+  }else{
+    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
 
-    let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
-    //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
-    periodoCargarActualizar.horaAmarro=this.amarreForm.value.horaAmarro;
-    periodoCargarActualizar.fechaAmarro=this.amarreForm.value.fechaAmarro;
-    periodoCargarActualizar.horaDesamarro=this.amarreForm.value.horaDesamarro;
-    periodoCargarActualizar.fechaDesamarro=this.amarreForm.value.fechaDesamarro;
+      let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
+      //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
+      periodoCargarActualizar.horaAmarro=this.amarreForm.value.horaAmarro;
+      periodoCargarActualizar.fechaAmarro=this.amarreForm.value.fechaAmarro;
+      periodoCargarActualizar.horaDesamarro=this.amarreForm.value.horaDesamarro;
+      periodoCargarActualizar.fechaDesamarro=this.amarreForm.value.fechaDesamarro;
 
 
-    this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
 
-      this.modalService.dismissAll();
-      this.finalizaCalidad();
-    });
+        this.modalService.dismissAll();
+        this.finalizaCalidad();
+      });
 
-     });
+       });
+  }
+
+
+
+
 
 }
 cargarHorasDesamarro(amarre)

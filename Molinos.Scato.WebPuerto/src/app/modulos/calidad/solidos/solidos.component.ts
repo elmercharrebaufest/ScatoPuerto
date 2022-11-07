@@ -22,6 +22,7 @@ import { formatDate } from '@angular/common';
 import { time } from 'console';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 
 @Component({
@@ -52,6 +53,7 @@ export class SolidosComponent implements OnInit {
   horaAmarro: string;
   fechaDesamarro: Date;
   horaDesamarro: string;
+  confirmationDialogService: any;
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -209,6 +211,11 @@ export class SolidosComponent implements OnInit {
 
   guardarAmarre()
   {
+
+    if(this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
+      this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+    }else{
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
 
       let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
@@ -225,6 +232,7 @@ export class SolidosComponent implements OnInit {
       });
 
        });
+      }
 
   }
   cargarHorasDesamarro(amarre)
