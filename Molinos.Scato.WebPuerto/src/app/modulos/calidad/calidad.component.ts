@@ -211,7 +211,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
       .then((confirmed) => {
         if (confirmed) {
           this.modificarEstadoBuque('PostOperativo');
-          this.zarparEmbarque();
+          //this.zarparEmbarque();
      //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
 
 
