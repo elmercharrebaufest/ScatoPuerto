@@ -68,10 +68,10 @@ export class LiquidosComponent implements OnInit {
  /* SECCION GUARDAR FECHA DESAMARRE Y ZARPAR */
  newFormAmarre(){
   this.amarreForm = this._builder.group({
-    fechaAmarro : [{value:''}],
-    horaAmarro : [''],
-    fechaDesamarro :  [{value:''}],
-    horaDesamarro : [''],
+    fechaAmarro : ['',  [Validators.required]],
+      horaAmarro : ['',  [Validators.required]],
+      fechaDesamarro :  ['',  [Validators.required]],
+      horaDesamarro : ['',  [Validators.required]],
   })
 }
 
@@ -108,18 +108,12 @@ cargarHorasDesamarro(amarre)
   var newDate = new Date();
   var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
 
-  amarre.fechaAmarro = this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : "";
+  amarre.fechaAmarro =   this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
   amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
   amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
   amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
 
   this.amarreForm.patchValue(amarre);
-  if(this.amarreForm.value.fechaAmarro!='')
-    this.amarreForm.controls.fechaAmarro.disable();
-
-  if(this.amarreForm.value.horaAmarro!='')
-     this.amarreForm.controls.horaAmarro.disable();
-
 }
 cargarModuloCarga() {
   this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe(res => {
