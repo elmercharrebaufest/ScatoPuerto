@@ -228,22 +228,16 @@ export class SolidosComponent implements OnInit {
 
   }
   cargarHorasDesamarro(amarre)
-  {
-    var newDate = new Date();
-    var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
+{
+  var newDate = new Date();
+  var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
 
-    amarre.fechaAmarro = this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : "";
-    amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
-    amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
-    amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
+  amarre.fechaAmarro =   this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+  amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
+  amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+  amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
 
-    this.amarreForm.patchValue(amarre);
-    if(this.amarreForm.value.fechaAmarro!='')
-      this.amarreForm.controls.fechaAmarro.disable();
-
-    if(this.amarreForm.value.horaAmarro!='')
-       this.amarreForm.controls.horaAmarro.disable();
-
-  }
+  this.amarreForm.patchValue(amarre);
+}
 
 }
