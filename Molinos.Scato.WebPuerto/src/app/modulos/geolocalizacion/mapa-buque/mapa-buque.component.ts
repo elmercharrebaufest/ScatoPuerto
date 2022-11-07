@@ -68,7 +68,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   // #region Metodos
   public setCargarConfiguracion() {
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) => {
-      this.setListaEmbarcacion(data);
+      const buquesSel = data.filter(x=> x.esSeleccionado === true);
+      this.setListaEmbarcacion(buquesSel);
     });
 
     this.puntosInteresSubject$ = this.geolocalizacionSharingService.getPuntosInteres().subscribe((data) => {

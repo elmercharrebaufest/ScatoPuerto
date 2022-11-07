@@ -63,7 +63,7 @@ export class EmbarqueService {
     return this.http.post(`${this.url}Embarque/GuardarArchivos?idEmbarque=`+ id, archivos, { 'withCredentials': true });
   }
 
-guardarTipoArchivo(tipoArchivo: TipoArchivoPuerto){
+  guardarTipoArchivo(tipoArchivo: TipoArchivoPuerto){
     return this.http.post(`${this.url}Embarque/GuardarTipoArchivo`, tipoArchivo, { 'withCredentials': true });
   }
   
@@ -138,8 +138,8 @@ guardarTipoArchivo(tipoArchivo: TipoArchivoPuerto){
     return this.http.get<Bandera[]>(`${this.url}Embarque/ObtenerBanderas`, { 'withCredentials' : true});
   }
   
-   guardarCapturaImagenLineUp(embarque_id: number, embarque: Embarque){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarCapturaImagenLineUp?embarque_id=${embarque_id}`, embarque, { 'withCredentials': true});
+   guardarCapturaImagenLineUp(capturaImagenLineUp: any){
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarCapturaImagenLineUp`, capturaImagenLineUp, { 'withCredentials': true});
   } 
   
   obtenerIdsUsuales(idEmbarque: number): Observable<IdsDelEmbarque>{

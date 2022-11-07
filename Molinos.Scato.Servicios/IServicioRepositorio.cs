@@ -2691,7 +2691,7 @@ namespace Molinos.Scato.Servicios
         VaporInformacionDto ObtenerVaporInformacion(int vapor_id);
 
         [OperationContract]
-        void GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque);
+        void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp);
 
         [OperationContract]
         void EliminarObservacionDeCalidad(int observacion_id);

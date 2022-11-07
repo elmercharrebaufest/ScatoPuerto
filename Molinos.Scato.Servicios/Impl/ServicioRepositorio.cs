@@ -11452,14 +11452,13 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque)
+        public void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp)
         {
             Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
-            /*
+            
             if (embarque != null)
-            {
-                embarque.FilePathImgLineUp = Embarque.FilePathImgLineUp;
-            }*/
+                embarque.FilePathImgLineUp = filePathImgLineUp;
+
             repositorio.GuardarCambios();
         }
 
