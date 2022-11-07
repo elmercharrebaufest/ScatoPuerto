@@ -187,8 +187,9 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
                 color: '#FF9D4A',
                 fillColor: '#FF9D4A',
                 fillOpacity: 0.40,
-                radius: punto.radioPunto,
-                weight: 0.2
+                radius: punto.radioPunto * 2,
+                weight: 0.2,
+
               }).addTo(this.map);
             layerZona01.addLayer(this.markadorAnclaCirculo);
           }
