@@ -445,10 +445,10 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
             c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '-';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
-        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.bandera.descripcionCorta}]</span><br>`;
+        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.bandera}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
         //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
-       
+
         mensajeToolTip += `<span>Ultima posición recibida: ${fechaPosicionRecibida }</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
@@ -491,11 +491,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
       var mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
 
     var hoy = new Date();
-    hoy.setHours(hoy.getHours() - 3);    
+    hoy.setHours(hoy.getHours() - 3);
     if(fechaPosicion < hoy){
        mensajeUltimaPosicion = 'El buque está fuera de alcance';
     }
-  
+
     return mensajeUltimaPosicion;
   }
   public async limpiarMarcadores() {
