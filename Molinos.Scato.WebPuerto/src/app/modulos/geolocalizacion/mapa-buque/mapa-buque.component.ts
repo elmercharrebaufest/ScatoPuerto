@@ -436,16 +436,16 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
             c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '-';
             c.instance.imo = buque.informacion ? buque.informacion.imo : '-';
             c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '-';
-            c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '-';
-            c.instance.porteBruto = buque.embarque ? buque.embarque.porteBruto : '-';
-            c.instance.puntal = buque.embarque ? buque.embarque.puntal : '-';
-            c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '-';
-            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '-';
+            c.instance.porteNeto = buque.embarque && buque.embarque.porteNeto>0 ? buque.embarque.porteNeto : '-';
+            c.instance.porteBruto = buque.embarque && buque.embarque.porteBruto>0 ? buque.embarque.porteBruto : '-';
+            c.instance.puntal = buque.embarque && buque.embarque.puntal>0 ? buque.embarque.puntal : '-';
+            c.instance.freeboard = buque.embarque && buque.embarque.freeboard>0 ? buque.embarque.freeboard : '-';
+            c.instance.cantidadBodegas = buque.embarque && buque.embarque.cantidadBodegasTanques>0 ? buque.embarque.cantidadBodegasTanques : '-';
             c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '-';
             c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '-';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
-        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.bandera}]</span><br>`;
+        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.informacion.bandera.abreviatura}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
         //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
 
