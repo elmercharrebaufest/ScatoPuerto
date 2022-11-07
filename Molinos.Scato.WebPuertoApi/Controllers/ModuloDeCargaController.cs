@@ -904,14 +904,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-[HttpPost]
+        [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarCapturaImagenLineUp")]
-        public HttpResponseMessage GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque)
+        public HttpResponseMessage GuardarCapturaImagenLineUp(CapturaImagenLineUp capturaImagenLineUp)
         {
-            servicio.GuardarCapturaImagenLineUp(embarque_Id, Embarque);
+            servicio.GuardarCapturaImagenLineUp(capturaImagenLineUp.Embarque_Id, capturaImagenLineUp.FilePathImgLineUp);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+        public class CapturaImagenLineUp
+        {
+            public int Embarque_Id { get; set; }
+            public string FilePathImgLineUp { get; set; }
+        }
+
 
     }
 }

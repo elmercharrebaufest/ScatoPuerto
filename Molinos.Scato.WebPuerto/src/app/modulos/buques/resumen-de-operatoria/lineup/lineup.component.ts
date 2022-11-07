@@ -1,36 +1,35 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
-import { finalize } from 'rxjs/operators';
 import { Embarque } from '@ScatoModels/embarque';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-lineup',
+  selector: 'app-lineup-buque',
   templateUrl: './lineup.component.html',
   styleUrls: ['./lineup.component.css']
 })
-export class LineupComponent implements OnInit, AfterViewInit {
+export class LineupComponent implements OnInit {
   captura: string | ArrayBuffer;
+  private embarqueId: number = 0;
 
-  constructor(private embarqueService: EmbarqueService) { 
+  constructor(private route: ActivatedRoute,
+              private embarqueService: EmbarqueService) { 
+    
+    this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));  
   }
 
-  ngAfterViewInit(): void {
-    let embarque: Embarque;
-    
-    // TODO: Por ahora está a mano hasta unir lo producido por el equipo.
-    this.embarqueService.obtenerEmbarque(1020)
-    .pipe( finalize(() => {
-      console.log('embarque: ', embarque);
-    }) )
-    .subscribe( res => {
-      if (res!=null){
-        embarque = res;
+  ngOnInit(): void {
+    this.mostrarImagenLineUp();
+  }
+
+  private mostrarImagenLineUp(){
+    this.embarqueService.obtenerEmbarque(this.embarqueId)
+    .subscribe( embarque => {
+      if (embarque!=null){
         this.captura = embarque.filePathImgLineUp;
       }
     });
   }
-
-  ngOnInit(): void {
-  }
-
+  
 }

@@ -20,6 +20,10 @@ import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import * as htmlToImage from 'html-to-image';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import { UbicacionBuquePuerto } from '@ScatoEnums/ubicacion-buque-puerto';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -31,7 +35,7 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
-
+  
 
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
@@ -52,12 +56,12 @@ export class LineupEmbarqueComponent implements OnInit {
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
   fileToUpload: any | null = null;
-
+  mostrarSpinnerCaptura: boolean = false;
   colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
-
+  private embarqueSeleccionado:number = 0;
   constructor(
     private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
@@ -70,6 +74,7 @@ export class LineupEmbarqueComponent implements OnInit {
     private _modalService: NgbModal,
     private embarqueService: EmbarqueService,
     private erroresGeolocalizacionEmbarqueService: ErroresGeolocalizacionEmbarqueService,
+    private embarqueSharingService: EmbarqueSharingService
   ) {
     this.user = this.session.getUser();
   }
@@ -218,10 +223,11 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public onSelectAction(accion) {
+    this.embarqueSeleccionado = this.instanciaWorkflow.embarque.id;
     if (this.hasPermisoLineUp_EditarUbicacionEmbarque()) {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
-      if (accion == 2) {
+      if (accion == UbicacionBuquePuerto.MuelleDeCarga) {
         this.workflowService.obtenerListado().subscribe(
           listado => {
             if (this.BarcoEnMuelleActualmente(listado)) {
@@ -229,13 +235,14 @@ export class LineupEmbarqueComponent implements OnInit {
               return;
             }
             else {
+              this.mostrarSpinnerCaptura = true;
               this.actualizarUbicacion(accion);
             }
           }
         );
       }
       /**Zarpó**/
-      else if (accion == 1) {
+      else if (accion == UbicacionBuquePuerto.Zarpo) {
         this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up y geolocalización`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
           .then((confirmed) => {
             if (confirmed) {
@@ -254,15 +261,61 @@ export class LineupEmbarqueComponent implements OnInit {
           })
           .catch(() => window.location.reload());
       }
-      else
+      else{
         this.actualizarUbicacion(accion);
+      }
     }
   }
 
   actualizarUbicacion(accion) {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;
-    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { if (this.observador) this.observador.Actualizar(); });
+    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { 
+    }, error =>{}
+     , () =>{
+
+      if (this.embarqueSeleccionado > 0 && accion == UbicacionBuquePuerto.MuelleDeCarga)
+          this.crearImagenLineUp();
+
+      if (this.observador)
+          this.observador.Actualizar();
+      
+      this.mostrarSpinnerCaptura = false;
+    });
+  }
+
+
+  private crearImagenLineUp(){
+
+    const divEmbarqueLineUp = document.getElementById('divEmbarqueLineUp');
+    let divLineUpAcciones = document.getElementById('listadoAcciones');
+    
+    divLineUpAcciones.className += 'ocultar-division';
+    divLineUpAcciones.classList.add('ocultar-division')
+    let base64data='';
+    htmlToImage.toPng(divEmbarqueLineUp, { 
+          quality: 1,
+          backgroundColor: '#ffffff',
+        })
+        .then(function (url) {
+          var img = new Image();
+          img.src = url;
+          base64data = img.src;
+        }).catch(function (error) {
+          base64data = '';
+        }).finally(() => {
+          if (base64data!=null || base64data !=undefined)
+              this.guardarImagenLineUp(base64data);
+              divLineUpAcciones.classList.remove('ocultar-division')
+        });
+  }
+
+  guardarImagenLineUp =(base64data) => { 
+    const capturaImagenLineUp = {
+      embarque_Id : this.instanciaWorkflow.embarque.id,
+      filePathImgLineUp : base64data,
+    };
+    this.embarqueService.guardarCapturaImagenLineUp(capturaImagenLineUp).subscribe(res => console.log(res));
   }
 
   actualizarOrden(posicion) {
@@ -297,6 +350,7 @@ export class LineupEmbarqueComponent implements OnInit {
         });
     }
   }
+
   /**ubicacion == 2 --> Muelle de Carga**/
   BarcoEnMuelleActualmente(listado: InstanciaWorkflowPuerto[]): boolean {
     if (!this.instanciaWorkflow.embarque.vicentin && !this.instanciaWorkflow.embarque.otrosMuelles && !this.instanciaWorkflow.embarque.noryon)
@@ -358,21 +412,27 @@ export class LineupEmbarqueComponent implements OnInit {
   hasPermisoLineUp_EliminarBuque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EliminarBuque);
   }
+
   hasPermisoLineUp_EditarBuque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarBuque);
   }
+
   hasPermisoLineUp_EditarChecksEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
   }
+
   hasPermisoLineUp_EditarUbicacionEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacionEmbarque);
   }
+
   hasPermisoLineUp_EditarOrdenEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
   }
+
   hasPermisoPDC_Ver() {
     return this.user.permisos.find(p => p === this.permisosScato.PDC_Ver);
   }
+
   hasPermisoLineUp_Adjuntar() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_Adjuntar);
   }
@@ -442,7 +502,6 @@ export class LineupEmbarqueComponent implements OnInit {
       }
     })
   }
-
 
   eliminarArchivo(reg: ArchivoPuerto){
     if(reg.id > 0){
@@ -517,7 +576,6 @@ export class LineupEmbarqueComponent implements OnInit {
       //Primero valido que esté toda la data necesaria completa
     
   }
-
 
 }
 
