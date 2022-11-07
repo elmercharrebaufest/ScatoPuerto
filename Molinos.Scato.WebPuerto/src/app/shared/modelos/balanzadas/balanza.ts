@@ -1,4 +1,5 @@
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
+import * as internal from "events";
 
 export class InfoTableristas {
   balanzas: Balanzas[];
@@ -76,6 +77,7 @@ export class BalanzadasCompletas {
   balanzadasAgrupadas: BalanzadasAgrupadas[];
   balanzadasBajaCarga: any[];
   balanzadasBuque: BalanzadasBuque[];
+  cargasPorBodegas: CargasPorBodega[];
 }
 
 export class BalanzadasBuque {
@@ -101,4 +103,12 @@ export class BalanzadasAgrupadas {
   porcentajeCarga: number; 
   totalProducto: number; 
   seleccionado: boolean;
+}
+
+export class CargasPorBodega {
+  nombreBodega: string;
+  nombreProducto: string;
+  cargado: number;
+  restaCargar: number;
+  excetende: number;
 }

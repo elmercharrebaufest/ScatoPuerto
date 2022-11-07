@@ -13,10 +13,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let bodegas of bodegasProductosTn">
-          <td> {{ bodegas.bodega }} </td>
-          <td> {{ bodegas.producto }} </td>
-          <td> {{ bodegas.kilos }} Kg </td>
+        <tr *ngFor="let bodegas of cargasPorbodega">
+          <td> {{ bodegas.nombreBodega }} </td>
+          <td> {{ bodegas.nombreProducto }} </td>
+          <td> {{ bodegas.cargado }} Kg </td>
           <td> {{ bodegas.restaCargar }} Kg </td>
           <td> {{ bodegas.excedente }} Kg </td>
         </tr>

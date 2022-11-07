@@ -2691,7 +2691,7 @@ namespace Molinos.Scato.Servicios
         VaporInformacionDto ObtenerVaporInformacion(int vapor_id);
 
         [OperationContract]
-        void GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque);
+        void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp);
 
         [OperationContract]
         void EliminarObservacionDeCalidad(int observacion_id);
@@ -2755,9 +2755,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         bool EliminarArchivos(List<ArchivosPuertoDto> archivosPuerto);
 
-
-
         [OperationContract]
         IList<InstanciaWorkflowPuertoDto> ListarEmbarques();
+
+        [OperationContract]
+        IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
+
     }
 }

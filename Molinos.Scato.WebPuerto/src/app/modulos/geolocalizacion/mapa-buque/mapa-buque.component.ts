@@ -57,7 +57,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     await this.cargarBuquesMapa();
     let element = document.getElementsByClassName('buque-lerp')[0];
     this.map.on('zoomend', this.onMapZoomEnd.bind(this));
- 
+
   }
   public ngOnDestroy(): void {
     this.puntosInteresSubject$.unsubscribe();
@@ -68,7 +68,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   // #region Metodos
   public setCargarConfiguracion() {
     this.embarcacionSubject$ = this.geolocalizacionSharingService.getBuquesLineUp().subscribe((data) => {
-      this.setListaEmbarcacion(data);
+      const buquesSel = data.filter(x=> x.esSeleccionado === true);
+      this.setListaEmbarcacion(buquesSel);
     });
 
     this.puntosInteresSubject$ = this.geolocalizacionSharingService.getPuntosInteres().subscribe((data) => {
@@ -118,7 +119,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
         }
         else
-{ 
+{
   this.cargarPosicionPorDefectoMapa();
 }
 
@@ -186,8 +187,9 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
                 color: '#FF9D4A',
                 fillColor: '#FF9D4A',
                 fillOpacity: 0.40,
-                radius: punto.radioPunto,
-                weight: 0.2
+                radius: punto.radioPunto * 2,
+                weight: 0.2,
+
               }).addTo(this.map);
             layerZona01.addLayer(this.markadorAnclaCirculo);
           }
@@ -431,21 +433,23 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         let markerPopup: any = this.cargarTarjetaBuque(TarjetaBuqueComponent,
           (c: any) => {
             c.instance.nombreBuque = buque.nombreBuque;
-            c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '';
-            c.instance.imo = buque.informacion ? buque.informacion.imo : '';
-            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '';
-            c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '';
-            c.instance.puntal = buque.embarque ? buque.embarque.puntal : '';
-            c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '';
-            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '';
-            c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '';
-            c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '';
+            c.instance.tipoBuque = buque.embarque ? buque.embarque.tipoBuque : '-';
+            c.instance.imo = buque.informacion ? buque.informacion.imo : '-';
+            c.instance.bandera = buque.informacion.bandera ? buque.informacion.bandera.nombre : '-';
+            c.instance.porteNeto = buque.embarque ? buque.embarque.porteNeto : '-';
+            c.instance.porteBruto = buque.embarque ? buque.embarque.porteBruto : '-';
+            c.instance.puntal = buque.embarque ? buque.embarque.puntal : '-';
+            c.instance.freeboard = buque.embarque ? buque.embarque.freeboard : '-';
+            c.instance.cantidadBodegas = buque.embarque ? buque.embarque.cantidadBodegasTanques : '-';
+            c.instance.eslora = buque.informacion ? buque.informacion.largoxAnchoExtremo : '-';
+            c.instance.fotoEmbarque = buque.informacion ? buque.informacion.fotoEmbarque : '-';
           }, latitud, longitud);
         let mensajeToolTip = `<div style='border-width: 1px; border-color:gray;'><b> ${buque.nombreBuque} [${buque.viaje.paisOrigen}]</b><br>`;
-        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.viaje.paisDestino}]</span><br>`;
+        mensajeToolTip += `<span>Destino: ${buque.viaje.puertoDestino} [${buque.bandera.descripcionCorta}]</span><br>`;
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
         //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
-        mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida}</span><br>`;
+       
+        mensajeToolTip += `<span>Ultima posición recibida: ${fechaPosicionRecibida }</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
         markerBuque.on('click', this.markerOnClick, this);
@@ -484,9 +488,14 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
 
     if (minutes > 0)
       messageMinutes = minutes > 1 ? minutes + ' minutos ' : minutes + ' minuto ';
+      var mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
 
-    const mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
-
+    var hoy = new Date();
+    hoy.setHours(hoy.getHours() - 3);    
+    if(fechaPosicion < hoy){
+       mensajeUltimaPosicion = 'El buque está fuera de alcance';
+    }
+  
     return mensajeUltimaPosicion;
   }
   public async limpiarMarcadores() {
@@ -524,7 +533,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
     const longitud = event.longitud;
     this.map.setView([latitud, longitud], 12);
     this.modificarIconoSeleccionado(latitud, longitud);
-   
+
 
   }
 
@@ -545,11 +554,11 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         {
           var icon = layer.getIcon();
           if(icon.options.iconUrl.includes("buque_"))
-            {                  
+            {
               icon.options.iconSize = [32,32];
               (layer as any)._icon .style.animation = ''
               layer.getIcon().remove;
-              layer.setIcon(icon);   
+              layer.setIcon(icon);
             }
         }
       }
@@ -558,18 +567,18 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
   private onMapZoomEnd(map: L.Map): void {
     /*
     if (this.map.getZoom() <= 5){
-      
+
       this.map.eachLayer((layer) => {
         if (layer instanceof L.Marker || layer instanceof L.Circle){
             this.map.removeLayer(layer)
         }
       });
       this.map.removeControl(this.referenciaOverlay)
-      
+
       this.recargarMarkadores = true;
     }else {
       if (this.recargarMarkadores){
-          
+
           this.map.removeControl(this.referenciaOverlay)
           this.cargarPuntosInteres();
           this.cargarBuquesMapa();

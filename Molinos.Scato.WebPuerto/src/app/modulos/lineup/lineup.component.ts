@@ -21,6 +21,9 @@ import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { Embarque } from '@ScatoModels/embarque';
+
 @Component({
   selector: 'app-lineup',
   templateUrl: './lineup.component.html',
@@ -48,11 +51,11 @@ export class LineupComponent implements OnInit, Observador {
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   LogCount: number = 0;
   private user: Usuario;
-
   estadoVicentinLp: string;
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
   estadoOtrosLp: string;
+  embarqueCapturaLineUp: Embarque;
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -64,8 +67,9 @@ export class LineupComponent implements OnInit, Observador {
     private _messageService: MessageService,
     private parametrosService: ParametrosService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService,
-    private auth: AutenticadorService
+    private auth: AutenticadorService,
+    private embarqueSharingService: EmbarqueSharingService
+
   ) {
     this.auth.renovarAuthUsuario();
     
@@ -74,8 +78,6 @@ export class LineupComponent implements OnInit, Observador {
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
-
-
   }
   
   cargarGeolocalizacionLineUp() {
@@ -144,7 +146,6 @@ export class LineupComponent implements OnInit, Observador {
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
-    console.log('this.sanBenito: ', this.sanBenito);
 
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
@@ -152,7 +153,7 @@ export class LineupComponent implements OnInit, Observador {
     function_name = 'filtrarMuelles - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
     this.cargarEstadoLineUp();
-   }
+  }
 
   public altaEmbarque() {
 
@@ -270,7 +271,6 @@ export class LineupComponent implements OnInit, Observador {
     return body;
   }
 
-
   public cambiarVista() {
     let actualDate = new Date();
     let function_name = 'cambiarVista';
@@ -278,6 +278,7 @@ export class LineupComponent implements OnInit, Observador {
 
     this.mostrarCalendario = !this.mostrarCalendario;
   }
+
   public cambiarGeolocalizacion() {
     let actualDate = new Date();
     let function_name = 'cambiarGeolocalizacion';
@@ -285,6 +286,7 @@ export class LineupComponent implements OnInit, Observador {
 
     this.router.navigate(['geolocalizacion']);
   }
+
   estadoSanBenito() {
     let actualDate = new Date();
     let function_name = 'estadoSanBenito';
@@ -367,4 +369,5 @@ export class LineupComponent implements OnInit, Observador {
   hasPermisoExcel() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_Exportar);
   }
+
 }

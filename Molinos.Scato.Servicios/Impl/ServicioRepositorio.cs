@@ -34,6 +34,7 @@ using System.DirectoryServices;
 using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using NPOI.SS.Formula.Functions;
+using System.Drawing.Text;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -9457,6 +9458,9 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzadasCompletas.balanzadasBuque.Add(balanzadasBuque);
                     }
                 }
+
+                
+
                 return balanzadasCompletas;
             }
             catch (Exception ex)
@@ -9464,6 +9468,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
 
         public BalanzadasCompletasDto ObtenerBalanzadasEnCurso(int IdModuloDeCarga)
         {
@@ -9508,7 +9513,110 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzadasCompletas.balanzadasAgrupadas.Add(balanzadasAgrupadas);
                     }
                 }
+
+                balanzadasCompletas.cargasPorBodegas = ObtenerCargasPorBodega(idEmbarque);
+
                 return balanzadasCompletas;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public List<CargasPorBodega> ObtenerCargasPorBodega(int IdEmbarque)
+        {
+            try
+            {
+                List<CargasPorBodega> cargasAbiertas = new List<CargasPorBodega>();
+                List<CargasPorBodega> cargasCerradas = new List<CargasPorBodega>();
+                List<CargasPorBodega> cargasFinal = new List<CargasPorBodega>();
+
+                Embarque embarqueBase = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque);
+
+                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                    return null;
+
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque).Vapor.Id;                
+                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio == null && x.CargaOpuesta_Id == null);
+
+                //Este caso representa solamente cargas en curso.
+                foreach (Carga carga in cargas)
+                {
+                    int pesoTotalBalanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.Id).Sum(x => x.PesoNeto);
+                    int excedente = pesoTotalBalanzadas - carga.PesoProgramado;
+                    int restaCargar = carga.PesoProgramado - pesoTotalBalanzadas;
+                    CargasPorBodega cargasPorBodega = new CargasPorBodega()
+                    {
+                        Cargado = pesoTotalBalanzadas,
+                        Excedente = excedente > 0 ? excedente : 0,
+                        RestaCargar = restaCargar > 0 ? restaCargar : 0,
+                        NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
+                        NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
+                    };
+                    cargasAbiertas.Add(cargasPorBodega);
+
+                }
+
+                cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga && x.CargaOpuesta_Id != null);
+                //Este caso representa cargas cerradas
+                foreach (Carga carga in cargas)
+                {
+                    int pesoTotalBalanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id).Sum(x => x.PesoNeto);
+                    int excedente = pesoTotalBalanzadas - carga.PesoProgramado;
+                    int restaCargar = carga.PesoProgramado - pesoTotalBalanzadas;
+                    CargasPorBodega cargasPorBodega = new CargasPorBodega()
+                    {
+                        Cargado = pesoTotalBalanzadas,
+                        Excedente = excedente > 0 ? excedente : 0,
+                        RestaCargar = restaCargar > 0 ? restaCargar : 0,
+                        NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
+                        NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
+                    };
+                    cargasCerradas.Add(cargasPorBodega);
+                }
+
+                foreach (CargasPorBodega carga in cargasAbiertas)
+                {
+                        if (cargasFinal.Exists(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto)) { 
+                            cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Cargado += carga.Cargado;
+                            cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).RestaCargar += carga.RestaCargar += carga.RestaCargar;
+                            cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Excedente += carga.Excedente += carga.Excedente;
+                        }
+                        else
+                        {
+                            cargasFinal.Add(new CargasPorBodega()
+                            {
+                                Cargado = carga.Cargado,
+                                RestaCargar = carga.RestaCargar,
+                                Excedente = carga.Excedente,
+                                NombreBodega = carga.NombreBodega,
+                                NombreProducto = carga.NombreProducto
+                            });
+                        }           
+                }
+
+                foreach (CargasPorBodega carga in cargasCerradas)
+                {
+                    if (cargasFinal.Exists(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto))
+                    {
+                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Cargado += carga.Cargado;
+                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).RestaCargar += carga.RestaCargar += carga.RestaCargar;
+                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Excedente += carga.Excedente += carga.Excedente;
+                    }
+                    else
+                    {
+                        cargasFinal.Add(new CargasPorBodega()
+                        {
+                            Cargado = carga.Cargado,
+                            RestaCargar = carga.RestaCargar,
+                            Excedente = carga.Excedente,
+                            NombreBodega = carga.NombreBodega,
+                            NombreProducto = carga.NombreProducto
+                        });
+                    }
+                }
+                return cargasFinal;
             }
             catch (Exception ex)
             {
@@ -9811,6 +9919,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var estadoBuq = repositorio.Obtener<EstadoBuque>(x => x.Id == Estado);
                     embarque.EstadoBuque = estadoBuq;
+                    
                     repositorio.GuardarCambios();
                 }
             }
@@ -11452,16 +11561,17 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque)
+        public void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp)
         {
             Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
-            /*
+            
             if (embarque != null)
-            {
-                embarque.FilePathImgLineUp = Embarque.FilePathImgLineUp;
-            }*/
+                embarque.FilePathImgLineUp = filePathImgLineUp;
+
             repositorio.GuardarCambios();
         }
+
+      
 
         public IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque)
         {
@@ -11888,6 +11998,12 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
 
+        }
+
+        public IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
+        {
+            IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x=> x.Embarque_id == idEmbarque).OrderByDescending(x=> x.FechaError).ToList();
+            return erroresGeolocalizacion;
         }
     }
 }

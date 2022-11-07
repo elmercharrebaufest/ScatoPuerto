@@ -19,6 +19,11 @@ import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import * as htmlToImage from 'html-to-image';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import { UbicacionBuquePuerto } from '@ScatoEnums/ubicacion-buque-puerto';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -30,8 +35,8 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
-
   
+
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
@@ -51,12 +56,12 @@ export class LineupEmbarqueComponent implements OnInit {
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
   fileToUpload: any | null = null;
-
+  mostrarSpinnerCaptura: boolean = false;
   colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
-
+  private embarqueSeleccionado:number = 0;
   constructor(
     private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
@@ -68,15 +73,19 @@ export class LineupEmbarqueComponent implements OnInit {
     private session: SessionService,
     private _modalService: NgbModal,
     private embarqueService: EmbarqueService,
+    private erroresGeolocalizacionEmbarqueService: ErroresGeolocalizacionEmbarqueService,
+    private embarqueSharingService: EmbarqueSharingService
   ) {
     this.user = this.session.getUser();
   }
 
   ngOnInit(): void {
+    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
     if (this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada) {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
     }
+
     this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
@@ -91,24 +100,25 @@ export class LineupEmbarqueComponent implements OnInit {
     return new Array(i);
   }
 
-  cargarBuqueGeolocalizacion(id: any) {
+  cargarBuqueGeolocalizacion(id: number) {
     this.mensajeBuque = "No se encontró. Completar IMO";
     this.hayBuque = false;
-    
-    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
-      const embarqueInformacion = this.buquesGeolocalizacion.embarque?.embarqueInformacion;
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
-      if (embarqueInformacion !=  undefined || embarqueInformacion!= null) {
-        this.mensajeBuque = embarqueInformacion.length > 0 ? "Ver en el mapa" : "No se encontró. Completar IMO";
-        this.hayBuque =  embarqueInformacion.length > 0 ? true : false;
-      }
-      this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
-      this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
-    } else {
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
+    const embarquePosicion = this.buquesGeolocalizacion.embarque?.embarquePosicion;
+    if (embarquePosicion.length == 0) {
+      this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(id).subscribe(errores =>{
+        if (errores != null){
+          this.mensajeBuque = errores.mensaje;
+          this.hayBuque =  false;
+        }else{
+          this.mensajeBuque = "No se encontró. Completar IMO";
+          this.hayBuque =  false;
+        }
+      });
+    }else{
+      this.hayBuque =  true;
     }
+    this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
+    this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';  
   }
 
   getListaBuquesGeolocalizacion() {
@@ -213,10 +223,11 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public onSelectAction(accion) {
+    this.embarqueSeleccionado = this.instanciaWorkflow.embarque.id;
     if (this.hasPermisoLineUp_EditarUbicacionEmbarque()) {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
-      if (accion == 2) {
+      if (accion == UbicacionBuquePuerto.MuelleDeCarga) {
         this.workflowService.obtenerListado().subscribe(
           listado => {
             if (this.BarcoEnMuelleActualmente(listado)) {
@@ -224,13 +235,14 @@ export class LineupEmbarqueComponent implements OnInit {
               return;
             }
             else {
+              this.mostrarSpinnerCaptura = true;
               this.actualizarUbicacion(accion);
             }
           }
         );
       }
       /**Zarpó**/
-      else if (accion == 1) {
+      else if (accion == UbicacionBuquePuerto.Zarpo) {
         this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up y geolocalización`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
           .then((confirmed) => {
             if (confirmed) {
@@ -249,15 +261,61 @@ export class LineupEmbarqueComponent implements OnInit {
           })
           .catch(() => window.location.reload());
       }
-      else
+      else{
         this.actualizarUbicacion(accion);
+      }
     }
   }
 
   actualizarUbicacion(accion) {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;
-    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { if (this.observador) this.observador.Actualizar(); });
+    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { 
+    }, error =>{}
+     , () =>{
+
+      if (this.embarqueSeleccionado > 0 && accion == UbicacionBuquePuerto.MuelleDeCarga)
+          this.crearImagenLineUp();
+
+      if (this.observador)
+          this.observador.Actualizar();
+      
+      this.mostrarSpinnerCaptura = false;
+    });
+  }
+
+
+  private crearImagenLineUp(){
+
+    const divEmbarqueLineUp = document.getElementById('divEmbarqueLineUp');
+    let divLineUpAcciones = document.getElementById('listadoAcciones');
+    
+    divLineUpAcciones.className += 'ocultar-division';
+    divLineUpAcciones.classList.add('ocultar-division')
+    let base64data='';
+    htmlToImage.toPng(divEmbarqueLineUp, { 
+          quality: 1,
+          backgroundColor: '#ffffff',
+        })
+        .then(function (url) {
+          var img = new Image();
+          img.src = url;
+          base64data = img.src;
+        }).catch(function (error) {
+          base64data = '';
+        }).finally(() => {
+          if (base64data!=null || base64data !=undefined)
+              this.guardarImagenLineUp(base64data);
+              divLineUpAcciones.classList.remove('ocultar-division')
+        });
+  }
+
+  guardarImagenLineUp =(base64data) => { 
+    const capturaImagenLineUp = {
+      embarque_Id : this.instanciaWorkflow.embarque.id,
+      filePathImgLineUp : base64data,
+    };
+    this.embarqueService.guardarCapturaImagenLineUp(capturaImagenLineUp).subscribe(res => console.log(res));
   }
 
   actualizarOrden(posicion) {
@@ -265,7 +323,7 @@ export class LineupEmbarqueComponent implements OnInit {
         var cantidadDeLineUps = this.embarquesPuerto.length;
         //1,2,3,4,5,6,7,8
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
-        
+
         if (posicion > posicionActual){
           this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion + 0.5
         }else{
@@ -279,19 +337,20 @@ export class LineupEmbarqueComponent implements OnInit {
         this.embarquesPuerto.forEach(embarquePuerto => {
           embarquePuerto.lineUp.orden = index;
           index += 1;
-        }); 
+        });
         let idsYorden: { [key: number]: number; } = {};
         this.embarquesPuerto.forEach( embarquePuerto => {
           idsYorden[embarquePuerto.lineUp.id] = embarquePuerto.lineUp.orden;
-        });        
+        });
 
         this.instanciaWorkflow.lineUp.orden = posicion;
-        
+
         this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
-          if (this.observador) this.observador.Actualizar(); 
+          if (this.observador) this.observador.Actualizar();
         });
-    }    
+    }
   }
+
   /**ubicacion == 2 --> Muelle de Carga**/
   BarcoEnMuelleActualmente(listado: InstanciaWorkflowPuerto[]): boolean {
     if (!this.instanciaWorkflow.embarque.vicentin && !this.instanciaWorkflow.embarque.otrosMuelles && !this.instanciaWorkflow.embarque.noryon)
@@ -353,21 +412,27 @@ export class LineupEmbarqueComponent implements OnInit {
   hasPermisoLineUp_EliminarBuque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EliminarBuque);
   }
+
   hasPermisoLineUp_EditarBuque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarBuque);
   }
+
   hasPermisoLineUp_EditarChecksEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
   }
+
   hasPermisoLineUp_EditarUbicacionEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacionEmbarque);
   }
+
   hasPermisoLineUp_EditarOrdenEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
   }
+
   hasPermisoPDC_Ver() {
     return this.user.permisos.find(p => p === this.permisosScato.PDC_Ver);
   }
+
   hasPermisoLineUp_Adjuntar() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_Adjuntar);
   }
@@ -377,15 +442,15 @@ export class LineupEmbarqueComponent implements OnInit {
 //------------------------------------------------------------------------------------------------------------
 
   openModalFiles(Modal: any){
-    //embarqueid 
+    //embarqueid
     this.initializeModalArchivos();
      this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(
         res => this.ArchivosPuerto = res)
-      ; 
+      ;
      this.embarqueService.obtenerTipoArchivos().subscribe(res => {
       this.TipoArchivosDbList = res
-    }); 
-    
+    });
+
     this._modalService.open(Modal);
   }
 
@@ -400,24 +465,24 @@ export class LineupEmbarqueComponent implements OnInit {
     //En caso de no ser, le aviso que no se puede descargar.
     }else{
       this.confirmationDialogService.confirm('¡Atención!', "El archivo tiene un formato inválido para la acción que desea realizar.", 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }    
+    }
   }
-  
+
   previewFile(Modal: any, file: ArchivoPuerto){
     if(file.archivo.includes("data:image")){
       this.convertB64ToImg(file);
       this._modalService.open(Modal);
-    }else if(file.archivo.includes("data:application/pdf")){      
+    }else if(file.archivo.includes("data:application/pdf")){
       let pdfWindow = window.open("");
       pdfWindow.document.write(
       "<iframe width='100%' height='100%' src='" +
       encodeURI(file.archivo) + "'></iframe>"
-      )      
+      )
     }else{
       this.confirmationDialogService.confirm('¡Atención!', "El tipo de archivo no se puede mostrar", 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }    
+    }
   }
-    
+
   convertB64ToImg(file: ArchivoPuerto) {
     this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl(file.archivo);
   }
@@ -425,7 +490,7 @@ export class LineupEmbarqueComponent implements OnInit {
   initializeModalArchivos(){
     this.nombreArchivo = null;
   }
-    
+
   guardarArchivos(){
 
     this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los cambios?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
@@ -433,14 +498,13 @@ export class LineupEmbarqueComponent implements OnInit {
       if (confirmed) {
         this.embarqueService.guardarArchivos(this.instanciaWorkflow.embarque.id, this.ArchivosPuerto).subscribe(res => {
           this._modalService.dismissAll();
-        })          
+        })
       }
     })
   }
 
-
   eliminarArchivo(reg: ArchivoPuerto){
-    if(reg.id > 0){  
+    if(reg.id > 0){
       this.ArchivosPuerto.forEach((element,index)=>{
         if(element.id ==reg.id) this.ArchivosPuerto.splice(index,1);
      });
@@ -512,7 +576,6 @@ export class LineupEmbarqueComponent implements OnInit {
       //Primero valido que esté toda la data necesaria completa
     
   }
-
 
 }
 

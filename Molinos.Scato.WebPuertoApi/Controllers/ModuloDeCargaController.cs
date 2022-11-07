@@ -171,6 +171,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/ActualizarEstadoBuque")]
         public HttpResponseMessage ActualizarEstadoBuque(int Embarque_Id, int Estado)
         {
+      
             servicio.ActualizarEstadoBuque(Embarque_Id, Estado);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -903,14 +904,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-[HttpPost]
+        [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarCapturaImagenLineUp")]
-        public HttpResponseMessage GuardarCapturaImagenLineUp(int embarque_Id, EmbarqueDto Embarque)
+        public HttpResponseMessage GuardarCapturaImagenLineUp(CapturaImagenLineUp capturaImagenLineUp)
         {
-            servicio.GuardarCapturaImagenLineUp(embarque_Id, Embarque);
+            servicio.GuardarCapturaImagenLineUp(capturaImagenLineUp.Embarque_Id, capturaImagenLineUp.FilePathImgLineUp);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+        public class CapturaImagenLineUp
+        {
+            public int Embarque_Id { get; set; }
+            public string FilePathImgLineUp { get; set; }
+        }
+
 
     }
 }

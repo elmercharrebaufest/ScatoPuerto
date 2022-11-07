@@ -16,6 +16,14 @@ import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { formatDate } from '@angular/common';
+import { time } from 'console';
+import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
+import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+
 
 @Component({
   selector: 'app-solidos',
@@ -23,12 +31,15 @@ import { SessionService } from '@ScatoServicios/session.service';
   styleUrls: ['./solidos.component.css']
 })
 export class SolidosComponent implements OnInit {
+
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
 
+  public amarreForm: FormGroup;
   embarqueSelected: EmbarqueNav;
   celdasManoDeEmbarque: CeldaManoDeEmbarque[];
+  periodoDeCarga: PeriodoDeCarga;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
   embarque: Embarque;
   materialesPuerto: MaterialPuerto[];
@@ -37,8 +48,15 @@ export class SolidosComponent implements OnInit {
   RecibidoresPdf: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-
+  errorMessage: boolean = false;
+  fechaAmarro: Date;
+  horaAmarro: string;
+  fechaDesamarro: Date;
+  horaDesamarro: string;
+  confirmationDialogService: any;
   constructor(
+    private _builder: FormBuilder,
+    private modalService: NgbModal,
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
@@ -48,9 +66,11 @@ export class SolidosComponent implements OnInit {
     private session: SessionService,) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+
   }
 
   ngOnInit(): void {
+
     this._procesoService.sendEmbarque.subscribe(
       res => {
         this.embarqueSelected = res;
@@ -58,7 +78,7 @@ export class SolidosComponent implements OnInit {
     )
     if (!this.embarqueSelected)
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
+      this.newFormAmarre();
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
@@ -74,6 +94,7 @@ export class SolidosComponent implements OnInit {
         }));
       });
     this.drawGraphic();
+
   }
 
   drawGraphic() {
@@ -84,9 +105,9 @@ export class SolidosComponent implements OnInit {
       this.sentidosManoDeEmbarque = res1;
       this.celdasManoDeEmbarque = res2;
       this._changeDetector.detectChanges();
-      
+
       if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
-          
+
           // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
           this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
           this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
@@ -98,6 +119,8 @@ export class SolidosComponent implements OnInit {
     this.hideSpinner.emit(false);
   }
 
+
+
   agregarTabique(tabique, entreColumna, yColumna) {
     this.graficoCarga.agregarTabique(tabique, entreColumna, yColumna);
   }
@@ -106,6 +129,13 @@ export class SolidosComponent implements OnInit {
     let { celda, sentido } = item;
     this.graficoCarga.agregarManoDeEmbarque(celda, sentido);
   }
+  public openModalCargarAmarre(modal: any) {
+    this.cargarHorasDesamarro(this.amarreForm);
+        this.errorMessage = false;
+        this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
+
+  }
+
 
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
@@ -114,6 +144,13 @@ export class SolidosComponent implements OnInit {
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+          this.periodoDeCarga=res.moduloDeCargaPeriodoDeCarga[0];
+          this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
+          this.horaAmarro = res.moduloDeCargaPeriodoDeCarga[0].horaAmarro;
+          this.fechaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].fechaDesamarro;
+          this.horaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].horaDesamarro;
+        }
         if (res.moduloDeCargaElementoGrafico) {
           this.graficoCarga.agregarElementosGraficos(res.moduloDeCargaElementoGrafico);
         }
@@ -131,13 +168,14 @@ export class SolidosComponent implements OnInit {
     this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
 
+
   imprimir(imprimir: boolean = false){
      // #region Imprimir Recibidores Liquido
       this._CalidadSharedService.ocultarBotonesImprimir();
-     
+
      this.RecibidoresPdf = true;
- 
-     
+
+
      let element = document.getElementById('imprimirRecibidoresSolido');
      let opt = {
        margin:       0,
@@ -146,7 +184,7 @@ export class SolidosComponent implements OnInit {
        html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
      };
- 
+
      html2pdf().from(element).set(opt).outputPdf()
      .then(() => {
        if (!imprimir) this.RecibidoresPdf = false
@@ -160,4 +198,54 @@ export class SolidosComponent implements OnInit {
   hasPermisoRecibidores_Finalizar() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Finalizar);
   }
+
+  /* SECCION GUARDAR FECHA DESAMARRE Y ZARPAR */
+  newFormAmarre(){
+    this.amarreForm = this._builder.group({
+      fechaAmarro : ['',  [Validators.required]],
+      horaAmarro : ['',  [Validators.required]],
+      fechaDesamarro :  ['',  [Validators.required]],
+      horaDesamarro : ['',  [Validators.required]],
+    })
+  }
+
+  guardarAmarre()
+  {
+
+    if(this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
+      this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+    }else{
+    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+
+      let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
+      //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
+      periodoCargarActualizar.horaAmarro=this.amarreForm.value.horaAmarro;
+      periodoCargarActualizar.fechaAmarro=this.amarreForm.value.fechaAmarro;
+      periodoCargarActualizar.horaDesamarro=this.amarreForm.value.horaDesamarro;
+      periodoCargarActualizar.fechaDesamarro=this.amarreForm.value.fechaDesamarro;
+
+
+      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+        this.modalService.dismissAll();
+        this.finalizaCalidad();
+      });
+
+       });
+      }
+
+  }
+  cargarHorasDesamarro(amarre)
+{
+  var newDate = new Date();
+  var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
+
+  amarre.fechaAmarro =   this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+  amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
+  amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+  amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
+
+  this.amarreForm.patchValue(amarre);
+}
+
 }
