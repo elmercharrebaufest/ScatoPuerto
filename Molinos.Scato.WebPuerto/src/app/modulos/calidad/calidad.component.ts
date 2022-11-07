@@ -225,6 +225,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
       });
   }
 
+
   zarparEmbarque()
   {
 
@@ -238,7 +239,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
     try {
       let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
       this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => console.log(res) );
-     // this.zarparEmbarque();
+     this.zarparEmbarque();
     } catch (e) {
       console.log(e);
       console.log("Error al modificarEstadoBuque");
