@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +14,13 @@ export class EmbarqueSharingService {
   private embarqueId : number;
   private moduloDeCargaId: number;
   private parametrosIdsEmbarque: BehaviorSubject<any> = new BehaviorSubject<any>(null);
-
   // #endregion
 
   // #region Constructor  
   // #endregion
 
   // #region Metodos
+
   public setVaporId(vaporId: number){
     this.vaporId = vaporId;
   }

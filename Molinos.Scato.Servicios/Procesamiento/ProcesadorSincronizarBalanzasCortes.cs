@@ -223,10 +223,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
        
 
-       
-
-       
-
         public void ValidarBajaCarga(int idModulodeCarga)
         {
 
@@ -438,7 +434,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     balanzadas = Repositorio.Listar<Balanzada>(x => x.Id >= car.CargaOpuesta_Id && x.Id <= car.Id && x.NumeroBalanza == car.NumeroBalanza).ToList();
                     regP.numeroBalanza = car.NumeroBalanza;
                     regP.numeroCarga = car.Id;
-                    regP.kilosTotalesCarga = balanzadas.Sum(x => x.PesoNeto);
+                    //regP.kilosTotalesCarga = balanzadas.Sum(x => x.PesoNeto);
                     regP.fechaError = new List<Dictionary<DateTime, DateTime>>();
                     DateTime fechaSiguiente = new DateTime();
                     DateTime fechaError = new DateTime();
@@ -453,7 +449,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             regP.numeroCarga = car.Id;
                             regP.fechaError = new List<Dictionary<DateTime, DateTime>>();
                             regP.fechaInicio = inicioNuevo;
-                            regP.kilosTotalesCarga = balanzadas.Sum(x => x.PesoNeto);
+                            //regP.kilosTotalesCarga = balanzadas.Where(x => x.Id >= regP.idInicio) .Sum(x => x.PesoNeto);
                             regP.idInicio = registro.Id;
                             vieneError = false;
                         }
@@ -470,16 +466,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 regP.idFin = registro.Id;
                                 fechaSiguiente = registro.Fecha;
                                 break;
-                            case "error":
+                            case "balanzada":
+                                fechaSiguiente = registro.Fecha;
+                                break;
+
+                            default:
                                 if (fechaError == DateTime.MinValue)
                                 {
                                     fechaSiguiente = DateTime.MinValue;
                                     fechaError = registro.Fecha;
                                 }
-
-                                break;
-                            default:
-                                fechaSiguiente = registro.Fecha;
                                 break;
                         }
 
@@ -495,11 +491,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 reg.Add(fechaError, fechaSiguiente);
                                 regP.fechaError.Add(reg);
                                 vieneError = true;
-
                                 if (regP.numeroBalanza == "7")
+                                {
+                                    regP.kilosTotalesCarga = balanzadas.Where(x => x.Id >= regP.idInicio && x.Id <= regP.idFin && x.NumeroBalanza == "7").Sum(x => x.PesoNeto);
                                     listaBalanza7.Add(regP);
+                                }
                                 else
+                                {
+                                    regP.kilosTotalesCarga = balanzadas.Where(x => x.Id >= regP.idInicio && x.Id <= regP.idFin && x.NumeroBalanza == "8").Sum(x => x.PesoNeto);
                                     listaBalanza8.Add(regP);
+                                }                                   
 
                                 inicioNuevo = fechaSiguiente;
                             }
@@ -510,9 +511,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         }
                     }
                     if (regP.numeroBalanza == "7")
+                    {
+                        regP.kilosTotalesCarga = balanzadas.Where(x => x.Id >= regP.idInicio && x.Id <= regP.idFin && x.NumeroBalanza == "7").Sum(x => x.PesoNeto);
                         listaBalanza7.Add(regP);
+                    }
                     else
+                    {
+                        regP.kilosTotalesCarga = balanzadas.Where(x => x.Id >= regP.idInicio && x.Id <= regP.idFin && x.NumeroBalanza == "8").Sum(x => x.PesoNeto);
                         listaBalanza8.Add(regP);
+                    }
+                        
 
                 }
             }

@@ -95,8 +95,9 @@ export class GeolocalizacionComponent implements OnInit {
     this.mostrarListaBuque = false;
     this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(
       data => {
+        const listaBuque = data.filter(item => item.ubicacionLineUp != 'Zarpó');
         let muelleCarga = '';
-        data.forEach((item) => {
+        listaBuque.forEach((item) => {
           if (item.sanBenito) muelleCarga = 'San Benito';
           if (item.vicentin) muelleCarga = 'Vicentin';
           if (item.otrosMuelles) muelleCarga = 'Otros Muelles';
@@ -109,7 +110,6 @@ export class GeolocalizacionComponent implements OnInit {
           item.numeroPaginado = 0;
         });
         this.setListaBuquesGeolocalizacion(data);
-
       },
       err => {
         this.mostrarListaBuque = false;

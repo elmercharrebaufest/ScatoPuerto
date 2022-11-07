@@ -427,3 +427,6 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 
 --- Actualizar a cero el idBalanzarCorte cuando sea null
 update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where idBalanzaCorte is null
+
+--cambios zona Vicentin
+update PuntosInteresGeolocalizacion  set Latitud = '-32.77205351237338', Longitud = '-60.72096919438843' where Nombre = 'Vicentín'

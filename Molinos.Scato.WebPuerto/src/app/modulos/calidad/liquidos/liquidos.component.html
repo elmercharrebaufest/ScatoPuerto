@@ -27,7 +27,7 @@
   </div>
 
   <app-registro-recibos></app-registro-recibos>
-  
+
   <!--
   <div class='mt-5' style='margin-left: 25%; width: 50%;'>
       <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
@@ -36,7 +36,60 @@
 
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
     <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
-    <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>
+    <!-- <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button> -->
+    <button type="button" class="btn btn-success mx-5" (click)="openModalCargarAmarre(CargarAmarre)">FINALIZAR</button>
+
+
   </div>
+
+  <ng-template #CargarAmarre let-modal >
+    <!-- <div class='container'> -->
+      <form [formGroup]="amarreForm">
+     <div class="form-row" style="margin-top:4px">
+            <div class="form-group  col-6" style="padding-left:30px;">
+                <label>Amarró</label>
+                <input formControlName="fechaAmarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+            </div>
+            <div class="form-group col-6" style="padding-right:30px;">
+              <label>&nbsp;</label>
+              <div class="input_img">
+                  <input class="form-control hora" formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
+                      [format]="24" >
+                  <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+              </div>
+              <ngx-material-timepicker #fullTimeAmarro style="z-index: 1000000 !important;" >
+              </ngx-material-timepicker>
+          </div>
+
+      </div>
+      <div class="form-row">
+        <div class="form-group  col-6" style="padding-left:30px;">
+                <label>Desamarró</label>
+                <input formControlName="fechaDesamarro" type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+            </div>
+            <div class="form-group col-6" style="padding-right:30px;">
+              <label>&nbsp;</label>
+              <div class="input_img">
+                  <input class="form-control hora" formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
+                      [format]="24" >
+                  <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+              </div>
+              <ngx-material-timepicker #fullTimeDesamarro>
+              </ngx-material-timepicker>
+            </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group  col-6" style="padding-left:30px;text-align:center">
+          <button  style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
+        </div>
+        <div class="form-group col-6" style="padding-right:30px;text-align:center">
+          <button style="margin-top: 18px;" type="button" class="btn btn-danger" [disabled]="" (click)="modal.dismiss('Cross click')" >CANCELAR</button>
+        </div>
+      </div>
+
+      </form>
+    <!-- </div> -->
+  </ng-template>
+
 
 </div>

@@ -760,7 +760,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls) {
         let cantidad = turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
         cantidad = cantidad / 1000;
-        cantidad = Math.round(cantidad);
         cantidad = parseInt(cantidad.toString());
         contador += cantidad;
     }
