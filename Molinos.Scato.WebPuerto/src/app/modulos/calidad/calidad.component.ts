@@ -16,8 +16,11 @@ import { Router } from '@angular/router';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { takeUntil } from 'rxjs/operators';
-import { EstadoBuque } from '@ScatoModels/embarque';
+import { Embarque, EstadoBuque } from '@ScatoModels/embarque';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
+import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
+import { LineupService } from '@ScatoServicios/lineup.service';
+import { BuqueService } from '@ScatoServicios/buque.service';
 
 
 @Component({
@@ -26,6 +29,9 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
   styleUrls: ['./calidad.component.css']
 })
 export class CalidadComponent implements OnInit, OnDestroy {
+
+  ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
+
   mostrarSpinner: boolean = true;
   mostrarTabs: boolean = false;
   mostrarPlano: boolean = false;
@@ -34,7 +40,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   embarqueSelected: EmbarqueNav;
   unsubscribe: Subject<any>;
   errorMessage: boolean = false;
-  
+
   embarquesEnLineUpSinFiltrar: EmbarqueNav[];
   listadoEmbarques: InstanciaWorkflowPuerto[];
 
@@ -55,12 +61,16 @@ export class CalidadComponent implements OnInit, OnDestroy {
   confirmationDialogService: any;
   periodoDeCarga: PeriodoDeCarga;
   estadoBuque: EstadoBuque;
-  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
-                  {id: 2, descripcion: 'Cargando'}, 
-                  {id: 3, descripcion: 'ControlCalidad'}, 
+  estadosBuque = [{id: 1, descripcion: 'PreOperativo'},
+                  {id: 2, descripcion: 'Cargando'},
+                  {id: 3, descripcion: 'ControlCalidad'},
                   {id: 4, descripcion: 'PostOperativo'}];
 
+
+
   constructor(
+    private _buqueService: BuqueService,
+    private lineUpService: LineupService,
     private workflowService: WorkflowService,
     private procesoCalidadService: ProcesoCalidadService,
     private _procesoService: DatosEmbarquesProcesoService,
@@ -86,6 +96,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
     this.embarque = this._procesoService.getEmbarqueSelected();
     this.trabajoOrdenado();
   }
@@ -96,7 +107,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
       this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
       this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id)
         .subscribe( res => this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0] : null);
-      
+
       setTimeout(() => this.estadoBuque = this._procesoService.getEstadoBuque(), 3000);
     });
   }
@@ -113,15 +124,15 @@ export class CalidadComponent implements OnInit, OnDestroy {
       listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
     })
     .subscribe( (res: {
-                        obtenerListado: InstanciaWorkflowPuerto[], 
+                        obtenerListado: InstanciaWorkflowPuerto[],
                         listarEmbarquesEnLineUp: EmbarqueNav[]
                       }) => {
       this.listadoEmbarques = res.obtenerListado;
       this.filtrarMuelles();
-      
+
       this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
 
-      
+
       let embEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
       if(embEnLineUp) this.embarquesEnLineUp.push(embEnLineUp);
 
@@ -144,7 +155,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
       this.mostrarTabs = true;
     });
-    
+
   }
 
   filtrarMuelles() {
@@ -172,11 +183,12 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean){
+  finalizaEnCalidad(esLiquido: boolean ){
+
     if(esLiquido){
       let fechaFinalizacionCarga  = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga   = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
-  
+
       if(fechaFinalizacionCarga == null || horaFinalizacionCarga == null){
         this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de finalización de carga debe estar completa.', 'Aceptar', '', null, null, Tipoalerta.Warning)
       }else{
@@ -192,14 +204,20 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   consultaCambioDeEstado(){
-    let texto = "Desea cambiar el estado del embarque a PostOperativo?";
+    //let texto = "Desea cambiar el estado del embarque a PostOperativo?";
+    let texto = "Desea zarpar el embarque?";
 
     this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
       .then((confirmed) => {
         if (confirmed) {
           this.modificarEstadoBuque('PostOperativo');
+          //this.zarparEmbarque();
+     //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
+
+
+          InstanciaWorkflowPuerto
           this.router.navigate(['/lineup']);
-        } else 
+        } else
           console.log('Close: Finalizar Tablerista');
       })
       .catch(() => {
@@ -207,10 +225,21 @@ export class CalidadComponent implements OnInit, OnDestroy {
       });
   }
 
+
+  zarparEmbarque()
+  {
+
+    let ubicacionBuque = this.ubicacionDeBuquePuerto.find( e => e.id=9);
+    let embarqueActualizar = this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['embarque'];
+    embarqueActualizar.ubicacionDeBuque =ubicacionBuque;
+    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe( res => console.log(res) );
+
+  }
   modificarEstadoBuque(estado: string){
     try {
       let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
       this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => console.log(res) );
+     this.zarparEmbarque();
     } catch (e) {
       console.log(e);
       console.log("Error al modificarEstadoBuque");
@@ -239,7 +268,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   showPlano(event: boolean) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-  
+
     setTimeout(() => {
       this.mostrarSpinner = false;
       this.mostrarPlano = event;

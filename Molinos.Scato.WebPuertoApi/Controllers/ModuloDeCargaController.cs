@@ -171,6 +171,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/ActualizarEstadoBuque")]
         public HttpResponseMessage ActualizarEstadoBuque(int Embarque_Id, int Estado)
         {
+      
             servicio.ActualizarEstadoBuque(Embarque_Id, Estado);
             return Request.CreateResponse(HttpStatusCode.OK);
         }

@@ -9811,6 +9811,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var estadoBuq = repositorio.Obtener<EstadoBuque>(x => x.Id == Estado);
                     embarque.EstadoBuque = estadoBuq;
+                    
                     repositorio.GuardarCambios();
                 }
             }

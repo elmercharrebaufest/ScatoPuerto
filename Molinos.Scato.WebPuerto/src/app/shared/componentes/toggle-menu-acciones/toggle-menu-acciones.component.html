@@ -1,6 +1,7 @@
 <div class="fullwidth fullheight cursorPointer my-auto" (click)="toggleMenu()">
   <i class="fa fa-sort-down "></i>
-  <ng-container *ngIf="hasPermisoLineUp_EditarUbicacionEmbarque()">
+ <ng-container *ngIf="hasPermisoLineUp_EditarUbicacionEmbarque()">
+
     <div *ngIf="showMenu" class="listadoAcciones" (click)="$event.stopPropagation()">
       <ng-content></ng-content>
     </div>

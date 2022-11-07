@@ -223,10 +223,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
        
 
-       
-
-       
-
         public void ValidarBajaCarga(int idModulodeCarga)
         {
 
