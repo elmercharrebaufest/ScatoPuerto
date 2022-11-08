@@ -2672,7 +2672,7 @@ namespace Molinos.Scato.Servicios
         IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
         
         [OperationContract]
-        List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, DateTime? desde, DateTime? hasta);
+        List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
       
         [OperationContract]
         List<HistoricoActoresDto> ListarOperadores(int Embarque_Id);

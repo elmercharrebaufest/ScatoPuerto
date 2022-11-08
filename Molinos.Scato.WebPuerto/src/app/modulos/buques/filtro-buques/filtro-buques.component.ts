@@ -50,7 +50,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.getMesActual();
     this.getAnioActual();   
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
-    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
+    //this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     //this.setCargarFiltroBusqueda();
 
   }
@@ -158,24 +158,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   // #endregion 
 
   // #region Eventos Controles
-  onChangeBusqueda(event) {
-    if (event != undefined) {
-      this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
-      this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(false); 
-      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
-    }
-  }
-
-  onChangeValues(event) {
-    if (event != undefined) {
-      this.filtroBuquedaForm.controls.esBusqueda.setValue(false);
-      this.filtroBuquedaForm.controls.esDetalle.setValue(false);
-      this.filtroBuquedaForm.controls.embarqueId.setValue(0);
-      this.filtroBuquedaForm.controls.vaporId.setValue(0);
-      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
-    }
-  }
-
+ 
   onLimpiarFiltros() {
    
     this.filtroBuquedaForm.controls.producto.setValue('');
