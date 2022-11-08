@@ -40,14 +40,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     private store: Store,
     private route: Router) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
+      if(data != null && data != undefined){
       this.filtroBuquedaForm = data;
-      
-
       if (this.esRegresar) {
         this.filtroBuquedaForm?.controls?.esBusqueda?.setValue(true);
         this.esRegresar = false;
       }
       this.setCargarHistorialBuque();
+    }
     });
   }
   // #endregion
@@ -114,6 +114,13 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       const filMes = filtro.controls.mes.value;
       const desde = filtro.controls.desde.value;
       const hasta = filtro.controls.hasta.value;     
+      const producto = filtro.controls.producto.value != "" ?
+       filtro.controls.producto.value.map(({ descripcionCorta }) => descripcionCorta).join(",") : "";
+      const buque = filtro.controls.buque.value ?? "";
+      const destino = filtro.controls.destino.value ?? "";
+      const control = filtro.controls.control.value ?? "";
+      const exportador = filtro.controls.nombreExportador.value ?? "";
+    
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
       let anio: number = filAnio > '' ? parseInt(filAnio, 0) : 0;
       let mes: number = filMes > '' ? parseInt(filMes, 0) : 0;
@@ -121,12 +128,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         anio = 0;
         mes = 0;
         this.store.dispatch(new LoadingHistorialBuques());
-        this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, desde, hasta));
+        this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, buque, destino, exportador, 
+          control, desde, hasta, producto));
         this.setListaHistorialBuques();
       } else {
         if (anio > 0 && mes > 0) {
          this.store.dispatch(new LoadingHistorialBuques());
-         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, desde, hasta)).subscribe(result => {
+         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, buque, destino, exportador, 
+          control, desde, hasta, producto)).subscribe(result => {
           this.setListaHistorialBuques();
          });
         }

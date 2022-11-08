@@ -9919,7 +9919,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var estadoBuq = repositorio.Obtener<EstadoBuque>(x => x.Id == Estado);
                     embarque.EstadoBuque = estadoBuq;
-                    
+
                     repositorio.GuardarCambios();
                 }
             }
@@ -11099,7 +11099,24 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var embarques = Listar<Embarque, EmbarqueDto>();
+
+              //  var embarques = Listar<Embarque, EmbarqueDto>();
+
+                var embar = (from e in repositorio.Listar<Embarque>()
+                                        join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
+                                        join r in repositorio.Listar<RecorridoDto>() on l.Recorrido.Id  equals r.Id
+                                        join v in repositorio.Listar<Vapor>() on e.Vapor.Id  equals v.Id
+                                        where e.Ubicacion != 1 && l.ModuloDeCarga.Id >0 
+                                        orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
+                                        select (e.Id)).ToList();
+
+                var embarques = new List<EmbarqueDto>();
+                foreach (var em in embar)
+                {
+                    var embarque = repositorio.Obtener<EmbarqueDto>(x => x.Id == em);
+                    embarques.Add(embarque);
+                }
+
                 List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
 
                 foreach (var embarque in embarques)
@@ -11228,7 +11245,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, DateTime? desde = null, DateTime? hasta = null)
+        public List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null)
         {
             IList<Embarque> listaEmbarques;
 
@@ -11239,9 +11256,9 @@ namespace Molinos.Scato.Servicios.Impl
             else
             {
                 var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
-                var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>(x =>
-                (desde == null || (x.FechaDesamarro.HasValue && (x.FechaDesamarro.Value >= desde.Value)))
-                 && (fechaHasta == null || (x.FechaDesamarro.HasValue && (x.FechaDesamarro.Value <= fechaHasta.Value))));
+                var moduloCargaPeriodo = repositorio.Listar<ModuloDeCargaPeriodoDeCarga>(x => x.FechaDesamarro.HasValue &&
+                (desde == null || (x.FechaDesamarro.Value >= desde.Value))
+                 && (fechaHasta == null || (x.FechaDesamarro.Value <= fechaHasta.Value)));
                 log.Debug("moduloCargaPeriodo" + moduloCargaPeriodo.Count());
                 listaEmbarques = new List<Embarque>();
                 foreach (var item in moduloCargaPeriodo)
@@ -11249,8 +11266,13 @@ namespace Molinos.Scato.Servicios.Impl
                     var lineUps = repositorio.Listar<LineUp>(x => x.ModuloDeCarga.Id == item.ModuloDeCarga.Id);
                     foreach (var lineup in lineUps)
                     {
-                        var embarque = repositorio.Obtener<Embarque>(x => x.Id == lineup.Embarque.Id && x.SanBenito == true);
-                        listaEmbarques.Add(embarque);
+                        var embarque = repositorio.Obtener<Embarque>(x => x.Id == lineup.Embarque.Id && x.SanBenito == true &&
+                        (String.IsNullOrEmpty(nombreBuque) || x.Patente.ToUpper().StartsWith(nombreBuque.ToUpper())) &&
+                        (String.IsNullOrEmpty(destino) || (x.Destino != null && x.Destino.Nombre.ToUpper().StartsWith(destino.ToUpper()))));
+                        if (embarque != null)
+                        {
+                            listaEmbarques.Add(embarque);
+                        }
                     }
                 }
             }
@@ -11265,7 +11287,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     foreach (var embarque in listaEmbarques)
                     {
-                        log.Debug("Embarque" + embarque.Id);
+
                         historialDeBusquesDto = new HistorialDeBusquesDto();
                         historialDeBusquesDto.NombreBuque = embarque.Vapor.Nombre;
                         historialDeBusquesDto.EmbarqueId = embarque.Id;
@@ -11309,6 +11331,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 log.Debug("Planilla de Liquido");
                                 if (planillaDeTurnos.EsLiquido)
                                 {
+
                                     foreach (var detalleLiquido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                                     {
                                         productoExportadorDto = new ProductoExportadorDto();
@@ -11321,6 +11344,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         listaProductoExportador.Add(productoExportadorDto);
                                         historialDeBusquesDto.ProductoExportador = listaProductoExportador;
                                     }
+
                                 }
                                 #endregion
 
@@ -11328,6 +11352,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 log.Debug("Planilla de Solido");
                                 if (!planillaDeTurnos.EsLiquido)
                                 {
+
                                     foreach (var detalleSolido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
                                     {
                                         productoExportadorDto = new ProductoExportadorDto();
@@ -11340,6 +11365,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         listaProductoExportador.Add(productoExportadorDto);
                                         historialDeBusquesDto.ProductoExportador = listaProductoExportador;
                                     }
+
                                 }
                                 #endregion
 
@@ -11347,6 +11373,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 log.Debug("Plano de Carga");
                                 if (lineUp.PlanoDeCarga != null)
                                 {
+                                  
                                     foreach (var agenciaControlPrivado in lineUp.PlanoDeCarga.AgentesControlPrivado)
                                     {
                                         historialDeBusquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
@@ -11430,8 +11457,14 @@ namespace Molinos.Scato.Servicios.Impl
 
 
                         }
-                      
-                        listarHistorialDeBusques.Add(historialDeBusquesDto);
+                        if (historialDeBusquesDto.ProductoExportador != null && historialDeBusquesDto.ProductoExportador.Any(x => (String.IsNullOrEmpty(exportador) ||
+                                         (x.NombreExportador.ToUpper().StartsWith(exportador.ToUpper())))
+                                         && (producto == null || (!string.IsNullOrEmpty(x.NombreMaterial) && producto.Select(y => y.ToUpper()).Contains(x.NombreMaterial.ToUpper())))) &&
+                                         String.IsNullOrEmpty(controlPrivado) || (historialDeBusquesDto.AgenciaControlPrivado != null && historialDeBusquesDto.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado)))
+                        {
+
+                            listarHistorialDeBusques.Add(historialDeBusquesDto);
+                        }
                     }
                 }
             }
@@ -12002,7 +12035,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
         {
-            IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x=> x.Embarque_id == idEmbarque).OrderByDescending(x=> x.FechaError).ToList();
+            IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x => x.Embarque_id == idEmbarque).OrderByDescending(x => x.FechaError).ToList();
             return erroresGeolocalizacion;
         }
     }
