@@ -280,3 +280,15 @@ input[type=number]::-webkit-outer-spin-button{
 .timepicker-backdrop-overlay {
   z-index: 10000000 !important;
 }
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0px !important;
+    border-radius: 0.3rem;
+    outline: 0;
+  }

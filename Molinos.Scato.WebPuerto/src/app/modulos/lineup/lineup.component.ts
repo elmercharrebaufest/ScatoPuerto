@@ -78,6 +78,7 @@ export class LineupComponent implements OnInit, Observador {
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
+    this.cargarEstadoLineUp();
   }
   
   cargarGeolocalizacionLineUp() {
@@ -152,7 +153,7 @@ export class LineupComponent implements OnInit, Observador {
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     function_name = 'filtrarMuelles - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
-    this.cargarEstadoLineUp();
+    
   }
 
   public altaEmbarque() {
