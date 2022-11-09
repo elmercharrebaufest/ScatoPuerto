@@ -144,8 +144,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                //var listaEmbarques = workflows.ListarEmbarques();
-                 var listaEmbarques = servicio.ListarEmbarques();
+               var listaEmbarques = workflows.ListarEmbarques();
+                //  var listaEmbarques = servicio.ListarEmbarques();
 
                 List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion = new List<EmbarqueGeolocalizacionDto>();
                 IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto = servicio.ListarUbicacionDeBuquePuerto();
