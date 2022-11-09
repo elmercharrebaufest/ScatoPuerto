@@ -589,7 +589,6 @@ export class AltaEmbarqueComponent implements OnInit {
         this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
       }
 
-      this.embarqueForm.value
       this.embarqueForm.value.esLiquido = this.listadoMateriales.find(x => x.id == this.materialesPuertoCantidadFormArray.controls.find(x => x.value.cantidad > 0).value.materialId).esLiquido;
       this.state === 'modulo-carga' ? this.embarqueForm.value['sanBenito'] = true : '';
       let altaEmbarque = this.embarqueForm.value;
@@ -608,6 +607,8 @@ export class AltaEmbarqueComponent implements OnInit {
           nombre : this.vaporInfo.nombreBuque
         }
       }
+
+
       this.embarqueService.altaEmbarque(altaEmbarque)
         .subscribe((res: any) => {
           if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, mostramos el confirm solo con el boton volver
@@ -640,11 +641,15 @@ export class AltaEmbarqueComponent implements OnInit {
   finalizarAlta() {
     this.submitted = true;
     if (this.embarqueId == 0) {
+      
+      if (this.id_buque == 0){
+        let mensaje = "Debe seleccionar un buque para realizar el alta de embarque.";
+        this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+        return false;
+      }
       this.guardarAltaEmbarque();
     }
     else{
-      console.log('embarqueSeleccionado-->>', this.embarqueSeleccionado);
-      console.log('this.vaporSeleccionado-->>', this.vaporSeleccionado);
       // Sino se cambiado el embarque
       if (this.vaporSeleccionado === undefined || this.vaporSeleccionado == null){
         this.modificarAltaEmbarque();
@@ -665,7 +670,6 @@ export class AltaEmbarqueComponent implements OnInit {
           });
         }
       }
-
     }
   }
 
@@ -1169,6 +1173,7 @@ export class AltaEmbarqueComponent implements OnInit {
   )
 
   public selectedVapor($event) {
+    console.log('$event--->>', $event);
     let { id, nombre } = $event.item
     this.id_buque  = id;
     this.nombre_buque = nombre;
