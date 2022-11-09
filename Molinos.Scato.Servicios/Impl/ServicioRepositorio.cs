@@ -9459,7 +9459,7 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 }
 
-                
+
 
                 return balanzadasCompletas;
             }
@@ -9537,7 +9537,7 @@ namespace Molinos.Scato.Servicios.Impl
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return null;
 
-                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque).Vapor.Id;                
+                int idVapor = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque).Vapor.Id;
                 var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio == null && x.CargaOpuesta_Id == null);
 
                 //Este caso representa solamente cargas en curso.
@@ -9578,22 +9578,23 @@ namespace Molinos.Scato.Servicios.Impl
 
                 foreach (CargasPorBodega carga in cargasAbiertas)
                 {
-                        if (cargasFinal.Exists(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto)) { 
-                            cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Cargado += carga.Cargado;
-                            cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).RestaCargar += carga.RestaCargar += carga.RestaCargar;
-                            cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Excedente += carga.Excedente += carga.Excedente;
-                        }
-                        else
+                    if (cargasFinal.Exists(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto))
+                    {
+                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Cargado += carga.Cargado;
+                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).RestaCargar += carga.RestaCargar += carga.RestaCargar;
+                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Excedente += carga.Excedente += carga.Excedente;
+                    }
+                    else
+                    {
+                        cargasFinal.Add(new CargasPorBodega()
                         {
-                            cargasFinal.Add(new CargasPorBodega()
-                            {
-                                Cargado = carga.Cargado,
-                                RestaCargar = carga.RestaCargar,
-                                Excedente = carga.Excedente,
-                                NombreBodega = carga.NombreBodega,
-                                NombreProducto = carga.NombreProducto
-                            });
-                        }           
+                            Cargado = carga.Cargado,
+                            RestaCargar = carga.RestaCargar,
+                            Excedente = carga.Excedente,
+                            NombreBodega = carga.NombreBodega,
+                            NombreProducto = carga.NombreProducto
+                        });
+                    }
                 }
 
                 foreach (CargasPorBodega carga in cargasCerradas)
@@ -11099,24 +11100,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-
-              //  var embarques = Listar<Embarque, EmbarqueDto>();
-
-                var embar = (from e in repositorio.Listar<Embarque>()
-                                        join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
-                                        join r in repositorio.Listar<RecorridoDto>() on l.Recorrido.Id  equals r.Id
-                                        join v in repositorio.Listar<Vapor>() on e.Vapor.Id  equals v.Id
-                                        where e.Ubicacion != 1 && l.ModuloDeCarga.Id >0 
-                                        orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
-                                        select (e.Id)).ToList();
-
-                var embarques = new List<EmbarqueDto>();
-                foreach (var em in embar)
-                {
-                    var embarque = repositorio.Obtener<EmbarqueDto>(x => x.Id == em);
-                    embarques.Add(embarque);
-                }
-
+                var embarques = Listar<Embarque, EmbarqueDto>();
                 List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
 
                 foreach (var embarque in embarques)
@@ -11371,9 +11355,9 @@ namespace Molinos.Scato.Servicios.Impl
 
                                 #region Plano de Carga
                                 log.Debug("Plano de Carga");
-                                if (lineUp.PlanoDeCarga != null)
+                                if (lineUp.PlanoDeCarga != null && lineUp.PlanoDeCarga.AgentesControlPrivado != null)
                                 {
-                                  
+
                                     foreach (var agenciaControlPrivado in lineUp.PlanoDeCarga.AgentesControlPrivado)
                                     {
                                         historialDeBusquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
@@ -11383,43 +11367,47 @@ namespace Molinos.Scato.Servicios.Impl
                                 #endregion
 
                                 #region Modulo de Carga de Periodo de Carga
-                                foreach (var moduloCargaPeriodoCarga in moduloCarga.ModuloDeCargaPeriodoDeCarga)
+                                log.Debug("Modulo de carga de periodo de carga");
+                                if (moduloCarga.ModuloDeCargaPeriodoDeCarga != null)
                                 {
-                                    DateTime fechaHoraDesamarro;
-                                    DateTime fechaHoraAmarro;
-                                    if (moduloCargaPeriodoCarga.FechaDesamarro != null)
+                                    foreach (var moduloCargaPeriodoCarga in moduloCarga.ModuloDeCargaPeriodoDeCarga)
                                     {
-                                        string fechaDesamarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaDesamarro).ToString("yyyy-MM-dd");
-                                        if (moduloCargaPeriodoCarga.HoraDesamarro.Length > 0)
+                                        DateTime fechaHoraDesamarro;
+                                        DateTime fechaHoraAmarro;
+                                        if (moduloCargaPeriodoCarga.FechaDesamarro != null)
                                         {
-                                            fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, moduloCargaPeriodoCarga.HoraDesamarro);
-                                        }
+                                            string fechaDesamarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaDesamarro).ToString("yyyy-MM-dd");
+                                            if (moduloCargaPeriodoCarga.HoraDesamarro.Length > 0)
+                                            {
+                                                fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, moduloCargaPeriodoCarga.HoraDesamarro);
+                                            }
 
-                                        fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
-                                        historialDeBusquesDto.FechaDesamarro = fechaHoraDesamarro;
-                                    }
-                                    if (moduloCargaPeriodoCarga.FechaAmarro != null)
-                                    {
-                                        string fechaAmarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaAmarro).ToString("yyyy-MM-dd");
-                                        if (moduloCargaPeriodoCarga.HoraAmarro.Length > 0)
+                                            fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
+                                            historialDeBusquesDto.FechaDesamarro = fechaHoraDesamarro;
+                                        }
+                                        if (moduloCargaPeriodoCarga.FechaAmarro != null)
                                         {
-                                            fechaAmarro = string.Format("{0} {1}", fechaAmarro, moduloCargaPeriodoCarga.HoraAmarro);
+                                            string fechaAmarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaAmarro).ToString("yyyy-MM-dd");
+                                            if (moduloCargaPeriodoCarga.HoraAmarro.Length > 0)
+                                            {
+                                                fechaAmarro = string.Format("{0} {1}", fechaAmarro, moduloCargaPeriodoCarga.HoraAmarro);
+                                            }
+
+                                            fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
+                                            historialDeBusquesDto.FechaAmarro = fechaHoraAmarro;
                                         }
-
-                                        fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
-                                        historialDeBusquesDto.FechaAmarro = fechaHoraAmarro;
+                                        if (historialDeBusquesDto.FechaDesamarro != null && historialDeBusquesDto.FechaAmarro != null)
+                                        {
+                                            TimeSpan? diferencia = historialDeBusquesDto.FechaDesamarro - historialDeBusquesDto.FechaAmarro;
+                                            historialDeBusquesDto.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
+                                        }
                                     }
-                                    if (historialDeBusquesDto.FechaDesamarro != null && historialDeBusquesDto.FechaAmarro != null)
-                                    {
-                                        TimeSpan? diferencia = historialDeBusquesDto.FechaDesamarro - historialDeBusquesDto.FechaAmarro;
-                                        historialDeBusquesDto.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
-                                    }
-
                                 }
                                 #endregion
 
                             }
                             #region Ritmos
+                            log.Debug("Ritmos");
                             if (lineUp.Embarque.EsLiquido)
                             {
                                 Dictionary<string, int> resultado = ObtenerRitmosLiquidos(lineUp.ModuloDeCarga.Id);
@@ -11597,14 +11585,14 @@ namespace Molinos.Scato.Servicios.Impl
         public void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp)
         {
             Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
-            
+
             if (embarque != null)
                 embarque.FilePathImgLineUp = filePathImgLineUp;
 
             repositorio.GuardarCambios();
         }
 
-      
+
 
         public IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque)
         {
