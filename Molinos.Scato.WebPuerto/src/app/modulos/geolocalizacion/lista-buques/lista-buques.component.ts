@@ -203,5 +203,10 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
     this.paginaActual = 1;
   }
   // #endregion
-
+  CalcularHoraBuqueFueraDeAlcance(posicion: any){
+    var hoy = new Date();
+    var posicionDate = new Date(posicion);
+    hoy.setHours(hoy.getHours() - 3);
+    return posicionDate > hoy;
+  }
 }

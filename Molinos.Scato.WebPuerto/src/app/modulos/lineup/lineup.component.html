@@ -87,7 +87,7 @@
 
   <app-cargando-muelle *ngIf="sanBenitoCargandoMuelle" [instanciaWorkflow]="sanBenitoCargandoMuelle"></app-cargando-muelle>
 
-  <div id="divEmbarqueLineUp" fxFlex *ngIf="listadoEmbarques && mostrarContent">
+  <div id="divEmbarqueLineUp" fxFlex *ngIf="listadoEmbarques && mostrarContent && ubicacionDeBuquePuerto">
     <div *ngIf="!mostrarCalendario">
       <div class="row m-lg-4" *ngFor="let instanciaWorkflow of sanBenito; let i = index;" #puertoSanBenito>
         <app-lineup-embarque *ngIf="!(sanBenitoCargandoMuelle?.embarque.nombreBuque == instanciaWorkflow.embarque.nombreBuque) && instanciaWorkflow.embarque.ubicacion !=1 && mostrarContent"
@@ -95,6 +95,7 @@
                              [observador]="observador"
                              [index]="i"
                              class="w-100 mb-4"
+                             [ubicacionDeBuquePuerto]="ubicacionDeBuquePuerto"
                              [buquesGeolocalizacion]="instanciaWorkflow"></app-lineup-embarque>
       </div>
       <div class="row">
@@ -137,6 +138,7 @@
                                [observador]="observador"
                                [index]="i"
                                class="w-100 mb-4"
+                               [ubicacionDeBuquePuerto]="ubicacionDeBuquePuerto"
                                [buquesGeolocalizacion]="instanciaWorkflow"></app-lineup-embarque>
         </div>
         <div class="row">
@@ -180,6 +182,7 @@
                                [observador]="observador"
                                [index]="i"
                                class="w-100 mb-4"
+                               [ubicacionDeBuquePuerto]="ubicacionDeBuquePuerto"
                                [buquesGeolocalizacion]="instanciaWorkflow"></app-lineup-embarque>
         </div>
         <div class="row">
@@ -221,6 +224,7 @@
                                [observador]="observador"
                                [index]="i"
                                class="w-100 mb-4"
+                               [ubicacionDeBuquePuerto]="ubicacionDeBuquePuerto"
                                [buquesGeolocalizacion]="instanciaWorkflow"></app-lineup-embarque>
         </div>
         <div class="row">

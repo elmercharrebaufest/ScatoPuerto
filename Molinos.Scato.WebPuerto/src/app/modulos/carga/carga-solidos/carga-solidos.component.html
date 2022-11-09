@@ -24,7 +24,7 @@
 
     <div  *ngIf="mostrarTableristaOperando">    
         <div id="umap">
-            <app-umap [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId"></app-umap>
+            <app-umap #umapComponent [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId"></app-umap>
         </div>
 
         <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
