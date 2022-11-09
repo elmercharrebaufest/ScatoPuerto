@@ -449,7 +449,7 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
         mensajeToolTip += `<span>Vel./Curso: ${buque.posicion.velocidadCurso}</span><br>`;
         //mensajeToolTip += `<span>Posición recibido: ${buque.posicion.horaUTCPosicionRecibida}</span><br>`;
 
-        mensajeToolTip += `<span>Ultima posición recibida: ${fechaPosicionRecibida }</span><br>`;
+        mensajeToolTip += `<span>Posición recibida: ${fechaPosicionRecibida }</span><br>`;
         mensajeToolTip += `</div>`;
         const markerBuque = L.marker([latitud, longitud], { icon: this.iconoBuque }).bindPopup(markerPopup).bindTooltip(mensajeToolTip);
         markerBuque.on('click', this.markerOnClick, this);
@@ -490,9 +490,8 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
       messageMinutes = minutes > 1 ? minutes + ' minutos ' : minutes + ' minuto ';
       var mensajeUltimaPosicion = 'Hace ' + messageDays + messageHours + messageMinutes;
 
-    var hoy = new Date();
-    hoy.setHours(hoy.getHours() - 3);
-    if(fechaPosicion < hoy){
+    
+    if(!this.CalcularHoraBuqueFueraDeAlcance(fechaPosicion)){
        mensajeUltimaPosicion = 'El buque está fuera de alcance';
     }
 
@@ -586,6 +585,12 @@ export class MapaBuqueComponent implements AfterViewInit, OnDestroy {
       }
     }
     */
+  }
+  CalcularHoraBuqueFueraDeAlcance(posicion: any){
+    var hoy = new Date();
+    var posicionDate = new Date(posicion);
+    hoy.setHours(hoy.getHours() - 3);
+    return posicionDate > hoy;
   }
   // #endregion
 
