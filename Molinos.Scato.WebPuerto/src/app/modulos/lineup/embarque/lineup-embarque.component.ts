@@ -35,9 +35,9 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
-  
+  @Input() ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
 
-  ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
+  
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
   showMenu = false;
@@ -80,7 +80,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
+    //this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
     if (this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada) {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
@@ -90,10 +90,10 @@ export class LineupEmbarqueComponent implements OnInit {
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { 
-      this.ubicacionDeBuquePuerto = res;
-      this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
-    });
+   // this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { 
+      //this.ubicacionDeBuquePuerto = res;
+      this.listadoUbicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.map(u => u.nombre);
+    //});
   }
 
   counter(i: number) {

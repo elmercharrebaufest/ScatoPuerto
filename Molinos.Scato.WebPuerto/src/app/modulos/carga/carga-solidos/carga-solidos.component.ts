@@ -107,9 +107,10 @@ export class CargaSolidosComponent implements OnInit {
           esLiquido: m.esLiquido,
           color: m.color
         }));
+      }, error =>{},
+      ()=>{
+        this.drawGraphic()
       });
-      
-    this.drawGraphic();
   }
 
   drawGraphic() {
@@ -155,10 +156,13 @@ export class CargaSolidosComponent implements OnInit {
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
-        if (res.moduloDeCargaUmap.length > 0 && this.mostrarTableristaOperando) {
+        if (res.moduloDeCargaUmap.length > 0) {
+          console.log('this.manosComponent-->>', this.manosComponent)
+
+          console.log('this.umapComponent-->>', this.umapComponent)
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
-        if(res.moduloDeCargaPeriodoDeCarga.length > 0 && this.mostrarTableristaOperando){
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });

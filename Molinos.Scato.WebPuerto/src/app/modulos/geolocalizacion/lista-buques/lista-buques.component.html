@@ -51,7 +51,9 @@
                             <td class="sticky lista-nombre-buque row-geo-letra" (click)='onOpenModalGeo(addGeo, geolocalizacion)'>
                                 {{geolocalizacion.nombreBuque}}
                             </td>
-                            <td class="row-geo-letra">{{geolocalizacion.posicion.horaUTCPosicionRecibidaCalc | date: 'dd/MM/yyyy h:mm a' }}</td>
+                            
+                            <td class="row-geo-letra" *ngIf="CalcularHoraBuqueFueraDeAlcance(geolocalizacion.posicion.horaUTCPosicionRecibida); else fueraDeAlcance">{{geolocalizacion.posicion.horaUTCPosicionRecibida | date: 'dd/MM/yyyy h:mm a' }}</td>
+                            <ng-template #fueraDeAlcance><td class="row-geo-letra">El buque está fuera de alcance</td></ng-template>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion.estado}}</td>
