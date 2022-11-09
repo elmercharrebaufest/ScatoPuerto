@@ -11100,22 +11100,22 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                // var embarques = Listar<Embarque, EmbarqueDto>();
+                 var embarques = Listar<Embarque, EmbarqueDto>();
 
-                var embar = (from e in repositorio.Listar<Embarque>()
-                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
-                             join r in repositorio.Listar<RecorridoDto>() on l.Recorrido.Id equals r.Id
-                             join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
-                             where e.Ubicacion != 1 && l.ModuloDeCarga.Id > 0
-                             orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
-                             select (e.Id)).ToList();
+                //var embar = (from e in repositorio.Listar<Embarque>()
+                //             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
+                //             join r in repositorio.Listar<RecorridoDto>() on l.Recorrido.Id equals r.Id
+                //             join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
+                //             where e.Ubicacion != 1 && l.ModuloDeCarga.Id > 0
+                //             orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
+                //             select (e.Id)).ToList();
 
-                var embarques = new List<EmbarqueDto>();
-                foreach (var em in embar)
-                {
-                    var embarque = repositorio.Obtener<EmbarqueDto>(x => x.Id == em);
-                    embarques.Add(embarque);
-                }
+                //var embarques = new List<EmbarqueDto>();
+                //foreach (var em in embar)
+                //{
+                //    var embarque = repositorio.Obtener<EmbarqueDto>(x => x.Id == em);
+                //    embarques.Add(embarque);
+                //}
 
                 List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
 
