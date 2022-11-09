@@ -50,7 +50,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.getMesActual();
     this.getAnioActual();   
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
-    //this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
+    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     //this.setCargarFiltroBusqueda();
 
   }

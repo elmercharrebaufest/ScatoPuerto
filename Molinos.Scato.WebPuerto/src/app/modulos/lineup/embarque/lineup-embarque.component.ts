@@ -115,6 +115,7 @@ export class LineupEmbarqueComponent implements OnInit {
         }
       });
     }else{
+      this.mensajeBuque = "Ver en el mapa."
       this.hayBuque =  true;
     }
     this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
