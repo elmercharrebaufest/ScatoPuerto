@@ -208,10 +208,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     case null: //Corte
                                //Crear turno en ModuloDeCargaPlanillaDeTurnosSolido
-                        turno = this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnos(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
+                        //turno = this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnos(ModuloDeCargaId, cb.Fecha_Inicio.Value, idTurno);
 
                         //Crear turno en ModuloDeCargaPlanillaDeTurnosCortes
-                        this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnosCortes(turno, cb);
+                        //this.ServicioRepositorio.CrearModuloDeCargaPlanillaDeTurnosCortes(turno, cb);
                         break;
                 }
             }
@@ -395,7 +395,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             {
                                 //si vengo de un fin me fijo el tiempo desde el fin al inicio para generar el corte.
                                 tiempo = registro.Fecha.Subtract(regP_carga.fechaFin).TotalMinutes;
-                                if(tiempo > TIEMPO_MINIMO_CORTE)
+                                if(tiempo >= TIEMPO_MINIMO_CORTE)
                                 {
                                     //Creo un corte
                                     if (regP_carga.numeroBalanza == "7")
@@ -430,7 +430,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                         case "balanzada":
                             tiempo = registro.Fecha.Subtract(regP_carga.fechaFin).TotalMinutes;
-                            if(tiempo > TIEMPO_MINIMO_CORTE)
+                            if(tiempo >= TIEMPO_MINIMO_CORTE)
                             {
                                 //Agrego el intervalo a la lista de balanza que corresponda
                                 if (regP_carga.numeroBalanza == "7")
