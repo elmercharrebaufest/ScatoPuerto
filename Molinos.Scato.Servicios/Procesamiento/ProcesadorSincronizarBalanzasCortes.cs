@@ -114,31 +114,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     foreach (var cb in balanzasCortes)
                     {
                         ModuloDeCargaPlanillaDeTurnosUltimaActualizacion moduloDeCargaPlanillaDeTurnosUltimaActualizacion = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosUltimaActualizacion>(x => x.ModuloDeCarga.Id == IdModuloDeCarga && x.NumeroBalanza == cb.NumeroBalanza);
-                        List<RegistroBalanzaPuerto> registroBalanzaPuerto = new List<RegistroBalanzaPuerto>();
-                        //obtengo todos los RegistroBalanzaPuerto                            
-
+                        
                         if (moduloDeCargaPlanillaDeTurnosUltimaActualizacion != null)
                         {
-                            registroBalanzaPuerto = Repositorio.Listar<RegistroBalanzaPuerto>(x => x.Fecha >= cb.Fecha_Inicio && x.Fecha <= cb.Fecha_Corte && x.NumeroBalanza == cb.NumeroBalanza && x.Id > moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id).ToList();
-                            if (registroBalanzaPuerto != null && registroBalanzaPuerto.Count > 0)
+                            if (cb.idFin > 0 && cb.idFin > moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id)
                             {
-                                moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = registroBalanzaPuerto.Last().Id;
+                                moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = Convert.ToInt32(cb.idFin);
+                                CrearPlanillaDeTurnos(cb, cb, IdModuloDeCarga);
                             }
                         }
                         else
                         {
-                            registroBalanzaPuerto = Repositorio.Listar<RegistroBalanzaPuerto>(x => x.Fecha >= cb.Fecha_Inicio && x.Fecha <= cb.Fecha_Corte && x.NumeroBalanza == cb.NumeroBalanza).ToList();
                             moduloDeCargaPlanillaDeTurnosUltimaActualizacion = new ModuloDeCargaPlanillaDeTurnosUltimaActualizacion();
                             moduloDeCargaPlanillaDeTurnosUltimaActualizacion.ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == IdModuloDeCarga);
                             moduloDeCargaPlanillaDeTurnosUltimaActualizacion.NumeroBalanza = cb.NumeroBalanza;
-                            if (registroBalanzaPuerto != null && registroBalanzaPuerto.Count > 0)
+                            if (cb.idFin > 0)
                             {
-                                moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = registroBalanzaPuerto.Last().Id;
+                                moduloDeCargaPlanillaDeTurnosUltimaActualizacion.Carga_Id = Convert.ToInt32(cb.idFin);
+                                CrearPlanillaDeTurnos(cb, cb, IdModuloDeCarga);
                             }
                             Repositorio.Agregar(moduloDeCargaPlanillaDeTurnosUltimaActualizacion);
                         }
                         Repositorio.GuardarCambios();
-                        if (registroBalanzaPuerto != null && registroBalanzaPuerto.Count > 0) CrearPlanillaDeTurnos(registroBalanzaPuerto, cb, IdModuloDeCarga);
                     }
                 }
             }
@@ -149,22 +146,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
         }
 
-        public void CrearPlanillaDeTurnos(List<RegistroBalanzaPuerto> rbp, BalanzasCortes cb, int ModuloDeCargaId)
+        public void CrearPlanillaDeTurnos(BalanzasCortes rbp, BalanzasCortes cb, int ModuloDeCargaId)
         {
             try
             {
-                if (rbp != null && rbp.Count > 0)
-                {
                     //Id Turno actual
-                    int idTurno = (rbp[0].Fecha.Hour / 6) + 1;
-
-                    int idInicio = rbp[0].Id;
-                    int idFin = rbp[rbp.Count - 1].Id;
-
-                    ProcesarPlanilla(cb, ModuloDeCargaId, idTurno, idInicio, idFin);
-
+                    int idTurno = (rbp.Fecha_Inicio.Value.Hour / 6) + 1;
+                    ProcesarPlanilla(cb, ModuloDeCargaId, idTurno, Convert.ToInt32(rbp.idInicio), Convert.ToInt32(rbp.idFin));
                     return;
-                }
             }
             catch (Exception ex)
             {
@@ -262,6 +251,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         NumeroBalanza = reg.numeroBalanza,
                         Kg = PesoTotal,
                         Tn = PesoTotal / 1000,
+                        idInicio = reg.idInicio,
+                        idFin = reg.idFin,
                         Bodega_id = car.Bodega == null ? 0 : car.Bodega.Id,
                         Material_id = car.Material == null ? 0 : car.Material.Id,
                         Exportador_Id = car.Exportador == null ? 0 : car.Exportador.Id,
@@ -295,6 +286,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         NumeroBalanza = reg.numeroBalanza,
                         Kg = PesoTotal,
                         Tn = PesoTotal / 1000,
+                        idInicio = reg.idInicio,
+                        idFin = reg.idFin,
                         Bodega_id = car.Bodega == null ? 0 : car.Bodega.Id,
                         Material_id = car.Material == null ? 0 : car.Material.Id,
                         Exportador_Id = car.Exportador == null ? 0 : car.Exportador.Id,
@@ -405,7 +398,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                             fechaInicio = regP_carga.fechaFin,
                                             fechaFin = registro.Fecha,
                                             numeroBalanza = regP_carga.numeroBalanza,
-                                            numeroCarga = regP_carga.numeroCarga
+                                            numeroCarga = regP_carga.numeroCarga,
+                                            idInicio = regP_carga.idInicio,
+                                            idFin = regP_carga.idFin,
                                         });
                                     }
                                     else
@@ -415,7 +410,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                             fechaInicio = regP_carga.fechaFin,
                                             fechaFin = registro.Fecha,
                                             numeroBalanza = regP_carga.numeroBalanza,
-                                            numeroCarga = regP_carga.numeroCarga
+                                            numeroCarga = regP_carga.numeroCarga,
+                                            idInicio = regP_carga.idInicio,
+                                            idFin = regP_carga.idFin,
                                         });
                                     }
                                 }

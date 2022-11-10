@@ -25,6 +25,9 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int? Exportador_Id { get; set; }
         public virtual int? Destino_Id { get; set; }
         public virtual bool? CargaNormal { get; set; }
+        public virtual int? idInicio { get; set; }
+        public virtual int? idFin { get; set; }
+
 
     }
 }
