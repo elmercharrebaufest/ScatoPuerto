@@ -12044,5 +12044,92 @@ namespace Molinos.Scato.Servicios.Impl
             IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x => x.Embarque_id == idEmbarque).OrderByDescending(x => x.FechaError).ToList();
             return erroresGeolocalizacion;
         }
+        private void CompletarDatosHistorialDeEmbarque(List<HistorialDeBusquesDto> historialDeBusquesDto)
+        {
+            if (historialDeBusquesDto != null && historialDeBusquesDto.Count > 0)
+            {
+                foreach (var item in historialDeBusquesDto)
+                {
+                    item.MuelleCarga = item.NombreMuelle == "San Benito" ? new List<string>() { "San Benito" } :
+                               item.NombreMuelle == "Vicentin" ? new List<string>() { "Vicentin" } : item.NombreMuelle == "Noryon" ?
+                               new List<string>() { "Noryon" } : item.NombreMuelle == "Otros Muelles" ? new List<string>() { "Otros Muelles" } : new List<string>();
+
+                    DateTime fechaHoraDesamarro;
+                    DateTime fechaHoraAmarro;
+                    if (item.FechaDesamarro != null)
+                    {
+                        string fechaDesamarro = Convert.ToDateTime(item.FechaDesamarro).ToString("yyyy-MM-dd");
+                        if (item.HoraDesamarro.Length > 0)
+                        {
+                            fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, item.HoraDesamarro);
+                        }
+
+                        fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
+                        item.FechaDesamarro = fechaHoraDesamarro;
+                    }
+                    if (item.FechaAmarro != null)
+                    {
+                        string fechaAmarro = Convert.ToDateTime(item.FechaAmarro).ToString("yyyy-MM-dd");
+                        if (item.HoraAmarro.Length > 0)
+                        {
+                            fechaAmarro = string.Format("{0} {1}", fechaAmarro, item.HoraAmarro);
+                        }
+
+                        fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
+                        item.FechaAmarro = fechaHoraAmarro;
+                    }
+                    if (item.FechaDesamarro != null && item.FechaAmarro != null)
+                    {
+                        TimeSpan? diferencia = item.FechaDesamarro - item.FechaAmarro;
+                        item.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
+
+                    }
+                    if(item.ModuloDeCargaId > 0) { 
+                    if (item != null && item.EsLiquido)
+                    {
+                        Dictionary<string, int> resultado = ObtenerRitmosLiquidos(item.ModuloDeCargaId);
+                        if (resultado != null)
+                        {
+                            if (resultado.Count > 0)
+                            {
+                                int ritmoAcumuladoNeto = 0;
+                                resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
+                                item.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
+                            }
+                        }
+                    }
+                        if (item != null && !item.EsLiquido)
+                        {
+                            Dictionary<string, int> resultado = ObtenerRitmos(item.ModuloDeCargaId);
+                            if (resultado != null)
+                            {
+                                if (resultado.Count > 0)
+                                {
+                                    int ritmoCargaNeto = 0;
+                                    resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
+                                    item.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
+                                }
+                            }
+
+                            #region Ritmos Baja Carga
+                            string[] listaBC = new string[] { "BCB", "BCP", "F" };
+                            var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
+                            int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
+                            item.TotalRitmoBaja = 0;
+                            item.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                        }
+                    }
+                }
+                #endregion
+            }
+        }
+        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null)
+        {
+            var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
+            var historial = repositorio.ListarConsulta(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto));
+            CompletarDatosHistorialDeEmbarque(historial);
+            return historial;
+        }
+
     }
 }
