@@ -15,16 +15,20 @@ namespace Molinos.Scato.Dominio.Dto
         public string NombreBuque { get; set; }
         public string NombreAta { get; set; }
         public string Destino { get; set; }
-        public List<string> MuelleCarga { get; set; }
-        public List<string> Productos { get; set; }
+        public IEnumerable<string> MuelleCarga { get; set; }
+        public IEnumerable<string> Productos { get; set; }
         public DateTime? FechaDesamarro { get; set; }
         public DateTime? FechaAmarro { get; set; }
-        public List<ProductoExportadorDto> ProductoExportador { get; set; }
+        public IEnumerable<ProductoExportadorDto> ProductoExportador { get; set; }
         public decimal TotalRitmoBaja { get; set; }
         public decimal TotalRitmoNormal { get; set; }
         public string AgenciaControlPrivado { get; set; }
         public double HorasMuelle { get; set; }
         public int ModuloDeCargaId { get; set; }
+        public int LineUpId { get; set; }
+        public string HoraAmarro { get; set; }
+        public string HoraDesamarro { get; set; }
+        public string NombreMuelle { get; set; }
     }
     public class ProductoExportadorDto
     {

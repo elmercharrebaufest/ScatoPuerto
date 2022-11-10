@@ -112,8 +112,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       const filVaporId = filtro.controls.vaporId.value;
       const filAnio = filtro.controls.anio.value;
       const filMes = filtro.controls.mes.value;
-      const desde = filtro.controls.desde.value;
-      const hasta = filtro.controls.hasta.value;     
+      let desde = filtro.controls.desde.value;
+      let hasta = filtro.controls.hasta.value;     
       const producto = filtro.controls.producto.value != "" ?
        filtro.controls.producto.value.map(({ descripcionCorta }) => descripcionCorta).join(",") : "";
       const buque = filtro.controls.buque.value ?? "";
@@ -127,6 +127,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       if (vaporId > 0) {
         anio = 0;
         mes = 0;
+        desde = null;
+        hasta = null;
         this.store.dispatch(new LoadingHistorialBuques());
         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, buque, destino, exportador, 
           control, desde, hasta, producto));
