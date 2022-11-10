@@ -29,7 +29,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeBuques(anio, mes, vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null)));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeEmbarques(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null)));
             }
             catch (Exception ex)
             {
