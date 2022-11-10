@@ -11,6 +11,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Carga_Id { get; set; }
         public virtual ModuloDeCarga ModuloDeCarga { get; set; }
         public virtual DateTime? Fecha { get; set; }
+        public virtual string NumeroBalanza { get; set; }
 
 
     }
