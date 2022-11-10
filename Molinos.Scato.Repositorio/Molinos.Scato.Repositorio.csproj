@@ -123,6 +123,7 @@
     <Compile Include="ConsultasEF\ObtenerStock.cs" />
     <Compile Include="ConsultasEF\ObtenerTransmisionASap.cs" />
     <Compile Include="ConsultasEF\ToneladasPorRangoDeDiasConsulta.cs" />
+    <Compile Include="ConsultasEF\ListarHistorialDeEmbarquesConsulta.cs" />
     <Compile Include="ConsultasEF\TransmisionesCuposErrorConsulta.cs" />
     <Compile Include="ConsultasEF\ListarMuestraEnvioACamaraIntactaParaArchivoConsulta.cs" />
     <Compile Include="ConsultasEF\ListarLibroMovimientosExistenciaDeGranos.cs" />

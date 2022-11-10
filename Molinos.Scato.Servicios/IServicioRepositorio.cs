@@ -2761,5 +2761,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
 
+        [OperationContract]
+        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
+
     }
 }
