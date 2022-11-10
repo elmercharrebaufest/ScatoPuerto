@@ -8,6 +8,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Id { get; set; }
         public int Carga_Id { get; set; }
         public DateTime? Fecha { get; set; }
+        public string NumeroBalanza { get; set; }
 
     }
 }
