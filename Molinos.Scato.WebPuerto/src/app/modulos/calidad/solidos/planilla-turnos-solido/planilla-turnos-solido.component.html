@@ -39,7 +39,7 @@
                                     <td [attr.rowspan]='getRowSpan(dia)'>
                                         <div class='column-center'>
                                             <span><b>{{getDia(d)}}</b></span>
-                                            <span class='toneladas'>{{ getCantDia(dia) }} <span class='turno'>Tn</span></span>
+                                            <span class='toneladas'>{{ (getCantDia(dia)/1000) | number: '1.0-0'  }} <span class='turno'>Tn</span></span>
                                             <span class='turno'>por día</span>
                                         </div>
                                     </td>
@@ -50,7 +50,7 @@
                                             <td [attr.rowspan]='getRowSpanTurno(turno)'>
                                                 <div class="column-center">
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
-                                                    <span class='toneladas'>{{ getCantTurno(turno) }} <span class='turno'>Tn</span></span>
+                                                    <span class='toneladas'>{{ (getCantTurno(turno)/1000) | number: '1.0-0' }} <span class='turno'>Tn</span></span>
                                                     <span class='turno'>por turno</span>
                                                     <button class='btn btn btn-success' 
                                                             *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"

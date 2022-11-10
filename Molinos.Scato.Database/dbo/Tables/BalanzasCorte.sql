@@ -16,6 +16,8 @@
 	[Exportador_Id] INT NULL, 
     [Destino_Id] INT NULL, 
     [CargaNormal] BIT NULL, 
+    [idInicio] INT NULL, 
+    [idFin] INT NULL, 
     CONSTRAINT [PK_BalanzasCortes] PRIMARY KEY ([Id]), 
     CONSTRAINT [FK_dbo.BalanzasCortes_dbo.ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade
 

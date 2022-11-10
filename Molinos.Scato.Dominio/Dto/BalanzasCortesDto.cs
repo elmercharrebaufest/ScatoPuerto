@@ -21,6 +21,8 @@ namespace Molinos.Scato.Dominio.Dto
         public int? Exportador_Id { get; set; }
         public int? Destino_Id { get; set; }
         public bool? CargaNormal { get; set; }
+        public int? idInicio { get; set; }
+        public int? idFin { get; set; }
         public object Clone()
         {
             return this.MemberwiseClone();
