@@ -48,8 +48,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             (moduloPeriodoCarga != null && moduloPeriodoCarga.FechaDesamarro.HasValue &&
                             (fechaInicio == null || moduloPeriodoCarga.FechaDesamarro.Value >= fechaInicio.Value) &&
                             (fechaFin == null || moduloPeriodoCarga.FechaDesamarro.Value <= fechaFin.Value) &&
-                            (String.IsNullOrEmpty(nombreBuque) || item.Embarque.Vapor.Nombre.ToUpper().Contains(nombreBuque.ToUpper())) &&
-                            (String.IsNullOrEmpty(destino) || (item.Embarque.Destino != null && item.Embarque.Destino.Nombre.ToUpper().Contains(destino.ToUpper())))))
+                            (String.IsNullOrEmpty(nombreBuque) || item.Embarque.Vapor.Nombre.ToUpper().Contains(nombreBuque.ToUpper()))))
 
                             orderby moduloPeriodoCarga.FechaDesamarro
 
@@ -80,7 +79,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                          MaterialPuerto_Id = planillaDeTurnoLiquido.MaterialPuerto != null ? planillaDeTurnoLiquido.MaterialPuerto.Id : 0,
                                          NombreExportador = planillaDeTurnoLiquido.Exportador != null ? planillaDeTurnoLiquido.Exportador.Nombre : "",
                                          NombreMaterial = planillaDeTurnoLiquido.MaterialPuerto != null ? planillaDeTurnoLiquido.MaterialPuerto.DescripcionCorta : "",
-                                         Toneladas = planillaDeTurnoLiquido.Cantidad > 0 ? (planillaDeTurnoLiquido.Cantidad / 1000) : planillaDeTurnoLiquido.Cantidad
+                                         Toneladas = planillaDeTurnoLiquido.Cantidad > 0 ? (planillaDeTurnoLiquido.Cantidad / 1000) : planillaDeTurnoLiquido.Cantidad,
+                                         Destino = planillaDeTurnoLiquido.Destino != null ? planillaDeTurnoLiquido.Destino.Nombre : "",
                                      }).Union
                                     (from planillaDeTurnoSolido in contexto.Set<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()
                                      where planillaDeTurnoSolido.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == item.ModuloDeCarga.Id
@@ -90,15 +90,17 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                          MaterialPuerto_Id = planillaDeTurnoSolido.MaterialPuerto != null ? planillaDeTurnoSolido.MaterialPuerto.Id : 0,
                                          NombreExportador = planillaDeTurnoSolido.Exportador != null ? planillaDeTurnoSolido.Exportador.Nombre : "",
                                          NombreMaterial = planillaDeTurnoSolido.MaterialPuerto != null ? planillaDeTurnoSolido.MaterialPuerto.DescripcionCorta : "",
-                                         Toneladas = planillaDeTurnoSolido.Cantidad > 0 ? (planillaDeTurnoSolido.Cantidad / 1000) : planillaDeTurnoSolido.Cantidad
+                                         Toneladas = planillaDeTurnoSolido.Cantidad > 0 ? (planillaDeTurnoSolido.Cantidad / 1000) : planillaDeTurnoSolido.Cantidad,
+                                         Destino = planillaDeTurnoSolido.Destino != null ? planillaDeTurnoSolido.Destino.Nombre : "",
                                      }),
                                 NombreMuelle = item.Embarque.SanBenito ? "San Benito" :
                                 item.Embarque.Vicentin ? "Vicentin" : item.Embarque.Noryon ? "Noryon" : item.Embarque.OtrosMuelles ? "Otros Muelles" : ""
                             };
          
-            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) ||
+            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || String.IsNullOrEmpty(destino) ||
                                          (x.ProductoExportador != null && x.ProductoExportador
-                                            .Any(y => y.NombreExportador.ToUpper().StartsWith(exportador.ToUpper()))) &&
+                                            .Any(y => y.NombreExportador.ToUpper().StartsWith(exportador.ToUpper()) 
+                                            && y.Destino.ToUpper().StartsWith(destino.ToUpper()))) &&
                                          (productos == null || (x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) &&
                                          (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado.ToUpper()))
                                            ))).ToList();
