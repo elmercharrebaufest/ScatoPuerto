@@ -26,13 +26,13 @@
                             <th class="header-geo-fijo header-geo-letra">Área</th>
                             <th class="header-geo-fijo header-geo-letra">Ubicación actual</th>
                             <th class="header-geo-fijo header-geo-letra">Estado del barco</th>
-                            <th class="header-geo-fijo header-geo-letra" style="background: darkgray">Muelle de carga</th>
-                            <th class="header-geo-fijo header-geo-letra" style="background: darkgray">Ubicación del barco Line Up</th>
+                            <th class="header-geo-fijo header-geo-letra row-geo-letra-white" style="background: #616369">Muelle de carga</th>
+                            <th class="header-geo-fijo header-geo-letra row-geo-letra-white" style="background: #616369">Ubicación del barco Line Up</th>
                         </tr> 
                     </thead>
                     <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
                         <tr *ngIf="geolocalizacion.esSeleccionadoPorMuelle &&  geolocalizacion.numeroPaginado == paginaActual">
-                            <td align="center" valign="center" style="width: 5%">
+                            <td valign="center" style="width: 65px">
                                 <input class="largerCheckbox" 
                                     id={{geolocalizacion.embarque_Id}} 
                                     type="checkbox" 
