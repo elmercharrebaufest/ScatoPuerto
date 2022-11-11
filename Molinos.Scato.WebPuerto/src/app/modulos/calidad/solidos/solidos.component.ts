@@ -23,7 +23,7 @@ import { time } from 'console';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
 @Component({
   selector: 'app-solidos',
@@ -53,10 +53,10 @@ export class SolidosComponent implements OnInit {
   horaAmarro: string;
   fechaDesamarro: Date;
   horaDesamarro: string;
-  confirmationDialogService: any;
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
+    private confirmationDialogService: ConfirmationDialogService,
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
     private moduloCargaService: ModuloDeCargaService,
