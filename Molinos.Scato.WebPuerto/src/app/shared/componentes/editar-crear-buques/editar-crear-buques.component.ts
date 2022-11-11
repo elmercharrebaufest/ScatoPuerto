@@ -140,24 +140,26 @@ export class EditarCrearBuquesComponent implements OnInit {
     this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
       this.vaporInfoBD = res;
       // console.log(this.vaporInfoBD);
-      let bandera;
-      if(this.vaporInfoBD.bandera_Id != null){
-        bandera = this.banderasBuque.filter(p => p.id == this.vaporInfoBD.bandera_Id)
+      if (this.vaporInfoBD!=null){
+        let bandera;
+        if(this.vaporInfoBD.bandera_Id != null){
+          bandera = this.banderasBuque.filter(p => p.id == this.vaporInfoBD.bandera_Id)
+        }
+        let tipoBuqueBD = this.tipoBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfoBD.tipoBuque)
+        let categoriaBuqueBD = this.categoriasBuque.filter(tipo => tipo.nombre == this.vaporInfoBD.categoriaBuque)
+  
+        this.vaporInfoBD.freeboard !== null && this.crearEditarBuqueForm.controls.freeboard.setValue(this.vaporInfoBD.freeboard);
+        this.vaporInfoBD.porteNeto !== null && this.crearEditarBuqueForm.controls.porteNeto.setValue(this.vaporInfoBD.porteNeto);
+        this.vaporInfoBD.porteBruto !== null && this.crearEditarBuqueForm.controls.porteBruto.setValue(this.vaporInfoBD.porteBruto);
+        this.vaporInfoBD.eslora !== null && this.crearEditarBuqueForm.controls.eslora.setValue(this.vaporInfoBD.eslora);
+        this.vaporInfoBD.manga !== null && this.crearEditarBuqueForm.controls.manga.setValue(this.vaporInfoBD.manga);
+        this.vaporInfoBD.puntual !== null && this.crearEditarBuqueForm.controls.puntual.setValue(this.vaporInfoBD.puntual);
+        this.vaporInfoBD.cantidadBodegasTks !== null && this.crearEditarBuqueForm.controls.cantBodegastks.setValue(this.vaporInfoBD.cantidadBodegasTks);
+        bandera !== null && this.crearEditarBuqueForm.controls.bandera.setValue(bandera[0] != null ? bandera[0] : null);
+        tipoBuqueBD !== null && this.crearEditarBuqueForm.controls.tipoBuque.setValue(tipoBuqueBD[0]);
+        categoriaBuqueBD !== null && this.crearEditarBuqueForm.controls.categoriaBuque.setValue(categoriaBuqueBD[0]);
+        this.vaporInfoBD.imoVapor !== null && this.crearEditarBuqueForm.controls.imoVapor.setValue(this.vaporInfoBD.imoVapor);
       }
-      let tipoBuqueBD = this.tipoBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfoBD.tipoBuque)
-      let categoriaBuqueBD = this.categoriasBuque.filter(tipo => tipo.nombre == this.vaporInfoBD.categoriaBuque)
-
-      this.vaporInfoBD.freeboard !== null && this.crearEditarBuqueForm.controls.freeboard.setValue(this.vaporInfoBD.freeboard);
-      this.vaporInfoBD.porteNeto !== null && this.crearEditarBuqueForm.controls.porteNeto.setValue(this.vaporInfoBD.porteNeto);
-      this.vaporInfoBD.porteBruto !== null && this.crearEditarBuqueForm.controls.porteBruto.setValue(this.vaporInfoBD.porteBruto);
-      this.vaporInfoBD.eslora !== null && this.crearEditarBuqueForm.controls.eslora.setValue(this.vaporInfoBD.eslora);
-      this.vaporInfoBD.manga !== null && this.crearEditarBuqueForm.controls.manga.setValue(this.vaporInfoBD.manga);
-      this.vaporInfoBD.puntual !== null && this.crearEditarBuqueForm.controls.puntual.setValue(this.vaporInfoBD.puntual);
-      this.vaporInfoBD.cantidadBodegasTks !== null && this.crearEditarBuqueForm.controls.cantBodegastks.setValue(this.vaporInfoBD.cantidadBodegasTks);
-      bandera !== null && this.crearEditarBuqueForm.controls.bandera.setValue(bandera[0] != null ? bandera[0] : null);
-      tipoBuqueBD !== null && this.crearEditarBuqueForm.controls.tipoBuque.setValue(tipoBuqueBD[0]);
-      categoriaBuqueBD !== null && this.crearEditarBuqueForm.controls.categoriaBuque.setValue(categoriaBuqueBD[0]);
-      this.vaporInfoBD.imoVapor !== null && this.crearEditarBuqueForm.controls.imoVapor.setValue(this.vaporInfoBD.imoVapor);
     })
   }
 
@@ -184,7 +186,7 @@ export class EditarCrearBuquesComponent implements OnInit {
         bandera_Id: buque.bandera.id,
         nombrebuque: buque.nombreBuque.nombre,
         tipoBuque: buque.tipoBuque.nombre,
-        categoriaBuque: buque.categoriaBuque.nombre,
+        categoriaBuque: '',
         imoVapor: buque.imoVapor,
         freeboard: buque.freeboard,
         eslora: buque.eslora,
@@ -215,7 +217,7 @@ export class EditarCrearBuquesComponent implements OnInit {
         bandera_Id: buque.bandera.id,
         nombrebuque: buque.nombreBuque,
         tipoBuque: buque.tipoBuque.nombre,
-        categoriaBuque: buque.categoriaBuque.nombre,
+        categoriaBuque: '',
         imoVapor: buque.imoVapor,
         freeboard: buque.freeboard,
         eslora: buque.eslora,

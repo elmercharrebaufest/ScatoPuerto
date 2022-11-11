@@ -808,6 +808,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     controSel['controls'][index]['controls'].medidaInicialMM.enable();
     controSel['controls'][index]['controls'].medidaFinalCM.enable();
     controSel['controls'][index]['controls'].medidaFinalMM.enable();
+    controSel['controls'][index]['controls'].medidaInicialCMyMM.enable();
+    controSel['controls'][index]['controls'].medidaFinalCMyMM.enable();
     controSel['controls'][index]['controls'].destino.enable();
     controSel['controls'][index]['controls'].tk.enable();
 
@@ -828,6 +830,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaInicialMM.disable();
         controSel['controls'][index]['controls'].medidaFinalCM.disable();
         controSel['controls'][index]['controls'].medidaFinalMM.disable();
+        controSel['controls'][index]['controls'].medidaInicialCMyMM.disable();
+        controSel['controls'][index]['controls'].medidaFinalCMyMM.disable();
         controSel['controls'][index]['controls'].destino.disable();
         controSel['controls'][index]['controls'].tk.disable();
       }
@@ -1102,7 +1106,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
     }
 
-    return this._builder.group({
+    let medidaInicialCM = line?.medidaInicialCM > 0 ? line.medidaInicialCM : 0;
+    let medidaInicialMM = line?.medidaInicialMM > 0 ? line.medidaInicialMM : 0;
+
+    let medidaFinalCM = line?.medidaFinalCM > 0 ? line.medidaFinalCM : 0;
+    let medidaFinalMM = line?.medidaFinalMM > 0 ? line.medidaFinalMM : 0;
+
+
+    const formulario = this._builder.group({
       linea: [{ value: line ? line.linea_Id : '', disabled: guardado },],
       tipoLineaEmbarque: [{ value: tipoLineaEmbarque, disabled: guardado },],
       exportador: [{ value: line ? line.exportador : '', disabled: guardado }],
@@ -1110,16 +1121,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: guardado }],
       tk: [{ value: line ? line.tk : '', disabled: bloqueoVicentin? bloqueoVicentin : guardado }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin }],
-      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` :`${line.medidaInicialCM},0`:"", disabled: guardado }],
-      medidaInicialCM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialCM : 0, }],
-      medidaInicialMM: [{ value: line?.medidaInicialMM >= 0 ? line.medidaInicialMM : 0, }],
-      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= 0 ? `${line.medidaFinalCM},${line.medidaFinalMM}` :`${line.medidaFinalCM},0`:"", disabled: guardado }],
-      medidaFinalCM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalCM : 0, }],
-      medidaFinalMM: [{ value: line?.medidaFinalMM >= 0 ? line.medidaFinalMM : 0, }],
+      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` :`${line.medidaInicialCM},0`:"", disabled: bloqueoVicentin }],
+      medidaInicialCM: [{ value: medidaInicialCM , disabled: bloqueoVicentin }],
+      medidaInicialMM: [{ value: medidaInicialMM , disabled: bloqueoVicentin }],
+      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` :`${line.medidaFinalCM},0`:"", disabled: bloqueoVicentin }],
+      medidaFinalCM: [{ value: medidaFinalCM , disabled: bloqueoVicentin }],
+      medidaFinalMM: [{ value: medidaFinalMM , disabled: bloqueoVicentin }],
       destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
       cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
-    })
+    });
+    return formulario;
   }
 
   initCorte(corte?: any, guardado?: boolean) {
@@ -1542,8 +1554,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           (bodegaParcelVal == '' || bodegaParcelVal == '0') ||
           (materialPuertoVal == '' || materialPuertoVal == '0') ||
           (exportadorVal == '' || exportadorVal == '0') ||
-          (medidaFinalCMyMM == '' || medidaFinalCMyMM == '0') ||
-          (medidaInicialCMyMM == '' || medidaInicialCMyMM == '0') ||
           (temperatura == '' || temperatura == '0')) {
           console.log('No es Vicentin')
           bPlanillaIncompleta = true;

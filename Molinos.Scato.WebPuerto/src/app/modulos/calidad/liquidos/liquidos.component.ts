@@ -8,6 +8,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
@@ -25,8 +26,8 @@ export class LiquidosComponent implements OnInit {
   public amarreForm: FormGroup;
   errorMessage: boolean;
   embarqueSelected: any;
-  confirmationDialogService: any;
   constructor(private _CalidadSharedService: CalidadSharedService,
+    private confirmationDialogService: ConfirmationDialogService,
   private _procesoService: DatosEmbarquesProcesoService,
   private _builder: FormBuilder,
   private moduloCargaService: ModuloDeCargaService,

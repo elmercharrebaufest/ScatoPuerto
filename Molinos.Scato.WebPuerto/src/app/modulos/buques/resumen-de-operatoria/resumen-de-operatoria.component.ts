@@ -80,8 +80,6 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   ngOnInit(): void {
     this.initOperatoria();
     this.browserRefresh = browserRefresh;
-    console.log('this.browserRefresh---->>')
-    console.log(this.browserRefresh)
     if (this.browserRefresh)
       this.cargarValoresHistorial();
   }
@@ -150,6 +148,38 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     }
   }
 
+  private obtenerInformacionEmbarque(){
+    let embarque = null;
+    this.embarqueService.obtenerEmbarque(this.idEmbarqueOp).subscribe(res => {
+      embarque = res;
+    }, error=>{},
+      ()=>{
+        const info = embarque.embarqueInformacion.length > 0 ? embarque.embarqueInformacion[0] : null;
+        let bandera_Id = 0;
+        let imoVapor = '';
+        if (info != null) {
+          bandera_Id = info.bandera.id;
+          imoVapor = info.imo;
+        }
+        
+        this.vaporInformacion = {
+          bandera_Id        : bandera_Id,
+          cantidadBodegasTks: embarque.cantidadBodegasTanques ,
+          categoriaBuque    : ''                         ,
+          eslora            : embarque.eslora            ,
+          freeboard         : embarque.freeboard         ,
+          imoVapor          : imoVapor       ,
+          manga             : embarque.manga             ,
+          nombreBuque       : embarque.nombreBuque       ,
+          porteBruto        : embarque.porteBruto        ,
+          porteNeto         : embarque.porteNeto         ,
+          puntual           : embarque.puntal            ,
+          tipoBuque         : embarque.tipoBuque         ,
+          vapor_Id          : embarque.vapor.id          
+       };
+      });
+  }
+
   private initOperatoria() {
     if (this.embarqueBuqueSel != null && this.embarqueBuqueSel !=undefined) {
       this.nombreBuque = this.embarqueBuqueSel.nombreBuque;
@@ -160,16 +190,18 @@ export class ResumenDeOperatoriaComponent implements OnInit {
       });
     }
     this.buqueService.obtenerVaporInformacion(this.idVaporOp).subscribe(res => {
+      this.vaporInformacion = res;
       if (this.vaporInformacion != null && this.vaporInformacion != undefined){
         this.embarqueService.obtenerBanderas().subscribe(res => {
           const banderaSel = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
           if (banderaSel.length >0)
           this.banderasBuque =  banderaSel[0];
         })
+      }else{
+        this.obtenerInformacionEmbarque();
       }
       this.mostrarInformacion = true;
     });
-  
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
 
@@ -235,27 +267,27 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   public openModalShipParticular(modal) {
     this.mostrarCardBuque = true;
     if (this.buque == null || this.buque == undefined) {
-      this.embarqueService.obtenerEmbarque(this.idEmbarqueOp).subscribe(res => {
-        console.log('res--->>', res)
-        this.buque = {
-          nombreBuque : res.patente,
-          informacion : {
-            fotoEmbarque       : res.embarqueInformacion[0].fotoEmbarque,
-            imo                : res.embarqueInformacion[0].imo,
-            bandera            : res.embarqueInformacion[0].bandera,
-            largoxAnchoExtremo : res.embarqueInformacion[0].largoxAnchoExtremo
-          },
-          embarque : { 
-            tipoBuque              : res.tipoBuque, 
-            porteBruto             : res.porteBruto,
-            porteNeto              : res.porteNeto,
-            puntal                 : res.puntal,
-            freeboard              : res.freeboard,
-            cantidadBodegasTanques : res.cantidadBodegasTanques
-          }
+      this.buque = {
+        nombreBuque : this.nombreBuque,
+        informacion : {
+          fotoEmbarque       : null,
+          imo                : this.vaporInformacion.imoVapor,
+          bandera            : this.banderasBuque,
+          largoxAnchoExtremo : `${this.vaporInformacion.eslora} x ${this.vaporInformacion.manga}`
+        },
+        embarque : { 
+          tipoBuque              : this.vaporInformacion.tipoBuque, 
+          porteBruto             : this.vaporInformacion.porteBruto,
+          porteNeto              : this.vaporInformacion.porteNeto,
+          puntal                 : this.vaporInformacion.puntual,
+          freeboard              : this.vaporInformacion.freeboard,
+          cantidadBodegasTanques : this.vaporInformacion.cantidadBodegasTks
         }
-        this.cargaModalShipParticular(modal);
-      });
+      }
+      this.embarqueService.obtenerEmbarqueInformacion(this.idEmbarqueOp).subscribe(res => {
+        this.buque.informacion.fotoEmbarque = res.fotoEmbarque;
+      }, error => {}
+       , ()=> {this.cargaModalShipParticular(modal);});
     }else{
       this.cargaModalShipParticular(modal);
     }

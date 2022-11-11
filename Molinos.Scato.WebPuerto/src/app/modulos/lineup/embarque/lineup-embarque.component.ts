@@ -101,7 +101,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   cargarBuqueGeolocalizacion(id: number) {
-    this.mensajeBuque = "No se encontró. Completar IMO";
+    this.mensajeBuque = "No se encontro existen datos incorrectos en el buque.";
     this.hayBuque = false;
     const embarquePosicion = this.buquesGeolocalizacion.embarque?.embarquePosicion;
     if (embarquePosicion.length == 0) {
