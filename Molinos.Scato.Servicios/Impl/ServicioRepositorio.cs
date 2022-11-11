@@ -9446,15 +9446,14 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         BalanzadasBuque balanzadasBuque = new BalanzadasBuque();
 
-                        balanzadasBuque.NumeroBalanza = carga.NumeroBalanza;
-                        balanzadasBuque.Bodega_Id = carga.Bodega.Id;
-                        balanzadasBuque.Material_Id = carga.Material.Id;
-                        balanzadasBuque.Id = balanzada.Id;
-                        balanzadasBuque.PesoBruto = balanzada.PesoBruto;
-                        balanzadasBuque.PesoNeto = balanzada.PesoNeto;
-                        balanzadasBuque.PesoTara = balanzada.PesoTara;
-                        balanzadasBuque.CargaInicial_Id = balanzada.CargaInicial_Id;
-
+                        balanzadasBuque.NumeroBalanza = carga != null ? carga.NumeroBalanza : "";
+                        balanzadasBuque.Bodega_Id = carga != null && carga.Bodega != null ? carga.Bodega.Id : 0;
+                        balanzadasBuque.Material_Id = carga != null && carga.Material != null ? carga.Material.Id : 0;
+                        balanzadasBuque.Id = balanzada != null ? balanzada.Id : 0;
+                        balanzadasBuque.PesoBruto = balanzada != null ? balanzada.PesoBruto : 0;
+                        balanzadasBuque.PesoNeto = balanzada != null ? balanzada.PesoNeto : 0;
+                        balanzadasBuque.PesoTara = balanzada != null ? balanzada.PesoTara : 0;
+                        balanzadasBuque.CargaInicial_Id = balanzada != null ? balanzada.CargaInicial_Id : 0;
                         balanzadasCompletas.balanzadasBuque.Add(balanzadasBuque);
                     }
                 }
