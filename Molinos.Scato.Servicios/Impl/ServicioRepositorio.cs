@@ -9543,7 +9543,12 @@ namespace Molinos.Scato.Servicios.Impl
                 //Este caso representa solamente cargas en curso.
                 foreach (Carga carga in cargas)
                 {
-                    int pesoTotalBalanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.Id).Sum(x => x.PesoNeto);
+                    int pesoTotalBalanzadas = 0;
+                    List<RegistroBalanzaPuerto> rbp = repositorio.Listar<RegistroBalanzaPuerto>(x => x.Id >= carga.Id && x.NumeroBalanza == carga.NumeroBalanza).ToList();
+                    foreach (RegistroBalanzaPuerto reg in rbp)
+                    {
+                        pesoTotalBalanzadas += repositorio.Obtener<Balanzada>(x => x.Id == reg.Id && x.NumeroBalanza == reg.NumeroBalanza) != null ? repositorio.Obtener<Balanzada>(x => x.Id == reg.Id && x.NumeroBalanza == reg.NumeroBalanza).PesoNeto : 0;
+                    }
                     int excedente = pesoTotalBalanzadas - carga.PesoProgramado;
                     int restaCargar = carga.PesoProgramado - pesoTotalBalanzadas;
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
@@ -9562,12 +9567,11 @@ namespace Molinos.Scato.Servicios.Impl
                 //Este caso representa cargas cerradas
                 foreach (Carga carga in cargas)
                 {
-                    int pesoTotalBalanzadas = repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id).Sum(x => x.PesoNeto);
-                    int excedente = pesoTotalBalanzadas - carga.PesoProgramado;
-                    int restaCargar = carga.PesoProgramado - pesoTotalBalanzadas;
+                    int excedente = carga.ToneladasAW - carga.PesoProgramado;
+                    int restaCargar = carga.PesoProgramado - carga.ToneladasAW;
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
-                        Cargado = pesoTotalBalanzadas,
+                        Cargado = carga.ToneladasAW,
                         Excedente = excedente > 0 ? excedente : 0,
                         RestaCargar = restaCargar > 0 ? restaCargar : 0,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
