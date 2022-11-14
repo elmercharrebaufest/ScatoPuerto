@@ -168,6 +168,7 @@ body{margin-top:20px;}
     font-weight: normal;
     font-size: 1rem;
     margin-bottom: 10px;
+    width: 200px;
 }
 
 .timeline .event {
@@ -277,4 +278,24 @@ body{margin-top:20px;}
 
 .maxx{
     max-width:555px
+}
+
+.timeline .motivoYObservacion {
+    /* border-bottom: 1px dashed #5CB85C; */
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.timeline .motivoYObservacion:before {
+    left: -207px;
+    content: attr(data-date);
+    text-align: right;
+    color: #949494;
+    font-weight: 600;
+    font-size: 1.1em;
+    min-width: 120px;
+    position: absolute;
+    display: block;
+    top: 0;
 }
