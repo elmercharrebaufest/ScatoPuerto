@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { GetObtenerHistorialBuques, LoadingHistorialBuques } from 'app/store/buques/buques.actions';
@@ -80,20 +81,17 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.esResumenOperatoria){
+      this.setObtenerHistorialBuques();
+    }
     if (esBusqueda && !esLimpiarBusqueda) {
-      const anio = this.filtroBuquedaForm?.controls.anio?.value;
-      const mes = this.filtroBuquedaForm?.controls?.mes.value;
       const desde = this.filtroBuquedaForm?.controls.desde?.value;
       const hasta = this.filtroBuquedaForm?.controls?.hasta.value;
       this.listaHistorialBuques = null;
       this.listaHistorialBuquesFiltro = null;
 
-      if (this.esResumenOperatoria){
+      if (desde > '' && hasta > '') {
         this.setObtenerHistorialBuques();
-      }else{
-        if (anio > '' && mes > '') {
-          this.setObtenerHistorialBuques();
-        }
       }
     } else {
       if (this.listaHistorialBuquesFiltro != null) {
@@ -110,8 +108,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     if (filtro != null) {
       this.buscarHistorialBuques = true;
       const filVaporId = filtro.controls.vaporId.value;
-      const filAnio = filtro.controls.anio.value;
-      const filMes = filtro.controls.mes.value;
       let desde = filtro.controls.desde.value;
       let hasta = filtro.controls.hasta.value;     
       const producto = filtro.controls.producto.value != "" ?
@@ -122,21 +118,18 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       const exportador = filtro.controls.nombreExportador.value ?? "";
     
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
-      let anio: number = filAnio > '' ? parseInt(filAnio, 0) : 0;
-      let mes: number = filMes > '' ? parseInt(filMes, 0) : 0;
+
       if (vaporId > 0) {
-        anio = 0;
-        mes = 0;
         desde = null;
         hasta = null;
         this.store.dispatch(new LoadingHistorialBuques());
-        this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, buque, destino, exportador, 
+        this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador, 
           control, desde, hasta, producto));
         this.setListaHistorialBuques();
       } else {
-        if (anio > 0 && mes > 0) {
+        if (desde!=null && hasta!=null) {
          this.store.dispatch(new LoadingHistorialBuques());
-         this.store.dispatch(new GetObtenerHistorialBuques(anio, mes, vaporId, buque, destino, exportador, 
+         this.store.dispatch(new GetObtenerHistorialBuques( vaporId, buque, destino, exportador, 
           control, desde, hasta, producto)).subscribe(result => {
           this.setListaHistorialBuques();
          });
@@ -225,6 +218,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       nombreBuque     : nombreBuque,
       esLiquido       : esLiquido
     }
+    localStorage.removeItem("embarqueBuque");
     localStorage.setItem("embarqueBuque", JSON.stringify(embarqueBuque));
     
     this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
@@ -236,7 +230,12 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.filtroBuquedaForm.controls.vaporId.setValue(vaporId);
     this.filtroBuquedaForm.controls.moduloDeCargaId.setValue(moduloDeCargaId);
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
-    this.route.navigate([`buques/operatoria/${vaporId}//${embarqueId}/buques`]);
+    const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = {
+      embarqueId: embarqueId,
+      actualizarDatos: this.esResumenOperatoria? true : false
+    };
+    this.buqueSharingService.setActualizarResumenOperatoria(resumenOperatoriaEmbarque);
+    this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
   }
   // #endregion
 

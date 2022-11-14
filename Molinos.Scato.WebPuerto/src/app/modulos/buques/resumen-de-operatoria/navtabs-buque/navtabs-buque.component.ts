@@ -14,6 +14,8 @@ import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 
 @Component({
   selector: 'app-navtabs-buque',
@@ -30,21 +32,33 @@ export class NavtabsBuqueComponent implements OnInit {
   vistaSeleccionada: string = 'lineup-tab';
   cargandoInformacion: boolean = false;
   moduloDeCargaManosDeEmbarque;
-
+  
   constructor(private moduloCargaService: ModuloDeCargaService, 
               private procesoService: DatosEmbarquesProcesoService,
               private balanzas78Service: Balanzas78Service,
               private turnosService: TurnosService,
               private planoDeCargaService: PlanoDeCargaService,
               private calidadSharedService: CalidadSharedService,
-              private embarqueSharingService: EmbarqueSharingService) { }
+              private buqueSharingService: BuqueSharingService,
+              private embarqueSharingService: EmbarqueSharingService) { 
+    
+    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+      const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
+      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
+        if (resumenOperatoriaEmbarque.actualizarDatos)
+          this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(res =>{
+            this.paramEmbarqueSel = res;
+          });
+          this.onClickHandlerClient('lineup-tab');
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.setCargarEmbarquesWorklow();
   }
 
   private setCargarEmbarquesWorklow(){   
-    console.log('Ini setCargarEmbarquesWorklow..>', this.paramEmbarqueSel, new Date());
       let embarqueItem:EmbarqueNav = new EmbarqueNav();
       let embarqueList:EmbarqueNav[] = new Array();
       embarqueItem.cargado = true;
@@ -59,27 +73,20 @@ export class NavtabsBuqueComponent implements OnInit {
       this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
       this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
       this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
-      console.log('Fin setCargarEmbarquesWorklow..>', this.paramEmbarqueSel, new Date());
       this.setCargarEmbarquesPlanillas();
   }
 
   private setCargarEmbarquesPlanillas(){
-    this.cargandoInformacion = true;
-    console.log('Fin setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
-    
+    this.cargandoInformacion = true;   
     this.planoDeCargaService.obtenerPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id).subscribe(res => {
       this.turnosService.setExportadores(res.cargasComerciales);
       this.turnosService.setBodega(res.planoDeCargaBodegas);
-      console.log('3 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
     });
     this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
-    console.log('4 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
-    
+   
     this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id).subscribe( res => {
         this.procesoService.setModuloDeCarga(res);
-        console.log('2 setCargarEmbarquesPlanillas..>', this.paramEmbarqueSel, new Date());
         this.cargandoInformacion = false;
-        console.log('5 -->', res.moduloDeCargaManosDeEmbarque)
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.moduloDeCargaManosDeEmbarque = res.moduloDeCargaManosDeEmbarque;
           this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
@@ -104,21 +111,18 @@ export class NavtabsBuqueComponent implements OnInit {
     this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id)
       .subscribe(res => {
         if (res !== undefined || res !== null) {
-          console.log('res--->>>')
-          console.log(this.umapComponent)
+
           if (res.moduloDeCargaUmap.length > 0)
             this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
           
           if (res.moduloDeCargaPeriodoDeCarga.length > 0)
             this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
-          
         }
       });
   }
-
  
   onClickHandlerClient(idElemento: string) {
-
+    console.log('entroooooooo onClickHandlerClient', this.paramEmbarqueSel)
     this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
     var idElementoModif = idElemento.slice(0, -4);
     this.vistaSeleccionada = idElemento;
@@ -133,14 +137,15 @@ export class NavtabsBuqueComponent implements OnInit {
       elementoDeseleccionado.classList.remove("show");
 
     var elementoSeleccionado = document.getElementById(idElemento);
-    elementoSeleccionado.classList.add("active");
+      if (elementoSeleccionado != null)
+        elementoSeleccionado.classList.add("active");
+
     var elementoSeleccionado = document.getElementById(idElementoModif);
-    elementoSeleccionado.classList.add("active");
-    var elementoSeleccionado = document.getElementById(idElementoModif);
-    elementoSeleccionado.classList.add("show");
-    console.log('this.paramEmbarqueSel-->>');
-    console.log(this.paramEmbarqueSel);
-    
+      if (elementoSeleccionado != null){
+        elementoSeleccionado.classList.add("active");
+        elementoSeleccionado.classList.add("show");
+      }
+
     if (this.vistaSeleccionada == 'op-tablero-tab') {
       if (this.esEmbarqueLiquido) {
         this.setCargarPeriodoDeCarga();
@@ -150,7 +155,6 @@ export class NavtabsBuqueComponent implements OnInit {
     }
     
     if (this.vistaSeleccionada === 'recibidores-tab'){
-      console.log('this.moduloDeCargaManosDeEmbarque--->>', this.moduloDeCargaManosDeEmbarque)
       this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
       this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
     }
