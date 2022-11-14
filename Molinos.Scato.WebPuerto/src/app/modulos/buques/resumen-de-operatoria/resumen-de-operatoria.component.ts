@@ -91,8 +91,10 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   ngOnInit(): void {
     this.initOperatoria();
     this.browserRefresh = browserRefresh;
-    if (this.browserRefresh)
+    if (this.browserRefresh){
+      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
       this.cargarValoresHistorial();
+    }
   }
   // #endregion
 
@@ -137,7 +139,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.idEmbarqueOp = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
     this.idVaporOp = parseInt(this.route.snapshot.paramMap.get('vaporid'));
     this.cargarParametros();
-       this.buqueSharingService.getFiltroBusques().subscribe(data => {
+       this.buqueSharingService.getFiltroFormulario().subscribe(data => {
       if (data !== undefined) {
         if (data !== null) {
           this.filtroBuquedaForm = data;
@@ -168,7 +170,6 @@ export class ResumenDeOperatoriaComponent implements OnInit {
         control: '',
         nombreExportador: ''
       })
-      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     }
   }
   private obtenerInformacionEmbarque(){
@@ -206,7 +207,6 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   private initOperatoria() {
     this.mostrarInformacion = false;
     if (this.embarqueBuqueSel != null && this.embarqueBuqueSel !=undefined) {
-      console.log('embarqueBuqueSel--->>', this.embarqueBuqueSel)
       this.nombreBuque = this.embarqueBuqueSel.nombreBuque;
       this.esEmbarqueLiquido = this.embarqueBuqueSel.esLiquido;
     }else{
@@ -227,12 +227,12 @@ export class ResumenDeOperatoriaComponent implements OnInit {
       }
       this.mostrarInformacion = true;
     });
-    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
+    
   }
 
   private limpiarFiltrosHistorial() {
     if (this.filtroBuquedaForm != null) {
-      this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
+      this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(false);
       this.filtroBuquedaForm.controls.esBusqueda.setValue(false);
       this.filtroBuquedaForm.controls.esDetalle.setValue(false);
       this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(false);

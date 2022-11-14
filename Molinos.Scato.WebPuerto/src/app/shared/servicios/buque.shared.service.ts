@@ -11,6 +11,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class BuqueSharingService {
 
   // #region Variables  
+  private filtroFormularioSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private filtroBusquesSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private listadoBuquesSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private embarqueSeleccionadoSubject: BehaviorSubject<ResumenOperatoriaEmbarque> = new BehaviorSubject<ResumenOperatoriaEmbarque>(null);
@@ -28,7 +29,12 @@ export class BuqueSharingService {
   public setFiltroBusques(filtroBuque: FormGroup) {
     this.filtroBusquesSubject.next(filtroBuque);
   }
-
+  public getFiltroFormulario() {
+    return this.filtroFormularioSubject.asObservable();
+  }
+  public setFiltroFormulario(filtroFormulario: FormGroup) {
+    this.filtroFormularioSubject.next(filtroFormulario);
+  }
   public getListadoBuques() {
     return this.listadoBuquesSubject.asObservable();
   }

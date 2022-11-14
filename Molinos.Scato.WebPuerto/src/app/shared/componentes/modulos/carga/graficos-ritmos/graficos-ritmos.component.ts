@@ -47,15 +47,11 @@ export class GraficosRitmosComponent implements OnInit {
     this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
       if (data!= null && data!= undefined){
         this.moduloDeCargaId = data.moduloDeCarga_Id;
-        this.cargarTurnosBalanzas();
       }
     })
   }
 
   ngOnInit(): void {
-    if (this.enBuque){
-      this.cargarTurnosBalanzas();
-    }
     this._parametros.obtenerParametro("tiempoActualizacionRelojes").subscribe((res: Parametros) => {
       this.tiempoActualizacionRelojes = res.parametro2 != null && res.parametro2 > 0? res.parametro2 : 0;
       this.cargarTurnosBalanzas();
@@ -67,10 +63,17 @@ export class GraficosRitmosComponent implements OnInit {
       this.moduloDeCargaId = this._procesoService.getModuloDeCargaId(); 
     
     this.moduloDeCargaId = (this.moduloDeCargaId == null || this.moduloDeCargaId == undefined) ? 0 : this.moduloDeCargaId;
-    if (this.liquido)
-      this.subscribeTurnos();
-    else
-      this.subscribeBalanzas();
+    if (this.enBuque){
+      if (this.liquido)
+        this.setRitmosRelojesLiquidos();
+        else
+        this.setRitmosRelojesSolidos();
+    }else{
+      if (this.liquido)
+        this.subscribeTurnos();
+        else
+        this.subscribeBalanzas();
+    }
   }
 
   subscribeTurnos() { 
@@ -83,9 +86,9 @@ export class GraficosRitmosComponent implements OnInit {
 
     if(this.moduloDeCargaId > 0){
       this.setRitmosRelojesLiquidos();    
-      setInterval(() => {
-        this.setRitmosRelojesLiquidos();    
-      }, this.tiempoActualizacionRelojes > 0 ? this.tiempoActualizacionRelojes: 15000)      
+        setInterval(() => {
+          this.setRitmosRelojesLiquidos();    
+        }, this.tiempoActualizacionRelojes > 0 ? this.tiempoActualizacionRelojes: 15000);
     }
     
     this._turnosService.sendTnTotal.subscribe(res => {
@@ -97,9 +100,9 @@ export class GraficosRitmosComponent implements OnInit {
     if(this.moduloDeCargaId > 0)
     {   
       this.setRitmosRelojesSolidos();    
-      setInterval(() => {
-        this.setRitmosRelojesSolidos();    
-      }, this.tiempoActualizacionRelojes > 0 ? this.tiempoActualizacionRelojes: 15000)      
+        setInterval(() => {
+          this.setRitmosRelojesSolidos();    
+        }, this.tiempoActualizacionRelojes > 0 ? this.tiempoActualizacionRelojes: 15000);
     }
 
     this._procesoService.sendTotalPlanoDeEmbarque.subscribe(res => {
