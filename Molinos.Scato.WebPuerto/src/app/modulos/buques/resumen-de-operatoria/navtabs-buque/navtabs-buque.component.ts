@@ -82,18 +82,22 @@ export class NavtabsBuqueComponent implements OnInit {
       this.turnosService.setExportadores(res.cargasComerciales);
       this.turnosService.setBodega(res.planoDeCargaBodegas);
     });
-    this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
    
     this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id).subscribe( res => {
         this.procesoService.setModuloDeCarga(res);
         this.cargandoInformacion = false;
-        if (res.moduloDeCargaManosDeEmbarque.length > 0) {
+        if (res.moduloDeCargaManosDeEmbarque.length > 0 && !this.paramEmbarqueSel.esLiquido) {
           this.moduloDeCargaManosDeEmbarque = res.moduloDeCargaManosDeEmbarque;
           this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
           this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
         }
     });
-    this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
+    
+    if (!this.paramEmbarqueSel.esLiquido){
+      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
+      this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
+    }
+
   }
   
   private setCargarPeriodoDeCarga() {
@@ -122,7 +126,6 @@ export class NavtabsBuqueComponent implements OnInit {
   }
  
   onClickHandlerClient(idElemento: string) {
-    console.log('entroooooooo onClickHandlerClient', this.paramEmbarqueSel)
     this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
     var idElementoModif = idElemento.slice(0, -4);
     this.vistaSeleccionada = idElemento;

@@ -50,9 +50,8 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.getMesActual();
     this.getAnioActual();   
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
-    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
-    //this.setCargarFiltroBusqueda();
-
+    if (!this.filtroBuquedaForm.controls.esResumenOperatoria.value)
+      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
 
   ngOnDestroy() {
@@ -141,20 +140,6 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   public getListaProductos() {
     return this.listaProductos;
   }
-
-  public setCargarFiltroBusqueda() {
-    this.buqueSharingService.getFiltroBusques().subscribe(data => {
-      if (data != undefined) {
-        const esLimpiarBusqueda = data.controls.esLimpiarBusqueda.value;
-        if (esLimpiarBusqueda) {
-          this.filtroBuquedaForm.controls.anio.setValue('');
-          this.filtroBuquedaForm.controls.mes.setValue('');
-          this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
-        }
-      }
-    });
-  }
-
   // #endregion 
 
   // #region Eventos Controles

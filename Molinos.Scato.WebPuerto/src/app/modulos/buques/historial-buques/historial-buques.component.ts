@@ -80,25 +80,21 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.setValue(false);
       return;
     }
-
     if (this.esResumenOperatoria){
       this.setObtenerHistorialBuques();
+    }else{
+      if (esBusqueda && !esLimpiarBusqueda) {
+        const desde = this.filtroBuquedaForm?.controls.desde?.value;
+        const hasta = this.filtroBuquedaForm?.controls?.hasta.value;
+        this.listaHistorialBuques = null;
+        this.listaHistorialBuquesFiltro = null;
+  
+        if (desde > '' && hasta > '') {
+          this.setObtenerHistorialBuques();
+        }
+      }
     }
-    if (esBusqueda && !esLimpiarBusqueda) {
-      const desde = this.filtroBuquedaForm?.controls.desde?.value;
-      const hasta = this.filtroBuquedaForm?.controls?.hasta.value;
-      this.listaHistorialBuques = null;
-      this.listaHistorialBuquesFiltro = null;
 
-      if (desde > '' && hasta > '') {
-        this.setObtenerHistorialBuques();
-      }
-    } else {
-      if (this.listaHistorialBuquesFiltro != null) {
-        this.listaHistorialBuques = JSON.parse(JSON.stringify(this.listaHistorialBuquesFiltro));
-        this.setCargarPaginas();
-      }
-    }
   }
 
   private setObtenerHistorialBuques() {
@@ -175,7 +171,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
               item.productoExportador = result;
             }
           });
-
           const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
           if (mostrarPorEmbarque) {
             this.listaHistorialBuques = data.filter(x => x.embarqueId == this.filtroBuquedaForm.controls.embarqueId.value);
@@ -229,12 +224,12 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.filtroBuquedaForm.controls.embarqueId.setValue(embarqueId);
     this.filtroBuquedaForm.controls.vaporId.setValue(vaporId);
     this.filtroBuquedaForm.controls.moduloDeCargaId.setValue(moduloDeCargaId);
-    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = {
       embarqueId: embarqueId,
       actualizarDatos: this.esResumenOperatoria? true : false
     };
     this.buqueSharingService.setActualizarResumenOperatoria(resumenOperatoriaEmbarque);
+    this.buqueSharingService.setFiltroFormulario(this.filtroBuquedaForm);
     this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
   }
   // #endregion
