@@ -1,18 +1,18 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
-import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-fechas-ritmos',
   templateUrl: './fechas-ritmos.component.html',
   styleUrls: ['./fechas-ritmos.component.css']
 })
-export class FechasRitmosComponent implements OnInit, AfterViewInit {
+export class FechasRitmosComponent implements OnInit {
   //#region variables
   moduloDeCargaId: number = 0;
   embarqueId: number;
@@ -31,18 +31,21 @@ export class FechasRitmosComponent implements OnInit, AfterViewInit {
     private balanzas78Service: Balanzas78Service,
     private route: ActivatedRoute,
     private buqueService: BuqueService,
+    private buqueSharingService: BuqueSharingService,
     private embarqueSharingService: EmbarqueSharingService,
   ) {
     this.enBuque = true;
-    this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));  
+    this.cargarParametros();  
     
     this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data =>{
-      this.moduloDeCargaId = data.moduloDeCarga_Id;
-      this.embarqueId = data.embarque_Id;
-      this.liquido = data.esLiquido;
-      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
+      if (data!=null && data!= undefined){
+        this.moduloDeCargaId = data.moduloDeCarga_Id;
+        this.embarqueId = data.embarque_Id;
+        this.liquido = data.esLiquido;
+        this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
+        this.embarqueSharingService.setEmbarqueId(this.embarqueId); 
+      }
     });
-    this.embarqueSharingService.setEmbarqueId(this.embarqueId);                      
     this.vaporId = parseInt(this.route.snapshot.paramMap.get('vaporid'));      //consigo el vaporID que esta en la ruta y lo seteo
   }
 
@@ -51,9 +54,17 @@ export class FechasRitmosComponent implements OnInit, AfterViewInit {
 
 
   ngOnInit(): void {
-    console.log('Iniciaa componente FechasRitmosComponent');
     this.initRegistroFechas();
     this.initRitmos()
+  }
+  private cargarParametros(){
+    this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
+    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+      const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
+      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
+        this.embarqueId = resumenOperatoriaEmbarque.embarqueId;
+      }
+    });
   }
   //obtengo las fechas para la linea temporal que luego seteo en el HTML
   initRegistroFechas(){
@@ -75,9 +86,5 @@ export class FechasRitmosComponent implements OnInit, AfterViewInit {
     this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
     this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
   }
-  ngAfterViewInit(): void {
-    console.log('Terminar componente FechasRitmosComponent');
-  }
-
   //#endregion
 }

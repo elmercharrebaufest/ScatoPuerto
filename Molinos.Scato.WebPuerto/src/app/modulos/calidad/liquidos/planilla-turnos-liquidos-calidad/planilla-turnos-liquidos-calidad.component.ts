@@ -128,7 +128,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
         this.setCargarFormularioPlanilla();
     }else{
         this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data=>{
-          this.embarqueId = data.embarque_Id;
+          if (data!= null && data!= undefined)
+            this.embarqueId = data.embarque_Id;
         });
         this.setCargarFormularioPlanilla();
     }
