@@ -19,12 +19,13 @@
             <h3>
               Desde: {{ registroFechas.limpiezaDesde }}hs <br>Hasta:
               {{ registroFechas.limpiezaHasta }}hs
-            </h3>
-            <p>
-              <span *ngIf="tieneMotivoLimpieza">Motivo: {{ registroFechas.motivoLimpieza}}</span>
-                  <br>
-              <span  *ngIf="tieneObsLimpieza">Observación: {{ registroFechas.obsLimpieza }}</span>
-            </p>
+            </h3>            
+          </li>
+          <li *ngIf="tieneLimpieza" class="motivoYObservacion" data-date="Motivo">
+            <h3> {{ registroFechas.motivoLimpieza }}</h3>
+          </li>
+          <li *ngIf="tieneLimpieza" class="motivoYObservacion" data-date="Observación">
+            <h3> {{ registroFechas.obsLimpieza }}</h3>
           </li>
           <li class="event" data-date="Comienza Carga">
             <h3>{{ registroFechas.cominezoCarga }}hs</h3>
