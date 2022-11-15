@@ -37,7 +37,7 @@
                 <tbody *ngFor="let operador of operadores">
                     <tr>
                         <td>
-                            {{operador.fecha}}
+                            {{operador.fecha | date: 'dd/MM/yyyy'}}
                         </td>
                         <td>
                             {{operador.usuario}}
