@@ -200,6 +200,12 @@ export class AltaEmbarqueComponent implements OnInit {
     }, err => { console.log(err); });
   }
 
+  actualizarListaDeVapores(event){
+    console.log('event-->>', event);
+    this.buqueService.obtenerVapores().subscribe(res => {
+      this.vaporesList = res;
+    });
+  }
   cargarEmbarqueEditar() {
     if (!this.tipoDeBuquePuerto)
       this.embarqueService.obtenerListadoTipoDeBuquePuerto().subscribe(res => { this.tipoDeBuquePuerto = res; });
