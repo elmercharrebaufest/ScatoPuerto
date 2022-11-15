@@ -105,7 +105,7 @@ export class ArchivosComponent implements OnInit {
   }
 
   openAddFilesModal(Modal: any){
-    this.listArchivosToSave = [];
+    this.listArchivosToSave = this.listArchivos;
     this.embarqueService.obtenerTipoArchivos().subscribe((res : TipoArchivoPuerto[]) => {this.TipoArchivosDbList = res}); 
     this._modalService.open(Modal);
   }
@@ -160,7 +160,7 @@ export class ArchivosComponent implements OnInit {
     .then((confirmed) => {
       if (confirmed) {
         this.embarqueService.guardarArchivos(this.idEmbarque, this.listArchivosToSave).subscribe(res => {
-          this.listArchivos.push(...this.listArchivosToSave);
+          this.listArchivos = this.listArchivosToSave;
           this._modalService.dismissAll();
         })          
       }
