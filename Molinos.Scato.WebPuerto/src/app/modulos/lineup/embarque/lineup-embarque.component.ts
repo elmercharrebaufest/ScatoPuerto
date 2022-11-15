@@ -24,6 +24,7 @@ import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service'
 import * as htmlToImage from 'html-to-image';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import { UbicacionBuquePuerto } from '@ScatoEnums/ubicacion-buque-puerto';
+import { ErroresGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geolocalizacion';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -36,8 +37,9 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
   @Input() ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
+  @Input() listadoEmbarques: InstanciaWorkflowPuerto[];
+  @Input() listaErroresEmbarques: ErroresGeolocalizacion[];
 
-  
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
   showMenu = false;
@@ -105,15 +107,17 @@ export class LineupEmbarqueComponent implements OnInit {
     this.hayBuque = false;
     const embarquePosicion = this.buquesGeolocalizacion.embarque?.embarquePosicion;
     if (embarquePosicion.length == 0) {
-      this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(id).subscribe(errores =>{
+      const errores = this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(this.listaErroresEmbarques ,id);
+        console.log('errores-->>',errores)
         if (errores != null){
           this.mensajeBuque = errores.mensaje;
           this.hayBuque =  false;
         }else{
+          console.log('this.buquesGeolocalizacion.embarque-->>', this.buquesGeolocalizacion.embarque)
           this.mensajeBuque = "No se encontró. Completar IMO";
           this.hayBuque =  false;
         }
-      });
+      
     }else{
       this.mensajeBuque = "Ver en el mapa."
       this.hayBuque =  true;
@@ -229,9 +233,7 @@ export class LineupEmbarqueComponent implements OnInit {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
       if (accion == UbicacionBuquePuerto.MuelleDeCarga) {
-        this.workflowService.obtenerListado().subscribe(
-          listado => {
-            if (this.BarcoEnMuelleActualmente(listado)) {
+            if (this.BarcoEnMuelleActualmente(this.listadoEmbarques)) {
               this.confirmationDialogService.confirm('¡Error!', 'Actualmente ya se encuentra otro buque en muelle', 'Cerrar', '', null, null, Tipoalerta.Error);
               return;
             }
@@ -239,8 +241,6 @@ export class LineupEmbarqueComponent implements OnInit {
               this.mostrarSpinnerCaptura = true;
               this.actualizarUbicacion(accion);
             }
-          }
-        );
       }
       /**Zarpó**/
       else if (accion == UbicacionBuquePuerto.Zarpo) {
@@ -295,7 +295,7 @@ export class LineupEmbarqueComponent implements OnInit {
     divLineUpAcciones.classList.add('ocultar-division')
     let base64data='';
     htmlToImage.toPng(divEmbarqueLineUp, { 
-          quality: 1,
+          quality: 0.8,
           backgroundColor: '#ffffff',
         })
         .then(function (url) {

@@ -2759,7 +2759,7 @@ namespace Molinos.Scato.Servicios
         IList<InstanciaWorkflowPuertoDto> ListarEmbarques();
 
         [OperationContract]
-        IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
+        ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
 
         [OperationContract]
         IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);

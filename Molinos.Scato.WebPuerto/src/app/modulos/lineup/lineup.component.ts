@@ -23,6 +23,9 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { Embarque } from '@ScatoModels/embarque';
+import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
+import { EmbarqueGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geolocalizacion-embarque';
+import { ErroresGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geolocalizacion';
 
 @Component({
   selector: 'app-lineup',
@@ -33,6 +36,7 @@ import { Embarque } from '@ScatoModels/embarque';
 export class LineupComponent implements OnInit, Observador {
   mostrarSpinner: boolean = true;
   mostrarContent: boolean = false;
+  mostrarErroresGeolocalizacion: boolean = false;
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
   sanBenito: InstanciaWorkflowPuerto[];
   sanBenitoCargandoMuelle: InstanciaWorkflowPuerto;
@@ -56,6 +60,7 @@ export class LineupComponent implements OnInit, Observador {
   estadoSanBenitoLp: string;
   estadoOtrosLp: string;
   embarqueCapturaLineUp: Embarque;
+  listaErroresEmbarques: ErroresGeolocalizacion[];
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -68,7 +73,8 @@ export class LineupComponent implements OnInit, Observador {
     private parametrosService: ParametrosService,
     private session: SessionService,
     private auth: AutenticadorService,
-    private embarqueSharingService: EmbarqueSharingService
+    private embarqueSharingService: EmbarqueSharingService,
+    private geolocalizacionService: GeolocalizacionService
 
   ) {
     this.auth.renovarAuthUsuario();
@@ -124,6 +130,7 @@ export class LineupComponent implements OnInit, Observador {
       .subscribe(
         ret => {
           this.listadoEmbarques = ret;
+
           this.fechaActualizacion = new Date();
           if (!blockUI) {
             setTimeout(x => this.cargarWorkflows(), 120000);
@@ -131,12 +138,26 @@ export class LineupComponent implements OnInit, Observador {
         },
         errmess => this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error)),
         () => {
+          this.filtrarMuelles();
           this.mostrarContent = true;
           this.mostrarSpinner = false;
-          this.filtrarMuelles();
-          console.log('FIN LINEUP ', new Date())
+          this.cargarErroresGeolocalizacion();
+          console.log('FIN LINEUP ', new Date());
         }
       );
+  }
+
+  private cargarErroresGeolocalizacion(){
+    let listaEmbarques:EmbarqueGeolocalizacion[] = new Array<EmbarqueGeolocalizacion>();
+    this.listadoEmbarques.forEach(item =>{
+      listaEmbarques.push(new EmbarqueGeolocalizacion(item.embarque.id));
+    });
+    this.geolocalizacionService.ListarErroresGeolocalizacionPorEmbarque(listaEmbarques).subscribe(errores =>{
+      this.listaErroresEmbarques = errores;
+    }, error => {}
+     , ()=>{
+      this.mostrarErroresGeolocalizacion = true;
+     });
   }
 
   filtrarMuelles() {
