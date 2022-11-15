@@ -12050,10 +12050,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        public IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
+        public ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
         {
             IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x => x.Embarque_id == idEmbarque).OrderByDescending(x => x.FechaError).ToList();
-            return erroresGeolocalizacion;
+            ErroresGeolocalizacionDto erroreGeolocalizacion = null;
+            if (erroresGeolocalizacion != null && erroresGeolocalizacion.Count > 0)
+                erroreGeolocalizacion = erroresGeolocalizacion[0];
+            return erroreGeolocalizacion;
         }
         private void CompletarDatosHistorialDeEmbarque(List<HistorialDeBusquesDto> historialDeBusquesDto)
         {
