@@ -82,6 +82,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   destinoPuerto: Destino[];
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
+  totalABordo:number=0;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -113,7 +114,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.fillPlanilla();
     }, 2000);
     this.initFormularioObs();
-  }  
+  }
 
   private setCargarValoresPlanilla(){
     this.user = this.session.getUser();
@@ -282,7 +283,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
-        element.fechaMiliseconds = new Date(element.fecha).getTime();       
+        element.fechaMiliseconds = new Date(element.fecha).getTime();
       });
 
       // Ordenamos los turnos por fecha y turno correspondiente
@@ -523,14 +524,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     const observacionesCalidad = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad  as FormArray;
     let listaObservacionesCalidad = observacionesCalidad.value;
 
-    for(let observacion of listaObservacionesCalidad){ 
+    for(let observacion of listaObservacionesCalidad){
       observacion.fechaMiliseconds = new Date(observacion.fechaHora).getTime();
     }
 
     listaObservacionesCalidad = listaObservacionesCalidad.sort((a, b) => {
       return (a.fechaMiliseconds - b.fechaMiliseconds);
     });
-    
+
     return listaObservacionesCalidad;
   }
 
@@ -699,7 +700,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       this.formCorte.get('tiempoTotal').setValue(`${total.getHours() < 10 ? '0' + total.getHours() : total.getHours()}:${total.getMinutes() < 10 ? '0' + total.getMinutes() : total.getMinutes()}`)
   }
 
-  
+
   getRowSpan(dia: any) {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
@@ -781,6 +782,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       contador += this.getCantDia(dia);
       contador = parseInt(contador.toString());
     }
+    this.totalABordo =contador;
     return contador;
   }
 
@@ -1033,7 +1035,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo);
     this.exportaPlanilla = false;
   }
 
@@ -1060,7 +1062,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
       }
-    }, error=>{}, 
+    }, error=>{},
     ()=>{
 
       const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
@@ -1070,11 +1072,11 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       planillaDeTurnosRecibidores.forEach(item => {
         item.fechaMiliseconds = new Date(item.fecha).getTime()
       });
-      
+
       planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
       if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
-        if (planillaDeTurnosRecibidores.length > 0) 
-            bResultado = true;         
+        if (planillaDeTurnosRecibidores.length > 0)
+            bResultado = true;
       }
 
       subjectTurnosNoCerrados.next(bResultado)
@@ -1141,7 +1143,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       }
 
       this.validaTurnosNoCerrados(Turno).subscribe( resp =>{
-        
+
         const existeTurno = resp;
         let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
         mensaje += " turnos anteriores que aun no se han sido cerrados.";

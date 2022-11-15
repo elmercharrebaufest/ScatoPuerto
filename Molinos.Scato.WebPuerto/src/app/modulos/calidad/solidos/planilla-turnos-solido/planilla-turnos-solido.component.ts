@@ -67,6 +67,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   exportaPlanilla: boolean = false;
+  totalABordo : number=0;
 
   constructor(
     private _builder: FormBuilder,
@@ -200,7 +201,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
                 } else {
                   diaTurnoToAdd = 0;
-                  ///this.setDia(fechaSeleccionada, turnoNuevo, fechaSeleccionada)  
+                  ///this.setDia(fechaSeleccionada, turnoNuevo, fechaSeleccionada)
                   //this.setTurno(diaTurnoToAdd,turnoNuevo, true);
                   this.setDia(null, turnoNuevo, fechaSeleccionada)
 
@@ -411,7 +412,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
       }
-    }, error=>{}, 
+    }, error=>{},
     ()=>{
       const fechaMiliseconds = turnoSel.value.turnoPuerto.fechaMiliseconds;
       const turnoSelId = turnoSel.value.id;
@@ -420,11 +421,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       planillaDeTurnosRecibidores.forEach(item => {
         item.fechaMiliseconds = new Date(item.fecha).getTime()
       });
-      
+
       planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
       if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
-        if (planillaDeTurnosRecibidores.length > 0) 
-            bResultado = true;         
+        if (planillaDeTurnosRecibidores.length > 0)
+            bResultado = true;
       }
 
       subjectTurnosNoCerrados.next(bResultado)
@@ -433,7 +434,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   guardarTurnoDetallado(turnoSeleccionado: any){
-    const idPlanillaDeTurnos = turnoSeleccionado['controls'].id.value; 
+    const idPlanillaDeTurnos = turnoSeleccionado['controls'].id.value;
     this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
     .then((confirmed) => {
       if (confirmed) {
@@ -458,7 +459,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     });
   }
 
-  onCerrarTurno (turnoSeleccionado: any) {   
+  onCerrarTurno (turnoSeleccionado: any) {
     this.validaTurnosNoCerrados(turnoSeleccionado).subscribe( resp =>{
       const existeTurno = resp;
       let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
@@ -708,7 +709,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   getRowSpan(dia: any) {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
-      contador += this.getRowSpanTurnoCalc(turnos);      
+      contador += this.getRowSpanTurnoCalc(turnos);
     }
     contador += 1;
     return contador;
@@ -731,7 +732,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
     let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
     let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
-    
+
     registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
     registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
     registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
@@ -783,7 +784,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       contador += Math.ceil(this.getCantDia(dia));
     }
     contador = Math.round(contador)/1000;
-    contador = parseInt(contador.toString());    
+    contador = parseInt(contador.toString());
+    this.totalABordo = contador;
     return contador;
   }
 
@@ -1008,7 +1010,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService,  this.planillaDeTurnos, esEnviarPlanilla);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService,  this.planillaDeTurnos, esEnviarPlanilla, this.totalABordo);
     this.exportaPlanilla = false;
   }
 
