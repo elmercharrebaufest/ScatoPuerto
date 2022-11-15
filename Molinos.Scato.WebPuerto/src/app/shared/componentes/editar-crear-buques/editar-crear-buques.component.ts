@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -22,6 +22,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 export class EditarCrearBuquesComponent implements OnInit {
 
   // #region Variables
+  @Output() actualizarListaVapores = new EventEmitter();
   errorMessage: boolean = false;
   editarBuque: boolean = false;
   crearEditarBuqueForm: FormGroup;
@@ -35,6 +36,8 @@ export class EditarCrearBuquesComponent implements OnInit {
   listadoBanderasModificadas: boolean = false;
   vaporInfoBD: VaporInformacion;
   vaporInformacion: VaporInformacion;
+  mostrarSpinner: boolean = false;
+  mensajeBuque: string = '';
   // #endregion
 
   // #region Constructor
@@ -45,19 +48,19 @@ export class EditarCrearBuquesComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private buqueService: BuqueService,
   ) {
-
+    this.initFormCrearEditarBuque();
   }
   // #endregion
 
   // #region Eventos del Componente
   ngOnInit(): void {
-    this.initFormCrearEditarBuque();
     this.initListas();
   }
   // #endregion
 
   // #region Metodos
   private initFormCrearEditarBuque() {
+    this.crearEditarBuqueForm = null;
     this.crearEditarBuqueForm = this.formBuilder.group({
       nombreBuque: ['', Validators.required],
       tipoBuque: ['', Validators.required],
@@ -134,6 +137,8 @@ export class EditarCrearBuquesComponent implements OnInit {
   )
 
   public selectedVapor($event) {
+    this.mostrarSpinner = true;
+    this.mensajeBuque = 'Cargando información de buque...............';
     let { id, nombre } = $event.item
     this.editarBuque = true
 
@@ -159,12 +164,18 @@ export class EditarCrearBuquesComponent implements OnInit {
         tipoBuqueBD !== null && this.crearEditarBuqueForm.controls.tipoBuque.setValue(tipoBuqueBD[0]);
         categoriaBuqueBD !== null && this.crearEditarBuqueForm.controls.categoriaBuque.setValue(categoriaBuqueBD[0]);
         this.vaporInfoBD.imoVapor !== null && this.crearEditarBuqueForm.controls.imoVapor.setValue(this.vaporInfoBD.imoVapor);
+
       }
-    })
+    }, error => {}
+     , () => {
+      this.mostrarSpinner = false;
+      this.mensajeBuque = '';
+     })
   }
 
   public openModalEditarCrearBuque(modal: any) {
     this.errorMessage = false;
+    this.initFormCrearEditarBuque();
     this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
   }
 
@@ -173,6 +184,7 @@ export class EditarCrearBuquesComponent implements OnInit {
 
   // #region Eventos Controles
   public onResetForm() {
+    this.submitted = false;
     this.crearEditarBuqueForm.reset();
     this.editarBuque = false
   }
@@ -196,15 +208,27 @@ export class EditarCrearBuquesComponent implements OnInit {
         puntual: buque.puntual,
         cantidadBodegasTks: buque.cantBodegastks,
       }]
+      
+      if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid || 
+          this.crearEditarBuqueForm.controls['tipoBuque'].invalid || 
+          this.crearEditarBuqueForm.controls['bandera'].invalid){
+          this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+          return
+      }
+      this.mostrarSpinner = true;
+      this.mensajeBuque = 'Guardando información de buque';
+    this.buqueService.guardarVaporInformacion(objVapor).subscribe(
+      res => res = objVapor
+    ,error=>{}
+    , () =>{
+      this.mostrarSpinner = false;
+      this.mensajeBuque = '';
+      this.actualizarListaVapores.emit(true);
+      this.onResetForm();
+      this.initListas();
+      this.modalService.dismissAll();
+    });
 
-    this.buqueService.guardarVaporInformacion(objVapor).subscribe(res => res = objVapor);
-
-    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid || this.crearEditarBuqueForm.controls['tipoBuque'].invalid || this.crearEditarBuqueForm.controls['bandera'].invalid) {
-      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-      return
-    }
-    this.modalService.dismissAll();
-    this.onResetForm();
   }
 
   public onCrearBuque() {
@@ -228,19 +252,26 @@ export class EditarCrearBuquesComponent implements OnInit {
         cantidadBodegasTks: buque.cantBodegastks,
       }
     ]
-
-    // console.log(objVapor);
-    this.buqueService.guardarVaporInformacion(objVapor).subscribe(res => res = objVapor);
-
-    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid || this.crearEditarBuqueForm.controls['tipoBuque'].invalid || this.crearEditarBuqueForm.controls['bandera'].invalid)
-    // if(this.crearEditarBuqueForm.controls['nombreBuque'].invalid || this.crearEditarBuqueForm.controls['tipoBuque'].invalid)
-    {
-      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-
-      return
+    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid || 
+        this.crearEditarBuqueForm.controls['tipoBuque'].invalid || 
+        this.crearEditarBuqueForm.controls['bandera'].invalid){
+        this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return
     }
-    this.modalService.dismissAll();
-    this.onResetForm()
+    this.mostrarSpinner = true;
+    this.mensajeBuque = 'Guardando información de buque';
+    this.buqueService.guardarVaporInformacion(objVapor).subscribe(
+      res => res = objVapor
+    ,error=>{}
+    , () =>{
+      this.mostrarSpinner = false;
+      this.mensajeBuque = '';
+      this.actualizarListaVapores.emit(true);
+      this.onResetForm();
+      this.initListas();
+      this.modalService.dismissAll();
+    });
+    
   }
   // #endregion
 
