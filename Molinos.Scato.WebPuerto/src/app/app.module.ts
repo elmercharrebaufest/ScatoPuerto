@@ -22,6 +22,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
 import { NgxPermissionsModule, NgxPermissionsService } from 'ngx-permissions';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { InterceptorADService } from './shared/servicios/interceptors/intercepto
       useFactory: adapterFactory,
     }),
     SidebarModule.forRoot(),
+    ToastrModule.forRoot(),
     RouterModule.forRoot(routeConfig),
     NgxsModule.forRoot([
       ProductoState, 

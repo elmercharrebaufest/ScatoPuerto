@@ -173,12 +173,12 @@
                                                     </td>
                                                     <!-- °C -->
                                                     <td><input type="number" formControlName='temperatura'
-                                                            (change)='getCantidadLinea(result)'
+                                                            (focusout)='getCantidadLinea(result)'
                                                             class='planilla-text-derecha'></td>
                                                     <td><input type="text" formControlName='medidaInicialCMyMM'
                                                             (keypress)="validateMedicion($event, result, true)"
                                                             (focusout)="setMediciones(result, true)"
-                                                            (blur)='getCantidadLinea(result)'
+                                                            
                                                             class='planilla-text-derecha'></td>
                                                     <!-- <td><input type="number" formControlName='medidaInicialMM'
                                                             (blur)='getCantidadLinea(result)'
@@ -186,7 +186,7 @@
                                                     <td><input type="text" formControlName='medidaFinalCMyMM'
                                                             (keypress)="validateMedicion($event, result, false)"
                                                             (focusout)="setMediciones(result, false)"
-                                                            (blur)='getCantidadLinea(result)'
+                            
                                                             class='planilla-text-derecha'></td>
                                                     <!-- <td><input type="number" formControlName='medidaFinalMM'
                                                             (blur)='getCantidadLinea(result)'
