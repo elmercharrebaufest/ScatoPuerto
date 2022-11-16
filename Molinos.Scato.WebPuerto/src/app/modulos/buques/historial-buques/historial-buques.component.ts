@@ -84,9 +84,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.setObtenerHistorialBuques();
     }else{
       if (esBusqueda && !esLimpiarBusqueda) {
+        const desde = this.filtroBuquedaForm?.controls.desde?.value;
+        const hasta = this.filtroBuquedaForm?.controls?.hasta.value;
         this.listaHistorialBuques = null;
         this.listaHistorialBuquesFiltro = null;
-        this.setObtenerHistorialBuques();
+  
+        if (desde > '' && hasta > '') {
+          this.setObtenerHistorialBuques();
+        }
       }
     }
 
