@@ -500,7 +500,7 @@ export class PlanillaTurnoLiquidoExcelService {
           });
 
     }
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0) {
+    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
 
       planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
         turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((corte: CorteTurno, index ) => {
@@ -683,10 +683,35 @@ export class PlanillaTurnoLiquidoExcelService {
         worksheet.getCell(`A${baseCell}`).border = borders;
         worksheet.getCell(`A${baseCell}`).font   = {name: 'Arial',family: 2,size: 9,bold: true}
 
-        worksheet.getCell(`B${baseCell}`).value  = totalABordo;
+        worksheet.getCell(`B${baseCell}`).value  = totalABordo + ' tn';
        // worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
         worksheet.getCell(`B${baseCell}`).border = borders;
         worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
+
+
+        baseCell = baseCell + 2;
+        worksheet.mergeCells(`A${baseCell}:B${baseCell}`);
+        worksheet.getCell(`A${baseCell}:B${baseCell}`).value = 'LINEAS';
+        worksheet.getCell(`A${baseCell}:B${baseCell}`).alignment = { horizontal:'center'} ;
+        worksheet.getCell(`A${baseCell}:B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
+        worksheet.getCell(`A${baseCell}:B${baseCell}`).border = borders;
+        worksheet.getCell(`A${baseCell}:B${baseCell}`).font   = {name: 'Arial',family: 2,size: 9,bold: true}
+
+        toneladasLineas.forEach(item => {
+          baseCell = baseCell + 1;
+          worksheet.getCell(`A${baseCell}`).value  = item.linea;
+          worksheet.getCell(`A${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
+          worksheet.getCell(`A${baseCell}`).border = borders;
+          worksheet.getCell(`A${baseCell}`).font   = {name: 'Arial',family: 2,size: 9,bold: true}
+
+          worksheet.getCell(`B${baseCell}`).value  = item.total +' tn';
+         // worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
+          worksheet.getCell(`B${baseCell}`).border = borders;
+          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
+
+
+        });
+
 
         workbook.xlsx.writeBuffer().then((data) => {
           const archivo = fname + '.xlsx'

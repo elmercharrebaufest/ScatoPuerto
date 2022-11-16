@@ -26,6 +26,7 @@ import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { Subject } from 'rxjs';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { createFalse } from 'typescript';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -38,6 +39,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
   formTurnos: FormGroup;
   formCorte: FormGroup;
+  toneladasLineas:any[]=[];
   formNuevoTurno: FormGroup;
   obsCalidadForm: FormGroup;
   formExportarExcel: FormGroup;
@@ -67,7 +69,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   mostrarBtn: boolean = true;
   permisosScato: typeof PermisosScato = PermisosScato;
   fechaHoraInicioCarga: Date;
-
+  totalABordo:number=0;
   embarqueId: number;
   embarque: Embarque;
   vientoAmarre: string;
@@ -136,7 +138,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.controlarPermisos();
     }, 3000);
   }
-  
+
   private obtenerTipoLineaEmbarque() {
     this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
       this.tipoLineaEmbarque = res;
@@ -333,7 +335,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   fillPlanilla() {
-    
+
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
     this.lineaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
     this.diasTurno.clear();
@@ -845,7 +847,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const horaFin = this.formCorte.getRawValue().horaFin;
     let motivosDeCorte = this.formCorte.getRawValue().motivosDeCorte;
     let observaciones = this.formCorte.getRawValue().observaciones;
-    
+
     if (motivosDeCorte == null) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar un motivo de corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
@@ -1002,6 +1004,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       contador += this.getCantDia(dia);
       contador = parseInt(contador.toString());
     }
+    this.totalABordo =contador;
     return contador;
   }
 
@@ -1221,7 +1224,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     let lineaTurno = linea?.controls;
     let materialPuertoSel = lineaTurno.materialPuerto.value;
-    materialPuertoSel = (materialPuertoSel == undefined || materialPuertoSel == null)? '0' : materialPuertoSel; 
+    materialPuertoSel = (materialPuertoSel == undefined || materialPuertoSel == null)? '0' : materialPuertoSel;
     if (materialPuertoSel == '0')
       lineaTurno.tk.setValue(0);
 
@@ -1289,7 +1292,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   async onExportarExcelLiquido(){
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas);
+    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
+    this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
+    this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
+    this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas,false,  false,this.totalABordo, this.toneladasLineas);
     this.exportaPlanilla = false;
   }
 
@@ -1318,7 +1325,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
     planillaTurno.fecha = turnoFechaHora;
   }
-  
+
   guardarTurno(planillaTurno: PlanillaDeTurnos, reload: boolean = false) {
 
     planillaTurno.fecha = new Date();
@@ -1374,7 +1381,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               this.confirmationDialogService.confirm('¡Atención!', mensajeGuardado, 'Aceptar', '', null, null, Tipoalerta.Success);
               if (enviado)
                 this.enviarRecibidores();
-              
+
               this.recargarTurnosPlanilla();
               this.bGrabandoTurnoActivo = true;
             }, error => {
@@ -1421,7 +1428,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
             else
             lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal?.id && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal?.id);
-            
+
         if (turnoDetalle['controls'].linea.value == undefined || turnoDetalle['controls'].linea.value == null){
           turnoDetalle['controls'].linea.setValue(0)
         }
@@ -1439,7 +1446,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
               return;
             }
-            
+
             let medidaFinalCM = turnoDetalle['controls'].medidaFinalCM.value;
             let medidaFinalMM = turnoDetalle['controls'].medidaFinalMM.value;
             let medidaInicialCM = turnoDetalle['controls'].medidaInicialCM.value;
@@ -1535,7 +1542,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
       if (turnoDetalle['controls'].medidaInicialMM.value != null || turnoDetalle['controls'].medidaInicialMM.value != undefined)
         medidaInicialMM = turnoDetalle['controls'].medidaInicialMM.value;
-      
+
       if (turnoDetalle['controls'].medidaInicialCMyMM.value != null || turnoDetalle['controls'].medidaInicialCMyMM.value != undefined)
         medidaInicialCMyMM = turnoDetalle['controls'].medidaInicialMM.value;
 
@@ -1544,10 +1551,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
       if (turnoDetalle['controls'].temperatura.value != null || turnoDetalle['controls'].temperatura.value != undefined)
         temperatura = turnoDetalle['controls'].temperatura.value;
-      
+
       materialPuertoVal = (materialPuertoVal == undefined || materialPuertoVal == null)? '' : materialPuertoVal;
       bodegaParcelVal = (bodegaParcelVal == undefined || bodegaParcelVal == null)? '' : bodegaParcelVal;
-      
+
       if (lineaSeleccionada != 'Vicentin') {
         if (turnoDestinoVal == '0' ||
           (tkVal == '' || tkVal == '0') ||
@@ -1686,7 +1693,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
       }
-    }, error=>{}, 
+    }, error=>{},
     ()=>{
 
       const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
@@ -1705,16 +1712,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       /*
       // SE COMENTA LA VALIDACION EN RECIBIDORES
       if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null){
-        if (planillaDeTurnosRecibidores.length > 0) 
-            bResultado = true;         
+        if (planillaDeTurnosRecibidores.length > 0)
+            bResultado = true;
       }
       */
         planillaDeTurnosTablerista = planillaDeTurnosTablerista.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
         if (planillaDeTurnosTablerista != undefined || planillaDeTurnosTablerista != null){
-          if (planillaDeTurnosTablerista.length > 0) 
-              bResultado = true;         
+          if (planillaDeTurnosTablerista.length > 0)
+              bResultado = true;
         }
-      
+
       subjectTurnosNoCerrados.next(bResultado)
     });
     return subjectTurnosNoCerrados;
@@ -1755,7 +1762,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
     linea.controls['medidaFinalMM'].setValue(mm);
   }
-  
+
   hasPermisoTableroLiquido_AgregarTurno() {
     return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarTurno);
   }

@@ -340,6 +340,8 @@ export class PlanillaTurnoSolidoExcelService {
           });
 
     }
+
+
     async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean=false, totalABordo: number=0) {
       const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
 

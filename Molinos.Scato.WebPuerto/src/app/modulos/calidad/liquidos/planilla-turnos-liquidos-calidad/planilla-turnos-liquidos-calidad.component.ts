@@ -62,6 +62,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
   producto: any[];
   tanques: any[];
   hoy: any;
+  toneladasLineas:any[]=[];
   bodegas: any[];
   productos: any[];
   destinos: any[];
@@ -1035,7 +1036,13 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo);
+    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
+    this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
+    this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
+    this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
+
+    this.exportaPlanilla = true;
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas);
     this.exportaPlanilla = false;
   }
 
