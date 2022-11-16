@@ -78,7 +78,7 @@ export class LineupComponent implements OnInit, Observador {
 
   ) {
     this.auth.renovarAuthUsuario();
-    
+
     this.user = this.session.getUser()
     this.sanBenito = new Array();
     this.noryon = new Array();
@@ -86,14 +86,14 @@ export class LineupComponent implements OnInit, Observador {
     this.otrosMuelles = new Array();
     this.cargarEstadoLineUp();
   }
-  
+
   cargarGeolocalizacionLineUp() {
     this.cargarWorkflows();
   }
 
   cargarEstadoLineUp() {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-      this.ubicacionDeBuquePuerto = res;
+      this.ubicacionDeBuquePuerto = res.filter(u => u.orden!=1);;
       this.estadoVicentinLp = this.estadoVicentin();
       console.log('estadoVicentinLp '+this.estadoVicentinLp);
       this.estadoNoryonLp = this.estadoNoryon();
@@ -174,7 +174,7 @@ export class LineupComponent implements OnInit, Observador {
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     function_name = 'filtrarMuelles - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
-    
+
   }
 
   public altaEmbarque() {
@@ -258,7 +258,7 @@ export class LineupComponent implements OnInit, Observador {
     if (sanBenito.length > 0) {
       body += `\f\0- San Benito:\0\0\f\f\n`;
       sanBenito.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
@@ -267,7 +267,7 @@ export class LineupComponent implements OnInit, Observador {
     if (vicentin.length > 0) {
       body += `\n\f\0- Vicentin:\0\0\f\f\n`;
       vicentin.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
@@ -276,7 +276,7 @@ export class LineupComponent implements OnInit, Observador {
     if (noryon.length > 0) {
       body += `\n\f\0- Nouryon:\0\0\f\f\n`;
       noryon.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
@@ -285,7 +285,7 @@ export class LineupComponent implements OnInit, Observador {
     if (otrosM.length > 0) {
       body += `\n\f\0- Otros Muelles:\0\0\f\f\n`;
       otrosM.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
