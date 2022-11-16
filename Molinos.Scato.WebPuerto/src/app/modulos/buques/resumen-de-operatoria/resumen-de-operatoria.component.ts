@@ -22,6 +22,8 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { browserRefresh } from '../../../app.component';
 import { Bandera } from '@ScatoModels/bandera';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 
 @Component({
   selector: 'app-resumen-de-operatoria',
@@ -62,26 +64,37 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private session: SessionService,
-    private messageService: MessageService,
+    private embarqueSharingService: EmbarqueSharingService,
     private router: Router,
     private buqueSharingService: BuqueSharingService,
     private embarqueService: EmbarqueService,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
-    private buqueService: BuqueService
-  ) {
-    this.cargarValoresHistorial();
-    this.cargarValoresOperatoria();
-    this.setValoresEmbarque();
-  }
+    private buqueService: BuqueService) {
+      
+      this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+        const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
+        if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos){
+          this.cargarValoresHistorial();
+          this.setValoresEmbarque();
+          this.initOperatoria();
+        }
+      });
+
+      this.cargarValoresHistorial();
+      this.cargarValoresOperatoria();
+      this.setValoresEmbarque();
+    }
   // #endregion
 
   // #region Eventos del Componente
   ngOnInit(): void {
     this.initOperatoria();
     this.browserRefresh = browserRefresh;
-    if (this.browserRefresh)
+    if (this.browserRefresh){
+      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
       this.cargarValoresHistorial();
+    }
   }
   // #endregion
 
@@ -96,24 +109,37 @@ export class ResumenDeOperatoriaComponent implements OnInit {
       this.embarqueBuqueSel = JSON.parse(this.embarqueBuqueSel)
     }
   }
-  private cargarValoresHistorial() {
-    this.mostrarInformacion = false;
-    this.user = this.session.getUser()
 
-    //como el id de oeracion que se muestra en la url es el id del embarque, lo obtengo directamente de la url
-    //asi me obtengo el embarque 
-    this.idEmbarqueOp = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
-    this.idVaporOp = parseInt(this.route.snapshot.paramMap.get('vaporid'));
-    this.embarqueService.obtenerIdsUsuales(this.idEmbarqueOp).subscribe(data => {
+  private cargarParametros(){
+    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+      const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
+      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
+        this.idEmbarqueOp = resumenOperatoriaEmbarque.embarqueId;
+        this.obtenerIdsEmbarque(this.idEmbarqueOp);
+      }else{
+        this.obtenerIdsEmbarque(this.idEmbarqueOp);
+      }
+    });
+  }
+  private obtenerIdsEmbarque(embarqueId){
+    this.embarqueService.obtenerIdsUsuales(embarqueId).subscribe(data => {
       this.paramEmbarqueSel = { 
         embarque_Id: this.idEmbarqueOp, 
         moduloDeCarga_Id: data.moduloDeCargaId, 
         vapor_Id: data.vaporId, 
         planoDeCarga_Id: data.planoDeCargaId,
         esLiquido: data.esLiquido ==1? true : false};
+        this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
     });
-   
-    this.buqueSharingService.getFiltroBusques().subscribe(data => {
+  }
+  private cargarValoresHistorial() {   
+    this.user = this.session.getUser()
+    //como el id de oeracion que se muestra en la url es el id del embarque, lo obtengo directamente de la url
+    //asi me obtengo el embarque 
+    this.idEmbarqueOp = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
+    this.idVaporOp = parseInt(this.route.snapshot.paramMap.get('vaporid'));
+    this.cargarParametros();
+       this.buqueSharingService.getFiltroFormulario().subscribe(data => {
       if (data !== undefined) {
         if (data !== null) {
           this.filtroBuquedaForm = data;
@@ -122,8 +148,8 @@ export class ResumenDeOperatoriaComponent implements OnInit {
         }
       }
     });
-  }
 
+  }
   private cargarValoresOperatoria() {
     if (this.filtroBuquedaForm == null || this.filtroBuquedaForm === undefined) {
       this.filtroBuquedaForm = this.formBuilder.group({
@@ -136,18 +162,16 @@ export class ResumenDeOperatoriaComponent implements OnInit {
         vaporId: this.idVaporOp,
         embarqueId: this.idEmbarqueOp,
         moduloDeCargaId: 0,
-        anio: '',
-        mes: '',
+        desde: '',
+        hasta: '',
         producto: '',
         buque: '',
         destino: '',
         control: '',
-        ata: ''
+        nombreExportador: ''
       })
-      this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     }
   }
-
   private obtenerInformacionEmbarque(){
     let embarque = null;
     this.embarqueService.obtenerEmbarque(this.idEmbarqueOp).subscribe(res => {
@@ -181,6 +205,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
   }
 
   private initOperatoria() {
+    this.mostrarInformacion = false;
     if (this.embarqueBuqueSel != null && this.embarqueBuqueSel !=undefined) {
       this.nombreBuque = this.embarqueBuqueSel.nombreBuque;
       this.esEmbarqueLiquido = this.embarqueBuqueSel.esLiquido;
@@ -202,12 +227,12 @@ export class ResumenDeOperatoriaComponent implements OnInit {
       }
       this.mostrarInformacion = true;
     });
-    this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
+    
   }
 
   private limpiarFiltrosHistorial() {
     if (this.filtroBuquedaForm != null) {
-      this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
+      this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(false);
       this.filtroBuquedaForm.controls.esBusqueda.setValue(false);
       this.filtroBuquedaForm.controls.esDetalle.setValue(false);
       this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(false);
@@ -220,9 +245,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
       this.filtroBuquedaForm.controls.buque.setValue('');
       this.filtroBuquedaForm.controls.destino.setValue('');
       this.filtroBuquedaForm.controls.control.setValue('');
-      this.filtroBuquedaForm.controls.ata.setValue('');
       this.filtroBuquedaForm.controls.embarqueId.setValue(0);
-      this.filtroBuquedaForm.controls.mes.setValue(0);
       this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
     }
   }

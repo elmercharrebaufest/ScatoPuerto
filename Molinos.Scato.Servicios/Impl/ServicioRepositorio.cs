@@ -9371,10 +9371,10 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                //#if (DEBUG)
-                //                log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  DEBUG-----");
-                //                return "10000";
-                //#endif
+#if (DEBUG)
+                log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  DEBUG-----");
+                return "10000";
+#endif
                 log.Info("----- Inicio ObtenerLlenadoMilimetroPorTanque  -----");
                 string mmABuscar = cm + "," + mm;
                 string mmABuscar1 = cm + "." + mm;
@@ -9446,15 +9446,14 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         BalanzadasBuque balanzadasBuque = new BalanzadasBuque();
 
-                        balanzadasBuque.NumeroBalanza = carga.NumeroBalanza;
-                        balanzadasBuque.Bodega_Id = carga.Bodega.Id;
-                        balanzadasBuque.Material_Id = carga.Material.Id;
-                        balanzadasBuque.Id = balanzada.Id;
-                        balanzadasBuque.PesoBruto = balanzada.PesoBruto;
-                        balanzadasBuque.PesoNeto = balanzada.PesoNeto;
-                        balanzadasBuque.PesoTara = balanzada.PesoTara;
-                        balanzadasBuque.CargaInicial_Id = balanzada.CargaInicial_Id;
-
+                        balanzadasBuque.NumeroBalanza = carga != null ? carga.NumeroBalanza : "";
+                        balanzadasBuque.Bodega_Id = carga != null && carga.Bodega != null ? carga.Bodega.Id : 0;
+                        balanzadasBuque.Material_Id = carga != null && carga.Material != null ? carga.Material.Id : 0;
+                        balanzadasBuque.Id = balanzada != null ? balanzada.Id : 0;
+                        balanzadasBuque.PesoBruto = balanzada != null ? balanzada.PesoBruto : 0;
+                        balanzadasBuque.PesoNeto = balanzada != null ? balanzada.PesoNeto : 0;
+                        balanzadasBuque.PesoTara = balanzada != null ? balanzada.PesoTara : 0;
+                        balanzadasBuque.CargaInicial_Id = balanzada != null ? balanzada.CargaInicial_Id : 0;
                         balanzadasCompletas.balanzadasBuque.Add(balanzadasBuque);
                     }
                 }
@@ -11932,59 +11931,67 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
-            //Me traigo el embarque
-            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque);
-
-            //Me traigo todos los archivos que tengo en la DB que corresponden a ese Embarque.
-            var archivosPuertoDB = repositorio.Listar<ArchivosPuerto>(x => x.Embarque.Id == idEmbarque);
-
-            //Recorro todos los archivos que tengo guardados en la base de datos que correspondan a ese Embarque.
-            foreach (var archivo in archivosPuertoDB)
+            try
             {
-                //Me fijo si el archivo está en la lista que voy a guardar.
-                bool archivoBorrado = archivosPuerto.FindAll(x => x.Id == archivo.Id).Count == 0;
+                //Me traigo el embarque
+                Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque);
 
-                //En caso de no estar, lo elimino de la base de datos.
-                if (archivoBorrado)
-                {
-                    repositorio.Remover(archivo);
-                }
-            }
+                //Me traigo todos los archivos que tengo en la DB que corresponden a ese Embarque.
+                var archivosPuertoDB = repositorio.Listar<ArchivosPuerto>(x => x.Embarque.Id == idEmbarque);
 
-            //Recorro todos los archivos a guardar
-            foreach (var archivo in archivosPuerto)
-            {
-                //Me traigo el archivo de la DB.
-                ArchivosPuerto archivoPuertoDB = repositorio.Obtener<ArchivosPuerto>(x => x.Id == archivo.Id);
+                //Recorro todos los archivos que tengo guardados en la base de datos que correspondan a ese Embarque.
+                foreach (var archivo in archivosPuertoDB)
+                {
+                    //Me fijo si el archivo está en la lista que voy a guardar.
+                    bool archivoBorrado = archivosPuerto.FindAll(x => x.Id == archivo.Id).Count == 0;
 
-                //En caso de que exista piso su data.
-                if (archivoPuertoDB != null)
-                {
-                    archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
-                    archivoPuertoDB.Archivo = archivo.Archivo;
-                    archivoPuertoDB.Fecha = archivo.Fecha;
-                    archivoPuertoDB.Extension = archivo.Extension;
-                    archivoPuertoDB.Size = archivo.Size;
-                }
-                //Si no existe lo agrego a la DB.
-                else
-                {
-                    TipoArchivoPuerto tipoArchivoPuertoDB = repositorio.Obtener<TipoArchivoPuerto>(x => x.Id == archivo.TipoArchivoPuerto.Id);
-                    archivoPuertoDB = new ArchivosPuerto()
+                    //En caso de no estar, lo elimino de la base de datos.
+                    if (archivoBorrado)
                     {
-                        TipoArchivoPuerto = tipoArchivoPuertoDB,
-                        Embarque = embarque,
-                        NombreArchivo = archivo.NombreArchivo,
-                        Archivo = archivo.Archivo,
-                        Fecha = archivo.Fecha,
-                        Size = archivo.Size,
-                        Extension = archivo.Extension
-                    };
-                    //Guardo toda la data en la DB.
-                    repositorio.Agregar(archivoPuertoDB);
+                        repositorio.Remover(archivo);
+                    }
                 }
+
+                //Recorro todos los archivos a guardar
+                foreach (var archivo in archivosPuerto)
+                {
+                    //Me traigo el archivo de la DB.
+                    ArchivosPuerto archivoPuertoDB = repositorio.Obtener<ArchivosPuerto>(x => x.Id == archivo.Id);
+
+                    //En caso de que exista piso su data.
+                    if (archivoPuertoDB != null)
+                    {
+                        archivoPuertoDB.NombreArchivo = archivo.NombreArchivo;
+                        archivoPuertoDB.Archivo = archivo.Archivo;
+                        archivoPuertoDB.Fecha = archivo.Fecha;
+                        archivoPuertoDB.Extension = archivo.Extension;
+                        archivoPuertoDB.Size = archivo.Size;
+                    }
+                    //Si no existe lo agrego a la DB.
+                    else
+                    {
+                        TipoArchivoPuerto tipoArchivoPuertoDB = repositorio.Obtener<TipoArchivoPuerto>(x => x.Id == archivo.TipoArchivoPuerto.Id);
+                        archivoPuertoDB = new ArchivosPuerto()
+                        {
+                            TipoArchivoPuerto = tipoArchivoPuertoDB,
+                            Embarque = embarque,
+                            NombreArchivo = archivo.NombreArchivo,
+                            Archivo = archivo.Archivo,
+                            Fecha = archivo.Fecha,
+                            Size = archivo.Size,
+                            Extension = archivo.Extension
+                        };
+                        //Guardo toda la data en la DB.
+                        repositorio.Agregar(archivoPuertoDB);
+                    }
+                }
+                repositorio.GuardarCambios();
             }
-            repositorio.GuardarCambios();
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
         public IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque)
         {
@@ -12043,10 +12050,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        public IList<ErroresGeolocalizacionDto> ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
+        public ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
         {
             IList<ErroresGeolocalizacionDto> erroresGeolocalizacion = Listar<ErroresGeolocalizacion, ErroresGeolocalizacionDto>(x => x.Embarque_id == idEmbarque).OrderByDescending(x => x.FechaError).ToList();
-            return erroresGeolocalizacion;
+            ErroresGeolocalizacionDto erroreGeolocalizacion = null;
+            if (erroresGeolocalizacion != null && erroresGeolocalizacion.Count > 0)
+                erroreGeolocalizacion = erroresGeolocalizacion[0];
+            return erroreGeolocalizacion;
         }
         private void CompletarDatosHistorialDeEmbarque(List<HistorialDeBusquesDto> historialDeBusquesDto)
         {

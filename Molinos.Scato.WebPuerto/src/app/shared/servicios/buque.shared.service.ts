@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -10,8 +11,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class BuqueSharingService {
 
   // #region Variables  
+  private filtroFormularioSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private filtroBusquesSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private listadoBuquesSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  private embarqueSeleccionadoSubject: BehaviorSubject<ResumenOperatoriaEmbarque> = new BehaviorSubject<ResumenOperatoriaEmbarque>(null);
   // #endregion
 
   // #region Constructor  
@@ -26,13 +29,24 @@ export class BuqueSharingService {
   public setFiltroBusques(filtroBuque: FormGroup) {
     this.filtroBusquesSubject.next(filtroBuque);
   }
-
+  public getFiltroFormulario() {
+    return this.filtroFormularioSubject.asObservable();
+  }
+  public setFiltroFormulario(filtroFormulario: FormGroup) {
+    this.filtroFormularioSubject.next(filtroFormulario);
+  }
   public getListadoBuques() {
     return this.listadoBuquesSubject.asObservable();
   }
 
   public setListadoBuques(listadoBuques: any) {
     this.listadoBuquesSubject.next(listadoBuques);
+  }
+  public setActualizarResumenOperatoria(valor: ResumenOperatoriaEmbarque){
+    this.embarqueSeleccionadoSubject.next(valor);
+  }
+  public getActualizarResumenOperatoria(){
+    return this.embarqueSeleccionadoSubject.asObservable();
   }
   // #endregion
 }

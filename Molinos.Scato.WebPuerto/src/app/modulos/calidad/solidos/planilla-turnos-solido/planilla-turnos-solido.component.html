@@ -14,7 +14,7 @@
             </ng-container>
         <br>
         <br>
-        
+
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
             <div id="scrollbar-planilla-recibidores-solido" class='mt-4 px-4 pb-4' style="height: 800px;">
                 <!-- ACA VA LA SCROLLBAR -->
@@ -52,13 +52,13 @@
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
                                                     <span class='toneladas'>{{ (getCantTurno(turno)/1000) | number: '1.0-0' }} <span class='turno'>Tn</span></span>
                                                     <span class='turno'>por turno</span>
-                                                    <button class='btn btn btn-success' 
+                                                    <button class='btn btn btn-success'
                                                             *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
-                                                            style="margin-top: 5px; margin-bottom: 5px" 
-                                                            (click)='onCerrarTurno(turno)'> 
+                                                            style="margin-top: 5px; margin-bottom: 5px"
+                                                            (click)='onCerrarTurno(turno)'>
                                                             Cerrar turno
                                                     </button>
-                                                    <img  *ngIf="turno.value.guardadoPorRecibidor" 
+                                                    <img  *ngIf="turno.value.guardadoPorRecibidor"
                                                             src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
@@ -111,7 +111,7 @@
                                                             </thead>
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                     <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
-                                                                        <tr *ngIf='corte.controls.observaciones.value != null && corte.controls.observaciones.value != ""'>
+                                                                        <tr *ngIf='corte.controls.observaciones.value != null && corte.controls.observaciones.value != ""' >
                                                                             <td colspan="4"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.motivosDeCorte.value.siglas}} - {{corte.controls.motivosDeCorte.value.nombre}}
                                                                             </td>
@@ -133,7 +133,7 @@
                                                         </table>
                                                     </div>
                                                 </div>
-                                            </td>                                           
+                                            </td>
                                         </tr>
                                         <tr *ngIf='getCorteTurnos(d, t).controls.length == 0'>
                                             <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
@@ -153,7 +153,7 @@
                                                                     <th style="width:85px"></th>
                                                                 </tr>
                                                             </thead>
-                                                            
+
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
                                                                     <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                         <tr>
@@ -172,7 +172,7 @@
                                                                         </tr>
                                                                     </ng-container>
                                                                 </ng-container>
-                                                            
+
                                                         </table>
                                                     </div>
                                                 </div>
@@ -207,17 +207,17 @@
                 <div class='bt-total'>Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn'></div>
                 </div>
             </div>
-        </div>        
-    
+        </div>
+
         <p-toast data-html2canvas-ignore="true" position='top-center' key='enviar-turno'></p-toast>
-    
+
         <div data-html2canvas-ignore="true" class="mt-4 text-center" *ngIf="!esSoloLectura">
             <button id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
             <button id="envPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelSolido(true)' > Enviar planilla </button>
         </div>
-        </div>    
+        </div>
     </div>
-        
+
     <ng-template #agregarObs let-modal>
         <div class='modal-header'>
             <h4>Agregar Observación de Calidad</h4>
@@ -235,7 +235,7 @@
                         </div>
                         <ngx-material-timepicker #fullTimeAmarro>
                         </ngx-material-timepicker>
-                       
+
                     </div>
                     <div class="form-group col-8 d-flex flex-column">
                         <label class="font-weight-bold">Observaciones</label>

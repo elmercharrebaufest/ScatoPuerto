@@ -20,7 +20,7 @@
             <tr class="claseTr" >
               <th class="headerLineas">
                 <div fxFlex='25'>
-                  
+
                 </div>
                 <div class="form-group div-active pl-2" fxFlex='31'>
                   <label>INICIAL</label>
@@ -94,15 +94,15 @@
                           <td>
 
                             <div class="form-group pl-2" fxFlex='9'>
-                                <select class="custom-select" 
-                                        formControlName="tipoLineaEmbarque" 
+                                <select class="custom-select"
+                                        formControlName="tipoLineaEmbarque"
                                         (change)="onLineaSeleccionada(lineasE)"
                                         [compareWith]='compareLineaEmbarque'>
                                   <option *ngFor="let tipo of tipoLineaEmbarque" [ngValue]="tipo"> {{ tipo.linea }} </option>
                                 </select>
                             </div>
                             <div class="form-group pl-2" fxFlex='10' (change)="onFocusOutEvent(i)">
-                                <select class="custom-select" 
+                                <select class="custom-select"
                                         formControlName="materialPuerto"
                                         [compareWith]="compareLineas">
                                   <option value="" selected></option>
@@ -110,14 +110,14 @@
                                 </select>
                             </div>
                             <div class="form-group pl-2 pr-2" fxFlex='6'>
-                                <select class="custom-select" 
+                                <select class="custom-select"
                                         formControlName="tkInicial"
                                         #tanqueSelect
                                         [ngClass]='setClase(i)'
                                         [compareWith]='compareTanque'>
-                                  <option *ngFor="let t of tanquesOption" 
+                                  <option *ngFor="let t of tanquesOption"
                                           [ngValue]="t"
-                                          [ngClass]="t.color"> 
+                                          [ngClass]="t.color">
                                           {{ t.value }}
                                   </option>
                                 </select>
@@ -181,8 +181,8 @@
     <br/>
     <div class="text-center" >
     	<ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Editar()">
-			<button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary"  
-			(click)="onGuardar()" 
+			<button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary"
+			(click)="onGuardar()"
 			[disabled]="!esGuardadoActivo" >GUARDAR</button>
    		</ng-container>
    </div>

@@ -164,17 +164,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_VerGeo)]
         [Route("api/Geolocalizacion/ListarErroresGeolocalizacionPorEmbarque")]
-        public HttpResponseMessage ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
+        public HttpResponseMessage ListarErroresGeolocalizacionPorEmbarque(List<EmbarquesSel> embarquesSel)
         {
             try
             {
-                var erroresGeolocalizacion = servicio.ListarErroresGeolocalizacionPorEmbarque(idEmbarque);
-                return Request.CreateResponse(HttpStatusCode.OK, erroresGeolocalizacion);
-
+                List<ErroresGeolocalizacionDto> errores = new List<ErroresGeolocalizacionDto>();
+                foreach (var item in embarquesSel)
+                {
+                    var error = servicio.ListarErroresGeolocalizacionPorEmbarque(item.Embarque_Id);
+                    if (error != null) errores.Add(error);
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, errores);
             }
             catch (Exception ex)
             {
@@ -225,6 +229,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public string Mensaje;
         }
 
+        public class EmbarquesSel
+        {
+            public int Embarque_Id;
+        }
 
         #region Metodos para cargar los embarques en la pantalla de geolocalización
         private void cargarEmbarquenesLineUpPorPuerto(IList<InstanciaWorkflowPuertoDto> listaEmbarques, ref List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion,  IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto, short tipoMuelleCarga)

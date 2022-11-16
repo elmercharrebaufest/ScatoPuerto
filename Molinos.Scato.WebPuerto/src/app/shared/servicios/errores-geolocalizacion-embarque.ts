@@ -11,21 +11,21 @@ export class ErroresGeolocalizacionEmbarqueService {
     
     constructor( private geolocalizacionService: GeolocalizacionService) {}
 
-    obtenerEmbarquesErrores(idEmbarque: number): Observable<ErroresGeolocalizacionEmbarque>{
-      let listaErroresResultados = new Subject<ErroresGeolocalizacionEmbarque>();
+    obtenerEmbarquesErrores(listaErroresEmbarques: ErroresGeolocalizacion[], idEmbarque: number): ErroresGeolocalizacionEmbarque{
+      let listaErroresResultados:ErroresGeolocalizacionEmbarque = null;
 
       let embarquePos: ErroresGeolocalizacionEmbarque = {
         idEmbarque : idEmbarque,
         mensaje : '',
       };
-      let listaErrores = Array<ErroresGeolocalizacion>();
-      this.geolocalizacionService.ListarErroresGeolocalizacionPorEmbarque(idEmbarque).subscribe(res =>{
-        listaErrores = res;
-      }, error =>{}, 
-      () =>{
+      console.log('listaErroresEmbarques-->>', listaErroresEmbarques, idEmbarque)
+      const listaErrores = listaErroresEmbarques.filter(x=> x.embarque_id == idEmbarque);
+      console.log('listaErrores-->>', listaErrores)
+      if (listaErrores != null && listaErrores != undefined){
         if (listaErrores.length > 0){
           const errores =  listaErrores[0];
-          let mensaje = '';
+          console.log('errores-->>', errores)
+
           const mensaje1 = 'Después de hacer una búsqueda en la página de Marine Traffic, no logramos encontrar';
           const mensaje2 = 'Se encontró más de un barco con el mismo nombre, por lo tanto se necesitara el IMO';
 
@@ -33,9 +33,11 @@ export class ErroresGeolocalizacionEmbarqueService {
               embarquePos.mensaje = 'Buque no encontrado, validar datos ingresados.';
             if (errores.mensaje.indexOf(mensaje2) > -1 )
               embarquePos.mensaje = 'Existe más de un buque con esos datos, ingresar IMO.';
-          listaErroresResultados.next(embarquePos);
+              console.log('embarquePos-->>', embarquePos)
+
+          listaErroresResultados = embarquePos;
         }
-      });
+      }      
       return listaErroresResultados;
     }
 

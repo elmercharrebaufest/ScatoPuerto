@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Mail } from '@ScatoModels/mail';
 import { CorteTurno } from '@ScatoModels/planilla-turnos/corte-turno';
-import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { PlanillaDeTurnos, TurnoDetalleSolido } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 import { ConfirmationDialogService } from './confirmation-dialog.service';
@@ -76,7 +76,7 @@ export class PlanillaTurnoSolidoExcelService {
 		  { width: 20 },
 		  { width: 11 },
 		  { width: 16 },
-		  { width: 11 },  
+		  { width: 11 },
 		  { width: 17 },
 		  { width: 11 },
 		  { width: 11 },
@@ -107,10 +107,10 @@ export class PlanillaTurnoSolidoExcelService {
     private setObservacionesCalidad(headerObservaciones,worksheet, offset, borders){
         headerObservaciones.forEach((text, index) => {
             let currentCell = worksheet.getRow(offset).getCell(3 + (index));
-  
+
             if (index == 2)
               worksheet.mergeCells(`E${offset}:G${(offset)}`);
-  
+
             if (text) {
               currentCell.value = text;
               currentCell.alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
@@ -153,13 +153,13 @@ export class PlanillaTurnoSolidoExcelService {
             worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
         }else{
             let registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length - 1;
-    
+
             if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
               registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length
               const registroCorte = turno.moduloDeCargaPlanillaDeTurnosCortes.length;
               registrosTurno += registroCorte;
             }
-            
+
             let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
             numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
             registrosTurno += numeroObservaciones;
@@ -173,11 +173,11 @@ export class PlanillaTurnoSolidoExcelService {
             worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
             worksheet.getCell(`B${inicioTurnoMerge}`).value = `${nombreTurno} \r\n ${toneladas} tn`;
             worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true}
-            worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;   
+            worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
             worksheet.getCell(`B${offset}`).border = borders;
         }
     }
-    
+
     private setDetallePlanillaTurno(turno, worksheet, offset, borders) {
 
       let toneladas = turno.cantidad/1000;
@@ -201,8 +201,8 @@ export class PlanillaTurnoSolidoExcelService {
         planillaDeTurnos = planillaDeTurnos.sort((a, b) => {
             return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
           });
-      
-          
+
+
           planillaDeTurnos.forEach((turno: PlanillaDeTurnos, i) => {
             if (i == 0) {
               turno.indexDia = diaOrder;
@@ -290,13 +290,13 @@ export class PlanillaTurnoSolidoExcelService {
         });
     }
     private setDetallePlanillaCortes(worksheet, turno, offset, borders){
-    
+
             worksheet.getRow(offset).getCell(3).value = turno.motivosDeCorte!=null?turno.motivosDeCorte.nombre : '';
             worksheet.getRow(offset).getCell(4).value = turno.horaInicio!=null?turno.horaInicio:'';
             worksheet.getRow(offset).getCell(5).value = turno.horaFin!=null?turno.horaFin:'';
             worksheet.getRow(offset).getCell(6).value = turno.tiempoTotal!=null?turno.tiempoTotal:'';
             worksheet.getRow(offset).getCell(7).value = turno.observaciones!=null?turno.observaciones:'';
-    
+
             let celdaCorte = 3
             for (let indexCell = 1; indexCell <= 5; indexCell++) {
               worksheet.getRow(offset).getCell(celdaCorte).border = borders;
@@ -315,11 +315,11 @@ export class PlanillaTurnoSolidoExcelService {
         this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosLiquido').subscribe(x => mail.destinatarios = x);
         const button1 = 'Enviar';
         const button2 = 'Cancelar';
-    
+
         this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mail, null, inputTitle, true)
           .then(async (confirmed) => {
             if (confirmed) {
-  
+
               const convertBlobToBase64 = (blob) => new Promise((resolve, reject) => {
                 const reader = new FileReader;
                 reader.onerror = reject;
@@ -328,7 +328,7 @@ export class PlanillaTurnoSolidoExcelService {
                 };
                 reader.readAsDataURL(blob);
               });
-    
+
               const base64String = await convertBlobToBase64(blob);
               this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
                 this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success)
@@ -338,9 +338,22 @@ export class PlanillaTurnoSolidoExcelService {
           .catch((e) => {
             return
           });
-    
+
     }
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, esEnviarPlanilla: boolean=false) {
+
+
+    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean=false, totalABordo: number=0) {
+      const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
+
+      planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
+        turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((corte: CorteTurno, index ) => {
+          if(corte.motivosDeCorte==null)
+            turno.moduloDeCargaPlanillaDeTurnosCortes.pop();
+
+        });
+
+      });
+
         const fname = this.getNombreArchivo();
         const imgMolinos = await this.getImgMolinos();
         let workbook = new Workbook();
@@ -353,78 +366,79 @@ export class PlanillaTurnoSolidoExcelService {
             bottom: { style: 'thin' },
             right: { style: 'thin' }
             }
-    
+
         const molinosImg = workbook.addImage({buffer: imgMolinos, extension: 'png'});
-    
+
         let worksheet = workbook.addWorksheet("Turnos",{
             views: [{ state: 'frozen', activeCell: 'A1', showGridLines: false }]
         });
-    
+
         //Ancho Columnas
         this.setAnchoColumnas(worksheet);
 
         //Merge cells cabecera
         this.setCabeceraExcel(worksheet, molinosImg, procesoService);
-    
+
         // Planilla de embarque
         const rowOffset = 9;
         const planillaDeEmbarque = procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeEmbarque;
         const planillaEmbarqueData = worksheet.getRows(rowOffset, planillaDeEmbarque.length)
-    
-        
+
+
         // Ordenamos los turnos por fecha y turno correspondiente
         let diaOrder = 0;
         diaOrder = this.setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder);
-    
-        let baseCell = 10;    
+
+        let baseCell = 10;
         let offset = baseCell;
         //Calculo la cantidad de rows que va a ocupar la planilla
         let numeroTurno = 0;
         let totalNumeroTurnos = planillaDeTurnos.length;
-    
+
         planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
           // sino tiene informacion de detalle de turnos y cortes no lo considera
           if (turno.moduloDeCargaPlanillaDeTurnosCortes.length == 0 && turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length == 0) {
             totalNumeroTurnos -= 1;
           }
         });
-    
+
         //Renderizo todos los detalles
         planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-    
+
           // sino tiene informacion de detalle de turnos y cortes no lo considera
           if (turno.moduloDeCargaPlanillaDeTurnosCortes.length == 0 && turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length == 0) {
             return;
           }
-    
+
           numeroTurno += 1;
           /* Planilla de turnos */
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length == 0)
             this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos,borders);
 
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0) {
-            
+
             // Cargando Detalle de Planillas
             this.setCabeceraPlanillaTurno(worksheet,headerPlanilla, offset, borders);
             offset = offset + 1;
 
             // Cargando Agrupador de Turnos
             this.setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos,borders);
-    
+
             turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach((turno: any, index) => {
               this.setDetallePlanillaTurno(turno, worksheet, offset, borders);
               offset = offset + 1;
             });
           }
-    
+
           if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
+
               this.setCabeceraPlanillaCortes(headerCortes, worksheet, offset, borders);
               offset = offset + 1;
               turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((turno: CorteTurno, index) => {
                 this.setDetallePlanillaCortes(worksheet, turno, offset, borders);
                 offset = offset + 1;
               });
-            
+
           }
           if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
               this.setObservacionesCalidad(headerObservaciones,worksheet, offset, borders);
@@ -435,7 +449,7 @@ export class PlanillaTurnoSolidoExcelService {
               });
           }
         });
-    
+
         //renderizo detalles
         for (let dia = 0; dia <= diaOrder; dia++) {
           let CantRows = 0;
@@ -458,7 +472,7 @@ export class PlanillaTurnoSolidoExcelService {
           if (CantRows == 0) continue;
 
           const fechaTurno = this.obtenerFechaTurno(fechaDia);
-          
+
           /* Toneladas por fecha */
           let toneladas: number = 0;
           planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
@@ -480,20 +494,31 @@ export class PlanillaTurnoSolidoExcelService {
           /* Cabeceras Fecha */
           worksheet.mergeCells(`A${baseCell + 1}:A${baseCell + (CantRows > 0 ? CantRows - 1 : CantRows)}`);
           worksheet.getCell(`A${baseCell}`).value = "Fecha";
-    
+
           worksheet.getCell(`A${baseCell}`).fill   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' } };
           worksheet.getCell(`A${baseCell}`).border = borders;
           worksheet.getCell(`A${baseCell}`).font   = { name: 'Arial', family: 2, size: 11, bold: true }
-    
+
           /* Cabeceras Turno */
           worksheet.getCell(`B${baseCell}`).value  = "Turno";
           worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
           worksheet.getCell(`B${baseCell}`).border = borders;
           worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
-          
+
           baseCell = baseCell + (CantRows > 0 ? CantRows : CantRows);
-    
+
         }
+        baseCell = baseCell + 1;
+        worksheet.getCell(`A${baseCell}`).value  = "Total a Bordo: ";
+        worksheet.getCell(`A${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
+        worksheet.getCell(`A${baseCell}`).border = borders;
+        worksheet.getCell(`A${baseCell}`).font   = {name: 'Arial',family: 2,size: 9,bold: true}
+
+        worksheet.getCell(`B${baseCell}`).value  = totalABordo;
+       // worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
+        worksheet.getCell(`B${baseCell}`).border = borders;
+        worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
+
         workbook.xlsx.writeBuffer().then((data) => {
           const archivo = fname + '.xlsx'
           const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

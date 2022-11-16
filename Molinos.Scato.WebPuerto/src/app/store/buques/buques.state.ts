@@ -20,7 +20,7 @@ export class BuquesStateModel {
 
 @Injectable()
 export class BuquesState {
-    
+
     constructor(private buqueService: BuqueService) {
     }
 
@@ -31,9 +31,11 @@ export class BuquesState {
     @Action(GetObtenerHistorialBuques)
     GetObtenerHistorialBuques(
         {getState, setState}: StateContext<BuquesStateModel>,
-        {anio, mes, vaporId, desde, hasta, producto, 
+        {vaporId, desde, hasta, producto, 
             nombreBuque, destino, exportador, controlPrivado}: GetObtenerHistorialBuques
         ) {
+        const anio: number = 0;
+        const mes: number = 0;
         return this.buqueService.obtenerListarHistorialDeBuques(anio, mes, vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, producto).pipe(tap((result) => {
             const state = getState();
             setState({
