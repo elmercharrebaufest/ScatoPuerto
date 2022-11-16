@@ -91,9 +91,9 @@ export class AltaEmbarqueComponent implements OnInit {
     private workflowService: WorkflowService,
     private moduloCargaService: ModuloDeCargaService,
     private buqueService: BuqueService,
-    
-    
-  ) 
+
+
+  )
     {
     this.state = this.route.snapshot.params.state;
     this.embarqueId = this.route.snapshot.params.id ? this.route.snapshot.params.id : 0;
@@ -192,7 +192,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueService.obtenerBanderas(),
     ]).subscribe(([res1, res2, res3, res4, res5]) => {
       this.tipoDeBuquePuerto = res1.filter(a => a.nombre == "Bulk Carrier" || a.nombre == "Oil Tanker");
-      this.ubicacionDeBuquePuerto = res2;
+      this.ubicacionDeBuquePuerto = res2.filter(u => u.orden!=1);
       this.destinoPuerto = res3;
       this.vaporesList = res4;
       this.banderasBuque = res5
@@ -211,7 +211,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueService.obtenerListadoTipoDeBuquePuerto().subscribe(res => { this.tipoDeBuquePuerto = res; });
 
     if (!this.ubicacionDeBuquePuerto)
-      this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
+      this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res.filter(u=>u.orden!=1); });
 
     if (!this.destinoPuerto)
       this.planoDeCargaService.obtenerDestinos().subscribe(res => { this.destinoPuerto = res; });
@@ -412,16 +412,16 @@ export class AltaEmbarqueComponent implements OnInit {
 
   private validaAltaEmbarque(): Subject<boolean>{
     let subjectModificarAlta = new Subject<boolean>();
-    let moduloDeCargaPlanillaDeTurnos = null; 
+    let moduloDeCargaPlanillaDeTurnos = null;
     let esValido = true;
     this.moduloCargaService.obtenerModuloDeCarga(this.parametrosSel.moduloDeCargaId).subscribe(res => {
-      moduloDeCargaPlanillaDeTurnos = res.moduloDeCargaPlanillaDeTurnos; 
+      moduloDeCargaPlanillaDeTurnos = res.moduloDeCargaPlanillaDeTurnos;
     }, error => {}
      , () => {
         if (moduloDeCargaPlanillaDeTurnos != null && moduloDeCargaPlanillaDeTurnos != undefined){
           if (moduloDeCargaPlanillaDeTurnos.length == 0)
             esValido = true;
-          else 
+          else
             esValido = false;
         }
         subjectModificarAlta.next(esValido);
@@ -430,7 +430,7 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   private modificarAltaEmbarque(){
-    
+
     if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
@@ -641,13 +641,13 @@ export class AltaEmbarqueComponent implements OnInit {
             this.confirmationDialogService.confirm('¡Error!', 'Error al crear el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             this.mostrarSpinner = false;
           });
-    
+
   }
 
   finalizarAlta() {
     this.submitted = true;
     if (this.embarqueId == 0) {
-      
+
       if (this.id_buque == 0){
         let mensaje = "Debe seleccionar un buque para realizar el alta de embarque.";
         this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
@@ -686,7 +686,7 @@ export class AltaEmbarqueComponent implements OnInit {
     return material == null;
   }
 
-  
+
   public openConfirmationDialog(titulo: string, texto: string, button1: string = 'OK', button2: string = 'Cancel') {
     if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, nos devuelve al mismo modulo
       this.confirmationDialogService.confirm(titulo, texto, button1, '')
@@ -831,10 +831,10 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   //#endregion
-  
+
   public trackByFn(index: any, item: any) {
     return index;
-    
+
   }
 
   public checkLiquidOrSolid(materialCantidad) {
@@ -1219,7 +1219,7 @@ export class AltaEmbarqueComponent implements OnInit {
       if(this.vaporInfo.bandera_Id !== undefined || this.vaporInfo.bandera_Id !== null){
         bandera = this.banderasBuque.filter(p => p.id == this.vaporInfo.bandera_Id)
       }
-    
+
       let tipoBuqueBD = this.tipoDeBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfo.tipoBuque)
 
       this.vaporInfo.freeboard !== null && this.embarqueForm.controls.freeboard.setValue(this.vaporInfo.freeboard);
