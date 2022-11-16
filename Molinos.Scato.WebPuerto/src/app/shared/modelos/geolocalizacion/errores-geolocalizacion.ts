@@ -1,6 +1,6 @@
 export class ErroresGeolocalizacion {
     id: number;
-    embarque_Id: number;
+    embarque_id: number;
     nombreBuque: string;
     tipoBuque: string;
     bandera: string;

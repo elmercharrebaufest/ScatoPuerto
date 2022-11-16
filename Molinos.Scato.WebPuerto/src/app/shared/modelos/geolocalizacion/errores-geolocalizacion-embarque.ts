@@ -6,3 +6,10 @@ export class ErroresGeolocalizacionEmbarque {
         this.mensaje = mensaje;
   }
 }
+
+export class EmbarqueGeolocalizacion {
+  embarque_Id: number;
+  constructor(id){
+      this.embarque_Id = id;
+  }
+}

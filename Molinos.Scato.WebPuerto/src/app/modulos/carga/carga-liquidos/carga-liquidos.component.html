@@ -49,7 +49,7 @@
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
       <app-planilla-turno-liquidos [tablerista]='true' (recargarGraficos)="recargarGraficoRitmos($event)"></app-planilla-turno-liquidos>
     </div>
-    <div class='mt-5' style='margin-left: 25%; width: 50%;'>
+    <div class='mt-5' style='margin-left: 25%; width: 50%;' id="grafico-ritmo">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
       <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
     </div>

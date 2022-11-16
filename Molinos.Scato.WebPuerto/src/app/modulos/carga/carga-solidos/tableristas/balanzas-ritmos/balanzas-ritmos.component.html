@@ -14,7 +14,8 @@
         </div>
         <div class="row">
             <div class="col text-center">
-                <span class="cargaHastaAhora text-center">Cargó hasta ahora: </span>
+                <span *ngIf="!enBuque" class="cargaHastaAhora text-center">Cargó hasta ahora: </span>
+                <span *ngIf="enBuque" class="cargaHastaAhora text-center">Total cargado: </span>
                 <span class="contenidoCargaHastaAhora">{{this.TnCargadasHastaAhora7}} Tn</span>
                 <!-- <span class="contenidoCargaHastaAhora">{{this.TnCargadasHastaAhora7 | number : '1.2-2'}} Tn</span> -->
             </div>
@@ -49,7 +50,8 @@
 
             <div class="row">
                 <div class="col text-center">
-                    <span class="cargaHastaAhora ">Cargó hasta ahora: </span>
+                    <span *ngIf="!enBuque" class="cargaHastaAhora text-center">Cargó hasta ahora: </span>
+                    <span *ngIf="enBuque" class="cargaHastaAhora text-center">Total cargado: </span>
                     <span class="contenidoCargaHastaAhora">{{this.TnCargadasHastaAhora8}} Tn</span>
                     <!-- <span class="contenidoCargaHastaAhora">{{this.TnCargadasHastaAhora8 | number : '1.2-2'}} Tn</span> -->
                 </div>

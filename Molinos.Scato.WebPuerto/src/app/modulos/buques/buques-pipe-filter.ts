@@ -56,18 +56,15 @@ export class BuqueFilterPipe implements PipeTransform {
         const itemBuque = item.nombreBuque != null ? item.nombreBuque.toUpperCase() : '';
         const itemDestino = item.destino != null ? item.destino.toUpperCase() : '';
         const itemControl = item.agenciaControlPrivado != null ? item.agenciaControlPrivado.toUpperCase() : '';
-        const itemATA = item.nombreAta != null ? item.nombreAta.toUpperCase() : '';
 
         const filBuque = filtroBuques.controls.buque.value != null ? filtroBuques.controls.buque.value.toUpperCase() : '';
         const filDestino = filtroBuques.controls.destino.value != null ? filtroBuques.controls.destino.value.toUpperCase() : '';
         const filControl = filtroBuques.controls.control.value != null ? filtroBuques.controls.control.value.toUpperCase() : '';
-        const filATA = filtroBuques.controls.ata.value != null ? filtroBuques.controls.ata.value.toUpperCase() : '';
 
         return (
           (filDestino.length > 0 ? itemDestino.indexOf(filDestino) !== -1 : itemDestino.indexOf(itemDestino) !== -1) &&
           (filBuque.length > 0 ? itemBuque.indexOf(filBuque) !== -1 : itemBuque.indexOf(itemBuque) !== -1) &&
-          (filControl.length > 0 ? itemControl.indexOf(filControl) !== -1 : itemControl.indexOf(itemControl) !== -1) &&
-          (filATA.length > 0 ? itemATA.indexOf(filATA) !== -1 : itemATA.indexOf(itemATA) !== -1)
+          (filControl.length > 0 ? itemControl.indexOf(filControl) !== -1 : itemControl.indexOf(itemControl) !== -1) 
         );
 
       }

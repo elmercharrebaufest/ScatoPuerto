@@ -9,6 +9,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as JSZip from 'jszip';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 
 @Component({
   selector: 'app-archivos',
@@ -20,12 +22,11 @@ export class ArchivosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private _modalService: NgbModal,
     private _sanitizer: DomSanitizer,
-    private _formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private confirmationDialogService: ConfirmationDialogService,
-    ) {
-      this.idEmbarque = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
-     }  
+    private buqueSharingService: BuqueSharingService,
+    private confirmationDialogService: ConfirmationDialogService) {
+      this.cargarParametros();
+    }  
    
   ListTipoArchivoPuerto: TipoArchivoPuerto[];
   ArchivosPuertoDb: ArchivoPuerto[];
@@ -57,7 +58,15 @@ export class ArchivosComponent implements OnInit {
       this.downloadSelectionActivated = false
     }
   }
-
+  private cargarParametros(){
+    this.idEmbarque = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
+    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+      const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
+      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
+        this.idEmbarque = resumenOperatoriaEmbarque.embarqueId;
+      }
+    });
+  }
   initArchivos(){
     this.embarqueService.obtenerArchivos(this.idEmbarque).subscribe((res: ArchivoPuerto[]) => {
       this.listArchivos = res;
@@ -96,7 +105,7 @@ export class ArchivosComponent implements OnInit {
   }
 
   openAddFilesModal(Modal: any){
-    this.listArchivosToSave = [];
+    this.listArchivosToSave = this.listArchivos;
     this.embarqueService.obtenerTipoArchivos().subscribe((res : TipoArchivoPuerto[]) => {this.TipoArchivosDbList = res}); 
     this._modalService.open(Modal);
   }
@@ -151,7 +160,7 @@ export class ArchivosComponent implements OnInit {
     .then((confirmed) => {
       if (confirmed) {
         this.embarqueService.guardarArchivos(this.idEmbarque, this.listArchivosToSave).subscribe(res => {
-          this.listArchivos.push(...this.listArchivosToSave);
+          this.listArchivos = this.listArchivosToSave;
           this._modalService.dismissAll();
         })          
       }

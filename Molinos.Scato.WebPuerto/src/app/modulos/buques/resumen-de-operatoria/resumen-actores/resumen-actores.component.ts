@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Actores } from '@ScatoModels/Buques/Actores';
 import { Operador } from '@ScatoModels/Buques/Operador';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { forkJoin } from 'rxjs';
 
 
@@ -21,13 +23,10 @@ export class ResumenActoresComponent implements OnInit {
   
   //#endregion
   //#region constructor
-  constructor
-  (
-    private route: ActivatedRoute,
-    private buqueService: BuqueService,
-  )
-  {
-    this.idEmbarque = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
+  constructor(private route: ActivatedRoute,
+              private buqueService: BuqueService,
+              private buqueSharingService: BuqueSharingService){
+    this.cargarParametros();
   }
 
   //#endregion
@@ -35,6 +34,16 @@ export class ResumenActoresComponent implements OnInit {
   ngOnInit(): void {
     this.initActores();
   }
+  private cargarParametros(){
+    this.idEmbarque = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
+    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+      const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
+      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
+        this.idEmbarque = resumenOperatoriaEmbarque.embarqueId;
+      }
+    });
+  }
+
   initActores(){
     this.buqueService.obtenerActores(this.idEmbarque).subscribe((res: Actores) => {
       this.actores = res;

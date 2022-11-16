@@ -144,7 +144,7 @@ export class LineasComponent implements OnInit, OnChanges {
     var str = inicial ? linea.controls.alturaInicialCMyMM.value.toString() : linea.controls.alturaFinalCMyMM.value.toString();
     if(rg.test(str + event.key)) return true;
     return false;
-    
+
   }
 
 
@@ -166,45 +166,23 @@ export class LineasComponent implements OnInit, OnChanges {
       let m3 = litros / 1000;
       let tn = this.calcularTn(this.calcularKilos(densidadInicial, litros));
       let salidaTk = 0
+
       if (inicial){
-        linea.controls['kilos'].setValue(tn.toString());
+        linea.controls['kilos'].setValue(tn.toFixed(3).toString());
         linea.controls['litros'].setValue(m3.toString());
       }else{
-        linea.controls['kilosFinales'].setValue(tn.toString());
+        linea.controls['kilosFinales'].setValue(tn.toFixed(3).toString());
         linea.controls['litrosFinales'].setValue(m3.toString());
-        
+
       }
-      salidaTk  =  parseInt(linea.controls['kilos'].value != ''? linea.controls['kilos'].value : 0) - parseInt(linea.controls['kilosFinales'].value != ''? linea.controls['kilosFinales'].value : 0);
-      linea.controls['tkFinal'].setValue(salidaTk.toString());
+       salidaTk  =  parseFloat(linea.controls['kilos'].value != ''? linea.controls['kilos'].value : 0) - parseFloat(linea.controls['kilosFinales'].value != ''? linea.controls['kilosFinales'].value : 0);
+      linea.controls['tkFinal'].setValue(salidaTk.toFixed(3).toString());
 
     });
-    
 
-    // const temperaturaInicial = linea.controls['temperaturaInicial'].value;
-    // const alturaInicialCM = linea.controls['alturaInicialCM'].value;
-    // const alturaInicialMM = linea.controls['alturaInicialMM'].value;
-    // const tkInicial = linea.controls['tkInicial'].value.value;
-    // linea.controls['temperaturaFinal'].setValue(0);
-    // linea.controls['litros'].setValue(0);
-    // linea.controls['kilos'].setValue(0)
-    // linea.controls['temperaturaFinal'].setValue(temperaturaInicial);
-    // if(alturaInicialCM == '' || alturaInicialMM == '' || tkInicial == '' || densidadInicial == '' || temperaturaInicial == '') return
-    // this._lineasService.obtenerLlenadoMilimetroPorTanque(alturaInicialCM, alturaInicialMM, '0' + tkInicial)
-    //   .subscribe(res => {
-    //     let resultado = res != null ? res : '0';
-    //     let valResultado = resultado.toString();
-    //     valResultado = (parseFloat(valResultado) / 1000).toString();
 
-    //     linea.controls['litros'].setValue(valResultado, { emitEvent: false });
-    //     if (densidadInicial != undefined || densidadInicial != null) {
-    //       const kilosInicial = Number(valResultado) * Number(densidadInicial);
-    //       const kilosInicialDecimals = kilosInicial.toString();
-    //       linea.controls['kilos'].setValue(kilosInicialDecimals, { emitEvent: false })
-    //       this.onCalculaKilos(linea);
-    //     }
-    //   });
   }
-  
+
   splitMediciones(medicion:Number): any[] {
     let arrMedicion = medicion.toString().split(',');
     if(arrMedicion != null){
@@ -217,50 +195,15 @@ export class LineasComponent implements OnInit, OnChanges {
     }else{
       return ['0','0'];
     }
-    
+
 
   }
 
   public onCalculaKilos(linea) {
     const temperaturaInicial = linea.controls['temperaturaInicial'].value;
-    
-    
 
-    // linea.controls['alturaFinalCM'].setValue(parseInt(arrMedicionesFinales[0]));
-    // arrMedicionesFinales.length > 1 && linea.controls['alturaFinalMM'].setValue(parseInt(arrMedicionesFinales[1]));
 
-    // const alturaFinalCM = linea.controls['alturaFinalCM'].value;
-    // const alturaFinalMM = linea.controls['alturaFinalMM'].value;
-    // const tkInicial = linea.controls['tkInicial'].value.value;
-    // const densidadFinal = linea.controls['densidadFinal'].value;
-    // linea.controls['tkFinal'].setValue(0, { emitEvent: false })
-    // linea.controls['temperaturaFinal'].setValue(0, { emitEvent: false });
-    // linea.controls['temperaturaFinal'].setValue(temperaturaInicial, { emitEvent: false });
 
-    // if(alturaFinalCM == '' || alturaFinalMM == '' || tkInicial == '' || densidadFinal == '' || temperaturaInicial == '') return
-    // // en base a la altura devuelve los litros
-    // this._lineasService.obtenerLlenadoMilimetroPorTanque(alturaFinalCM, alturaFinalMM, '0' + tkInicial)
-    //   .subscribe(res => {
-    //     // 
-    //     let litrosFinal = res != null ? res : '0';
-    //     litrosFinal = litrosFinal.toString().replace(',', '');
-    //     const kilos = linea.controls['kilos'].value;
-    //     console.log('resultado alturaFinalMM ')
-    //     console.log('densidadFinal ', densidadFinal)
-    //     console.log(' ', litrosFinal, ' ', densidadFinal, ' ', kilos)
-
-    //     if ((litrosFinal != undefined || litrosFinal != null) &&
-    //       (densidadFinal != undefined || densidadFinal != null) &&
-    //       (kilos != undefined || kilos != null)
-    //     ) {
-    //       const kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
-    //       // const kilosFinalRes = (Number(kilos) - kilosFinal);
-    //       const tkFinal = parseInt(kilosFinal.toString());
-    //       linea.controls['litrosFinales'].setValue(litrosFinal);
-    //       linea.controls['kilosFinales'].setValue(kilosFinal);
-    //       linea.controls['tkFinal'].setValue(tkFinal, { emitEvent: false })
-    //     }
-    //   });
   }
 
   calcularKilos(densidad: number, litros:number): number{
@@ -275,7 +218,7 @@ export class LineasComponent implements OnInit, OnChanges {
     let arrMediciones = this.splitMediciones(altura);
     let cm = parseInt(arrMediciones[0]);
     let mm = parseInt(arrMediciones[1]);
-    
+
     if(inicial){
       linea.controls['alturaInicialCM'].setValue(cm);
       linea.controls['alturaInicialMM'].setValue(mm);
@@ -291,101 +234,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
   private cargarLineasEmbarque() {
     console.log('entro a cargarLineasEmbarque');
-    //#region comentado
-    /*
-    this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'].forEach((linea, indexLinea) => {
-      linea.controls['alturaInicialCM'].valueChanges.pipe(startWith(null as object), pairwise())
-        .subscribe(([previous, current]) => {
-          linea.controls['alturaInicialMM'].setValue(null, { emitEvent: false });
-          if (current) {
-            if (current > 0) {
-              linea.controls['alturaInicialMM'].setValue(0, { emitEvent: false })
-            }
-            linea.controls['alturaInicialMM'].enable({ emitEvent: false });
-          } else {
-            linea.controls['alturaInicialMM'].disable({ emitEvent: false });
-          }
-        });
 
-      linea.get('alturaInicialMM').valueChanges.pipe(startWith(null), pairwise())
-        .subscribe(([previous, current]) => {
-          console.log('previo alturaInicialMM')
-          if (current && linea.controls['alturaInicialCM'].value && linea.controls['tkInicial']) {
-            console.log('entro alturaInicialMM')
-            this._lineasService.obtenerLlenadoMilimetroPorTanque(linea.controls['alturaInicialCM'].value, current, '0' + linea.controls['tkInicial'].value.value)
-              .subscribe(res => {
-                let resultado = res != null ? res : '0';
-                const densidadInicial = linea.controls['densidadInicial'].value;
-                console.log('resultado alturaInicialMM ')
-                console.log(' ', resultado, ' ', densidadInicial)
-                const valResultado = resultado.toString().replace(',', '');
-                console.log(' ', valResultado, ' ', densidadInicial)
-
-                linea.controls['litros'].setValue(valResultado, { emitEvent: false });
-                if (densidadInicial != undefined || densidadInicial != null) {
-                  const kilosInicial = (Number(valResultado) * Number(densidadInicial));
-                  linea.controls['kilos'].setValue(kilosInicial, { emitEvent: false })
-                }
-              });
-          } else {
-            linea.controls['litros'].setValue(null, { emitEvent: false });
-          }
-        });
-
-      linea.get('alturaFinalCM').valueChanges.pipe(startWith(null as object), pairwise())
-        .subscribe(([previous, current]) => {
-          linea.controls['alturaFinalMM'].setValue(null, { emitEvent: false });
-          if (current) {
-            if (current > 0) {
-              linea.controls['alturaFinalMM'].setValue(0, { emitEvent: false })
-            }
-            linea.controls['alturaFinalMM'].enable({ emitEvent: false });
-          } else {
-            linea.controls['alturaFinalMM'].disable({ emitEvent: false });
-          }
-        });
-
-      linea.controls['alturaFinalMM'].valueChanges.pipe(startWith(null as object), pairwise())
-        .subscribe(([previous, current]) => {
-          console.log('previo alturaFinalMM')
-
-          if (current && linea.controls['alturaFinalCM'].value && linea.controls['tkInicial']) {
-            console.log('entro alturaFinalMM')
-            this._lineasService.obtenerLlenadoMilimetroPorTanque(linea.controls['alturaFinalCM'].value, current, '0' + linea.controls['tkInicial'].value.value)
-              .subscribe(res => {
-                let litrosFinal = res != null ? res : '0';
-                litrosFinal = litrosFinal.toString().replace(',', '');
-                const densidadFinal = linea.controls['densidadFinal'].value;
-                const kilos = linea.controls['kilos'].value;
-                console.log('resultado alturaFinalMM ')
-                console.log('densidadFinal ', densidadFinal)
-                console.log(' ', litrosFinal, ' ', densidadFinal, ' ', kilos)
-
-                if ((litrosFinal != undefined || litrosFinal != null) &&
-                  (densidadFinal != undefined || densidadFinal != null) &&
-                  (kilos != undefined || kilos != null)
-                ) {
-                  let kilosFinal = Number((Number(densidadFinal) * Number(litrosFinal)));
-                  linea.controls['tkFinal'].setValue(Number(kilos) - kilosFinal, { emitEvent: false })
-                }
-              });
-          } else {
-            linea.controls['tkFinal'].setValue(null, { emitEvent: false });
-          }
-        });
-
-      linea.controls['temperaturaInicial'].valueChanges.pipe(startWith(null as object), pairwise())
-        .subscribe(([previous, current]) => {
-          if (current && linea.controls['materialPuerto'].value) {
-            linea.controls['temperaturaFinal'].setValue(current, { emitEvent: false });
-
-          } else {
-            linea.controls['temperaturaFinal'].setValue('', { emitEvent: false });
-          }
-        });
-    });
-    */
-   //#endregion
   }
 
   private cargarEmbarque(idEmbarque: number) {
@@ -475,13 +324,13 @@ export class LineasComponent implements OnInit, OnChanges {
 
   onEliminarLineasEmbarque(pos: number) {
     if (this.esCalidad) return;
-    
+
     this.confirmationDialogService.confirm('¡Atención!', "¿Seguro que desea eliminar la linea de embarque?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
     .then((confirmed) => {
       if (confirmed) {
         this.lineasEmbarque.removeAt(pos);
         this.colorSelected.splice(pos, 1);
-    
+
         //Si no queda ninguna agrego una nueva al principio.
         if (this.lineasEmbarque.length == 0){
           this.lineasEmbarque.push(this.initLineasEmbarque());
@@ -489,7 +338,7 @@ export class LineasComponent implements OnInit, OnChanges {
       } else return;
     }).catch();
 
-    
+
   }
 
   obtenerLineasEmbarque() {
@@ -503,7 +352,7 @@ export class LineasComponent implements OnInit, OnChanges {
         } else {
           l.tkInicial = l.tkInicial.value;
         }
-        
+
       });
     }
     return lineas;
@@ -551,7 +400,7 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].litrosFinales.enable;
 
 
-      
+
       // this.onCalculaLitros(lineaSel);
     }
     //#endregion
@@ -561,6 +410,7 @@ export class LineasComponent implements OnInit, OnChanges {
     const materialPuertoId = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['materialPuerto'].value.id;
     let temperatura = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaInicial'].value;
     temperatura = temperatura == '' ? 0 : temperatura;
+    linea['controls'].temperaturaFinal.setValue(temperatura);
     if (temperatura == 0) {
       this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaInicial'].setValue(0);
       this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaFinal'].setValue(0);
@@ -590,7 +440,7 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   private validarLineasDuplicadas() {
-    
+
     const lineasEmbarque = this.obtenerLineasEmbarque();
     let bValidarDuplicadas: boolean = false;
     let filtroLineas = [];
@@ -630,7 +480,7 @@ export class LineasComponent implements OnInit, OnChanges {
       filtro.cantidad = selLinea.length;
     })
     const cantidadLineas =  filtroLineas.filter(linea => {return linea.cantidad > 1 });
-    if (cantidadLineas.length > 0) 
+    if (cantidadLineas.length > 0)
       bValidarDuplicadas = true;
     return bValidarDuplicadas;
   }
@@ -674,7 +524,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
       console.log('this.obtenerLineasEmbarque()---->>>');
       console.log(this.obtenerLineasEmbarque());
-      
+
       this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe(res => {
         let texto = "Se guardaron las lineas de embarque correctamente";
         this.esGuardadoActivo = true;
