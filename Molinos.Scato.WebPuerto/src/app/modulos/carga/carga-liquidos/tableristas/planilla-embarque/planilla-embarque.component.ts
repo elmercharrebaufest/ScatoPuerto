@@ -10,6 +10,7 @@ import { Alert } from 'selenium-webdriver';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descriptors/border-radius';
 
 
 @Component({
@@ -70,6 +71,16 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
   }
 
+  
+  eliminarObjPlanilla(i: number){
+    this.getPlanillaDeEmbarque().removeAt(i);
+  }
+
+  agregarObjPlanilla(){
+    this.getPlanillaDeEmbarque().push(this.initLinea())
+  }
+
+
   newForm() {
     console.log('this.lineas...>>')
     console.log(this.lineas)
@@ -104,16 +115,11 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       
       if (this.planillaDeEmbarque.length > 0){
         this.fillPlanillaDeEmbarque();
-      }
-      
-      //Agrego registros restantes para llegar a 3 registros.
-      for (let i = 0; i < (5- this.planillaDeEmbarque.length); i++) {
+      }else{
+        //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
         this.getPlanillaDeEmbarque().push(this.initLinea());
       }
-    }
-
-
-    
+    }    
   }
 
   fillPlanillaDeEmbarque(){
@@ -152,12 +158,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       tn: { value: planilla?.tn ? planilla.tn : null, disabled: true },
       materialPuerto: { value: planilla?.materialPuerto ? planilla.materialPuerto : null, disabled: true },
       fechaComienzoCarga: { value:planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga: '',disabled:result=='true'?true:false},
-      fechaFinalizacionCarga: { value:planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga: '',disabled:result=='true'?true:false},
-      //fechaComienzoCarga: planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga.toString().split('T')[0] : '',
-      //horaComienzoCarga: planilla?.horaComienzoCarga ? planilla.horaComienzoCarga : '',
-      //fechaFinalizacionCarga: planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga.toString().split('T')[0] : '',
-      //horaFinalizacionCarga: planilla?.horaFinalizacionCarga ? planilla.horaFinalizacionCarga : ''
-      //finalizo: planilla.fechaFinalizacionCarga? planilla.fechaFinalizacionCarga : ''
+      fechaFinalizacionCarga: { value:planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga: '',disabled:result=='true'?true:false}
     })
   }
 
@@ -176,17 +177,12 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     const parcelValue =  parcel.split(":");
     parcel = (parcelValue.length > 0) ? parcelValue[1] :  parcel;
     */
-    console.log('parcel--->>')
-    console.log(parcel)
-    let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);
-    
-    console.log('bodega--->>')
-    console.log(bodega)
+    let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);   
 
-    l.controls.tanqueDeAbordo.setValue(bodega.tanqueDeAbordo);
-    l.controls.destino.setValue(bodega.destino);
-    l.controls.tn.setValue(bodega.cantidad);
-    l.controls.materialPuerto.setValue(bodega.materialPuerto);
+    l.controls?.tanqueDeAbordo.setValue(bodega != null ? bodega.tanqueDeAbordo: '' );
+    l.controls?.destino.setValue(bodega != null ? bodega.destino : null);
+    l.controls?.tn.setValue(bodega != null ? bodega.cantidad : 0);
+    l.controls?.materialPuerto.setValue(bodega != null ? bodega.materialPuerto : null);
 
   }
 
@@ -214,10 +210,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
           if (this.planillaDeEmbarque.length > 0){
             this.fillPlanillaDeEmbarque();
-          }
-          
-          //Agrego registros restantes para llegar a 3 registros.
-          for (let i = 0; i < (5- this.planillaDeEmbarque.length); i++) {
+          }else{
+            //Si no tengo ningún registro, agrego 1 por default.
             this.getPlanillaDeEmbarque().push(this.initLinea());
           }
         }
@@ -229,6 +223,13 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       console.log('this.planillaDeEmbarque fin-->>>');
       console.log(planillaEmbarque);
       this.guardando = true;
+      
+      if(this.validarExportadorYPartida(planillaEmbarque) == false){
+        this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        this.guardando = false;
+        return;
+      }
+
       this.moduloCargaService.guardarPlanillaDeEmbarque( planillaEmbarque, this.idModuloDeCarga).subscribe( 
         res => {
           this.guardando = false;
@@ -248,6 +249,20 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
           this.guardando = false;
           this.cargarPlanilla();  
         });
+  }
+  
+  validarExportadorYPartida(planilla: any[]): boolean{
+    for(let i = 0; i <= planilla.length - 1; i++){
+      if(i < planilla.length - 1)
+        for(let j = i + 1; j <= planilla.length -1; j++ ){
+          if(planilla[i].exportador != null && planilla[i].bodegaParcel != null && planilla[j].exportador != null && planilla[j].bodegaParcel != null){
+            if(planilla[i].exportador.nombre == planilla[j].exportador.nombre && planilla[i].bodegaParcel == planilla[j].bodegaParcel){
+              return false ;
+            }
+          } 
+        }
+    }
+    return true;
   }
 
   hasPermisoLiquido_PlanillaEmbarque_Editar() {

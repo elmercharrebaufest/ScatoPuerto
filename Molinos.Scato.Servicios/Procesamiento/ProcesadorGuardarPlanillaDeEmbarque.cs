@@ -18,63 +18,72 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         protected override void ModificarEntidad(GuardarPlanillaDeEmbarque comando)
         {
-            var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(x => x.Id == comando.IdModuloDeCarga);
-
-            ///////////////////////////
-            ///// PROCESO PARA EL HISTORICO /////
-            if (moduloDeCarga.FechaDeCreacion == null)
-                moduloDeCarga.FechaDeCreacion = DateTime.Now;
-            else
-                moduloDeCarga.FechaDeModificacion = DateTime.Now;
+            List<ModuloDeCargaPlanillaDeEmbarque> planillasDeEmbarque_DB = Repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == comando.IdModuloDeCarga).ToList();
 
             ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
 
-            var planillaDeEmbarque = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.Id == comando.Dto.Id);
-
-            if (planillaDeEmbarque != null)
+            foreach (var planilla_DB in planillasDeEmbarque_DB)
             {
-                planillaDeEmbarque.ModuloDeCarga = moduloDeCarga;
-                planillaDeEmbarque.FechaComienzoCarga = comando.Dto.FechaComienzoCarga;
-                planillaDeEmbarque.FechaFinalizacionCarga = comando.Dto.FechaFinalizacionCarga;
-                planillaDeEmbarque.TanqueDeAbordo = comando.Dto.TanqueDeAbordo;
-                planillaDeEmbarque.Tk = comando.Dto.Tk;
-                planillaDeEmbarque.Tn = comando.Dto.Tn;
-                planillaDeEmbarque.Cantidad = comando.Dto.Cantidad;
-                planillaDeEmbarque.BodegaParcel = comando.Dto.BodegaParcel;
-
-                if(comando.Dto.Exportador != null && comando.Dto.Exportador.Id > 0)
+                bool exist = false;
+                foreach (var planilla in comando.Dto)
                 {
-                    var exportador = Repositorio.Obtener<Exportador>(x => x.Id == comando.Dto.Exportador.Id);
-                    if (exportador != null) planillaDeEmbarque.Exportador = exportador;
+                    if (planilla.Id <= 0) continue;
+                    if (planilla.Id == planilla_DB.Id && planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                    {
+                        exist = true;
+                    }
                 }
-                
-            }
-            else
-            {
-                var MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(x => x.Id == comando.Dto.MaterialPuerto.Id);
-                var Destino = Repositorio.Obtener<Destino>(x => x.Id == comando.Dto.Destino.Id);
-                var Exportador = Repositorio.Obtener<Exportador>(x => x.Id == comando.Dto.Exportador.Id);
-
-                planillaDeEmbarque = new ModuloDeCargaPlanillaDeEmbarque()
+                if (!exist)
                 {
-                    ModuloDeCarga = moduloDeCarga,
-                    Destino = Destino,
-                    MaterialPuerto = MaterialPuerto,
-                    Exportador = Exportador,
-                    FechaComienzoCarga = comando.Dto.FechaComienzoCarga,
-                    FechaFinalizacionCarga = comando.Dto.FechaFinalizacionCarga,
-                    TanqueDeAbordo = comando.Dto.TanqueDeAbordo,
-                    Tk = comando.Dto.Tk,
-                    Tn = comando.Dto.Tn,
-                    Cantidad = comando.Dto.Cantidad,
-                    BodegaParcel = comando.Dto.BodegaParcel
-                };
-
-                moduloDeCarga.ModuloDeCargaPlanillaDeEmbarque.Add(planillaDeEmbarque);
+                    Repositorio.Remover(planilla_DB);
+                }
             }
 
+            if (comando.Dto != null)
+            {
+                foreach (var planilla in comando.Dto)
+                {
+                    if (planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                    {
+                        ModuloDeCargaPlanillaDeEmbarque planillaDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.Id == planilla.Id);
+                        if (planillaDB != null)
+                        {
+                            planillaDB.ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
+                            planillaDB.Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id);
+                            planillaDB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id);
+                            planillaDB.Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id);
+                            planillaDB.FechaComienzoCarga = planilla.FechaComienzoCarga;
+                            planillaDB.FechaFinalizacionCarga = planilla.FechaFinalizacionCarga;
+                            planillaDB.TanqueDeAbordo = planilla.TanqueDeAbordo;
+                            planillaDB.Tk = planilla.Tk;
+                            planillaDB.Tn = planilla.Tn;
+                            planillaDB.Cantidad = planilla.Cantidad;
+                            planillaDB.BodegaParcel = planilla.BodegaParcel;
+                        }
+                        else
+                        {
+                            planillaDB = new ModuloDeCargaPlanillaDeEmbarque()
+                            {
+                                ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga),
+                                Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id),
+                                MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id),
+                                Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id),
+                                FechaComienzoCarga = planilla.FechaComienzoCarga,
+                                FechaFinalizacionCarga = planilla.FechaFinalizacionCarga,
+                                TanqueDeAbordo = planilla.TanqueDeAbordo,
+                                Tk = planilla.Tk,
+                                Tn = planilla.Tn,
+                                Cantidad = planilla.Cantidad,
+                                BodegaParcel = planilla.BodegaParcel
+                            };
+
+                            Repositorio.Agregar(planillaDB);
+                        }
+                    }
+                }
+            }
             Repositorio.GuardarCambios();
-        }
+    }
         
 
         protected override void Validar(GuardarPlanillaDeEmbarque comando, Resultado resultado)
