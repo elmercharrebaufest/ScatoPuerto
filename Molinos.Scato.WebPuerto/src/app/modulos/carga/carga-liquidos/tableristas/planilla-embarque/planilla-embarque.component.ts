@@ -71,7 +71,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
   }
 
-  
+
   eliminarObjPlanilla(i: number){
     this.getPlanillaDeEmbarque().removeAt(i);
   }
@@ -86,7 +86,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     console.log(this.lineas)
     if (this.lineas == undefined || this.lineas == null)
       this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
-    
+
     // Evangelino Se considera exportadores unicos no duplicados
     //this.exportadores = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad);
     const exportadoresData = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad)
@@ -99,7 +99,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
     //antes de iniciar las lineas vacias me fijo cuantos registros hay de la DB.
     this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
-    
+
 
     this.getProductos();
     this.getTanqueAbordo();
@@ -107,19 +107,19 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     this.lineasEmbarque = new FormGroup({
       linea:  this.builder.array([])
     });
-    
+
     // this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
 
     //Si tengo items en la planilla de embarque los agrego a la tabla.
     if (this.planillaDeEmbarque){
-      
+
       if (this.planillaDeEmbarque.length > 0){
         this.fillPlanillaDeEmbarque();
       }else{
         //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
         this.getPlanillaDeEmbarque().push(this.initLinea());
       }
-    }    
+    }
   }
 
   fillPlanillaDeEmbarque(){
@@ -137,10 +137,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     this.productos = new Array();
     this.destinos = new Array();
     this.bodegas.forEach(b => {
-      if (b.destino && !this.destinos.find(d => d == b.destino.nombre)) 
+      if (b.destino && !this.destinos.find(d => d == b.destino.nombre))
         this.destinos.push(b.materialPuerto.descripcionCorta);
 
-      if (b.materialPuerto && !this.productos.find(p => p == b.materialPuerto.descripcionCorta)) 
+      if (b.materialPuerto && !this.productos.find(p => p == b.materialPuerto.descripcionCorta))
         this.productos.push(b.materialPuerto)
     })
   }
@@ -155,7 +155,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       tanqueDeAbordo: { value: planilla?.tanqueDeAbordo ? planilla.tanqueDeAbordo : '', disabled: true },
       destino: { value: planilla?.destino ? planilla.destino : null, disabled: true },
       tk: { value:planilla?.tk ? planilla.tk : '',  disabled:result=='true'?false:false},
-      tn: { value: planilla?.tn ? planilla.tn : null, disabled: true },
+      tn: { value: planilla?.tn ? planilla.tn : null, disabled: false },
       materialPuerto: { value: planilla?.materialPuerto ? planilla.materialPuerto : null, disabled: true },
       fechaComienzoCarga: { value:planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga: '',disabled:result=='true'?true:false},
       fechaFinalizacionCarga: { value:planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga: '',disabled:result=='true'?true:false}
@@ -170,18 +170,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     return this.lineasEmbarque.get('linea') as FormArray;
   }
 
-  autoCompleteParcel(parcel, l: FormGroup) {   
+  autoCompleteParcel(parcel, l: FormGroup) {
 
     // Evangelino Se corrige el codigo para obtener por parcel los valores de tanque, destino, tn y producto(material)
     /*
     const parcelValue =  parcel.split(":");
     parcel = (parcelValue.length > 0) ? parcelValue[1] :  parcel;
     */
-    let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);   
+    let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);
 
     l.controls?.tanqueDeAbordo.setValue(bodega != null ? bodega.tanqueDeAbordo: '' );
     l.controls?.destino.setValue(bodega != null ? bodega.destino : null);
-    l.controls?.tn.setValue(bodega != null ? bodega.cantidad : 0);
+   // l.controls?.tn.setValue(bodega != null ? bodega.cantidad : 0);
     l.controls?.materialPuerto.setValue(bodega != null ? bodega.materialPuerto : null);
 
   }
@@ -218,39 +218,39 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       console.log(resp);
     });
   }
-  guardar() {      
+  guardar() {
       const planillaEmbarque = this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto > '' && x.exportador > '' && x.destino != null);
       console.log('this.planillaDeEmbarque fin-->>>');
       console.log(planillaEmbarque);
       this.guardando = true;
-      
-      if(this.validarExportadorYPartida(planillaEmbarque) == false){
-        this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
-        this.guardando = false;
-        return;
-      }
 
-      this.moduloCargaService.guardarPlanillaDeEmbarque( planillaEmbarque, this.idModuloDeCarga).subscribe( 
+      // if(this.validarExportadorYPartida(planillaEmbarque) == false){
+      //   this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+      //   this.guardando = false;
+      //   return;
+      // }
+
+      this.moduloCargaService.guardarPlanillaDeEmbarque( planillaEmbarque, this.idModuloDeCarga).subscribe(
         res => {
           this.guardando = false;
           console.log(res);
           const texto = "Se guardo la planilla de embarque correctamente";
           this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-      
+
 
           console.log('termino');
-        }, 
+        },
         err => {
           this.guardando = false;
           console.log(err);
-        }, 
+        },
         () => {
-          
+
           this.guardando = false;
-          this.cargarPlanilla();  
+          this.cargarPlanilla();
         });
   }
-  
+
   validarExportadorYPartida(planilla: any[]): boolean{
     for(let i = 0; i <= planilla.length - 1; i++){
       if(i < planilla.length - 1)
@@ -259,7 +259,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
             if(planilla[i].exportador.nombre == planilla[j].exportador.nombre && planilla[i].bodegaParcel == planilla[j].bodegaParcel){
               return false ;
             }
-          } 
+          }
         }
     }
     return true;
