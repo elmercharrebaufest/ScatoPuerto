@@ -26,7 +26,7 @@ import { ObsCalidad } from '@ScatoModels/obs-calidad';
 import { Subject } from 'rxjs';
 import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
-import { createFalse } from 'typescript';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -106,6 +106,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
     private embarqueService: EmbarqueService,
+    private toastr: ToastrService
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
@@ -161,6 +162,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.cargarShipParticular(res);
     });
   }
+
   cargarTurnosBodegasDestinos() {
     this._turnosService.sendBodega.subscribe(res => {
       this.bodegas = res;
@@ -169,6 +171,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.getDestinos();
     });
   }
+
   expandir() {
     document.getElementById('collapsePlanillaTurnosLiquidos').className = "collapse show";
   }
@@ -926,6 +929,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
     return turnoValor;
   }
+
   calcularTotal() {
 
     const fechaDesde = this.formCorte.get('horaInicio').value;
@@ -1220,6 +1224,45 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
   }
 
+  private calcularResultadoMediciones(lineaTurno, inicial, final, densidad){
+    console.log(' resultado ==>')
+    console.log(' ', inicial, final, densidad)
+
+    let valInicial = inicial.toString();
+    let valFinal = final.toString();
+    let valDensidad = densidad.toString();
+
+    valInicial = valInicial != null ? valInicial : '0';
+    valFinal = valFinal != null ? valFinal : '0';
+    valDensidad = valDensidad != null ? valDensidad : '0';
+
+    valInicial = valInicial.toString().replace(',', '');
+    valFinal = valFinal.toString().replace(',', '');
+    valDensidad = valDensidad.toString().replace(',', '');
+    
+    console.log(' ', valInicial, valFinal, valDensidad)
+
+    if (valDensidad == null || valDensidad == '0'){
+      this.toastr.error('No se encontro densidad para el material y temperatura ingresada','Error ingreso de mediciones!');
+      return false;
+    }
+
+    if (valInicial == null || valInicial == '0'){
+      this.toastr.error('No se encontraron resultados con los valores de mediciones iniciales ingresados','Error ingreso de mediciones!');
+      return false;
+    }
+    
+    if (valFinal == null || valFinal == '0'){
+      this.toastr.error('No se encontraron resultados con los valores de mediciones finales ingresados','Error ingreso de mediciones!');
+      return false;
+    }
+
+    let cantidad = (Number(valInicial) - Number(valFinal)) * Number(valDensidad);
+    cantidad = cantidad / 1000
+    cantidad = parseInt(cantidad.toString());
+    lineaTurno.cantidad.setValue(cantidad);
+  }
+
   getCantidadLinea(linea: any) {
 
     let lineaTurno = linea?.controls;
@@ -1256,31 +1299,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this.lineasService.obtenerLlenadoMilimetroPorTanque(medidaFinalCM, medidaFinalMM, tkLinea).toPromise(),
         this.lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuerto, temperatura).toPromise()
       ]).then(([inicial, final, densidad]) => {
-
-
-        console.log(' resultado ==>')
-        console.log(' ', inicial, final, densidad)
-
-        let valInicial = inicial.toString();
-        let valFinal = final.toString();
-        let valDensidad = densidad.toString();
-
-        valInicial = valInicial != null ? valInicial : '0';
-        valFinal = valFinal != null ? valFinal : '0';
-        valDensidad = valDensidad != null ? valDensidad : '0';
-
-        valInicial = valInicial.toString().replace(',', '');
-        valFinal = valFinal.toString().replace(',', '');
-        valDensidad = valDensidad.toString().replace(',', '');
-
-        console.log(' ', valInicial, valFinal, valDensidad)
-
-        let cantidad = (Number(valInicial) - Number(valFinal)) * Number(valDensidad);
-        cantidad = cantidad / 1000
-        cantidad = parseInt(cantidad.toString());
-        lineaTurno.cantidad.setValue(cantidad);
-      })
-
+        this.calcularResultadoMediciones(lineaTurno, inicial, final, densidad)
+      }).catch((ex)=> {
+        const mensaje = `No se pudo conectar al servicio ${ex.url}`;
+        this.toastr.error(mensaje,'Error de conexión a los servicios!');
+      });
     }
   }
 
@@ -1761,6 +1784,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       linea.controls['medidaFinalCMyMM'].setValue(cm + ',' + mm);
     }
     linea.controls['medidaFinalMM'].setValue(mm);
+    this.getCantidadLinea(linea);
   }
 
   hasPermisoTableroLiquido_AgregarTurno() {

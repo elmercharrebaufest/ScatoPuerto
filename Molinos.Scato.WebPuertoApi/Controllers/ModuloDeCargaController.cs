@@ -12,6 +12,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Linq;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -204,11 +205,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                foreach (var item in planillaDeEmbarqueDtos)
-                {
-                    comandos.Ejecutar(new GuardarPlanillaDeEmbarque { Dto = item, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
-                }
-                return Request.CreateResponse(HttpStatusCode.OK);
+                comandos.Ejecutar(new GuardarPlanillaDeEmbarque { Dto = planillaDeEmbarqueDtos, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
+                List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarqueDtos1 = servicio.ObtenerModuloDeCarga(idModuloDeCarga)?.ModuloDeCargaPlanillaDeEmbarque.ToList();
+                return Request.CreateResponse(HttpStatusCode.OK, planillaDeEmbarqueDtos1);
             }
             catch
             {
