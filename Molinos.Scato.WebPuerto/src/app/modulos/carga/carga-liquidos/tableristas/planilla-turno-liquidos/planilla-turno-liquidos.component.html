@@ -23,7 +23,7 @@
                 <table class='table table-bordered turnos'>
                     <thead class="header-fijo">
                         <tr>
-                            <th class="header-fijo tabla-border-resaltado">Día</th>
+                            <th class="header-fijo tabla-border-resaltado" >Día</th>
                             <th class="header-fijo tabla-border-resaltado">Turno</th>
                             <th class="header-fijo tabla-border-resaltado" width="12%">Exportador</th>
                             <th class="header-fijo tabla-border-resaltado" width="10%">Destino</th>
@@ -37,12 +37,14 @@
                             <th class="header-fijo tabla-border-resaltado" width="10%">Medición final</th>
                             <!-- <th class="header-fijo tabla-border-resaltado">Med.fin. MM</th> -->
                             <th class="header-fijo tabla-border-resaltado" width="5%">Cant.</th>
-                            <th class="header-fijo tabla-border-resaltado" width="4%"></th>
+                            <th class="header-fijo tabla-border-resaltado ocultarEliminarTurno" width="4%"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <ng-container formArrayName='diasTurno'>
                             <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
+                                <div class="html2pdf__page-break" *ngIf="d >0">
+                                </div>
                                 <tr>
                                     <td [attr.rowspan]='getRowSpan(dia) + 1'>
 
@@ -106,6 +108,7 @@
                                             <ng-container
                                                 *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
                                                 [formGroupName]='i'>
+                                              
                                                 <tr disabled="true">
                                                     <!-- EXPORTADOR -->
                                                     <td>
@@ -196,7 +199,7 @@
                                                             class='planilla-text-derecha'></td>
                                                     <td>
                                                         <ng-container *ngIf="hasPermisoTableroLiquido_EliminarLinea()">
-                                                            <div fxFlex='2' class='full-right'
+                                                            <div fxFlex='2' class='full-right ocultarEliminarFila'
                                                                 *ngIf="!turno.value.guardadoPorTablerista">
                                                                 <img src="assets/trashIcon.svg" class="basurerito"
                                                                     (click)="onEliminarDetalleTurno(result, d, t, i)"
@@ -209,9 +212,9 @@
                                             </ng-container>
                                         </ng-container>
                                         <tr>
-                                            <td colspan="13" class='btn-add-cell'>
+                                            <td colspan="13" class='btn-add-cell '>
                                                 <ng-container *ngIf="hasPermisoTableroLiquido_AgregarLinea()">
-                                                    <div class='btn-add-container center-bt' 
+                                                    <div class='btn-add-container center-bt ocultarAgregarLinea' 
                                                         (click)='onAgregarDetalleTurno(turno, d)' #addButton>
                                                         <button type='button' class='btn btn-primary bt-circle'
                                                             style='margin-top: -5px;'>+</button>
@@ -221,8 +224,8 @@
                                             </td>
                                         </tr>
                                         <tr class="tabla-fila-corte-boton">
-                                            <td colspan="13" class='btn-add-cell'>
-                                                <div class='btn-add-container center-bt' 
+                                            <td colspan="13" class='btn-add-cell '>
+                                                <div class='btn-add-container center-bt ocultarAgregarCorte' 
                                                     (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                     <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
                                                         <button type='button' class='btn btn-primary bt-circle'
@@ -289,8 +292,10 @@
             </perfect-scrollbar>
         </div>
     </form>
-
-    <div fxLayout='row wrap' class='px-4 pb-4' *ngIf='turnoPuerto'>
+   <div class="html2pdf__page-break">    
+   </div>
+<br>
+    <div fxLayout='row wrap ' class='px-4 pb-4 ' *ngIf='turnoPuerto'>
         <div fxFlex='50'>
             <div fxLayout='row wrap'>
                 <div fxFlex='100'>
@@ -311,7 +316,7 @@
                 </div>
             </div>
         </div>
-        <div fxFlex='50' class='right-side'>
+        <div fxFlex='50' class='right-side totalABordo'>
             <div class='bt-total'>Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn'></div>
             </div>
         </div>

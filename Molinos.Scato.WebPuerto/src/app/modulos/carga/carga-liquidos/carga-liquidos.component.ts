@@ -153,27 +153,30 @@ export class CargaLiquidosComponent implements OnInit {
     let scrollTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("scroll-bar-turnos-liquidos") : null;
     let scrollValue = this.mostrarTableristaOperando == true && scrollTurnosLiquidos.style.height;
     let botonAgregarTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-agregar-turnos-liquidos") : null;
-    let botonGuardarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-guardar-turno-liquidos") : null;
+
     let botonTurnoEnviadoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-turno-enviado-liquidos") : null;
     let botonExportarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-exportar-planilla-liquidos") : null;
     if (botonExportarTurnoLiquidos != null) valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
     let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
-    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
-    let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null;
-    let iconosRelojes = document.getElementsByName('relojPeriodo');
-    let planillaDeTurnos = this.mostrarTableristaOperando == true ? document.getElementById("turno-liquidos") : null;
-    let graficoDeRitmo = this.mostrarTableristaOperando == true ? document.getElementById("grafico-ritmo") : null;
-
+    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display    
+    let iconosRelojes = document.getElementsByName('relojPeriodo');   
     //Botones que siempre tienen que estar ocultos.
     let guardarPeriodoDeCarga = document.getElementById("guardarPeriodoDeCarga");
     let collapse = this.elem.nativeElement.querySelectorAll("#ocultarCollapse");
     let agregarNuevaFila = document.getElementById("btn-add-container-lineas");
-    let eliminarLinea = document.getElementById("btn-eliminar-lineas");
-    let guardarPlanillaEmbarque = document.getElementById("guardarPlanillaEmbarque");
-
-
-
-
+    let guardarPlanillaEmbarque = document.getElementById("guardarPlanillaEmbarque");   
+    let guardarTurnoLiquido = this.elem.nativeElement.querySelectorAll("#btn-guardar-turno-liquidos");
+    let ocultarAgregarLinea = this.elem.nativeElement.querySelectorAll(".ocultarAgregarLinea");
+    let ocultarAgregarCorte = this.elem.nativeElement.querySelectorAll(".ocultarAgregarCorte");
+    let ocultarEliminarTurno = document.getElementsByClassName("ocultarEliminarTurno");
+    let enviarTurnoARecibidor = this.elem.nativeElement.querySelectorAll("#btn-turno-enviado-liquidos");
+    let IconoTotalABordo = this.elem.nativeElement.querySelectorAll(".img-tn");
+    let totalABordo = document.getElementById("totalABordo");
+    let eliminarLineas = this.elem.nativeElement.querySelectorAll(".ocultarEliminarFila");
+    let tablaTurno = this.elem.nativeElement.querySelectorAll(".turnos");
+    let eliminarLineasDeEmbarque = this.elem.nativeElement.querySelectorAll(".btn-eliminar");
+    
+   
     // #endregion
 
 
@@ -182,27 +185,37 @@ export class CargaLiquidosComponent implements OnInit {
     iconosRelojes.forEach(reloj => reloj.style.display = 'none');
 
     btonConformacionLineasEmbarque.style.display = 'none';
-    if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'none';
     if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
 
     if (this.mostrarTableristaOperando == true) {
       if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'none';
-      if (botonGuardarTurnoLiquidos != null) botonGuardarTurnoLiquidos.style.display = 'none';
+     
       if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'none';
       if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = 'none';
       if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = 'auto';
-      if (planillaDeTurnos != null) planillaDeTurnos.style.display = 'none';
-      if (graficoDeRitmo != null) graficoDeRitmo.style.display = 'none';
+      
       //Botones que siempre tienen que estar ocultos
-      if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'none';
-      if (collapse != null) {
-        for (let i = 0; i < collapse.length; i++) {
-          collapse[i].style.display = 'none';
+      if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'none';      
+      if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'none';
+      if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'none';    
+      if (totalABordo != null) totalABordo.style.display = 'none';    
+     
+      if (tablaTurno != null) {
+        for (let i = 0; i < tablaTurno.length; i++) {
+          tablaTurno[i].classList.add('borrarBordes');
         }
       }
-      if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'none';
-      if (eliminarLinea != null) eliminarLinea.style.display = 'none';
-      if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'none';
+      
+      this.ocultarCamposEnPDFListas(eliminarLineasDeEmbarque, "none");
+      this.ocultarCamposEnPDFListas(eliminarLineas, "none");
+      this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "none");
+      this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "none");
+      this.ocultarCamposEnPDFListas(ocultarAgregarLinea, "none");
+      this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "none");
+      this.ocultarCamposEnPDFListas(collapse, "none");
+      this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "none");
+      this.ocultarCamposEnPDFListas(IconoTotalABordo, "none");
+      
     }
     // #endregion
 
@@ -213,26 +226,32 @@ export class CargaLiquidosComponent implements OnInit {
       iconosRelojes.forEach(reloj => reloj.style.display = 'block');
 
       btonConformacionLineasEmbarque.style.display = valueGuardarLieasEmbarque;
-      if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'block';
-
       if (this.mostrarTableristaOperando == true) {
         if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'block';
-        if (botonGuardarTurnoLiquidos != null) botonGuardarTurnoLiquidos.style.display = 'block';
         if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
         if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
-        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;
-        if (planillaDeTurnos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
-        if (graficoDeRitmo != null) planillaDeTurnos.style.display = 'block';
+        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;       
         //Botones que siempre tienen que estar ocultos
-        if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'block';
-        if (collapse != null) {
-          for (let i = 0; i < collapse.length; i++) {
-            collapse[i].style.display = 'block';
+        if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'block';        
+        if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'block';
+        if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'block';
+        if (totalABordo != null) totalABordo.style.display = 'block';    
+        this.ocultarCamposEnPDFListas(eliminarLineasDeEmbarque, "block");
+        this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "block");
+        this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "revert");
+        this.ocultarCamposEnPDFListas(ocultarAgregarLinea, "block");
+        this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "block");
+        this.ocultarCamposEnPDFListas(collapse, "block");
+        this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "block");
+        this.ocultarCamposEnPDFListas(IconoTotalABordo, "block");
+        this.ocultarCamposEnPDFListas(eliminarLineas, "flex");
+        if (tablaTurno != null) {
+          for (let i = 0; i < tablaTurno.length; i++) {
+            tablaTurno[i].classList.add('agregarBordes');
+            tablaTurno[i].classList.remove('borrarBordes');
           }
         }
-        if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'block';
-        if (eliminarLinea != null) eliminarLinea.style.display = 'block';
-        if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'block';
+       
       }
     }, 5000);
     // #endregion
@@ -242,15 +261,14 @@ export class CargaLiquidosComponent implements OnInit {
 
     this.ocultarBotonesParaImpresion();
     this.cargaPdf = true;
-
     //OBTENGO EL ID DE QUE ESTABLECÍ EN EL HTML
     let element = document.getElementById('imprimirCargaLiquidos');
     let opt = {
-      margin: 0,
+      margin: [0.2, 0],
       filename: 'Pantalla Operaciones.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 3, letterRendering: true },                 //IMPRIMO PANTALLA DE LIQUIDOS USANDO LIBRERIA JS2PDF, SETEANDO
-      jsPDF: { unit: 'in', format: 'a3', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 
     if (finalizado) {
@@ -462,4 +480,11 @@ export class CargaLiquidosComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.Operadores_EnviarATablerista);
   }
 
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+    if (selector != null) {
+      for (let i = 0; i < selector.length; i++) {
+        selector[i].style.display = ocultarMostrar;
+      }
+    }
+  }
 }
