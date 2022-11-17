@@ -264,3 +264,11 @@ table.turnos table.tabla-embebida th{
 .bandera{
     height: 38px;
 }
+
+.borrarBordes{
+    border:none !important;
+}
+
+.agregarBordes{
+    border:1px !important;
+}

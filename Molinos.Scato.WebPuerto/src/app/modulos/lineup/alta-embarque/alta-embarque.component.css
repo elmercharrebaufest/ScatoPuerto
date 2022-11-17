@@ -32,3 +32,9 @@ img:hover{
     left: 100%;
 
 }
+.margen-borrado-seleccion{ 
+    margin-top: -5px;
+}
+.imagen-borrado-seleccion{ 
+    height: 40px;
+}
