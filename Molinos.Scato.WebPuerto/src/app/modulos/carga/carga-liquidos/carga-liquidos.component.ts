@@ -287,14 +287,7 @@ export class CargaLiquidosComponent implements OnInit {
       return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     //CAMBIOS, POR LO QUE DEBERIA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
-    // this.hideSpinner.emit(true);
-    if (this.enviado && !finalizar) {
-      this.guardarContinuacion(finalizar);
-    } else {
-      this.guardarContinuacion(finalizar);
-
-
-    }
+    this.guardarContinuacion(finalizar);
   }
   cambiarEstado() {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
@@ -371,6 +364,7 @@ export class CargaLiquidosComponent implements OnInit {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {
             this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+            this.cambiarEstado();
             this.imprimir(true, finalizar)
 
           },
@@ -423,15 +417,12 @@ export class CargaLiquidosComponent implements OnInit {
                 .then((confirmed) => {
                   if (confirmed) {
                     this.hideSpinner.emit(false)
-                    this.cambiarEstado();
                     return
                   }
                   else
-                    this.cambiarEstado();
                   window.location.reload();
                 }).catch(() => window.location.reload());
             }, error => {
-              this.cambiarEstado();
               this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
               this.hideSpinner.emit(false);
             })

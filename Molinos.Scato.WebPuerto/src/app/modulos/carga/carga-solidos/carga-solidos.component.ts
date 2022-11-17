@@ -281,6 +281,7 @@ export class CargaSolidosComponent implements OnInit {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {
             this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+            this.cambiarEstado();
             this.imprimir(true, finalizar)},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
@@ -337,22 +338,18 @@ export class CargaSolidosComponent implements OnInit {
                 .then((confirmed) => {
                   if (confirmed){
                     this.hideSpinner.emit(false)
-                    this.cambiarEstado();
                     return
                   }
                 }).catch(() => window.location.reload());
             }, error => {
               this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
-              this.cambiarEstado();
               this.hideSpinner.emit(false);
             })
         }
         else
-          this.cambiarEstado();
           this.hideSpinner.emit(false);
       })
       .catch(() => {
-        this.cambiarEstado();
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.hideSpinner.emit(false);
       });
