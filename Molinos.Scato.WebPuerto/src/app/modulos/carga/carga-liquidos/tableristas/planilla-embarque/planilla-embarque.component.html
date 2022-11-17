@@ -5,7 +5,7 @@
 
 <div id='planillaEmbarque' class='pb-5 collapse show'>
     <div class='btn-add-container center-bt'
-    style="margin-bottom: 30px" 
+    style="margin-bottom: 30px"
     (click)='agregarObjPlanilla()' #addButton>
     <button type='button' class='btn btn-primary bt-circle'
         style='margin-top: -5px;'>+</button>
@@ -60,7 +60,7 @@
                                         <input formControlName="tk">
                                     </td>
                                     <td>
-                                        <input formControlName='tn'  class="control-bloqueado">
+                                        <input formControlName='tn'>
                                     </td>
                                     <td>
                                         <select formControlName='materialPuerto' [compareWith]='compareLineaItem' class="control-bloqueado">
@@ -113,7 +113,7 @@
                 </div>
                 <div class="row"></div>
             </div>
-            
+
         </div>
     </div>
     <br/>
@@ -122,5 +122,5 @@
             <button type="button" class="btn btn-primary" [disabled]="this.guardando" (click)="guardar()">GUARDAR</button>
         </ng-container>
     </div>
-    
+
 </div>
