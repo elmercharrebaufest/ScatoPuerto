@@ -1170,6 +1170,9 @@ export class AltaEmbarqueComponent implements OnInit {
   public onChangeAMPM(event) {
     this.horaRecalada.nativeElement.value = '';
   }
+  public onBorrarSeleccionAMPM(){
+    this.embarqueForm.get('meridiemRecalada').setValue('');
+  }
   // #endregion
 
   public searchVapores = (text$: Observable<string>) => text$.pipe(
