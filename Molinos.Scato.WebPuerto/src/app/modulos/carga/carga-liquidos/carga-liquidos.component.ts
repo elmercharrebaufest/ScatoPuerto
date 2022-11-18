@@ -175,7 +175,6 @@ export class CargaLiquidosComponent implements OnInit {
     let eliminarLineas = this.elem.nativeElement.querySelectorAll(".ocultarEliminarFila");
     let tablaTurno = this.elem.nativeElement.querySelectorAll(".turnos");
     let eliminarLineasDeEmbarque = this.elem.nativeElement.querySelectorAll(".btn-eliminar");
-    
    
     // #endregion
 
