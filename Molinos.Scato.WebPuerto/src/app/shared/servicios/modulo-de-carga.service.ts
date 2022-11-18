@@ -133,8 +133,6 @@ export class ModuloDeCargaService {
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number){
-    console.log('guardarLineasDeEmbarque')
-    console.log(JSON.stringify(lineasDeEmbarque));
     return this.http.post(`${this.url}ModuloDeCarga/GuardarLineasDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, lineasDeEmbarque, { 'withCredentials': true});  
   }
 
