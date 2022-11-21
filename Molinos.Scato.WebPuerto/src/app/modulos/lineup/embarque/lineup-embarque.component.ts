@@ -108,12 +108,10 @@ export class LineupEmbarqueComponent implements OnInit {
     const embarquePosicion = this.buquesGeolocalizacion.embarque?.embarquePosicion;
     if (embarquePosicion.length == 0) {
       const errores = this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(this.listaErroresEmbarques ,id);
-        console.log('errores-->>',errores)
         if (errores != null){
           this.mensajeBuque = errores.mensaje;
           this.hayBuque =  false;
         }else{
-          console.log('this.buquesGeolocalizacion.embarque-->>', this.buquesGeolocalizacion.embarque)
           this.mensajeBuque = "No se encontró. Completar IMO";
           this.hayBuque =  false;
         }
@@ -177,7 +175,7 @@ export class LineupEmbarqueComponent implements OnInit {
         }
       }
       let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-      lineUpDto.moduloDeCarga = null;
+      //lineUpDto.moduloDeCarga = null;
       this.lineUpService.modificarLineUp(lineUpDto).subscribe(res => console.log(res));
     }
   }
@@ -234,14 +232,14 @@ export class LineupEmbarqueComponent implements OnInit {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
       if (accion == UbicacionBuquePuerto.MuelleDeCarga) {
-            if (this.BarcoEnMuelleActualmente(this.listadoEmbarques)) {
-              this.confirmationDialogService.confirm('¡Error!', 'Actualmente ya se encuentra otro buque en muelle', 'Cerrar', '', null, null, Tipoalerta.Error);
-              return;
-            }
-            else {
-              this.mostrarSpinnerCaptura = true;
-              this.actualizarUbicacion(accion);
-            }
+        if (this.BarcoEnMuelleActualmente(this.listadoEmbarques)) {
+          this.confirmationDialogService.confirm('¡Error!', 'Actualmente ya se encuentra otro buque en muelle', 'Cerrar', '', null, null, Tipoalerta.Error);
+          return;
+        }
+        else {
+          this.mostrarSpinnerCaptura = true;
+          this.actualizarUbicacion(accion);
+        }
       }
       /**Zarpó**/
       else if (accion == UbicacionBuquePuerto.Zarpo) {
@@ -252,7 +250,7 @@ export class LineupEmbarqueComponent implements OnInit {
               this.instanciaWorkflow.embarque.ubicacion = accion;
               this.instanciaWorkflow.lineUp.ubicacion = accion;
               let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-              lineUpDto.moduloDeCarga = null;
+              //lineUpDto.moduloDeCarga = null;
               this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
                 if (this.observador) {
                   setTimeout(() => {
@@ -275,7 +273,7 @@ export class LineupEmbarqueComponent implements OnInit {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;
     let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-    lineUpDto.moduloDeCarga = null;
+    //lineUpDto.moduloDeCarga = null;
     this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => { 
     }, error =>{}
      , () =>{
@@ -380,7 +378,7 @@ export class LineupEmbarqueComponent implements OnInit {
       if (this.fechaCarta && this.horaCarta) {
         this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada = this.fechaCarta + ' ' + this.horaCarta;
         let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-        lineUpDto.moduloDeCarga = null;
+        //lineUpDto.moduloDeCarga = null;
         this.lineUpService.modificarLineUp(lineUpDto).subscribe(
           ret => console.log(ret));
       }
