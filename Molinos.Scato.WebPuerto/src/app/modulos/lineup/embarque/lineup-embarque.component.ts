@@ -176,8 +176,9 @@ export class LineupEmbarqueComponent implements OnInit {
           break;
         }
       }
-
-      this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(res => console.log(res));
+      let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+      lineUpDto.moduloDeCarga = null;
+      this.lineUpService.modificarLineUp(lineUpDto).subscribe(res => console.log(res));
     }
   }
 
@@ -250,7 +251,9 @@ export class LineupEmbarqueComponent implements OnInit {
               this.showSpinner.emit(true)
               this.instanciaWorkflow.embarque.ubicacion = accion;
               this.instanciaWorkflow.lineUp.ubicacion = accion;
-              this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => {
+              let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+              lineUpDto.moduloDeCarga = null;
+              this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
                 if (this.observador) {
                   setTimeout(() => {
                     this.observador.Actualizar();
@@ -271,7 +274,9 @@ export class LineupEmbarqueComponent implements OnInit {
   actualizarUbicacion(accion) {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;
-    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { 
+    let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+    lineUpDto.moduloDeCarga = null;
+    this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => { 
     }, error =>{}
      , () =>{
 
@@ -374,7 +379,9 @@ export class LineupEmbarqueComponent implements OnInit {
       console.log(this.fechaCarta + ' ' + this.horaCarta)
       if (this.fechaCarta && this.horaCarta) {
         this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada = this.fechaCarta + ' ' + this.horaCarta;
-        this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(
+        let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+        lineUpDto.moduloDeCarga = null;
+        this.lineUpService.modificarLineUp(lineUpDto).subscribe(
           ret => console.log(ret));
       }
     }

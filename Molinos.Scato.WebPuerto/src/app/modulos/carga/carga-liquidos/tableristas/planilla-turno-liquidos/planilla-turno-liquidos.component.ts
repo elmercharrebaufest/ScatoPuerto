@@ -120,9 +120,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.cargarEmbarqueShipParticular();
     this.obtenerTipoLineaEmbarque();
     this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
-      if (data) this.obtenerTipoLineaEmbarque();
-      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
-      console.log('this.fechaHoraInicioCarga--->', this.fechaHoraInicioCarga);
+      if (data) {
+        this.obtenerTipoLineaEmbarque();
+        this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
+      }
     });
   }
 
@@ -665,6 +666,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let lineasEmbarque = null;
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
       lineasEmbarque = resp.moduloDeCargaLineasDeEmbarque;
+      this.lineas = resp.moduloDeCargaLineasDeEmbarque;
     },
       error => { },
       () => {
@@ -1699,7 +1701,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
         const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+        const selModuloDeCargaLineasDeEmbarque = resp.moduloDeCargaLineasDeEmbarque;
         this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+        this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque = selModuloDeCargaLineasDeEmbarque;
         this.fillPlanilla();
         this.recargarGraficos.emit(true);
       }
