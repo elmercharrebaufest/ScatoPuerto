@@ -52,9 +52,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                                 .Select(x => new EmbarqueNavDto
                                 {
                                     Id = x.Embarque.Id,
-                                    PlanoDeCargaId = x.LineUp.PlanoDeCarga.Id,
-                                    ModuloDeCargaId = x.LineUp.ModuloDeCarga.Id,
-                                    NombreBuque = x.Embarque.NombreBuque,
+                                    PlanoDeCargaId = x.LineUp.PlanoDeCarga != null ? x.LineUp.PlanoDeCarga.Id : 0,
+                                    ModuloDeCargaId = x.LineUp.ModuloDeCarga != null ? x.LineUp.ModuloDeCarga.Id : 0,
+                                    NombreBuque = x.Embarque != null ? x.Embarque.NombreBuque : "",
                                     Cargado = x.LineUp.PlanoDeCarga != null && x.LineUp.PlanoDeCarga.Cargado,
                                     NombreUbicacion = ubicaciones.Where(z => z.Id == x.Embarque.Ubicacion).FirstOrDefault()?.Nombre,
                                     EsLiquido = x.Embarque.EsLiquido
