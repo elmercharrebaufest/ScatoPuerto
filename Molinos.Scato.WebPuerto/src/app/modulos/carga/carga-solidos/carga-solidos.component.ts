@@ -330,7 +330,7 @@ export class CargaSolidosComponent implements OnInit {
     var inputTitle = "Destinatarios";
     var mail = new Mail(`${this.embarque.nombreBuque}. ${this.embarque.materialesPuertoCantidad[0].descripcionCorta}. Muelle: San Benito. Plano de carga, nominación, adjunto comunicación previa y gráfico de celdas.`);
     mail.adjunto = this.adjunto.split("base64,")[1];
-    mail.nombre = "GráficoDeCeldas.pdf"
+    mail.nombre = this.embarque.nombreBuque + "planilla de tablerista.pdf"
     this.planoDeCargaService.obtenerBodyPlanoDeCarga(this.embarqueSelected.planoDeCargaId, this.embarque).subscribe(x => { mail.body = x });
     this.planoDeCargaService.obtenerDestinatariosPlanoDeCarga().subscribe(x => mail.destinatarios = x);
     var button1 = 'Enviar';

@@ -17,7 +17,7 @@
         <ngx-material-timepicker #encendidoTime ></ngx-material-timepicker>
       </div>
       
-      <div class="col-1" *ngIf="!cargaIniciada" style="margin-top: 20px" >
+      <div class="col-1 ocultarPdf" *ngIf="!cargaIniciada" style="margin-top: 20px" >
         <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
           <button [disabled]="inicioCargaForm.invalid" 
                   class="btn btn-success" 
