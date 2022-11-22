@@ -12,12 +12,12 @@
       <div class="col-2" >
         <div class="input_img" style="margin-top: 20px;">
           <input class="form-control" formControlName='horaInicioCarga' [disabled]="!editandoFecha && cargaIniciada" placeholder="00:00" [ngxTimepicker]="encendidoTime" [format]="24">
-          <img src="assets/reloj.svg" class="imgClockInput1">
+          <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
         </div>
         <ngx-material-timepicker #encendidoTime ></ngx-material-timepicker>
       </div>
       
-      <div class="col-1" *ngIf="!cargaIniciada" style="margin-top: 20px" >
+      <div class="col-1 ocultarPdf" *ngIf="!cargaIniciada" style="margin-top: 20px" >
         <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
           <button [disabled]="inicioCargaForm.invalid" 
                   class="btn btn-success" 
@@ -25,7 +25,7 @@
         </ng-container>
       </div> 
       <!-- LAPIZ PARA EDICIÓN -->
-      <div class="col-1" *ngIf="!editandoFecha && cargaIniciada">
+      <div class="col-1 ocultarPdf" *ngIf="!editandoFecha && cargaIniciada">
         <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
           <svg style="margin-top: 20px"  id="Componente_176_1" 
               data-name="Componente 176 – 1" xmlns="http://www.w3.org/2000/svg" 

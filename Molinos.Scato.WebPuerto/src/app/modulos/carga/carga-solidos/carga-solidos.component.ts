@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { forkJoin } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
@@ -77,7 +77,8 @@ export class CargaSolidosComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private _changeDetector: ChangeDetectorRef,
     private _procesoGuardar: ProcesoGuardarService,
-    private _buqueService: BuqueService
+    private _buqueService: BuqueService,
+    private elem: ElementRef
   ) {
     this.user = this.session.getUser();
    }
@@ -181,7 +182,7 @@ export class CargaSolidosComponent implements OnInit {
 
     let element = document.getElementById('imprimirCargaSolidos');
     let opt = {
-      margin:       [.1, 0],
+      margin:       [0.5, 0],
       filename:     'Pantalla Operaciones.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
@@ -228,7 +229,12 @@ export class CargaSolidosComponent implements OnInit {
     if(botonTerminarYExportarPLanillasSolidos != null) valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display;
     if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
     if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
-      
+    let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
+    let ocultarCollapse= this.elem.nativeElement.querySelectorAll(".ocultarCollapse");
+    this.ocultarCamposEnPDFListas(ocultarBotones, "none");
+    this.ocultarCamposEnPDFListas(ocultarCollapse, "none");
+    //
+    //
     setTimeout(() => {
       if(this.mostrarTableristaOperando == true && this.inicioCarga == true) {
         if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'block');
@@ -236,6 +242,8 @@ export class CargaSolidosComponent implements OnInit {
       }
 
       if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+      this.ocultarCamposEnPDFListas(ocultarBotones, "block");
+      this.ocultarCamposEnPDFListas(ocultarCollapse, "block");
     },6500);
   }
 
@@ -322,7 +330,7 @@ export class CargaSolidosComponent implements OnInit {
     var inputTitle = "Destinatarios";
     var mail = new Mail(`${this.embarque.nombreBuque}. ${this.embarque.materialesPuertoCantidad[0].descripcionCorta}. Muelle: San Benito. Plano de carga, nominación, adjunto comunicación previa y gráfico de celdas.`);
     mail.adjunto = this.adjunto.split("base64,")[1];
-    mail.nombre = "GráficoDeCeldas.pdf"
+    mail.nombre = this.embarque.nombreBuque + "planilla de tablerista.pdf"
     this.planoDeCargaService.obtenerBodyPlanoDeCarga(this.embarqueSelected.planoDeCargaId, this.embarque).subscribe(x => { mail.body = x });
     this.planoDeCargaService.obtenerDestinatariosPlanoDeCarga().subscribe(x => mail.destinatarios = x);
     var button1 = 'Enviar';
@@ -387,5 +395,13 @@ export class CargaSolidosComponent implements OnInit {
   }
   hasPermisoTableroSolido_VerInformacionAdicional() {
     return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerInformacionAdicional);
+  }
+
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+    if (selector != null) {
+      for (let i = 0; i < selector.length; i++) {
+        selector[i].style.display = ocultarMostrar;
+      }
+    }
   }
 }
