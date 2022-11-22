@@ -11,7 +11,7 @@
                     <label>&nbsp;</label>
                     <div class="input_img">
                         <input formControlName="horaAmarro" class="form-control" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro" [format]="24" (change)="validarAMPM($event)">
-                        <img src="assets/reloj.svg" class="imgClockInput1">
+                        <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
                     </div>
                     <ngx-material-timepicker #fullTimeAmarro (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
                 </div>
@@ -44,7 +44,7 @@
                     <label>&nbsp;</label>
                     <div class="input_img">
                         <input formControlName="horaDesamarro"  class="form-control" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro" [format]="24" (change)="validarAMPM($event)">
-                        <img src="assets/reloj.svg" class="imgClockInput1">
+                        <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
                     </div>
                     <ngx-material-timepicker #fullTimeDesamarro (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
                 </div>
@@ -77,7 +77,7 @@
                     <label>&nbsp;</label>
                     <div class="input_img">
                         <input class="form-control" formControlName="horaHabilitacion" placeholder="00:00" [ngxTimepicker]="fullTimeHabilitacion" [format]="24" (change)="validarAMPM($event)">
-                        <img src="assets/reloj.svg" class="imgClockInput1">
+                        <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
                     </div>
                     <ngx-material-timepicker #fullTimeHabilitacion (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
                 </div>
@@ -86,7 +86,7 @@
                 <p>Velocidad Máxima del viento para amarre 35 Km/h</p>
             </div>
             <ng-container *ngIf="hasPermisoTableroSolido_Amarre_Modificar()">
-                <div  style="display: flex; flex-direction: row; justify-content: center;" >
+                <div  style="display: flex; flex-direction: row; justify-content: center;" class="ocultarPdf" >
                     <button *ngIf="!esSoloLectura" style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
                 </div>
             </ng-container>
