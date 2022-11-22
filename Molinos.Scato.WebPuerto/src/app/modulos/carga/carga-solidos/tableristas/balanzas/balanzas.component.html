@@ -15,7 +15,7 @@
           <div class="col">
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
           </div>
-          <div class="col">
+          <div class="col ocultarPdf">
           	<ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
             	<button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 7, true)'>Corte Manual</button>
 			</ng-container>
@@ -142,7 +142,7 @@
                                       *ngIf="balanza.value.tn>0"
                                       width="28" height="28" viewBox="0 0 28 28" 
                                       (click)='openModalCorte(addCorte7, null, null, false)' 
-                                      class="m-1 icono"
+                                      class="m-1 icono ocultarPdf"
                                       fill="#F0AD4E">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
                                     <path id="Trazado_75" 
@@ -322,7 +322,7 @@
                                         </div>
 
                                         <div class="row mt-3">
-                                          <div class="col flex-between">
+                                          <div class="col flex-between ocultarPdf">
                                             <button class='btn btn-outline-danger' (click)='modal.dismiss(cerrarModal())'>Cancelar</button>
                                             <button name ="ocultarImpresionTableristaSolido" class='btn btn-danger' 
                                                     (click)="eliminarCorteManual(i, balanza.value.numeroBalanza, addCorte7)"
@@ -434,7 +434,7 @@
             <!-- <h6 class="colorSubTitulo">Start: {{ fechaHoraInicioCarga }}</h6> -->
             <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
           </div>
-          <div class="col">
+          <div class="col ocultarPdf">
           	<ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
             	<button name ="ocultarImpresionTableristaSolido" class='btn btn-outline-primary' (click)='openModalCorte(addCorteManual, true, 8, true)'>Corte Manual</button>
 			</ng-container>
@@ -530,7 +530,7 @@
                                       height="25" 
                                       viewBox="0 0 28 25"
                                       (click)='openModalCorte(addCorte8, null, null, false)' 
-                                      class="m-1 icono"
+                                      class="m-1 icono ocultarPdf"
                                       fill="#F0AD4E">
                                     <path id="Trazado_31" 
                                           data-name="Trazado 31" 
@@ -561,7 +561,7 @@
                                       *ngIf="balanza.value.tn>0"
                                       width="28" height="28" viewBox="0 0 28 28" 
                                       (click)='openModalCorte(addCorte8, null, null, false)' 
-                                      class="m-1 icono"
+                                      class="m-1 icono ocultarPdf"
                                       fill="#F0AD4E">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
                                     <path id="Trazado_75" 
@@ -575,7 +575,7 @@
                                       *ngIf="balanza.value.tn==0"
                                       width="28" height="28" viewBox="0 0 28 28" 
                                       (click)='openModalCorte(addCorte8, null, null, true)' 
-                                      class="m-1 icono"
+                                      class="m-1 icono ocultarPdf"
                                       fill="#D9534F">
                                     <g id="Grupo_25" data-name="Grupo 25" transform="translate(-370 -224.594)">
                                     <path id="Trazado_75" 
