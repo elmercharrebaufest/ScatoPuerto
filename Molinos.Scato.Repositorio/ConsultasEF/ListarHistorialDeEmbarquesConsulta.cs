@@ -50,7 +50,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             (fechaFin == null || moduloPeriodoCarga.FechaDesamarro.Value <= fechaFin.Value) &&
                             (String.IsNullOrEmpty(nombreBuque) || item.Embarque.Vapor.Nombre.ToUpper().Contains(nombreBuque.ToUpper()))))
 
-                            orderby moduloPeriodoCarga.FechaDesamarro
+                            orderby moduloPeriodoCarga.FechaDesamarro descending
 
                             select new HistorialDeBusquesDto
                             {
