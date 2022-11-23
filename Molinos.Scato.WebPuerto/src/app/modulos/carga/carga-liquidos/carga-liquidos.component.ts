@@ -175,15 +175,21 @@ export class CargaLiquidosComponent implements OnInit {
     let eliminarLineas = this.elem.nativeElement.querySelectorAll(".ocultarEliminarFila");
     let tablaTurno = this.elem.nativeElement.querySelectorAll(".turnos");
     let eliminarLineasDeEmbarque = this.elem.nativeElement.querySelectorAll(".btn-eliminar");
-   
+    let ocultarPdf = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
+    let selects = this.elem.nativeElement.querySelectorAll(".seleccionable");
+    
+    
     // #endregion
 
 
     //UNA VEZ OBTENIDOS LOS BOTONES LOS OCULTOS CAMBIANDO SU DYSPLAY = 'none'
     // #region OcultarBotones
+    
     iconosRelojes.forEach(reloj => reloj.style.display = 'none');
 
     btonConformacionLineasEmbarque.style.display = 'none';
+   
+    
     if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
 
     if (this.mostrarTableristaOperando == true) {
@@ -200,20 +206,26 @@ export class CargaLiquidosComponent implements OnInit {
       if (totalABordo != null) totalABordo.style.display = 'none';    
      
       if (tablaTurno != null) {
-        for (let i = 0; i < tablaTurno.length; i++) {
-          tablaTurno[i].classList.add('borrarBordes');
+        for (let i = 0; i < tablaTurno.length; i++) {        
+          tablaTurno[i].classList.add('borrarBordes');         
         }
       }
-      
+      this.ocultarCamposEnPDFListas(collapse, "none");
+      this.ocultarCamposEnPDFListas(ocultarPdf, "none");
       this.ocultarCamposEnPDFListas(eliminarLineasDeEmbarque, "none");
       this.ocultarCamposEnPDFListas(eliminarLineas, "none");
       this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "none");
       this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "none");
       this.ocultarCamposEnPDFListas(ocultarAgregarLinea, "none");
-      this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "none");
-      this.ocultarCamposEnPDFListas(collapse, "none");
+      this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "none");    
       this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "none");
-      this.ocultarCamposEnPDFListas(IconoTotalABordo, "none");
+      this.ocultarCamposEnPDFListas(IconoTotalABordo, "none");  
+      if (selects != null) {
+        for (let i = 0; i < selects.length; i++) {
+          selects[i].classList.add('ocultarBackground');
+          selects[i].classList.remove('mostrarBackground');
+        }
+      }
       
     }
     // #endregion
@@ -244,10 +256,18 @@ export class CargaLiquidosComponent implements OnInit {
         this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "block");
         this.ocultarCamposEnPDFListas(IconoTotalABordo, "block");
         this.ocultarCamposEnPDFListas(eliminarLineas, "flex");
+        this.ocultarCamposEnPDFListas(ocultarPdf, "block");
         if (tablaTurno != null) {
           for (let i = 0; i < tablaTurno.length; i++) {
             tablaTurno[i].classList.add('agregarBordes');
             tablaTurno[i].classList.remove('borrarBordes');
+          }
+        }
+
+        if (selects != null) {
+          for (let i = 0; i < selects.length; i++) {
+            selects[i].classList.add("mostrarBackground");
+            selects[i].classList.remove("ocultarBackground");            
           }
         }
        
@@ -418,7 +438,7 @@ export class CargaLiquidosComponent implements OnInit {
     var inputTitle = "Destinatarios";
     var mail = new Mail(`${this.embarque.nombreBuque}. ${this.embarque.materialesPuertoCantidad[0].descripcionCorta}. Muelle: San Benito. Plano de carga, nominación, adjunto comunicación previa y habilitación de tanques.`);
     mail.adjunto = this.adjunto.split("base64,")[1];
-    mail.nombre = this.embarque.nombreBuque + "planilla de tablerista.pdf"
+    mail.nombre = "HabilitaciónDeTanques.pdf"
     this.planoDeCargaService.obtenerBodyPlanoDeCarga(this.embarqueSelected.planoDeCargaId, this.embarque).subscribe(x => { mail.body = x });
     this.planoDeCargaService.obtenerDestinatariosPlanoDeCarga().subscribe(x => mail.destinatarios = x);
     var button1 = 'Enviar';
