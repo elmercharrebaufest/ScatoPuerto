@@ -44,7 +44,8 @@
                 <td class="lista-buque-row-item">
                    <!--  <div >{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div> -->
                     <!--  <div *ngIf="historial.totalRitmoBaja   > 0" class="ritmo-baja-carga">{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div> -->
-                    <div>{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
+                   
+                    <div [ngStyle]="{'color': historial.totalRitmoNormal  > ritmoBajaCarga ? 'RGB(13,205,0)' : 'burlywood' }">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
                 </td>
                 <td class="lista-buque-row-item">{{historial.horasMuelle | date:'h:mm:ss ' }} hs</td>
                 <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>               

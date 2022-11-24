@@ -5,6 +5,7 @@ import { Select, Store } from '@ngxs/store';
 import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { GetObtenerHistorialBuques, LoadingHistorialBuques } from 'app/store/buques/buques.actions';
 import { BuquesState } from 'app/store/buques/buques.state';
 import { Observable, Subscription } from 'rxjs';
@@ -29,6 +30,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   public buscarHistorialBuques: boolean = false;
   public esNoExisteRegistros = false;
   public esResumenOperatoria = false;
+  private ritmoBajaCarga: number;
   // #endregion
 
   // #region Observable
@@ -39,7 +41,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   // #region Constructor
   constructor(private buqueSharingService: BuqueSharingService,
     private store: Store,
-    private route: Router) {
+    private route: Router,
+    private _parametros: ParametrosService) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
       if(data != null && data != undefined){
       this.filtroBuquedaForm = data;
@@ -55,7 +58,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
   // #region Eventos del Componente
   ngOnInit() {
-
+    this._parametros.obtenerParametro("toneladasBajaCarga").subscribe((res: any) => {
+      this.ritmoBajaCarga = res.parametro2;
+    });
   }
 
   ngOnDestroy() {
