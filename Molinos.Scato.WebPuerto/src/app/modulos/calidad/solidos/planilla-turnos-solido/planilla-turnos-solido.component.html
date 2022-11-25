@@ -1,5 +1,4 @@
-    <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>
-
+    <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>    
     <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
         <app-collapse-button collapseSelectorId='collapsePlanillaTurnosSolido'></app-collapse-button>
         <div class="divHeaderRightLeft">
@@ -35,6 +34,8 @@
                     <tbody>
                         <ng-container formArrayName='diasTurno'>
                             <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
+                                <div class="html2pdf__page-break" *ngIf="d >0">
+                                </div>
                                 <tr>
                                     <td [attr.rowspan]='getRowSpan(dia)'>
                                         <div class='column-center'>
@@ -203,8 +204,8 @@
                     </div>
                 </div>
             </div>
-            <div fxFlex='50' class='right-side'>
-                <div class='bt-total'>Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn'></div>
+            <div fxFlex='50' class='right-side' *ngIf="getCantTotalABordo() > 0">
+                <div class='bt-total' >Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn ocultarPdf'></div>
                 </div>
             </div>
         </div>
