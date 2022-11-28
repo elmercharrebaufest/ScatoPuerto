@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
@@ -63,10 +63,11 @@ export class SolidosComponent implements OnInit {
     private balanzas78Service: Balanzas78Service,
     private _changeDetector: ChangeDetectorRef,
     private _CalidadSharedService: CalidadSharedService,
+    private elem: ElementRef,
     private session: SessionService,) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
+ 
   }
 
   ngOnInit(): void {
@@ -78,7 +79,7 @@ export class SolidosComponent implements OnInit {
     )
     if (!this.embarqueSelected)
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-      this.newFormAmarre();
+    this.newFormAmarre();
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
@@ -108,12 +109,12 @@ export class SolidosComponent implements OnInit {
 
       if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
 
-          // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
-          this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
-          this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
-          this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
-          this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
+      // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
+      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
+      this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
+      this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
+      this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
+      this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
     });
 
     this.hideSpinner.emit(false);
@@ -131,8 +132,8 @@ export class SolidosComponent implements OnInit {
   }
   public openModalCargarAmarre(modal: any) {
     this.cargarHorasDesamarro(this.amarreForm);
-        this.errorMessage = false;
-        this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
+    this.errorMessage = false;
+    this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
 
   }
 
@@ -144,8 +145,8 @@ export class SolidosComponent implements OnInit {
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
-        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
-          this.periodoDeCarga=res.moduloDeCargaPeriodoDeCarga[0];
+        if (res.moduloDeCargaPeriodoDeCarga.length > 0) {
+          this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
           this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
           this.horaAmarro = res.moduloDeCargaPeriodoDeCarga[0].horaAmarro;
           this.fechaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].fechaDesamarro;
@@ -164,88 +165,127 @@ export class SolidosComponent implements OnInit {
       });
   }
 
-  finalizaCalidad():void{
+  finalizaCalidad(): void {
     this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
 
 
-  imprimir(imprimir: boolean = false){
-     // #region Imprimir Recibidores Liquido
-      this._CalidadSharedService.ocultarBotonesImprimir();
+  imprimir(imprimir: boolean = false) {
+    // #region Imprimir Recibidores Liquido
+    this._CalidadSharedService.ocultarBotonesImprimir();
+    let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
+    this.ocultarCamposEnPDFListas(ocultarBotones, "none");
+    
+  
 
-     this.RecibidoresPdf = true;
+    this.RecibidoresPdf = true;
 
 
-     let element = document.getElementById('imprimirRecibidoresSolido');
-     let opt = {
-       margin:       0,
-       filename:     'Pantalla Recibidores.pdf',
-       image:        { type: 'jpeg', quality: 0.98 },
-       html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
-       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
-     };
+    let element = document.getElementById('imprimirRecibidoresSolido');
+    let opt = {
+      margin:       [0.3, 0],
+      filename:     'Pantalla Recibidores',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 3, letterRendering: true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
+      pagebreak: { after: '.page-break' }  
+    };
 
-     html2pdf().from(element).set(opt).outputPdf()
-     .then(() => {
-       if (!imprimir) this.RecibidoresPdf = false
-     }).save();
-     // #endregion
+
+    let ele = Array.from(document.getElementsByClassName('break'));
+
+   // html2pdf().from(element).set(opt).outputPdf()
+     // .then(() => {
+       // if (!imprimir) this.RecibidoresPdf = false
+      //}).save();
+
+      let html = html2pdf()
+      .set(opt)
+      .from(ele[0]);
+
+      if (ele.length > 1) {
+        html = html.toPdf();
+        ele.slice(1).forEach((ele, index) => {
+          html = html
+            .get('pdf')
+            .then(pdf => {
+              pdf.addPage()
+            })
+            .from(ele)
+            .toContainer()
+            .toCanvas()
+            .toPdf()
+        })
+      }
+    
+      html = html.then(() => {
+        if (!imprimir) this.RecibidoresPdf = false
+        this.ocultarCamposEnPDFListas(ocultarBotones, "block");
+     }).save();    
+    // #endregion
   }
 
-	hasPermisoRecibidores_Imprimir() {
-    	return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
-	}
+
+
+
+  hasPermisoRecibidores_Imprimir() {
+    return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
+  }
   hasPermisoRecibidores_Finalizar() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Finalizar);
   }
 
   /* SECCION GUARDAR FECHA DESAMARRE Y ZARPAR */
-  newFormAmarre(){
+  newFormAmarre() {
     this.amarreForm = this._builder.group({
-      fechaAmarro : ['',  [Validators.required]],
-      horaAmarro : ['',  [Validators.required]],
-      fechaDesamarro :  ['',  [Validators.required]],
-      horaDesamarro : ['',  [Validators.required]],
+      fechaAmarro: ['', [Validators.required]],
+      horaAmarro: ['', [Validators.required]],
+      fechaDesamarro: ['', [Validators.required]],
+      horaDesamarro: ['', [Validators.required]],
     })
   }
 
-  guardarAmarre()
-  {
+  guardarAmarre() {
 
-    if(this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
-      this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
+    if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
+      this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }else{
-    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+    } else {
+      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
 
-      let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
-      //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
-      periodoCargarActualizar.horaAmarro=this.amarreForm.value.horaAmarro;
-      periodoCargarActualizar.fechaAmarro=this.amarreForm.value.fechaAmarro;
-      periodoCargarActualizar.horaDesamarro=this.amarreForm.value.horaDesamarro;
-      periodoCargarActualizar.fechaDesamarro=this.amarreForm.value.fechaDesamarro;
+        let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
+        //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
+        periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
+        periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
+        periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
+        periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
 
 
-      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-        this.modalService.dismissAll();
-        this.finalizaCalidad();
+        this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+          this.modalService.dismissAll();
+          this.finalizaCalidad();
+        });
+
       });
-
-       });
-      }
+    }
 
   }
-  cargarHorasDesamarro(amarre)
-{
-  var newDate = new Date();
-  var horaActual = newDate.getHours() + ":"+newDate.getMinutes();
+  cargarHorasDesamarro(amarre) {
+    var newDate = new Date();
+    var horaActual = newDate.getHours() + ":" + newDate.getMinutes();
 
-  amarre.fechaAmarro =   this.fechaAmarro? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
-  amarre.horaAmarro = this.horaAmarro=='' ? horaActual : this.horaAmarro ;
-  amarre.fechaDesamarro = this.fechaDesamarro? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
-  amarre.horaDesamarro = this.horaDesamarro=='' ?  horaActual : this.horaDesamarro ;
+    amarre.fechaAmarro = this.fechaAmarro ? formatDate(this.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+    amarre.horaAmarro = this.horaAmarro == '' ? horaActual : this.horaAmarro;
+    amarre.fechaDesamarro = this.fechaDesamarro ? formatDate(this.fechaDesamarro, 'yyyy-MM-dd', 'es-ar') : formatDate(Date.now(), 'yyyy-MM-dd', 'es-ar');
+    amarre.horaDesamarro = this.horaDesamarro == '' ? horaActual : this.horaDesamarro;
 
-  this.amarreForm.patchValue(amarre);
-}
-
+    this.amarreForm.patchValue(amarre);
+  }
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+    if (selector != null) {
+      for (let i = 0; i < selector.length; i++) {
+        selector[i].style.display = ocultarMostrar;
+      }
+    }
+  }
 }
