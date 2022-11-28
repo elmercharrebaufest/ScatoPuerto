@@ -53,19 +53,39 @@ export class LiquidosComponent implements OnInit {
     this.RecibidoresPdf = true;
 
 
-    let element = document.getElementById('imprimirRecibidoresLiquido');
     let opt = {
-      margin:       .1,
-      filename:     'Pantalla Recibidores.pdf',
+      margin:       [0.05, 0],
+      filename:     'Pantalla Recibidores',
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2},                                               //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
+      html2canvas:  { scale: 3, letterRendering: true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
+      pagebreak: { after: '.page-break' }  
     };
 
-    html2pdf().from(element).set(opt).outputPdf()
-    .then(() => {
-      if (!imprimir) this.RecibidoresPdf = false
-    }).save();
+    let ele = Array.from(document.getElementsByClassName('break'));
+
+    let html = html2pdf()
+    .set(opt)
+    .from(ele[0]);
+
+    if (ele.length > 1) {
+      html = html.toPdf();
+      ele.slice(1).forEach((ele, index) => {
+        html = html
+          .get('pdf')
+          .then(pdf => {
+           pdf.addPage()
+           })
+          .from(ele)
+          .toContainer()
+          .toCanvas()
+          .toPdf()
+      })
+    }
+    html = html.then(() => {
+      if (!imprimir) this.RecibidoresPdf = false;
+      this._CalidadSharedService.retirarEstilosImprimirLiquido();
+   }).save();  
   }
 
  /* SECCION GUARDAR FECHA DESAMARRE Y ZARPAR */
