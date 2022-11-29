@@ -19,7 +19,13 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { MessageService } from 'primeng/api';
-import { forkJoin } from 'rxjs';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
+
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { Embarque } from '@ScatoModels/embarque';
+import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
+import { EmbarqueGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geolocalizacion-embarque';
+import { ErroresGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geolocalizacion';
 
 @Component({
   selector: 'app-lineup',
@@ -30,6 +36,7 @@ import { forkJoin } from 'rxjs';
 export class LineupComponent implements OnInit, Observador {
   mostrarSpinner: boolean = true;
   mostrarContent: boolean = false;
+  mostrarErroresGeolocalizacion: boolean = false;
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
   sanBenito: InstanciaWorkflowPuerto[];
   sanBenitoCargandoMuelle: InstanciaWorkflowPuerto;
@@ -48,12 +55,12 @@ export class LineupComponent implements OnInit, Observador {
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   LogCount: number = 0;
   private user: Usuario;
-
   estadoVicentinLp: string;
   estadoNoryonLp: string;
   estadoSanBenitoLp: string;
   estadoOtrosLp: string;
-  buquesGeolocalizacion: any;
+  embarqueCapturaLineUp: Embarque;
+  listaErroresEmbarques: ErroresGeolocalizacion[];
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -65,20 +72,28 @@ export class LineupComponent implements OnInit, Observador {
     private _messageService: MessageService,
     private parametrosService: ParametrosService,
     private session: SessionService,
+    private auth: AutenticadorService,
+    private embarqueSharingService: EmbarqueSharingService,
     private geolocalizacionService: GeolocalizacionService
+
   ) {
+    this.auth.renovarAuthUsuario();
+
     this.user = this.session.getUser()
     this.sanBenito = new Array();
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
+    this.cargarEstadoLineUp();
+  }
 
-
+  cargarGeolocalizacionLineUp() {
+    this.cargarWorkflows();
   }
 
   cargarEstadoLineUp() {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-      this.ubicacionDeBuquePuerto = res;
+      this.ubicacionDeBuquePuerto = res.filter(u => u.orden!=1);;
       this.estadoVicentinLp = this.estadoVicentin();
       console.log('estadoVicentinLp '+this.estadoVicentinLp);
       this.estadoNoryonLp = this.estadoNoryon();
@@ -106,7 +121,7 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
   }
 
-  ListarEmbarques(): InstanciaWorkflowPuerto[] {
+  ListarEmbarques(): any[] {
     return this.listadoEmbarques;
   }
 
@@ -116,6 +131,7 @@ export class LineupComponent implements OnInit, Observador {
       .subscribe(
         ret => {
           this.listadoEmbarques = ret;
+
           this.fechaActualizacion = new Date();
           if (!blockUI) {
             setTimeout(x => this.cargarWorkflows(), 120000);
@@ -123,12 +139,26 @@ export class LineupComponent implements OnInit, Observador {
         },
         errmess => this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error)),
         () => {
+          this.filtrarMuelles();
           this.mostrarContent = true;
           this.mostrarSpinner = false;
-          this.filtrarMuelles();
-          console.log('FIN LINEUP ', new Date())
+          this.cargarErroresGeolocalizacion();
+          console.log('FIN LINEUP ', new Date());
         }
       );
+  }
+
+  private cargarErroresGeolocalizacion(){
+    let listaEmbarques:EmbarqueGeolocalizacion[] = new Array<EmbarqueGeolocalizacion>();
+    this.listadoEmbarques.forEach(item =>{
+      listaEmbarques.push(new EmbarqueGeolocalizacion(item.embarque.id));
+    });
+    this.geolocalizacionService.ListarErroresGeolocalizacionPorEmbarque(listaEmbarques).subscribe(errores =>{
+      this.listaErroresEmbarques = errores;
+    }, error => {}
+     , ()=>{
+      this.mostrarErroresGeolocalizacion = true;
+     });
   }
 
   filtrarMuelles() {
@@ -139,22 +169,21 @@ export class LineupComponent implements OnInit, Observador {
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
-    console.log('this.sanBenito: ', this.sanBenito);
 
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     function_name = 'filtrarMuelles - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
-    this.cargarEstadoLineUp();
-   }
+
+  }
 
   public altaEmbarque() {
 
     let actualDate = new Date();
     let function_name = 'altaEmbarque';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-    if (this.user.permisos.find(p => p === this.permisosScato.PreLineUp_CrearBuque)) {
+    if (this.hasPermisoAltaEmbarque()) {
       localStorage.removeItem('embarque');
       this.router.navigate(['/lineup/alta-embarque/0/line-up']);
     } else {
@@ -230,7 +259,7 @@ export class LineupComponent implements OnInit, Observador {
     if (sanBenito.length > 0) {
       body += `\f\0- San Benito:\0\0\f\f\n`;
       sanBenito.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
@@ -239,7 +268,7 @@ export class LineupComponent implements OnInit, Observador {
     if (vicentin.length > 0) {
       body += `\n\f\0- Vicentin:\0\0\f\f\n`;
       vicentin.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
@@ -248,7 +277,7 @@ export class LineupComponent implements OnInit, Observador {
     if (noryon.length > 0) {
       body += `\n\f\0- Nouryon:\0\0\f\f\n`;
       noryon.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
@@ -257,14 +286,13 @@ export class LineupComponent implements OnInit, Observador {
     if (otrosM.length > 0) {
       body += `\n\f\0- Otros Muelles:\0\0\f\f\n`;
       otrosM.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} - 
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }
 
     return body;
   }
-
 
   public cambiarVista() {
     let actualDate = new Date();
@@ -273,6 +301,7 @@ export class LineupComponent implements OnInit, Observador {
 
     this.mostrarCalendario = !this.mostrarCalendario;
   }
+
   public cambiarGeolocalizacion() {
     let actualDate = new Date();
     let function_name = 'cambiarGeolocalizacion';
@@ -280,6 +309,7 @@ export class LineupComponent implements OnInit, Observador {
 
     this.router.navigate(['geolocalizacion']);
   }
+
   estadoSanBenito() {
     let actualDate = new Date();
     let function_name = 'estadoSanBenito';
@@ -348,14 +378,19 @@ export class LineupComponent implements OnInit, Observador {
   }
 
   hasPermisoAltaEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_CrearBuque);
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_AltaEmbarque);
   }
-
+  hasPermisoVerCalendario(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerCalendario);
+  }
+  hasPermisoVerGeo(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerGeo);
+  }
   hasPermisoMail() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EnviarMail);
   }
-
   hasPermisoExcel() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_Exportar);
   }
+
 }

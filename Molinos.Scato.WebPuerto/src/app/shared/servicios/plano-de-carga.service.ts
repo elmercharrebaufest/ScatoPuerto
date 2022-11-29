@@ -102,4 +102,8 @@ export class PlanoDeCargaService {
     return this.http.post<string>(`${this.url}PlanoDeCarga/ObtenerBodyPlanoDeCarga?planoDeCargaId=`+planoDeCargaId, embarque, { 'withCredentials' : true});
   }
 
+  obtenerPlanoDeCargaId(idEmbarque: number): Observable<any>{
+    return this.http.get<number>(`${this.url}PlanoDeCarga/obtenerPlanoDeCargaId?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
+  }
+
 }

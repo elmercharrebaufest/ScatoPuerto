@@ -36,7 +36,9 @@
             </div>
             <div class="row">
                 <div class="col-3 align-self-center">
-                    <button class="btn btn-primary ml-2" (click)="editarEmbarque()">Editar</button>
+                    <ng-container *ngIf="hasPermisoEditarEmbarqueEnCalidad()">
+                        <button class="btn btn-primary ml-2" (click)="editarEmbarque()">Editar</button>
+                    </ng-container>
                 </div>
                 <div class="col-3 mt-3 mb-3 align-self-center">
                     <div><strong>Agencia:</strong>{{extraeNombre(instanciaWorkflow.embarque.agencias)}}</div>

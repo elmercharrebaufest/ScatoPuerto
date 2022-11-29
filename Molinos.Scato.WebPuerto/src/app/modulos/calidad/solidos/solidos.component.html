@@ -1,18 +1,22 @@
 <div id="imprimirRecibidoresSolido">
+
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='RecibidoresPdf' [src]='"pdf"'></ship-spinner>
     </div>
-    <app-grafico-carga id='graficoCargaCanva' 
-                       class='bg-white'
+
+    <app-grafico-carga id='graficoCargaCanva'
+                       class='bg-white break'
                        [esCalidad]="true"></app-grafico-carga>
 
-    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque" 
+
+
+    <app-manos class="break" [celdasManoDeEmbarque]="celdasManoDeEmbarque"
                [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"
                [esCalidad]="true"></app-manos>
 
-    <div class="html2pdf__page-break"></div>
+ 
 
-    <div class='bg-white px-4 min-h5 shadow mt-4'>
+    <div class='bg-white px-4 min-h5 shadow mt-4 break'>
         <app-planilla-turnos-solido></app-planilla-turnos-solido>
     </div>
 
@@ -20,18 +24,16 @@
         <app-modal-recibo></app-modal-recibo>
     </div>
 
-    <app-registro-recibos></app-registro-recibos>
+    <app-registro-recibos class="break" ></app-registro-recibos>
 
-    <div class="html2pdf__page-break"></div>
+    <app-nir class="break"></app-nir>
 
-    <app-nir></app-nir>
-    
-    <div class="html2pdf__page-break"></div>
 
-    <app-balanzas-ritmos></app-balanzas-ritmos>
 
-    <div fxLayout='row wrap' class="mt-4 shadow" >
-        
+    <app-balanzas-ritmos class="break"></app-balanzas-ritmos>
+
+    <div fxLayout='row wrap' class="mt-4 shadow break" >
+
         <div fxFlex='50'>
             <!-- <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos> -->
         </div>
@@ -40,7 +42,62 @@
         </div>
     </div>
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
-        <!-- <button class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
-        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+    	<ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
+	        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+        </ng-container>
+      <!--  <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button>-->
+        <button type="button" class="btn btn-success mx-5"  (click)='openModalCargarAmarre(CargarAmarre)' >FINALIZAR</button>
+
+
+        <ng-template #CargarAmarre let-modal >
+          <!-- <div class='container'> -->
+            <form [formGroup]="amarreForm">
+           <div class="form-row" style="margin-top:4px">
+                  <div class="form-group  col-6" style="padding-left:30px;">
+                      <label>Amarró</label>
+                      <input formControlName="fechaAmarro" required type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                  </div>
+                  <div class="form-group col-6" style="padding-right:30px;">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control hora" required formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
+                            [format]="24" >
+                        <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeAmarro style="z-index: 1000000 !important;" >
+                    </ngx-material-timepicker>
+                </div>
+
+            </div>
+            <div class="form-row">
+              <div class="form-group  col-6" style="padding-left:30px;">
+                      <label>Desamarró</label>
+                      <input formControlName="fechaDesamarro" required type="date" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
+                  </div>
+                  <div class="form-group col-6" style="padding-right:30px;">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control hora" required formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
+                            [format]="24" >
+                        <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeDesamarro>
+                    </ngx-material-timepicker>
+                  </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-6" style="padding-right:30px;text-align:center">
+                <button style="margin-top: 18px;" type="button" class="btn btn-danger" [disabled]="" (click)="modal.dismiss('Cross click')" >CANCELAR</button>
+              </div>
+              <div class="form-group  col-6" style="padding-left:30px;text-align:center">
+                <button  style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]="" (click)="guardarAmarre()" >GUARDAR</button>
+              </div>
+
+            </div>
+
+            </form>
+          <!-- </div> -->
+        </ng-template>
+       <!--<app-amarre></app-amarre>-->
     </div>
 </div>

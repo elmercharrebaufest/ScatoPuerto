@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy,Input } from '@angular/core';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
@@ -12,7 +12,7 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
   styleUrls: ['./balanzas-ritmos.component.css']
 })
 export class BalanzasRitmosComponent implements OnInit, OnDestroy {
-
+  @Input() enBuque: boolean = false;
   unsubscribe: Subject<any>;
   startBalanza7: Date;
   startBalanza8: Date;

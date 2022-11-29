@@ -1,16 +1,18 @@
 <div style="display: flex; flex-direction: row; justify-content:space-between;" >
     <div class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
-        <app-amarre [ModuloDeCargaId]="this.ModuloDeCargaId" ></app-amarre>
+        <app-amarre [ModuloDeCargaId]="this.ModuloDeCargaId" [esSoloLectura]="esSoloLectura"></app-amarre>
     </div>
     <div  class="mt-4 px-4 pb-4 shadow ml-4" style="background-color: white; display: flex; flex-direction: column; justify-content: space-between;">
         <!-- Title -->
         <div style="display: flex; flex-direction: row; justify-content: space-between">
             <h4 class='colorTitle pt-3'>UMAP</h4>
-            <div>
-                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='addUmap()'>
-                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encendido</span>
-                </div>
+            <div class="ocultarPdf">
+	            <ng-container *ngIf="hasPermisoUmap_AgregarEncendido() && !esSoloLectura">
+	                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='addUmap()'>
+	                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+	                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo encendido</span>
+	                </div>
+	            </ng-container>
             </div>
         </div>            
         <!-- Body -->
@@ -30,7 +32,7 @@
                                     <div class="input_img">
                                         <input class="form-control hora" formControlName='horaEncendido' placeholder="00:00" [ngxTimepicker]="encendidoTime"
                                             [format]="24">
-                                        <img src="assets/reloj.svg" class="imgClockInput1">
+                                        <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
                                     </div>
                                     <ngx-material-timepicker #encendidoTime>
                                     </ngx-material-timepicker>
@@ -45,7 +47,7 @@
                                     <div class="input_img">
                                         <input class="form-control hora" placeholder="00:00" [ngxTimepicker]="apagadoTime"
                                             [format]="24" formControlName='horaApagado'>
-                                        <img src="assets/reloj.svg" class="imgClockInput1">
+                                        <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
                                     </div>
                                     <ngx-material-timepicker #apagadoTime>
                                     </ngx-material-timepicker>
@@ -69,8 +71,10 @@
                                         <option value="sureste">Sureste</option>
                                     </select>
                                 </div>
-                                <div fxFlex='4' class='full-center'>
-                                    <img src='assets/trashIcon-no-border.svg' (click)='deleteHorario(i)' style="margin-top: 14px">
+                                <div fxFlex='4' class='full-center ocultarPdf'>
+                                	<ng-container *ngIf="hasPermisoUmap_EliminarRegistro() && !esSoloLectura">
+                                    	<img src='assets/trashIcon-no-border.svg' (click)='deleteHorario(i)' style="margin-top: 14px">
+									</ng-container>
                                 </div>
                             </div>
                         </div>
@@ -81,8 +85,10 @@
         </div>
 
         <!-- Footer -->
-        <div style="margin: 0 auto">
-            <button type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
-         </div>
+        <ng-container *ngIf="hasPermisoTableroSolido_Umap_Modificar()">
+            <div style="margin: 0 auto" class="ocultarPdf">
+                <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary" [disabled]="this.guardando"  (click)="guardarUMAP()" >GUARDAR</button>
+            </div>
+        </ng-container>
     </div>
 </div>

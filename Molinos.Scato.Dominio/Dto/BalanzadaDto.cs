@@ -52,11 +52,22 @@ namespace Molinos.Scato.Dominio.Dto
         public string Bodega { get; set; }
     }
 
+    public sealed class CargasPorBodega
+    {
+        public string NombreBodega { get; set; }
+        public string NombreProducto { get; set; }
+        public int Cargado { get; set; }
+        public int RestaCargar { get; set; }
+        public int Excedente { get; set; }
+
+    }
+
     public sealed class BalanzadasCompletasDto
     {
         public IList<BalanzadasAgrupadas> balanzadasAgrupadas { get; set; }
         public IList<BalanzadasBajaCarga> balanzadasBajaCarga{ get; set; }
         public IList<BalanzadasBuque> balanzadasBuque { get; set; }
+        public IList<CargasPorBodega> cargasPorBodegas { get; set; }
     }
 
     public sealed class ListadoTotalBalanzadasDto

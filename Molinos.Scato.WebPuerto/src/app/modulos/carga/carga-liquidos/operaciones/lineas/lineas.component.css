@@ -1,5 +1,9 @@
 .colorTitle{ color: #4D60A8; }
 
+.headerLineas{
+    position: relative;
+    top: 17px;
+}
 .inputLineasEmbarque{
     /* width: 75px;
     height: 38px; */
@@ -87,9 +91,20 @@ label{ font-weight: bold; }
     border: 1px solid #dee2e6da;
     background-color: #DADADA;
 }
-.custom-select{
-    text-align: center;
+.ocultarBackground{
+    background: none;
 }
+
+.custom-select {  
+    text-align: center;
+   
+  }
+
 .temperatura-error{
     border: 1px solid red;
 }
+
+.mostrarBackground{
+    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+}
+

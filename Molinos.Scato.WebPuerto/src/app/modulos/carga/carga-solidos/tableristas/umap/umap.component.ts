@@ -5,6 +5,9 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/amarre.component';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-umap',
@@ -14,29 +17,37 @@ import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/ama
 export class UmapComponent implements OnInit {
   @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
   @Input() ModuloDeCargaId: number;
+	private user: Usuario;
+	permisosScato: typeof PermisosScato = PermisosScato;
+  @Input() esSoloLectura: boolean = false;
 
   guardando: boolean = false;
   public forms: FormGroup;
 
   constructor(private builder: FormBuilder,
               private _confirmationDialogService: ConfirmationDialogService,
-              private _moduloDeCargaService: ModuloDeCargaService) { }
+              private _moduloDeCargaService: ModuloDeCargaService,
+              private session: SessionService,) { 
+  this.user = this.session.getUser();
+  }
               
   ngOnInit(): void {
     this.forms = this.builder.group({
       umap: this.builder.array([this.initUmap()])
     });
+
+    if(!this.hasPermisoTableroSolido_Umap_Modificar()) this.forms.get('umap').disable();
   }
 
 
   initUmap(){
     return this.builder.group({
-      fechaEncendido: '',
-      horaEncendido: '',
-      fechaApagado:'',
-      horaApagado: '',
-      velocidadDelViento: '',
-      direccionDelViento: ''
+      fechaEncendido: [{ value: '', disabled: this.esSoloLectura }],
+      horaEncendido : [{ value: '', disabled: this.esSoloLectura }],
+      fechaApagado      : [{ value: '', disabled: this.esSoloLectura }],
+      horaApagado       : [{ value: '', disabled: this.esSoloLectura }],
+      velocidadDelViento: [{ value: '', disabled: this.esSoloLectura }],
+      direccionDelViento: [{ value: '', disabled: this.esSoloLectura }]
     });
   }
 
@@ -48,7 +59,7 @@ export class UmapComponent implements OnInit {
     return this.amarreComponent.obtenerAmarre();
   }
 
-  updateUMAP(umap){
+  public updateUMAP(umap){
     while(this.umapFormArray.length < umap.length) this.umapFormArray.push(this.initUmap());
     umap.forEach(element => {
       element.fechaEncendido = element.fechaEncendido ?  formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar') : " ";
@@ -57,7 +68,7 @@ export class UmapComponent implements OnInit {
     this.umapFormArray.patchValue(umap);
   }
 
-  updateAmarre(amarre){
+  public updateAmarre(amarre){
     this.amarreComponent.updateAmarre(amarre);
   }
 
@@ -91,5 +102,15 @@ export class UmapComponent implements OnInit {
     if(index == 0 && this.umapFormArray.length == 0){
       this.umapFormArray.push(this.initUmap());
     }
+  }
+
+  hasPermisoUmap_AgregarEncendido() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Umap_AgregarEncendido);
+  }
+  hasPermisoUmap_EliminarRegistro() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Umap_EliminarRegistro);
+  }
+  hasPermisoTableroSolido_Umap_Modificar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_Umap_Modificar);
   }
 }

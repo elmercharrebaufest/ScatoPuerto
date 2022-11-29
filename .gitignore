@@ -10,4 +10,5 @@
 *.vssscc
 *rdl.data
 *.config
+!web.config
 Molinos.Scato.WebPuerto/dist

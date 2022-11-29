@@ -714,7 +714,8 @@ namespace Molinos.Scato.Dominio.Seguridad
         PuestoPausado = 605,
         [Display(ResourceType = typeof(Textos), Name = "HidraulicasEspeciales")]
         HidraulicasEspeciales = 606,
-
+        [Display(ResourceType = typeof(Textos), Name = "ModuloBuque")]
+        ModuloBuque = 609,
 
         [Display(ResourceType = typeof(Textos), Name = "VerBalanzasPesada")]
         VerBalanzasPesada = 607,
@@ -722,5 +723,94 @@ namespace Molinos.Scato.Dominio.Seguridad
         [Display(ResourceType = typeof(Textos), Name = "VerRevertirRechazoVagones")]
         VerRevertirRechazoVagones = 608,
 
+        // =============== INI Permisos SCATO PUERTO ===============
+        // LineUp
+        [Display(ResourceType = typeof(Textos), Name = "LineUp_Ver")] LineUp_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "LineUp_AltaEmbarque")] LineUp_AltaEmbarque,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_VerCalendario")] LineUp_VerCalendario,
+        [Display(ResourceType = typeof(Textos), Name = "LineUp_VerGeo")] LineUp_VerGeo,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EditarEmbarqueEnCalidad")] LineUp_EditarEmbarqueEnCalidad,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EditarOrdenEmbarque")] LineUp_EditarOrdenEmbarque,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EditarUbicacionEmbarque")] LineUp_EditarUbicacionEmbarque,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EditarChecksEmbarque")] LineUp_EditarChecksEmbarque,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EditarPlanoDeCarga")] LineUp_EditarPlanoDeCarga,
+        [Display(ResourceType = typeof(Textos), Name = "LineUp_EditarBuque")] LineUp_EditarBuque,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EliminarBuque")] LineUp_EliminarBuque,
+        //[Display(ResourceType = typeof(Textos), Name = "LineUp_EnviarMail")] LineUp_EnviarMail,
+        [Display(ResourceType = typeof(Textos), Name = "LineUp_Exportar")] LineUp_Exportar,
+
+        //// PlanoDeCarga
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Ver")] PlanoDeCarga_Ver,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Bodegas_Modificar")] PlanoDeCarga_Bodegas_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_CargasComerciales_Modificar")] PlanoDeCarga_CargasComerciales_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_DefensasMoviles_Modificar")] PlanoDeCarga_DefensasMoviles_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Fumigacion_Modificar")] PlanoDeCarga_Fumigacion_Modificar,
+        [Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Estiba_Modificar")] PlanoDeCarga_Estiba_Modificar,
+        [Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_AgenciaControlPrivado_Modificar")] PlanoDeCarga_AgenciaControlPrivado_Modificar,
+        [Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_AgentesControlPrivado_Modificar")] PlanoDeCarga_AgentesControlPrivado_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Observaciones_Modificar")] PlanoDeCarga_Observaciones_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_CaladoSalida_Modificar")] PlanoDeCarga_CaladoSalida_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Modificar")] PlanoDeCarga_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_AgregarNuevoBuque")] PlanoDeCarga_AgregarNuevoBuque,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_AMB")] PlanoDeCarga_AMB,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Adjuntar")] PlanoDeCarga_Adjuntar,
+        [Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Guardar")] PlanoDeCarga_Guardar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Finalizar")] PlanoDeCarga_Finalizar,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Imprimir")] PlanoDeCarga_Imprimir,
+        //[Display(ResourceType = typeof(Textos), Name = "PlanoDeCarga_Cancelar")] PlanoDeCarga_Cancelar,
+
+        //// Sólido
+        //[Display(ResourceType = typeof(Textos), Name = "GraficoDeCeldas_Modificar")] GraficoDeCeldas_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "ConformacionManosEmbarque_Modificar")] ConformacionManosEmbarque_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "Tabiques_Modificar")] Tabiques_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "Operadores_EnviarATablerista")] Operadores_EnviarATablerista,
+
+        //// TableroSolido
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_Amarre_Modificar")] TableroSolido_Amarre_Modificar,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_Umap_EliminarRegistro")] TableroSolido_Umap_EliminarRegistro,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_Umap_AgregarEncendido")] TableroSolido_Umap_AgregarEncendido,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_Umap_Modificar")] TableroSolido_Umap_Modificar,
+        [Display(ResourceType = typeof(Textos), Name = "TableroSolido_IniciarCargaBalanzas")] TableroSolido_IniciarCargaBalanzas,
+        [Display(ResourceType = typeof(Textos), Name = "TableroSolido_CorteManualBalanzas")] TableroSolido_CorteManualBalanzas,
+        [Display(ResourceType = typeof(Textos), Name = "TableroSolido_MotivoCorte_Editar")] TableroSolido_MotivoCorte_Editar,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_TerminarCarga_Exportar")] TableroSolido_TerminarCarga_Exportar,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_VerRitmosEmbarqueBlzas78")] TableroSolido_VerRitmosEmbarqueBlzas78,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_VerCargasBodegas")] TableroSolido_VerCargasBodegas,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_VerRitmos")] TableroSolido_VerRitmos,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroSolido_VerInformacionAdicional")] TableroSolido_VerInformacionAdicional,
+
+        //// Liquido
+        //[Display(ResourceType = typeof(Textos), Name = "Liquido_VerPeriodoDeCarga")] Liquido_VerPeriodoDeCarga,
+        [Display(ResourceType = typeof(Textos), Name = "Liquido_EditarPeriodoDeCarga")] Liquido_EditarPeriodoDeCarga,
+        //[Display(ResourceType = typeof(Textos), Name = "Liquido_VerHabilitacionTanques")] Liquido_VerHabilitacionTanques,
+        //[Display(ResourceType = typeof(Textos), Name = "Liquido_EditarHabilitacionTanques")] Liquido_EditarHabilitacionTanques,
+        //[Display(ResourceType = typeof(Textos), Name = "Liquido_ConformacionLineasEmb_Editar")] Liquido_ConformacionLineasEmb_Editar,
+        //[Display(ResourceType = typeof(Textos), Name = "Liquido_ConformacionLineasEmb_Eliminar")] Liquido_ConformacionLineasEmb_Eliminar,
+        //[Display(ResourceType = typeof(Textos), Name = "Liquido_PlanillaEmbarque_Editar")] Liquido_PlanillaEmbarque_Editar,
+
+        //// TableroLiquido
+        //[Display(ResourceType = typeof(Textos), Name = "TableroLiquido_Planilla_Editar")] TableroLiquido_Planilla_Editar,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroLiquido_AgregarTurno")] TableroLiquido_AgregarTurno,
+        [Display(ResourceType = typeof(Textos), Name = "TableroLiquido_GuardarTurno")] TableroLiquido_GuardarTurno,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroLiquido_EnviarARecibidores")] TableroLiquido_EnviarARecibidores,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroLiquido_AgregarCorte")] TableroLiquido_AgregarCorte,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroLiquido_Exportar")] TableroLiquido_Exportar,
+        //[Display(ResourceType = typeof(Textos), Name = "TableroLiquido_VerRitmos")] TableroLiquido_VerRitmos,
+
+        //// Recibidores / Calidad
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Ver")] Recibidores_Ver,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_ExportarEnviarPlanillas")] Recibidores_ExportarEnviarPlanillas,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_EmitirRecibo")] Recibidores_EmitirRecibo,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Nir_AgregarNuevaFila")] Recibidores_Nir_AgregarNuevaFila,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Nir_EliminarFila")] Recibidores_Nir_EliminarFila,
+        [Display(ResourceType = typeof(Textos), Name = "Recibidores_Nir_EnviarNir")] Recibidores_Nir_EnviarNir,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Nir_GuardarNir")] Recibidores_Nir_GuardarNir,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Recibo_Imprimir")] Recibidores_Recibo_Imprimir,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Recibo_ConfirmarDatos")] Recibidores_Recibo_ConfirmarDatos,
+        //[Display(ResourceType = typeof(Textos), Name = "Recibidores_Imprimir")] Recibidores_Imprimir,
+
+        //// Geolocalizacion
+        //[Display(ResourceType = typeof(Textos), Name = "Geolocalizacion_Ver")] Geolocalizacion_Ver
+        // =============== FIN Permisos SCATO PUERTO ===============
     }
 }

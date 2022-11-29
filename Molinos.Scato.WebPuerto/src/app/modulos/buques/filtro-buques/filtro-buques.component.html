@@ -1,0 +1,69 @@
+
+
+<div class="row">
+    
+    <div class="col-md-9"><label class="titulo-historial-buque-letra">Historial de embarques</label></div>
+    <div class="text-md-right margen-boton-buque col-md-3" style="margin-top: 10px;"> 
+    </div>
+</div>
+<br>
+<form id="filtroBuquedaForm" [formGroup]="getFiltroBuquedaForm()">
+    <div class="form-row">
+       <!--  <div class="form-group col-md-1">
+            <select class="form-control" formControlName="anio" (change)="onChangeBusqueda($event)" [(ngModel)]="anio">
+                <option *ngFor="let anio of getListaAnios()" [value]="anio.numeroAnio">{{anio.nombreAnio}}</option>
+            </select>
+        </div>
+        <div class="form-group col-md-1">
+            <select class="custom-select" formControlName="mes" (change)="onChangeBusqueda($event)" [(ngModel)]="mes" >
+                <option *ngFor="let meses of getListaMeses()" [value]="meses.numeroMes">{{meses.nombreMes}}</option>
+            </select>
+        </div> -->
+        <div class="form-group col-md-2 input_img">
+            <input type="month" placeholder="Desde" class="form-control colorGris" [value]="desde" formControlName="desde">
+            <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
+          </div>
+          <div class="form-group col-md-2 input_img">
+            <input type="month" placeholder="Hasta" class="form-control colorGris" [value]="hasta" formControlName="hasta">
+            <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
+          </div>
+        <div class="form-group col-md-2 colorGris">
+
+            <ng-multiselect-dropdown  *ngIf="getListaProductos()"
+                                     formControlName="producto" 
+                                     [placeholder]="'Producto'"
+                                     [settings]="getConfigListaMultiple()"
+                                     [data]="getListaProductos()"                                    
+                                    >
+            </ng-multiselect-dropdown>
+
+        </div>
+        <div class="form-group col-md-2 colorGris">
+            <input type="text" class="form-control" placeholder="Buque" formControlName="buque"
+                >
+        </div>
+        <div class="form-group col-md-2 colorGris">
+            <input type="text" class="form-control" placeholder="Destino" formControlName="destino"
+               >
+        </div>
+        <div class="form-group col-md-2 colorGris">
+            <input type="text" class="form-control" placeholder="Exportador" formControlName="nombreExportador"           
+                >
+        </div>
+        <div class="form-group col-md-2 colorGris">
+            <input type="text" class="form-control" placeholder="Control privado" formControlName="control"
+               >
+        </div>
+       <!--  <div class="form-group col-md-1">
+            <input type="text" class="form-control" placeholder="A.T.A" formControlName="ata"           
+                (keyup)="onChangeValues($event)">
+        </div> -->      
+        <div class="form-group col-md-1" >
+            <button class="btn buscar" style="width: 100%;" (click)="onBuscar()" >Buscar</button>
+        </div>
+        <div class="form-group col-md-2">
+            <button class="btn limpiar" (click)="onLimpiarFiltros()">Limpiar Búsqueda</button>
+        </div>
+    </div>
+
+</form>

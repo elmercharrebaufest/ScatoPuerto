@@ -22,21 +22,17 @@
                         <tr>
                             <th class="header-geo-fijo header-geo-centrado"> <div class="fa fa-map-marker fa-1x"></div> </th>
                             <th class="header-geo-fijo sticky-head header-geo-letra">Nombre Buque</th>
-                            <th class="header-geo-fijo header-geo-letra">Puerto de Partida</th>
-                            <th class="header-geo-fijo header-geo-letra">Puerto de Destino</th>
-                            <th class="header-geo-fijo header-geo-letra">Eta Reportada</th>
-                            <th class="header-geo-fijo header-geo-letra">Arribó</th>
                             <th class="header-geo-fijo header-geo-letra">Última posición recibida</th>
                             <th class="header-geo-fijo header-geo-letra">Área</th>
-                            <th class="header-geo-fijo header-geo-letra">Puerto actual</th>
-                            <th class="header-geo-fijo header-geo-letra">Estado</th>
-                            <th class="header-geo-fijo header-geo-letra">Muelle de carga</th>
-                            <th class="header-geo-fijo header-geo-letra">Ubicación del barco Line Up</th>
+                            <th class="header-geo-fijo header-geo-letra">Ubicación actual</th>
+                            <th class="header-geo-fijo header-geo-letra">Estado del barco</th>
+                            <th class="header-geo-fijo header-geo-letra row-geo-letra-white" style="background: #616369">Muelle de carga</th>
+                            <th class="header-geo-fijo header-geo-letra row-geo-letra-white" style="background: #616369">Ubicación del barco Line Up</th>
                         </tr> 
                     </thead>
                     <tbody *ngFor="let geolocalizacion of getListaBuquesGeolocalizacion()">
                         <tr *ngIf="geolocalizacion.esSeleccionadoPorMuelle &&  geolocalizacion.numeroPaginado == paginaActual">
-                            <td align="center" valign="center" style="width: 5%">
+                            <td valign="center" style="width: 65px">
                                 <input class="largerCheckbox" 
                                     id={{geolocalizacion.embarque_Id}} 
                                     type="checkbox" 
@@ -55,11 +51,9 @@
                             <td class="sticky lista-nombre-buque row-geo-letra" (click)='onOpenModalGeo(addGeo, geolocalizacion)'>
                                 {{geolocalizacion.nombreBuque}}
                             </td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoOrigen : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje != null? geolocalizacion.viaje.puertoDestino : ''}}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje.etA_Reportado  | date: 'dd/MM/yyyy hh:mm' }}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.viaje.ata  | date: 'dd/MM/yyyy hh:mm' }}</td>
-                            <td class="row-geo-letra">{{geolocalizacion.posicion.horaUTCPosicionRecibida | date: 'dd/MM/yyyy hh:mm' }}</td>
+                            
+                            <td class="row-geo-letra" *ngIf="CalcularHoraBuqueFueraDeAlcance(geolocalizacion.posicion.horaUTCPosicionRecibida); else fueraDeAlcance">{{geolocalizacion.posicion.horaUTCPosicionRecibida | date: 'dd/MM/yyyy h:mm a' }}</td>
+                            <ng-template #fueraDeAlcance><td class="row-geo-letra">El buque está fuera de alcance</td></ng-template>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.area : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion != null? geolocalizacion.posicion.puertoActual : ''}}</td>
                             <td class="row-geo-letra">{{geolocalizacion.posicion.estado}}</td>

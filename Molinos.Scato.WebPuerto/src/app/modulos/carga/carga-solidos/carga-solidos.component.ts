@@ -1,8 +1,6 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { forkJoin } from 'rxjs';
-import jspdf from 'jspdf';
-import html2canvas from 'html2canvas';
 import * as html2pdf from 'html2pdf.js';
 
 // MODELOS
@@ -16,7 +14,6 @@ import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
 // SERVICIOS
 import { AlertService } from '@ScatoServicios/alert.service';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -32,7 +29,9 @@ import { NIRComponent } from '../../calidad/solidos/nir/nir.component';
 import { UmapComponent } from './tableristas/umap/umap.component';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
+import { BuqueService } from '@ScatoServicios/buque.service';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -61,7 +60,7 @@ export class CargaSolidosComponent implements OnInit {
   inicioCarga: boolean = false;
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
-  
+  permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
@@ -77,7 +76,9 @@ export class CargaSolidosComponent implements OnInit {
     private alertService: AlertService,
     private _procesoService: DatosEmbarquesProcesoService,
     private _changeDetector: ChangeDetectorRef,
-    private _procesoGuardar: ProcesoGuardarService
+    private _procesoGuardar: ProcesoGuardarService,
+    private _buqueService: BuqueService,
+    private elem: ElementRef
   ) {
     this.user = this.session.getUser();
    }
@@ -107,9 +108,10 @@ export class CargaSolidosComponent implements OnInit {
           esLiquido: m.esLiquido,
           color: m.color
         }));
+      }, error =>{},
+      ()=>{
+        this.drawGraphic()
       });
-      
-    this.drawGraphic();
   }
 
   drawGraphic() {
@@ -155,10 +157,13 @@ export class CargaSolidosComponent implements OnInit {
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
-        if (res.moduloDeCargaUmap.length > 0 && this.mostrarTableristaOperando) {
+        if (res.moduloDeCargaUmap.length > 0) {
+          console.log('this.manosComponent-->>', this.manosComponent)
+
+          console.log('this.umapComponent-->>', this.umapComponent)
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
-        if(res.moduloDeCargaPeriodoDeCarga.length > 0 && this.mostrarTableristaOperando){
+        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
@@ -177,7 +182,7 @@ export class CargaSolidosComponent implements OnInit {
 
     let element = document.getElementById('imprimirCargaSolidos');
     let opt = {
-      margin:       [.1, 0],
+      margin:       [0.5, 0],
       filename:     'Pantalla Operaciones.pdf',
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 3, letterRendering:true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
@@ -224,7 +229,14 @@ export class CargaSolidosComponent implements OnInit {
     if(botonTerminarYExportarPLanillasSolidos != null) valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display;
     if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
     if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
-      
+    let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
+    let ocultarCollapse= this.elem.nativeElement.querySelectorAll(".ocultarCollapse");
+    let mostrarPdf= this.elem.nativeElement.querySelectorAll(".mostrarPdf");
+    this.ocultarCamposEnPDFListas(ocultarBotones, "none");
+    this.ocultarCamposEnPDFListas(ocultarCollapse, "none");
+    this.ocultarCamposEnPDFListas(mostrarPdf, "block");
+    //
+    //
     setTimeout(() => {
       if(this.mostrarTableristaOperando == true && this.inicioCarga == true) {
         if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'block');
@@ -232,6 +244,9 @@ export class CargaSolidosComponent implements OnInit {
       }
 
       if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
+      this.ocultarCamposEnPDFListas(ocultarBotones, "block");
+      this.ocultarCamposEnPDFListas(ocultarCollapse, "block");
+      this.ocultarCamposEnPDFListas(mostrarPdf, "none");
     },6500);
   }
 
@@ -252,12 +267,6 @@ export class CargaSolidosComponent implements OnInit {
               this.guardarContinuacion(finalizar);
       } else {
         this.guardarContinuacion(finalizar);
-
-        if(finalizar){
-          this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe( (resp: Embarque) => {
-            if(resp.estadoBuque.id<2) this.modificarEstadoBuque('Cargando');
-          });
-        }
       }
     }
   }
@@ -281,7 +290,10 @@ export class CargaSolidosComponent implements OnInit {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar)
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(true, finalizar)},
+          .then(() => {
+            this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+            this.cambiarEstado();
+            this.imprimir(true, finalizar)},
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
@@ -321,7 +333,7 @@ export class CargaSolidosComponent implements OnInit {
     var inputTitle = "Destinatarios";
     var mail = new Mail(`${this.embarque.nombreBuque}. ${this.embarque.materialesPuertoCantidad[0].descripcionCorta}. Muelle: San Benito. Plano de carga, nominación, adjunto comunicación previa y gráfico de celdas.`);
     mail.adjunto = this.adjunto.split("base64,")[1];
-    mail.nombre = "GráficoDeCeldas.pdf"
+    mail.nombre = this.embarque.nombreBuque + "planilla de tablerista.pdf"
     this.planoDeCargaService.obtenerBodyPlanoDeCarga(this.embarqueSelected.planoDeCargaId, this.embarque).subscribe(x => { mail.body = x });
     this.planoDeCargaService.obtenerDestinatariosPlanoDeCarga().subscribe(x => mail.destinatarios = x);
     var button1 = 'Enviar';
@@ -352,5 +364,47 @@ export class CargaSolidosComponent implements OnInit {
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.hideSpinner.emit(false);
       });
+  }
+
+  cambiarEstado() {
+    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
+      if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
+    });
+  }
+
+  hasPermisoPlanoDeCarga_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Guardar);
+  }
+  hasPermisoPlanoDeCarga_Finalizar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Finalizar);
+  }
+  hasPermisoPlanoDeCarga_Imprimir() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Imprimir);
+  }
+  hasPermisoPlanoDeCarga_Cancelar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Cancelar);
+  }
+  hasPermisoEnviarATablerista() {
+    return this.user.permisos.find(p => p === this.permisosScato.Operadores_EnviarATablerista);
+  }
+  hasPermisoTableroSolido_VerRitmosEmbarqueBlzas78() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerRitmosEmbarqueBlzas78);
+  }
+  hasPermisoTableroSolido_VerCargasBodegas() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerCargasBodegas);
+  }
+  hasPermisoTableroSolido_VerRitmos() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerRitmos);
+  }
+  hasPermisoTableroSolido_VerInformacionAdicional() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_VerInformacionAdicional);
+  }
+
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+    if (selector != null) {
+      for (let i = 0; i < selector.length; i++) {
+        selector[i].style.display = ocultarMostrar;
+      }
+    }
   }
 }

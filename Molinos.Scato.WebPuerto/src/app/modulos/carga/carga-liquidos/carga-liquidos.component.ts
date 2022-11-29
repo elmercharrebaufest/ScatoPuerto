@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Mail } from '@ScatoModels/mail';
 import { Embarque } from '@ScatoModels/embarque';
@@ -7,8 +7,6 @@ import { Alerta } from '@ScatoModels/alerta';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
-import html2canvas from 'html2canvas';
-import jspdf from 'jspdf';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { LineasComponent } from './operaciones/lineas/lineas.component';
 import { AlertService } from '@ScatoServicios/alert.service';
@@ -27,6 +25,9 @@ import { TanquesComponent } from './operaciones/tanques/tanques.component';
 import * as html2pdf from 'html2pdf.js';
 import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liquidos/planilla-turno-liquidos.component';
 import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { BuqueService } from '@ScatoServicios/buque.service';
+
 @Component({
   selector: 'app-carga-liquidos',
   templateUrl: './carga-liquidos.component.html',
@@ -58,6 +59,7 @@ export class CargaLiquidosComponent implements OnInit {
   mostrarTableristaOperando = true;
   tanquesSeleccionados: any;
   private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
   estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
   { id: 2, descripcion: 'Cargando' },
   { id: 3, descripcion: 'ControlCalidad' },
@@ -72,7 +74,9 @@ export class CargaLiquidosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private planoDeCargaService: PlanoDeCargaService,
     private alertService: AlertService,
-    private _procesoGuardar: ProcesoGuardarService
+    private _procesoGuardar: ProcesoGuardarService,
+    private _buqueService: BuqueService,
+    private elem: ElementRef
   ) {
     this.user = this.session.getUser();
   }
@@ -149,31 +153,80 @@ export class CargaLiquidosComponent implements OnInit {
     let scrollTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("scroll-bar-turnos-liquidos") : null;
     let scrollValue = this.mostrarTableristaOperando == true && scrollTurnosLiquidos.style.height;
     let botonAgregarTurnosLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-agregar-turnos-liquidos") : null;
-    let botonGuardarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-guardar-turno-liquidos") : null;
+
     let botonTurnoEnviadoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-turno-enviado-liquidos") : null;
     let botonExportarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-exportar-planilla-liquidos") : null;
     if (botonExportarTurnoLiquidos != null) valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
     let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
-    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
-    let botonEliminarLineas = document.getElementById("btn-eliminar-lineas") != null ? document.getElementById("btn-eliminar-lineas") : null;
-    let iconosRelojes = document.getElementsByName('relojPeriodo');
+    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display    
+    let iconosRelojes = document.getElementsByName('relojPeriodo');   
+    //Botones que siempre tienen que estar ocultos.
+    let guardarPeriodoDeCarga = document.getElementById("guardarPeriodoDeCarga");
+    let collapse = this.elem.nativeElement.querySelectorAll("#ocultarCollapse");
+    let agregarNuevaFila = document.getElementById("btn-add-container-lineas");
+    let guardarPlanillaEmbarque = document.getElementById("guardarPlanillaEmbarque");   
+    let guardarTurnoLiquido = this.elem.nativeElement.querySelectorAll("#btn-guardar-turno-liquidos");
+    let ocultarAgregarLinea = this.elem.nativeElement.querySelectorAll(".ocultarAgregarLinea");
+    let ocultarAgregarCorte = this.elem.nativeElement.querySelectorAll(".ocultarAgregarCorte");
+    let ocultarEliminarTurno = document.getElementsByClassName("ocultarEliminarTurno");
+    let enviarTurnoARecibidor = this.elem.nativeElement.querySelectorAll("#btn-turno-enviado-liquidos");
+    let IconoTotalABordo = this.elem.nativeElement.querySelectorAll(".img-tn");
+    let totalABordo = document.getElementById("totalABordo");
+    let eliminarLineas = this.elem.nativeElement.querySelectorAll(".ocultarEliminarFila");
+    let tablaTurno = this.elem.nativeElement.querySelectorAll(".turnos");
+    let eliminarLineasDeEmbarque = this.elem.nativeElement.querySelectorAll(".btn-eliminar");
+    let ocultarPdf = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
+    let selects = this.elem.nativeElement.querySelectorAll(".seleccionable");
+    
+    
     // #endregion
 
 
     //UNA VEZ OBTENIDOS LOS BOTONES LOS OCULTOS CAMBIANDO SU DYSPLAY = 'none'
     // #region OcultarBotones
+    
     iconosRelojes.forEach(reloj => reloj.style.display = 'none');
 
     btonConformacionLineasEmbarque.style.display = 'none';
-    if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'none';
+   
+    
     if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
 
     if (this.mostrarTableristaOperando == true) {
       if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'none';
-      if (botonGuardarTurnoLiquidos != null) botonGuardarTurnoLiquidos.style.display = 'none';
+     
       if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'none';
       if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = 'none';
       if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = 'auto';
+      
+      //Botones que siempre tienen que estar ocultos
+      if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'none';      
+      if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'none';
+      if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'none';    
+      if (totalABordo != null) totalABordo.style.display = 'none';    
+     
+      if (tablaTurno != null) {
+        for (let i = 0; i < tablaTurno.length; i++) {        
+          tablaTurno[i].classList.add('borrarBordes');         
+        }
+      }
+      this.ocultarCamposEnPDFListas(collapse, "none");
+      this.ocultarCamposEnPDFListas(ocultarPdf, "none");
+      this.ocultarCamposEnPDFListas(eliminarLineasDeEmbarque, "none");
+      this.ocultarCamposEnPDFListas(eliminarLineas, "none");
+      this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "none");
+      this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "none");
+      this.ocultarCamposEnPDFListas(ocultarAgregarLinea, "none");
+      this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "none");    
+      this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "none");
+      this.ocultarCamposEnPDFListas(IconoTotalABordo, "none");  
+      if (selects != null) {
+        for (let i = 0; i < selects.length; i++) {
+          selects[i].classList.add('ocultarBackground');
+          selects[i].classList.remove('mostrarBackground');
+        }
+      }
+      
     }
     // #endregion
 
@@ -184,14 +237,40 @@ export class CargaLiquidosComponent implements OnInit {
       iconosRelojes.forEach(reloj => reloj.style.display = 'block');
 
       btonConformacionLineasEmbarque.style.display = valueGuardarLieasEmbarque;
-      if (botonEliminarLineas != null) botonEliminarLineas.style.display = 'block';
-
       if (this.mostrarTableristaOperando == true) {
         if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'block';
-        if (botonGuardarTurnoLiquidos != null) botonGuardarTurnoLiquidos.style.display = 'block';
         if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
         if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
-        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;
+        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;       
+        //Botones que siempre tienen que estar ocultos
+        if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'block';        
+        if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'block';
+        if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'block';
+        if (totalABordo != null) totalABordo.style.display = 'block';    
+        this.ocultarCamposEnPDFListas(eliminarLineasDeEmbarque, "block");
+        this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "block");
+        this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "revert");
+        this.ocultarCamposEnPDFListas(ocultarAgregarLinea, "block");
+        this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "block");
+        this.ocultarCamposEnPDFListas(collapse, "block");
+        this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "block");
+        this.ocultarCamposEnPDFListas(IconoTotalABordo, "block");
+        this.ocultarCamposEnPDFListas(eliminarLineas, "flex");
+        this.ocultarCamposEnPDFListas(ocultarPdf, "block");
+        if (tablaTurno != null) {
+          for (let i = 0; i < tablaTurno.length; i++) {
+            tablaTurno[i].classList.add('agregarBordes');
+            tablaTurno[i].classList.remove('borrarBordes');
+          }
+        }
+
+        if (selects != null) {
+          for (let i = 0; i < selects.length; i++) {
+            selects[i].classList.add("mostrarBackground");
+            selects[i].classList.remove("ocultarBackground");            
+          }
+        }
+       
       }
     }, 5000);
     // #endregion
@@ -201,11 +280,10 @@ export class CargaLiquidosComponent implements OnInit {
 
     this.ocultarBotonesParaImpresion();
     this.cargaPdf = true;
-
     //OBTENGO EL ID DE QUE ESTABLECÍ EN EL HTML
     let element = document.getElementById('imprimirCargaLiquidos');
     let opt = {
-      margin: 0,
+      margin: [0.2, 0],
       filename: 'Pantalla Operaciones.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 3, letterRendering: true },                 //IMPRIMO PANTALLA DE LIQUIDOS USANDO LIBRERIA JS2PDF, SETEANDO
@@ -245,19 +323,13 @@ export class CargaLiquidosComponent implements OnInit {
     if (!fechasHorasOK && this.mostrarTableristaOperando)
       return;
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
-    //CAMBIOS, POR LO QUE DEBERÝA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
-    // this.hideSpinner.emit(true);
-    if (this.enviado && !finalizar) {
-            this.guardarContinuacion(finalizar);
-    } else {
-      this.guardarContinuacion(finalizar);
-
-      if (finalizar) {
-        this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
-          if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
-        });
-      }
-    }
+    //CAMBIOS, POR LO QUE DEBERIA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
+    this.guardarContinuacion(finalizar);
+  }
+  cambiarEstado() {
+    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
+      if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
+    });
   }
 
   validarFechas(): boolean {
@@ -321,19 +393,24 @@ export class CargaLiquidosComponent implements OnInit {
       this.usuarioFinalizacion = null;
 
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
-    this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
-    this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
+      this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
+      this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar) {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {this.imprimir(true, finalizar)},
+          .then(() => {
+            this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+            this.cambiarEstado();
+            this.imprimir(true, finalizar)
+
+          },
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
       } else {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {},
+          .then(() => { },
             error => {
               this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
             }).catch(() => window.location.reload())
@@ -361,7 +438,7 @@ export class CargaLiquidosComponent implements OnInit {
     var inputTitle = "Destinatarios";
     var mail = new Mail(`${this.embarque.nombreBuque}. ${this.embarque.materialesPuertoCantidad[0].descripcionCorta}. Muelle: San Benito. Plano de carga, nominación, adjunto comunicación previa y habilitación de tanques.`);
     mail.adjunto = this.adjunto.split("base64,")[1];
-    mail.nombre = "HabilitaciónDeTanques.pdf"
+    mail.nombre = this.embarque.nombreBuque + "planilla de tablerista.pdf"
     this.planoDeCargaService.obtenerBodyPlanoDeCarga(this.embarqueSelected.planoDeCargaId, this.embarque).subscribe(x => { mail.body = x });
     this.planoDeCargaService.obtenerDestinatariosPlanoDeCarga().subscribe(x => mail.destinatarios = x);
     var button1 = 'Enviar';
@@ -380,7 +457,7 @@ export class CargaLiquidosComponent implements OnInit {
                     return
                   }
                   else
-                    window.location.reload();
+                  window.location.reload();
                 }).catch(() => window.location.reload());
             }, error => {
               this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
@@ -406,4 +483,27 @@ export class CargaLiquidosComponent implements OnInit {
     }
   }
 
+  hasPermisoPlanoDeCarga_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Guardar);
+  }
+  hasPermisoPlanoDeCarga_Finalizar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Finalizar);
+  }
+  hasPermisoPlanoDeCarga_Imprimir() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Imprimir);
+  }
+  hasPermisoPlanoDeCarga_Cancelar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Cancelar);
+  }
+  hasPermisoEnviarATablerista() {
+    return this.user.permisos.find(p => p === this.permisosScato.Operadores_EnviarATablerista);
+  }
+
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+    if (selector != null) {
+      for (let i = 0; i < selector.length; i++) {
+        selector[i].style.display = ocultarMostrar;
+      }
+    }
+  }
 }

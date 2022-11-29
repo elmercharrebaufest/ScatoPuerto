@@ -22,13 +22,14 @@ export class TarjetaBuqueComponent implements OnInit {
   @Input() imo!: string
   @Input() bandera!: string
   @Input() porteNeto!: string
+  @Input() porteBruto!: string
   @Input() puntal!: string
   @Input() freeboard!: string
   @Input() cantidadBodegas!: string
   @Input() eslora!: string
   @Input() fotoEmbarque!: string
-  
-  constructor() { 
+
+  constructor() {
   }
 
   ngOnInit(): void {
@@ -38,7 +39,7 @@ export class TarjetaBuqueComponent implements OnInit {
     if (this.fotoEmbarque != null || this.fotoEmbarque != undefined){
       this.fotoEmbarque = this.fotoEmbarque > '' ? ('data:image/png;base64,' + this.fotoEmbarque) : null;
     }else{
-      this.fotoEmbarque = null
+      this.fotoEmbarque = './assets/buque_no_encontrado.png';
     }
   }
 

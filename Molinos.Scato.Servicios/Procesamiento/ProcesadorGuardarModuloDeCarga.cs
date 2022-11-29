@@ -6,6 +6,7 @@ using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Molinos.Scato.Dominio.Dto;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -351,6 +352,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     });
                 }
             }
+            if(comando.Dto.ModuloDeCargaPlanillaDeEmbarque != null)
+            {
+                ProcesarPlanillaDeEmbarque(comando.Dto.ModuloDeCargaPlanillaDeEmbarque.ToList(), comando.Dto.Id);
+            }
+            else
+            {
+                ProcesarPlanillaDeEmbarque(new List<ModuloDeCargaPlanillaDeEmbarqueDto>() { }, comando.Dto.Id);
+            }
 
             if (comando.Dto.ModuloDeCargaPlanillaDeEmbarque != null)
             {
@@ -383,42 +392,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.ToList());
-            //if (comando.Dto.ModuloDeCargaPlanillaDeTurnos != null)
-            //{
-            //    foreach (var planilla in comando.Dto.ModuloDeCargaPlanillaDeTurnos)
-            //    {
-            //        var moduloDeCargaPlanillaDeTurnos = new ModuloDeCargaPlanillaDeTurnos
-            //        {
-            //            ModuloDeCarga = moduloDeCarga,
-            //            Fecha = planilla.Fecha
-            //        };
-
-            //        moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos = new List<ModuloDeCargaPlanillaDeTurnos>();
-            //        planilla.ModuloDeCargaPlanillaDeTurnos.ToList()
-            //        .ForEach(turnos => moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
-            //        {
-            //            TurnoPuerto = turnos.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(turnos.TurnoPuerto.Id) : null,
-            //            Cerrado = turnos.Cerrado,
-            //            Enviado = turnos.Enviado
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetalles> ModuloDeCargaPlanillaDeTurnosDetalles { get; set; }
-            //            //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortes> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
-            //        }));
-
-            //        moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Add(new ModuloDeCargaPlanillaDeTurnos
-            //        {
-            //            ModuloDeCarga = moduloDeCarga,
-            //            Fecha = planilla.Fecha,
-            //            ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnos
-            //        });
-            //    }
-            //}
-            // LÍQUIDOS
-            /////////////////////////
-
-
-            /////////////////////////
-            // LÍQUIDOS / SÓLIDOS
             if (comando.Dto.ModuloDeCargaPeriodoDeCarga != null)
             {
                 Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaPeriodoDeCarga.ToList());
@@ -478,38 +451,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             }
 
-            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaNirManualPuerto.ToList());
-            //if (comando.Dto.ModuloDeCargaNirManualPuerto != null)
-            //{
-            //    foreach (var Nir in comando.Dto.ModuloDeCargaNirManualPuerto)
-            //    {
-            //        //var bodega = Nir.Bodega != null ? Repositorio.Obtener<Bodega>(Nir.Bodega.Id) : null;
-
-            //        moduloDeCarga.ModuloDeCargaNirManualPuerto.Add(new ModuloDeCargaNirManualPuerto
-            //        {
-            //            Id = Nir.Id,
-            //            ModuloDeCarga = moduloDeCarga,
-            //            Fecha = Nir.Fecha,
-            //            HD = Nir.HD,
-            //            Hora = Nir.Hora,
-            //            Origen = Nir.Origen,
-            //            PH = Nir.PH,
-            //            ProtBase = Nir.ProtBase,
-            //            Prot_BS = Nir.Prot_BS,
-            //            Ritmo = Nir.Ritmo,
-            //            Material_id = Nir.Material_id,
-            //            Mano = Nir.Mano,
-            //            Bodega_id = Nir.Bodega_id,
-            //            //Bodega = bodega
-            //        });
-            //    }
-            //}
-            // LÍQUIDOS / SÓLIDOS
-            /////////////////////////
-
-
-            /////////////////////////
-            // SÓLIDOS
             if (comando.Dto.ModuloDeCargaUmap != null)
             {
                 Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaUmap.ToList());
@@ -528,29 +469,83 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaBalanzas.ToList());
-            //if (comando.Dto.ModuloDeCargaBalanzas != null)
-            //{
-            //    foreach (var balanzas in comando.Dto.ModuloDeCargaBalanzas)
-            //    {
-            //        var motivosFallasBalanza = balanzas.MotivosFallasBalanza != null ? Repositorio.Obtener<MotivosFallasBalanza>(balanzas.MotivosFallasBalanza.Id) : null;
-                    
-            //        moduloDeCarga.ModuloDeCargaBalanzas.Add(new ModuloDeCargaBalanzas
-            //        {
-                        
-            //           // ModuloDeCarga = moduloDeCarga,
-            //            MotivosFallasBalanza = motivosFallasBalanza,
-            //            Observaciones = balanzas.Observaciones,
-                    
-            //        });
-            //    }
-            //}
-            // SÓLIDOS
-            /////////////////////////
-            ///// TABLERISTAS /////
+          
+        }
 
-            ///// PROCESO TABLAS ACTUALES /////
-            ///////////////////////////
+        private void ProcesarPlanillaDeEmbarque(List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarque, int moduloDeCarga_Id)
+        {
+            try
+            {
+
+                List<ModuloDeCargaPlanillaDeEmbarque> planillasDeEmbarque_DB = Repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id).ToList();
+
+                foreach (var planilla_DB in planillasDeEmbarque_DB)
+                {
+                    bool exist = false;
+                    foreach (var planilla in planillaDeEmbarque)
+                    {
+                        if (planilla.Id <= 0) continue;
+                        if (planilla.Id == planilla_DB.Id && planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                        {
+                            exist = true;
+                        }
+                    }
+                    if (!exist)
+                    {
+                        Repositorio.Remover(planilla_DB);
+                    }
+                }
+
+                if (planillaDeEmbarque != null)
+                {
+                    foreach (var planilla in planillaDeEmbarque)
+                    {
+                        if (planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                        {
+                            ModuloDeCargaPlanillaDeEmbarque planillaDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.Id == planilla.Id);
+                            if (planillaDB != null)
+                            {
+                                planillaDB.ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(moduloDeCarga_Id);
+                                planillaDB.Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id);
+                                planillaDB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id);
+                                planillaDB.Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id);
+                                planillaDB.FechaComienzoCarga = planilla.FechaComienzoCarga;
+                                planillaDB.FechaFinalizacionCarga = planilla.FechaFinalizacionCarga;
+                                planillaDB.TanqueDeAbordo = planilla.TanqueDeAbordo;
+                                planillaDB.Tk = planilla.Tk;
+                                planillaDB.Tn = planilla.Tn;
+                                planillaDB.Cantidad = planilla.Cantidad;
+                                planillaDB.BodegaParcel = planilla.BodegaParcel;
+                            }
+                            else
+                            {
+                                planillaDB = new ModuloDeCargaPlanillaDeEmbarque()
+                                {
+                                    ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(moduloDeCarga_Id),
+                                    Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id),
+                                    MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id),
+                                    Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id),
+                                    FechaComienzoCarga = planilla.FechaComienzoCarga,
+                                    FechaFinalizacionCarga = planilla.FechaFinalizacionCarga,
+                                    TanqueDeAbordo = planilla.TanqueDeAbordo,
+                                    Tk = planilla.Tk,
+                                    Tn = planilla.Tn,
+                                    Cantidad = planilla.Cantidad,
+                                    BodegaParcel = planilla.BodegaParcel
+                                };
+
+                                Repositorio.Agregar(planillaDB);
+                            }
+                        }
+                    }
+                }
+                Repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
         protected override void Validar(GuardarModuloDeCarga comando, Resultado resultado)

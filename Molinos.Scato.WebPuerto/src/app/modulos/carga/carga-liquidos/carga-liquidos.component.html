@@ -8,7 +8,6 @@
     <ship-spinner *ngIf='cargaPdf' [src]='"pdf"'></ship-spinner>
   </div>
 
-
   <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
   <div id="grafico-liquidos" class="mt-4 shadow bg-white min-h5">
     <app-tanques (tanquesSeleccionados)="onTanquesSeleccionados($event)"></app-tanques>
@@ -24,14 +23,19 @@
   </div>
 
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
-    <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
-    <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
-    <!-- <button class="btn btn-secondary" (click)="imprimir()">IMPRIMIR</button> -->
-    <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
-    <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
+  	<ng-container *ngIf="hasPermisoPlanoDeCarga_Cancelar()">
+	    <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+	  </ng-container>
+    <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
+    	<button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+    </ng-container>
+    <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
+	    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;"/>
+    </ng-container>
+    <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
+    	<button type="button" class="btn btn-success mx-5" (click)='guardar(true)'>ENVIAR A TABLERISTA</button>
+	  </ng-container>
   </div>
-
-
 
   <!-- Rol Tablerista -->
   <!-- <ng-container *ngIf='embarqueSelected.nombreUbicacion.toLowerCase() == "muelle de carga"'> -->
@@ -45,18 +49,24 @@
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
       <app-planilla-turno-liquidos [tablerista]='true' (recargarGraficos)="recargarGraficoRitmos($event)"></app-planilla-turno-liquidos>
     </div>
-    <div class='mt-5' style='margin-left: 25%; width: 50%;'>
+    <div class='mt-5' style='margin-left: 25%; width: 50%;' id="grafico-ritmo">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
       <app-graficos-ritmos [liquido]='true'></app-graficos-ritmos>
     </div>
   </ng-container>
 
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="mostrarTableristaOperando">
-    <button name="botonesTableristaLiquidos" id="btn-cancelar-tablerista" type="button" class="btn btn-danger ocultar" [routerLink]="['/lineup']">CANCELAR</button>
-    <button name="botonesTableristaLiquidos" id="btn-guardar-tablerista" type="button" class="btn btn-primary mx-5 ocultar" (click)="guardar(false)">GUARDAR</button>
-    <!-- <button name="botonesTableristaLiquidos" id="btn-imprimir-tablerista" class="btn btn-primary" (click)="imprimir()">IMPRIMIR</button> -->
-    <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" name="botonesTableristaLiquidos" id="btn-imprimir-tablerista"/>
-
-    <button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+  	<ng-container *ngIf="hasPermisoPlanoDeCarga_Cancelar()">
+    	<button name="botonesTableristaLiquidos" id="btn-cancelar-tablerista" type="button" class="btn btn-danger ocultar" [routerLink]="['/lineup']">CANCELAR</button>
+    </ng-container>
+    <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
+    	<button name="botonesTableristaLiquidos" id="btn-guardar-tablerista" type="button" class="btn btn-primary mx-5 ocultar" (click)="guardar(false)">GUARDAR</button>
+    </ng-container>
+    <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
+	    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;" name="botonesTableristaLiquidos" id="btn-imprimir-tablerista"/>
+	  </ng-container>
+    <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
+    	<button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" (click)='guardar(true)'>FINALIZAR</button>
+	  </ng-container>
   </div>
 </div>

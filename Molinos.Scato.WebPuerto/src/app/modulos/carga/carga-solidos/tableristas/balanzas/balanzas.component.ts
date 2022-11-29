@@ -19,9 +19,13 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { FuncionesGeneralesService } from '@ScatoServicios/funciones-generales.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
+import { SessionService } from '@ScatoServicios/session.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { Embarque } from '@ScatoModels/embarque';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 
 interface TotToneladas {
   producto: string;
@@ -34,6 +38,9 @@ interface TotToneladas {
   styleUrls: ['./balanzas.component.css']
 })
 export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
+  @Input() esSoloLectura: boolean = false;
+  private paramSoloLectura: any;
+
   agregaCorte: boolean = false;
   balanza7Form: FormGroup;
   balanza8Form: FormGroup;
@@ -66,7 +73,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   totalTnBodegas7: TotToneladas[] = [];
   totalTnBodegas8: TotToneladas[] = [];
   unsubscribe: Subject<any>;
-  vaporId: number = 0;
   yaCargoModal: boolean = false;
   @Input() imprimir : boolean = false; 
   patenteEmbarque: string;
@@ -83,6 +89,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   llevaCargando8EnCurso: number;
   mostrarInfoBalanzadasEnCurso7: boolean = false;
   mostrarInfoBalanzadasEnCurso8: boolean = false;
+  mostrarInfoBalanzadasEnCurso: boolean = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -91,30 +100,29 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     private balanzas78Service: Balanzas78Service,
     config: NgbModalConfig,
     confirmationDialogService: ConfirmationDialogService,
+    private embarqueSharingService: EmbarqueSharingService,
     private embarqueService: EmbarqueService,
     private _balanzaService: BalanzaService,
     private funcionesGeneralesService: FuncionesGeneralesService,
-    private parametrosService: ParametrosService) {
+    private parametrosService: ParametrosService,
+    private session: SessionService,) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
+    this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
     this.unsubscribe = new Subject();
-    this.embarque = this._procesoService.getEmbarqueSelected();
-    this.embarqueId = this._procesoService.getEmbarqueId();
-    this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-    this.vaporId = this._procesoService.getVaporId();
-    this.datosEmbarque = this._procesoService.getDatosGrafico();
-    this.materialesPuerto = this.datosEmbarque.listaMateriales;
-    console.log('this.moduloDeCarga_Id: ', this.moduloDeCarga_Id);
+   
     
-    this.cargarMotivosBalanzas78();
-    this._balanzaService.obtenerListadoBodegas().subscribe( b => this.bodegas = b );
-    this.verificarNombresBuque();
-    this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
+      this.paramSoloLectura = data;
+    });
+    //this.verificarNombresBuque();
+    
   }
 
   ngOnInit(): void {
+    this.setCargarValoresBalanza();
     this.balanza7Form = this.formBuilder.group({
       balanzas7: this.formBuilder.array([])
       // balanzas7: this.formBuilder.array([this.initBalanzas7()])
@@ -126,11 +134,43 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.initCorteManualForm();
-    this.obtenerBalanzadasEnVivo();
+    if (!this.esSoloLectura) {
+      this.obtenerBalanzadasEnVivo();
+    }
   }
 
   ngAfterViewInit(): void {
     this.yaCargoModal = true;
+  }
+
+
+  setCargarValoresBalanza() {
+    if (this.esSoloLectura) {
+      this.embarqueId = this.paramSoloLectura.embarque_Id;
+      this.moduloDeCarga_Id = this.paramSoloLectura.moduloDeCarga_Id;
+      this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(res => {
+        this.materialesPuerto = res.materialesPuertoCantidad?.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color }));
+      });
+      this.cargarMotivosBalanzas78();      
+      this._balanzaService.obtenerListadoBodegas().subscribe(b => {
+        this.bodegas = b;
+        this.obtenerBalanzadasEnVivo();
+
+      });
+      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
+    } else {
+      this.embarque = this._procesoService.getEmbarqueSelected();
+      if (this.embarque != null || this.embarque != undefined) {
+        this.embarqueId = this._procesoService.getEmbarqueId();
+        this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
+        this.datosEmbarque = this._procesoService.getDatosGrafico();
+        this.materialesPuerto = this.datosEmbarque?.listaMateriales;
+        this.cargarMotivosBalanzas78();
+        this._balanzaService.obtenerListadoBodegas().subscribe(b => this.bodegas = b);
+        this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id);
+      }
+    }
+
   }
 
   initCorteManualForm(){
@@ -328,7 +368,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   obtenerBalanzadasEnVivo() {
-    this.parametrosService.consola(`vapor: `,this.vaporId);
     this.parametrosService.consola(`moduloDeCarga: `,this.moduloDeCarga_Id);
 
     this.balanzas78Service.sendDataBalanzada7
@@ -661,8 +700,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     let fecha_Inicio_Inicial = bc.fecha_Inicio_Inicial + ' ' + bc.hora_Inicio_Inicial;
     let fecha_Corte_Inicial = bc.fecha_Corte_Inicial + ' ' + bc.hora_Corte_Inicial;
     let nuevoEsAnteriorAlOriginal: boolean;
-    // let tnInicial = bc.tn;
-    // let kgInicial = bc.kg;
 
     if( balanzadas.length === 0 ){ // Cuando no selecciona ninguno
       if( !bc.listadoTotalBalanzadas.motivosFallasBalanza.id ){
@@ -762,8 +799,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
           }
 
           cortes.push(objetoNuevo);
-          // this._balanzaService.guardarBalanzaCorte( cortes )
-          //   .subscribe( res => console.log('se guardo correctamente') );
         } else {
           this.mensajeGenerico('La fecha y hora del nuevo Inicio y/o Corte quedó fuera del rango que está modificando.');
           return;
@@ -921,6 +956,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   //El comentario es porque todos los parámetros se llaman igual WTF.
   //Si estás leyendo esto leé la linea de abajo de esta y me vas a entender. CORTEE (Con voz de Gaspi Cancelado)
   openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number, corte?: boolean) {
+    if (this.esSoloLectura) return; 
     this.esCorteManual = corteManual;
     this.balanzaCorteManual = balanzaCorteManual;
     this.agregaCorte = false;
@@ -1073,4 +1109,13 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
     this.unsubscribe.complete();
   }
 
+  hasPermisoCorteManualBalanzas() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_CorteManualBalanzas);
+  }
+  hasPermisoTableroSolido_MotivoCorte_Editar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_MotivoCorte_Editar);
+  }
+  hasPermisoTableroSolido_TerminarCarga_Exportar() {
+    return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_TerminarCarga_Exportar);
+  }
 }

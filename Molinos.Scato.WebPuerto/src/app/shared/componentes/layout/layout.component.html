@@ -6,7 +6,7 @@
       <img src='assets/sidebar/Logo_Molinos_M.png' (click)='goHome()'>
     </div>
     <div class='links-container' #menuSide>
-      <a routerLink='/' *ngIf='tienePermiso(600)'>
+      <a routerLink='/' *ngIf='tienePermiso("LineUp_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "lineup" || rutaActual == ""'>
           <div class='icon-lineup'></div>
           <span>Line Up</span>
@@ -19,45 +19,41 @@
           <img src='assets/sidebar-icons/reportes.svg' width="32">
           <span>Reportes/Informes</span>
         </div>
-      </a>
-
-      <hr *ngIf='tienePermiso(680)'>
-      <a routerLink='/buques' *ngIf='tienePermiso(680)'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "buques"'>
-          <img src='assets/sidebar-icons/buques.svg' width="32">
-          <span>Buques</span>
-        </div>
       </a> -->
       <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA-->
       
-      
-      <hr *ngIf='tienePermiso(600)'> 
-      <a routerLink='/geolocalizacion' *ngIf='tienePermiso(600)'>
+      <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'> 
+      <a routerLink='/geolocalizacion' *ngIf='tienePermiso("Geolocalizacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
         
           <div class='icon-geolocalizacion'></div>
           <span *ngIf='opened'>Geolocalización</span>
         </div>
       </a>
-    
 
-      <hr *ngIf='tienePermiso(630)'>
-      <a routerLink='/carga' *ngIf='tienePermiso(630)'>
+      <hr *ngIf='tienePermiso("Carga_Ver")'>
+      <a routerLink='/carga' *ngIf='tienePermiso("Carga_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>
           <div class='icon-operaciones'></div>
           <span *ngIf='opened'>Operaciones</span>
         </div>
       </a>
-
       
-      <hr *ngIf='tienePermiso(640)'>
-      <a routerLink='/calidad' *ngIf='tienePermiso(640)'>
+      <hr *ngIf='tienePermiso("Recibidores_Ver")'>
+      <a routerLink='/calidad' *ngIf='tienePermiso("Recibidores_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "calidad"'>
           <div class='icon-recibidores'></div>
           <span *ngIf='opened'>Recibidores</span>
         </div>
       </a>
-      
+
+      <hr *ngIf='tienePermiso("Buque_Ver")'>
+      <a routerLink='/buques' *ngIf='tienePermiso("Buque_Ver")'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "buques"'>
+          <div class='icon-buques'></div>
+          <span *ngIf='opened'>Embarques</span>
+        </div>
+      </a>
 
       <!-- <hr *ngIf='tienePermiso(650)'>
       <a routerLink='/administracion' *ngIf='tienePermiso(650)'>

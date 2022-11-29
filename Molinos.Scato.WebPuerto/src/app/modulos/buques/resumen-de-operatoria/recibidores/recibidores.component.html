@@ -1,0 +1,17 @@
+<div class="forms row">
+    <div class="form-group col-md-12" *ngIf="!esEmbarqueLiquido">
+        <app-planilla-turnos-solido  [esSoloLectura]="true">
+        </app-planilla-turnos-solido>
+        <app-nir [esSoloLectura]="true">
+        </app-nir>
+    </div>
+    <div class="form-group col-md-12" *ngIf="esEmbarqueLiquido">
+        <app-planilla-turnos-liquidos-calidad  [esSoloLectura]="true">
+        </app-planilla-turnos-liquidos-calidad>
+    </div>
+</div>
+
+ 
+<!--
+px-4 min-h5 shadow mt-4 ng-star-inserted
+-->

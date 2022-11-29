@@ -209,11 +209,17 @@ li{
  {
    color:red;
    font-size: 0.975rem;
+   margin-bottom: 0px !important;
+   display: flex;
+   align-items: center;
   }
   .color-text-mapa
  {
    color:blue;
    font-size: 0.975rem;
+   margin-bottom: 0px !important;
+   display: flex;
+   align-items: center;
   }
 
   .color-text-espera

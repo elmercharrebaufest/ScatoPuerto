@@ -27,7 +27,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/PlanoDeCarga/ListarDestinos")]
         public HttpResponseMessage ListarDestinos()
         {
@@ -37,7 +38,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/PlanoDeCarga/ListarAgenciasControlPrivado")]
         public HttpResponseMessage ListarAgenciasControlPrivado()
         {
@@ -47,7 +49,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/PlanoDeCarga/ListarAgentesControlPrivado")]
         public HttpResponseMessage ListarAgentesControlPrivado()
         {
@@ -57,7 +60,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/PlanoDeCarga/ListarEstibas")]
         public HttpResponseMessage ListarEstibas()
         {
@@ -67,7 +71,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_Guardar)]
         [Route("api/PlanoDeCarga/GuardarPlanoDeCarga")]
         public HttpResponseMessage GuardarPlanoDeCarga(PlanoDeCargaDto planoDeCarga)
         {
@@ -77,7 +82,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/PlanoDeCarga/ListarExportadores")]
         public HttpResponseMessage ListarExportadores()
         {
@@ -87,7 +93,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/PlanoDeCarga/ObtenerPlanoDeCarga")]
         public HttpResponseMessage ObtenerPlanoDeCarga(int id)
         {
@@ -96,7 +103,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             );
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_Estiba_Modificar)]
         [Route("api/PlanoDeCarga/AgregarEstiba")]
         public HttpResponseMessage AgregarEstiba(EstibaDto estiba)
         {
@@ -104,7 +112,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_Estiba_Modificar)]
         [Route("api/PlanoDeCarga/ModificarEstiba")]
         public HttpResponseMessage ModificarEstiba(EstibaDto estiba)
         {
@@ -112,7 +121,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_Estiba_Modificar)]
         [Route("api/PlanoDeCarga/EliminarEstiba")]
         public HttpResponseMessage EliminarEstiba(int estibaId)
         {
@@ -121,7 +131,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_AgenciaControlPrivado_Modificar)]
         [Route("api/PlanoDeCarga/AgregarAgenciaControlPrivado")]
         public HttpResponseMessage AgregarAgenciaControlPrivado(AgenciaControlPrivadoDto agencia)
         {
@@ -129,7 +140,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_AgenciaControlPrivado_Modificar)]
         [Route("api/PlanoDeCarga/ModificarAgenciaControlPrivado")]
         public HttpResponseMessage ModificarAgenciaControlPrivado(AgenciaControlPrivadoDto agencia)
         {
@@ -137,7 +149,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_AgenciaControlPrivado_Modificar)]
         [Route("api/PlanoDeCarga/EliminarAgenciaControlPrivado")]
         public HttpResponseMessage EliminarAgenciaControlPrivado(int agenciaId)
         {
@@ -146,7 +159,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_AgentesControlPrivado_Modificar)]
         [Route("api/PlanoDeCarga/AgregarAgenteControlPrivado")]
         public HttpResponseMessage AgregarAgenteControlPrivado(AgenteControlPrivadoDto agente)
         {
@@ -154,7 +168,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_AgentesControlPrivado_Modificar)]
         [Route("api/PlanoDeCarga/ModificarAgenteControlPrivado")]
         public HttpResponseMessage ModificarAgenteControlPrivado(AgenteControlPrivadoDto agente)
         {
@@ -162,7 +177,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.PlanoDeCarga_AgentesControlPrivado_Modificar)]
         [Route("api/PlanoDeCarga/EliminarAgenteControlPrivado")]
         public HttpResponseMessage EliminarAgenteControlPrivado(int agenteId)
         {
@@ -171,7 +187,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/PlanoDeCarga/ObtenerDestinatariosPlanoDeCarga")]
         public HttpResponseMessage ObtenerDestinatariosPlanoDeCarga()
         {
@@ -180,7 +197,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             );
         }
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/PlanoDeCarga/ObtenerBodyPlanoDeCarga")]
         public HttpResponseMessage ObtenerBodyPlanoDeCarga([FromUri]int planoDeCargaId, [FromBody]EmbarqueDto embarque)
         {
@@ -189,8 +207,25 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             );
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/PlanoDeCarga/obtenerPlanoDeCargaId")]
+        public HttpResponseMessage obtenerPlanoDeCargaId(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.obtenerPlanoDeCargaId(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
         [HttpPost]
-        [Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/PlanoDeCarga/EnviarPorMail")]
         public void EnviarPorMail(int planoDeCargaId, MailDto mail)
         {
