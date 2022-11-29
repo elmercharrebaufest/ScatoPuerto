@@ -3,19 +3,20 @@
     <div id="element-to-hide" data-html2canvas-ignore="true">
         <ship-spinner *ngIf='RecibidoresPdf' [src]='"pdf"'></ship-spinner>
     </div>
+
     <app-grafico-carga id='graficoCargaCanva'
-                       class='bg-white'
+                       class='bg-white break'
                        [esCalidad]="true"></app-grafico-carga>
 
-    <div class="html2pdf__page-break"></div>
 
-    <app-manos [celdasManoDeEmbarque]="celdasManoDeEmbarque"
+
+    <app-manos class="break" [celdasManoDeEmbarque]="celdasManoDeEmbarque"
                [sentidosManoDeEmbarque]="sentidosManoDeEmbarque"
                [esCalidad]="true"></app-manos>
 
-    <div class="html2pdf__page-break"></div>
+ 
 
-    <div class='bg-white px-4 min-h5 shadow mt-4'>
+    <div class='bg-white px-4 min-h5 shadow mt-4 break'>
         <app-planilla-turnos-solido></app-planilla-turnos-solido>
     </div>
 
@@ -23,15 +24,15 @@
         <app-modal-recibo></app-modal-recibo>
     </div>
 
-    <app-registro-recibos></app-registro-recibos>
+    <app-registro-recibos class="break" ></app-registro-recibos>
 
-    <app-nir></app-nir>
+    <app-nir class="break"></app-nir>
 
-    <div class="html2pdf__page-break"></div>
 
-    <app-balanzas-ritmos></app-balanzas-ritmos>
 
-    <div fxLayout='row wrap' class="mt-4 shadow" >
+    <app-balanzas-ritmos class="break"></app-balanzas-ritmos>
+
+    <div fxLayout='row wrap' class="mt-4 shadow break" >
 
         <div fxFlex='50'>
             <!-- <app-graficos-ritmos [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos> -->

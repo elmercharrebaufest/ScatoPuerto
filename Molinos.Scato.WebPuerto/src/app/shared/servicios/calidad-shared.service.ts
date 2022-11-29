@@ -51,6 +51,26 @@ export class CalidadSharedService {
     return this.manosDeEmbarque;
   }
 
+  retirarEstilosImprimirLiquido(){
+    var listas = document.getElementsByClassName('custom-select');
+    for (let item of listas){
+      item.classList.remove("custom-select-background");
+    }
+
+    var listaFlechas = document.getElementsByClassName('fas fa-angle-down');
+    for (let item of listaFlechas){
+      item.classList.remove("ocultar-botones");
+    }
+
+    var listaBotones= document.getElementsByClassName("basurerito");
+    for (let item of listaBotones){
+      item.classList.remove("ocultar-botones");
+    }
+    var listaTksAbordo= document.getElementsByClassName("img-tn");
+    for (let item of listaTksAbordo){
+      item.classList.remove("ocultar-botones");
+    }
+  }
   ocultarBotonesImprimir(){     
     var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
     var tagFilas: string[] = ["AGREGAR NUEVA FILA"];
@@ -58,6 +78,25 @@ export class CalidadSharedService {
     var buttons = document.getElementsByTagName('button');
     let collapse = document.getElementsByTagName('app-collapse-button');
     var spanAgregarFila = document.getElementsByTagName('span')
+
+    var listas = document.getElementsByClassName('custom-select');
+    for (let item of listas){
+      item.classList.add("custom-select-background");
+    }
+
+    var listaFlechas = document.getElementsByClassName('fas fa-angle-down');
+    for (let item of listaFlechas){
+      item.classList.add("ocultar-botones");
+    }
+
+    var listaBotones= document.getElementsByClassName("basurerito");
+    for (let item of listaBotones){
+      item.classList.add("ocultar-botones");
+    }
+    var listaTksAbordo= document.getElementsByClassName("img-tn");
+    for (let item of listaTksAbordo){
+      item.classList.add("ocultar-botones");
+    }
 
     if (document.getElementById('expPlanillaSolidoCalidad')) {
       let scrollBarPlanillaSolidos = document.getElementById('scrollbar-planilla-recibidores-solido');
