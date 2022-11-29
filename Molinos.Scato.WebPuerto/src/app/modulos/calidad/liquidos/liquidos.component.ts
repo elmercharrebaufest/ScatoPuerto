@@ -107,6 +107,18 @@ public openModalCargarAmarre(modal: any) {
 
 guardarAmarre()
 {
+  if(
+      (this.amarreForm.value.fechaAmarro == '' || 
+       this.amarreForm.value.fechaAmarro == null || 
+       this.amarreForm.value.fechaAmarro == undefined) || 
+      (this.amarreForm.value.fechaDesamarro == '' || 
+       this.amarreForm.value.fechaDesamarro == null || 
+       this.amarreForm.value.fechaDesamarro == undefined) 
+    ){
+    this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+    return false;
+  } 
+
   if(this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
     this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
     this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
