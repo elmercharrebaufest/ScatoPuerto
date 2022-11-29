@@ -1,11 +1,14 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadScreen } from '@ScatoInterfaces/load-screen';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { PlanoContentComponent } from './plano-content/plano-content.component';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-plano-de-carga',
@@ -22,6 +25,8 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
   estadoAlturaValor: string;
   planoDeCargaId: number;
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
+  permisosScato: typeof PermisosScato = PermisosScato;
+  private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
                   {id: 2, descripcion: 'Cargando'}, 
                   {id: 3, descripcion: 'ControlCalidad'}, 
@@ -32,9 +37,11 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
     private workflowService: WorkflowService,
     private _procesoService: DatosEmbarquesProcesoService,
     private embarqueService: EmbarqueService,
-    private _changeDet: ChangeDetectorRef
+    private _changeDet: ChangeDetectorRef,
+    private session: SessionService,
   ) {
     super();
+    this.user = this.session.getUser();
   }
 
   ngOnInit() {
@@ -85,5 +92,12 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
     let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
     let idEmbarque = this.route.snapshot.params.id;
     this.embarqueService.actualizarEstadoBuque(idEmbarque, estadoBuque.id).subscribe( res => console.log(res) );
+  }
+
+  hasPermisoPDC_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PDC_Guardar);
+  }
+  hasPermisoPDC_Finalizar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PDC_Finalizar);
   }
 }

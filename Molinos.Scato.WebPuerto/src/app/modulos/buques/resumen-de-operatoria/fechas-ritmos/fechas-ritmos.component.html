@@ -1,0 +1,38 @@
+<div class="forms row" *ngIf="mostrarFechas">
+  <div class="form-group col-md-6">
+    <div class="row">
+      <div class="form-group col-md-12">
+        <app-fechas-puerto [registroFechas]="registroFechas"
+                           [tieneLimpieza]="tieneLimpieza"
+                           [horasPuerto]="horasPuerto">
+        </app-fechas-puerto>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group col-md-6">
+
+    <div class="row" *ngIf="!liquido">
+      <div class="form-group col-md-12">
+        <app-balanzas-ritmos [enBuque]="true">
+        </app-balanzas-ritmos>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-12">
+        <app-graficos-ritmos [enBuque]="true"
+                             [liquido]="liquido">
+        </app-graficos-ritmos>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="!liquido">
+      <div class="form-group col-md-12">
+        <app-info-adicional [enBuque]="enBuque">
+        </app-info-adicional>
+      </div>
+    </div>
+
+  </div>
+</div>

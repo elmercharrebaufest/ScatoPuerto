@@ -687,6 +687,8 @@
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ErroresGeolocalizacionDto.cs" />
+    <Compile Include="Dto\HistorialDeBusquesDto.cs" />
+    <Compile Include="Dto\HistoricoActoresDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosUltimaActualizacionDto.cs" />
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaFiltroDto.cs" />
@@ -898,6 +900,7 @@
     <Compile Include="Dto\ImpresoraEstadoDto.cs" />
     <Compile Include="Dto\FotosDto.cs" />
     <Compile Include="Dto\FotoDto.cs" />
+    <Compile Include="Dto\VaporInformacionDto.cs" />
     <Compile Include="Dto\VideoCamaraDto.cs" />
     <Compile Include="Dto\CosechaDto.cs" />
     <Compile Include="Dto\InfoCaladoDto.cs">
@@ -973,6 +976,7 @@
     <Compile Include="Entidades\EmbarquePosicionHistorico.cs" />
     <Compile Include="Entidades\ErroresGeolocalizacion.cs" />
     <Compile Include="Entidades\EstadoBuque.cs" />
+    <Compile Include="Entidades\HistoricoActores.cs" />
     <Compile Include="Entidades\ImpEtiquetaPuerto.cs" />
     <Compile Include="Entidades\LlenadoMilimetroPorTanque.cs" />
     <Compile Include="Entidades\LogAfipCpe.cs" />
@@ -1092,6 +1096,7 @@
     <Compile Include="Entidades\RangosDeRedondeo.cs" />
     <Compile Include="Entidades\ImpReciboMunicipalImportacion.cs" />
     <Compile Include="Entidades\MotivoHumedadManual.cs" />
+    <Compile Include="Entidades\VaporInformacion.cs" />
     <Compile Include="Entidades\VideoCamara.cs" />
     <Compile Include="Entidades\Cosecha.cs" />
     <Compile Include="Entidades\ImpEtiquetaRubrosAnalizar.cs" />

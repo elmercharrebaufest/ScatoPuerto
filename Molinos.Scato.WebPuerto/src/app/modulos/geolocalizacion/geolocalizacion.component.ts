@@ -1,5 +1,6 @@
 import { Component, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
 import { GeolocalizacionSharingService } from '@ScatoServicios/geolocalizacion.sharing.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
@@ -30,7 +31,9 @@ export class GeolocalizacionComponent implements OnInit {
     private geolocalizacionSharingService: GeolocalizacionSharingService,
     private router: Router,
     private route: ActivatedRoute,
-    private parametrosService: ParametrosService) {
+    private parametrosService: ParametrosService,
+    private auth: AutenticadorService) {
+    this.auth.renovarAuthUsuario();
     this.user = this.session.getUser();
     this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
     this.cargarPuntosInteres();
@@ -92,8 +95,9 @@ export class GeolocalizacionComponent implements OnInit {
     this.mostrarListaBuque = false;
     this.geolocalizacionService.ListarEmbarqueLineUpGeolocalizacion().subscribe(
       data => {
+        const listaBuque = data.filter(item => item.ubicacionLineUp != 'Zarpó');
         let muelleCarga = '';
-        data.forEach((item) => {
+        listaBuque.forEach((item) => {
           if (item.sanBenito) muelleCarga = 'San Benito';
           if (item.vicentin) muelleCarga = 'Vicentin';
           if (item.otrosMuelles) muelleCarga = 'Otros Muelles';
@@ -106,7 +110,6 @@ export class GeolocalizacionComponent implements OnInit {
           item.numeroPaginado = 0;
         });
         this.setListaBuquesGeolocalizacion(data);
-
       },
       err => {
         this.mostrarListaBuque = false;

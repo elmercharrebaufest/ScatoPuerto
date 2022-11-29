@@ -40,7 +40,7 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
         data.forEach((item) => {
           let fechaRecibida: Date = new Date(item.posicion.horaUTCPosicionRecibida);
           fechaRecibida.setHours(fechaRecibida.getHours() - 3);
-          item.posicion.horaUTCPosicionRecibida = fechaRecibida;
+          item.posicion.horaUTCPosicionRecibidaCalc = fechaRecibida;
           item.posicion.estado = this.setEstadoBuque(item.posicion.estado);
         })
         this.setListaBuquesGeolocalizacion(data);
@@ -142,11 +142,16 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
   public onChangeBuqueSeleccionado(event: any) {
     const embarqueId = event.target?.defaultValue;
     const esSeleccionado = event.target?.checked;
-    const indexEmbarque = this.listaBuquesGeolocalizacion.findIndex((item => item.embarque_Id == embarqueId));
-    this.listaBuquesGeolocalizacion[indexEmbarque].esSeleccionado = esSeleccionado
+    let filtroBuque = this.listaBuquesGeolocalizacion.filter((item => item.embarque_Id == embarqueId));
+    filtroBuque.esSeleccionado = esSeleccionado;
+    this.listaBuquesGeolocalizacion.forEach((item) => {
+      if (item.embarque_Id == embarqueId){
+          item.esSeleccionado = esSeleccionado;
+          return false;
+      } 
+    });
     this.listaBuquesGeolocalizacionFiltro.emit(this.listaBuquesGeolocalizacion)
     this.geolocalizacionSharingService.setBuquesLineUp(this.listaBuquesGeolocalizacion);
-    
   }
 
   public onZoomBuqueSeleccionado(event) {
@@ -198,5 +203,10 @@ export class ListaBuquesComponent implements OnInit, OnDestroy {
     this.paginaActual = 1;
   }
   // #endregion
-
+  CalcularHoraBuqueFueraDeAlcance(posicion: any){
+    var hoy = new Date();
+    var posicionDate = new Date(posicion);
+    hoy.setHours(hoy.getHours() - 3);
+    return posicionDate > hoy;
+  }
 }

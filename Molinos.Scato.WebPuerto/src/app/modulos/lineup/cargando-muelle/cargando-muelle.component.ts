@@ -6,6 +6,9 @@ import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { finalize } from 'rxjs/operators';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-cargando-muelle',
@@ -23,23 +26,34 @@ export class CargandoMuelleComponent implements OnInit {
   liquido: boolean;
   fechaAmarro: Date;
   horaAmarro: string;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private router: Router,
     private balanzaService: BalanzaService,
-    private moduloCargaService: ModuloDeCargaService,) { }
+    private moduloCargaService: ModuloDeCargaService,
+    private session: SessionService,) { 
+      this.user = this.session.getUser()
+  }
 
   ngOnInit(): void {
+    const moduloDeCargaPeriodoDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'];
 
-    this.fechaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].fechaAmarro;
-    this.horaAmarro = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0].horaAmarro;
+    if (moduloDeCargaPeriodoDeCarga.length > 0)
+      this.fechaAmarro = moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
+    
+      if (moduloDeCargaPeriodoDeCarga.length > 0)
+      this.horaAmarro = moduloDeCargaPeriodoDeCarga[0].horaAmarro;
 
     if(this.instanciaWorkflow){
-      this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'].forEach(x => this.tnTotales += x.cantidad );
+      const moduloDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga'];
+      const planoDeCargaBodegas = this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'];
+      planoDeCargaBodegas.forEach(x => this.tnTotales += x.cantidad );
       
       if(this.instanciaWorkflow.embarque.esLiquido){
         this.liquido = true;
-        this.balanzaService.obtenerRitmosLiquidos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.balanzaService.obtenerRitmosLiquidos(moduloDeCarga.id)
         .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmosLiquidos: ', res);
@@ -48,7 +62,7 @@ export class CargandoMuelleComponent implements OnInit {
         });
       }else{
         this.liquido = false;
-        this.balanzaService.obtenerRitmos(this.instanciaWorkflow.embarque.vapor.id, this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+        this.balanzaService.obtenerRitmos( moduloDeCarga.id)
         .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
           console.log('obtenerRitmos: ', res);
@@ -57,7 +71,7 @@ export class CargandoMuelleComponent implements OnInit {
         });
       }
 
-      this.moduloCargaService.obtenerModuloDeCarga(this.instanciaWorkflow.lineUp['moduloDeCarga'].id)
+      this.moduloCargaService.obtenerModuloDeCarga(moduloDeCarga.id)
       .subscribe(res => {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
@@ -93,5 +107,9 @@ export class CargandoMuelleComponent implements OnInit {
 
   get filteredMaterialList(): MaterialPuertoCantidad[] {
     return this.instanciaWorkflow.embarque.materialesPuertoCantidad.filter(x => x.cantidad > 0);
+  }
+
+  hasPermisoEditarEmbarqueEnCalidad(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarEmbarqueEnCalidad);
   }
 }

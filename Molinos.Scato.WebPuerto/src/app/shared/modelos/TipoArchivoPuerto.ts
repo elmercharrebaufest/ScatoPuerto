@@ -1,4 +1,4 @@
 export class TipoArchivoPuerto{
-    Id: number;
-    TipoArchivo : string;
+    id: number;
+    tipoArchivo : string;
 }

@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
-import { BalanzadasAgrupadas, BalanzadasBuque, Balanzas, InformacionAdicional } from '@ScatoModels/balanzadas/balanza';
+import { BalanzadasAgrupadas, BalanzadasBuque, Balanzas, CargasPorBodega, InformacionAdicional } from '@ScatoModels/balanzadas/balanza';
 import { EmbarqueService } from './embarque.service';
 import { RitmosBalanzas78 } from '@ScatoModels/balanzadas/ritmos-balanzas78';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
@@ -43,7 +43,7 @@ export class Balanzas78Service {
   @Output() informacionAdicional = new EventEmitter<InformacionAdicional>();
   @Output() sendRitmosBalanzas78 = new EventEmitter<RitmosBalanzas78>();
   @Output() sendBalanzadasBuque = new EventEmitter<BalanzadasBuque[]>();
-
+  @Output() sendCargasPorBodega = new EventEmitter<CargasPorBodega[]>();
   materialesPuerto = [];
   tiempoActualizacionBalanzas: number = 15000; // por default
   tiempoActualizacionRitmosBlzas78: number = 15000; // por default
@@ -89,7 +89,25 @@ export class Balanzas78Service {
 
     this.intervalBodegas = setInterval(() => this.actualizarBodegas(idModuloDeCarga), this.tiempoActualizacionBalanzas);
   }
+  setObtenerEmbarqueBalanza(idModuloDeCarga: number = 0) {
+    if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
+    
+    this._balanzaService.listarBalanzasCortes(idModuloDeCarga).subscribe(resp => {
+      
+      this.balanzadasArray = resp.balanzas;
+      this.filtroBalanza7 = this.balanzadasArray.filter(x => x.numeroBalanza === '7');
+      this.filtroBalanza8 = this.balanzadasArray.filter(x => x.numeroBalanza === '8');
+  
+      this.setBalanzada7y8(this.balanzadasArray);
+      this.setBalanzada7(this.filtroBalanza7);
+      this.setBalanzada8(this.filtroBalanza8);
+      this.setBalanzada7y8Completas(resp.balanzas);
+      this.setBalanzada7Kilos(resp.balanzas);
+      this.setBalanzada8Kilos(resp.balanzas);
+      this.setInfoAdicional(resp.informacionAdicional);
 
+    } );
+  }
   setEmbarqueBalanzaCalidad(idModuloDeCarga: number = 0) {
     if (idModuloDeCarga<=0 || !idModuloDeCarga) return;
     
@@ -128,18 +146,22 @@ export class Balanzas78Service {
           this.filtroBalanzas8EnCurso = balanzadasAgrupadasArray.filter(x => x.numeroBalanza === '8');
           this.setBalanzadas7EnCurso(this.filtroBalanzas7EnCurso);
           this.setBalanzadas8EnCurso(this.filtroBalanzas8EnCurso);
+          this.setCargasPorBodega(resp.balanzadasEnCurso.cargasPorBodegas);
         }else{
           this.filtroBalanzas7EnCurso = [];
           this.filtroBalanzas8EnCurso = [];
           this.setBalanzadas7EnCurso(this.filtroBalanzas7EnCurso);
           this.setBalanzadas8EnCurso(this.filtroBalanzas8EnCurso);
+          this.setCargasPorBodega(resp.balanzadasEnCurso.cargasPorBodegas);
         }
       })
   }
 
   actualizarBodegas(idModuloDeCarga: number){
     this._balanzaService.balanzadasBuque(idModuloDeCarga)
-      .subscribe(resp => this.setBalanzadasBuque(resp.balanzadasBuque))
+      .subscribe(resp => {
+        this.setBalanzadasBuque(resp.balanzadasBuque);
+      })
   }
 
   limpiarInterval(){
@@ -214,5 +236,9 @@ export class Balanzas78Service {
 
   setBalanzadasBuque(balanzadasBuque: BalanzadasBuque[]){
     this.sendBalanzadasBuque.emit(balanzadasBuque);
+  }
+
+  setCargasPorBodega(cargasPorBodega: CargasPorBodega[]){
+    this.sendCargasPorBodega.emit(cargasPorBodega);
   }
 }

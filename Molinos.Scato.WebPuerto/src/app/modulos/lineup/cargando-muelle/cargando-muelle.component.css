@@ -196,23 +196,10 @@
     }
   }
 
-  .card-ritmo-grafico{
-    background-color: white !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 0 10px;
-}
-
 .card-ritmo-grafico:first-child{
-    margin-right: 10px;
+    /* margin-right: 10px; */
+    margin-right: 0px;
     margin-left: 0;
-}
-
-.card-ritmo-grafico{
-    background-color: transparent;
-    max-height: 250px;
 }
 
 .center-knob{
@@ -270,16 +257,12 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin: 0 10px;
+  margin: 0 0px;
+  background-color: transparent;
+  max-height: 200px;
 }
 
 .card-ritmo-grafico:first-child{
   margin-right: 10px;
   margin-left: 0;
-}
-
-.card-ritmo-grafico{
-  background-color: transparent;
-  /* max-height: 270px; */
-  max-height: 400px;
 }

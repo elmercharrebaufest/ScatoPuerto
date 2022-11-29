@@ -3,14 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { SessionService } from './session.service';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutenticadorService {
   url: string = environment.apiUrl;
-  // user: any;
-  constructor(private http: HttpClient, private sessionService: SessionService) { }
+  
+  constructor(private http: HttpClient, 
+              private sessionService: SessionService) { }
 
   /**
    * 
@@ -18,11 +20,15 @@ export class AutenticadorService {
    * @memberof AutenticadorService
    */
   public autenticarUsuario() {
-    return this.http.get(`${this.url}AutenticarUsuario`, { 'withCredentials': true });
+    return this.http.get(`${this.url}AutenticarUsuarioAD`, { 'withCredentials': true });
   }
 
-  public autenticarUsuarioAD() {
-    return this.http.get(`${this.url}AutenticarUsuarioAD`, { 'withCredentials': true });
+  public renovarAuthUsuario(){
+    this.autenticarUsuario().subscribe((res: Usuario) => {
+      this.sessionService.clear();
+      res.autenticado = true;
+      this.sessionService.setUser(res);
+    })
   }
 
   // public getUserName() {

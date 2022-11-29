@@ -25,31 +25,36 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicioComandos = servicioComandos;
         }
 
-        [Autorizacion(PermisosScato.LineUpLectura)]
+        //[Autorizacion(PermisosScato.LineUpLectura)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [HttpGet]
         [Route("api/Workflow/Listar")]
         public HttpResponseMessage Listar()
         {
             var embarques = workflows.ListarEmbarques();
+          //  var embarques = servicio.ListarEmbarques();
             return Request.CreateResponse(HttpStatusCode.OK, embarques);
         }
 
         [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Workflow/ListarEnLineUp")]
         public HttpResponseMessage ListarEnLineUp()
         {
-            var embarques = workflows.ListarEmbarques("LineUp");
+            //    var embarques = servicio.ListarEmbarques();
+             var embarques = workflows.ListarEmbarques();
+           // var embarques = servicio.ListarEmbarques();
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
-
             return Request.CreateResponse(HttpStatusCode.OK,
                             embarques
                                 .Where(y => y.Embarque.SanBenito)
-                                .Select(x => new EmbarqueNavDto {
+                                .Select(x => new EmbarqueNavDto
+                                {
                                     Id = x.Embarque.Id,
-                                    PlanoDeCargaId = x.LineUp.PlanoDeCarga.Id,
-                                    ModuloDeCargaId = x.LineUp.ModuloDeCarga.Id,
-                                    NombreBuque = x.Embarque.NombreBuque,
+                                    PlanoDeCargaId = x.LineUp.PlanoDeCarga != null ? x.LineUp.PlanoDeCarga.Id : 0,
+                                    ModuloDeCargaId = x.LineUp.ModuloDeCarga != null ? x.LineUp.ModuloDeCarga.Id : 0,
+                                    NombreBuque = x.Embarque != null ? x.Embarque.NombreBuque : "",
                                     Cargado = x.LineUp.PlanoDeCarga != null && x.LineUp.PlanoDeCarga.Cargado,
                                     NombreUbicacion = ubicaciones.Where(z => z.Id == x.Embarque.Ubicacion).FirstOrDefault()?.Nombre,
                                     EsLiquido = x.Embarque.EsLiquido
@@ -59,11 +64,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/Workflow/Eliminar")]
-        [Autorizacion(PermisosScato.LineUp)]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         public HttpResponseMessage Eliminar(Guid id)
         {
             var resultado = Eliminar(servicio, servicioComandos, workflows, nombreUsuario, id);
-            return string.IsNullOrEmpty(resultado) ? Request.CreateResponse(HttpStatusCode.OK): Request.CreateResponse(HttpStatusCode.InternalServerError, resultado);
+            return string.IsNullOrEmpty(resultado) ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.InternalServerError, resultado);
         }
 
         public static string Eliminar(IServicioRepositorio servicio, IServicioComandos servicioComandos, IListaDeWorkflows workflows, string nombreUsuario, Guid id)

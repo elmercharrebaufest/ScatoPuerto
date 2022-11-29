@@ -22,10 +22,6 @@
     margin: 5px auto;
 }
 
-.ritmo-title{
-    border-bottom: 1px solid rgb(190, 190, 190);
-}
-
 .text-knob{
     font-size: 10px;
     position: absolute;
@@ -75,9 +71,4 @@
         margin-top: -65px;
     }
 }
-.si-es-liquido{ 
-    width: 150px;
-    height: 150px;
-    position: relative;
-    bottom: 13px;
-}
+

@@ -11,11 +11,12 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./iniciar-sesion.component.css']
 })
 export class IniciarSesionComponent implements OnInit {
+  permisos: any;
 
   constructor(
     private router: Router,
     private messageService: MessageService,
-    private serviceauth: AutenticadorService,
+    private auth: AutenticadorService,
     private session: SessionService) { }
 
   ngOnInit(): void {
@@ -23,22 +24,46 @@ export class IniciarSesionComponent implements OnInit {
   }
 
   autenticar() {
-    this.serviceauth.autenticarUsuario().subscribe(
+    this.auth.autenticarUsuario().subscribe(
       (res: Usuario) => {
         if (res) {
+          console.log('========== autenticarUsuario ==========', res);
           this.session.clear();
-          res.permisos = [600, 601, 602, 603, 604, 605, 606, 607, 608, 609,
-            610, 611, 612, 613, 614, 615, 616, 617, 618, 619,
-            620, 621, 622, 623, 624, 625, 626, 627, 628, 629,
-            630, 631, 632, 633, 634, 635, 636, 637, 638, 639,
-            640, 641, 642, 643, 644, 645, 646, 647, 648, 649]
           res.autenticado = true;
           this.session.setUser(res);
-          this.router.navigateByUrl('/lineup');
+          // this.router.navigateByUrl('/lineup');
+          this.navigate(res.permisos);
         } else {
           this.messageService.add({ severity: 'error', detail: 'Error al iniciar sesión', summary: 'No se ha encontrado el usuario' })
         }
       }
     )
   }
+
+  navigate(permisos){
+    let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+    switch(primerPermiso){
+        case 'LineUp_Ver': {
+            this.router.navigate(['/lineup']);
+            break;
+        };
+        case 'Carga_Ver': {
+            this.router.navigate(['/carga']);
+            break;
+        }
+        case 'Recibidores_Ver': {
+            this.router.navigate(['/calidad']);
+            break;
+        }
+        case 'Geolocalizacion_Ver': {
+            this.router.navigate(['/geolocalizacion']);
+            break;
+        }
+        case 'Buque_Ver': {
+            this.router.navigate(['/buques']);
+            break;
+        }
+    }
+  }
+
 }

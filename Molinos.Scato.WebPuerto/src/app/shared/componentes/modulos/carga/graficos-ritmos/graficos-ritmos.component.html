@@ -1,40 +1,7 @@
 <div class='bg-white shadow'>
-    <div class="row">
-        <div class="col card-ritmo-grafico">
-            <h5 *ngIf='liquido' class='colorTitle text-center py-3 w-100 ritmo-title' style="position: relative;bottom: 10px;">Ritmo Acumulado</h5>
-            <h5 *ngIf='!liquido' class='colorTitle text-center py-3 w-100 ritmo-title' style="position: relative;bottom: 10px;">Ritmo de carga</h5>
-
-            <p-knob style="width: 150px;height: 150px;position: relative;bottom: 11px;" [(ngModel)]='valorRitmo' class='center-knob' valueColor={{colorRitmo}} [size]='150' [min]='0' [max]='valorRitmo' [strokeWidth]='5' [readonly]='true'></p-knob>
-            <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas'>
-            <p  *ngIf='liquido' class='text-knob text-center'>por hora por mano</p>
-            <p  *ngIf='!liquido' class='text-knob text-center'>por hora</p>
-
-            <!-- <p class='footer-ritmos-text text-center'>Ultima actualización: {{horaActualizacion}}</p> -->
-        </div>
-        <div class="col card-ritmo-grafico">
-            <h5 *ngIf="!liquido" class='colorTitle text-center py-3 w-100 ritmo-title'>Llevas cargando</h5>
-            <h5 *ngIf="liquido" style="position: relative;bottom: 10px;" class='colorTitle text-center py-3 w-100 ritmo-title'>Llevas cargando</h5>
-            
-            <p-knob [(ngModel)]='valorCargando' class='center-knob' [ngClass]="{'si-es-liquido': liquido == true}" valueColor='#5CB85C' [size]='150' [min]='0' 
-                [max]='tnTotales > valorCargando ? tnTotales : valorCargando' 
-                [strokeWidth]='5' [readonly]='true'></p-knob>
-            <!-- <p-knob [(ngModel)]='valorCargando' class='center-knob'valueColor='#5CB85C' [size]='150' [min]='0' [max]='tnTotales' [strokeWidth]='5' [readonly]='true'></p-knob> -->
-            <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas'>
-            <p class='text-knob text-center'>de {{tnTotales}} Tn totales</p>
-
-            <!-- <p class='footer-ritmos-text text-center' *ngIf='liquido'>Ultima actualización: {{horaActualizacion}}</p> -->
-            <p class='footer-ritmos-text text-center' *ngIf='!liquido'>Balanza 7 + Balanza 8</p>
-        </div>
-        <div class="col card-ritmo-grafico">
-            <h5 class='colorTitle text-center py-3 w-100 ritmo-title' style="position: relative;top: 6px;">Ritmo Carga NETO</h5>
-
-            <p-knob style="width: 150px;height: 150px;position: relative;bottom: 4px;" [(ngModel)]='valorNeto' class='center-knob' valueColor={{colorValorNeto}} [size]='150' [min]='0' [max]='valorNeto' [strokeWidth]='5' [readonly]='true'></p-knob>
-            <img src='assets/carga/Icono_Toneladas.svg' class='img-toneladas img-toneladas-circulo3'>
-            <p  *ngIf='liquido' class='text-knob text-center'>por hora por mano</p>
-            <p  *ngIf='!liquido' class='text-knob text-center'>por hora</p>
-
-            <!-- <p class='footer-ritmos-text text-center'>Ultima actualización: {{horaActualizacion}}</p> -->
-            <div class="referencia-carga-neto text-center">Este ritmo no contempla fuleos ni bajas cargas a pedido del buque</div>
-        </div>
+    <div class="row" style="justify-content: space-evenly">
+        <app-reloj-balanzas [titulo]='liquido? "Ritmo acumulado" : "Ritmo de carga"' [valor]="valorRitmo" [maximo]="valorRitmo" [color]="colorRitmo" [descripcion]='liquido? "por hora" : "por hora por mano"' [footer]='""' style="margin-right: 20px;"></app-reloj-balanzas>
+        <app-reloj-balanzas [titulo]='enBuque? "Total cargado" : "Llevas cargando"' [valor]="valorCargando" [maximo]='tnTotales > valorCargando ? tnTotales : valorCargando'  [color]='"#5CB85C"' [descripcion]= '"de " + tnTotales + " Tn totales"' [footer]='!liquido? "Balanza 7 + Balanza 8" : ""'  style="margin-right: 20px;"></app-reloj-balanzas>
+        <app-reloj-balanzas [titulo]='"Ritmo carga neto"' [valor]="valorNeto" [maximo]="valorRitmo" [color]="colorValorNeto" [descripcion]='liquido? "por hora" : "por hora por mano"' [footer]='"Este ritmo no contempla fuleos ni bajas cargas a pedido del buque"'  style="margin-right: 20px;"></app-reloj-balanzas>
     </div>
 </div>

@@ -79,8 +79,6 @@ export class ModuloDeCargaService {
    */
 
   guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false){
-    console.log('planillaDeTurnos guardar')
-    console.log(JSON.stringify(planillaDeTurnos))
     return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}`, planillaDeTurnos, { 'withCredentials': true});  
   }
 
@@ -135,8 +133,6 @@ export class ModuloDeCargaService {
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number){
-    console.log('guardarLineasDeEmbarque')
-    console.log(JSON.stringify(lineasDeEmbarque));
     return this.http.post(`${this.url}ModuloDeCarga/GuardarLineasDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, lineasDeEmbarque, { 'withCredentials': true});  
   }
 

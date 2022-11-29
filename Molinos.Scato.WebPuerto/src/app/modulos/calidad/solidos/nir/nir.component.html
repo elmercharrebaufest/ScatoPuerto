@@ -3,11 +3,11 @@
   <div class="mb-1">
     <h4 class="colorTitle pt-4">NIR</h4>
   </div>
-  <div class="alert alert-warning" role="alert" *ngIf="this.nir.tipoNir == 0">
+  <div class="alert alert-warning" role="alert" *ngIf="this.nir.tipoNir == 0 || this.nir.tipoNir == undefined">
     El buque no posee ni trigo ni maíz.
   </div>
-  <app-nir-mano #mano1 *ngIf="isLoaded && Mano1Visible" [queMano]="1" [mano]="nir.mano1"></app-nir-mano>
-  <app-nir-mano #mano2 *ngIf="isLoaded && Mano2Visible" [queMano]="2" [mano]="nir.mano2"></app-nir-mano>
+  <app-nir-mano [esSoloLectura]="esSoloLectura" #mano1 *ngIf="isLoaded && Mano1Visible" [queMano]="1" [mano]="nir.mano1"></app-nir-mano>
+  <app-nir-mano [esSoloLectura]="esSoloLectura" #mano2 *ngIf="isLoaded && Mano2Visible" [queMano]="2" [mano]="nir.mano2"></app-nir-mano>
     <!-- Promedios TOTALES -->
     <div *ngIf='this.nir.tipoNir == 3 || this.nir.tipoNir == 4'  class="promediosJustificados">
       <a><b>Promedio HD TOTAL:</b>{{promedioTotalHD() | number : '1.2-2'}}</a>
@@ -16,8 +16,12 @@
       <a *ngIf='this.nir.tipoNir == 3'><b>Promedio Prot. Base seca TOTAL:</b>{{promedioTotalProtBS() | number : '1.2-2'}}</a>
       <hr class="hrCustom">
     </div>
-    <div class="rowBotonesCentrados" *ngIf="this.nir.tipoNir != 0">
-      <button class="btn btn-primary mr-2" [disabled]="this.guardando" (click)="enviarNir()">GUARDAR</button>
-      <button class="btn btn-success ml-2" (click)="enviarNir(true)">ENVIAR NIR</button>
-    </div>    
+    <div class="rowBotonesCentrados" *ngIf="this.nir.tipoNir != 0 && !esSoloLectura">
+      <ng-container *ngIf="hasPermisoRecibidores_Nir_GuardarNir()">
+        <button class="btn btn-primary mr-2" [disabled]="this.guardando" (click)="enviarNir()">GUARDAR</button>
+      </ng-container>
+      <ng-container *ngIf="hasPermisoRecibidores_Nir_EnviarNir()">
+        <button class="btn btn-success ml-2" (click)="enviarNir(true)">ENVIAR NIR</button>
+      </ng-container>
+    </div>
 </div>

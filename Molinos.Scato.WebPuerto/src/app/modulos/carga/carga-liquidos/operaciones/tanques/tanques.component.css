@@ -190,3 +190,7 @@ svg{
     stroke-width: 1px; 
     font-size: 29px;
 }
+
+.alturaMaxima{
+    max-height: 130px
+}

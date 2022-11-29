@@ -1,4 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-toggle-menu-orden',
@@ -7,8 +10,13 @@ import { Component, HostListener, OnInit } from '@angular/core';
 })
 export class ToggleMenuOrdenComponent implements OnInit {
   showMenu = false;
+  private wasInside = false;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
-  constructor() { }
+  constructor(private session: SessionService,) {
+    this.user = this.session.getUser();
+  }
 
   ngOnInit(): void {
 
@@ -18,11 +26,11 @@ export class ToggleMenuOrdenComponent implements OnInit {
     this.showMenu = !this.showMenu;
   }
 
-  private wasInside = false;
   @HostListener('click')
   clickInside() {
     this.wasInside = true;
   }
+
   @HostListener('document:click')
   clickout() {
     if (!this.wasInside) {
@@ -31,5 +39,9 @@ export class ToggleMenuOrdenComponent implements OnInit {
       }
     }
     this.wasInside = false;
+  }
+
+  hasPermisoLineUp_EditarOrdenEmbarque(){
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
   }
 }

@@ -20,6 +20,23 @@ import { PeriodoCargaComponent } from "app/shared/componentes/modulos/carga/peri
 import { BodegasComponent } from './carga-solidos/tableristas/bodegas/bodegas.component';
 import { InicioCargaComponent } from "./carga-solidos/tableristas/inicio-carga/inicio-carga.component";
 
+const components = [
+    CargaComponent,
+    CargaSolidosComponent,
+    GraficoCargaComponent,
+    ManosComponent,
+    BalanzasComponent,
+    BalanzasRitmosComponent,
+    InfoAdicionalComponent,
+    UmapComponent,
+    PlanillaEmbarqueComponent,
+    CargaLiquidosComponent,
+    TanquesComponent,
+    LineasComponent,
+    PlanillaTurnoLiquidosComponent,
+    BodegasComponent,
+    InicioCargaComponent
+]
 @NgModule({
     imports: [
         CargaRoutingModule,
@@ -28,32 +45,10 @@ import { InicioCargaComponent } from "./carga-solidos/tableristas/inicio-carga/i
         ListboxModule,
     ],
     declarations: [
-        CargaComponent,
-        CargaSolidosComponent,
-        GraficoCargaComponent,
-        ManosComponent,
-        BalanzasComponent,
-        BalanzasRitmosComponent,
-        InfoAdicionalComponent,
-        UmapComponent,
-        PlanillaEmbarqueComponent,
-        CargaLiquidosComponent,
-        TanquesComponent,
-        LineasComponent,
-        PlanillaTurnoLiquidosComponent,
-        BodegasComponent,
-        InicioCargaComponent
+        components,
     ],
     exports: [
-        ManosComponent,
-        GraficoCargaComponent,
-        TanquesComponent,
-        PeriodoCargaComponent,
-        CargaLiquidosComponent,
-        LineasComponent,
-        InfoAdicionalComponent,
-        PlanillaTurnoLiquidosComponent,
-        BalanzasRitmosComponent
+        components,
     ]
 })
 export class CargaModule {}

@@ -1,0 +1,27 @@
+:host ::ng-deep .multiselect-dropdown .dropdown-btn{
+    background: #ffffff !important;
+}
+.titulo-historial-buque-letra{
+    font-family: roboto;
+    font-weight: bold;
+    font-size: 36px;
+    text-align: left;
+    color: #1A1A1A;
+}
+
+.colorGris{
+    color: gray !important;
+
+}
+
+.buscar{
+background-color: #1C7CD5;
+border-color: #1C7CD5;
+color: white;
+}
+
+.limpiar{
+    color: #1C7CD5;
+    background: white;
+    border-color: #1C7CD5;
+}

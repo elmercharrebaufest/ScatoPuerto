@@ -1,0 +1,281 @@
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Select, Store } from '@ngxs/store';
+import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
+import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { ParametrosService } from '@ScatoServicios/parametros.service';
+import { GetObtenerHistorialBuques, LoadingHistorialBuques } from 'app/store/buques/buques.actions';
+import { BuquesState } from 'app/store/buques/buques.state';
+import { Observable, Subscription } from 'rxjs';
+import { first } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-historial-buques',
+  templateUrl: './historial-buques.component.html',
+  styleUrls: ['./historial-buques.component.css']
+})
+export class HistorialBuquesComponent implements OnInit, OnDestroy {
+  @Input() esRegresar: boolean = false;
+  // #region Variables
+  private listaHistorialBuques;
+  private listaHistorialBuquesFiltro;
+  private filtroBuquedaForm: FormGroup;
+  private listaHistorialBuques$: any;
+  private tamanioPagina = 6;
+  private paginaActual: number = 1;
+  private totalPaginas: number = 0;
+  private listaPaginas: any;
+  public buscarHistorialBuques: boolean = false;
+  public esNoExisteRegistros = false;
+  public esResumenOperatoria = false;
+  private ritmoBajaCarga: number;
+  // #endregion
+
+  // #region Observable
+  @Select(BuquesState.getHistorialBuques) historialBuques$: Observable<any[]>;
+  storeBuques: Subscription;
+  // #endregion
+
+  // #region Constructor
+  constructor(private buqueSharingService: BuqueSharingService,
+    private store: Store,
+    private route: Router,
+    private _parametros: ParametrosService) {
+    this.buqueSharingService.getFiltroBusques().subscribe(data => {
+      if(data != null && data != undefined){
+      this.filtroBuquedaForm = data;
+      if (this.esRegresar) {
+        this.filtroBuquedaForm?.controls?.esBusqueda?.setValue(true);
+        this.esRegresar = false;
+      }
+      this.setCargarHistorialBuque();
+    }
+    });
+  }
+  // #endregion
+
+  // #region Eventos del Componente
+  ngOnInit() {
+    this._parametros.obtenerParametro("toneladasBajaCarga").subscribe((res: any) => {
+      this.ritmoBajaCarga = res.parametro2;
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.listaHistorialBuques$ != undefined) {
+      this.listaHistorialBuques$.unsubscribe();
+    }
+    if (this.storeBuques != undefined || this.storeBuques != null) {
+      this.storeBuques.unsubscribe();
+    }
+  }
+  // #endregion
+
+  // #region Metodos
+  private setCargarHistorialBuque() {   
+    this.esResumenOperatoria = this.filtroBuquedaForm?.controls?.esResumenOperatoria.value;
+    const esBusqueda = this.filtroBuquedaForm?.controls?.esBusqueda.value;
+    const esLimpiarBusqueda = this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.value;
+    if (esLimpiarBusqueda) {
+      this.esNoExisteRegistros = false;
+      this.listaHistorialBuques = null;
+      this.listaHistorialBuquesFiltro = null;
+      this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.setValue(false);
+      return;
+    }
+    if (this.esResumenOperatoria){
+      this.setObtenerHistorialBuques();
+    }else{
+      if (esBusqueda && !esLimpiarBusqueda) {
+        this.listaHistorialBuques = null;
+        this.listaHistorialBuquesFiltro = null;
+        this.setObtenerHistorialBuques();
+      }
+    }
+
+  }
+
+  private setObtenerHistorialBuques() {
+
+    const filtro = this.filtroBuquedaForm;
+
+    if (filtro != null) {
+      this.buscarHistorialBuques = true;
+      const filVaporId = filtro.controls.vaporId.value;
+      let desde = filtro.controls.desde.value;
+      let hasta = filtro.controls.hasta.value;     
+      const producto = filtro.controls.producto.value != "" ?
+       filtro.controls.producto.value.map(({ descripcionCorta }) => descripcionCorta).join(",") : "";
+      const buque = filtro.controls.buque.value ?? "";
+      const destino = filtro.controls.destino.value ?? "";
+      const control = filtro.controls.control.value ?? "";
+      const exportador = filtro.controls.nombreExportador.value ?? "";
+    
+      const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
+
+      if (vaporId > 0) {
+        desde = null;
+        hasta = null;
+        this.store.dispatch(new LoadingHistorialBuques());
+        this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador, 
+          control, desde, hasta, producto));
+        this.setListaHistorialBuques();
+      } else {
+        if (desde!=null && hasta!=null) {
+         this.store.dispatch(new LoadingHistorialBuques());
+         this.store.dispatch(new GetObtenerHistorialBuques( vaporId, buque, destino, exportador, 
+          control, desde, hasta, producto)).subscribe(result => {
+          this.setListaHistorialBuques();
+         });
+        }
+      }
+    }
+  }
+
+  public setListaHistorialBuques() {
+    this.esNoExisteRegistros = false;
+    if (this.filtroBuquedaForm == null || this.filtroBuquedaForm == undefined) {
+      this.buscarHistorialBuques = false;
+      return;
+    }
+    this.storeBuques = this.historialBuques$.subscribe(data => {
+      if (data == null || data == undefined){
+       this.buscarHistorialBuques = false;
+       this.esNoExisteRegistros = true;
+        return;
+      }
+      if (data.length == 0){
+        this.buscarHistorialBuques = false;
+        this.esNoExisteRegistros = true;
+        return;
+      }
+
+
+      if (data !== null || data !== undefined) {
+        if (data.length > 0) {
+          data.forEach(item => {
+            if (item.productoExportador != undefined && item.productoExportador != null) {
+              var result = item.productoExportador.reduce(function (r, o) {
+                var key = o.exportador_Id + '-' + o.materialPuerto_Id;
+
+                if (!item.productoExportador[key]) {
+                  item.productoExportador[key] = Object.assign({}, o); // create a copy of o
+                  r.push(item.productoExportador[key]);
+                } else {
+                  item.productoExportador[key].toneladas += o.toneladas;
+                }
+                return r;
+              }, []);
+              item.productoExportador = result;
+            }
+          });
+          const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
+          if (mostrarPorEmbarque) {
+            this.listaHistorialBuques = data.filter(x => x.embarqueId == this.filtroBuquedaForm.controls.embarqueId.value);
+          } else {
+            this.listaHistorialBuques = JSON.parse(JSON.stringify(data));
+            this.listaHistorialBuquesFiltro = JSON.parse(JSON.stringify(data));
+          }
+          this.setCargarPaginas();
+          this.buscarHistorialBuques = false;
+        }else{
+         this.buscarHistorialBuques = false;
+        }
+      }
+    }, error => { },
+      () => {
+        this.buscarHistorialBuques = false;
+      });
+
+  }
+
+  public getListaHistorialBuques() {
+    return this.listaHistorialBuques;
+  }
+
+  public getFiltroBuques() {
+    return this.filtroBuquedaForm;
+  }
+
+  public getFiltrosSeleccionado() {
+    return this.filtroBuquedaForm.value;
+  }
+  // #endregion
+
+  // #region Eventos Controles
+  onVerHistorial(embarqueId, vaporId, moduloDeCargaId, nombreBuque, esLiquido) {
+    const embarqueBuque = {
+      embarqueId      : embarqueId,
+      vaporId         : vaporId,
+      moduloDeCargaId : moduloDeCargaId,
+      nombreBuque     : nombreBuque,
+      esLiquido       : esLiquido
+    }
+    localStorage.removeItem("embarqueBuque");
+    localStorage.setItem("embarqueBuque", JSON.stringify(embarqueBuque));
+    
+    this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
+    this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
+    this.filtroBuquedaForm.controls.esDetalle.setValue(true);
+    this.filtroBuquedaForm.controls.mostrarPorEmbarque.setValue(true);
+    this.filtroBuquedaForm.controls.mostrarOtrasOperaciones.setValue(false);
+    this.filtroBuquedaForm.controls.embarqueId.setValue(embarqueId);
+    this.filtroBuquedaForm.controls.vaporId.setValue(vaporId);
+    this.filtroBuquedaForm.controls.moduloDeCargaId.setValue(moduloDeCargaId);
+    const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = {
+      embarqueId: embarqueId,
+      actualizarDatos: this.esResumenOperatoria? true : false
+    };
+    this.buqueSharingService.setActualizarResumenOperatoria(resumenOperatoriaEmbarque);
+    this.buqueSharingService.setFiltroFormulario(this.filtroBuquedaForm);
+    this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
+  }
+  // #endregion
+
+  // #region Paginado de historial de buques
+
+  private marcarPaginas() {
+    let numeroRegistro = 1;
+    let numeroPagina = 1;
+    this.listaHistorialBuques.forEach((item) => {
+
+      if (numeroRegistro > this.tamanioPagina) {
+        numeroRegistro = 1;
+        numeroPagina++;
+      }
+      item.numeroPaginado = numeroPagina;
+      numeroRegistro++;
+    });
+  }
+
+  public setPaginaActual(pagina) {
+    this.paginaActual = pagina;
+  }
+
+  public getPaginaActual() {
+    return this.paginaActual;
+  }
+
+  public getListaPaginas() {
+    return this.listaPaginas;
+  }
+
+  public getTotalPaginas() {
+    return this.totalPaginas;
+  }
+
+  private setCargarPaginas() {
+    if (this.listaHistorialBuques != undefined) {
+      const registros = this.listaHistorialBuques.length;
+      this.totalPaginas = (registros / this.tamanioPagina);
+      this.totalPaginas = Math.ceil(this.totalPaginas);
+      this.listaPaginas = new Array(this.totalPaginas);
+      this.marcarPaginas()
+    }
+  }
+
+  // #endregion
+
+}

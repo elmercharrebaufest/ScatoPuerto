@@ -25,3 +25,16 @@ img:hover{
     filter: drop-shadow(0px 0px 0.5px #026402);
     cursor: pointer;
 }
+
+.crearEditar{
+    display: inline;
+    position: sticky;
+    left: 100%;
+
+}
+.margen-borrado-seleccion{ 
+    margin-top: -5px;
+}
+.imagen-borrado-seleccion{ 
+    height: 40px;
+}

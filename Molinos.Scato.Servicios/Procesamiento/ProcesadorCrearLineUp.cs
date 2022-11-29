@@ -39,8 +39,21 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
                 else
                 {
-                    Conversor.Convertir(comando.LineUp, lineup);
+                    //Conversor.Convertir(comando.LineUp, lineup);
+                    lineup.CartaDeSubidaEnviada   = comando.LineUp.CartaDeSubidaEnviada   ;
+                    lineup.CartaDeSubidaAprobada  = comando.LineUp.CartaDeSubidaAprobada  ;
+                    lineup.CargaEnSap             = comando.LineUp.CargaEnSap             ;
+                    lineup.NominacionDePractico   = comando.LineUp.NominacionDePractico   ;
+                    lineup.SeguridadPortuaria     = comando.LineUp.SeguridadPortuaria     ;
+                    lineup.InspeccionSenasa       = comando.LineUp.InspeccionSenasa       ;
+                    lineup.ControlSenasa          = comando.LineUp.ControlSenasa          ;
+                    lineup.ControlPrivado         = comando.LineUp.ControlPrivado         ;
+                    lineup.Amarrador              = comando.LineUp.Amarrador              ;
+                    lineup.AgenciaContactada      = comando.LineUp.AgenciaContactada      ;
+                    lineup.PlanoDeCargaEnviado    = comando.LineUp.PlanoDeCargaEnviado    ;
+                    lineup.Orden = comando.LineUp.Orden;
                 }
+
                 lineup.Embarque.Ubicacion = comando.LineUp.Ubicacion;
                 Repositorio.GuardarCambios();
                 resultado.Id = (int)lineup.GetType().GetProperty("Id").GetValue(lineup, null);

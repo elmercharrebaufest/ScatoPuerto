@@ -1,32 +1,30 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Observador } from '@ScatoInterfaces/observador';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LoadScreen } from '@ScatoInterfaces/load-screen';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { MessageService } from 'primeng/api';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
-import { GeolocalizacionComponent } from 'app/modulos/geolocalizacion/geolocalizacion.component';
-import { GeolocalizacionService } from '@ScatoServicios/geolocalizacion.services';
-import { sign } from 'crypto';
-import { LineUp } from '@ScatoModels/lineUp';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { FormGroup } from '@angular/forms';
-import { textChangeRangeIsUnchanged } from 'typescript';
+import { ErroresGeolocalizacionEmbarqueService } from '@ScatoServicios/errores-geolocalizacion-embarque';
+import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import * as htmlToImage from 'html-to-image';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import { UbicacionBuquePuerto } from '@ScatoEnums/ubicacion-buque-puerto';
+import { ErroresGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geolocalizacion';
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -35,12 +33,13 @@ import { textChangeRangeIsUnchanged } from 'typescript';
 export class LineupEmbarqueComponent implements OnInit {
   @Input() buquesGeolocalizacion;
   @Input() index: number;
-  @Input() instanciaWorkflow: InstanciaWorkflowPuerto;
+  @Input() instanciaWorkflow: any;
   @Input() observador: Observador;
   @Output() showSpinner = new EventEmitter<boolean>();
+  @Input() ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
+  @Input() listadoEmbarques: InstanciaWorkflowPuerto[];
+  @Input() listaErroresEmbarques: ErroresGeolocalizacion[];
 
-  
-  ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
   showMenu = false;
@@ -55,17 +54,16 @@ export class LineupEmbarqueComponent implements OnInit {
   ArchivosPuerto: ArchivoPuerto[];
   ListFilesToErase: ArchivoPuerto[];
   mensajeBuque: string;
-
-
   imagePath: any;
   TipoArchivosDbList: TipoArchivoPuerto[] = [];
   nombreArchivo: TipoArchivoPuerto;
   fileToUpload: any | null = null;
-
+  mostrarSpinnerCaptura: boolean = false;
   colorMapa: string = 'color-text-espera';
   private listaBuquesGeolocalizacion;
   private user: Usuario;
   ruta: string = 'assets/esperaBuque.svg';
+  private embarqueSeleccionado:number = 0;
   constructor(
     private _sanitizer: DomSanitizer,
     private lineUpService: LineupService,
@@ -75,50 +73,59 @@ export class LineupEmbarqueComponent implements OnInit {
     private _procesoService: DatosEmbarquesProcesoService,
     private messageService: MessageService,
     private session: SessionService,
-    private geolocalizacionService: GeolocalizacionService,
     private _modalService: NgbModal,
     private embarqueService: EmbarqueService,
+    private erroresGeolocalizacionEmbarqueService: ErroresGeolocalizacionEmbarqueService,
+    private embarqueSharingService: EmbarqueSharingService
   ) {
     this.user = this.session.getUser();
   }
 
   ngOnInit(): void {
+    //this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
     if (this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada) {
       this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
       this.horaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'HH:mm', 'es-ar');
     }
+
     this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
-
-    this.lineUpService.obtenerListadoUbicacionDeBuquePuerto()
-      .subscribe(res => {
-        this.listadoUbicacionDeBuquePuerto = res.map(u => u.nombre);
-      });
+   // this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { 
+      //this.ubicacionDeBuquePuerto = res;
+      this.listadoUbicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.map(u => u.nombre);
+    //});
   }
+
   counter(i: number) {
     return new Array(i);
-}
-  cargarBuqueGeolocalizacion(id: any) {
-    this.mensajeBuque = "No se encontró. Completar IMO";
+  }
+
+  cargarBuqueGeolocalizacion(id: number) {
+    this.mensajeBuque = "No se encontro existen datos incorrectos en el buque.";
     this.hayBuque = false;
-    
-    if (this.buquesGeolocalizacion != undefined || this.buquesGeolocalizacion != null) {
-      const embarqueInformacion = this.buquesGeolocalizacion.embarque?.embarqueInformacion;
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
-      if (embarqueInformacion !=  undefined || embarqueInformacion!= null) {
-        this.mensajeBuque = embarqueInformacion.length > 0 ? "Ver en el mapa" : "No se encontró. Completar IMO";
-        this.hayBuque =  embarqueInformacion.length > 0 ? true : false;
-      }
-      this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
-      this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
-    } else {
-      this.mensajeBuque = "No se encontró. Completar IMO";
-      this.hayBuque = false;
+    const embarquePosicion = this.buquesGeolocalizacion.embarque?.embarquePosicion;
+    if (embarquePosicion.length == 0) {
+      const errores = this.erroresGeolocalizacionEmbarqueService.obtenerEmbarquesErrores(this.listaErroresEmbarques ,id);
+        if (errores != null){
+          this.mensajeBuque = errores.mensaje;
+          this.hayBuque =  false;
+        }else{
+          this.mensajeBuque = "No se encontró. Completar IMO";
+          this.hayBuque =  false;
+        }
+      
+    }else{
+      this.mensajeBuque = "Ver en el mapa."
+      this.hayBuque =  true;
     }
+    this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
+    this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';  
+  }
+
+  getListaBuquesGeolocalizacion() {
+    return this.listaBuquesGeolocalizacion;
   }
 
   verGeolocalizacion(flagVerGeo: any, embarque_Id: number) {
@@ -126,8 +133,9 @@ export class LineupEmbarqueComponent implements OnInit {
       this.router.navigate(['/geolocalizacion'], { queryParams: { embarque_id: embarque_Id, tipo: 'zoom' } });
     }
   }
+  
   public modificarLineUp(campo: string) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
+    if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       switch (campo) {
         case "CartaDeSubidaEnviada": {
           this.instanciaWorkflow.lineUp.cartaDeSubidaEnviada = !this.instanciaWorkflow.lineUp.cartaDeSubidaEnviada;
@@ -166,8 +174,9 @@ export class LineupEmbarqueComponent implements OnInit {
           break;
         }
       }
-
-      this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(res => console.log(res));
+      let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+      //lineUpDto.moduloDeCarga = null;
+      this.lineUpService.modificarLineUp(lineUpDto).subscribe(res => console.log(res));
     }
   }
 
@@ -176,7 +185,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public armarPlanoCarga() {
-    if (this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_Editar))
+    if(this.hasPermisoPDC_Ver())
       this.router.navigate([`/lineup/plano-de-carga/${this.instanciaWorkflow.embarque.id}`]);
     else
       this.showWarning();
@@ -218,31 +227,31 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public onSelectAction(accion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacion)) {
+    this.embarqueSeleccionado = this.instanciaWorkflow.embarque.id;
+    if (this.hasPermisoLineUp_EditarUbicacionEmbarque()) {
       accion = this.numeroUbicacionDeBuquePuerto(accion);
       /**Muelle de Carga**/
-      if (accion == 2) {
-        this.workflowService.obtenerListado().subscribe(
-          listado => {
-            if (this.BarcoEnMuelleActualmente(listado)) {
-              this.confirmationDialogService.confirm('¡Error!', 'Actualmente ya se encuentra otro buque en muelle', 'Cerrar', '', null, null, Tipoalerta.Error);
-              return;
-            }
-            else {
-              this.actualizarUbicacion(accion);
-            }
-          }
-        );
+      if (accion == UbicacionBuquePuerto.MuelleDeCarga) {
+        if (this.BarcoEnMuelleActualmente(this.listadoEmbarques)) {
+          this.confirmationDialogService.confirm('¡Error!', 'Actualmente ya se encuentra otro buque en muelle', 'Cerrar', '', null, null, Tipoalerta.Error);
+          return;
+        }
+        else {
+          this.mostrarSpinnerCaptura = true;
+          this.actualizarUbicacion(accion);
+        }
       }
       /**Zarpó**/
-      else if (accion == 1) {
+      else if (accion == UbicacionBuquePuerto.Zarpo) {
         this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up y geolocalización`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
           .then((confirmed) => {
             if (confirmed) {
               this.showSpinner.emit(true)
               this.instanciaWorkflow.embarque.ubicacion = accion;
               this.instanciaWorkflow.lineUp.ubicacion = accion;
-              this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => {
+              let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+              //lineUpDto.moduloDeCarga = null;
+              this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
                 if (this.observador) {
                   setTimeout(() => {
                     this.observador.Actualizar();
@@ -254,23 +263,71 @@ export class LineupEmbarqueComponent implements OnInit {
           })
           .catch(() => window.location.reload());
       }
-      else
+      else{
         this.actualizarUbicacion(accion);
+      }
     }
   }
 
   actualizarUbicacion(accion) {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;
-    this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(x => { if (this.observador) this.observador.Actualizar(); });
+    let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+    //lineUpDto.moduloDeCarga = null;
+    this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => { 
+    }, error =>{}
+     , () =>{
+
+      if (this.embarqueSeleccionado > 0 && accion == UbicacionBuquePuerto.MuelleDeCarga)
+          this.crearImagenLineUp();
+
+      if (this.observador)
+          this.observador.Actualizar();
+      
+      this.mostrarSpinnerCaptura = false;
+    });
+  }
+
+
+  private crearImagenLineUp(){
+
+    const divEmbarqueLineUp = document.getElementById('divEmbarqueLineUp');
+    let divLineUpAcciones = document.getElementById('listadoAcciones');
+    
+    divLineUpAcciones.className += 'ocultar-division';
+    divLineUpAcciones.classList.add('ocultar-division')
+    let base64data='';
+    htmlToImage.toPng(divEmbarqueLineUp, { 
+          quality: 0.8,
+          backgroundColor: '#ffffff',
+        })
+        .then(function (url) {
+          var img = new Image();
+          img.src = url;
+          base64data = img.src;
+        }).catch(function (error) {
+          base64data = '';
+        }).finally(() => {
+          if (base64data!=null || base64data !=undefined)
+              this.guardarImagenLineUp(base64data);
+              divLineUpAcciones.classList.remove('ocultar-division')
+        });
+  }
+
+  guardarImagenLineUp =(base64data) => { 
+    const capturaImagenLineUp = {
+      embarque_Id : this.instanciaWorkflow.embarque.id,
+      filePathImgLineUp : base64data,
+    };
+    this.embarqueService.guardarCapturaImagenLineUp(capturaImagenLineUp).subscribe(res => console.log(res));
   }
 
   actualizarOrden(posicion) {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarPosicion)) {  
+    if (this.hasPermisoLineUp_EditarOrdenEmbarque()) {
         var cantidadDeLineUps = this.embarquesPuerto.length;
         //1,2,3,4,5,6,7,8
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
-        
+
         if (posicion > posicionActual){
           this.embarquesPuerto[posicionActual - 1].lineUp.orden = posicion + 0.5
         }else{
@@ -284,19 +341,20 @@ export class LineupEmbarqueComponent implements OnInit {
         this.embarquesPuerto.forEach(embarquePuerto => {
           embarquePuerto.lineUp.orden = index;
           index += 1;
-        }); 
+        });
         let idsYorden: { [key: number]: number; } = {};
         this.embarquesPuerto.forEach( embarquePuerto => {
           idsYorden[embarquePuerto.lineUp.id] = embarquePuerto.lineUp.orden;
-        });        
+        });
 
         this.instanciaWorkflow.lineUp.orden = posicion;
-        
+
         this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
-          if (this.observador) this.observador.Actualizar(); 
+          if (this.observador) this.observador.Actualizar();
         });
-    }    
+    }
   }
+
   /**ubicacion == 2 --> Muelle de Carga**/
   BarcoEnMuelleActualmente(listado: InstanciaWorkflowPuerto[]): boolean {
     if (!this.instanciaWorkflow.embarque.vicentin && !this.instanciaWorkflow.embarque.otrosMuelles && !this.instanciaWorkflow.embarque.noryon)
@@ -315,20 +373,21 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public guardarFechaCarta() {
-    if (this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks)) {
-
+    if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       console.log(this.fechaCarta + ' ' + this.horaCarta)
       if (this.fechaCarta && this.horaCarta) {
         this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada = this.fechaCarta + ' ' + this.horaCarta;
-        this.lineUpService.modificarLineUp(this.instanciaWorkflow.lineUp).subscribe(
+        let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+        //lineUpDto.moduloDeCarga = null;
+        this.lineUpService.modificarLineUp(lineUpDto).subscribe(
           ret => console.log(ret));
       }
     }
 
   }
-
+  
   nombreUbicacionDeBuquePuerto(numero): string {
-    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.id == numero) != undefined ? this.ubicacionDeBuquePuerto.find(x => x.id == numero).nombre.toString() : '';
+    return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.orden == numero) != undefined ? this.ubicacionDeBuquePuerto.find(x => x.orden == numero).nombre.toString() : '';
   }
 
   numeroUbicacionDeBuquePuerto(nombre): number {
@@ -356,16 +415,32 @@ export class LineupEmbarqueComponent implements OnInit {
     this.messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
   }
 
-  hasPermisoRadios() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecks);
+  hasPermisoLineUp_EliminarBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EliminarBuque);
   }
 
-  hasPermisoDeleteEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EliminarBuque);
+  hasPermisoLineUp_EditarBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarBuque);
   }
 
-  hasPermisoEditEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.PreLineUp_EditarBuque);
+  hasPermisoLineUp_EditarChecksEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarChecksEmbarque);
+  }
+
+  hasPermisoLineUp_EditarUbicacionEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarUbicacionEmbarque);
+  }
+
+  hasPermisoLineUp_EditarOrdenEmbarque() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarOrdenEmbarque);
+  }
+
+  hasPermisoPDC_Ver() {
+    return this.user.permisos.find(p => p === this.permisosScato.PDC_Ver);
+  }
+
+  hasPermisoLineUp_Adjuntar() {
+    return this.user.permisos.find(p => p === this.permisosScato.LineUp_Adjuntar);
   }
 
 //------------------------------------------------------------------------------------------------------------
@@ -373,15 +448,15 @@ export class LineupEmbarqueComponent implements OnInit {
 //------------------------------------------------------------------------------------------------------------
 
   openModalFiles(Modal: any){
-    //embarqueid 
+    //embarqueid
     this.initializeModalArchivos();
      this.embarqueService.obtenerArchivos(this.instanciaWorkflow.embarque.id).subscribe(
         res => this.ArchivosPuerto = res)
-      ; 
+      ;
      this.embarqueService.obtenerTipoArchivos().subscribe(res => {
       this.TipoArchivosDbList = res
-    }); 
-    
+    });
+
     this._modalService.open(Modal);
   }
 
@@ -396,24 +471,24 @@ export class LineupEmbarqueComponent implements OnInit {
     //En caso de no ser, le aviso que no se puede descargar.
     }else{
       this.confirmationDialogService.confirm('¡Atención!', "El archivo tiene un formato inválido para la acción que desea realizar.", 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }    
+    }
   }
-  
+
   previewFile(Modal: any, file: ArchivoPuerto){
     if(file.archivo.includes("data:image")){
       this.convertB64ToImg(file);
       this._modalService.open(Modal);
-    }else if(file.archivo.includes("data:application/pdf")){      
+    }else if(file.archivo.includes("data:application/pdf")){
       let pdfWindow = window.open("");
       pdfWindow.document.write(
       "<iframe width='100%' height='100%' src='" +
       encodeURI(file.archivo) + "'></iframe>"
-      )      
+      )
     }else{
       this.confirmationDialogService.confirm('¡Atención!', "El tipo de archivo no se puede mostrar", 'Aceptar', '', null, null, Tipoalerta.Warning)
-    }    
+    }
   }
-    
+
   convertB64ToImg(file: ArchivoPuerto) {
     this.imagePath = this._sanitizer.bypassSecurityTrustResourceUrl(file.archivo);
   }
@@ -421,7 +496,7 @@ export class LineupEmbarqueComponent implements OnInit {
   initializeModalArchivos(){
     this.nombreArchivo = null;
   }
-    
+
   guardarArchivos(){
 
     this.confirmationDialogService.confirm('¡Atención!', "Estás seguro que deseas guardar los cambios?", 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning)
@@ -429,14 +504,13 @@ export class LineupEmbarqueComponent implements OnInit {
       if (confirmed) {
         this.embarqueService.guardarArchivos(this.instanciaWorkflow.embarque.id, this.ArchivosPuerto).subscribe(res => {
           this._modalService.dismissAll();
-        })          
+        })
       }
     })
   }
 
-
   eliminarArchivo(reg: ArchivoPuerto){
-    if(reg.id > 0){  
+    if(reg.id > 0){
       this.ArchivosPuerto.forEach((element,index)=>{
         if(element.id ==reg.id) this.ArchivosPuerto.splice(index,1);
      });
@@ -454,61 +528,60 @@ export class LineupEmbarqueComponent implements OnInit {
     reader.onload = () => {
         console.log(reader.result);
     };
-}
-
-addFileToSave(){
-  if(this.fileToUpload == null){
-    this.confirmationDialogService.confirm('Atención','No has seleccionado ningún archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-    return;
   }
 
-  if(!this.nombreArchivo[0] || this.nombreArchivo[0].tipoArchivo == undefined || this.nombreArchivo[0].tipoArchivo == ""){
-    this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
-    return;
-  }
-  
-  if (this.fileToUpload.name  == "" ){
-    this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
-    return;
-  }
-
-  if(this.fileToUpload.size >= 5000000){  
-    this.confirmationDialogService.confirm('Atención','El tamaño del archivo debe ser menor a 5MB.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-    return;
-  }    
-
-  
-  const reader = new FileReader();
-  reader.readAsDataURL(this.fileToUpload);
-  reader.onload = () => {
-    var file = reader.result.toString(); 
-      if(file.includes("data:image") || file.includes("openxmlformats") || file.includes("data:application/pdf") || file.includes("text/plain")){
-
-        let fileToAdd = new ArchivoPuerto;
-
-        fileToAdd.archivo = file;
-        fileToAdd.fecha = new Date;
-        fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
-        fileToAdd.nombreArchivo = this.fileToUpload.name        
-        fileToAdd.tipoArchivoPuerto = this.nombreArchivo[0];
-        fileToAdd.id = 0;
-
-        this.ArchivosPuerto.push(fileToAdd);
-        this.ArchivosPuerto = this.ArchivosPuerto.sort((a,b) => a.id - b.id)
-        this.nombreArchivo = null;
-        this.fileToUpload = null
-  
-    }else{
-      //Salgo y no lo dejo agregar 
-      this.confirmationDialogService.confirm('Atención','El archivo tiene un formato inválido.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+  addFileToSave(){
+    if(this.fileToUpload == null){
+      this.confirmationDialogService.confirm('Atención','No has seleccionado ningún archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
     }
-  }
-    
-    //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
-    //Primero valido que esté toda la data necesaria completa
-   
-}
 
+    if(!this.nombreArchivo[0] || this.nombreArchivo[0].tipoArchivo == undefined || this.nombreArchivo[0].tipoArchivo == ""){
+      this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+      return;
+    }
+    
+    if (this.fileToUpload.name  == "" ){
+      this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+      return;
+    }
+
+    if(this.fileToUpload.size >= 5000000){  
+      this.confirmationDialogService.confirm('Atención','El tamaño del archivo debe ser menor a 5MB.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }    
+
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(this.fileToUpload);
+    reader.onload = () => {
+      var file = reader.result.toString(); 
+        if(file.includes("data:image") || file.includes("openxmlformats") || file.includes("data:application/pdf") || file.includes("text/plain")){
+
+          let fileToAdd = new ArchivoPuerto;
+
+          fileToAdd.archivo = file;
+          fileToAdd.fecha = new Date;
+          fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
+          fileToAdd.nombreArchivo = this.fileToUpload.name        
+          fileToAdd.tipoArchivoPuerto = this.nombreArchivo[0];
+          fileToAdd.id = 0;
+
+          this.ArchivosPuerto.push(fileToAdd);
+          this.ArchivosPuerto = this.ArchivosPuerto.sort((a,b) => a.id - b.id)
+          this.nombreArchivo = null;
+          this.fileToUpload = null
+    
+      }else{
+        //Salgo y no lo dejo agregar 
+        this.confirmationDialogService.confirm('Atención','El archivo tiene un formato inválido.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      }
+    }
+      
+      //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
+      //Primero valido que esté toda la data necesaria completa
+    
+  }
 
 }
 

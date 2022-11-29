@@ -8,7 +8,8 @@
             <feComposite in="SourceGraphic"/>
         </filter>
         <pattern id="pattern" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" viewBox="0 0 800 600">
-            <image width="800" height="600" id="imagenBuque" attr.xlink:href="{{fotoEmbarque}}"/>            
+            <image *ngIf="fotoEmbarque" width="800" height="600" id="imagenBuque" attr.xlink:href="{{fotoEmbarque}}"/> 
+            <image *ngIf="!fotoEmbarque"  width="800" height="600" id="imagenBuque" href="./assets/buque_no_encontrado.png"/>
         </pattern>
     </defs>
     <g id="Componente_148_2" data-name="Componente 148 – 2" transform="translate(16.5)">
@@ -28,7 +29,7 @@
                 Bandera: Liberia [LR]
                 Tipo de buque: Bulk Carrier
                 Porte bruto: 50868
-                Porte neto (TNR): xxxx
+                Porte neto (TRN): xxxx
                 Eslora x manga: 229.5 x 36.92 m
                 Puntal: xxxx
                 Freeboard: xxxx

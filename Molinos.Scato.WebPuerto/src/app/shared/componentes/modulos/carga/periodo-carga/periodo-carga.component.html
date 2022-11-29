@@ -10,7 +10,7 @@
                             <label class="font-weight-bold">Amarró</label>
                             <input type="date" formControlName="fechaAmarro" max="3000-12-31" min="1000-01-01" class="form-control fecha"/>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-3">
                             <label>&nbsp;</label>
                             <div class="input_img">
                                 <input class="form-control hora" formControlName="horaAmarro" placeholder="00:00" [ngxTimepicker]="fullTimeAmarro"
@@ -24,7 +24,7 @@
                             <label class="font-weight-bold">Viento</label>
                             <input class="form-control" placeholder="Km/h" formControlName="vientoAmarro"/>
                         </div>
-                        <div class="form-group col-4">
+                        <div class="form-group col-3">
                             <label class="font-weight-bold">Dirección</label>
                             <!-- <input class="form-control" formControlName="direccionAmarro"/> -->
                             <select class="form-control" formControlName="direccionAmarro">
@@ -46,7 +46,7 @@
                             <label class="font-weight-bold">Desamarró</label>
                             <input type="date" formControlName="fechaDesamarro" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-3">
                             <label>&nbsp;</label>
                             <div class="input_img">
                                 <input class="form-control hora" formControlName="horaDesamarro" placeholder="00:00" [ngxTimepicker]="fullTimeDesamarro"
@@ -60,7 +60,7 @@
                             <label>&nbsp;</label>
                             <input class="form-control" placeholder="Km/h" formControlName="vientoDesamarro"/>
                         </div>
-                        <div class="form-group col-4">
+                        <div class="form-group col-3">
                             <label>&nbsp;</label>
                             <!-- <input class="form-control"  formControlName="direccionDesamarro"/> -->
                             <select class="form-control" formControlName="direccionDesamarro">
@@ -82,7 +82,7 @@
                             <label class="font-weight-bold">Habilitación</label>
                             <input type="date" formControlName="fechaHabilitacion" max="3000-12-31" min="1000-01-01" class="form-control fecha" />
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-3">
                             <label>&nbsp;</label>
                             <div class="input_img">
                                 <input class="form-control hora" formControlName="horaHabilitacion" placeholder="00:00" [ngxTimepicker]="fullTimeHabilitacion"
@@ -166,8 +166,10 @@
                 </div>
             </div>
         </form>
-        <div class="text-center" >
-          <button type="button" class="btn btn-primary" (click)="guardar()" [disabled]="this.guardando" >GUARDAR</button>
-       </div>
+        <ng-container *ngIf="hasPermisoLiquido_PeriodoDeCarga_Guardar()" >
+            <div class="text-center" id="guardarPeriodoDeCarga">
+                <button type="button" *ngIf="!esSoloLectura" class="btn btn-primary" (click)="guardar()" [disabled]="this.guardando" >GUARDAR</button>
+            </div>
+        </ng-container>
     </div>
 </div>

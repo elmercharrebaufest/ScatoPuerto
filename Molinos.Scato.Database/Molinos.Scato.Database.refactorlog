@@ -686,4 +686,95 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="idBalanzaCorte" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="ff604240-fcbf-495a-9ae7-6e9722ac7aff" ChangeDateTime="10/05/2022 19:55:45">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[vapor_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Vapor_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9983ca05-87dc-4c45-a247-d56364da78d0" ChangeDateTime="10/05/2022 19:55:50">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[nombreBuque]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="NombreBuque" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f8d921f4-4c8b-47e6-8cdb-66e2a89b79c0" ChangeDateTime="10/05/2022 19:55:54">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[tipoBuque]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TipoBuque" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9fc60f1b-051a-417e-85f3-c5fd7c47f340" ChangeDateTime="10/05/2022 19:56:04">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[categoriaBuque]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CategoriaBuque" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="855a09b8-8b07-45fe-9ec2-26ae3e490b61" ChangeDateTime="10/05/2022 19:56:07">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[imoVapor]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ImoVapor" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d644dc45-82e5-432e-95ac-e29e52272f37" ChangeDateTime="10/05/2022 19:56:11">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[freeboard]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Freeboard" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cf10579b-6d23-4e34-b49d-e7066fbfb2da" ChangeDateTime="10/05/2022 19:56:15">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[eslora]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Eslora" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e12f42f0-6f3d-4508-99da-fb49ae6d8952" ChangeDateTime="10/05/2022 19:56:18">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[porteNeto]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PorteNeto" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fb788893-a673-4829-89c4-dbbbed9c956c" ChangeDateTime="10/05/2022 19:56:22">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[porteBruto]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PorteBruto" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="622c7e39-380f-4806-ab75-2530f8f2b609" ChangeDateTime="10/05/2022 19:56:25">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[manga]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Manga" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cd1288f0-91c5-4c66-a632-a0cc657464dd" ChangeDateTime="10/05/2022 19:56:29">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[puntual]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Puntual" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a51b462b-7a8e-494a-8f83-89ba412a8113" ChangeDateTime="10/05/2022 19:56:33">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[cantidadBodegasTks]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CantidadBodegasTks" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="edad9f1f-e044-4292-9b21-403b3c0408c4" ChangeDateTime="10/05/2022 20:07:11">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[PaisPuerto_id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Bandera_Id" />
+  </Operation>
 </Operations>
