@@ -231,8 +231,10 @@ export class CargaSolidosComponent implements OnInit {
     if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
     let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     let ocultarCollapse= this.elem.nativeElement.querySelectorAll(".ocultarCollapse");
+    let mostrarPdf= this.elem.nativeElement.querySelectorAll(".mostrarPdf");
     this.ocultarCamposEnPDFListas(ocultarBotones, "none");
     this.ocultarCamposEnPDFListas(ocultarCollapse, "none");
+    this.ocultarCamposEnPDFListas(mostrarPdf, "block");
     //
     //
     setTimeout(() => {
@@ -244,6 +246,7 @@ export class CargaSolidosComponent implements OnInit {
       if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
       this.ocultarCamposEnPDFListas(ocultarBotones, "block");
       this.ocultarCamposEnPDFListas(ocultarCollapse, "block");
+      this.ocultarCamposEnPDFListas(mostrarPdf, "none");
     },6500);
   }
 

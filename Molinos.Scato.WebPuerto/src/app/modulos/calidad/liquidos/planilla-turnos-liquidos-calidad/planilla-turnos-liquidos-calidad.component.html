@@ -71,13 +71,13 @@
                                                             class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
                                                             {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
                                                             Tn.</span>
-                                                        <button class='btn btn btn-success'
+                                                        <button class='btn btn btn-success ocultarPdf' data-html2canvas-ignore="true"
                                                             *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
                                                             style="margin-top: 5px; margin-bottom: 5px"
                                                             (click)='guardarTurnoGeneral(d,t, true)'>
                                                             Cerrar turno
                                                         </button>
-                                                        <img *ngIf="turno.value.guardadoPorRecibidor"                                                    
+                                                        <img *ngIf="turno.value.guardadoPorRecibidor" class="ocultarPdf" data-html2canvas-ignore="true"                                                    
                                                             src="./assets/turno_cerrado.svg" />
                                                     </div>
                                                 </td>
