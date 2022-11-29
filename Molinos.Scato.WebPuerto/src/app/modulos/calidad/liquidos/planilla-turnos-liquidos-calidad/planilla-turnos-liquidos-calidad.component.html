@@ -1,5 +1,6 @@
 <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>
-<div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
+
+<div class="mt-4 pb-4" style='background-color: white !important;'>
     <app-collapse-button  collapseSelectorId='collapsePlanillaTurnosLiquidos'></app-collapse-button>
     <div class="divHeaderRightLeft">
         <h4 *ngIf="tablerista" class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos líquidos Tablerista</h4>
@@ -15,11 +16,9 @@
                 (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
         </div>
         <br>
-        <br>
-
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup">
 
-            <div id="scrollbar-planilla-recibidores-liquido" class='mt-4 px-4 pb-4'
+            <div id="scrollbar-planilla-recibidores-liquido" class='mt-4 pb-4'
                 [ngStyle]="{'height': cantidadTurnos >= 3 ? '800px' : 'auto' }">
                 <!-- ACA VA LA SCROLLBAR -->
                 <perfect-scrollbar [config]="{suppressScrollX: true, wheelSpeed: 0.4}">
@@ -39,6 +38,8 @@
                         
                             <ng-container formArrayName='diasTurno'>
                                 <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
+                                    <div class="html2pdf__page-break" *ngIf="d >0">
+                                    </div>
                                     <tr>
                                         <td [attr.rowspan]='getRowSpan(dia)' width="10%">
                                             <div class='column-center'>
