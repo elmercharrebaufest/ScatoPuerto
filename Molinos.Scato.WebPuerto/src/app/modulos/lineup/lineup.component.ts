@@ -93,7 +93,7 @@ export class LineupComponent implements OnInit, Observador {
 
   cargarEstadoLineUp() {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-      this.ubicacionDeBuquePuerto = res.filter(u => u.orden!=1);;
+      this.ubicacionDeBuquePuerto = res;
       this.estadoVicentinLp = this.estadoVicentin();
       console.log('estadoVicentinLp '+this.estadoVicentinLp);
       this.estadoNoryonLp = this.estadoNoryon();
