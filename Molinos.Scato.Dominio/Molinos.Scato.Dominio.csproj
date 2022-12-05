@@ -963,6 +963,7 @@
     <Compile Include="Entidades\CartaPorteOtrosPuertos.cs" />
     <Compile Include="Entidades\CategoriaVehiculo.cs" />
     <Compile Include="Entidades\CeldaManoDeEmbarque.cs" />
+    <Compile Include="Entidades\CompaniaDeFumigacion.cs" />
     <Compile Include="Entidades\ConfiguracionAutomatizacionEtapas.cs" />
     <Compile Include="Entidades\ConfiguracionMail.cs" />
     <Compile Include="Entidades\CubitacionDeTanques.cs" />
@@ -1010,6 +1011,11 @@
     <Compile Include="Entidades\ModuloDeCargaTabiquesDeEmbarqueHistorico.cs" />
     <Compile Include="Entidades\ModuloDeCargaUmap.cs" />
     <Compile Include="Entidades\Bandera.cs" />
+    <Compile Include="Entidades\MuelleDeCarga.cs" />
+    <Compile Include="Entidades\Nominacion.cs" />
+    <Compile Include="Entidades\NominacionDatoTecnico.cs" />
+    <Compile Include="Entidades\NominacionDetalleIntervecion.cs" />
+    <Compile Include="Entidades\NominacionRecibo.cs" />
     <Compile Include="Entidades\ReciboDeBuque.cs" />
     <Compile Include="Entidades\ReciboDeBuqueDetalles.cs" />
     <Compile Include="Entidades\Parametros.cs" />
@@ -1075,9 +1081,13 @@
     <Compile Include="Entidades\Bodega.cs" />
     <Compile Include="Entidades\Adjunto.cs" />
     <Compile Include="Entidades\ReglaDeAnalisisObligatorio.cs" />
+    <Compile Include="Entidades\Surveyor.cs" />
+    <Compile Include="Entidades\TasaDeCarga.cs" />
     <Compile Include="Entidades\TipoArchivoPuerto.cs" />
+    <Compile Include="Entidades\TipoContrato.cs" />
     <Compile Include="Entidades\TipoDeActividad.cs" />
     <Compile Include="Entidades\TipoDeBuquePuerto.cs" />
+    <Compile Include="Entidades\TipoDeFumigacion.cs" />
     <Compile Include="Entidades\TipoLineaEmbarque.cs" />
     <Compile Include="Entidades\TurnoPuerto.cs" />
     <Compile Include="Entidades\UbicacionDeBuquePuerto.cs" />
