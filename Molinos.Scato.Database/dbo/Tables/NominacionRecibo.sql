@@ -1,0 +1,18 @@
+﻿CREATE TABLE [dbo].[NominacionRecibo](
+	[Id] [int] NOT NULL,
+	[Nominacion_Id] [int] NOT NULL,
+	[Exportador_Id] [int] NULL,
+	[Formato] [varchar](10) NULL,
+	[Cantidad] [int] NULL,
+	[Unidad] [varchar](10) NULL,
+	[Ajuste] [varchar](10) NULL,
+	[PuertoDeCarga] [varchar](250) NULL,
+	[PuertoDeDescarga] [varchar](250) NULL,
+	[DescripcionesBienes] [varchar](250) NULL,
+	[RecibosPorDia] [smallint] NULL,
+	[MostrarDestinos] [smallint] NULL,
+	[MostrarBodegas] [smallint] NULL,
+ CONSTRAINT [PK_dbo.NominacionRecibo] PRIMARY KEY CLUSTERED ([Id] ASC),
+ CONSTRAINT [FK_dbo.NominacionRecibo_dbo.Exportador_Exportador_Id] FOREIGN KEY([Exportador_Id]) REFERENCES [dbo].[Exportador] ([Id]),
+ CONSTRAINT [FK_dbo.NominacionRecibo_dbo.Nominacion_Nominacion_Id] FOREIGN KEY([Nominacion_Id]) REFERENCES [dbo].[Nominacion] ([Id]),
+)
