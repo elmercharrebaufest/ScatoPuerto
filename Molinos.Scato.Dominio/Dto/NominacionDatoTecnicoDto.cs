@@ -9,7 +9,6 @@ namespace Molinos.Scato.Dominio.Dto
     public sealed class NominacionDatoTecnicoDto
     {
         public int Id { get; set; }
-        public NominacionDto Nominacion { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public int CantidadTotal { get; set; }
         public int Tolerancia { get; set; }
