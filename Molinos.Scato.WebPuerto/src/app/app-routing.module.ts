@@ -43,6 +43,11 @@ export const routeConfig: Routes = [
         path: 'buques',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/buques/buques.module').then(m => m.BuquesModule)
+      },
+      {
+        path: 'programa',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/programa-embarque/programa-embarque.module').then(m => m.ProgramaEmbarqueModule)
       }
     ]
   },

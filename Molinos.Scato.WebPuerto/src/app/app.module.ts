@@ -26,7 +26,7 @@ import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     CommonModule,
@@ -45,7 +45,7 @@ import { ToastrModule } from 'ngx-toastr';
     NgxsModule.forRoot([
       ProductoState, 
       BuquesState
-    ]),   
+    ])
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },

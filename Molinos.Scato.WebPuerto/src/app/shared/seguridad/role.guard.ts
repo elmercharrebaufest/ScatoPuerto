@@ -92,6 +92,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case 'programa': {
+                if (permisos.find(x => x === 'Recibidores_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "programa");
+                }
+                break;
+            } 
         }
     }
 
@@ -119,6 +127,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'Buque_Ver': {
                 this.router.navigate(['/buques']);
+                break;
+            }
+            case 'Buque_Ver': {
+                this.router.navigate(['/programa']);
                 break;
             }
         }
@@ -157,6 +169,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'buque': {
                 msje = 'No tiene permiso para Buque';
+                break;
+            }
+            case 'programa': {
+                msje = 'No tiene permiso para visualizar Programa de Embarque';
                 break;
             }
         }
