@@ -9,11 +9,12 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   private listaProductos;
   private listaBuques;
   private listaMuelles;
+  private configListaMultiple;
   constructor() { }
 
   ngOnInit(): void {
   }
-  public getListaProductos() {
+  public getListaProductos() {   
     return this.listaProductos;
   }
   public getListaBuques() {
@@ -25,5 +26,17 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   public onBuscar(){
   }
   public onLimpiarBusqueda(){
+  }
+  public getConfigListaMultiple() {
+    return this.configListaMultiple;
+  }
+  public setConfigListaMultiple() {
+    this.configListaMultiple = {
+      singleSelection: false,
+      idField: 'id',
+      textField: 'descripcionCorta',
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
+    };
   }
 }
