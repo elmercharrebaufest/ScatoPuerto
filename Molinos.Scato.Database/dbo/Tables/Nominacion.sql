@@ -1,5 +1,5 @@
 create table Nominacion(
-Id int,
+Id int  IDENTITY (1, 1) NOT NULL,
 NominacionDatoTecnico_Id  int NOT NULL,
 NominacionDetalleIntervencion_Id int NULL,
 EnviadoFumigador bit NOT NULL ,
