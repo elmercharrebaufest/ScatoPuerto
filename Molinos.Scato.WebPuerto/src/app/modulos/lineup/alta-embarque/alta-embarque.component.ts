@@ -210,9 +210,6 @@ export class AltaEmbarqueComponent implements OnInit {
     if (!this.tipoDeBuquePuerto)
       this.embarqueService.obtenerListadoTipoDeBuquePuerto().subscribe(res => { this.tipoDeBuquePuerto = res; });
 
-    if (!this.ubicacionDeBuquePuerto)
-      this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res.filter(u=>u.orden!=1); });
-
     if (!this.destinoPuerto)
       this.planoDeCargaService.obtenerDestinos().subscribe(res => { this.destinoPuerto = res; });
     if (this.embarqueId != 0) {
@@ -228,6 +225,13 @@ export class AltaEmbarqueComponent implements OnInit {
             },
             res.materialesPuertoCantidad.map(x => x.materialId)
           );
+
+          if (this.embarqueSeleccionado.sanBenito &&  this.embarqueSeleccionado.fechaHoraInicioCarga != null)
+            this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res.filter(u=>u.orden!=1); });
+          else
+            this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
+
+
 
           filtered.map(x => new MaterialPuertoCantidad({
             materialId: x.id,
