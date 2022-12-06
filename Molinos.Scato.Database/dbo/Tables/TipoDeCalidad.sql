@@ -1,5 +1,5 @@
 create table TipoDeCalidad(
-Id int not null,
+Id int IDENTITY (1, 1) NOT NULL,
 Descripcion varchar(250) not null,
 MaterialPuerto_Id  int not null,
 CONSTRAINT [PK_dbo.TipoDeCalidad] PRIMARY KEY CLUSTERED ([Id] ASC),

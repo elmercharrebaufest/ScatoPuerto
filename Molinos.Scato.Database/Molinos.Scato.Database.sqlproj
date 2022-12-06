@@ -550,7 +550,7 @@
     <Build Include="dbo\Tables\NominacionDatoTecnicoCoordinadorPuerto.sql" />
     <Build Include="dbo\Tables\NominacionDatoTecnicoDestino.sql" />
     <Build Include="dbo\Tables\NominacionDatoTecnicoExportador.sql" />
-    <Build Include="dbo\Tables\NominacionDetalleIntervecion.sql" />
+    <Build Include="dbo\Tables\NominacionDetalleIntervencion.sql" />
     <Build Include="dbo\Tables\Surveyor.sql" />
     <Build Include="dbo\Tables\TipoDeFumigacion.sql" />
     <Build Include="dbo\Tables\Senasa.sql" />

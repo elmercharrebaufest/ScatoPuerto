@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class Nominacion
+    public class Nominacion : IIdentificable
     {
         [Key]
         public virtual int Id { get; set; }
@@ -19,7 +19,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Embarque Embarque { get; set; }
         public virtual ICollection<NominacionDatoTecnico> NominacionDatoTecnico { get; set; }
         public virtual ICollection<NominacionRecibo> NominacionRecibo { get; set; }
-        public virtual ICollection<NominacionDetalleIntervencion> NominacionDetalleIntervencion { get; set; }
+        public virtual ICollection<NominacionDetalleIntervencion> NominacionDetalleIntervecion { get; set; }
 
     }
 }
