@@ -15,8 +15,8 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime? FechaEnvioLineUp { get; set; }
         public DateTime? FechaEliminacion { get; set; }
         public EmbarqueDto Embarque { get; set; }
-        public ICollection<NominacionDatoTecnicoDto> NominacionDatoTecnico { get; set; }
+        public NominacionDatoTecnicoDto NominacionDatoTecnico { get; set; }
+        public NominacionDetalleIntervencionDto NominacionDetalleIntervecion { get; set; }
         public ICollection<NominacionReciboDto> NominacionRecibo { get; set; }
-        public ICollection<NominacionDetalleIntervencionDto> NominacionDetalleIntervecion { get; set; }
     }
 }
