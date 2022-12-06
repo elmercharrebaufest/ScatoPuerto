@@ -11,7 +11,6 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
-        public virtual Nominacion Nominacion { get; set; }
         public virtual bool Precintado { get; set; }
         public virtual bool DraftSurvey { get; set; }
         public virtual string ACuentaDe         { get; set; }
