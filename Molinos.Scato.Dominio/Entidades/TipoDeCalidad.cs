@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class TipoDeFumigacion : IIdentificable
+    public class TipoDeCalidad : IIdentificable
     {
         [Key]
         public virtual int Id { get; set; }
         public virtual string Descripcion { get; set; }
+        public virtual MaterialPuerto MaterialPuerto { get; set; }
     }
 }

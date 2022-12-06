@@ -685,6 +685,8 @@
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
+    <Compile Include="Dto\CalidadValorDto.cs" />
+    <Compile Include="Dto\CompaniaDeFumigacionDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ErroresGeolocalizacionDto.cs" />
     <Compile Include="Dto\HistorialDeBusquesDto.cs" />
@@ -696,6 +698,14 @@
     <Compile Include="Dto\MonitorCPECacheada\MonitorCPECacheadaListadoDto.cs" />
     <Compile Include="Dto\EstadoIntercomunicadorDto.cs" />
     <Compile Include="Dto\BanderaDto.cs" />
+    <Compile Include="Dto\MuelleDeCargaDto.cs" />
+    <Compile Include="Dto\NominacionDatoTecnicoCoordinadorPuertoDto.cs" />
+    <Compile Include="Dto\NominacionDatoTecnicoDestinoDto.cs" />
+    <Compile Include="Dto\NominacionDatoTecnicoDto.cs" />
+    <Compile Include="Dto\NominacionDatoTecnicoExportadorDto.cs" />
+    <Compile Include="Dto\NominacionDetalleIntervencionDto.cs" />
+    <Compile Include="Dto\NominacionDto.cs" />
+    <Compile Include="Dto\NominacionReciboDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDetallesDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDto.cs" />
     <Compile Include="Dto\ParametrosDto.cs" />
@@ -832,11 +842,17 @@
     <Compile Include="Dto\ReporteDetalleMovimientoDto.cs" />
     <Compile Include="Dto\ResultadoCamaraDto.cs" />
     <Compile Include="Dto\SectorCantidadCamionesDto.cs" />
+    <Compile Include="Dto\SenasaDto.cs" />
     <Compile Include="Dto\SentidoManoDeEmbarqueDto.cs" />
     <Compile Include="Dto\EntradaDto.cs" />
+    <Compile Include="Dto\SurveyorDto.cs" />
+    <Compile Include="Dto\TasaDeCargaDto.cs" />
     <Compile Include="Dto\TipoArchivoPuertoDto.cs" />
+    <Compile Include="Dto\TipoContratoDto.cs" />
     <Compile Include="Dto\TipoDeActividadDto.cs" />
     <Compile Include="Dto\TipoDeBuquePuertoDto.cs" />
+    <Compile Include="Dto\TipoDeCalidadDto.cs" />
+    <Compile Include="Dto\TipoDeFumigacionDto.cs" />
     <Compile Include="Dto\TipoLineaEmbarqueDto.cs" />
     <Compile Include="Dto\TransmisionASapManualDto.cs" />
     <Compile Include="Dto\AnalisisObligatorioDto.cs" />
@@ -957,6 +973,7 @@
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
     <Compile Include="Entidades\BalanzasCortes.cs" />
+    <Compile Include="Entidades\CalidadValor.cs" />
     <Compile Include="Entidades\CaracteristicasCartaPorteOtrosPuertos.cs" />
     <Compile Include="Entidades\CargaComercialHistorico.cs" />
     <Compile Include="Entidades\CartaPorteElectronica.cs" />
@@ -1014,7 +1031,10 @@
     <Compile Include="Entidades\MuelleDeCarga.cs" />
     <Compile Include="Entidades\Nominacion.cs" />
     <Compile Include="Entidades\NominacionDatoTecnico.cs" />
-    <Compile Include="Entidades\NominacionDetalleIntervecion.cs" />
+    <Compile Include="Entidades\NominacionDatoTecnicoCoordinadorPuerto.cs" />
+    <Compile Include="Entidades\NominacionDatoTecnicoDestino.cs" />
+    <Compile Include="Entidades\NominacionDatoTecnicoExportador.cs" />
+    <Compile Include="Entidades\NominacionDetalleIntervencion.cs" />
     <Compile Include="Entidades\NominacionRecibo.cs" />
     <Compile Include="Entidades\ReciboDeBuque.cs" />
     <Compile Include="Entidades\ReciboDeBuqueDetalles.cs" />
@@ -1056,6 +1076,7 @@
     <Compile Include="Entidades\RamalFerroviario.cs" />
     <Compile Include="Entidades\RegistroStockOtrosPuertos.cs" />
     <Compile Include="Entidades\PuntosInteresGeolocalizacion.cs" />
+    <Compile Include="Entidades\Senasa.cs" />
     <Compile Include="Entidades\SentidoManoDeEmbarque.cs" />
     <Compile Include="Entidades\Stock.cs" />
     <Compile Include="Entidades\AnalisisObligatorio.cs" />
@@ -1087,6 +1108,7 @@
     <Compile Include="Entidades\TipoContrato.cs" />
     <Compile Include="Entidades\TipoDeActividad.cs" />
     <Compile Include="Entidades\TipoDeBuquePuerto.cs" />
+    <Compile Include="Entidades\TipoDeCalidad.cs" />
     <Compile Include="Entidades\TipoDeFumigacion.cs" />
     <Compile Include="Entidades\TipoLineaEmbarque.cs" />
     <Compile Include="Entidades\TurnoPuerto.cs" />

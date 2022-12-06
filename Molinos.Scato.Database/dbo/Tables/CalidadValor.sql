@@ -1,5 +1,5 @@
 create table CalidadValor(
-Id int not null,
+Id int IDENTITY (1, 1) NOT NULL,
 Valor varchar(250) not null,
 TipoDeCalidad_Id int not null,
 Parametro varchar(250) not null,
