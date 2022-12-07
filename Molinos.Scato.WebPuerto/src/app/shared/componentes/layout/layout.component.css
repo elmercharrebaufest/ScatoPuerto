@@ -118,3 +118,12 @@
     margin: 0;
     padding: 0;
 } */
+
+.links-container a div.item-container div.icon-pe{
+    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
+    -webkit-mask: url('/assets/IconoHomeProgramaEmbarque.svg') no-repeat center;
+    mask-image: url('/assets/IconoHomeProgramaEmbarque.svg') no-repeat center;
+    width: 27px;
+    height: 27px;
+}
