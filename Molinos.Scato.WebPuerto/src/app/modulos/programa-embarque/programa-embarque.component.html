@@ -1,0 +1,27 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <label class="cargando-programa-embarque">Programa de Embarque</label>
+        </div> 
+        <div class="col-md-2">
+            <button class="btn nominacion" (click)="onCrearNuevaNominacion()">NUEVA NOMINACIÓN</button>
+        </div>      
+    </div>
+    <div class="row">
+        <div class="col-md-10"></div>        
+        <div class="col-md-2 alinearAlFinal">
+            <button class="btn enviarLineUp" (click)="onCrearNuevaNominacion()">ENVIAR A LINE UP</button>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <app-filtro-programa-embarque></app-filtro-programa-embarque>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <app-listado-programa-embarque></app-listado-programa-embarque>
+        </div>
+    </div>
+</div>

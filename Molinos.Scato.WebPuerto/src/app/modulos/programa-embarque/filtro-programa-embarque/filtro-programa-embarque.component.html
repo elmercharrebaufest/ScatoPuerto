@@ -1,0 +1,36 @@
+<form id="filtroForm">
+  <div class="row">   
+    <div class="form-group col-md-2 input_img">
+      <input type="month" class="form-control" formControlName="mes">
+    </div>
+    <div class="form-group col-md-2 colorGris">
+
+      <ng-multiselect-dropdown formControlName="buque" [placeholder]="'Buque'"
+        [settings]="getConfigListaMultiple()" [data]="getListaBuques()">
+      </ng-multiselect-dropdown>
+
+    </div>
+    <div class="form-group col-md-2 colorGris">
+
+      <ng-multiselect-dropdown  formControlName="muelle"
+        [placeholder]="'Muelle de carga'" [settings]="getConfigListaMultiple()" [data]="getListaMuelleDeCarga()">
+      </ng-multiselect-dropdown>
+
+    </div>
+    <div class="form-group col-md-2 colorGris">
+
+      <ng-multiselect-dropdown formControlName="producto" [placeholder]="'Producto'"
+        [settings]="getConfigListaMultiple()" [data]="getListaProductos()">
+      </ng-multiselect-dropdown>
+
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn buscar" (click)="onBuscar()">Buscar</button>
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn limpiar" (click)="onLimpiarBusqueda()">Limpiar Búsqueda</button>
+    </div>
+  </div>
+
+
+</form>
