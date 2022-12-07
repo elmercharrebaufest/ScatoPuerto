@@ -7,16 +7,12 @@ import { ListadoProgramaEmbarqueComponent } from './listado-programa-embarque/li
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProgramaEmbarqueComponent } from './programa-embarque.component';
 import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
-import { ListadoPruebaPrimengComponent } from './listado-prueba-primeng/listado-prueba-primeng.component';
-
-
 
 @NgModule({
   declarations: [
     FiltroProgramaEmbarqueComponent, 
     ListadoProgramaEmbarqueComponent,
     ProgramaEmbarqueComponent,
-    ListadoPruebaPrimengComponent
   ],
   imports: [
     CommonModule,

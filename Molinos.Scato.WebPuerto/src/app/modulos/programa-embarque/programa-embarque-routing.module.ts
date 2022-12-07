@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { ListadoPruebaPrimengComponent } from "./listado-prueba-primeng/listado-prueba-primeng.component";
+import { RoleGuard } from "app/shared/seguridad/role.guard";
 import { ProgramaEmbarqueComponent } from "./programa-embarque.component";
 
 const routes: Routes = [
@@ -9,8 +9,9 @@ const routes: Routes = [
         component: ProgramaEmbarqueComponent
     },
     {
-        path: 'listado-primeng',
-        component: ListadoPruebaPrimengComponent
+        path: 'nominacion',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./nominacion/nominacion.module').then(m => m.NominacionModule)
     },
 ]
 
