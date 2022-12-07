@@ -1,0 +1,23 @@
+<p-table #myTab [value]="tableData">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+        </tr>
+    </ng-template>
+  
+    <ng-template pTemplate="body" let-people>
+        <tr>
+            <td>
+                {{ people.firstname }}
+            </td>
+            <td>
+                {{ people.lastname }}
+            </td>
+            <td>
+                {{ people.age }}
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

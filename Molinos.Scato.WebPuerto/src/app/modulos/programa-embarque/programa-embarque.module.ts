@@ -6,6 +6,8 @@ import { FiltroProgramaEmbarqueComponent } from './filtro-programa-embarque/filt
 import { ListadoProgramaEmbarqueComponent } from './listado-programa-embarque/listado-programa-embarque.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProgramaEmbarqueComponent } from './programa-embarque.component';
+import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
+import { ListadoPruebaPrimengComponent } from './listado-prueba-primeng/listado-prueba-primeng.component';
 
 
 
@@ -13,11 +15,13 @@ import { ProgramaEmbarqueComponent } from './programa-embarque.component';
   declarations: [
     FiltroProgramaEmbarqueComponent, 
     ListadoProgramaEmbarqueComponent,
-    ProgramaEmbarqueComponent
+    ProgramaEmbarqueComponent,
+    ListadoPruebaPrimengComponent
   ],
   imports: [
     CommonModule,
     SharedModule, 
+    SharedComponentModule,
     ProgramaEmbarqueRoutingModule,
     NgMultiSelectDropDownModule.forRoot(),
   ]
