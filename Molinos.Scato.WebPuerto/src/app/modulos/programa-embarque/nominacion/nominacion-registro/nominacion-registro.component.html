@@ -1,0 +1,87 @@
+<br />
+<div class="margenes-nominacion">
+    <!-- TITULO -->
+    <div class="form">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>{{titulo}}</h2>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <!-- MENUS -->
+    <div class="form">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="accordion" id="accordionExample">
+                    <div class="card">
+                        <div class="card-header acordion-header-fondo" id="datoTecnico">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link acordion-header-titulo" type="button" data-toggle="collapse"
+                                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Datos técnicos
+                                </button>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="collapse show" aria-labelledby="datoTecnico"
+                            data-parent="#accordionExample">
+                            <div class="card-body acordion-card-body">
+                                <app-nominacion-dato-tecnico></app-nominacion-dato-tecnico>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="card">
+                        <div class="card-header acordion-header-fondo" id="datoRecibos">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed acordion-header-titulo" type="button"
+                                    data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false"
+                                    aria-controls="collapseTwo">
+                                    Datos de recibos
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="datoRecibos"
+                            data-parent="#accordionExample">
+                            <div class="card-body acordion-card-body">
+                                <app-nominacion-recibos></app-nominacion-recibos>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="card">
+                        <div class="card-header acordion-header-fondo" id="datoIntervencion">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed acordion-header-titulo" type="button"
+                                    data-toggle="collapse" data-target="#collapseThree" aria-expanded="false"
+                                    aria-controls="collapseThree">
+                                    Datos de intervenciones
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="datoIntervencion"
+                            data-parent="#accordionExample">
+                            <div class="card-body acordion-card-body">
+                                <app-nominacion-intervenciones></app-nominacion-intervenciones>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="form">
+        <div class="row">
+            <div class="col-md-12 botones-registro-centrado">
+                <button class="btn btn-danger botones-registro-custom" (click)="onCancelarNominacion()">Cancelar</button>
+                <button class="btn btn-primary botones-registro-custom" (click)="onGuardarNominacion()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+</div>

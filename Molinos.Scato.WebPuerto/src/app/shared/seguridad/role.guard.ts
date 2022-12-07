@@ -100,7 +100,15 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "programa");
                 }
                 break;
-            }*/
+            } 
+            case 'nominacion': {
+                if (permisos.find(x => x === 'Recibidores_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "nominacion");
+                }
+                break;
+            } 
         }
     }
 
