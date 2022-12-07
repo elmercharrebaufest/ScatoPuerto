@@ -533,7 +533,7 @@
     <Build Include="dbo\Tables\ADPuertoRolesPermisos.sql" />
     <Build Include="dbo\Tables\ADPuertoPermisos.sql" />
     <Build Include="dbo\Tables\ArchivosPuerto.sql" />
-    <Build Include="dbo\Tables\TipoArchivoPuerto.sql" />	
+    <Build Include="dbo\Tables\TipoArchivoPuerto.sql" />
     <Build Include="dbo\Tables\Parametros.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosUltimaActualizacion.sql" />
     <Build Include="dbo\Tables\TipoLineaEmbarque.sql" />
@@ -541,6 +541,22 @@
     <Build Include="dbo\Tables\ErroresGeolocalizacion.sql" />
     <Build Include="dbo\Tables\VaporInformacion.sql" />
     <Build Include="dbo\Tables\HistoricoActores.sql" />
+    <Build Include="dbo\Tables\CompaniaDeFumigacion.sql" />
+    <Build Include="dbo\Tables\TipoContrato.sql" />
+    <Build Include="dbo\Tables\TasaDeCarga.sql" />
+    <Build Include="dbo\Tables\MuelleDeCarga.sql" />
+    <Build Include="dbo\Tables\Nominacion.sql" />
+    <Build Include="dbo\Tables\NominacionDatoTecnico.sql" />
+    <Build Include="dbo\Tables\NominacionDatoTecnicoCoordinadorPuerto.sql" />
+    <Build Include="dbo\Tables\NominacionDatoTecnicoDestino.sql" />
+    <Build Include="dbo\Tables\NominacionDatoTecnicoExportador.sql" />
+    <Build Include="dbo\Tables\NominacionDetalleIntervencion.sql" />
+    <Build Include="dbo\Tables\Surveyor.sql" />
+    <Build Include="dbo\Tables\TipoDeFumigacion.sql" />
+    <Build Include="dbo\Tables\Senasa.sql" />
+    <Build Include="dbo\Tables\CalidadValor.sql" />
+    <Build Include="dbo\Tables\TipoDeCalidad.sql" />
+    <Build Include="dbo\Tables\NominacionRecibo.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
