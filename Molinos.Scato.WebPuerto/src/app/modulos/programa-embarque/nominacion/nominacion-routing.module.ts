@@ -8,7 +8,7 @@ const routes: Routes =[
       component: NominacionRegistroComponent
   },
   {
-      path: ':nominacionid/:state',
+      path: ':idnominacion',
       component: NominacionRegistroComponent
   },
   
