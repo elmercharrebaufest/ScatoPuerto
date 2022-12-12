@@ -28,7 +28,7 @@
                         <div id="collapseOne" class="collapse show" aria-labelledby="datoTecnico"
                             data-parent="#accordionExample">
                             <div class="card-body acordion-card-body">
-                                <app-nominacion-dato-tecnico></app-nominacion-dato-tecnico>
+                                <app-nominacion-dato-tecnico *ngIf="nominacionId"></app-nominacion-dato-tecnico>
                             </div>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                         <div id="collapseTwo" class="collapse" aria-labelledby="datoRecibos"
                             data-parent="#accordionExample">
                             <div class="card-body acordion-card-body">
-                                <app-nominacion-recibos></app-nominacion-recibos>
+                                <app-nominacion-recibos  *ngIf="nominacionId"></app-nominacion-recibos>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                         <div id="collapseThree" class="collapse" aria-labelledby="datoIntervencion"
                             data-parent="#accordionExample">
                             <div class="card-body acordion-card-body">
-                                <app-nominacion-intervenciones></app-nominacion-intervenciones>
+                                <app-nominacion-intervenciones  *ngIf="nominacionId"></app-nominacion-intervenciones>
                             </div>
                         </div>
                     </div>
@@ -75,7 +75,7 @@
     </div>
 
     <!-- BOTONES -->
-    <div class="form" *ngIf="idNominacion == 0">
+    <div class="form" *ngIf="nominacionId == 0">
         <div class="row">
             <div class="col-md-12 botones-registro-centrado">
                 <button class="btn btn-danger botones-registro-custom" (click)="onCancelarNominacion()">Cancelar</button>
