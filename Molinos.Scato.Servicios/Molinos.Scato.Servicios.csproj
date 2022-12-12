@@ -350,8 +350,10 @@
     <Compile Include="Impl\AdministradorDeCalles.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
     <Compile Include="Impl\ServicioEstadoPuesto.cs" />
+    <Compile Include="Impl\ServicioProgramaEmbarque.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
+    <Compile Include="IServicioProgramaEmbarque.cs" />
     <Compile Include="MercadoLibreException.cs" />
     <Compile Include="FormattingHtmlHelper.cs" />
     <Compile Include="IFirmaProvider.cs" />
