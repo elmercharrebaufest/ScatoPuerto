@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 
 @Component({
   selector: 'app-nominacion-recibos',
@@ -7,9 +9,32 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NominacionRecibosComponent implements OnInit {
 
-  constructor() { }
+  private _nominacionParametros: NominacionParametros = null;
+
+  constructor(private nominacionService: NominacionService) { 
+    this.asignarNominacionParametros();
+  }
 
   ngOnInit(): void {
+  }
+
+  get nominacionParametros(): NominacionParametros {
+    return this._nominacionParametros;
+  }
+  set nominacionParametros(value: NominacionParametros){
+    this._nominacionParametros = value;
+  }
+
+  private asignarNominacionParametros(){
+    this.nominacionService.NominacionParametros.subscribe(parametro =>{
+      
+      const nominacionParametos: NominacionParametros = {
+        nominacion_Id : parametro.nominacion_Id,
+        actualizarDatoTecnico : parametro.actualizarDatoTecnico,
+        actualizarRecibos  : parametro.actualizarRecibos,
+        actualizarIntervenciones : parametro.actualizarIntervenciones};
+      this.nominacionParametros = nominacionParametos;
+    });
   }
 
 }
