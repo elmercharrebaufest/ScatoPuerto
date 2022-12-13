@@ -92,6 +92,7 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            /*
             case 'programa': {
                 if (permisos.find(x => x === 'Recibidores_Ver')){
                     return true;
@@ -99,7 +100,7 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "programa");
                 }
                 break;
-            } 
+            }*/
         }
     }
 

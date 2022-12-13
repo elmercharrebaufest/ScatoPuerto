@@ -217,21 +217,15 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueService.obtenerEmbarque(this.embarqueId).subscribe(
         res => {
           this.embarqueSeleccionado = JSON.parse(JSON.stringify(res));
-          console.log('obtenerEmbarque: ', res);
-          console.log('obtenerEmbarque xxxxxx: ', res);
           var filtered = this.listadoMateriales.filter(
             function (e) {
               return this.indexOf(e.id) < 0;
             },
             res.materialesPuertoCantidad.map(x => x.materialId)
           );
-
+          
           if (this.embarqueSeleccionado.sanBenito &&  this.embarqueSeleccionado.fechaHoraInicioCarga != null)
-            this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res.filter(u=>u.orden!=1); });
-          else
-            this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
-
-
+              this.ubicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.filter(ubicacion => ubicacion.orden != 1);
 
           filtered.map(x => new MaterialPuertoCantidad({
             materialId: x.id,
@@ -292,10 +286,10 @@ export class AltaEmbarqueComponent implements OnInit {
           let fechaHastaLimpieza = this.embarqueForm.get('fechaHastaLimpieza').value;
           let horaHastaLimpieza = this.embarqueForm.get('horaHastaLimpieza').value;
           this.totalHorasLimpieza = this.calcularHorasLimpieza(fechaDesdeLimpieza, horaDesdeLimpieza, fechaHastaLimpieza, horaHastaLimpieza);
-
+          console.log('res.ubicacion-->', res.ubicacion, this.ubicacionDeBuquePuerto);
           if (res.ubicacion != null && res.ubicacion != 0 && typeof this.ubicacionDeBuquePuerto != 'undefined')
             this.embarqueForm.get('ubicacionDeBuque').setValue(
-              this.ubicacionDeBuquePuerto.find(x => x.id == res.ubicacion));
+              this.ubicacionDeBuquePuerto.find(x => x.orden == res.ubicacion));
           else
             this.embarqueForm.get('ubicacionDeBuque').setValue('');
 
