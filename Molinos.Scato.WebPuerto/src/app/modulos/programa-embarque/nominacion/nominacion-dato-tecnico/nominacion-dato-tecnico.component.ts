@@ -60,6 +60,10 @@ import { GetObtenerCalidadValor } from '@ScatoStores/programa-embarque/calidad-v
 })
 export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
 
+  public datoTecnicoForm: FormGroup;
+  public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
+  public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
+  public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
   private _nominacionParametros: NominacionParametros = null;
   public datoTecnicoForm: FormGroup;
   public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
@@ -143,6 +147,33 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       this.nominacionParametros = nominacionParametos;
     });
   }
+  private inicializarForm(){
+    this.datoTecnicoForm = this.formBuilder.group({
+      id                   : [0, Validators.required],
+      materialPuerto       : ['', Validators.required],
+      cantidadTotal        : ['', Validators.required],
+      tolerancia           : ['', Validators.required],
+      observaciones        : ['', Validators.required],
+      vapor                : ['', Validators.required],
+      bandera              : ['', Validators.required],
+      eTARecalada          : ['', Validators.required],     
+      obligacionDeCarga    : ['', Validators.required],     
+      muelleDeCarga        : ['', Validators.required],
+      tasaDeCarga          : ['', Validators.required],
+      tasaDeCargaValor     : ['', Validators.required],
+      dEM                  : ['', Validators.required],
+      dES                  : ['', Validators.required],
+      tipoContrato         : ['', Validators.required],
+      aTAPuerto            : ['', Validators.required],
+      agenciaMaritimaPuerto: ['', Validators.required],
+      surveyor             : ['', Validators.required],
+      observacionesSurveyor: ['', Validators.required],
+      datoTecnicoExportador: this.formBuilder.array([]),
+      datoTecnicoDestino: this.formBuilder.array([]),
+      datoTecnicoCoordinador: this.formBuilder.array([]),
+    });
+  }
+
 
   private inicializarForm() {
     this.datoTecnicoForm = this.formBuilder.group({
