@@ -1,0 +1,15 @@
+.columa-ancho-total{ 
+    width: 100%;
+}
+.alinear-controles{
+    width: 100% !important;
+}
+.color-linea-division{ 
+    background-color: #707070;
+}
+.quitar-margen-detalles{ 
+    margin-left: -15px;
+}
+.margen-superior-detalle{ 
+    margin-top: 10px;
+}

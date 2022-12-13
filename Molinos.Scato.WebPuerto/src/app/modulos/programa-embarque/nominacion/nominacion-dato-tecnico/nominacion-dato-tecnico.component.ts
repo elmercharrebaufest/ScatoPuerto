@@ -1,4 +1,9 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
+import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
+import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-coordinador';
+
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 
@@ -9,24 +14,29 @@ import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.
 })
 export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
 
+  public datoTecnicoForm: FormGroup;
+  public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
+  public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
+  public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
   private _nominacionParametros: NominacionParametros = null;
 
-  constructor(private nominacionService: NominacionService) { 
+  constructor(private nominacionService: NominacionService,
+              private formBuilder: FormBuilder) { 
     this.asignarNominacionParametros();
   }
   ngAfterViewInit(): void {
   }
 
   ngOnInit(): void {
+    this.inicializarForm();
   }
 
-  get nominacionParametros(): NominacionParametros {
+  private get nominacionParametros(): NominacionParametros {
     return this._nominacionParametros;
   }
-  set nominacionParametros(value: NominacionParametros){
+  private set nominacionParametros(value: NominacionParametros){
     this._nominacionParametros = value;
   }
-
   private asignarNominacionParametros(){
     this.nominacionService.NominacionParametros.subscribe(parametro =>{
       
@@ -38,5 +48,32 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       this.nominacionParametros = nominacionParametos;
     });
   }
+  private inicializarForm(){
+    this.datoTecnicoForm = this.formBuilder.group({
+      id                   : [0, Validators.required],
+      materialPuerto       : ['', Validators.required],
+      cantidadTotal        : ['', Validators.required],
+      tolerancia           : ['', Validators.required],
+      observaciones        : ['', Validators.required],
+      vapor                : ['', Validators.required],
+      bandera              : ['', Validators.required],
+      eTARecalada          : ['', Validators.required],     
+      obligacionDeCarga    : ['', Validators.required],     
+      muelleDeCarga        : ['', Validators.required],
+      tasaDeCarga          : ['', Validators.required],
+      tasaDeCargaValor     : ['', Validators.required],
+      dEM                  : ['', Validators.required],
+      dES                  : ['', Validators.required],
+      tipoContrato         : ['', Validators.required],
+      aTAPuerto            : ['', Validators.required],
+      agenciaMaritimaPuerto: ['', Validators.required],
+      surveyor             : ['', Validators.required],
+      observacionesSurveyor: ['', Validators.required],
+      datoTecnicoExportador: this.formBuilder.array([]),
+      datoTecnicoDestino: this.formBuilder.array([]),
+      datoTecnicoCoordinador: this.formBuilder.array([]),
+    });
+  }
+
 
 }

@@ -1,1 +1,259 @@
-<p>nominacion-dato-tecnico works!</p>
+<br />
+<div class="margenes-nominacion">
+    <form [formGroup]="datoTecnicoForm" class="mt-4">
+        <div class="form">
+            <div class="row form-row">
+                <div class="form-group col-md-6">
+                    <label for="materialPuerto" class="font-weight-bold">Producto</label>
+                    <select formControlName="materialPuerto" class="custom-select" required>
+                        <option value=""></option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="cantidadTotal" class="font-weight-bold">Cantidad Total</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Ingrese la cantidad"
+                            formControlName="cantidadTotal">
+                        <div class="input-group-append">
+                            <span class="input-group-text">Tn</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="tolerancia" class="font-weight-bold">Tolerencia</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Ingrese la tolerancia"
+                            formControlName="tolerancia">
+                        <div class="input-group-append">
+                            <span class="input-group-text">Tn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="observaciones" class="font-weight-bold">Observaciones</label>
+                <textarea class="form-control" placeholder="Ingrese las observaciones" rows="4" maxlength="250"
+                    formControlName="observaciones"></textarea>
+            </div>
+        </div>
+        <hr class="color-linea-division"/>
+        <div class="row">
+            <div class="form-group col-md-5">
+                <div class='btn-add-container'>
+                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo destino</span>
+                </div>
+                <div class="input-group quitar-margen-detalles margen-superior-detalle">
+                    <div class="form-group col-8">
+                        <input
+                              type="text"
+                              class="form-control"
+                              formControlName="exportador"
+                              maxlength="50"
+                              placeholder="Exportador"
+          
+                              />
+                    </div>
+                    <div class="form-group col-4">
+                        <div class="input-group" >
+                          <input type="text" class="form-control"
+                                formControlName="cantidad">
+                          <div class="input-group-append">
+                            <span class="input-group-text">Tn</span>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-7">
+                <div class='btn-add-container'>
+                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cargador</span>
+                </div>
+                <div class="input-group quitar-margen-detalles margen-superior-detalle">
+                    <div class="form-group col-6">
+                        <input
+                              type="text"
+                              class="form-control"
+                              formControlName="exportador"
+                              maxlength="50"
+                              placeholder="Exportador"
+          
+                              />
+                    </div>
+                    <div class="form-group col-3">
+                        <div class="input-group" >
+                          <input type="text" class="form-control"
+                                formControlName="cantidad">
+                          <div class="input-group-append">
+                            <span class="input-group-text">Tn</span>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <div class="input-group" >
+                          <input type="text" class="form-control"
+                                formControlName="cantidad">
+                          <div class="input-group-append">
+                            <span class="input-group-text">%</span>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-5">
+                <div class='btn-add-container'>
+                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cliente</span>
+                </div>
+                <div class="input-group quitar-margen-detalles margen-superior-detalle">
+                    <div class="form-group col-8">
+                        <input
+                              type="text"
+                              class="form-control"
+                              formControlName="exportador"
+                              maxlength="50"
+                              placeholder="Exportador"
+          
+                              />
+                    </div>
+                    <div class="form-group col-4">
+                        <div class="input-group" >
+                          <input type="text" class="form-control"
+                                formControlName="cantidad">
+                          <div class="input-group-append">
+                            <span class="input-group-text">Tn</span>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="color-linea-division"/>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label class="font-weight-bold">Nombre buque</label>
+                <input type="text" class="form-control" formControlName="vapor" maxlength="50"
+                    placeholder="Ingrese nombre del buque" required />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="bandera" class="font-weight-bold">Bandera</label>
+                <select class="custom-select" formControlName="bandera" required>
+                    <option value=""></option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="eTARecalada" class="font-weight-bold">Eta Recalada</label>
+                <div class="input_img">
+                    <input type="date" max="3000-12-31" min="1000-01-01" class="form-control"
+                        formControlName="eTARecalada">
+                </div>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="obligacionDeCarga" class="font-weight-bold">Obligación de carga</label>
+                <div class="input_img">
+                    <input type="date" max="3000-12-31" min="1000-01-01" class="form-control"
+                        formControlName="obligacionDeCarga">
+                </div>
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="input-group col-md-4">
+                <div class="form-group columa-ancho-total">
+                    <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga</label>
+                    <select class="custom-select" formControlName="muelleDeCarga" required>
+                        <option value=""></option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="input-group col-md-4">
+                <div class="form-group col-md-3">
+                    <label class="font-weight-bold">Loading</label>
+                    <input type="text" class="form-control" formControlName="tasaDeCargaValor" maxlength="50"
+                        placeholder="" required />
+                </div>
+                <div class="form-group col-md-9">
+                    <label class="font-weight-bold">Rate</label>
+                    <select class="custom-select" formControlName="tasaDeCarga" required>
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group col-md-4">
+                <div class="form-group col-md-3">
+                    <label class="font-weight-bold">DEM</label>
+                    <input type="text" class="form-control" formControlName="dEM" maxlength="50" placeholder=""
+                        required />
+                </div>
+                <div class="form-group col-md-3">
+                    <label class="font-weight-bold">DES</label>
+                    <input type="text" class="form-control" formControlName="dES" maxlength="50" placeholder=""
+                        required />
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="font-weight-bold">Tipo contrato</label>
+                    <select class="custom-select" formControlName="bandera" required>
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-group col-md-4">
+                <div class="form-group columa-ancho-total">
+                    <label class="font-weight-bold">ATA</label>
+                    <div class="alinear-controles">
+                        <tag-input formControlName="aTAPuerto" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1">
+                            <tag-input-dropdown [showDropdownIfEmpty]="true" [identifyBy]="'id'" [displayBy]="'name'">
+                            </tag-input-dropdown>
+                        </tag-input>
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                    </div>
+                </div>
+            </div>
+            <div class="input-group col-md-4">
+                <div class="form-group columa-ancho-total">
+                    <label class="font-weight-bold">Agencia maritima</label>
+                    <div class="alinear-controles">
+                        <tag-input formControlName="agenciaMaritimaPuerto" [identifyBy]="'id'" [displayBy]="'name'"
+                            [maxItems]="1">
+                            <tag-input-dropdown [showDropdownIfEmpty]="true" [identifyBy]="'id'" [displayBy]="'name'">
+                            </tag-input-dropdown>
+                        </tag-input>
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                    </div>
+                </div>
+            </div>
+            <div class="input-group col-md-4">
+                <div class="form-group columa-ancho-total">
+                    <label class="font-weight-bold">Surveyor</label>
+                    <div class="alinear-controles">
+                        <tag-input formControlName="surveyor" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1">
+                            <tag-input-dropdown [showDropdownIfEmpty]="true" [identifyBy]="'id'" [displayBy]="'name'">
+                            </tag-input-dropdown>
+                        </tag-input>
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="observacionesSurveyor" class="font-weight-bold">Observaciones surveyor</label>
+                <textarea class="form-control" placeholder="Ingrese las observaciones surveyor" rows="4" maxlength="250"
+                    formControlName="observacionesSurveyor"></textarea>
+            </div>
+        </div>
+
+    </form>
+    <br />
+</div>

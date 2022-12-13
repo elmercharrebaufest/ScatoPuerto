@@ -6,12 +6,14 @@ import { NominacionRegistroComponent } from './nominacion-registro/nominacion-re
 import { NominacionDatoTecnicoComponent } from './nominacion-dato-tecnico/nominacion-dato-tecnico.component';
 import { NominacionRecibosComponent } from './nominacion-recibos/nominacion-recibos.component';
 import { NominacionIntervencionesComponent } from './nominacion-intervenciones/nominacion-intervenciones.component';
+import { SharedModule } from 'app/shared/shared.module';
 
 
 @NgModule({
   declarations: [NominacionRegistroComponent, NominacionDatoTecnicoComponent, NominacionRecibosComponent, NominacionIntervencionesComponent],
   imports: [
     CommonModule,
+    SharedModule,
     NominacionRoutingModule
   ]
 })
