@@ -1,21 +1,39 @@
 import { Injectable } from "@angular/core";
-import { State } from "@ngxs/store";
-import { Bandera } from "@ScatoModels/bandera";
+import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { tap } from "rxjs/operators";
+import { EmbarqueService } from "@ScatoServicios/embarque.service";
 import { CoordinadorPuerto } from "@ScatoModels/coordinador-puerto";
-
+import { GetObtenerCoordinadorPuerto } from "./coordinador-puerto.actions";
 export class CoordinadorPuertoStateModel {
-    coordinadorPuerto: CoordinadorPuerto[];
+    coordinadoresPuerto: CoordinadorPuerto[];
     selectedCoordinadorPuerto: any;
 }
 
 @State<CoordinadorPuertoStateModel>({
-    name: 'coordinadorPuerto',
+    name: 'coordinadoresPuerto',
     defaults: {
-        coordinadorPuerto: [],
+        coordinadoresPuerto: [],
         selectedCoordinadorPuerto: null
     }
 })
 
 @Injectable()
-export class CoordinadorPuertoState{
+export class CoordinadorPuertoState {
+    constructor(private embarqueService: EmbarqueService) {
+    }
+    @Selector()
+    static GetObtenerCoordinadorPuerto(state: CoordinadorPuertoStateModel) {
+        return state.coordinadoresPuerto;
+    }
+
+    @Action(GetObtenerCoordinadorPuerto)
+    GetObtenerCoordinadorPuerto({ getState, setState }: StateContext<CoordinadorPuertoStateModel>) {
+        return this.embarqueService.obtenerListadoCoordinadores().pipe(tap((result) => {
+            const state = getState();
+            setState({
+                ...state,
+                coordinadoresPuerto: result,
+            });
+        }));
+    }
 }

@@ -1,20 +1,40 @@
 import { Injectable } from "@angular/core";
-import { State } from "@ngxs/store";
+import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { tap } from "rxjs/operators";
 import { Vapor } from "@ScatoModels/vapor";
+import { BuqueService } from "@ScatoServicios/buque.service";
+import { GetObtenerVapor } from "./vapor.actions";
 
 export class VaporStateModel {
-    vapor: Vapor[];
+    vapores: Vapor[];
     selectedVapor: any;
 }
 
 @State<VaporStateModel>({
-    name: 'vapor',
+    name: 'vapores',
     defaults: {
-        vapor: [],
+        vapores: [],
         selectedVapor: null
     }
 })
 
 @Injectable()
-export class VaporState{
+export class VaporState {
+    constructor(private buqueService: BuqueService) {
+    }
+    @Selector()
+    static GetObtenerVapor(state: VaporStateModel) {
+        return state.vapores;
+    }
+
+    @Action(GetObtenerVapor)
+    GetObtenerVapor({ getState, setState }: StateContext<VaporStateModel>) {
+        return this.buqueService.obtenerVapores().pipe(tap((result) => {
+            const state = getState();
+            setState({
+                ...state,
+                vapores: result,
+            });
+        }));
+    }
 }
