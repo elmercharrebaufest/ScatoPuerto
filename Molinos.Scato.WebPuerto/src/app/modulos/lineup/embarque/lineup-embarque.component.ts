@@ -175,7 +175,8 @@ export class LineupEmbarqueComponent implements OnInit {
         }
       }
       let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-      //lineUpDto.moduloDeCarga = null;
+      lineUpDto.moduloDeCarga = null;
+      lineUpDto.planoDeCarga = null;
       this.lineUpService.modificarLineUp(lineUpDto).subscribe(res => console.log(res));
     }
   }
@@ -250,7 +251,8 @@ export class LineupEmbarqueComponent implements OnInit {
               this.instanciaWorkflow.embarque.ubicacion = accion;
               this.instanciaWorkflow.lineUp.ubicacion = accion;
               let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-              //lineUpDto.moduloDeCarga = null;
+              lineUpDto.moduloDeCarga = null;
+              lineUpDto.planoDeCarga = null;
               this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
                 if (this.observador) {
                   setTimeout(() => {
@@ -273,7 +275,8 @@ export class LineupEmbarqueComponent implements OnInit {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;
     let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-    //lineUpDto.moduloDeCarga = null;
+    lineUpDto.moduloDeCarga = null;
+    lineUpDto.planoDeCarga = null;
     this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => { 
     }, error =>{}
      , () =>{
@@ -378,7 +381,8 @@ export class LineupEmbarqueComponent implements OnInit {
       if (this.fechaCarta && this.horaCarta) {
         this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada = this.fechaCarta + ' ' + this.horaCarta;
         let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
-        //lineUpDto.moduloDeCarga = null;
+        lineUpDto.moduloDeCarga = null;
+        lineUpDto.planoDeCarga = null;
         this.lineUpService.modificarLineUp(lineUpDto).subscribe(
           ret => console.log(ret));
       }

@@ -172,7 +172,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/ActualizarEstadoBuque")]
         public HttpResponseMessage ActualizarEstadoBuque(int Embarque_Id, int Estado)
         {
-      
+
             servicio.ActualizarEstadoBuque(Embarque_Id, Estado);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -245,7 +245,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
-        
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarModuloDeCargaBalanzas")]
@@ -277,7 +277,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 var resultado = new ResultadoPrevisualizar();
                 comandos.Ejecutar(new GuardarNirManual { Dto = ObjetoMailNir.nirManualPuerto, IdModuloDeCarga = IdModuloDeCarga });
-                if(nombreBuque != "undefined")
+                if (nombreBuque != "undefined")
                 {
                     var docFile = "Nir.xls";
 
@@ -298,7 +298,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     });
                 }
 
-                
+
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -401,7 +401,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
 
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado =  Enviado, nombreUsuario = base.nombreUsuario});
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, nombreUsuario = base.nombreUsuario });
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -414,19 +414,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosMail")]
-        public HttpResponseMessage GuardarPlanillaDeTurnosMail(int IdModuloDeCarga,  ObjetoMail ObjetoMail)
+        public HttpResponseMessage GuardarPlanillaDeTurnosMail(int IdModuloDeCarga, ObjetoMail ObjetoMail)
         {
             try
             {
-             var resultado = new ResultadoPrevisualizar();
-            comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = ObjetoMail.planillaDeTurnos, IdModuloDeCarga = IdModuloDeCarga });
+                var resultado = new ResultadoPrevisualizar();
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = ObjetoMail.planillaDeTurnos, IdModuloDeCarga = IdModuloDeCarga });
 
-            string fechaTurno = ObjetoMail.planillaDeTurnos.Fecha.Value.ToString("yyyyMMdd");
+                string fechaTurno = ObjetoMail.planillaDeTurnos.Fecha.Value.ToString("yyyyMMdd");
 
 
-            
-            var docFile = "Planilla de turnos" + fechaTurno + ".xls";
-            
+
+                var docFile = "Planilla de turnos" + fechaTurno + ".xls";
+
                 var generadorExcel = new ExcelLiquido();
                 List<ModuloDeCargaPlanillaDeTurnosDto> moduloDeCargaPlanillaDeTurnosTurnosDtos = new List<ModuloDeCargaPlanillaDeTurnosDto>();
                 moduloDeCargaPlanillaDeTurnosTurnosDtos.Add(ObjetoMail.planillaDeTurnos);
@@ -458,8 +458,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         public class ObjetoMail
         {
-           public ModuloDeCargaPlanillaDeTurnosDto planillaDeTurnos;
-                  
+            public ModuloDeCargaPlanillaDeTurnosDto planillaDeTurnos;
+
             public MailDto mail;
 
         }
@@ -833,7 +833,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Route("api/ModuloDeCarga/EliminarObservacionDeCalidad")]
         public HttpResponseMessage EliminarObservacionDeCalidad(int observacion_id)
-        { 
+        {
             try
             {
                 servicio.EliminarObservacionDeCalidad(observacion_id);
@@ -860,7 +860,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                if(reciboDeBuque.FechaHoraImpresion != null) reciboDeBuque.FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion.Value.ToLocalTime();
+                if (reciboDeBuque.FechaHoraImpresion != null) reciboDeBuque.FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion.Value.ToLocalTime();
 
                 servicio.GuardarReciboDeBuque(idEmbarque, reciboDeBuque);
 
@@ -908,8 +908,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/GuardarCapturaImagenLineUp")]
         public HttpResponseMessage GuardarCapturaImagenLineUp(CapturaImagenLineUp capturaImagenLineUp)
         {
-            servicio.GuardarCapturaImagenLineUp(capturaImagenLineUp.Embarque_Id, capturaImagenLineUp.FilePathImgLineUp);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            try
+            {
+                servicio.GuardarCapturaImagenLineUp(capturaImagenLineUp.Embarque_Id, capturaImagenLineUp.FilePathImgLineUp);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         public class CapturaImagenLineUp

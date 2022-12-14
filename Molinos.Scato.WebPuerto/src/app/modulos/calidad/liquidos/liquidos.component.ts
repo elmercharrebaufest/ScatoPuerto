@@ -9,6 +9,8 @@ import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
@@ -26,6 +28,9 @@ export class LiquidosComponent implements OnInit {
   public amarreForm: FormGroup;
   errorMessage: boolean;
   embarqueSelected: any;
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
+
   constructor(private _CalidadSharedService: CalidadSharedService,
     private confirmationDialogService: ConfirmationDialogService,
   private _procesoService: DatosEmbarquesProcesoService,
@@ -141,12 +146,15 @@ guardarAmarre()
 
        });
   }
-
-
-
-
-
 }
+
+hasPermisoRecibidores_Imprimir() {
+  return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
+}
+hasPermisoRecibidores_Finalizar() {
+  return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Finalizar);
+}
+
 cargarHorasDesamarro(amarre)
 {
   var newDate = new Date();

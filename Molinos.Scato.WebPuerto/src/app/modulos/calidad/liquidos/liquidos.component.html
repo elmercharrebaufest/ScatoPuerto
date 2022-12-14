@@ -34,10 +34,13 @@
   -->
 
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
-    <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+    <ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
+      <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
+    </ng-container>
     <!-- <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button> -->
-    <button type="button" class="btn btn-success mx-5" (click)="openModalCargarAmarre(CargarAmarre)">FINALIZAR</button>
-
+    <ng-container *ngIf="hasPermisoRecibidores_Finalizar()">
+      <button type="button" class="btn btn-success mx-5" (click)="openModalCargarAmarre(CargarAmarre)">FINALIZAR</button>
+    </ng-container>
 
   </div>
 
