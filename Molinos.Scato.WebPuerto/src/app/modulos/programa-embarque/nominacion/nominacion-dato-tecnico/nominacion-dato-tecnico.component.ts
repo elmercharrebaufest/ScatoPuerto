@@ -122,6 +122,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+
     this.inicializarForm();
     this.cargarListasDeNominacion();
     this.obtenerListasDeNominacion();
@@ -172,6 +173,47 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       datoTecnicoDestino: this.formBuilder.array([]),
       datoTecnicoCoordinador: this.formBuilder.array([]),
     });
+    this.cargarNominacionListas();
+  }
+
+  private cargarNominacionListas(){
+    this.nominacionDatoTecnicoService.cargarMaterialPuerto();
+    this.nominacionDatoTecnicoService.cargarDestinos();
+    this.nominacionDatoTecnicoService.cargarExportador();
+    this.nominacionDatoTecnicoService.cargarCoordinadorPuerto();
+    this.nominacionDatoTecnicoService.cargarVapor();
+    this.nominacionDatoTecnicoService.cargarATAPuerto();
+    this.nominacionDatoTecnicoService.cargarAgenciaMaritima();
+
+  }
+
+  public obtenerMaterialPuerto(){
+    this.productos$.subscribe(materialPuerto =>{ this.listaMaterialPuerto = materialPuerto;});
+    return this.listaMaterialPuerto;
+  }
+  public obtenerDestinos(){
+    this.destino$.subscribe(destino =>{ this.listaDestino = destino;});
+    return this.listaDestino;
+  }
+  public obtenerExportador(){
+    this.exportador$.subscribe(exportador =>{ this.listaExportador = exportador;});
+    return this.listaExportador;
+  }
+  public obtenerCoordinadorPuerto(){
+    this.coordinadorPuerto$.subscribe(coordinadorPuerto =>{ this.listaCoordinadorPuerto = coordinadorPuerto;});
+    return this.listaCoordinadorPuerto;
+  }
+  public obtenerVapor(){
+    this.vapor$.subscribe(vapor =>{ this.listaVapor = vapor;});
+    return this.listaVapor;
+  }
+  public obtenerATAPuerto(){
+    this.ataPuerto$.subscribe(ataPuerto =>{ this.listaATAPuerto = ataPuerto;});
+    return this.listaATAPuerto;
+  }
+  public obtenerAgenciaMaritima(){
+    this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto =>{ this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto;});
+    return this.listaAgenciaMaritimaPuerto;
   }
 
 
