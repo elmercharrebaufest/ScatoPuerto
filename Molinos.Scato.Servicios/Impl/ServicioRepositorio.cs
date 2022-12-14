@@ -11605,12 +11605,18 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp)
         {
-            Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
+            try
+            {
+                Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
 
             if (embarque != null)
                 embarque.FilePathImgLineUp = filePathImgLineUp;
-
-            repositorio.GuardarCambios();
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
 

@@ -83,6 +83,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     horaInicio = Convert.ToInt32(horas[0]);
                     horaFin = Convert.ToInt32(horas[1]);
 
+                    if (embarque.FechaHoraInicioCarga.Value < DateTime.Now)
+                    {
+                        var estadoBuq = Repositorio.Obtener<EstadoBuque>(x => x.Id == 3);
+                        embarque.EstadoBuque = estadoBuq;
+                        Repositorio.GuardarCambios();
+                    }
+
                     if (embarque.FechaHoraInicioCarga.Value.Hour >= horaInicio &&
                        embarque.FechaHoraInicioCarga.Value.Hour < horaFin &&
                        DateTime.Now.Hour > horaFin)
