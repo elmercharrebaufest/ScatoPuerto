@@ -6,7 +6,8 @@
                 <div class="form-group col-md-6">
                     <label for="materialPuerto" class="font-weight-bold">Producto</label>
                     <select formControlName="materialPuerto" class="custom-select" required>
-                        <option value=""></option>
+                        <option value="">Seleccione</option>
+                        <option *ngFor="let material of obtenerMaterialPuerto()" [value]="material.codigo">{{material.descripcionCorta}}</option>
                     </select>
                 </div>
                 <div class="form-group col-md-3">
@@ -137,8 +138,13 @@
         <div class="row">
             <div class="form-group col-md-6">
                 <label class="font-weight-bold">Nombre buque</label>
-                <input type="text" class="form-control" formControlName="vapor" maxlength="50"
-                    placeholder="Ingrese nombre del buque" required />
+                <input type="text" 
+                       class="form-control" 
+                       formControlName="vapor" 
+                       maxlength="250"
+                       placeholder="Ingrese nombre del buque" 
+                       
+                       required />
             </div>
             <div class="form-group col-md-4">
                 <label for="bandera" class="font-weight-bold">Bandera</label>
