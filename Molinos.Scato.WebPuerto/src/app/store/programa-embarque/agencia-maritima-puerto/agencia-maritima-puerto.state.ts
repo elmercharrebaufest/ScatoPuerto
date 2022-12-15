@@ -23,7 +23,7 @@ export class AgenciaMaritimaPuertoState{
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetListaAgenciaMaritimaPuerto(state: AgenciaMaritimaPuertoStateModel) {
+    static getListaAgenciaMaritimaPuerto(state: AgenciaMaritimaPuertoStateModel) {
         return state.agenciaMaritimaPuerto;
     }
 

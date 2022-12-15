@@ -17,6 +17,10 @@ import { ATAPuertoState } from 'app/store/programa-embarque/ata-puerto/ata-puert
 import { CoordinadorPuertoState } from 'app/store/programa-embarque/coordinador-puerto/coordinador-puerto.state';
 import { BanderaState } from 'app/store/programa-embarque/bandera/bandera.state';
 import { FormsModule } from '@angular/forms';
+import { TipoDeContratoState } from 'app/store/programa-embarque/tipo-de-contrato/tipo-de-contrato.state';
+import { SurveyorState } from 'app/store/programa-embarque/surveyor/surveyor.state';
+import { MuelleDeCargaState } from 'app/store/programa-embarque/muelle-de-carga/muelle-de-carga.state';
+import { TasaDeCargaState } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.state';
 
 const libComponents = [
   NominacionRegistroComponent, 
@@ -31,7 +35,11 @@ const libState = [
   VaporState,
   ATAPuertoState,
   AgenciaMaritimaPuertoState,
-  BanderaState
+  BanderaState,
+  TipoDeContratoState,
+  SurveyorState,
+  MuelleDeCargaState,
+  TasaDeCargaState
 ]
 @NgModule({
 

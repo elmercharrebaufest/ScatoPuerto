@@ -23,7 +23,7 @@ export class TipoDeContratoState{
     constructor(private nominacionService: NominacionService) {
     }
     @Selector()
-    static GetObtenerTipoDeContrato(state: TipoDeContratoStateModel) {
+    static getListaTipoDeContrato(state: TipoDeContratoStateModel) {
         return state.tipoDeContratos;
     }
 

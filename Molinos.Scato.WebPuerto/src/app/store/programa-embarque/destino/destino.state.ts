@@ -23,7 +23,7 @@ export class DestinoState{
     constructor(private planoDeCargaService: PlanoDeCargaService) {
     }
     @Selector()
-    static GetListaDestino(state: DestinoStateModel) {
+    static getListaDestino(state: DestinoStateModel) {
         return state.destinos;
     }
 

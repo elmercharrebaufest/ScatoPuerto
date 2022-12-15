@@ -1,3 +1,3 @@
 export class GetObtenerTipoDeContrato {
-    static readonly type = '[Todo] Get';
+    static readonly type = '[Todo] Get TipoDeContrato Todo';
 }

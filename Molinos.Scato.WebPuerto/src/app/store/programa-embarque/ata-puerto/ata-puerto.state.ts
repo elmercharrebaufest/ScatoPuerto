@@ -23,7 +23,7 @@ export class ATAPuertoState{
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetListaATAPuerto(state: ATAPuertoStateModel) {
+    static getListaATAPuerto(state: ATAPuertoStateModel) {
         return state.ataPuerto;
     }
 

@@ -23,13 +23,13 @@ export class MuelleDeCargaState{
     constructor(private nominacionService: NominacionService) {
     }
     @Selector()
-    static GetObtenerMuelleDeCarga(state: MuelleDeCargaStateModel) {
+    static getListaMuelleDeCarga(state: MuelleDeCargaStateModel) {
         return state.muellesDeCarga;
     }
 
     @Action(GetObtenerMuelleDeCarga)
     GetObtenerMuelleDeCarga({ getState, setState }: StateContext<MuelleDeCargaStateModel>) {
-        return this.nominacionService.obtenerTipoDeContrato().pipe(tap((result) => {
+        return this.nominacionService.obtenerMuellesDeCarga().pipe(tap((result) => {
             const state = getState();
             setState({
                 ...state,

@@ -35,6 +35,18 @@ import { GetObtenerAgenciaMaritimaPuerto } from 'app/store/programa-embarque/age
 import { GetObtenerBandera } from 'app/store/programa-embarque/bandera/bandera.actions';
 import { BanderaState } from 'app/store/programa-embarque/bandera/bandera.state';
 import { Bandera } from '@ScatoModels/bandera';
+import { TipoDeContratoState } from 'app/store/programa-embarque/tipo-de-contrato/tipo-de-contrato.state';
+import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
+import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
+import { TasaDeCargaState } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.state';
+import { MuelleDeCargaState } from 'app/store/programa-embarque/muelle-de-carga/muelle-de-carga.state';
+import { SurveyorState } from 'app/store/programa-embarque/surveyor/surveyor.state';
+import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
+import { GetObtenerMuelleDeCarga } from 'app/store/programa-embarque/muelle-de-carga/muelle-de-carga.actions';
+import { GetObtenerTipoDeContrato } from 'app/store/programa-embarque/tipo-de-contrato/tipo-de-contrato.actions';
+import { GetObtenerSurveyor } from 'app/store/programa-embarque/surveyor/surveyor.actions';
+import { GetObtenerTasaDeCarga } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.actions';
+import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -66,17 +78,27 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   public listaATAPuerto: ATAPuerto[];
   public listaAgenciaMaritimaPuerto: AgenciaMaritimaPuerto[];
   public listaBanderas: Bandera[];
+  public listaSurveyor: Surveyor[];
+  public listaTasaDeCarga: TasaDeCarga[];
+  public listaMuelleDeCarga: MuelleDeCarga[];
+  public listaTipoDeContrato: TipoDeContrato[];
+
+
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
 
 
   @Select(ProductoState.getListaProductos) productos$: Observable<MaterialPuerto[]>;
   @Select(BanderaState.getListaBandera) banderas$: Observable<Bandera[]>;
   @Select(VaporState.getListaVapores) vapores$: Observable<Vapor[]>;
-  @Select(DestinoState.GetListaDestino) destino$: Observable<Destino[]>;
-  @Select(ExportadorState.GetListaExportadores) exportador$: Observable<Exportador[]>;
-  @Select(CoordinadorPuertoState.GetListaCoordinadorPuerto) coordinadorPuerto$: Observable<CoordinadorPuerto[]>;
-  @Select(ATAPuertoState.GetListaATAPuerto) ataPuerto$: Observable<ATAPuerto[]>;
-  @Select(AgenciaMaritimaPuertoState.GetListaAgenciaMaritimaPuerto) agenciaMaritimaPuerto$: Observable<AgenciaMaritimaPuerto[]>;
+  @Select(DestinoState.getListaDestino) destino$: Observable<Destino[]>;
+  @Select(ExportadorState.getListaExportadores) exportador$: Observable<Exportador[]>;
+  @Select(CoordinadorPuertoState.getListaCoordinadorPuerto) coordinadorPuerto$: Observable<CoordinadorPuerto[]>;
+  @Select(ATAPuertoState.getListaATAPuerto) ataPuerto$: Observable<ATAPuerto[]>;
+  @Select(AgenciaMaritimaPuertoState.getListaAgenciaMaritimaPuerto) agenciaMaritimaPuerto$: Observable<AgenciaMaritimaPuerto[]>;
+  @Select(TipoDeContratoState.getListaTipoDeContrato) tipoDeContrato$: Observable<TipoDeContrato[]>;
+  @Select(SurveyorState.getListaSurveyor) surveyor$: Observable<Surveyor[]>;
+  @Select(MuelleDeCargaState.getListaMuelleDeCarga) muelleDeCarga$: Observable<MuelleDeCarga[]>;
+  @Select(TasaDeCargaState.getListaTasaDeCarga) tasaDeCarga$: Observable<TasaDeCarga[]>;
 
   constructor(private nominacionService: NominacionService,
     private store: Store,
@@ -239,6 +261,12 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.store.dispatch(new GetObtenerVapor());
     this.store.dispatch(new GetObtenerATAPuerto());
     this.store.dispatch(new GetObtenerAgenciaMaritimaPuerto());
+    this.store.dispatch(new GetObtenerMuelleDeCarga());
+    this.store.dispatch(new GetObtenerTipoDeContrato());
+    this.store.dispatch(new GetObtenerSurveyor());
+    this.store.dispatch(new GetObtenerTasaDeCarga());
+
+
   }
   public obtenerListasDeNominacion(){
     this.productos$.subscribe(data => {this.listaMaterialPuerto = data;});
@@ -249,6 +277,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.vapores$.subscribe(vapor => {this.listaVapor = vapor});
     this.ataPuerto$.subscribe(ataPuerto => { this.listaATAPuerto = ataPuerto; });
     this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto => { this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto; });
+    this.surveyor$.subscribe(data => {this.listaSurveyor = data;});
+    this.tasaDeCarga$.subscribe(data => {this.listaTasaDeCarga = data;});
+    this.muelleDeCarga$.subscribe(data => {this.listaMuelleDeCarga = data;});
+    this.tipoDeContrato$.subscribe(data => {this.listaTipoDeContrato = data;}); 
   }
   public configurarListasDeNominacion(){
     this.formatoExportador = (exp: Exportador) => exp.nombre;

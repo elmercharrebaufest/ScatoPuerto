@@ -22,7 +22,7 @@ export class CoordinadorPuertoState {
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetListaCoordinadorPuerto(state: CoordinadorPuertoStateModel) {
+    static getListaCoordinadorPuerto(state: CoordinadorPuertoStateModel) {
         return state.coordinadoresPuerto;
     }
 

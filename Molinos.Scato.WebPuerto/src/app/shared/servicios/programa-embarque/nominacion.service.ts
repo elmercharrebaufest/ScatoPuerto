@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
+import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
 import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -28,9 +30,15 @@ export class NominacionService {
         return this._nominacionParametros.asObservable();
     }
     public obtenerMuellesDeCarga(): Observable<MuelleDeCarga[]> {
-        return this.http.get<MuelleDeCarga[]>(`${this.url}Nominacion/ObtenerMuelleDeCarga`, { 'withCredentials': true });
+        return this.http.get<MuelleDeCarga[]>(`${this.url}ProgramaEmbarque/ListarMuelleDeCarga`, { 'withCredentials': true });
     }
     public obtenerTipoDeContrato(): Observable<TipoDeContrato[]> {
-        return this.http.get<TipoDeContrato[]>(`${this.url}Nominacion/ObtenerTipoDeContrato`, { 'withCredentials': true });
+        return this.http.get<TipoDeContrato[]>(`${this.url}ProgramaEmbarque/ListarTipoDeContrato`, { 'withCredentials': true });
+    }
+    public obtenerSurveyor(): Observable<Surveyor[]> {
+        return this.http.get<Surveyor[]>(`${this.url}ProgramaEmbarque/ListarSurveyor`, { 'withCredentials': true });
+    }
+    public obtenerTasaDeCarga(): Observable<TasaDeCarga[]> {
+        return this.http.get<TasaDeCarga[]>(`${this.url}ProgramaEmbarque/ListarTasaDeCarga`, { 'withCredentials': true });
     }
 }

@@ -219,6 +219,7 @@
                     <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga</label>
                     <select class="custom-select" formControlName="muelleDeCarga" required>
                         <option value=""></option>
+                        <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [value]="muelleDeCarga.id">{{muelleDeCarga.descripcion}}</option>
                     </select>
                 </div>
 
@@ -237,6 +238,7 @@
                     <label class="font-weight-bold">Rate</label>
                     <select class="custom-select" formControlName="tasaDeCarga" required>
                         <option value=""></option>
+                        <option *ngFor="let tasaDeCarga of listaTasaDeCarga" [value]="tasaDeCarga.id">{{tasaDeCarga.descripcion}}</option>
                     </select>
                 </div>
             </div>
@@ -261,6 +263,7 @@
                     <label class="font-weight-bold">Tipo contrato</label>
                     <select class="custom-select" formControlName="tipoDeContrato" required>
                         <option value=""></option>
+                        <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [value]="tipoDeContrato.id">{{tipoDeContrato.descripcion}}</option>
                     </select>
                 </div>
             </div>
@@ -316,12 +319,15 @@
                     <label class="font-weight-bold">Surveyor</label>
                     <div class="alinear-controles">
                         <tag-input formControlName="surveyor" 
+                                   [placeholder]="'Ingrese el Surveyor'"
+                                   [secondaryPlaceholder]="'Ingrese el Surveyor'"
                                    [identifyBy]="'id'" 
-                                   [displayBy]="'name'" 
+                                   [displayBy]="'descripcion'" 
                                    [maxItems]="1">
                             <tag-input-dropdown [showDropdownIfEmpty]="true" 
+                                                [autocompleteItems]="listaSurveyor"
                                                 [identifyBy]="'id'" 
-                                                [displayBy]="'name'">
+                                                [displayBy]="'descripcion'">
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">

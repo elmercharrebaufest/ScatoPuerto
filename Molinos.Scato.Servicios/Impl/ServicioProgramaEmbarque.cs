@@ -66,26 +66,50 @@ namespace Molinos.Scato.Servicios.Impl
 
 		public IList<MuelleDeCargaDto> listarMuelleDeCarga()
         {
-            IList<MuelleDeCargaDto> muelleDeCarga = Listar<MuelleDeCarga, MuelleDeCargaDto>();
-            return muelleDeCarga;
+            try
+            {
+                return Listar<MuelleDeCarga, MuelleDeCargaDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public IList<SurveyorDto> listarSurveyor()
         {
-            IList<SurveyorDto> surveyor = Listar<Surveyor, SurveyorDto>();
-            return surveyor;
+            try
+            {
+                return Listar<Surveyor, SurveyorDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public IList<TasaDeCargaDto> listarTasaDeCarga()
         {
-            IList<TasaDeCargaDto> tasaDeCarga = Listar<TasaDeCarga, TasaDeCargaDto>();
-            return tasaDeCarga;
+            try
+            {
+                return Listar<TasaDeCarga, TasaDeCargaDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public IList<TipoDeContratoDto> listarTipoDeContrato()
         {
-            IList<TipoDeContratoDto> tipoDeContrato = Listar<TipoDeContrato, TipoDeContratoDto>();
-            return tipoDeContrato;
+            try
+            {
+                return Listar<TipoDeContrato, TipoDeContratoDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
 
