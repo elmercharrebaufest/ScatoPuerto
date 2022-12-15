@@ -92,7 +92,7 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
-            /*
+          
             case 'programa': {
                 if (permisos.find(x => x === 'Recibidores_Ver')){
                     return true;
