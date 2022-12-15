@@ -23,12 +23,12 @@ export class DestinoState{
     constructor(private planoDeCargaService: PlanoDeCargaService) {
     }
     @Selector()
-    static GetObtenerDestino(state: DestinoStateModel) {
+    static GetListaDestino(state: DestinoStateModel) {
         return state.destinos;
     }
 
     @Action(GetObtenerDestino)
-    GetObtenerDestino({ getState, setState }: StateContext<DestinoStateModel>) {
+    getObtenerDestino({ getState, setState }: StateContext<DestinoStateModel>) {
         return this.planoDeCargaService.obtenerDestinos().pipe(tap((result) => {
             const state = getState();
             setState({

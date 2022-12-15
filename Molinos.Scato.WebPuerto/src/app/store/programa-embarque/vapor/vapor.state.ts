@@ -23,12 +23,12 @@ export class VaporState {
     constructor(private buqueService: BuqueService) {
     }
     @Selector()
-    static GetObtenerVapor(state: VaporStateModel) {
+    static getListaVapores(state: VaporStateModel) {
         return state.vapores;
     }
 
     @Action(GetObtenerVapor)
-    GetObtenerVapor({ getState, setState }: StateContext<VaporStateModel>) {
+    getObtenerVapor({ getState, setState }: StateContext<VaporStateModel>) {
         return this.buqueService.obtenerVapores().pipe(tap((result) => {
             const state = getState();
             setState({

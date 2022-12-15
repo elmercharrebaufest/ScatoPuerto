@@ -17,10 +17,31 @@ import { GetObtenerAgenciaMaritimaPuerto } from 'app/store/programa-embarque/age
 })
 export class NominacionDatoTecnicoService {
 
+    @Select(ProductoState.getListaProductos) productos$: Observable<MaterialPuerto[]>;
 
     constructor(private store: Store) {
     }
 
+    public cargarListasDeNominacion() {
+        this.store.dispatch(new GetObtenerProductos());
+        this.store.dispatch(new GetObtenerDestino());
+        this.store.dispatch(new GetObtenerExportador());
+        this.store.dispatch(new GetObtenerCoordinadorPuerto());
+        this.store.dispatch(new GetObtenerVapor());
+        this.store.dispatch(new GetObtenerATAPuerto());
+        this.store.dispatch(new GetObtenerAgenciaMaritimaPuerto());
+    }
+    public async obtenerMaterialPuerto1() {
+        this.productos$.subscribe(materialPuerto => {
+          console.log('materialPuerto-->', materialPuerto);
+        });
+    }
+    public obtenerMaterialPuerto(listaMaterialPuerto) {
+        this.productos$.subscribe(data => {
+            console.log('materialPuerto-->', data);
+            listaMaterialPuerto = data;
+        });        
+    }
     public cargarMaterialPuerto() {
         this.store.dispatch(new GetObtenerProductos());
     }

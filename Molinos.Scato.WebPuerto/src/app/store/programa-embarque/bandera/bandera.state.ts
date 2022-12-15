@@ -23,12 +23,12 @@ export class BanderaState{
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetObtenerBandera(state: BanderaStateModel) {
+    static getListaBandera(state: BanderaStateModel) {
         return state.banderas;
     }
 
     @Action(GetObtenerBandera)
-    GetObtenerBandera({getState, setState}: StateContext<BanderaStateModel>) {
+    getObtenerBandera({getState, setState}: StateContext<BanderaStateModel>) {
         return this.embarqueService.obtenerBanderas().pipe(tap((result) => {
             const state = getState();
             setState({

@@ -7,7 +7,7 @@
                     <label for="materialPuerto" class="font-weight-bold">Producto</label>
                     <select formControlName="materialPuerto" class="custom-select" required>
                         <option value="">Seleccione</option>
-                        <option *ngFor="let material of obtenerMaterialPuerto()" [value]="material.codigo">{{material.descripcionCorta}}</option>
+                        <option *ngFor="let material of listaMaterialPuerto" [value]="material.codigo">{{material.descripcionCorta}}</option>
                     </select>
                 </div>
                 <div class="form-group col-md-3">
@@ -138,18 +138,23 @@
         <div class="row">
             <div class="form-group col-md-6">
                 <label class="font-weight-bold">Nombre buque</label>
-                <input type="text" 
+                <input *ngIf="listaVapor" 
+                       type="text" 
                        class="form-control" 
                        formControlName="vapor" 
-                       maxlength="250"
+                       maxlength="50"
                        placeholder="Ingrese nombre del buque" 
-                       
+                       [ngbTypeahead]="buscarVapor"
+                       (selectItem)="seleccionVapor($event)"
+                       [inputFormatter]="formatoVapor"
+                       [resultFormatter]="formatoVapor"
                        required />
             </div>
             <div class="form-group col-md-4">
                 <label for="bandera" class="font-weight-bold">Bandera</label>
                 <select class="custom-select" formControlName="bandera" required>
                     <option value=""></option>
+                    <option *ngFor="let bandera of listaBanderas" [value]="bandera.id">{{bandera.nombre}}</option>
                 </select>
             </div>
             <div class="form-group col-md-3">
@@ -206,7 +211,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label class="font-weight-bold">Tipo contrato</label>
-                    <select class="custom-select" formControlName="bandera" required>
+                    <select class="custom-select" formControlName="tipoDeContrato" required>
                         <option value=""></option>
                     </select>
                 </div>
@@ -218,8 +223,33 @@
                 <div class="form-group columa-ancho-total">
                     <label class="font-weight-bold">ATA</label>
                     <div class="alinear-controles">
-                        <tag-input formControlName="aTAPuerto" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1">
-                            <tag-input-dropdown [showDropdownIfEmpty]="true" [identifyBy]="'id'" [displayBy]="'name'">
+                        <!--
+                        <tag-input formControlName="ataList"
+                                [placeholder]="'Ingrese el A.T.A'"
+                                [secondaryPlaceholder]="'Ingrese el A.T.A'"
+                                [identifyBy]="'id'"
+                                [displayBy]="'name'"
+                                [maxItems]="1"
+                                (onSelect)="ABM('Ata', 'Modificar-Eliminar')">
+                            <tag-input-dropdown [showDropdownIfEmpty]="true"
+                                                [autocompleteItems]="ataList"
+                                                [identifyBy]="'id'"
+                                                [displayBy]="'name'">
+                            </tag-input-dropdown>
+                        </tag-input>
+                        -->
+                        <tag-input *ngIf="listaATAPuerto"
+                                   formControlName="ataPuerto" 
+                                   [placeholder]="'Ingrese el A.T.A'"
+                                   [secondaryPlaceholder]="'Ingrese el A.T.A'"
+                                   [identifyBy]="'id'" 
+                                   [displayBy]="'nombre'" 
+                                   [maxItems]="1">
+                            <tag-input-dropdown 
+                                    [showDropdownIfEmpty]="true" 
+                                    [autocompleteItems]="listaATAPuerto"
+                                    [identifyBy]="'id'" 
+                                    [displayBy]="'nombre'">
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
@@ -230,9 +260,18 @@
                 <div class="form-group columa-ancho-total">
                     <label class="font-weight-bold">Agencia maritima</label>
                     <div class="alinear-controles">
-                        <tag-input formControlName="agenciaMaritimaPuerto" [identifyBy]="'id'" [displayBy]="'name'"
-                            [maxItems]="1">
-                            <tag-input-dropdown [showDropdownIfEmpty]="true" [identifyBy]="'id'" [displayBy]="'name'">
+                        <tag-input *ngIf="listaAgenciaMaritimaPuerto"
+                                   formControlName="ataPuerto" 
+                                   [placeholder]="'Ingrese la Agencia'"
+                                   [secondaryPlaceholder]="'Ingrese la Agencia'"
+                                   [identifyBy]="'id'" 
+                                   [displayBy]="'nombre'" 
+                                   [maxItems]="1">
+                            <tag-input-dropdown 
+                                    [showDropdownIfEmpty]="true" 
+                                    [autocompleteItems]="listaAgenciaMaritimaPuerto"
+                                    [identifyBy]="'id'" 
+                                    [displayBy]="'nombre'">
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">

@@ -23,12 +23,12 @@ export class ATAPuertoState{
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetObtenerATAPuerto(state: ATAPuertoStateModel) {
+    static GetListaATAPuerto(state: ATAPuertoStateModel) {
         return state.ataPuerto;
     }
 
     @Action(GetObtenerATAPuerto)
-    GetObtenerATAPuerto({ getState, setState }: StateContext<ATAPuertoStateModel>) {
+    getObtenerATAPuerto({ getState, setState }: StateContext<ATAPuertoStateModel>) {
         return this.embarqueService.obtenerListadoATAPuerto().pipe(tap((result) => {
             const state = getState();
             setState({

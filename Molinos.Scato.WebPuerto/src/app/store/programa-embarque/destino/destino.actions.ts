@@ -1,3 +1,3 @@
 export class GetObtenerDestino {
-    static readonly type = '[Todo] Get';
+    static readonly type = '[Todo] Get Destino Todo';
 }

@@ -22,12 +22,12 @@ export class CoordinadorPuertoState {
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetObtenerCoordinadorPuerto(state: CoordinadorPuertoStateModel) {
+    static GetListaCoordinadorPuerto(state: CoordinadorPuertoStateModel) {
         return state.coordinadoresPuerto;
     }
 
     @Action(GetObtenerCoordinadorPuerto)
-    GetObtenerCoordinadorPuerto({ getState, setState }: StateContext<CoordinadorPuertoStateModel>) {
+    getObtenerCoordinadorPuerto({ getState, setState }: StateContext<CoordinadorPuertoStateModel>) {
         return this.embarqueService.obtenerListadoCoordinadores().pipe(tap((result) => {
             const state = getState();
             setState({

@@ -23,12 +23,12 @@ export class ExportadorState {
     constructor(private planoDeCargaService: PlanoDeCargaService) {
     }
     @Selector()
-    static GetObtenerExportador(state: ExportadorStateModel) {
+    static GetListaExportadores(state: ExportadorStateModel) {
         return state.exportadores;
     }
 
     @Action(GetObtenerExportador)
-    GetObtenerExportador({ getState, setState }: StateContext<ExportadorStateModel>) {
+    getObtenerExportador({ getState, setState }: StateContext<ExportadorStateModel>) {
         return this.planoDeCargaService.obtenerExportadores().pipe(tap((result) => {
             const state = getState();
             setState({

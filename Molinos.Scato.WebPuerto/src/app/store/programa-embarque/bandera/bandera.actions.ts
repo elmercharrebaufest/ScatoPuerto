@@ -1,3 +1,3 @@
 export class GetObtenerBandera {
-    static readonly type = '[Todo] Get';
+    static readonly type = '[Todo] Get Bandera Todo';
 }

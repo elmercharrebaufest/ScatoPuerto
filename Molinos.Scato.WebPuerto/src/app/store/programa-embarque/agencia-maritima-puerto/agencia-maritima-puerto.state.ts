@@ -23,12 +23,12 @@ export class AgenciaMaritimaPuertoState{
     constructor(private embarqueService: EmbarqueService) {
     }
     @Selector()
-    static GetObtenerAgenciaMaritimaPuerto(state: AgenciaMaritimaPuertoStateModel) {
+    static GetListaAgenciaMaritimaPuerto(state: AgenciaMaritimaPuertoStateModel) {
         return state.agenciaMaritimaPuerto;
     }
 
     @Action(GetObtenerAgenciaMaritimaPuerto)
-    GetObtenerAgenciaMaritimaPuerto({ getState, setState }: StateContext<AgenciaMaritimaPuertoStateModel>) {
+    getObtenerAgenciaMaritimaPuerto({ getState, setState }: StateContext<AgenciaMaritimaPuertoStateModel>) {
         return this.embarqueService.obtenerListadoAgenciasMaritimas().pipe(tap((result) => {
             const state = getState();
             setState({
