@@ -9,7 +9,6 @@ using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -25,8 +24,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             IServicioProgramaEmbarque programaEmbarque,
             IServicioComandos servicioComandos) : base(servicio)
         {
-            this.servicioProgramaEmbarque = programaEmbarque;
-            this.servicioComandos = servicioComandos;
+
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarMuelleDeCarga")]
+        public HttpResponseMessage ListarMuelleDeCarga()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarMuelleDeCarga());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         [HttpGet]

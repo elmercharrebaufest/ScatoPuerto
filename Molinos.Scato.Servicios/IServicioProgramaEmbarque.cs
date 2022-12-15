@@ -16,6 +16,17 @@ namespace Molinos.Scato.Servicios
     public interface IServicioProgramaEmbarque
     {
         [OperationContract]
+        IList<TipoDeContratoDto> listarTipoDeContrato();
+
+        [OperationContract]
+        IList<SurveyorDto> listarSurveyor();
+
+        [OperationContract]
+        IList<TasaDeCargaDto> listarTasaDeCarga();
+
+        [OperationContract]
+        IList<MuelleDeCargaDto> listarMuelleDeCarga();
+
         ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null);
         [OperationContract]
         ProgramaEmbarqueDto ListarDatosCombo();

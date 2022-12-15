@@ -64,6 +64,48 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.ObtenerConsultaEscalar(new ListarProgramaEmbarqueCombos());
         }
 
+		public IList<MuelleDeCargaDto> listarMuelleDeCarga()
+        {
+            IList<MuelleDeCargaDto> muelleDeCarga = Listar<MuelleDeCarga, MuelleDeCargaDto>();
+            return muelleDeCarga;
+        }
+
+        public IList<SurveyorDto> listarSurveyor()
+        {
+            IList<SurveyorDto> surveyor = Listar<Surveyor, SurveyorDto>();
+            return surveyor;
+        }
+
+        public IList<TasaDeCargaDto> listarTasaDeCarga()
+        {
+            IList<TasaDeCargaDto> tasaDeCarga = Listar<TasaDeCarga, TasaDeCargaDto>();
+            return tasaDeCarga;
+        }
+
+        public IList<TipoDeContratoDto> listarTipoDeContrato()
+        {
+            IList<TipoDeContratoDto> tipoDeContrato = Listar<TipoDeContrato, TipoDeContratoDto>();
+            return tipoDeContrato;
+        }
+
+
+        private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
+        }
+
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro)
+            where TEntidad : class
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
+        }
+
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro, int maxResultados)
+            where TEntidad : class
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro, maxResultados));
+        }
+        
         public NominacionDto ObtenerNominacion(int id)
         {
             try
@@ -78,9 +120,6 @@ namespace Molinos.Scato.Servicios.Impl
                 throw;
             }
         }
-        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
-        {
-            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
-        }
+        
     }
 }
