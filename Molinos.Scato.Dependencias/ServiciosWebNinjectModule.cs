@@ -40,6 +40,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IServicioCircular, ServicioCircular>().To<ServicioCircular>().InScope(ctx => OperationContext.Current);
             Bind<HttpClient>().ToSelf().InSingletonScope();
             Bind<IAdministradorDeCalles, AdministradorDeCalles>().To<AdministradorDeCalles>().InScope(ctx => OperationContext.Current);
+            Bind<IServicioProgramaEmbarque, ServicioProgramaEmbarque>().To<ServicioProgramaEmbarque>().InScope(ctx => OperationContext.Current);
             
             this.BindChannelFactory<IServicioNotificarUsuario>("ServicioNotificarUsuario");
             Bind<IServicioEstadoPuesto, ServicioEstadoPuesto>().To<ServicioEstadoPuesto>().InSingletonScope();
