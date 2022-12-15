@@ -274,6 +274,12 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.store.dispatch(new GetObtenerVapor());
     this.store.dispatch(new GetObtenerATAPuerto());
     this.store.dispatch(new GetObtenerAgenciaMaritimaPuerto());
+    this.store.dispatch(new GetObtenerMuelleDeCarga());
+    this.store.dispatch(new GetObtenerTipoDeContrato());
+    this.store.dispatch(new GetObtenerSurveyor());
+    this.store.dispatch(new GetObtenerTasaDeCarga());
+
+
   }
   public obtenerListasDeNominacion(){
     this.productos$.subscribe(data => {this.listaMaterialPuerto = data;});
@@ -284,6 +290,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.vapores$.subscribe(vapor => {this.listaVapor = vapor});
     this.ataPuerto$.subscribe(ataPuerto => { this.listaATAPuerto = ataPuerto; });
     this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto => { this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto; });
+    this.surveyor$.subscribe(data => {this.listaSurveyor = data;});
+    this.tasaDeCarga$.subscribe(data => {this.listaTasaDeCarga = data;});
+    this.muelleDeCarga$.subscribe(data => {this.listaMuelleDeCarga = data;});
+    this.tipoDeContrato$.subscribe(data => {this.listaTipoDeContrato = data;}); 
   }
 
 
