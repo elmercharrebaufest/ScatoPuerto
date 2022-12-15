@@ -228,9 +228,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   zarparEmbarque()
   {
-
     let ubicacionBuque = this.ubicacionDeBuquePuerto.find( e => e.orden=1);
-    let embarqueActualizar = this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['embarque'];
+    let embarqueActualizar = this.listadoEmbarques.find(x=>x.embarque.id == this.embarqueId)['embarque'];
     embarqueActualizar.ubicacionDeBuque =ubicacionBuque;
     this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe( res => console.log(res) );
 
