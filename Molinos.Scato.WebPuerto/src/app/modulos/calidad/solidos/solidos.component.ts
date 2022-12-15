@@ -49,10 +49,10 @@ export class SolidosComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   errorMessage: boolean = false;
-  fechaAmarro: Date;
-  horaAmarro: string;
-  fechaDesamarro: Date;
-  horaDesamarro: string;
+  fechaAmarro: Date=new Date();
+  horaAmarro: string='';
+  fechaDesamarro: Date=new Date();
+  horaDesamarro: string='';
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -67,7 +67,7 @@ export class SolidosComponent implements OnInit {
     private session: SessionService,) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
- 
+
   }
 
   ngOnInit(): void {
@@ -175,8 +175,8 @@ export class SolidosComponent implements OnInit {
     this._CalidadSharedService.ocultarBotonesImprimir();
     let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     this.ocultarCamposEnPDFListas(ocultarBotones, "none");
-    
-  
+
+
 
     this.RecibidoresPdf = true;
 
@@ -188,7 +188,7 @@ export class SolidosComponent implements OnInit {
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 3, letterRendering: true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
-      pagebreak: { after: '.page-break' }  
+      pagebreak: { after: '.page-break' }
     };
 
 
@@ -217,11 +217,11 @@ export class SolidosComponent implements OnInit {
             .toPdf()
         })
       }
-    
+
       html = html.then(() => {
         if (!imprimir) this.RecibidoresPdf = false
         this.ocultarCamposEnPDFListas(ocultarBotones, "block");
-     }).save();    
+     }).save();
     // #endregion
   }
 
@@ -248,16 +248,16 @@ export class SolidosComponent implements OnInit {
   guardarAmarre() {
 
     if(
-      (this.amarreForm.value.fechaAmarro == '' || 
-       this.amarreForm.value.fechaAmarro == null || 
-       this.amarreForm.value.fechaAmarro == undefined) || 
-      (this.amarreForm.value.fechaDesamarro == '' || 
-       this.amarreForm.value.fechaDesamarro == null || 
-       this.amarreForm.value.fechaDesamarro == undefined) 
+      (this.amarreForm.value.fechaAmarro == '' ||
+       this.amarreForm.value.fechaAmarro == null ||
+       this.amarreForm.value.fechaAmarro == undefined) ||
+      (this.amarreForm.value.fechaDesamarro == '' ||
+       this.amarreForm.value.fechaDesamarro == null ||
+       this.amarreForm.value.fechaDesamarro == undefined)
     ){
     this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
     return false;
-    } 
+    }
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
