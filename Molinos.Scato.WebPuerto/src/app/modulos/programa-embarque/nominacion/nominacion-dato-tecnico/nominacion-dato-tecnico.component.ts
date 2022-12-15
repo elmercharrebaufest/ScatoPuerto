@@ -122,7 +122,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-
     this.inicializarForm();
     this.cargarListasDeNominacion();
     this.obtenerListasDeNominacion();
@@ -148,72 +147,71 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       this.nominacionParametros = nominacionParametos;
     });
   }
-  private inicializarForm(){
+  public obtenerMaterialPuerto() {
+    this.productos$.subscribe(data => {
+      this.listaMaterialPuerto = data;
+    });
+  }
+  private inicializarForm() {
     this.datoTecnicoForm = this.formBuilder.group({
-      id                   : [0, Validators.required],
-      materialPuerto       : ['', Validators.required],
-      cantidadTotal        : ['', Validators.required],
-      tolerancia           : ['', Validators.required],
-      observaciones        : ['', Validators.required],
-      vapor                : ['', Validators.required],
-      bandera              : ['', Validators.required],
-      eTARecalada          : ['', Validators.required],     
-      obligacionDeCarga    : ['', Validators.required],     
-      muelleDeCarga        : ['', Validators.required],
-      tasaDeCarga          : ['', Validators.required],
-      tasaDeCargaValor     : ['', Validators.required],
-      dEM                  : ['', Validators.required],
-      dES                  : ['', Validators.required],
-      tipoContrato         : ['', Validators.required],
-      aTAPuerto            : ['', Validators.required],
-      agenciaMaritimaPuerto: ['', Validators.required],
-      surveyor             : ['', Validators.required],
+      id: [0, Validators.required],
+      materialPuerto: ['', Validators.required],
+      cantidadTotal: ['', Validators.required],
+      tolerancia: ['', Validators.required],
+      observaciones: ['', Validators.required],
+      vapor: ['', Validators.required],
+      bandera: ['', Validators.required],
+      eTARecalada: ['', Validators.required],
+      obligacionDeCarga: ['', Validators.required],
+      muelleDeCarga: ['', Validators.required],
+      tasaDeCarga: ['', Validators.required],
+      tasaDeCargaValor: ['', Validators.required],
+      dEM: ['', Validators.required],
+      dES: ['', Validators.required],
+      tipoContrato: ['', Validators.required],
+      ataPuerto: [],
+      agenciaMaritimaPuerto: [],
+      surveyor: ['', Validators.required],
       observacionesSurveyor: ['', Validators.required],
       datoTecnicoExportador: this.formBuilder.array([]),
       datoTecnicoDestino: this.formBuilder.array([]),
       datoTecnicoCoordinador: this.formBuilder.array([]),
     });
-    this.cargarNominacionListas();
   }
 
-  private cargarNominacionListas(){
-    this.nominacionDatoTecnicoService.cargarMaterialPuerto();
-    this.nominacionDatoTecnicoService.cargarDestinos();
-    this.nominacionDatoTecnicoService.cargarExportador();
-    this.nominacionDatoTecnicoService.cargarCoordinadorPuerto();
-    this.nominacionDatoTecnicoService.cargarVapor();
-    this.nominacionDatoTecnicoService.cargarATAPuerto();
-    this.nominacionDatoTecnicoService.cargarAgenciaMaritima();
-
+  public cargarListasDeNominacion() {
+    this.store.dispatch(new GetObtenerProductos());
+    this.store.dispatch(new GetObtenerDestino());
+    this.store.dispatch(new GetObtenerBandera());
+    this.store.dispatch(new GetObtenerExportador());
+    this.store.dispatch(new GetObtenerCoordinadorPuerto());
+    this.store.dispatch(new GetObtenerVapor());
+    this.store.dispatch(new GetObtenerATAPuerto());
+    this.store.dispatch(new GetObtenerAgenciaMaritimaPuerto());
   }
 
-  public obtenerMaterialPuerto(){
-    this.productos$.subscribe(materialPuerto =>{ this.listaMaterialPuerto = materialPuerto;});
-    return this.listaMaterialPuerto;
+  public obtenerDestinos() {
+    this.destino$.subscribe(destino => { this.listaDestino = destino; });
   }
-  public obtenerDestinos(){
-    this.destino$.subscribe(destino =>{ this.listaDestino = destino;});
-    return this.listaDestino;
+  public obtenerExportador() {
+    this.exportador$.subscribe(exportador => { this.listaExportador = exportador; });
   }
-  public obtenerExportador(){
-    this.exportador$.subscribe(exportador =>{ this.listaExportador = exportador;});
-    return this.listaExportador;
+  public obtenerBanderas() {
+    this.banderas$.subscribe(bandera => {this.listaBanderas = bandera; });
   }
-  public obtenerCoordinadorPuerto(){
-    this.coordinadorPuerto$.subscribe(coordinadorPuerto =>{ this.listaCoordinadorPuerto = coordinadorPuerto;});
-    return this.listaCoordinadorPuerto;
+  public obtenerCoordinadorPuerto() {
+    this.coordinadorPuerto$.subscribe(coordinadorPuerto => { this.listaCoordinadorPuerto = coordinadorPuerto; });
   }
-  public obtenerVapor(){
-    this.vapor$.subscribe(vapor =>{ this.listaVapor = vapor;});
-    return this.listaVapor;
+  public obtenerVapor() {
+    this.vapores$.subscribe(vapor => {
+      this.listaVapor = vapor;
+    });
   }
-  public obtenerATAPuerto(){
-    this.ataPuerto$.subscribe(ataPuerto =>{ this.listaATAPuerto = ataPuerto;});
-    return this.listaATAPuerto;
+  public obtenerATAPuerto() {
+    this.ataPuerto$.subscribe(ataPuerto => { this.listaATAPuerto = ataPuerto; });
   }
-  public obtenerAgenciaMaritima(){
-    this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto =>{ this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto;});
-    return this.listaAgenciaMaritimaPuerto;
+  public obtenerAgenciaMaritima() {
+    this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto => { this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto; });
   }
 
 
