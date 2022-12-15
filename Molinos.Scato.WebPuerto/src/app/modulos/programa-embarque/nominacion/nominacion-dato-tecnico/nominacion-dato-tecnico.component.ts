@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
 import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
 import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-coordinador';
@@ -24,7 +24,7 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { Vapor } from '@ScatoModels/embarque';
 import { CoordinadorPuerto } from '@ScatoModels/coordinador-puerto';
 import { Exportador } from '@ScatoModels/exportador';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { GetObtenerProductos } from 'app/store/productos/material.actions';
 import { GetObtenerExportador } from 'app/store/programa-embarque/exportador/exportador.actions';
 import { GetObtenerDestino } from 'app/store/programa-embarque/destino/destino.actions';
@@ -43,12 +43,21 @@ import { Bandera } from '@ScatoModels/bandera';
 })
 export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
 
+  private _nominacionParametros: NominacionParametros = null;
   public datoTecnicoForm: FormGroup;
   public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
   public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
   public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
-  private _nominacionParametros: NominacionParametros = null;
 
+  public formatoDestino;
+  public formatoVapor; 
+  public formatoCoordinadorPuerto; 
+  public formatoExportador;
+  public buscarDestino; 
+  public buscarVapor; 
+  public buscarCoordinadorPuerto; 
+  public buscarExportador;
+  
   public listaMaterialPuerto: MaterialPuerto[];
   public listaDestino: Destino[];
   public listaExportador: Exportador[];
@@ -82,11 +91,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.inicializarForm();
     this.cargarListasDeNominacion();
-    this.obtenerMaterialPuerto();
-    this.obtenerVapor();
-    this.obtenerBanderas();
-    this.obtenerATAPuerto();
-    this.obtenerAgenciaMaritima();
+    this.obtenerListasDeNominacion();
+    this.configurarListasDeNominacion();
   }
 
   private get nominacionParametros(): NominacionParametros {
@@ -107,11 +113,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       this.nominacionParametros = nominacionParametos;
     });
   }
-  public obtenerMaterialPuerto() {
-    this.productos$.subscribe(data => {
-      this.listaMaterialPuerto = data;
-    });
-  }
+
   private inicializarForm() {
     this.datoTecnicoForm = this.formBuilder.group({
       id: [0, Validators.required],
@@ -126,17 +128,106 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       muelleDeCarga: ['', Validators.required],
       tasaDeCarga: ['', Validators.required],
       tasaDeCargaValor: ['', Validators.required],
-      dEM: ['', Validators.required],
-      dES: ['', Validators.required],
-      tipoContrato: ['', Validators.required],
+      dem: ['', Validators.required],
+      des: ['', Validators.required],
+      tipoDeContrato: ['', Validators.required],
       ataPuerto: [],
       agenciaMaritimaPuerto: [],
-      surveyor: ['', Validators.required],
+      surveyor: [],
       observacionesSurveyor: ['', Validators.required],
       datoTecnicoExportador: this.formBuilder.array([]),
       datoTecnicoDestino: this.formBuilder.array([]),
       datoTecnicoCoordinador: this.formBuilder.array([]),
     });
+  }
+
+  public trackByFn(index: any, item: any) {
+    return index;
+  }
+  public numberOnly(event): boolean {
+    var charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+      return false;
+    return true;
+  }
+  public decimalOnly(event): boolean {
+    var charCode = (event.which) ? event.which : event.keyCode;
+    if ((charCode > 47 && charCode < 58) || charCode == 46)
+      return true;
+    return false;
+  }
+
+  get datoTecnicoExportadorFormArray(): FormArray {
+    return this.datoTecnicoForm.get("datoTecnicoExportador") as FormArray
+  }
+  get datoTecnicoDestinoFormArray(): FormArray {
+    return this.datoTecnicoForm.get("datoTecnicoDestino") as FormArray
+  }
+  get datoTecnicoCoordinadorFormArray(): FormArray {
+    return this.datoTecnicoForm.get("datoTecnicoCoordinador") as FormArray
+  }
+
+  onAgregarDatoTecnicoExportador(){
+    this.datoTecnicoExportadorFormArray.push(this.initCargaExportador());
+  }
+  onAgregarDatoTecnicoDestino(){
+    this.datoTecnicoDestinoFormArray.push(this.initCargaDestino());
+  }
+  onAgregarDatoTecnicoCoordinador(){
+    this.datoTecnicoCoordinadorFormArray.push(this.initCargaCoordinadorPuerto());
+  }
+
+  initCargaExportador(exportador: NominacionDatoTecnicoExportador = null){
+    if(exportador != null){
+      return this.formBuilder.group({
+        nominacionDatoTecnicoExportador_Id: exportador.nominacionDatoTecnicoExportador_Id,
+        exportador: exportador.exportador,
+        cantidad: exportador.cantidad,
+        tolerancia: exportador.tolerancia,
+        nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico_Id
+      })    
+    }else{
+      return this.formBuilder.group({
+        nominacionDatoTecnicoExportador_Id: '',
+        exportador: [],
+        cantidad: 0,
+        nominacionDatoTecnico_Id: 0
+      })
+    }    
+  }
+  initCargaDestino(destino: NominacionDatoTecnicoDestino = null){
+    if(destino != null){
+      return this.formBuilder.group({
+        nominacionDatoTecnicoDestino_Id: destino.nominacionDatoTecnicoDestino_Id,
+        exportador: destino.destino,
+        cantidad: destino.cantidad,
+        nominacionDatoTecnico_Id: destino.nominacionDatoTecnico_Id
+      })    
+    }else{
+      return this.formBuilder.group({
+        nominacionDatoTecnicoDestino_Id: 0,
+        destino: [],
+        cantidad: 0,
+        nominacionDatoTecnico_Id: 0
+      })
+    }
+  }
+  initCargaCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null){
+    if(coordinadorPuerto != null){
+      return this.formBuilder.group({
+        nominacionDatoTecnicoCoordinador_Id: coordinadorPuerto.nominacionDatoTecnicoCoordinador_Id,
+        coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
+        cantidad: coordinadorPuerto.cantidad,
+        nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico_Id
+      })    
+    }else{
+      return this.formBuilder.group({
+        nominacionDatoTecnicoCoordinador_Id: 0,
+        coordinadorPuerto: [],
+        cantidad: 0,
+        nominacionDatoTecnico_Id: 0
+      })
+    }
   }
 
   public cargarListasDeNominacion() {
@@ -149,65 +240,61 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.store.dispatch(new GetObtenerATAPuerto());
     this.store.dispatch(new GetObtenerAgenciaMaritimaPuerto());
   }
-
-  public obtenerDestinos() {
+  public obtenerListasDeNominacion(){
+    this.productos$.subscribe(data => {this.listaMaterialPuerto = data;});
     this.destino$.subscribe(destino => { this.listaDestino = destino; });
-  }
-  public obtenerExportador() {
     this.exportador$.subscribe(exportador => { this.listaExportador = exportador; });
-  }
-  public obtenerBanderas() {
     this.banderas$.subscribe(bandera => {this.listaBanderas = bandera; });
-  }
-  public obtenerCoordinadorPuerto() {
     this.coordinadorPuerto$.subscribe(coordinadorPuerto => { this.listaCoordinadorPuerto = coordinadorPuerto; });
-  }
-  public obtenerVapor() {
-    this.vapores$.subscribe(vapor => {
-      this.listaVapor = vapor;
-    });
-  }
-  public obtenerATAPuerto() {
+    this.vapores$.subscribe(vapor => {this.listaVapor = vapor});
     this.ataPuerto$.subscribe(ataPuerto => { this.listaATAPuerto = ataPuerto; });
-  }
-  public obtenerAgenciaMaritima() {
     this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto => { this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto; });
   }
-
-
-  public formatoExportador = (exp: Exportador) => exp.nombre;
-  public buscarExportador = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => this.listaExportador.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-  )
-
-  public formatoDestino = (exp: Destino) => exp.nombre;
-  public buscarDestino = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => this.listaDestino.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-  )
-
-  public formatoCoordinadorPuerto = (exp: CoordinadorPuerto) => exp.nombre;
-  public buscarCoordinadorPuerto = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => this.listaCoordinadorPuerto.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-  )
-
+  public configurarListasDeNominacion(){
+    this.formatoExportador = (exp: Exportador) => exp.nombre;
+    this.buscarExportador  = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaExportador.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+    this.formatoDestino = (exp: Destino) => exp.nombre;
+    this.buscarDestino = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaDestino.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+  
+    this.formatoCoordinadorPuerto = (exp: CoordinadorPuerto) => exp.nombre;
+    this.buscarCoordinadorPuerto = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaCoordinadorPuerto.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+  
+    this.formatoVapor = (exp: Vapor) => exp.nombre;
+    this.buscarVapor = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaVapor.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+  }
+  public seleccionExportador($event) {
+    console.log('$event--->>', $event);
+    let { id, nombre } = $event.item
+  }
   public seleccionVapor($event) {
     console.log('$event--->>', $event);
     let { id, nombre } = $event.item
   }
+  public seleccionDestino($event) {
+    console.log('$event--->>', $event);
+    let { id, nombre } = $event.item
+  }
+  public seleccionCoordinadorPuerto($event) {
+    console.log('$event--->>', $event);
+    let { id, nombre } = $event.item
+  }
 
-  public buscarVapor = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => this.listaVapor.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-  )
-
-  public formatoVapor = (exp: Vapor) => exp.nombre;
 
 
 }

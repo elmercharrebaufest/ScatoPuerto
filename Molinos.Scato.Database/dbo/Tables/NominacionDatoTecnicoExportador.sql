@@ -2,6 +2,7 @@ create table NominacionDatoTecnicoExportador(
 Id int IDENTITY (1, 1) NOT NULL,
 Exportador_Id int not null,
 Cantidad int,
+Tolerancia int,
 NominacionDatoTecnico_Id  int not null,
 [Tolerancia] INT NULL, 
     CONSTRAINT [PK_dbo.NominacionDatoTecnicoExportador] PRIMARY KEY CLUSTERED ([Id] ASC),
