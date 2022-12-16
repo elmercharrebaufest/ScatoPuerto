@@ -40,5 +40,29 @@ namespace Molinos.Scato.Servicios.Impl
 {
     public class ServicioProgramaEmbarque : IServicioProgramaEmbarque
     {
+        private readonly IRepositorio repositorio;
+        private readonly IConversor conversor;
+        private readonly ILogger log;
+
+        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log)
+        {
+            this.repositorio = repositorio;
+            this.conversor = conversor;
+            this.log = log;
+
+        }
+
+        public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null)
+        {
+            var fechaHasta = fecha.HasValue ? new DateTime(fecha.Value.Year, fecha.Value.Month, DateTime.DaysInMonth(fecha.Value.Year, fecha.Value.Month)) : (DateTime?)null;
+            return repositorio.ListarConsultaPaginada(new ListarProgramaEmbarqueConsulta(paginacion, fecha, buque, muelle, producto));
+
+        }
+
+        public ProgramaEmbarqueDto ListarDatosCombo()
+        {
+            return repositorio.ObtenerConsultaEscalar(new ListarProgramaEmbarqueCombos());
+        }
+
     }
 }
