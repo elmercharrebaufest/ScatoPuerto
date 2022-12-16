@@ -1,14 +1,117 @@
-
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-pe-table'>
-        <thead class="lista-pe-header">
-            <th>Producto</th>          
-            <th>Estado</th>
-            <th>Buque</th>
-            <th>Muelle de carga</th>
-            <th>Cargador</th>
-            <th>Cantidad (Tn)</th>
-            <th>Contrato</th>
-            <th>ETA Recalada</th>         
-        </thead>        
+        <thead class="lista-pe-header tamanioHeader">
+            <th class="noBorder"></th>
+            <th tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('producto')">
+                <div class="head noBorder">
+                    Producto
+                    <span><i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'producto' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'producto' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('estado')">
+                <div class="head">
+                    Estado
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'estado' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'estado' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('nombreBuque')">
+                <div class="head">
+                    Buque
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('muelleDeCarga')">
+                <div class="head">
+                    Muelle de carga
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'muelleDeCarga' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'muelleDeCarga' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cargadores.nombreExportador')">
+                <div class="head">
+                    Cargador
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.nombreExportador' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.nombreExportador' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cargadores.toneladas')">
+                <div class="head">
+                    Cantidad (Tn)
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.toneladas' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.toneladas' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('contrato')">
+                <div class="head">
+                    Contrato
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'contrato' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'contrato' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('etaRecalada')">
+                <div class="head">
+                    ETA Recalada
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'etaRecalada' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'etaRecalada' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+        </thead>
+        <tbody *ngFor="let historial of getListaProgramaEmbarque()" style="text-align: center;">
+            <tr class="lista-buque-row">
+                <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }" class="anchoDeFila"></td>
+                <td class="lista-buque-row-item" style="font-size: 20px;"><strong>{{historial.producto}}</strong></td>
+                <td>Sin estado</td>
+                <td>{{historial.nombreBuque}}</td>
+                <td>{{historial.muelleDeCarga}}</td>
+                <td class="lista-buque-row-item">
+                    <div *ngFor="let exportador of historial.cargadores">{{ exportador.nombreExportador }}</div>
+                </td>
+                <td class="lista-buque-row-item">
+                    <div *ngFor="let exportador of historial.cargadores">{{ exportador.toneladas |
+                        number:'0.0-0' }} tn</div>
+                </td>
+                <td class="lista-buque-row-item celda-nombre-buque">{{historial.contrato}}</td>
+                <td class="lista-buque-row-item">{{historial.etaRecalada | date:'dd/MM/yyyy HH:mm'}}</td>
+            </tr>
+        </tbody>
+
     </table>
+    <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
+        [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+        [pageIndex]="pageIndex" aria-label="Select page">
+    </mat-paginator>

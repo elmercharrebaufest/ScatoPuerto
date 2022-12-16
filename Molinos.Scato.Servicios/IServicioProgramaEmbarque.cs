@@ -12,8 +12,12 @@ using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
 {
-    [ServiceContract(Namespace = "http://scato.molinos.com.ar")]
+    [ServiceContract]
     public interface IServicioProgramaEmbarque
     {
+        [OperationContract]
+        ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null);
+        [OperationContract]
+        ProgramaEmbarqueDto ListarDatosCombo();
     }
 }
