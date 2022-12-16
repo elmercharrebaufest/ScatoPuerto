@@ -48,6 +48,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             (moduloPeriodoCarga != null && moduloPeriodoCarga.FechaDesamarro.HasValue &&
                             (fechaInicio == null || moduloPeriodoCarga.FechaDesamarro.Value >= fechaInicio.Value) &&
                             (fechaFin == null || moduloPeriodoCarga.FechaDesamarro.Value <= fechaFin.Value) &&
+                            (item.Embarque.Ubicacion == 1) && // Solo debe mostrarse los embarque que han zarpado
                             (String.IsNullOrEmpty(nombreBuque) || item.Embarque.Vapor.Nombre.ToUpper().Contains(nombreBuque.ToUpper()))))
 
                             orderby moduloPeriodoCarga.FechaDesamarro descending

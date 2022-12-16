@@ -54,6 +54,15 @@
           <span *ngIf='opened'>Embarques</span>
         </div>
       </a>
+    <!--
+      <hr *ngIf='tienePermiso("Buque_Ver")'>
+      <a routerLink='/programa' *ngIf='tienePermiso("Buque_Ver")'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "programa"'>
+          <div class='icon-pe'></div>
+          <span *ngIf='opened'>Programa de Embarque</span>
+        </div>
+      </a>
+    -->
 
       <!-- <hr *ngIf='tienePermiso(650)'>
       <a routerLink='/administracion' *ngIf='tienePermiso(650)'>

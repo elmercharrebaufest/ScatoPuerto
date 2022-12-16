@@ -107,6 +107,7 @@ export class LineupComponent implements OnInit, Observador {
 
 
   ngOnInit(): void {
+    let actualDate = new Date();
     this.cargarWorkflows();
   }
 
