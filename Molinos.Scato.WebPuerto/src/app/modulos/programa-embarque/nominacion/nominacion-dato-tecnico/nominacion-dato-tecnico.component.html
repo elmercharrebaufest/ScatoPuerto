@@ -5,9 +5,9 @@
             <div class="row form-row">
                 <div class="form-group col-md-6">
                     <label for="materialPuerto" class="font-weight-bold">Producto</label>
-                    <select formControlName="materialPuerto" class="custom-select" required>
+                    <select formControlName="materialPuerto" class="custom-select" required (change)="onCargarTipoCalidad()">
                         <option value="">Seleccione</option>
-                        <option *ngFor="let material of listaMaterialPuerto" [value]="material.codigo">{{material.descripcionCorta}}</option>
+                        <option *ngFor="let material of listaMaterialPuerto" [value]="material.codigo" >{{material.descripcionCorta}}</option>
                     </select>
                 </div>
                 <div class="form-group col-md-3">
@@ -32,6 +32,47 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !=''">
+            <div class="form-group col-md-6">
+                <label for="tipoDeCalidad" class="font-weight-bold">Calidad</label>
+                <select formControlName="tipoDeCalidad" class="custom-select" required>
+                    <option value="">Seleccione</option>
+                    <option *ngFor="let calidad of listaTipoDeCalidad" [value]="calidad.id">{{calidad.descripcion}}</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <div class="input-group" >
+                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="onMostrarParametroCalidad()">{{mostrarParametroCalidad? 'Ocultar' : 'Mostrar'}} Parametros</button>
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="mostrarParametroCalidad">
+            <div class="form-group col-md-6">
+                <table class='table table-bordered'>
+                    <thead class="header-calida-valor" >
+                        <tr>
+                            <th width="30%">
+                                <input type="checkbox" class="largerCheckbox"/>
+                                Párametros
+                            </th>
+                            <th width="70%">Valores</th>
+                        </tr> 
+                    </thead>
+                    <tbody *ngFor="let calidadValor of listaCalidadValor">
+                        <tr>
+                            <td>
+                                <input class="largerCheckbox" 
+                                id={{calidadValor.id}} 
+                                type="checkbox" 
+                                [value]="calidadValor.id"/>
+                                {{calidadValor.parametro}}
+                            </td>
+                            <td>{{calidadValor.valor}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="row">

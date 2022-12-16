@@ -47,6 +47,12 @@ import { GetObtenerTipoDeContrato } from 'app/store/programa-embarque/tipo-de-co
 import { GetObtenerSurveyor } from 'app/store/programa-embarque/surveyor/surveyor.actions';
 import { GetObtenerTasaDeCarga } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.actions';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
+import { TipoDeCalidadState } from 'app/store/programa-embarque/tipo-de-calidad/tipo-de-calidad.state';
+import { TipoDeCalidad } from '@ScatoModels/programa-embarque/tipo-de-calidad';
+import { GetObtenerTipoDeCalidad } from 'app/store/programa-embarque/tipo-de-calidad/tipo-de-calidad.actions';
+import { CalidadValorState } from 'app/store/programa-embarque/calidad-valor/calidad-valor.state';
+import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
+import { GetObtenerCalidadValor } from 'app/store/programa-embarque/calidad-valor/calidad-valor.actions';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -82,7 +88,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   public listaTasaDeCarga: TasaDeCarga[];
   public listaMuelleDeCarga: MuelleDeCarga[];
   public listaTipoDeContrato: TipoDeContrato[];
-
+  public listaTipoDeCalidad: TipoDeCalidad[];
+  public listaCalidadValor: CalidadValor[];
+  public mostrarParametroCalidad: boolean = false;
 
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
 
@@ -99,10 +107,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   @Select(SurveyorState.getListaSurveyor) surveyor$: Observable<Surveyor[]>;
   @Select(MuelleDeCargaState.getListaMuelleDeCarga) muelleDeCarga$: Observable<MuelleDeCarga[]>;
   @Select(TasaDeCargaState.getListaTasaDeCarga) tasaDeCarga$: Observable<TasaDeCarga[]>;
-
+  @Select(TipoDeCalidadState.getListaTipoDeCalidad) tipoDeCalidad$: Observable<TipoDeCalidad[]>;
+  @Select(CalidadValorState.getListaCalidadValor) calidadValor$: Observable<CalidadValor[]>;
   constructor(private nominacionService: NominacionService,
     private store: Store,
-    private modalService: NgbModal,
     private formBuilder: FormBuilder) {
     this.asignarNominacionParametros();
 
@@ -119,10 +127,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
 
   private get nominacionParametros(): NominacionParametros {
     return this._nominacionParametros;
-  }
+  }  
   private set nominacionParametros(value: NominacionParametros) {
     this._nominacionParametros = value;
   }
+
   private asignarNominacionParametros() {
     this.nominacionService.NominacionParametros.subscribe(parametro => {
 
@@ -140,6 +149,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.datoTecnicoForm = this.formBuilder.group({
       id: [0, Validators.required],
       materialPuerto: ['', Validators.required],
+      tipoDeCalidad: [],
       cantidadTotal: ['', Validators.required],
       tolerancia: ['', Validators.required],
       observaciones: ['', Validators.required],
@@ -198,6 +208,14 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   onAgregarDatoTecnicoCoordinador(){
     this.datoTecnicoCoordinadorFormArray.push(this.initCargaCoordinadorPuerto());
   }
+  onCargarTipoCalidad(){
+    console.log('onCargarTipoCalidad--->')
+      this.tipoDeCalidad$.subscribe(data => {console.log('data--->',data); this.listaTipoDeCalidad = data;});
+  }
+  onMostrarParametroCalidad(){
+    this.mostrarParametroCalidad = !this.mostrarParametroCalidad;
+  }
+  
 
   initCargaExportador(exportador: NominacionDatoTecnicoExportador = null){
     if(exportador != null){
@@ -206,7 +224,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
         exportador: exportador.exportador,
         cantidad: exportador.cantidad,
         tolerancia: exportador.tolerancia,
-        nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico_Id
+        nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico.id
       })    
     }else{
       return this.formBuilder.group({
@@ -223,7 +241,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
         nominacionDatoTecnicoDestino_Id: destino.nominacionDatoTecnicoDestino_Id,
         exportador: destino.destino,
         cantidad: destino.cantidad,
-        nominacionDatoTecnico_Id: destino.nominacionDatoTecnico_Id
+        nominacionDatoTecnico_Id: destino.nominacionDatoTecnico.id
       })    
     }else{
       return this.formBuilder.group({
@@ -240,7 +258,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
         nominacionDatoTecnicoCoordinador_Id: coordinadorPuerto.nominacionDatoTecnicoCoordinador_Id,
         coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
         cantidad: coordinadorPuerto.cantidad,
-        nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico_Id
+        nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico.id
       })    
     }else{
       return this.formBuilder.group({
@@ -265,7 +283,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.store.dispatch(new GetObtenerTipoDeContrato());
     this.store.dispatch(new GetObtenerSurveyor());
     this.store.dispatch(new GetObtenerTasaDeCarga());
-
+    this.store.dispatch(new GetObtenerTipoDeCalidad());
+    this.store.dispatch(new GetObtenerCalidadValor());
 
   }
   public obtenerListasDeNominacion(){
@@ -281,6 +300,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.tasaDeCarga$.subscribe(data => {this.listaTasaDeCarga = data;});
     this.muelleDeCarga$.subscribe(data => {this.listaMuelleDeCarga = data;});
     this.tipoDeContrato$.subscribe(data => {this.listaTipoDeContrato = data;}); 
+    this.calidadValor$.subscribe(data => {this.listaCalidadValor = data;}); 
+
   }
   public configurarListasDeNominacion(){
     this.formatoExportador = (exp: Exportador) => exp.nombre;

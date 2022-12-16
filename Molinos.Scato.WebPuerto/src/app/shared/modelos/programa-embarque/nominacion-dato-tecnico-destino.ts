@@ -1,19 +1,20 @@
 import { Destino } from "../destino";
+import { NominacionDatoTecnico } from "./nominacion-dato-tecnico";
 
 export class NominacionDatoTecnicoDestino {
     nominacionDatoTecnicoDestino_Id: number;
     destino: Destino;
     cantidad: number;
-    nominacionDatoTecnico_Id: number;
+    nominacionDatoTecnico: NominacionDatoTecnico;
 
     constructor(nominacionDatoTecnicoDestino_Id: number,
         destino: Destino,
         cantidad: number,
-        nominacionDatoTecnico_Id: number) {
+        nominacionDatoTecnico: NominacionDatoTecnico) {
         this.nominacionDatoTecnicoDestino_Id = nominacionDatoTecnicoDestino_Id;
         this.destino = destino;
         this.cantidad = cantidad;
-        this.nominacionDatoTecnico_Id = nominacionDatoTecnico_Id;
+        this.nominacionDatoTecnico = nominacionDatoTecnico;
 
     }
 }

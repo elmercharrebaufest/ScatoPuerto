@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
+import { TipoDeCalidad } from '@ScatoModels/programa-embarque/tipo-de-calidad';
 import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -41,4 +43,11 @@ export class NominacionService {
     public obtenerTasaDeCarga(): Observable<TasaDeCarga[]> {
         return this.http.get<TasaDeCarga[]>(`${this.url}ProgramaEmbarque/ListarTasaDeCarga`, { 'withCredentials': true });
     }
+    public obtenerTipoDeCalidad(): Observable<TipoDeCalidad[]> {
+        return this.http.get<TipoDeCalidad[]>(`${this.url}ProgramaEmbarque/ListarTipoDeCalidad`, { 'withCredentials': true });
+    }
+    public obtenerCalidadValor(): Observable<CalidadValor[]> {
+        return this.http.get<CalidadValor[]>(`${this.url}ProgramaEmbarque/ListarCalidadValor`, { 'withCredentials': true });
+    }
+    
 }

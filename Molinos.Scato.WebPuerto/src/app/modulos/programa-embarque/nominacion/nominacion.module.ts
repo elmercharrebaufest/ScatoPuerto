@@ -11,7 +11,6 @@ import { VaporState } from 'app/store/programa-embarque/vapor/vapor.state';
 import { NgxsModule } from '@ngxs/store';
 import { DestinoState } from 'app/store/programa-embarque/destino/destino.state';
 import { ExportadorState } from 'app/store/programa-embarque/exportador/exportador.state';
-import { ProductoState } from 'app/store/productos/material.state';
 import { AgenciaMaritimaPuertoState } from 'app/store/programa-embarque/agencia-maritima-puerto/agencia-maritima-puerto.state';
 import { ATAPuertoState } from 'app/store/programa-embarque/ata-puerto/ata-puerto.state';
 import { CoordinadorPuertoState } from 'app/store/programa-embarque/coordinador-puerto/coordinador-puerto.state';
@@ -21,6 +20,8 @@ import { TipoDeContratoState } from 'app/store/programa-embarque/tipo-de-contrat
 import { SurveyorState } from 'app/store/programa-embarque/surveyor/surveyor.state';
 import { MuelleDeCargaState } from 'app/store/programa-embarque/muelle-de-carga/muelle-de-carga.state';
 import { TasaDeCargaState } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.state';
+import { TipoDeCalidadState } from 'app/store/programa-embarque/tipo-de-calidad/tipo-de-calidad.state';
+import { CalidadValorState } from 'app/store/programa-embarque/calidad-valor/calidad-valor.state';
 
 const libComponents = [
   NominacionRegistroComponent, 
@@ -39,7 +40,9 @@ const libState = [
   TipoDeContratoState,
   SurveyorState,
   MuelleDeCargaState,
-  TasaDeCargaState
+  TasaDeCargaState,
+  TipoDeCalidadState,
+  CalidadValorState,
 ]
 @NgModule({
 
