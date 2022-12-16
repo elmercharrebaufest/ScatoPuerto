@@ -88,6 +88,30 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<CalidadValorDto> listarCalidadValor()
+        {
+            try
+            {
+                return Listar<CalidadValor, CalidadValorDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<TipoDeCalidadDto> listarTipoDeCalidad()
+        {
+            try
+            {
+                return Listar<TipoDeCalidad, TipoDeCalidadDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public IList<MuelleDeCargaDto> listarMuelleDeCarga()
         {
             try

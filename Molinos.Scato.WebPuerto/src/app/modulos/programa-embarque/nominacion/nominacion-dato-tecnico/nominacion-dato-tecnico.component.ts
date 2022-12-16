@@ -153,6 +153,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.datoTecnicoForm = this.formBuilder.group({
       id: [0, Validators.required],
       materialPuerto: ['', Validators.required],
+      tipoDeCalidad: [],
       cantidadTotal: ['', Validators.required],
       tolerancia: ['', Validators.required],
       observaciones: ['', Validators.required],
@@ -211,6 +212,14 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   onAgregarDatoTecnicoCoordinador(){
     this.datoTecnicoCoordinadorFormArray.push(this.initCargaCoordinadorPuerto());
   }
+  onCargarTipoCalidad(){
+    console.log('onCargarTipoCalidad--->')
+      this.tipoDeCalidad$.subscribe(data => {console.log('data--->',data); this.listaTipoDeCalidad = data;});
+  }
+  onMostrarParametroCalidad(){
+    this.mostrarParametroCalidad = !this.mostrarParametroCalidad;
+  }
+  
 
   initCargaExportador(exportador: NominacionDatoTecnicoExportador = null){
     if(exportador != null){
@@ -219,7 +228,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
         exportador: exportador.exportador,
         cantidad: exportador.cantidad,
         tolerancia: exportador.tolerancia,
-        nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico_Id
+        nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico.id
       })    
     }else{
       return this.formBuilder.group({
@@ -236,7 +245,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
         nominacionDatoTecnicoDestino_Id: destino.nominacionDatoTecnicoDestino_Id,
         exportador: destino.destino,
         cantidad: destino.cantidad,
-        nominacionDatoTecnico_Id: destino.nominacionDatoTecnico_Id
+        nominacionDatoTecnico_Id: destino.nominacionDatoTecnico.id
       })    
     }else{
       return this.formBuilder.group({
@@ -253,7 +262,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
         nominacionDatoTecnicoCoordinador_Id: coordinadorPuerto.nominacionDatoTecnicoCoordinador_Id,
         coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
         cantidad: coordinadorPuerto.cantidad,
-        nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico_Id
+        nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico.id
       })    
     }else{
       return this.formBuilder.group({
@@ -278,7 +287,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.store.dispatch(new GetObtenerTipoDeContrato());
     this.store.dispatch(new GetObtenerSurveyor());
     this.store.dispatch(new GetObtenerTasaDeCarga());
-
+    this.store.dispatch(new GetObtenerTipoDeCalidad());
+    this.store.dispatch(new GetObtenerCalidadValor());
 
   }
   public obtenerListasDeNominacion(){
@@ -294,6 +304,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.tasaDeCarga$.subscribe(data => {this.listaTasaDeCarga = data;});
     this.muelleDeCarga$.subscribe(data => {this.listaMuelleDeCarga = data;});
     this.tipoDeContrato$.subscribe(data => {this.listaTipoDeContrato = data;}); 
+    this.calidadValor$.subscribe(data => {this.listaCalidadValor = data;}); 
+
   }
 
 
