@@ -6,6 +6,7 @@ import { TasaDeCarga } from "./tasa-de-carga";
 import { MuelleDeCarga } from "./muelle-de-carga";
 import { Surveyor } from "./surveyor";
 import { TipoDeContrato } from "./tipo-de-contrato";
+import { NominacionDatoTecnicoCalidad } from "./nominacion-dato-tecnico-calidad";
 
 
 export class NominacionDatoTecnico {
@@ -27,13 +28,14 @@ export class NominacionDatoTecnico {
     agenciaMaritimaPuerto: AgenciaMaritimaPuerto;
     surveyor: Surveyor;
     observacionesSurveyor: string;
+    nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
 
     constructor(id, materialPuerto, cantidadTotal,
         tolerancia, observaciones, vapor,
         etaRecalada, obligacionDeCarga, muelleDeCarga,
         tasaDeCarga, tasaDeCargaValor, dem,
         des, tipoContrato, ataPuerto,
-        agenciaMaritimaPuerto, surveyor, observacionesSurveyor) {
+        agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad) {
         this.id = id;
         this.materialPuerto = materialPuerto;
         this.cantidadTotal = cantidadTotal;
@@ -52,5 +54,6 @@ export class NominacionDatoTecnico {
         this.agenciaMaritimaPuerto = agenciaMaritimaPuerto;
         this.surveyor = surveyor;
         this.observacionesSurveyor = observacionesSurveyor;
+        this.nominacionDatoTecnicoCalidad = nominacionDatoTecnicoCalidad;
     }
 }

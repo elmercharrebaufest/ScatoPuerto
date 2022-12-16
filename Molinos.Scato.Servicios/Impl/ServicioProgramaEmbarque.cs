@@ -64,7 +64,6 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.ObtenerConsultaEscalar(new ListarProgramaEmbarqueCombos());
         }
 
-		public IList<MuelleDeCargaDto> listarMuelleDeCarga()
         public IList<CalidadValorDto> listarCalidadValor()
         {
             try

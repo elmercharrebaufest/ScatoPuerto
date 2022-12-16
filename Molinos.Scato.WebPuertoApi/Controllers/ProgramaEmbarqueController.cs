@@ -18,11 +18,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class ProgramaEmbarqueController : BaseController
     {
-        private readonly IServicioProgramaEmbarque servicioProgramaEmbarque;
-        private readonly IServicioComandos servicioComandos;
+
         public ProgramaEmbarqueController(IServicioRepositorio servicio,
-            IServicioProgramaEmbarque programaEmbarque,
-            IServicioComandos servicioComandos) : base(servicio)
+            IServicioProgramaEmbarque servicioProgramaEmbarque,
+            IServicioComandos servicioComandos) : base(servicio, servicioProgramaEmbarque)
         {
 
         }
@@ -95,9 +94,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-
-
-        [HttpGet]
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp_Ver)]

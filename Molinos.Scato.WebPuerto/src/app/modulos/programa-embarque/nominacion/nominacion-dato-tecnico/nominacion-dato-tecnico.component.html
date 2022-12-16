@@ -1,45 +1,42 @@
-<br />
 <div class="margenes-nominacion">
     <form [formGroup]="datoTecnicoForm" class="mt-4">
-        <div class="form">
-            <div class="row form-row">
-                <div class="form-group col-md-6">
-                    <label for="materialPuerto" class="font-weight-bold">Producto</label>
-                    <select formControlName="materialPuerto" class="custom-select" required (change)="onCargarTipoCalidad()">
-                        <option value="">Seleccione</option>
-                        <option *ngFor="let material of listaMaterialPuerto" [value]="material.codigo" >{{material.descripcionCorta}}</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-3">
-                    <label for="cantidadTotal" class="font-weight-bold">Cantidad Total</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Ingrese la cantidad"
-                            formControlName="cantidadTotal"
-                            (keypress)="numberOnly($event)">
-                        <div class="input-group-append">
-                            <span class="input-group-text">Tn</span>
-                        </div>
+        <div class="row form-row">
+            <div class="form-group col-md-6">
+                <label for="materialPuerto" class="font-weight-bold">Producto</label>
+                <select formControlName="materialPuerto" class="custom-select" required (change)="onCargarTipoCalidad()">
+                    <option value="">Seleccione</option>
+                    <option *ngFor="let material of listaMaterialPuerto" [ngValue]="material" >{{material.descripcionCorta}}</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Ingrese la cantidad"
+                        formControlName="cantidadTotal"
+                        (keypress)="numberOnly($event)">
+                    <div class="input-group-append">
+                        <span class="input-group-text">Tn</span>
                     </div>
                 </div>
-                <div class="form-group col-md-3">
-                    <label for="tolerancia" class="font-weight-bold">Tolerencia</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Ingrese la tolerancia"
-                            formControlName="tolerancia"
-                            (keypress)="numberOnly($event)">
-                        <div class="input-group-append">
-                            <span class="input-group-text">Tn</span>
-                        </div>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="tolerancia" class="font-weight-bold">Tolerencia</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Ingrese la tolerancia"
+                        formControlName="tolerancia"
+                        (keypress)="numberOnly($event)">
+                    <div class="input-group-append">
+                        <span class="input-group-text">Tn</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !=''">
+        <div class="row form-row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !=''">
             <div class="form-group col-md-6">
                 <label for="tipoDeCalidad" class="font-weight-bold">Calidad</label>
                 <select formControlName="tipoDeCalidad" class="custom-select" required>
                     <option value="">Seleccione</option>
-                    <option *ngFor="let calidad of listaTipoDeCalidad" [value]="calidad.id">{{calidad.descripcion}}</option>
+                    <option *ngFor="let calidad of listaTipoDeCalidad" [ngValue]="calidad">{{calidad.descripcion}}</option>
                 </select>
             </div>
             <div class="form-group col-md-4">
@@ -48,7 +45,7 @@
                 </div>
             </div>
         </div>
-        <div class="row" *ngIf="mostrarParametroCalidad">
+        <div class="row form-row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !='' && mostrarParametroCalidad">
             <div class="form-group col-md-6">
                 <table class='table table-bordered'>
                     <thead class="header-calida-valor" >
@@ -75,7 +72,7 @@
                 </table>
             </div>
         </div>
-        <div class="row">
+        <div class="row form-row">
             <div class="form-group col-md-12">
                 <label for="observaciones" class="font-weight-bold">Observaciones</label>
                 <textarea class="form-control" placeholder="Ingrese las observaciones" rows="4" maxlength="250"
@@ -83,7 +80,7 @@
             </div>
         </div>
         <hr class="color-linea-division"/>
-        <div class="row">
+        <div class="row form-row">
             <div class="form-group col-md-5">
                 <div class='btn-add-container' (click)="onAgregarDatoTecnicoDestino()">
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
@@ -173,7 +170,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row form-row">
             <div class="form-group col-md-5">
                 <div class='btn-add-container' (click)="onAgregarDatoTecnicoCoordinador()">
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
@@ -214,7 +211,7 @@
             </div>
         </div>
         <hr class="color-linea-division"/>
-        <div class="row">
+        <div class="row form-row">
             <div class="form-group col-md-6">
                 <label class="font-weight-bold">Nombre buque</label>
                 <input *ngIf="listaVapor" 
@@ -233,14 +230,14 @@
                 <label for="bandera" class="font-weight-bold">Bandera</label>
                 <select class="custom-select" formControlName="bandera" required>
                     <option value=""></option>
-                    <option *ngFor="let bandera of listaBanderas" [value]="bandera.id">{{bandera.nombre}}</option>
+                    <option *ngFor="let bandera of listaBanderas" [ngValue]="bandera">{{bandera.nombre}}</option>
                 </select>
             </div>
             <div class="form-group col-md-3">
-                <label for="eTARecalada" class="font-weight-bold">Eta Recalada</label>
+                <label for="etaRecalada" class="font-weight-bold">ETA Recalada</label>
                 <div class="input_img">
                     <input type="date" max="3000-12-31" min="1000-01-01" class="form-control"
-                        formControlName="eTARecalada">
+                        formControlName="etaRecalada">
                 </div>
             </div>
             <div class="form-group col-md-3">
@@ -254,13 +251,13 @@
 
         <hr class="color-linea-division"/>
 
-        <div class="row">
+        <div class="row form-row">
             <div class="input-group col-md-4">
                 <div class="form-group columa-ancho-total">
                     <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga</label>
                     <select class="custom-select" formControlName="muelleDeCarga" required>
                         <option value=""></option>
-                        <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [value]="muelleDeCarga.id">{{muelleDeCarga.descripcion}}</option>
+                        <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [ngValue]="muelleDeCarga">{{muelleDeCarga.descripcion}}</option>
                     </select>
                 </div>
 
@@ -279,7 +276,7 @@
                     <label class="font-weight-bold">Rate</label>
                     <select class="custom-select" formControlName="tasaDeCarga" required>
                         <option value=""></option>
-                        <option *ngFor="let tasaDeCarga of listaTasaDeCarga" [value]="tasaDeCarga.id">{{tasaDeCarga.descripcion}}</option>
+                        <option *ngFor="let tasaDeCarga of listaTasaDeCarga" [ngValue]="tasaDeCarga">{{tasaDeCarga.descripcion}}</option>
                     </select>
                 </div>
             </div>
@@ -304,13 +301,13 @@
                     <label class="font-weight-bold">Tipo contrato</label>
                     <select class="custom-select" formControlName="tipoDeContrato" required>
                         <option value=""></option>
-                        <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [value]="tipoDeContrato.id">{{tipoDeContrato.descripcion}}</option>
+                        <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [ngValue]="tipoDeContrato">{{tipoDeContrato.descripcion}}</option>
                     </select>
                 </div>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row form-row">
             <div class="input-group col-md-4">
                 <div class="form-group columa-ancho-total">
                     <label class="font-weight-bold">ATA</label>
@@ -377,14 +374,18 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row form-row">
             <div class="form-group col-md-12">
                 <label for="observacionesSurveyor" class="font-weight-bold">Observaciones surveyor</label>
                 <textarea class="form-control" placeholder="Ingrese las observaciones surveyor" rows="4" maxlength="250"
                     formControlName="observacionesSurveyor"></textarea>
             </div>
         </div>
-
     </form>
-    <br />
+    <div class="row form-row">
+        <div class="col-md-12 botones-registro-centrado">
+            <button class="btn btn-danger botones-registro-custom" (click)="onCancelarDatoTecnico()">Cancelar</button>
+            <button class="btn btn-primary botones-registro-custom" (click)="onGuardarDatoTecnico()">Guardar</button>
+        </div>
+    </div>
 </div>

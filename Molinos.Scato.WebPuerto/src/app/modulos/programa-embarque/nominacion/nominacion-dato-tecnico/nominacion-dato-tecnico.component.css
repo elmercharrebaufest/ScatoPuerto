@@ -19,6 +19,18 @@
     background-color: #E8E8E8;
 }
 input.largerCheckbox {
-    transform : scale(1.3);
+    transform : scale(1.2);
     margin-right: 5px;
+}
+.botones-registro-centrado{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.botones-registro-custom{ 
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: 500;
+    margin-left: 10px;
+    margin-right: 10px;
 }

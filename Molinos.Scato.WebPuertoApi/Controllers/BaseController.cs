@@ -6,7 +6,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     public class BaseController : ApiController
     {
         protected readonly IServicioRepositorio servicio;
-        protected readonly IServicioProgramaEmbarque servicioProgramaEmbarque;
+        protected readonly IServicioProgramaEmbarque     servicioProgramaEmbarque;
         protected readonly string nombreUsuario;
         public BaseController(IServicioRepositorio servicio, IServicioProgramaEmbarque servicioProgramaEmbarque = null)
         {
@@ -15,4 +15,4 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicioProgramaEmbarque = servicioProgramaEmbarque;
         }        
     }
-}
+}   

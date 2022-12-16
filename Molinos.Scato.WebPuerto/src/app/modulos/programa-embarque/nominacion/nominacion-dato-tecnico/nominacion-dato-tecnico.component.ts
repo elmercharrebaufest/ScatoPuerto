@@ -7,17 +7,16 @@ import { NgbModal, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
-import { NominacionDatoTecnicoService } from './nominacion-dato-tecnico.services';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { ProductoState } from 'app/store/productos/material.state';
+import { ProductoState } from '@ScatoStores/productos/material.state';
 import { Select, Store } from '@ngxs/store';
 import { combineLatest, forkJoin, Observable } from 'rxjs';
-import { DestinoState } from 'app/store/programa-embarque/destino/destino.state';
-import { ExportadorState } from 'app/store/programa-embarque/exportador/exportador.state';
-import { CoordinadorPuertoState } from 'app/store/programa-embarque/coordinador-puerto/coordinador-puerto.state';
-import { VaporState } from 'app/store/programa-embarque/vapor/vapor.state';
-import { ATAPuertoState } from 'app/store/programa-embarque/ata-puerto/ata-puerto.state';
-import { AgenciaMaritimaPuertoState } from 'app/store/programa-embarque/agencia-maritima-puerto/agencia-maritima-puerto.state';
+import { DestinoState } from '@ScatoStores/programa-embarque/destino/destino.state';
+import { ExportadorState } from '@ScatoStores/programa-embarque/exportador/exportador.state';
+import { CoordinadorPuertoState } from '@ScatoStores/programa-embarque/coordinador-puerto/coordinador-puerto.state';
+import { VaporState } from '@ScatoStores/programa-embarque/vapor/vapor.state';
+import { ATAPuertoState } from '@ScatoStores/programa-embarque/ata-puerto/ata-puerto.state';
+import { AgenciaMaritimaPuertoState } from '@ScatoStores/programa-embarque/agencia-maritima-puerto/agencia-maritima-puerto.state';
 import { Destino } from '@ScatoModels/destino';
 import { AgenciaMaritimaPuerto } from '@ScatoModels/agencia-maritima-puerto';
 import { ATAPuerto } from '@ScatoModels/ata-puerto';
@@ -25,34 +24,34 @@ import { Vapor } from '@ScatoModels/embarque';
 import { CoordinadorPuerto } from '@ScatoModels/coordinador-puerto';
 import { Exportador } from '@ScatoModels/exportador';
 import { debounceTime, distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { GetObtenerProductos } from 'app/store/productos/material.actions';
-import { GetObtenerExportador } from 'app/store/programa-embarque/exportador/exportador.actions';
-import { GetObtenerDestino } from 'app/store/programa-embarque/destino/destino.actions';
-import { GetObtenerCoordinadorPuerto } from 'app/store/programa-embarque/coordinador-puerto/coordinador-puerto.actions';
-import { GetObtenerVapor } from 'app/store/programa-embarque/vapor/vapor.actions';
-import { GetObtenerATAPuerto } from 'app/store/programa-embarque/ata-puerto/ata-puerto.actions';
-import { GetObtenerAgenciaMaritimaPuerto } from 'app/store/programa-embarque/agencia-maritima-puerto/agencia-maritima-puerto.actions';
-import { GetObtenerBandera } from 'app/store/programa-embarque/bandera/bandera.actions';
-import { BanderaState } from 'app/store/programa-embarque/bandera/bandera.state';
+import { GetObtenerProductos } from '@ScatoStores/productos/material.actions';
+import { GetObtenerExportador } from '@ScatoStores/programa-embarque/exportador/exportador.actions';
+import { GetObtenerDestino } from '@ScatoStores/programa-embarque/destino/destino.actions';
+import { GetObtenerCoordinadorPuerto } from '@ScatoStores/programa-embarque/coordinador-puerto/coordinador-puerto.actions';
+import { GetObtenerVapor } from '@ScatoStores/programa-embarque/vapor/vapor.actions';
+import { GetObtenerATAPuerto } from '@ScatoStores/programa-embarque/ata-puerto/ata-puerto.actions';
+import { GetObtenerAgenciaMaritimaPuerto } from '@ScatoStores/programa-embarque/agencia-maritima-puerto/agencia-maritima-puerto.actions';
+import { GetObtenerBandera } from '@ScatoStores/programa-embarque/bandera/bandera.actions';
+import { BanderaState } from '@ScatoStores/programa-embarque/bandera/bandera.state';
 import { Bandera } from '@ScatoModels/bandera';
-import { TipoDeContratoState } from 'app/store/programa-embarque/tipo-de-contrato/tipo-de-contrato.state';
+import { TipoDeContratoState } from '@ScatoStores/programa-embarque/tipo-de-contrato/tipo-de-contrato.state';
 import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
-import { TasaDeCargaState } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.state';
-import { MuelleDeCargaState } from 'app/store/programa-embarque/muelle-de-carga/muelle-de-carga.state';
-import { SurveyorState } from 'app/store/programa-embarque/surveyor/surveyor.state';
+import { TasaDeCargaState } from '@ScatoStores/programa-embarque/tasa-de-carga/tasa-de-carga.state';
+import { MuelleDeCargaState } from '@ScatoStores/programa-embarque/muelle-de-carga/muelle-de-carga.state';
+import { SurveyorState } from '@ScatoStores/programa-embarque/surveyor/surveyor.state';
 import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
-import { GetObtenerMuelleDeCarga } from 'app/store/programa-embarque/muelle-de-carga/muelle-de-carga.actions';
-import { GetObtenerTipoDeContrato } from 'app/store/programa-embarque/tipo-de-contrato/tipo-de-contrato.actions';
-import { GetObtenerSurveyor } from 'app/store/programa-embarque/surveyor/surveyor.actions';
-import { GetObtenerTasaDeCarga } from 'app/store/programa-embarque/tasa-de-carga/tasa-de-carga.actions';
+import { GetObtenerMuelleDeCarga } from '@ScatoStores/programa-embarque/muelle-de-carga/muelle-de-carga.actions';
+import { GetObtenerTipoDeContrato } from '@ScatoStores/programa-embarque/tipo-de-contrato/tipo-de-contrato.actions';
+import { GetObtenerSurveyor } from '@ScatoStores/programa-embarque/surveyor/surveyor.actions';
+import { GetObtenerTasaDeCarga } from '@ScatoStores/programa-embarque/tasa-de-carga/tasa-de-carga.actions';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
-import { TipoDeCalidadState } from 'app/store/programa-embarque/tipo-de-calidad/tipo-de-calidad.state';
+import { TipoDeCalidadState } from '@ScatoStores/programa-embarque/tipo-de-calidad/tipo-de-calidad.state';
 import { TipoDeCalidad } from '@ScatoModels/programa-embarque/tipo-de-calidad';
-import { GetObtenerTipoDeCalidad } from 'app/store/programa-embarque/tipo-de-calidad/tipo-de-calidad.actions';
-import { CalidadValorState } from 'app/store/programa-embarque/calidad-valor/calidad-valor.state';
+import { GetObtenerTipoDeCalidad } from '@ScatoStores/programa-embarque/tipo-de-calidad/tipo-de-calidad.actions';
+import { CalidadValorState } from '@ScatoStores/programa-embarque/calidad-valor/calidad-valor.state';
 import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
-import { GetObtenerCalidadValor } from 'app/store/programa-embarque/calidad-valor/calidad-valor.actions';
+import { GetObtenerCalidadValor } from '@ScatoStores/programa-embarque/calidad-valor/calidad-valor.actions';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -149,13 +148,14 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.datoTecnicoForm = this.formBuilder.group({
       id: [0, Validators.required],
       materialPuerto: ['', Validators.required],
-      tipoDeCalidad: [],
+      tipoDeCalidad:['', Validators.required],
+      nominacionDatoTecnicoCalidad: ['', Validators.required],
       cantidadTotal: ['', Validators.required],
       tolerancia: ['', Validators.required],
       observaciones: ['', Validators.required],
       vapor: ['', Validators.required],
       bandera: ['', Validators.required],
-      eTARecalada: ['', Validators.required],
+      etaRecalada: ['', Validators.required],
       obligacionDeCarga: ['', Validators.required],
       muelleDeCarga: ['', Validators.required],
       tasaDeCarga: ['', Validators.required],
@@ -163,9 +163,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       dem: ['', Validators.required],
       des: ['', Validators.required],
       tipoDeContrato: ['', Validators.required],
-      ataPuerto: [],
-      agenciaMaritimaPuerto: [],
-      surveyor: [],
+      ataPuerto: ['', Validators.required],
+      agenciaMaritimaPuerto: ['', Validators.required],
+      surveyor: ['', Validators.required],
       observacionesSurveyor: ['', Validators.required],
       datoTecnicoExportador: this.formBuilder.array([]),
       datoTecnicoDestino: this.formBuilder.array([]),
@@ -348,6 +348,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     let { id, nombre } = $event.item
   }
 
+  public onGuardarDatoTecnico(){
+    console.log('this.datoTecnicoForm-->>', this.datoTecnicoForm);
+  }
 
+  public onCancelarDatoTecnico(){
+  }
 
 }
