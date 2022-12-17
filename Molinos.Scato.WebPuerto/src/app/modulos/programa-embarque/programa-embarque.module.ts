@@ -6,18 +6,18 @@ import { FiltroProgramaEmbarqueComponent } from './filtro-programa-embarque/filt
 import { ListadoProgramaEmbarqueComponent } from './listado-programa-embarque/listado-programa-embarque.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProgramaEmbarqueComponent } from './programa-embarque.component';
-
-
+import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
 
 @NgModule({
   declarations: [
     FiltroProgramaEmbarqueComponent, 
     ListadoProgramaEmbarqueComponent,
-    ProgramaEmbarqueComponent
+    ProgramaEmbarqueComponent,
   ],
   imports: [
     CommonModule,
     SharedModule, 
+    SharedComponentModule,
     ProgramaEmbarqueRoutingModule,
     NgMultiSelectDropDownModule.forRoot(),
   ]

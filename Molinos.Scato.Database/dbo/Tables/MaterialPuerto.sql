@@ -3,6 +3,7 @@
 	[Id]  INT IDENTITY (1, 1) NOT NULL, 
     [Descripcion] NVARCHAR(MAX) NULL, 
     [DescripcionCorta] NVARCHAR(50) NULL,
+    [DescripcionCortaIngles] NVARCHAR(100) NULL,
     [CodigoSap] NVARCHAR(50) NULL, 
     [Almacen_Id] INT NULL,
     [EsLiquido] BIT NOT NULL DEFAULT 0, 
