@@ -19,6 +19,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   fecha = this.AnioMesActual();
   combos: any;
   filtros = new Subject<any>();
+  public estaCargando = true;
   //#endregion
 
   // #region Observables
@@ -75,13 +76,17 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
     this.filtroBuquedaForm.controls.fecha.setValue('');
   }
   onBuscar() {
+    this.estaCargando = true;
     this.programaEmbarqueService.ListarProgramaEmbarque(
-      null, 
-      null, 
+      null,
+      null,
       this.filtroBuquedaForm.controls.fecha.value,
       this.filtroBuquedaForm.controls.buque.value,
       this.filtroBuquedaForm.controls.muelle.value,
-      this.filtroBuquedaForm.controls.producto.value)   
+      this.filtroBuquedaForm.controls.producto.value)
+    this.estaCargando = false;
+
+
   }
 
   public setListaCombos() {
@@ -99,6 +104,6 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   public getFiltroBusquedaForm() {
     return this.filtroBuquedaForm;
   }
- 
+
 
 }

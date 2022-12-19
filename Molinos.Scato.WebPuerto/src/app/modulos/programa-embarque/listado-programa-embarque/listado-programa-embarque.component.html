@@ -1,3 +1,6 @@
+<ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-pe-table'>
         <thead class="lista-pe-header tamanioHeader">
@@ -93,8 +96,11 @@
         <tbody *ngFor="let historial of getListaProgramaEmbarque()" style="text-align: center;">
             <tr class="lista-buque-row">
                 <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }" class="anchoDeFila"></td>
-                <td class="lista-buque-row-item" style="font-size: 20px;"><strong>{{historial.producto}}</strong></td>
-                <td>Sin estado</td>
+                <td class="lista-buque-row-item" style="font-size: 20px;">
+                    <strong>{{historial.producto}}                        
+                    </strong>
+                </td>
+                <td><i style="font-size: 25px;cursor:pointer" [ngbTooltip]="devolverMensajeDeEstados(historial.estado)" [ngStyle]="{ 'color': devolverColorEstado(historial.estado) }" class="fa fa-duotone fa-circle"></i></td>
                 <td>{{historial.nombreBuque}}</td>
                 <td>{{historial.muelleDeCarga}}</td>
                 <td class="lista-buque-row-item">
