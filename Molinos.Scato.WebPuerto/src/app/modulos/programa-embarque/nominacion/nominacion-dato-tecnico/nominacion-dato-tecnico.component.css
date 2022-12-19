@@ -34,3 +34,11 @@ input.largerCheckbox {
     margin-left: 10px;
     margin-right: 10px;
 }
+.boton-eliminar {
+    display: flex;
+    align-items: flex-end;
+}
+.cursorPointer{
+    cursor: pointer;
+
+}

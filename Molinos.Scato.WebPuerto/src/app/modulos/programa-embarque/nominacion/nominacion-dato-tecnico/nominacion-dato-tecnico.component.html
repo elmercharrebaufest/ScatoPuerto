@@ -3,7 +3,11 @@
         <div class="row form-row">
             <div class="form-group col-md-6">
                 <label for="materialPuerto" class="font-weight-bold">Producto</label>
-                <select formControlName="materialPuerto" class="custom-select" required (change)="onCargarTipoCalidad()">
+                <select formControlName="materialPuerto" 
+                        class="custom-select" 
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.materialPuerto.invalid}" 
+                        required 
+                        (change)="onCargarTipoCalidad()">
                     <option value="">Seleccione</option>
                     <option *ngFor="let material of listaMaterialPuerto" [ngValue]="material" >{{material.descripcionCorta}}</option>
                 </select>
@@ -13,6 +17,7 @@
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadTotal"
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" 
                         (keypress)="numberOnly($event)">
                     <div class="input-group-append">
                         <span class="input-group-text">Tn</span>
@@ -34,9 +39,9 @@
         <div class="row form-row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !=''">
             <div class="form-group col-md-6">
                 <label for="tipoDeCalidad" class="font-weight-bold">Calidad</label>
-                <select formControlName="tipoDeCalidad" class="custom-select" required>
+                <select formControlName="tipoDeCalidad" class="custom-select" (change)="onActualizarListaCalidadValor(datoTecnicoForm.controls['tipoDeCalidad'].value)">
                     <option value="">Seleccione</option>
-                    <option *ngFor="let calidad of listaTipoDeCalidad" [ngValue]="calidad">{{calidad.descripcion}}</option>
+                    <option *ngFor="let calidad of listaTipoDeCalidadxMaterial(datoTecnicoForm.controls['materialPuerto'].value)" [ngValue]="calidad">{{calidad.descripcion}}</option>
                 </select>
             </div>
             <div class="form-group col-md-4">
@@ -57,16 +62,15 @@
                             <th width="70%">Valores</th>
                         </tr> 
                     </thead>
-                    <tbody *ngFor="let calidadValor of listaCalidadValor">
+                    <tbody *ngFor="let calidad of listaNominacionDatoTecnicoCalidad">
                         <tr>
                             <td>
                                 <input class="largerCheckbox" 
-                                id={{calidadValor.id}} 
-                                type="checkbox" 
-                                [value]="calidadValor.id"/>
-                                {{calidadValor.parametro}}
+                                       type="checkbox" 
+                                       (change)="onSeleccionarParametroCalidad(calidad.calidadValor)"/>
+                                {{calidad.calidadValor.parametro}}
                             </td>
-                            <td>{{calidadValor.valor}}</td>
+                            <td>{{calidad.calidadValor.valor}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -79,6 +83,7 @@
                     formControlName="observaciones"></textarea>
             </div>
         </div>
+
         <hr class="color-linea-division"/>
         <div class="row form-row">
             <div class="form-group col-md-5">
@@ -89,7 +94,7 @@
                 <div formArrayName="datoTecnicoDestino">
                     <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let destino of datoTecnicoForm.get('datoTecnicoDestino').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
-                                <div class="form-group col-8">
+                                <div class="form-group col-6">
                                     <label *ngIf="i==0" for="destino" class="font-weight-bold">Destino</label>
                                     <input *ngIf="listaDestino"
                                         type="text"
@@ -101,8 +106,7 @@
                                         (selectItem)="seleccionDestino($event)"
                                         [inputFormatter]="formatoDestino"
                                         [resultFormatter]="formatoDestino"
-                                        required
-                                    />
+                                        />
                                 </div>
                                 <div class="form-group col-4">
                                     <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad</label>
@@ -114,6 +118,9 @@
                                             <span class="input-group-text">Tn</span>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="form-group col-1 boton-eliminar">
+                                    <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)">
                                 </div>
                         </div>
                     </div>
@@ -128,7 +135,7 @@
                 <div formArrayName="datoTecnicoExportador">
                     <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let exportador of datoTecnicoForm.get('datoTecnicoExportador').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
-                            <div class="form-group col-6">
+                            <div class="form-group col-5">
                                 <label *ngIf="i==0" for="exportador" class="font-weight-bold">Exportador</label>
                                 <input *ngIf="listaExportador"
                                     type="text"
@@ -140,15 +147,17 @@
                                     (selectItem)="seleccionExportador($event)"
                                     [inputFormatter]="formatoExportador"
                                     [resultFormatter]="formatoExportador"
-                                    required
                                     />
                             </div>
                             <div class="form-group col-3">
                                 <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad</label>
                                 <div class="input-group" >
-                                <input type="text" class="form-control"
-                                        formControlName="cantidad"
-                                        (keypress)="numberOnly($event)">
+                                <input type="text" 
+                                       class="form-control"
+                                       formControlName="cantidad"
+                                       [ngClass]="{'input-error': grabarNominacion && exportador.cantidad.invalid}"
+                                       required
+                                       (keypress)="numberOnly($event)">
                                 <div class="input-group-append">
                                     <span class="input-group-text">Tn</span>
                                 </div>
@@ -165,6 +174,9 @@
                                 </div>
                                 </div>
                             </div>
+                            <div class="form-group col-1 boton-eliminar">
+                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoExportador(i)">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,7 +191,7 @@
                 <div formArrayName="datoTecnicoCoordinador">
                     <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let coordinador of datoTecnicoForm.get('datoTecnicoCoordinador').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">                       
-                            <div class="form-group col-8">
+                            <div class="form-group col-6">
                                 <label *ngIf="i==0" for="coordinadorPuerto" class="font-weight-bold">Cliente</label>
                                 <input *ngIf="listaCoordinadorPuerto"
                                     type="text"
@@ -191,25 +203,32 @@
                                     (selectItem)="seleccionCoordinadorPuerto($event)"
                                     [inputFormatter]="formatoCoordinadorPuerto"
                                     [resultFormatter]="formatoCoordinadorPuerto"
-                                    required
+                                    
                                     />
                             </div>
                             <div class="form-group col-4">
                                 <label *ngIf="i==0" for="coordinador" class="font-weight-bold">Cantidad</label>
                                 <div class="input-group" >
-                                    <input type="text" class="form-control"
-                                            formControlName="cantidad"
-                                            (keypress)="numberOnly($event)">
+                                    <input type="text" 
+                                           class="form-control"
+                                           formControlName="cantidad"
+                                           [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
+                                           required
+                                           (keypress)="numberOnly($event)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="form-group col-1 boton-eliminar">
+                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoCoordinador(i)">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <hr class="color-linea-division"/>
         <div class="row form-row">
             <div class="form-group col-md-6">
@@ -224,11 +243,15 @@
                        (selectItem)="seleccionVapor($event)"
                        [inputFormatter]="formatoVapor"
                        [resultFormatter]="formatoVapor"
+                       [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.vapor.invalid}" 
                        required />
             </div>
             <div class="form-group col-md-4">
                 <label for="bandera" class="font-weight-bold">Bandera</label>
-                <select class="custom-select" formControlName="bandera" required>
+                <select class="custom-select" 
+                        formControlName="bandera" 
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.bandera.invalid}" 
+                        required>
                     <option value=""></option>
                     <option *ngFor="let bandera of listaBanderas" [ngValue]="bandera">{{bandera.nombre}}</option>
                 </select>
@@ -236,15 +259,23 @@
             <div class="form-group col-md-3">
                 <label for="etaRecalada" class="font-weight-bold">ETA Recalada</label>
                 <div class="input_img">
-                    <input type="date" max="3000-12-31" min="1000-01-01" class="form-control"
-                        formControlName="etaRecalada">
+                    <input type="date" 
+                           max="3000-12-31" 
+                           min="1000-01-01" 
+                           class="form-control"
+                           [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.etaRecalada.invalid}" required
+                           formControlName="etaRecalada">
                 </div>
             </div>
             <div class="form-group col-md-3">
                 <label for="obligacionDeCarga" class="font-weight-bold">Obligación de carga</label>
                 <div class="input_img">
-                    <input type="date" max="3000-12-31" min="1000-01-01" class="form-control"
-                        formControlName="obligacionDeCarga">
+                    <input type="date" 
+                           max="3000-12-31" 
+                           min="1000-01-01" 
+                           class="form-control"
+                           [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.obligacionDeCarga.invalid}" required
+                           formControlName="obligacionDeCarga">
                 </div>
             </div>
         </div>
@@ -255,12 +286,11 @@
             <div class="input-group col-md-4">
                 <div class="form-group columa-ancho-total">
                     <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga</label>
-                    <select class="custom-select" formControlName="muelleDeCarga" required>
+                    <select class="custom-select" formControlName="muelleDeCarga" [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}" required>
                         <option value=""></option>
                         <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [ngValue]="muelleDeCarga">{{muelleDeCarga.descripcion}}</option>
                     </select>
                 </div>
-
             </div>
             <div class="input-group col-md-4">
                 <div class="form-group col-md-3">
@@ -270,11 +300,11 @@
                            maxlength="10"
                            placeholder="" 
                            (keypress)="numberOnly($event)"
-                           required />
+                            />
                 </div>
                 <div class="form-group col-md-9">
                     <label class="font-weight-bold">Rate</label>
-                    <select class="custom-select" formControlName="tasaDeCarga" required>
+                    <select class="custom-select" formControlName="tasaDeCarga" >
                         <option value=""></option>
                         <option *ngFor="let tasaDeCarga of listaTasaDeCarga" [ngValue]="tasaDeCarga">{{tasaDeCarga.descripcion}}</option>
                     </select>
@@ -286,7 +316,7 @@
                     <input type="text" class="form-control" 
                            formControlName="dem" maxlength="10" 
                            (keypress)="decimalOnly($event)"
-                           required />
+                            />
                 </div>
                 <div class="form-group col-md-3">
                     <label class="font-weight-bold">DES</label>
@@ -295,11 +325,11 @@
                            maxlength="50" 
                            placeholder=""
                            (keypress)="decimalOnly($event)"
-                           required />
+                            />
                 </div>
                 <div class="form-group col-md-6">
                     <label class="font-weight-bold">Tipo contrato</label>
-                    <select class="custom-select" formControlName="tipoDeContrato" required>
+                    <select class="custom-select" formControlName="tipoDeContrato" >
                         <option value=""></option>
                         <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [ngValue]="tipoDeContrato">{{tipoDeContrato.descripcion}}</option>
                     </select>
@@ -318,6 +348,8 @@
                                    [secondaryPlaceholder]="'Ingrese el A.T.A'"
                                    [identifyBy]="'id'" 
                                    [displayBy]="'nombre'" 
+                                   [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.ataPuerto.invalid}" 
+                                   required
                                    [maxItems]="1">
                             <tag-input-dropdown 
                                     [showDropdownIfEmpty]="true" 
@@ -335,11 +367,13 @@
                     <label class="font-weight-bold">Agencia maritima</label>
                     <div class="alinear-controles">
                         <tag-input *ngIf="listaAgenciaMaritimaPuerto"
-                                   formControlName="ataPuerto" 
+                                   formControlName="agenciaMaritimaPuerto" 
                                    [placeholder]="'Ingrese la Agencia'"
                                    [secondaryPlaceholder]="'Ingrese la Agencia'"
                                    [identifyBy]="'id'" 
                                    [displayBy]="'nombre'" 
+                                   [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.agenciaMaritimaPuerto.invalid}" 
+                                   required
                                    [maxItems]="1">
                             <tag-input-dropdown 
                                     [showDropdownIfEmpty]="true" 

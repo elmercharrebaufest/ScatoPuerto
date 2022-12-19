@@ -52,6 +52,9 @@ import { GetObtenerTipoDeCalidad } from '@ScatoStores/programa-embarque/tipo-de-
 import { CalidadValorState } from '@ScatoStores/programa-embarque/calidad-valor/calidad-valor.state';
 import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
 import { GetObtenerCalidadValor } from '@ScatoStores/programa-embarque/calidad-valor/calidad-valor.actions';
+import { NominacionDatoTecnicoCalidad } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-calidad';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -65,11 +68,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
   public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
   public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
-  private _nominacionParametros: NominacionParametros = null;
-  public datoTecnicoForm: FormGroup;
-  public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
-  public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
-  public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
+  public nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
 
   public formatoDestino;
   public formatoVapor; 
@@ -94,8 +93,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   public listaTipoDeContrato: TipoDeContrato[];
   public listaTipoDeCalidad: TipoDeCalidad[];
   public listaCalidadValor: CalidadValor[];
-  public mostrarParametroCalidad: boolean = false;
+  public listaNominacionDatoTecnicoCalidad: ListaNominacionCalidad[] = [];
 
+  public mostrarParametroCalidad: boolean = false;
+  public grabarNominacion: boolean = false;
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
 
 
@@ -114,6 +115,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   @Select(TipoDeCalidadState.getListaTipoDeCalidad) tipoDeCalidad$: Observable<TipoDeCalidad[]>;
   @Select(CalidadValorState.getListaCalidadValor) calidadValor$: Observable<CalidadValor[]>;
   constructor(private nominacionService: NominacionService,
+    private confirmationDialogService: ConfirmationDialogService,
     private store: Store,
     private formBuilder: FormBuilder) {
     this.asignarNominacionParametros();
@@ -128,6 +130,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.obtenerListasDeNominacion();
     this.configurarListasDeNominacion();
   }
+
+  public get frmDatosTecnicos() { return this.datoTecnicoForm.controls; }
 
   private get nominacionParametros(): NominacionParametros {
     return this._nominacionParametros;
@@ -148,190 +152,31 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
       this.nominacionParametros = nominacionParametos;
     });
   }
-
-  private inicializarForm() {
-    this.datoTecnicoForm = this.formBuilder.group({
-      id: [0, Validators.required],
-      materialPuerto: ['', Validators.required],
-      tipoDeCalidad: [],
-      cantidadTotal: ['', Validators.required],
-      tolerancia: ['', Validators.required],
-      observaciones: ['', Validators.required],
-      vapor: ['', Validators.required],
-      bandera: ['', Validators.required],
-      eTARecalada: ['', Validators.required],
-      obligacionDeCarga: ['', Validators.required],
-      muelleDeCarga: ['', Validators.required],
-      tasaDeCarga: ['', Validators.required],
-      tasaDeCargaValor: ['', Validators.required],
-      dem: ['', Validators.required],
-      des: ['', Validators.required],
-      tipoDeContrato: ['', Validators.required],
-      ataPuerto: [],
-      agenciaMaritimaPuerto: [],
-      surveyor: [],
-      observacionesSurveyor: ['', Validators.required],
-      datoTecnicoExportador: this.formBuilder.array([]),
-      datoTecnicoDestino: this.formBuilder.array([]),
-      datoTecnicoCoordinador: this.formBuilder.array([]),
-    });
-  }
-
-  public trackByFn(index: any, item: any) {
-    return index;
-  }
-  public numberOnly(event): boolean {
-    var charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57))
-      return false;
-    return true;
-  }
-  public decimalOnly(event): boolean {
-    var charCode = (event.which) ? event.which : event.keyCode;
-    if ((charCode > 47 && charCode < 58) || charCode == 46)
-      return true;
-    return false;
-  }
-
-  get datoTecnicoExportadorFormArray(): FormArray {
-    return this.datoTecnicoForm.get("datoTecnicoExportador") as FormArray
-  }
-  get datoTecnicoDestinoFormArray(): FormArray {
-    return this.datoTecnicoForm.get("datoTecnicoDestino") as FormArray
-  }
-  get datoTecnicoCoordinadorFormArray(): FormArray {
-    return this.datoTecnicoForm.get("datoTecnicoCoordinador") as FormArray
-  }
-
-  onAgregarDatoTecnicoExportador(){
-    this.datoTecnicoExportadorFormArray.push(this.initCargaExportador());
-  }
-  onAgregarDatoTecnicoDestino(){
-    this.datoTecnicoDestinoFormArray.push(this.initCargaDestino());
-  }
-  onAgregarDatoTecnicoCoordinador(){
-    this.datoTecnicoCoordinadorFormArray.push(this.initCargaCoordinadorPuerto());
-  }
-  onCargarTipoCalidad(){
-    console.log('onCargarTipoCalidad--->')
-      this.tipoDeCalidad$.subscribe(data => {console.log('data--->',data); this.listaTipoDeCalidad = data;});
-  }
-  onMostrarParametroCalidad(){
-    this.mostrarParametroCalidad = !this.mostrarParametroCalidad;
-  }
   
 
-  initCargaExportador(exportador: NominacionDatoTecnicoExportador = null){
-    if(exportador != null){
-      return this.formBuilder.group({
-        nominacionDatoTecnicoExportador_Id: exportador.nominacionDatoTecnicoExportador_Id,
-        exportador: exportador.exportador,
-        cantidad: exportador.cantidad,
-        tolerancia: exportador.tolerancia,
-        nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico.id
-      })    
-    }else{
-      return this.formBuilder.group({
-        nominacionDatoTecnicoExportador_Id: '',
-        exportador: [],
-        cantidad: 0,
-        nominacionDatoTecnico_Id: 0
-      })
-    }    
-  }
-  initCargaDestino(destino: NominacionDatoTecnicoDestino = null){
-    if(destino != null){
-      return this.formBuilder.group({
-        nominacionDatoTecnicoDestino_Id: destino.nominacionDatoTecnicoDestino_Id,
-        exportador: destino.destino,
-        cantidad: destino.cantidad,
-        nominacionDatoTecnico_Id: destino.nominacionDatoTecnico.id
-      })    
-    }else{
-      return this.formBuilder.group({
-        nominacionDatoTecnicoDestino_Id: 0,
-        destino: [],
-        cantidad: 0,
-        nominacionDatoTecnico_Id: 0
-      })
-    }
-  }
-  initCargaCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null){
-    if(coordinadorPuerto != null){
-      return this.formBuilder.group({
-        nominacionDatoTecnicoCoordinador_Id: coordinadorPuerto.nominacionDatoTecnicoCoordinador_Id,
-        coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
-        cantidad: coordinadorPuerto.cantidad,
-        nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico.id
-      })    
-    }else{
-      return this.formBuilder.group({
-        nominacionDatoTecnicoCoordinador_Id: 0,
-        coordinadorPuerto: [],
-        cantidad: 0,
-        nominacionDatoTecnico_Id: 0
-      })
-    }
-  }
-
-  public cargarListasDeNominacion() {
-    this.store.dispatch(new GetObtenerProductos());
-    this.store.dispatch(new GetObtenerDestino());
-    this.store.dispatch(new GetObtenerBandera());
-    this.store.dispatch(new GetObtenerExportador());
-    this.store.dispatch(new GetObtenerCoordinadorPuerto());
-    this.store.dispatch(new GetObtenerVapor());
-    this.store.dispatch(new GetObtenerATAPuerto());
-    this.store.dispatch(new GetObtenerAgenciaMaritimaPuerto());
-    this.store.dispatch(new GetObtenerMuelleDeCarga());
-    this.store.dispatch(new GetObtenerTipoDeContrato());
-    this.store.dispatch(new GetObtenerSurveyor());
-    this.store.dispatch(new GetObtenerTasaDeCarga());
-    this.store.dispatch(new GetObtenerTipoDeCalidad());
-    this.store.dispatch(new GetObtenerCalidadValor());
-
-  }
-  public obtenerListasDeNominacion(){
-    this.productos$.subscribe(data => {this.listaMaterialPuerto = data;});
-    this.destino$.subscribe(destino => { this.listaDestino = destino; });
-    this.exportador$.subscribe(exportador => { this.listaExportador = exportador; });
-    this.banderas$.subscribe(bandera => {this.listaBanderas = bandera; });
-    this.coordinadorPuerto$.subscribe(coordinadorPuerto => { this.listaCoordinadorPuerto = coordinadorPuerto; });
-    this.vapores$.subscribe(vapor => {this.listaVapor = vapor});
-    this.ataPuerto$.subscribe(ataPuerto => { this.listaATAPuerto = ataPuerto; });
-    this.agenciaMaritimaPuerto$.subscribe(agenciaMaritimaPuerto => { this.listaAgenciaMaritimaPuerto = agenciaMaritimaPuerto; });
-    this.surveyor$.subscribe(data => {this.listaSurveyor = data;});
-    this.tasaDeCarga$.subscribe(data => {this.listaTasaDeCarga = data;});
-    this.muelleDeCarga$.subscribe(data => {this.listaMuelleDeCarga = data;});
-    this.tipoDeContrato$.subscribe(data => {this.listaTipoDeContrato = data;}); 
-    this.calidadValor$.subscribe(data => {this.listaCalidadValor = data;}); 
-
-  }
-
-
   private inicializarForm() {
     this.datoTecnicoForm = this.formBuilder.group({
       id: [0, Validators.required],
       materialPuerto: ['', Validators.required],
-      tipoDeCalidad:['', Validators.required],
-      nominacionDatoTecnicoCalidad: ['', Validators.required],
+      tipoDeCalidad:[''],
+      nominacionDatoTecnicoCalidad: [],
       cantidadTotal: ['', Validators.required],
-      tolerancia: ['', Validators.required],
-      observaciones: ['', Validators.required],
+      tolerancia: [''],
+      observaciones: [''],
       vapor: ['', Validators.required],
       bandera: ['', Validators.required],
       etaRecalada: ['', Validators.required],
       obligacionDeCarga: ['', Validators.required],
       muelleDeCarga: ['', Validators.required],
-      tasaDeCarga: ['', Validators.required],
-      tasaDeCargaValor: ['', Validators.required],
-      dem: ['', Validators.required],
-      des: ['', Validators.required],
-      tipoDeContrato: ['', Validators.required],
+      tasaDeCarga: [''],
+      tasaDeCargaValor: [''],
+      dem: [''],
+      des: [''],
+      tipoDeContrato: [''],
       ataPuerto: ['', Validators.required],
       agenciaMaritimaPuerto: ['', Validators.required],
-      surveyor: ['', Validators.required],
-      observacionesSurveyor: ['', Validators.required],
+      surveyor: [''],
+      observacionesSurveyor: [''],
       datoTecnicoExportador: this.formBuilder.array([]),
       datoTecnicoDestino: this.formBuilder.array([]),
       datoTecnicoCoordinador: this.formBuilder.array([]),
@@ -363,7 +208,50 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   get datoTecnicoCoordinadorFormArray(): FormArray {
     return this.datoTecnicoForm.get("datoTecnicoCoordinador") as FormArray
   }
+  
+  listaTipoDeCalidadxMaterial(materialPuerto){
+    return this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
+  }
 
+  onEliminarDatoTecnicoExportador(index: number){
+    const value = this.datoTecnicoExportadorFormArray.value;
+    this.datoTecnicoExportadorFormArray.setValue(
+      value.slice(0, index).concat(
+        value.slice(index + 1),
+      ).concat(value[index]),
+    );
+    this.datoTecnicoExportadorFormArray.removeAt(value.length - 1);
+  }
+  onEliminarDatoTecnicoDestino(index: number){
+    const value = this.datoTecnicoDestinoFormArray.value;
+    this.datoTecnicoDestinoFormArray.setValue(
+      value.slice(0, index).concat(
+        value.slice(index + 1),
+      ).concat(value[index]),
+    );
+    this.datoTecnicoDestinoFormArray.removeAt(value.length - 1);
+  }
+  onEliminarDatoTecnicoCoordinador(index: number){
+    const value = this.datoTecnicoCoordinadorFormArray.value;
+    this.datoTecnicoCoordinadorFormArray.setValue(
+      value.slice(0, index).concat(
+        value.slice(index + 1),
+      ).concat(value[index]),
+    );
+    this.datoTecnicoCoordinadorFormArray.removeAt(value.length - 1);
+  }
+
+  onActualizarListaCalidadValor(tipoDeCalidad){
+    this.listaNominacionDatoTecnicoCalidad = [];
+    const listaCalidad = this.listaCalidadValor.filter(x=> x.tipoDeCalidad.id == tipoDeCalidad.id);
+    listaCalidad.forEach(calidad =>{
+      const calidadValor:ListaNominacionCalidad = {
+        calidadValor : calidad,
+        esSeleccionado: false
+      };
+      this.listaNominacionDatoTecnicoCalidad.push(calidadValor);
+    });
+  }
   onAgregarDatoTecnicoExportador(){
     this.datoTecnicoExportadorFormArray.push(this.initCargaExportador());
   }
@@ -374,13 +262,18 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.datoTecnicoCoordinadorFormArray.push(this.initCargaCoordinadorPuerto());
   }
   onCargarTipoCalidad(){
-    console.log('onCargarTipoCalidad--->')
-      this.tipoDeCalidad$.subscribe(data => {console.log('data--->',data); this.listaTipoDeCalidad = data;});
+    this.mostrarParametroCalidad = false;
+    this.tipoDeCalidad$.subscribe(data => this.listaTipoDeCalidad = data);
   }
   onMostrarParametroCalidad(){
     this.mostrarParametroCalidad = !this.mostrarParametroCalidad;
   }
-  
+  onSeleccionarParametroCalidad(calidadValor){
+    let nominacionDatoTecnicoCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data => data.calidadValor == calidadValor);
+    if (nominacionDatoTecnicoCalidad.length > 0){
+      nominacionDatoTecnicoCalidad[0].esSeleccionado = !nominacionDatoTecnicoCalidad[0].esSeleccionado;
+    }
+  }
 
   initCargaExportador(exportador: NominacionDatoTecnicoExportador = null){
     if(exportador != null){
@@ -394,9 +287,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     }else{
       return this.formBuilder.group({
         nominacionDatoTecnicoExportador_Id: '',
-        exportador: [],
-        cantidad: 0,
-        nominacionDatoTecnico_Id: 0
+        exportador: ['', Validators.required],
+        cantidad: [0, Validators.required],
+        tolerancia: [0, Validators.required],
+        nominacionDatoTecnico_Id: '',
       })
     }    
   }
@@ -411,8 +305,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     }else{
       return this.formBuilder.group({
         nominacionDatoTecnicoDestino_Id: 0,
-        destino: [],
-        cantidad: 0,
+        destino: ['', Validators.required],
+        cantidad: [0, Validators.required],
         nominacionDatoTecnico_Id: 0
       })
     }
@@ -428,8 +322,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     }else{
       return this.formBuilder.group({
         nominacionDatoTecnicoCoordinador_Id: 0,
-        coordinadorPuerto: [],
-        cantidad: 0,
+        coordinadorPuerto: ['', Validators.required],
+        cantidad: [0, Validators.required],
         nominacionDatoTecnico_Id: 0
       })
     }
@@ -514,10 +408,59 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
   }
 
   public onGuardarDatoTecnico(){
+    this.grabarNominacion = true;
+    if (this.datoTecnicoForm.invalid) {
+      let erroresDestinos: boolean = false;
+      let erroresCoordinador: boolean = false;
+      let erroresExportador: boolean = false;
+      const datoTecnicoCoordinador = this.datoTecnicoForm.controls['datoTecnicoCoordinador']['controls'];
+      const datoTecnicoDestino = this.datoTecnicoForm.controls['datoTecnicoDestino']['controls'];
+      const datoTecnicoExportador = this.datoTecnicoForm.controls['datoTecnicoExportador']['controls'];
+      if (datoTecnicoExportador.length == 0 || datoTecnicoDestino.length == 0 || datoTecnicoExportador.length == 0){
+          this.confirmationDialogService.confirm('Registro Nominación', 'Debe agregar destino, cargador y cliente a la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
+          return false;
+      }
+      datoTecnicoDestino.forEach(detalle=>{
+        const datos = detalle['controls'];
+        if (datos.destino.value == '' ||  datos.cantidad.value=='' || datos.cantidad.value == '0'){
+          erroresDestinos = true;
+          return;
+        }
+      });
+      datoTecnicoCoordinador.forEach(detalle=>{
+        const datos = detalle['controls'];
+        if (datos.coordinadorPuerto.value == '' || (datos.cantidad.value=='' || datos.cantidad.value == '0')){
+          erroresCoordinador = true;
+          return;
+        }
+      });
+      datoTecnicoExportador.forEach(detalle=>{
+        const datos = detalle['controls'];
+        if (datos.exportador.value == '' ||  
+        (datos.cantidad.value=='' || datos.cantidad.value == '0') ||
+        (datos.tolerancia.value=='' || datos.tolerancia.value == '0')){
+          erroresExportador = true;
+          return;
+        }
+      });
+
+      if (erroresDestinos || erroresCoordinador || erroresExportador){
+        this.confirmationDialogService.confirm('Registro Nominación', 'Falta completar información en destino, cargador o cliente.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+        return false;
+      }
+    }
+    console.log('listaNominacionDatoTecnicoCalidad>>', this.listaNominacionDatoTecnicoCalidad);
+    const listaNominacion = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
+    this.datoTecnicoForm.controls['nominacionDatoTecnicoCalidad'].setValue(listaNominacion);
+    this.datoTecnicoForm.value.nominacionDatoTecnicoCalidad = listaNominacion;
     console.log('this.datoTecnicoForm-->>', this.datoTecnicoForm);
   }
 
   public onCancelarDatoTecnico(){
   }
 
+}
+export class ListaNominacionCalidad{
+  calidadValor: CalidadValor;
+  esSeleccionado: boolean;
 }
