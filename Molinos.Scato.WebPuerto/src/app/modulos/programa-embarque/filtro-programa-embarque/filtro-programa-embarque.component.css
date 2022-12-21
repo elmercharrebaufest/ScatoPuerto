@@ -13,4 +13,5 @@
 
 :host ::ng-deep .multiselect-dropdown .dropdown-btn {
     background: #ffffff !important;
+    color: #898989 !important;
 }

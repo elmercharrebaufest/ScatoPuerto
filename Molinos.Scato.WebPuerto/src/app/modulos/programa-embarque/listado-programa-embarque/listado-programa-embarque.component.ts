@@ -17,7 +17,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public orderedByColumn: string;
   public orderDirection: number;
   programa: any[]
-  subscripcionPrograma: Subscription
+  subscripcionPrograma: Subscription 
   
   paginator: any;
   length = 0;
@@ -32,19 +32,23 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   pageEvent: PageEvent;
   filtros: any;
+  public estaCargando = false;
   //#endregion
   constructor(private progamaService: ProgramaEmbarqueService, 
     private programaEmbarqueService: ProgramaEmbarqueService) { }
 
   ngOnInit(): void {
+    this.estaCargando = true;
     this.subscripcionPrograma = this.progamaService.observablePrograma.subscribe(
       (data: any) => {
         this.programa = data;
         this.length = this.programa.length > 0 ? this.programa[0].itemsTotales : this.programa.length;
         this.pageSize = this.programa.length > 0 ? this.programa[0].itemPorPagina : 10;
         this.pageIndex = this.programa.length > 0 ? this.programa[0].pagina : 1;
+        this.estaCargando = false; 
       }
-    )   
+    )
+     
   }
   ngOnDestroy(): void {
     this.subscripcionPrograma.unsubscribe();
@@ -95,4 +99,18 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       this.pageSizeOptions = setPageSizeOptionsInput.split(',').map(str => +str);
     }
   }
+
+  public devolverColorEstado(estado){
+    //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs, 
+    //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
+    return estado == 1 ? "#53b229" : estado == 2 ? "#1c7cd5" : estado == 3 ? "#dddddd" : "#d9534f"  
+  }
+  public devolverMensajeDeEstados(estado){
+    //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs, 
+    //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
+    return estado == 1 ? "Enviado a Line up" : estado == 2 ?
+     "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"  
+  }
+
+  
 }
