@@ -21,10 +21,14 @@ namespace Molinos.Scato.Dominio.Dto
         public string TasaDeCargaValor { get; set; }
         public decimal DEM { get; set; }
         public decimal DES { get; set; }
-        public TipoContratoDto TipoContrato { get; set; }
+        public TipoDeContratoDto TipoDeContrato { get; set; }
         public ATAPuertoDto ATAPuerto { get; set; }
         public AgenciaMaritimaPuertoDto AgenciaMaritimaPuerto { get; set; }
         public SurveyorDto Surveyor { get; set; }
         public string ObservacionesSurveyor { get; set; }
+        public ICollection<NominacionDatoTecnicoCalidadDto> NominacionDatoTecnicoCalidad { get; set; }
+        public ICollection<NominacionDatoTecnicoCoordinadorPuertoDto> NominacionDatoTecnicoCoordinadorPuerto { get; set; }
+        public ICollection<NominacionDatoTecnicoExportadorDto> NominacionDatoTecnicoExportador { get; set; }
+        public ICollection<NominacionDatoTecnicoDestinoDto> NominacionDatoTecnicoDestino { get; set; }
     }
 }

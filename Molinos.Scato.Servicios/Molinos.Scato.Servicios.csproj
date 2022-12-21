@@ -210,6 +210,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\MotivosLimpiezaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BanderaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\MuelleDeCargaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoCalidadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoCoordinadorPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoDestinoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoExportador.cs" />
@@ -283,7 +284,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\SurveyorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TasaDeCargaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoArchivoPuertoMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\TipoContratoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TipoDeContratoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDeBuquePuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDeCalidadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDeFumigacionMappingProfile.cs" />

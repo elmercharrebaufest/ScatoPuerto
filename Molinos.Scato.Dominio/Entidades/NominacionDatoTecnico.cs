@@ -23,10 +23,14 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string TasaDeCargaValor { get; set; }
         public virtual decimal DEM { get; set; }
         public virtual decimal DES { get; set; }
-        public virtual TipoContrato TipoContrato { get; set; }
+        public virtual TipoDeContrato TipoDeContrato { get; set; }
         public virtual ATAPuerto ATAPuerto { get; set; }
         public virtual AgenciaMaritimaPuerto AgenciaMaritimaPuerto { get; set; }
         public virtual Surveyor Surveyor { get; set; }
         public virtual string ObservacionesSurveyor { get; set; }
+        public virtual ICollection<NominacionDatoTecnicoCalidad> NominacionDatoTecnicoCalidad { get; set; }
+        public virtual ICollection<NominacionDatoTecnicoCoordinadorPuerto> NominacionDatoTecnicoCoordinadorPuerto { get; set; }
+        public virtual ICollection<NominacionDatoTecnicoExportador> NominacionDatoTecnicoExportador { get; set; }
+        public virtual ICollection<NominacionDatoTecnicoDestino> NominacionDatoTecnicoDestino { get; set; }
     }
 }

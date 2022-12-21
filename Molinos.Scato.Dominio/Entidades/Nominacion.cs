@@ -19,7 +19,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual DateTime? FechaEliminacion { get; set; }
         public virtual Embarque Embarque { get; set; }
         public virtual NominacionDatoTecnico NominacionDatoTecnico { get; set; }
-        public virtual NominacionDetalleIntervencion NominacionDetalleIntervecion { get; set; }
+        public virtual NominacionDetalleIntervencion NominacionDetalleIntervencion { get; set; }
         public virtual ICollection<NominacionRecibo> NominacionRecibo { get; set; }
 
     }
