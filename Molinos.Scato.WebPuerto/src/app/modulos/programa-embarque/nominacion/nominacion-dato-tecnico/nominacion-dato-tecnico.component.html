@@ -18,6 +18,7 @@
                     <input type="text" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadTotal"
                         [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" 
+                        required
                         (keypress)="numberOnly($event)">
                     <div class="input-group-append">
                         <span class="input-group-text">Tn</span>
@@ -44,10 +45,8 @@
                     <option *ngFor="let calidad of listaTipoDeCalidadxMaterial(datoTecnicoForm.controls['materialPuerto'].value)" [ngValue]="calidad">{{calidad.descripcion}}</option>
                 </select>
             </div>
-            <div class="form-group col-md-4">
-                <div class="input-group" >
+            <div class="form-group col-md-4 botones-alineado-abajo">
                     <button type="button" class="btn btn-sm btn-outline-primary" (click)="onMostrarParametroCalidad()">{{mostrarParametroCalidad? 'Ocultar' : 'Mostrar'}} Parametros</button>
-                </div>
             </div>
         </div>
         <div class="row form-row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !='' && mostrarParametroCalidad">
@@ -56,7 +55,7 @@
                     <thead class="header-calida-valor" >
                         <tr>
                             <th width="30%">
-                                <input type="checkbox" class="largerCheckbox"/>
+                                <input type="checkbox" class="largerCheckbox" (change)="onSeleccionarTodos($event)"/>
                                 Párametros
                             </th>
                             <th width="70%">Valores</th>
@@ -67,7 +66,8 @@
                             <td>
                                 <input class="largerCheckbox" 
                                        type="checkbox" 
-                                       (change)="onSeleccionarParametroCalidad(calidad.calidadValor)"/>
+                                       [checked]="calidad.esSeleccionado"
+                                       (change)="onSeleccionarParametro(calidad.calidadValor)"/>
                                 {{calidad.calidadValor.parametro}}
                             </td>
                             <td>{{calidad.calidadValor.valor}}</td>
@@ -91,8 +91,8 @@
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo destino</span>
                 </div>
-                <div formArrayName="datoTecnicoDestino">
-                    <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let destino of datoTecnicoForm.get('datoTecnicoDestino').value; let i = index; trackBy:trackByFn">
+                <div formArrayName="nominacionDatoTecnicoDestino">
+                    <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let destino of datoTecnicoForm.get('nominacionDatoTecnicoDestino').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
                                 <div class="form-group col-6">
                                     <label *ngIf="i==0" for="destino" class="font-weight-bold">Destino</label>
@@ -103,7 +103,6 @@
                                         maxlength="50"
                                         placeholder="Seleccione un destino"
                                         [ngbTypeahead]="buscarDestino"
-                                        (selectItem)="seleccionDestino($event)"
                                         [inputFormatter]="formatoDestino"
                                         [resultFormatter]="formatoDestino"
                                         />
@@ -119,7 +118,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group col-1 boton-eliminar">
+                                <div class="form-group col-1 botones-alineado-abajo">
                                     <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)">
                                 </div>
                         </div>
@@ -132,8 +131,8 @@
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cargador</span>
                 </div>
-                <div formArrayName="datoTecnicoExportador">
-                    <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let exportador of datoTecnicoForm.get('datoTecnicoExportador').value; let i = index; trackBy:trackByFn">
+                <div formArrayName="nominacionDatoTecnicoExportador">
+                    <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let exportador of datoTecnicoForm.get('nominacionDatoTecnicoExportador').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
                             <div class="form-group col-5">
                                 <label *ngIf="i==0" for="exportador" class="font-weight-bold">Exportador</label>
@@ -144,7 +143,6 @@
                                     maxlength="50"
                                     placeholder="Seleccione un exportador"
                                     [ngbTypeahead]="buscarExportador"
-                                    (selectItem)="seleccionExportador($event)"
                                     [inputFormatter]="formatoExportador"
                                     [resultFormatter]="formatoExportador"
                                     />
@@ -174,7 +172,7 @@
                                 </div>
                                 </div>
                             </div>
-                            <div class="form-group col-1 boton-eliminar">
+                            <div class="form-group col-1 botones-alineado-abajo">
                                 <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoExportador(i)">
                             </div>
                         </div>
@@ -188,8 +186,8 @@
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cliente</span>
                 </div>
-                <div formArrayName="datoTecnicoCoordinador">
-                    <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let coordinador of datoTecnicoForm.get('datoTecnicoCoordinador').value; let i = index; trackBy:trackByFn">
+                <div formArrayName="nominacionDatoTecnicoCoordinadorPuerto">
+                    <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let coordinador of datoTecnicoForm.get('nominacionDatoTecnicoCoordinadorPuerto').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">                       
                             <div class="form-group col-6">
                                 <label *ngIf="i==0" for="coordinadorPuerto" class="font-weight-bold">Cliente</label>
@@ -200,7 +198,6 @@
                                     maxlength="50"
                                     placeholder="Seleccione un cliente"
                                     [ngbTypeahead]="buscarCoordinadorPuerto"
-                                    (selectItem)="seleccionCoordinadorPuerto($event)"
                                     [inputFormatter]="formatoCoordinadorPuerto"
                                     [resultFormatter]="formatoCoordinadorPuerto"
                                     
@@ -220,7 +217,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-1 boton-eliminar">
+                            <div class="form-group col-1 botones-alineado-abajo">
                                 <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoCoordinador(i)">
                             </div>
                         </div>
@@ -249,9 +246,8 @@
             <div class="form-group col-md-4">
                 <label for="bandera" class="font-weight-bold">Bandera</label>
                 <select class="custom-select" 
-                        formControlName="bandera" 
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.bandera.invalid}" 
-                        required>
+                        [disabled]="true"
+                        formControlName="bandera">
                     <option value=""></option>
                     <option *ngFor="let bandera of listaBanderas" [ngValue]="bandera">{{bandera.nombre}}</option>
                 </select>
@@ -348,8 +344,6 @@
                                    [secondaryPlaceholder]="'Ingrese el A.T.A'"
                                    [identifyBy]="'id'" 
                                    [displayBy]="'nombre'" 
-                                   [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.ataPuerto.invalid}" 
-                                   required
                                    [maxItems]="1">
                             <tag-input-dropdown 
                                     [showDropdownIfEmpty]="true" 
@@ -372,8 +366,6 @@
                                    [secondaryPlaceholder]="'Ingrese la Agencia'"
                                    [identifyBy]="'id'" 
                                    [displayBy]="'nombre'" 
-                                   [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.agenciaMaritimaPuerto.invalid}" 
-                                   required
                                    [maxItems]="1">
                             <tag-input-dropdown 
                                     [showDropdownIfEmpty]="true" 

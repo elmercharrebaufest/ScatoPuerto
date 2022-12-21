@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class ProgramaEmbarqueController : BaseController
     {
+        private readonly IServicioComandos comandos;
 
         public ProgramaEmbarqueController(IServicioRepositorio servicio,
             IServicioProgramaEmbarque servicioProgramaEmbarque,
-            IServicioComandos servicioComandos) : base(servicio, servicioProgramaEmbarque)
+            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque)
         {
+            this.comandos = comandos;
 
         }
 
@@ -163,6 +166,56 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarTipoDeCalidad());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacion")]
+        public HttpResponseMessage RegistrarNominacion(NominacionDto nominacion)
+        {
+            try
+            {
+
+             comandos.Ejecutar(new GuardarNominacion { Dto = nominacion, 
+                                                  EsCreacion = true, 
+                                                  EsModificacionDatoTecnico = false, 
+                                                  EsModificacionIntervenciones = false, 
+                                                  EsModificacionRecibos = false});
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacionDatoTecnico")]
+        public HttpResponseMessage RegistrarNominacionDatoTecnico(NominacionDatoTecnicoDto nominacionDatoTecnicoDto)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "Prueba");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacionDetalleIntervenciones")]
+        public HttpResponseMessage RegistrarNominacionDetalleIntervencion(NominacionDetalleIntervencionDto nominacionDetalleIntervencion)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "Prueba");
             }
             catch (Exception ex)
             {

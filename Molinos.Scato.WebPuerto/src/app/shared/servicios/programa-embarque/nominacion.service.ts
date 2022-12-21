@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
+import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
@@ -49,5 +50,8 @@ export class NominacionService {
     public obtenerCalidadValor(): Observable<CalidadValor[]> {
         return this.http.get<CalidadValor[]>(`${this.url}ProgramaEmbarque/ListarCalidadValor`, { 'withCredentials': true });
     }
-    
+    public registroNominacion(nominacion: Nominacion){
+        return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacion`,nominacion, { 'withCredentials': true });
+        //return this.http.post(`${this.url}LineUp/ModificarOrden`, dcnIdsYOrden, { 'withCredentials': true });
+    }
 }
