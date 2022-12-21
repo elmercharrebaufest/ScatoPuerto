@@ -25,6 +25,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual decimal Puntual { get; set; }
         public virtual int CantidadBodegasTks { get; set; }
 
-        
+        public virtual Bandera Bandera { get; set; }
+        public virtual Vapor Vapor { get; set; }
+
     }
 }
