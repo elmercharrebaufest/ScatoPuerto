@@ -699,6 +699,7 @@
     <Compile Include="Dto\EstadoIntercomunicadorDto.cs" />
     <Compile Include="Dto\BanderaDto.cs" />
     <Compile Include="Dto\MuelleDeCargaDto.cs" />
+    <Compile Include="Dto\NominacionDatoTecnicoCalidadDto.cs" />
     <Compile Include="Dto\NominacionDatoTecnicoCoordinadorPuertoDto.cs" />
     <Compile Include="Dto\NominacionDatoTecnicoDestinoDto.cs" />
     <Compile Include="Dto\NominacionDatoTecnicoDto.cs" />
@@ -849,7 +850,7 @@
     <Compile Include="Dto\SurveyorDto.cs" />
     <Compile Include="Dto\TasaDeCargaDto.cs" />
     <Compile Include="Dto\TipoArchivoPuertoDto.cs" />
-    <Compile Include="Dto\TipoContratoDto.cs" />
+    <Compile Include="Dto\TipoDeContratoDto.cs" />
     <Compile Include="Dto\TipoDeActividadDto.cs" />
     <Compile Include="Dto\TipoDeBuquePuertoDto.cs" />
     <Compile Include="Dto\TipoDeCalidadDto.cs" />
@@ -1032,6 +1033,7 @@
     <Compile Include="Entidades\MuelleDeCarga.cs" />
     <Compile Include="Entidades\Nominacion.cs" />
     <Compile Include="Entidades\NominacionDatoTecnico.cs" />
+    <Compile Include="Entidades\NominacionDatoTecnicoCalidad.cs" />
     <Compile Include="Entidades\NominacionDatoTecnicoCoordinadorPuerto.cs" />
     <Compile Include="Entidades\NominacionDatoTecnicoDestino.cs" />
     <Compile Include="Entidades\NominacionDatoTecnicoExportador.cs" />
@@ -1106,7 +1108,7 @@
     <Compile Include="Entidades\Surveyor.cs" />
     <Compile Include="Entidades\TasaDeCarga.cs" />
     <Compile Include="Entidades\TipoArchivoPuerto.cs" />
-    <Compile Include="Entidades\TipoContrato.cs" />
+    <Compile Include="Entidades\TipoDeContrato.cs" />
     <Compile Include="Entidades\TipoDeActividad.cs" />
     <Compile Include="Entidades\TipoDeBuquePuerto.cs" />
     <Compile Include="Entidades\TipoDeCalidad.cs" />

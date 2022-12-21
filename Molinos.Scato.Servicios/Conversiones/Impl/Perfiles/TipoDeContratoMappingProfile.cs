@@ -4,7 +4,7 @@ using Molinos.Scato.Dominio.Entidades;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
-    public class TipoContratoMappingProfile : Profile
+    public class TipoDeContratoMappingProfile : Profile
     {
         public override string ProfileName
         {
@@ -12,8 +12,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         }
         protected override void Configure()
         {
-            Mapper.CreateMap<TipoContrato, TipoContratoDto>();
-            Mapper.CreateMap<TipoContratoDto, TipoContrato>();
+            Mapper.CreateMap<TipoDeContrato, TipoDeContratoDto>();
+            Mapper.CreateMap<TipoDeContratoDto, TipoDeContrato>();
         }
     }
 }
