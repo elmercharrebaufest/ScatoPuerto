@@ -26,7 +26,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             select new 
                             {
                                 Producto = item.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
-                                NombreBuque = item.NominacionDatoTecnico.Vapor.Nombre,
+                                NombreBuque = item.NominacionDatoTecnico.VaporInformacion.NombreBuque,
                                 Muelle = item.NominacionDatoTecnico.MuelleDeCarga.Descripcion
                             };
 
