@@ -2303,7 +2303,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
                                         join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
                                         join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
-                                        where a.NombreGrupoAd == "LAD_MOAAPP_PUERTO_SISTEMA"
+                                        //where a.NombreGrupoAd == "LAD_MOAAPP_PUERTO_SISTEMA"
                                         select (e.NombrePermiso);
 
                 gruposPermisosDebug.AddRange(permisoGrupoDebug);
