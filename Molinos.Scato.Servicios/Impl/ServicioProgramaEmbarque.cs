@@ -64,5 +64,23 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.ObtenerConsultaEscalar(new ListarProgramaEmbarqueCombos());
         }
 
+        public NominacionDto ObtenerNominacion(int id)
+        {
+            try
+            {
+                var nominacion = Obtener<Nominacion, NominacionDto>(id);
+                nominacion.Embarque = null;
+                return nominacion;
+            }
+            catch (Exception e)
+            {
+                log.Debug(e.Message);
+                throw;
+            }
+        }
+        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
+        {
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
+        }
     }
 }
