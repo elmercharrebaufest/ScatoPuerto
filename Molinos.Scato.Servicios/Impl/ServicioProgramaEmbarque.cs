@@ -136,22 +136,21 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
         }
-
-        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro)
-            where TEntidad : class
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
         }
-
-        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro, int maxResultados)
-            where TEntidad : class
+        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
         {
-            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro, maxResultados));
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
+        }
+        private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
         }
         
         public NominacionDto ObtenerNominacion(int id)

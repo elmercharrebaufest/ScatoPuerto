@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { TipoDeCalidad } from "@ScatoModels/programa-embarque/tipo-de-calidad";
+import { NominacionDatoTecnicoService } from "@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service";
 import { NominacionService } from "@ScatoServicios/programa-embarque/nominacion.service";
 import { tap } from "rxjs/operators";
 import { GetObtenerTipoDeCalidad } from "./tipo-de-calidad.actions";
@@ -20,7 +21,7 @@ export class TipoDeCalidadStateModel {
 
 @Injectable()
 export class TipoDeCalidadState{
-    constructor(private nominacionService: NominacionService) {
+    constructor(private nominacionService: NominacionDatoTecnicoService) {
     }
     @Selector()
     static getListaTipoDeCalidad(state: TipoDeCalidadStateModel) {

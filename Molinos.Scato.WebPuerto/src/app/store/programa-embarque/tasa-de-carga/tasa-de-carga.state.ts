@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { TasaDeCarga } from "@ScatoModels/programa-embarque/tasa-de-carga";
+import { NominacionDatoTecnicoService } from "@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service";
 import { NominacionService } from "@ScatoServicios/programa-embarque/nominacion.service";
 import { tap } from "rxjs/operators";
 import { GetObtenerTasaDeCarga } from "./tasa-de-carga.actions";
@@ -20,7 +21,7 @@ export class TasaDeCargaStateModel {
 
 @Injectable()
 export class TasaDeCargaState {
-    constructor(private nominacionService: NominacionService) {
+    constructor(private nominacionService: NominacionDatoTecnicoService) {
     }
     @Selector()
     static getListaTasaDeCarga(state: TasaDeCargaStateModel) {

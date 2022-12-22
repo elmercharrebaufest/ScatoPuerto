@@ -131,6 +131,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, AfterViewInit {
     this.cargarListasDeNominacion();
     this.obtenerListasDeNominacion();
     this.configurarListasDeNominacion();
+    this.datoTecnicoRegistroService.obtenerNominacion();
   }
 
   public get frmDatosTecnicos() { return this.datoTecnicoForm.controls; }

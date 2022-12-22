@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { Surveyor } from "@ScatoModels/programa-embarque/surveyor";
+import { NominacionDatoTecnicoService } from "@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service";
 import { NominacionService } from "@ScatoServicios/programa-embarque/nominacion.service";
 import { tap } from "rxjs/operators";
 import { GetObtenerSurveyor } from "./surveyor.actions";
@@ -20,7 +21,7 @@ export class SurveyorStateModel {
 
 @Injectable()
 export class SurveyorState {
-    constructor(private nominacionService: NominacionService) {
+    constructor(private nominacionService: NominacionDatoTecnicoService) {
     }
     @Selector()
     static getListaSurveyor(state: SurveyorStateModel) {

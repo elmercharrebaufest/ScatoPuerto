@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { MuelleDeCarga } from "@ScatoModels/programa-embarque/muelle-de-carga";
+import { NominacionDatoTecnicoService } from "@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service";
 import { NominacionService } from "@ScatoServicios/programa-embarque/nominacion.service";
 import { tap } from "rxjs/operators";
 import { GetObtenerMuelleDeCarga } from "./muelle-de-carga.actions";
@@ -20,7 +21,7 @@ export class MuelleDeCargaStateModel {
 
 @Injectable()
 export class MuelleDeCargaState{
-    constructor(private nominacionService: NominacionService) {
+    constructor(private nominacionService: NominacionDatoTecnicoService) {
     }
     @Selector()
     static getListaMuelleDeCarga(state: MuelleDeCargaStateModel) {

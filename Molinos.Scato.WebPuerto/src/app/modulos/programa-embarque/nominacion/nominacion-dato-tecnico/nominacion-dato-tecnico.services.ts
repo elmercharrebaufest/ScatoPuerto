@@ -11,6 +11,7 @@ import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
+import { NominacionDatoTecnicoService } from '@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +20,7 @@ export class NominacionDatoTecnicoRegistroService {
 
     constructor(private confirmationDialogService: ConfirmationDialogService,
         private buqueService: BuqueService,
-        private nominacionService: NominacionService,
+        private nominacionService: NominacionDatoTecnicoService,
         private formBuilder: FormBuilder) {
     }
 
@@ -166,6 +167,11 @@ export class NominacionDatoTecnicoRegistroService {
             console.log(data)
         });
     }
+    public obtenerNominacion(){
+        this.nominacionService.obtenerNominacion(14).subscribe(data=> {
+            console.log(data)
+        });
 
+    }
 
 }

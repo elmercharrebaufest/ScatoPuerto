@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { TipoDeContrato } from "@ScatoModels/programa-embarque/tipo-de-contrato";
+import { NominacionDatoTecnicoService } from "@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service";
 import { NominacionService } from "@ScatoServicios/programa-embarque/nominacion.service";
 import { tap } from "rxjs/operators";
 import { GetObtenerTipoDeContrato } from "./tipo-de-contrato.actions";
@@ -20,7 +21,7 @@ export class TipoDeContratoStateModel {
 
 @Injectable()
 export class TipoDeContratoState{
-    constructor(private nominacionService: NominacionService) {
+    constructor(private nominacionService: NominacionDatoTecnicoService) {
     }
     @Selector()
     static getListaTipoDeContrato(state: TipoDeContratoStateModel) {
