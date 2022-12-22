@@ -60,6 +60,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUp_Exportar)]
+        [Route("api/ProgramaEmbarque/ObtenerNominacion")]
+        public HttpResponseMessage ObtenerNominacion(int id)
+        {
+            try
+            {
+
+           
+            var nominacion = servicioProgramaEmbarque.ObtenerNominacion(id);
+            return Request.CreateResponse(HttpStatusCode.OK,
+                nominacion
+            );
+            }
+            catch (Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
+
 
 
     }

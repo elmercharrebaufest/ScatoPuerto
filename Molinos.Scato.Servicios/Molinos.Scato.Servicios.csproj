@@ -213,7 +213,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoCalidadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoCoordinadorPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoDestinoMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoExportador.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoExportadorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionDetalleIntervencionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NominacionMappingProfile.cs" />

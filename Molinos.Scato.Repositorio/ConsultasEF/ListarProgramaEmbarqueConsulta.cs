@@ -65,7 +65,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     EnviadoFumigador = item.EnviadoFumigador,
                                     EnviadoOtros = item.EnviadoOtros,
                                     EnviadoSurveyor = item.EnviadoSurveyor,
-                                    Contrato = item.NominacionDatoTecnico.TipoContrato.Descripcion,
+                                    Contrato = item.NominacionDatoTecnico.TipoDeContrato.Descripcion,
                                     Estado = item.FechaEnvioLineUp.HasValue && !item.FechaEliminacion.HasValue ? 1 :
                                     (item.FechaCreacion < hoy && item.FechaCreacion > ayer) && !item.FechaEliminacion.HasValue ? 2
                                     : item.FechaCreacion < ayer && !item.FechaEliminacion.HasValue ? 3 : item.FechaEliminacion.HasValue ? 4 : 0,

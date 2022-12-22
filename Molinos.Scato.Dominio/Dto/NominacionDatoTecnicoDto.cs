@@ -18,7 +18,7 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime? ObligacionDeCarga { get; set; }
         public MuelleDeCargaDto MuelleDeCarga { get; set; }
         public TasaDeCargaDto TasaDeCarga { get; set; }
-        public string TasaDeCargaValor { get; set; }
+        public int? TasaDeCargaValor { get; set; }
         public decimal DEM { get; set; }
         public decimal DES { get; set; }
         public TipoDeContratoDto TipoDeContrato { get; set; }
