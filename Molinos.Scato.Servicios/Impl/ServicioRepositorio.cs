@@ -2303,7 +2303,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
                                         join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
                                         join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
-                                        where a.NombreGrupoAd == "SWDEV"
+                                        where a.NombreGrupoAd == "LAD_MOAAPP_PUERTO_SISTEMA"
                                         select (e.NombrePermiso);
 
                 gruposPermisosDebug.AddRange(permisoGrupoDebug);
@@ -11107,7 +11107,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 var embar = (from e in repositorio.Listar<Embarque>()
                              join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
-                             join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
+                         // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
                              join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
                              where e.Ubicacion != 1 && l.ModuloDeCarga.Id > 0
                              orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
