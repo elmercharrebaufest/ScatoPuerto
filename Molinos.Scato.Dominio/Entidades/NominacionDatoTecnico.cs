@@ -15,7 +15,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int CantidadTotal { get; set; }
         public virtual int Tolerancia { get; set; }
         public virtual string Observaciones { get; set; }
-        public virtual Vapor Vapor { get; set; }
+        public virtual VaporInformacion VaporInformacion { get; set; }
         public virtual DateTime? ETARecalada { get; set; }
         public virtual DateTime? ObligacionDeCarga { get; set; }
         public virtual MuelleDeCarga MuelleDeCarga { get; set; }
