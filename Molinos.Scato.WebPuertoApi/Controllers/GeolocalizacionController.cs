@@ -81,7 +81,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var embarquesLineUp = workflows.ListarEmbarques("LineUp");
+
+                var embarquesLineUp = servicio.ListarEmbarques();
+
+                //var embarquesLineUp = workflows.ListarEmbarques("LineUp");
 
                 embarquesLineUp = embarquesLineUp.GroupBy(x=>x.Embarque.NombreBuque).Select(x=>x.FirstOrDefault()).ToList();
                 List<DatosEmbarqueGeolocalizacion> embarques = new List<DatosEmbarqueGeolocalizacion>();
@@ -144,8 +147,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-               var listaEmbarques = workflows.ListarEmbarques();
-                //  var listaEmbarques = servicio.ListarEmbarques();
+              // var listaEmbarques = workflows.ListarEmbarques();
+                  var listaEmbarques = servicio.ListarEmbarques();
 
                 List<EmbarqueGeolocalizacionDto> listaEmbarcacionGeolocalizacion = new List<EmbarqueGeolocalizacionDto>();
                 IList<UbicacionDeBuquePuertoDto> listarUbicacionDeBuquePuerto = servicio.ListarUbicacionDeBuquePuerto();

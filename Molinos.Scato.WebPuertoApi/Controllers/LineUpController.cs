@@ -153,7 +153,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             try
             {
-                var embarques = workflows.ListarEmbarques();
+               // var embarques = workflows.ListarEmbarques();
+                var embarques = servicio.ListarEmbarques();
                 var estado = servicio.ObtenerEstadoPuerto();
                 var resultado = new ResultadoPrevisualizar();
                 var generadorExcel = new ExcelLineUp();
@@ -184,7 +185,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var docFile = "Line Up " + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
             try
             {
-                var embarques = workflows.ListarEmbarques();
+                //var embarques = workflows.ListarEmbarques();
+                var embarques = servicio.ListarEmbarques();
                 var estado = servicio.ObtenerEstadoPuerto();
                 var resultado = new ResultadoPrevisualizar();
                 var generadorExcel = new ExcelLineUp();
