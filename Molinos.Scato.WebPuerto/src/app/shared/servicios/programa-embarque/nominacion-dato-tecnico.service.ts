@@ -39,7 +39,7 @@ export class NominacionDatoTecnicoService {
   public registroNominacion(nominacion: Nominacion) {
     return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionDatoTecnico`, nominacion, { 'withCredentials': true });
   }
-  public obtenerNominacion(nominacionId: number) {
-    return this.http.get(`${this.url}ProgramaEmbarque/ListarNominacion`, { 'withCredentials': true });
+  public obtenerNominacion(id: number) {
+    return this.http.get<Nominacion>(`${this.url}ProgramaEmbarque/ObtenerNominacion?id=${id}`, { 'withCredentials': true });
   }
 }

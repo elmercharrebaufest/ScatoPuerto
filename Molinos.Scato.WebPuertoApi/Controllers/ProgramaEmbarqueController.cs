@@ -61,8 +61,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public HttpResponseMessage ListarProgramaEmbarque(int? pagina = null, int? itemsPorPagina = null, DateTime? fecha = null, string muelle = null, string buque = null, string producto = null)
         {
             try
-            {                
-                var paginacion = new Paginacion(null, DirOrden.Desc, ( pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 :itemsPorPagina.Value);              
+            {
+                var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
                 var response = servicioProgramaEmbarque.ListarProgramaDeEmbarque(paginacion, fecha,
                     (!string.IsNullOrEmpty(muelle) ? muelle.Split(',').ToList() : null),
                     (!string.IsNullOrEmpty(buque) ? buque.Split(',').ToList() : null),
@@ -83,12 +83,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
-           
-            var nominacion = servicioProgramaEmbarque.ObtenerNominacion(id);
-            return Request.CreateResponse(HttpStatusCode.OK,
-                nominacion
-            );
+                var nominacion = servicioProgramaEmbarque.ObtenerNominacion(id);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    nominacion
+                );
             }
             catch (Exception ex)
             {
@@ -173,36 +171,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ProgramaEmbarque/ListarNominacion")]
-        public HttpResponseMessage ListarNominacion()
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarNominacion());
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpGet]
-        [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ProgramaEmbarque/ObtenerNominacion")]
-        public HttpResponseMessage ObtenerNominacion()
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.obtenerNominacion(0));
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarNominacion")]
@@ -217,7 +185,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-        
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarNominacionDatoTecnico")]
@@ -237,7 +205,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-        
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarNominacionDetalleIntervenciones")]
@@ -267,6 +235,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-    
+
     }
 }

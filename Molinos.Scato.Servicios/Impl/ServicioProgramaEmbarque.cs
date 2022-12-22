@@ -135,6 +135,19 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+        public NominacionDto ObtenerNominacion(int id)
+        {
+            try
+            {
+                var nominacion = Obtener<Nominacion, NominacionDto>(id);
+                nominacion.Embarque = null;
+                return nominacion;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {
@@ -151,22 +164,6 @@ namespace Molinos.Scato.Servicios.Impl
         private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
-        }
-        
-        public NominacionDto ObtenerNominacion(int id)
-        {
-            try
-            {
-                var nominacion = Obtener<Nominacion, NominacionDto>(id);
-                nominacion.Embarque = null;
-                return nominacion;
-            }
-            catch (Exception e)
-            {
-                log.Debug(e.Message);
-                throw;
-            }
-        }
-        
+        }        
     }
 }

@@ -33,8 +33,6 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         ProgramaEmbarqueDto ListarDatosCombo();
 
-
-
         [OperationContract]
         IList<CalidadValorDto> listarCalidadValor();
 
