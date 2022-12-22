@@ -52,7 +52,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     FechaEliminacion = item.FechaEliminacion.HasValue ? item.FechaEliminacion : null,
                                     FechaCreacion = item.FechaCreacion.HasValue ? item.FechaCreacion : null,
                                     FechaEnvioLineUp = item.FechaEnvioLineUp.HasValue ? item.FechaEnvioLineUp : null,
-                                    NombreBuque = item.NominacionDatoTecnico.Vapor.Nombre,
+                                    NombreBuque = item.NominacionDatoTecnico.VaporInformacion.NombreBuque,
                                     MuelleDeCarga = item.NominacionDatoTecnico.MuelleDeCarga.Descripcion,
                                     Cargadores = from nominacionDatoTecnico in contexto.Set<NominacionDatoTecnicoExportador>()
                                                  where nominacionDatoTecnico.NominacionDatoTecnico.Id == item.NominacionDatoTecnico.Id
