@@ -8,6 +8,9 @@ import { Surveyor } from "./surveyor";
 import { TipoDeContrato } from "./tipo-de-contrato";
 import { NominacionDatoTecnicoCalidad } from "./nominacion-dato-tecnico-calidad";
 import { VaporInformacion } from "@ScatoModels/Buques/VaporInformacion";
+import { NominacionDatoTecnicoDestino } from "./nominacion-dato-tecnico-destino";
+import { NominacionDatoTecnicoExportador } from "./nominacion-dato-tecnico-exportador";
+import { NominacionDatoTecnicoCoordinador } from "./nominacion-dato-tecnico-coordinador";
 
 
 export class NominacionDatoTecnico {
@@ -24,18 +27,21 @@ export class NominacionDatoTecnico {
     tasaDeCargaValor: string;
     dem: number;
     des: number;
-    tipoContrato: TipoDeContrato;
+    tipoDeContrato: TipoDeContrato;
     ataPuerto: ATAPuerto;
     agenciaMaritimaPuerto: AgenciaMaritimaPuerto;
     surveyor: Surveyor;
     observacionesSurveyor: string;
     nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
+    nominacionDatoTecnicoDestino: NominacionDatoTecnicoDestino[];
+    nominacionDatoTecnicoExportador: NominacionDatoTecnicoExportador[];
+    nominacionDatoTecnicoCoordinadorPuerto: NominacionDatoTecnicoCoordinador[];
 
     constructor(id, materialPuerto, cantidadTotal,
         tolerancia, observaciones, vaporInformacion,
         etaRecalada, obligacionDeCarga, muelleDeCarga,
         tasaDeCarga, tasaDeCargaValor, dem,
-        des, tipoContrato, ataPuerto,
+        des, tipoDeContrato, ataPuerto,
         agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad) {
         this.id = id;
         this.materialPuerto = materialPuerto;
@@ -50,7 +56,7 @@ export class NominacionDatoTecnico {
         this.tasaDeCargaValor = tasaDeCargaValor;
         this.dem = dem;
         this.des = des;
-        this.tipoContrato = tipoContrato;
+        this.tipoDeContrato = tipoDeContrato;
         this.ataPuerto = ataPuerto;
         this.agenciaMaritimaPuerto = agenciaMaritimaPuerto;
         this.surveyor = surveyor;

@@ -46,7 +46,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var nominacionDatoTecnico = this.AsignarDatoTecnico(comando);
                 var datoTecnico = comando.Dto.NominacionDatoTecnico;
-                Repositorio.Agregar(nominacionDatoTecnico);
                 Repositorio.GuardarCambios();
 
                 this.AsignarDatoTecnicoDetalles(nominacionDatoTecnico, datoTecnico, comando.EsCreacion);

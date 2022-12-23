@@ -241,7 +241,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 comandos.Ejecutar(new GuardarNominacionDatoTecnico
                 {
                     Dto = nominacion,
-                    EsCreacion = true
+                    EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
                 });
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
