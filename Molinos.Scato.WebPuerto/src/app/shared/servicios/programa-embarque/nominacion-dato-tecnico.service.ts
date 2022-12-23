@@ -9,6 +9,8 @@ import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { Observable } from 'rxjs';
+import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
+import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
 
 @Injectable({
   providedIn: 'root'
@@ -36,10 +38,16 @@ export class NominacionDatoTecnicoService {
   public obtenerCalidadValor(): Observable<CalidadValor[]> {
     return this.http.get<CalidadValor[]>(`${this.url}ProgramaEmbarque/ListarCalidadValor`, { 'withCredentials': true });
   }
+  public obtenerVaporInformacion(): Observable<VaporInformacion[]> {
+    return this.http.get<VaporInformacion[]>(`${this.url}ProgramaEmbarque/ListarVaporInformacion`, { 'withCredentials': true });
+  }
   public registroNominacion(nominacion: Nominacion) {
     return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionDatoTecnico`, nominacion, { 'withCredentials': true });
   }
   public obtenerNominacion(id: number) {
     return this.http.get<Nominacion>(`${this.url}ProgramaEmbarque/ObtenerNominacion?id=${id}`, { 'withCredentials': true });
+  }
+  public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico> {
+    return this.http.get<ProgramaEmbarqueNominacionDatoTecnico>(`${this.url}ProgramaEmbarque/ListarCombosDatoTecnico`, { 'withCredentials': true });
   }
 }

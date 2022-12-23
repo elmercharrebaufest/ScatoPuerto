@@ -709,7 +709,7 @@
     <Compile Include="Dto\ProgramaEmbarqueDto.cs" />
     <Compile Include="Dto\NominacionDto.cs" />
     <Compile Include="Dto\NominacionReciboDto.cs" />
-    <Compile Include="Dto\ProgramaEmbarqueNominacionDto.cs" />
+    <Compile Include="Dto\ProgramaEmbarqueNominacionDatoTecnicoDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDetallesDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDto.cs" />
     <Compile Include="Dto\ParametrosDto.cs" />

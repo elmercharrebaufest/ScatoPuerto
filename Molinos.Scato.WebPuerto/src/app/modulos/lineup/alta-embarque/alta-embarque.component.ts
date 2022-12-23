@@ -607,7 +607,7 @@ export class AltaEmbarqueComponent implements OnInit {
         altaEmbarque.patente = this.vaporInfo.nombreBuque;
         altaEmbarque.nombreBuque = this.vaporInfo.nombreBuque;
         altaEmbarque.Vapor = {
-          id : this.vaporInfo.vapor_Id,
+          id : this.vaporInfo.vapor.id,
           nombre : this.vaporInfo.nombreBuque
         }
       }
@@ -1217,8 +1217,8 @@ export class AltaEmbarqueComponent implements OnInit {
 
   setinfoSelected(){
     let bandera;
-      if(this.vaporInfo.bandera_Id !== undefined || this.vaporInfo.bandera_Id !== null){
-        bandera = this.banderasBuque.filter(p => p.id == this.vaporInfo.bandera_Id)
+      if(this.vaporInfo.bandera !== undefined || this.vaporInfo.bandera !== null){
+        bandera = this.banderasBuque.filter(p => p.id == this.vaporInfo.bandera.id)
       }
 
       let tipoBuqueBD = this.tipoDeBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfo.tipoBuque)

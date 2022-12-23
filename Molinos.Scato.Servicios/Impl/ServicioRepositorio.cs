@@ -2303,7 +2303,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
                                         join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
                                         join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
-                                        //where a.NombreGrupoAd == "LAD_MOAAPP_PUERTO_SISTEMA"
+                                        where a.NombreGrupoAd == "LAD_MOAAPP_PUERTO_SISTEMA"
                                         select (e.NombrePermiso);
 
                 gruposPermisosDebug.AddRange(permisoGrupoDebug);
@@ -11534,7 +11534,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             foreach (var item in VaporInformacionDto)
             {
-                if (item.Vapor_Id == null || item.Vapor_Id == 0)
+                if (item.Vapor == null)
                 {
                     var NuevoVapor = new Vapor
                     {
@@ -11547,15 +11547,15 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 else
                 {
-                    vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor_Id);
+                    vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor.Id);
                 }
-                Bandera bandera = repositorio.Obtener<Bandera>(x => x.Id == item.Bandera_Id);
-                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor_Id == item.Vapor_Id);
+                Bandera bandera = repositorio.Obtener<Bandera>(x => x.Id == item.Bandera.Id);
+                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == item.Vapor.Id);
 
 
                 if (vaporInformacion_Db != null)
                 {
-                    vaporInformacion_Db.Bandera_Id = bandera.Id;
+                    vaporInformacion_Db.Bandera = bandera;
                     vaporInformacion_Db.NombreBuque = item.NombreBuque;
                     vaporInformacion_Db.TipoBuque = item.TipoBuque;
                     vaporInformacion_Db.CategoriaBuque = item.CategoriaBuque;
@@ -11572,8 +11572,8 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     vaporInformacion_Db = new VaporInformacion()
                     {
-                        Vapor_Id = vapor.Id,
-                        Bandera_Id = bandera.Id,
+                        Vapor = vapor,
+                        Bandera = bandera,
                         NombreBuque = item.NombreBuque,
                         TipoBuque = item.TipoBuque,
                         CategoriaBuque = item.CategoriaBuque,
@@ -11597,7 +11597,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor_Id == vapor_id);
+                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor.Id == vapor_id);
                 return infoVapor;
             }
             catch (Exception ex)

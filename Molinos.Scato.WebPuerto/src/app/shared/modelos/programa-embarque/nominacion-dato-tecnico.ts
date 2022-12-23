@@ -7,6 +7,7 @@ import { MuelleDeCarga } from "./muelle-de-carga";
 import { Surveyor } from "./surveyor";
 import { TipoDeContrato } from "./tipo-de-contrato";
 import { NominacionDatoTecnicoCalidad } from "./nominacion-dato-tecnico-calidad";
+import { VaporInformacion } from "@ScatoModels/Buques/VaporInformacion";
 
 
 export class NominacionDatoTecnico {
@@ -15,7 +16,7 @@ export class NominacionDatoTecnico {
     cantidadTotal: number;
     tolerancia: number;
     observaciones: string;
-    vapor: Vapor;
+    vaporInformacion: VaporInformacion;
     etaRecalada: Date;
     obligacionDeCarga: Date;
     muelleDeCarga: MuelleDeCarga;
@@ -31,7 +32,7 @@ export class NominacionDatoTecnico {
     nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
 
     constructor(id, materialPuerto, cantidadTotal,
-        tolerancia, observaciones, vapor,
+        tolerancia, observaciones, vaporInformacion,
         etaRecalada, obligacionDeCarga, muelleDeCarga,
         tasaDeCarga, tasaDeCargaValor, dem,
         des, tipoContrato, ataPuerto,
@@ -41,7 +42,7 @@ export class NominacionDatoTecnico {
         this.cantidadTotal = cantidadTotal;
         this.tolerancia = tolerancia;
         this.observaciones = observaciones;
-        this.vapor = vapor;
+        this.vaporInformacion = vaporInformacion;
         this.etaRecalada = etaRecalada;
         this.obligacionDeCarga = obligacionDeCarga;
         this.muelleDeCarga = muelleDeCarga;

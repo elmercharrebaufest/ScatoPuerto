@@ -1,40 +1,13 @@
-﻿using Microsoft.Web.Administration;
-using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Enums;
-using Molinos.Scato.Dominio.Filtros;
-using Molinos.Scato.Dominio.Helpers;
-using Molinos.Scato.Dominio.Recursos;
-using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
-using Molinos.Scato.Servicios.Helpers;
-using Molinos.Scato.Servicios.Orquestador;
-using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
-using System.Data.Objects;
-using System.Data.Objects.SqlClient;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Printing;
-using System.ServiceModel.Configuration;
-using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
-using System.DirectoryServices;
-using System.Security.Principal;
-using System.DirectoryServices.AccountManagement;
-using NPOI.SS.Formula.Functions;
-using System.Drawing.Text;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -148,7 +121,102 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+        public IList<VaporInformacionDto> listarVaporInformacion()
+        {
+            try
+            {
+                return Listar<VaporInformacion, VaporInformacionDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
+        public IList<MaterialPuertoDto> listarMaterialPuerto()
+        {
+            try
+            {
+                return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<DestinoDto> listarDestino()
+        {
+            try
+            {
+                return Listar<Destino, DestinoDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<ExportadorDto> listarExportador()
+        {
+            try
+            {
+                return Listar<Exportador, ExportadorDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<CoordinadorPuertoDto> listarCoordinadorPuerto()
+        {
+            try
+            {
+                return Listar<CoordinadorPuerto, CoordinadorPuertoDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<BanderaDto> listarBandera()
+        {
+            try
+            {
+                return Listar<Bandera, BanderaDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public IList<ATAPuertoDto> listarATAPuerto()
+        {
+            try
+            {
+                return Listar<ATAPuerto, ATAPuertoDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<AgenciaMaritimaPuertoDto> listarAgenciaMaritimaPuerto()
+        {
+            try
+            {
+                return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
@@ -164,6 +232,8 @@ namespace Molinos.Scato.Servicios.Impl
         private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
-        }        
+        }
+        #endregion
+
     }
 }

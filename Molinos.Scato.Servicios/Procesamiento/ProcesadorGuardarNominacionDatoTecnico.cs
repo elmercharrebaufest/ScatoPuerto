@@ -73,7 +73,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             ATAPuerto ataPuerto = null;
             AgenciaMaritimaPuerto agenciaMaritimaPuerto = null;
             Surveyor surveyor = null;
-            Vapor vapor = null;
+            VaporInformacion vaporInformacion = null;
             MaterialPuerto materialPuerto = null;
 
             muelleDeCarga = datoTecnico.MuelleDeCarga != null ? Repositorio.Obtener<MuelleDeCarga>(x => x.Id == datoTecnico.MuelleDeCarga.Id) : muelleDeCarga;
@@ -82,14 +82,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
             ataPuerto = datoTecnico.ATAPuerto != null ? Repositorio.Obtener<ATAPuerto>(x => x.Id == datoTecnico.ATAPuerto.Id) : ataPuerto;
             agenciaMaritimaPuerto = datoTecnico.AgenciaMaritimaPuerto != null ? Repositorio.Obtener<AgenciaMaritimaPuerto>(x => x.Id == datoTecnico.AgenciaMaritimaPuerto.Id) : agenciaMaritimaPuerto;
             surveyor = datoTecnico.Surveyor != null ? Repositorio.Obtener<Surveyor>(x => x.Id == datoTecnico.Surveyor.Id) : surveyor;
-            vapor = datoTecnico.Vapor != null ? Repositorio.Obtener<Vapor>(x => x.Id == datoTecnico.Vapor.Id) : vapor;
+            vaporInformacion = datoTecnico.VaporInformacion != null ? Repositorio.Obtener<VaporInformacion>(x => x.Id == datoTecnico.VaporInformacion.Id) : vaporInformacion;
             materialPuerto = datoTecnico.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(x => x.Id == datoTecnico.MaterialPuerto.Id) : materialPuerto;
 
             nominacionDatoTecnico.MaterialPuerto = materialPuerto;
             nominacionDatoTecnico.CantidadTotal = datoTecnico.CantidadTotal;
             nominacionDatoTecnico.Tolerancia = datoTecnico.Tolerancia;
             nominacionDatoTecnico.Observaciones = datoTecnico.Observaciones;
-            nominacionDatoTecnico.Vapor = vapor;
+            nominacionDatoTecnico.VaporInformacion = vaporInformacion;
             nominacionDatoTecnico.ETARecalada = datoTecnico.ETARecalada;
             nominacionDatoTecnico.ObligacionDeCarga = datoTecnico.ObligacionDeCarga;
             nominacionDatoTecnico.MuelleDeCarga = muelleDeCarga;

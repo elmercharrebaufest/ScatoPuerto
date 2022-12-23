@@ -171,6 +171,51 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarVaporInformacion")]
+        public HttpResponseMessage listarVaporInformacion()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarVaporInformacion());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarCombosDatoTecnico")]
+        public HttpResponseMessage ListarCombosDatoTecnico()
+        {
+            try
+            {
+                var embarqueNominacionDatoTecnico = new ProgramaEmbarqueNominacionDatoTecnicoDto();
+                embarqueNominacionDatoTecnico.MaterialPuerto = servicioProgramaEmbarque.listarMaterialPuerto();
+                embarqueNominacionDatoTecnico.TipoDeCalidad = servicioProgramaEmbarque.listarTipoDeCalidad();
+                embarqueNominacionDatoTecnico.Destino = servicioProgramaEmbarque.listarDestino();
+                embarqueNominacionDatoTecnico.Exportador = servicioProgramaEmbarque.listarExportador();
+                embarqueNominacionDatoTecnico.CoordinadorPuerto = servicioProgramaEmbarque.listarCoordinadorPuerto();
+                embarqueNominacionDatoTecnico.VaporInformacion = servicioProgramaEmbarque.listarVaporInformacion();
+                embarqueNominacionDatoTecnico.Bandera = servicioProgramaEmbarque.listarBandera();
+                embarqueNominacionDatoTecnico.MuelleDeCarga = servicioProgramaEmbarque.listarMuelleDeCarga();
+                embarqueNominacionDatoTecnico.TasaDeCarga = servicioProgramaEmbarque.listarTasaDeCarga();
+                embarqueNominacionDatoTecnico.TipoDeContrato = servicioProgramaEmbarque.listarTipoDeContrato();
+                embarqueNominacionDatoTecnico.ATAPuerto = servicioProgramaEmbarque.listarATAPuerto();
+                embarqueNominacionDatoTecnico.AgenciaMaritimaPuerto = servicioProgramaEmbarque.listarAgenciaMaritimaPuerto();
+                embarqueNominacionDatoTecnico.Surveyor = servicioProgramaEmbarque.listarSurveyor();
+                embarqueNominacionDatoTecnico.CalidadValor = servicioProgramaEmbarque.listarCalidadValor();
+                return Request.CreateResponse(HttpStatusCode.OK, embarqueNominacionDatoTecnico);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarNominacion")]

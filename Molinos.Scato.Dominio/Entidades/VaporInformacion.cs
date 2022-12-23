@@ -11,8 +11,6 @@ namespace Molinos.Scato.Dominio.Entidades
 
         [Key]
         public virtual int Id { get; set; }
-        public virtual int Vapor_Id { get; set; }
-        public virtual int Bandera_Id { get; set; }
         public virtual string NombreBuque { get; set; }
         public virtual string TipoBuque { get; set; }
         public virtual string CategoriaBuque { get; set; }

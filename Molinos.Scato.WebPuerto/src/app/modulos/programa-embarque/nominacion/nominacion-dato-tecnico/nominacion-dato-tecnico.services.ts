@@ -7,11 +7,18 @@ import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque
 import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 import { NominacionDatoTecnicoService } from '@ScatoServicios/programa-embarque/nominacion-dato-tecnico.service';
+import { TipoDeCalidad } from '@ScatoModels/programa-embarque/tipo-de-calidad';
+import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
+import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
+import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
+import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
+import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
+import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
 
 @Injectable({
     providedIn: 'root'
@@ -27,7 +34,8 @@ export class NominacionDatoTecnicoRegistroService {
     public seleccionarInformacionVapor(vaporId: number): Observable<VaporInformacion> {
         return this.buqueService.obtenerVaporInformacion(vaporId);
     }
-    public inicializarForm() {
+
+    private inicializarFormNuevo(): FormGroup{
         return this.formBuilder.group({
             id: [0, Validators.required],
             materialPuerto: ['', Validators.required],
@@ -36,7 +44,7 @@ export class NominacionDatoTecnicoRegistroService {
             cantidadTotal: ['', Validators.required],
             tolerancia: [''],
             observaciones: [''],
-            vapor: ['', Validators.required],
+            vaporInformacion: [[], Validators.required],
             bandera: [''],
             etaRecalada: ['', Validators.required],
             obligacionDeCarga: ['', Validators.required],
@@ -54,6 +62,10 @@ export class NominacionDatoTecnicoRegistroService {
             nominacionDatoTecnicoDestino: this.formBuilder.array([]),
             nominacionDatoTecnicoCoordinadorPuerto: this.formBuilder.array([]),
         });
+    } 
+
+    public inicializarForm() {
+        return this.inicializarFormNuevo();
     }
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null): FormGroup {
         if (exportador != null) {
@@ -162,16 +174,12 @@ export class NominacionDatoTecnicoRegistroService {
         return bValidacion;
     }
     public grabarNominacion(nominacion: Nominacion){
-        console.log('nominacion--->>', nominacion)
-        this.nominacionService.registroNominacion(nominacion).subscribe(data=> {
-            console.log(data)
-        });
+        this.nominacionService.registroNominacion(nominacion).subscribe(data=> {console.log(data)});
     }
-    public obtenerNominacion(){
-        this.nominacionService.obtenerNominacion(14).subscribe(data=> {
-            console.log(data)
-        });
 
+    
+    public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico>{
+        return this.nominacionService.listarCombosDatoTecnico().pipe(map((data: ProgramaEmbarqueNominacionDatoTecnico) => { return data;}));
     }
 
 }

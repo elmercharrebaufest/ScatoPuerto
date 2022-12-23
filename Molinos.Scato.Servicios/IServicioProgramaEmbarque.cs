@@ -41,6 +41,29 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         NominacionDto ObtenerNominacion(int id);
-        
+
+        [OperationContract]
+        IList<VaporInformacionDto> listarVaporInformacion();
+
+        [OperationContract]
+        IList<MaterialPuertoDto> listarMaterialPuerto();
+
+        [OperationContract]
+        IList<DestinoDto> listarDestino();
+
+        [OperationContract]
+        IList<ExportadorDto> listarExportador();
+
+        [OperationContract]
+        IList<CoordinadorPuertoDto> listarCoordinadorPuerto();
+
+        [OperationContract]
+        IList<BanderaDto> listarBandera();
+
+        [OperationContract]
+        IList<ATAPuertoDto> listarATAPuerto();
+
+        [OperationContract]
+        IList<AgenciaMaritimaPuertoDto> listarAgenciaMaritimaPuerto();
     }
 }
