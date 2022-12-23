@@ -1,10 +1,10 @@
 create table NominacionDatoTecnicoExportador(
 Id int IDENTITY (1, 1) NOT NULL,
 Exportador_Id int not null,
-Cantidad int,
+Cantidad int not null,
+Tolerancia int NULL,
 NominacionDatoTecnico_Id  int not null,
-[Tolerancia] INT NULL, 
-    CONSTRAINT [PK_dbo.NominacionDatoTecnicoExportador] PRIMARY KEY CLUSTERED ([Id] ASC),
+CONSTRAINT [PK_dbo.NominacionDatoTecnicoExportador] PRIMARY KEY CLUSTERED ([Id] ASC),
 CONSTRAINT [FK_dbo.NominacionDatoTecnicoExportador_dbo.Exportador_Exportador_Id] FOREIGN KEY ([Exportador_Id]) REFERENCES [dbo].[Exportador] ([Id]),
 CONSTRAINT [FK_dbo.NominacionDatoTecnicoExportador_dbo.NominacionDatoTecnico_NominacionDatoTecnico_Id] FOREIGN KEY ([NominacionDatoTecnico_Id]) REFERENCES [dbo].[NominacionDatoTecnico] ([Id]),
 )

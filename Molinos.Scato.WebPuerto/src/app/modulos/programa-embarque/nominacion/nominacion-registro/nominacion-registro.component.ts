@@ -1,7 +1,10 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { NominacionDatoTecnicoComponent } from '../nominacion-dato-tecnico/nominacion-dato-tecnico.component';
 import { NominacionIntervencionesComponent } from '../nominacion-intervenciones/nominacion-intervenciones.component';
 import { NominacionRecibosComponent } from '../nominacion-recibos/nominacion-recibos.component';
@@ -11,7 +14,7 @@ import { NominacionRecibosComponent } from '../nominacion-recibos/nominacion-rec
   templateUrl: './nominacion-registro.component.html',
   styleUrls: ['./nominacion-registro.component.css']
 })
-export class NominacionRegistroComponent implements OnInit, AfterViewInit{
+export class NominacionRegistroComponent implements OnInit, OnDestroy{
 
   @ViewChild(NominacionDatoTecnicoComponent) datoTecnico!:  NominacionDatoTecnicoComponent;
   @ViewChild(NominacionRecibosComponent) datoRecibos!:  NominacionRecibosComponent;
@@ -19,6 +22,7 @@ export class NominacionRegistroComponent implements OnInit, AfterViewInit{
 
   public titulo: string = "Nueva Nominación"
   public nominacionId: number = 0;
+  private destroy$ = new Subject();
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -28,10 +32,6 @@ export class NominacionRegistroComponent implements OnInit, AfterViewInit{
 
   ngOnInit(): void {
 
-  }
-
-  ngAfterViewInit(): void {
-    
   }
 
   public onGuardarNominacion(){
@@ -49,13 +49,24 @@ export class NominacionRegistroComponent implements OnInit, AfterViewInit{
   }
 
   private asignarNominacionParametros(nominacionId: number){
-    const nominacionParametos: NominacionParametros = {
+    let nominacionParametos: NominacionParametros = {
       nominacion_Id : nominacionId,
       actualizarDatoTecnico : true,
       actualizarRecibos  : true,
-      actualizarIntervenciones : true
+      actualizarIntervenciones : true,
+      nominacion: null
     };
-    this.nominacionService.NominacionParametros = nominacionParametos;
+    if (nominacionId>0){
+      this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+        nominacionParametos.nominacion = data;
+        this.nominacionService.NominacionParametros = nominacionParametos;
+      });
+    }else{
+      this.nominacionService.NominacionParametros = nominacionParametos;
+    }
   }
-
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();  
+  }
 }

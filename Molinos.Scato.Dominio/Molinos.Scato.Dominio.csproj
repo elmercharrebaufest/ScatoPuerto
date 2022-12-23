@@ -115,6 +115,7 @@
     <Compile Include="Comandos\GuardarEtiquetaPuerto.cs" />
     <Compile Include="Comandos\GuardarModuloDeCarga.cs" />
     <Compile Include="Comandos\GuardarNirManual.cs" />
+    <Compile Include="Comandos\GuardarNominacionDatoTecnico.cs" />
     <Compile Include="Comandos\ImprimirEtiquetaPuerto.cs" />
     <Compile Include="Comandos\ImprimirFileGenerico.cs" />
     <Compile Include="Comandos\InformarArriboCircular.cs" />
@@ -708,6 +709,7 @@
     <Compile Include="Dto\ProgramaEmbarqueDto.cs" />
     <Compile Include="Dto\NominacionDto.cs" />
     <Compile Include="Dto\NominacionReciboDto.cs" />
+    <Compile Include="Dto\ProgramaEmbarqueNominacionDatoTecnicoDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDetallesDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDto.cs" />
     <Compile Include="Dto\ParametrosDto.cs" />

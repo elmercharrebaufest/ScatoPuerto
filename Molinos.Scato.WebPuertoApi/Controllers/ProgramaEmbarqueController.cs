@@ -6,10 +6,10 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,14 +19,29 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class ProgramaEmbarqueController : BaseController
     {
-        private readonly IServicioProgramaEmbarque servicioProgramaEmbarque;
-        private readonly IServicioComandos servicioComandos;
+        private readonly IServicioComandos comandos;
+
         public ProgramaEmbarqueController(IServicioRepositorio servicio,
-            IServicioProgramaEmbarque programaEmbarque,
-            IServicioComandos servicioComandos) : base(servicio)
+            IServicioProgramaEmbarque servicioProgramaEmbarque,
+            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque)
         {
-            this.servicioProgramaEmbarque = programaEmbarque;
-            this.servicioComandos = servicioComandos;
+            this.comandos = comandos;
+
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarMuelleDeCarga")]
+        public HttpResponseMessage ListarMuelleDeCarga()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarMuelleDeCarga());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         [HttpGet]
@@ -46,8 +61,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public HttpResponseMessage ListarProgramaEmbarque(int? pagina = null, int? itemsPorPagina = null, DateTime? fecha = null, string muelle = null, string buque = null, string producto = null)
         {
             try
-            {                
-                var paginacion = new Paginacion(null, DirOrden.Desc, ( pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 :itemsPorPagina.Value);              
+            {
+                var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
                 var response = servicioProgramaEmbarque.ListarProgramaDeEmbarque(paginacion, fecha,
                     (!string.IsNullOrEmpty(muelle) ? muelle.Split(',').ToList() : null),
                     (!string.IsNullOrEmpty(buque) ? buque.Split(',').ToList() : null),
@@ -68,12 +83,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
-           
-            var nominacion = servicioProgramaEmbarque.ObtenerNominacion(id);
-            return Request.CreateResponse(HttpStatusCode.OK,
-                nominacion
-            );
+                var nominacion = servicioProgramaEmbarque.ObtenerNominacion(id);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    nominacion
+                );
             }
             catch (Exception ex)
             {
@@ -83,6 +96,190 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarSurveyor")]
+        public HttpResponseMessage ListarSurveyor()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarSurveyor());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarTasaDeCarga")]
+        public HttpResponseMessage ListarTasaDeCarga()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarTasaDeCarga());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarTipoDeContrato")]
+        public HttpResponseMessage ListarTipoDeContrato()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarTipoDeContrato());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarCalidadValor")]
+        public HttpResponseMessage ListarCalidadValor()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarCalidadValor());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarTipoDeCalidad")]
+        public HttpResponseMessage ListarTipoDeCalidad()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarTipoDeCalidad());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarVaporInformacion")]
+        public HttpResponseMessage listarVaporInformacion()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.listarVaporInformacion());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarCombosDatoTecnico")]
+        public HttpResponseMessage ListarCombosDatoTecnico()
+        {
+            try
+            {
+                var embarqueNominacionDatoTecnico = new ProgramaEmbarqueNominacionDatoTecnicoDto();
+                embarqueNominacionDatoTecnico.MaterialPuerto = servicioProgramaEmbarque.listarMaterialPuerto();
+                embarqueNominacionDatoTecnico.TipoDeCalidad = servicioProgramaEmbarque.listarTipoDeCalidad();
+                embarqueNominacionDatoTecnico.Destino = servicioProgramaEmbarque.listarDestino();
+                embarqueNominacionDatoTecnico.Exportador = servicioProgramaEmbarque.listarExportador();
+                embarqueNominacionDatoTecnico.CoordinadorPuerto = servicioProgramaEmbarque.listarCoordinadorPuerto();
+                embarqueNominacionDatoTecnico.VaporInformacion = servicioProgramaEmbarque.listarVaporInformacion();
+                embarqueNominacionDatoTecnico.Bandera = servicioProgramaEmbarque.listarBandera();
+                embarqueNominacionDatoTecnico.MuelleDeCarga = servicioProgramaEmbarque.listarMuelleDeCarga();
+                embarqueNominacionDatoTecnico.TasaDeCarga = servicioProgramaEmbarque.listarTasaDeCarga();
+                embarqueNominacionDatoTecnico.TipoDeContrato = servicioProgramaEmbarque.listarTipoDeContrato();
+                embarqueNominacionDatoTecnico.ATAPuerto = servicioProgramaEmbarque.listarATAPuerto();
+                embarqueNominacionDatoTecnico.AgenciaMaritimaPuerto = servicioProgramaEmbarque.listarAgenciaMaritimaPuerto();
+                embarqueNominacionDatoTecnico.Surveyor = servicioProgramaEmbarque.listarSurveyor();
+                embarqueNominacionDatoTecnico.CalidadValor = servicioProgramaEmbarque.listarCalidadValor();
+                return Request.CreateResponse(HttpStatusCode.OK, embarqueNominacionDatoTecnico);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacion")]
+        public HttpResponseMessage RegistrarNominacion(NominacionDto nominacion)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacionDatoTecnico")]
+        public HttpResponseMessage RegistrarNominacionDatoTecnico(NominacionDto nominacion)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarNominacionDatoTecnico
+                {
+                    Dto = nominacion,
+                    EsCreacion = true
+                });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacionDetalleIntervenciones")]
+        public HttpResponseMessage RegistrarNominacionDetalleIntervencion(NominacionDto nominacion)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacionRecibo")]
+        public HttpResponseMessage RegistrarNominacionRecibo(NominacionDto nominacion)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
     }
 }

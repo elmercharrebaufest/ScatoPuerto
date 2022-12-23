@@ -13,7 +13,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int CantidadTotal { get; set; }
         public int Tolerancia { get; set; }
         public string Observaciones { get; set; }
-        public VaporInformacionDto VaporInoformacion { get; set; }
+        public VaporInformacionDto VaporInformacion { get; set; }
         public DateTime? ETARecalada { get; set; }
         public DateTime? ObligacionDeCarga { get; set; }
         public MuelleDeCargaDto MuelleDeCarga { get; set; }

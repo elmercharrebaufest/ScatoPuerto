@@ -22,8 +22,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             var hoy = DateTime.Now.AddHours(24);
             ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
-            var resultado = from item in contexto.Set<Nominacion>()                            
-                            select new 
+            var resultado = from item in contexto.Set<Nominacion>()
+                            select new
                             {
                                 Producto = item.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
                                 NombreBuque = item.NominacionDatoTecnico.VaporInformacion.NombreBuque,

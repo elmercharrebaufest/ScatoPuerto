@@ -16,11 +16,54 @@ namespace Molinos.Scato.Servicios
     public interface IServicioProgramaEmbarque
     {
         [OperationContract]
+        IList<TipoDeContratoDto> listarTipoDeContrato();
+
+        [OperationContract]
+        IList<SurveyorDto> listarSurveyor();
+
+        [OperationContract]
+        IList<TasaDeCargaDto> listarTasaDeCarga();
+
+        [OperationContract]
+        IList<MuelleDeCargaDto> listarMuelleDeCarga();
+
+        [OperationContract]
         ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null);
+        
         [OperationContract]
         ProgramaEmbarqueDto ListarDatosCombo();
 
         [OperationContract]
+        IList<CalidadValorDto> listarCalidadValor();
+
+        [OperationContract]
+        IList<TipoDeCalidadDto> listarTipoDeCalidad();
+        
+        [OperationContract]
         NominacionDto ObtenerNominacion(int id);
+
+        [OperationContract]
+        IList<VaporInformacionDto> listarVaporInformacion();
+
+        [OperationContract]
+        IList<MaterialPuertoDto> listarMaterialPuerto();
+
+        [OperationContract]
+        IList<DestinoDto> listarDestino();
+
+        [OperationContract]
+        IList<ExportadorDto> listarExportador();
+
+        [OperationContract]
+        IList<CoordinadorPuertoDto> listarCoordinadorPuerto();
+
+        [OperationContract]
+        IList<BanderaDto> listarBandera();
+
+        [OperationContract]
+        IList<ATAPuertoDto> listarATAPuerto();
+
+        [OperationContract]
+        IList<AgenciaMaritimaPuertoDto> listarAgenciaMaritimaPuerto();
     }
 }

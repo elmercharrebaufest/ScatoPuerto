@@ -147,8 +147,8 @@ export class EditarCrearBuquesComponent implements OnInit {
       // console.log(this.vaporInfoBD);
       if (this.vaporInfoBD!=null){
         let bandera;
-        if(this.vaporInfoBD.bandera_Id != null){
-          bandera = this.banderasBuque.filter(p => p.id == this.vaporInfoBD.bandera_Id)
+        if(this.vaporInfoBD.bandera != null){
+          bandera = this.banderasBuque.filter(p => p.id == this.vaporInfoBD.bandera.id)
         }
         let tipoBuqueBD = this.tipoBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfoBD.tipoBuque)
         let categoriaBuqueBD = this.categoriasBuque.filter(tipo => tipo.nombre == this.vaporInfoBD.categoriaBuque)

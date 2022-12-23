@@ -10,6 +10,5 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public CalidadValorDto CalidadValor { get; set; }
-        public NominacionDatoTecnicoDto NominacionDatoTecnico { get; set; }
     }
 }
