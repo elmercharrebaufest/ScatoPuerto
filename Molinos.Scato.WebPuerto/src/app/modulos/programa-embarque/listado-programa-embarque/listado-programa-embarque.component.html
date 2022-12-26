@@ -15,7 +15,7 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('estado')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('estado')">
                 <div class="head">
                     Estado
                     <span>
@@ -26,7 +26,7 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('nombreBuque')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('nombreBuque')">
                 <div class="head">
                     Buque
                     <span>
@@ -37,7 +37,7 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('muelleDeCarga')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('muelleDeCarga')">
                 <div class="head">
                     Muelle de carga
                     <span>
@@ -48,7 +48,8 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cargadores.nombreExportador')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1"
+                (click)="orderColumnBy('cargadores.nombreExportador')">
                 <div class="head">
                     Cargador
                     <span>
@@ -59,7 +60,7 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cargadores.toneladas')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cargadores.toneladas')">
                 <div class="head">
                     Cantidad (Tn)
                     <span>
@@ -70,7 +71,7 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('contrato')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('contrato')">
                 <div class="head">
                     Contrato
                     <span>
@@ -81,7 +82,7 @@
                     </span>
                 </div>
             </th>
-            <th tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('etaRecalada')">
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('etaRecalada')">
                 <div class="head">
                     ETA Recalada
                     <span>
@@ -92,26 +93,49 @@
                     </span>
                 </div>
             </th>
+            <th class="noBorder"></th>
+            <th class="noBorder"></th>
+            <th class="noBorder"></th>
+            <th class="noBorder"></th>
         </thead>
         <tbody *ngFor="let historial of getListaProgramaEmbarque()" style="text-align: center;">
-            <tr class="lista-buque-row">
-                <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }" class="anchoDeFila"></td>
-                <td class="lista-buque-row-item" style="font-size: 20px;">
-                    <strong>{{historial.producto}}                        
+            <tr class="lista-buque-row" (click)="seleccionarNominacion(historial.id)" style="cursor:pointer">
+                <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }"
+                    class="noBorder anchoDeFila"></td>
+                <td class="lista-buque-row-item noBorder" style="font-size: 20px;">
+                    <strong>{{historial.producto}}
                     </strong>
                 </td>
-                <td><i style="font-size: 25px;cursor:pointer" [ngbTooltip]="devolverMensajeDeEstados(historial.estado)" [ngStyle]="{ 'color': devolverColorEstado(historial.estado) }" class="fa fa-duotone fa-circle"></i></td>
-                <td>{{historial.nombreBuque}}</td>
-                <td>{{historial.muelleDeCarga}}</td>
-                <td class="lista-buque-row-item">
+                <td class="noBorder"><i style="font-size: 25px;cursor:pointer"
+                        [ngbTooltip]="devolverMensajeDeEstados(historial.estado)"
+                        [ngStyle]="{ 'color': devolverColorEstado(historial.estado) }"
+                        class="fa fa-duotone fa-circle"></i></td>
+                <td class="noBorder">{{historial.nombreBuque}}</td>
+                <td class="noBorder-rigth">{{historial.muelleDeCarga}}</td>
+                <td class="lista-buque-row-item noBorder">
                     <div *ngFor="let exportador of historial.cargadores">{{ exportador.nombreExportador }}</div>
                 </td>
-                <td class="lista-buque-row-item">
+                <td class="lista-buque-row-item noBorder">
                     <div *ngFor="let exportador of historial.cargadores">{{ exportador.toneladas |
                         number:'0.0-0' }} tn</div>
                 </td>
-                <td class="lista-buque-row-item celda-nombre-buque">{{historial.contrato}}</td>
-                <td class="lista-buque-row-item">{{historial.etaRecalada | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td class="lista-buque-row-item celda-nombre-buque noBorder-left">{{historial.contrato}}</td>
+                <td class="lista-buque-row-item noBorder-rigth">{{historial.etaRecalada | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td style="text-align: center;" class="noBorder">
+                    <div class='icon-fumigador'
+                        [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoFumigador) }"></div>
+                </td>
+                <td style="text-align: center;" class="noBorder">
+                    <div class='icon-surveyor'
+                        [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
+                </td>
+                <td class="noBorder">
+                    <div class='icon-editar'></div>
+                </td>
+                <td class="noBorder-left">
+                    <img src="assets/trashIcon-no-border.svg" class="eliminar" style="cursor: pointer;">
+                </td>
+
             </tr>
         </tbody>
 

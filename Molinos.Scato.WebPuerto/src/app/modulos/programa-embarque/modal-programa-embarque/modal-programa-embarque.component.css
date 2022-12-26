@@ -1,0 +1,30 @@
+.line {
+    background-color: #92B234;
+    height: 8px;
+    width: 100%;
+}
+
+.tabs{
+    width: 265px;
+    text-align: center;
+    color: black !important;
+    font-weight: bold;
+
+}
+
+.labelTabs{
+    cursor: pointer;
+}
+
+.margenes {
+    margin-left: 12px;
+    margin-top: 16px;
+}
+
+.titulo{
+    font-size: 16px;
+}
+
+.nav-link.labelTabs.active{
+    border-bottom: 2px solid #4461a8;
+}

@@ -98,7 +98,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 item.Embarque.Vicentin ? "Vicentin" : item.Embarque.Noryon ? "Noryon" : item.Embarque.OtrosMuelles ? "Otros Muelles" : ""
                             };
          
-            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || String.IsNullOrEmpty(destino) ||
+            var embarques =  resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || String.IsNullOrEmpty(destino) ||
                                          (x.ProductoExportador != null && x.ProductoExportador
                                             .Any(y => y.NombreExportador.ToUpper().StartsWith(exportador.ToUpper()) 
                                             && y.Destino.ToUpper().StartsWith(destino.ToUpper()))) &&

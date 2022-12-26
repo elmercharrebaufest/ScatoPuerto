@@ -1,0 +1,79 @@
+<div id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+    class="modal fade bd-example-modal-lg">
+    <div role="document" class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="margenes">
+                <label><strong class="titulo">{{ productoDescripcionCorta }}</strong> ( {{ productoDescripcionLarga }}
+                    )</label>
+            </div>
+            <div class="line"></div>
+            <div style="margin-top: 2px;">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item tabs">
+                        <label class="nav-link active labelTabs" id="tecnico-tab" data-toggle="tab" href="#tecnico"
+                            role="tab" aria-controls="tecnico" aria-selected="true">Datos Técnicos</label>
+                    </li>
+                    <li class="nav-item tabs ">
+                        <label class="nav-link labelTabs" id="recibo-tab" data-toggle="tab" href="#recibo" role="tab"
+                            aria-controls="recibo" aria-selected="false">Datos de Recibo</label>
+                    </li>
+                    <li class="nav-item tabs ">
+                        <label class="nav-link labelTabs" id="intervencion-tab" data-toggle="tab" href="#intervencion"
+                            role="tab" aria-controls="intervencion" aria-selected="false">Datos de
+                            intervenciones</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="tab-pane fade show active" id="tecnico" role="tabpanel" aria-labelledby="tecnico-tab">
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label><strong>Cantidad Total: </strong> {{ cantidadTotal}}</label>
+                            </div>
+                            <div class="col-md-4">
+                                <label><strong>Cantidad x destino: </strong></label>
+                                <div *ngFor="let destino of cantidadPorDestino">{{ destino.descripcion }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label><strong>Nombre buque: </strong> {{ nombreBuque}}</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label><strong>Calidad: </strong> {{ calidad}}</label>
+                            </div>
+                            <div class="col-md-4">
+                                <label><strong>Cantidad x cargadores: </strong></label>
+                                <div *ngFor="let cargador of cantidadPorCargador">{{ cargador.descripcion }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label><strong>Bandera: </strong> {{ nombreBuque}}</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label><strong>Observaciones: </strong> {{ observacionesDatotecnico }}</label>
+                            </div>
+                            <div class="col-md-4">
+                               
+                            </div>
+                            <div class="col-md-4">
+                                <label><strong>Tipo de buque: </strong> {{ tipoDeBuque}}</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane fade" id="recibo" role="tabpanel" aria-labelledby="recibo-tab">
+
+                    </div>
+                    <div class="tab-pane fade" id="intervencion" role="tabpanel" aria-labelledby="intervencion-tab">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

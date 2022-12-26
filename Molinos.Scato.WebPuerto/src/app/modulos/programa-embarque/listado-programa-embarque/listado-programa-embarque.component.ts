@@ -17,7 +17,9 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public orderedByColumn: string;
   public orderDirection: number;
   programa: any[]
+  public nominacion: any;
   subscripcionPrograma: Subscription 
+   
   
   paginator: any;
   length = 0;
@@ -47,7 +49,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.pageIndex = this.programa.length > 0 ? this.programa[0].pagina : 1;
         this.estaCargando = false; 
       }
-    )
+    )  
      
   }
   ngOnDestroy(): void {
@@ -112,5 +114,13 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
      "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"  
   }
 
-  
+  public seleccionarNominacion(id: number){    
+    this.nominacion = this.programaEmbarqueService.obtenerNominacion(id)
+    document.getElementById("myModal").style.display = "block";
+   
+  }
+
+  public retornarColorEnvioMail(mailEnviado: any){
+      return mailEnviado ? "#4D60A8" : "#999999"
+  }
 }
