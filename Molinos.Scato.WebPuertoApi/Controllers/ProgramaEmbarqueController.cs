@@ -94,6 +94,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUp_Exportar)]
+        [Route("api/ProgramaEmbarque/ValidarCreacionNominacion")]
+        public HttpResponseMessage ValidarCreacionNominacion(NominacionValidaDto nominacion)
+        {
+            try
+            {
+                bool validarCreacionNominacion = servicioProgramaEmbarque.ValidarCreacionNominacion(nominacion);
+                return Request.CreateResponse(HttpStatusCode.OK, validarCreacionNominacion);
+            }
+            catch (Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
 
 
         [HttpGet]

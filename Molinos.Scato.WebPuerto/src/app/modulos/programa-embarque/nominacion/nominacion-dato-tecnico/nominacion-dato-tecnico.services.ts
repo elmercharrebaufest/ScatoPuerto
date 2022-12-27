@@ -20,6 +20,7 @@ import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
 import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
 import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
 import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
+import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-valida';
 
 @Injectable({
     providedIn: 'root'
@@ -186,5 +187,7 @@ export class NominacionDatoTecnicoRegistroService {
     public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico> {
         return this.nominacionService.listarCombosDatoTecnico().pipe(map((data: ProgramaEmbarqueNominacionDatoTecnico) => { return data; }));
     }
-
+    public validarCreacionNominacion(nominacion: NominacionValida): Observable<boolean> {
+        return this.nominacionService.validarCreacionNominacion(nominacion).pipe(map((data: boolean) => { return data; }));
+    }
 }

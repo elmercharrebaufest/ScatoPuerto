@@ -11,6 +11,7 @@ import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { Observable } from 'rxjs';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
+import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-valida';
 
 @Injectable({
   providedIn: 'root'
@@ -50,4 +51,9 @@ export class NominacionDatoTecnicoService {
   public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico> {
     return this.http.get<ProgramaEmbarqueNominacionDatoTecnico>(`${this.url}ProgramaEmbarque/ListarCombosDatoTecnico`, { 'withCredentials': true });
   }
+  public validarCreacionNominacion(nominacion: NominacionValida): Observable<boolean> {
+    return this.http.post<boolean>(`${this.url}ProgramaEmbarque/ValidarCreacionNominacion`, nominacion, { 'withCredentials': true });
+  }
+  
+
 }

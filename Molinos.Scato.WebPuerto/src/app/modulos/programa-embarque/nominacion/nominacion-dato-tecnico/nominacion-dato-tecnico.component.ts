@@ -30,7 +30,8 @@ import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
 import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
-import { setTimeout } from 'timers';
+import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-valida';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -39,6 +40,7 @@ import { setTimeout } from 'timers';
 })
 export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
+  //#region Variables
   private _nominacionParametros: NominacionParametros = null;
   public datoTecnicoForm: FormGroup;
   public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
@@ -79,8 +81,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
 
   private destroy$ = new Subject();
+  //#endregion
 
+  //#region Contructor
   constructor(private nominacionService: NominacionService,
+    private confirmationDialogService: ConfirmationDialogService,
     private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.cargando;
@@ -88,6 +93,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.inicializarForm();
     this.obtenerListasDeNominacion();
   }
+  //#endregion
+
+  //#region Eventos
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.unsubscribe();  
@@ -95,16 +103,28 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
   ngOnInit(): void {
   }
+  //#endregion
 
+  //#region Propiedades
   public get frmDatosTecnicos() { return this.datoTecnicoForm.controls; }
-
   private get nominacionParametros(): NominacionParametros {
     return this._nominacionParametros;
   }  
   private set nominacionParametros(value: NominacionParametros) {
     this._nominacionParametros = value;
   }
+  get datoTecnicoExportadorFormArray(): FormArray {
+    return this.datoTecnicoForm.get("nominacionDatoTecnicoExportador") as FormArray
+  }
+  get datoTecnicoDestinoFormArray(): FormArray {
+    return this.datoTecnicoForm.get("nominacionDatoTecnicoDestino") as FormArray
+  }
+  get datoTecnicoCoordinadorFormArray(): FormArray {
+    return this.datoTecnicoForm.get("nominacionDatoTecnicoCoordinadorPuerto") as FormArray
+  }
+  //#endregion
 
+  //#region Metodos Privados  
   private asignarNominacionParametros() {
     this.nominacionService.NominacionParametros.subscribe(parametro => {
       if (parametro!=null){
@@ -123,8 +143,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       }
     });
   }
-  
-
   private inicializarForm() {
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarForm();
   }
@@ -213,7 +231,73 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoCoordinadorFormArray.push(this.inicializarFormCoordinadorPuerto(coordinador, dataTecnico.id));
     });
   }
+  private cargarFormulario(nominacionId: number){
+    this.cargandoDatoTecnico = true;
+    this.mensajeDatoTecnico = Mensajes.cargando;
+    this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+      this.cargandoDatoTecnico = false;
+      this.inicializarFormEdicion(this.datoTecnicoForm, data.nominacionDatoTecnico);
+    });
+  }
+  private inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0){
+    return this.datoTecnicoRegistroService.inicializarFormExportador(exportador,nominacionDatoTecnico);   
+  }
+  private inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null, nominacionDatoTecnico: number = 0){
+    return this.datoTecnicoRegistroService.inicializarFormDestino(destino,nominacionDatoTecnico);   
+  }
+  private inicializarFormCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null, nominacionDatoTecnico: number = 0){
+    return this.datoTecnicoRegistroService.inicializarFormCoordinadorPuerto(coordinadorPuerto,nominacionDatoTecnico);   
+  }
+  private guardarDatoTecnico(validacion: boolean){
+    if (!validacion){
+      this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Ya existe una nominación para el buque, material y muelle de carga.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
 
+    const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
+    let listaCalidadSeleccionada = [];
+    listaNominacionCalidad.forEach(calidad=>{
+      listaCalidadSeleccionada.push({
+        nominacionDatoTecnicoCalidad_Id: 0,
+        calidadValor: calidad.calidadValor,
+        nominacionDatoTecnico: null
+      });
+    });
+    this.datoTecnicoForm.controls['nominacionDatoTecnicoCalidad'].setValue(listaCalidadSeleccionada);
+    this.datoTecnicoForm.value.nominacionDatoTecnicoCalidad = listaCalidadSeleccionada;
+    let agenciaMaritimaPuerto = this.datoTecnicoForm.value.agenciaMaritimaPuerto;
+    let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
+    let surveyor = this.datoTecnicoForm.value.surveyor;
+
+    this.datoTecnicoForm.get('agenciaMaritimaPuerto').setValue(
+      agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
+        this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);
+
+    this.datoTecnicoForm.get('ataPuerto').setValue(
+      ataPuerto != null && ataPuerto.length > 0 ?
+        this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
+
+    this.datoTecnicoForm.get('surveyor').setValue(
+      surveyor != null && surveyor.length > 0 ?
+        this.listaSurveyor.find(x => x.id == surveyor[0].id) : null);          
+
+    let nominacion: Nominacion = new Nominacion();
+    nominacion.id = this._nominacionParametros.nominacion.id;
+    nominacion.fechaCreacion = new Date();
+    nominacion.embarque_Id = 0;
+    nominacion.nominacionDatoTecnico= this.datoTecnicoForm.value;
+    nominacion.nominacionDetalleIntervencion = null;
+    nominacion.nominacionRecibo = null;
+    this.cargandoDatoTecnico = true;
+    this.mensajeDatoTecnico = Mensajes.grabando;
+    this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+      this.cargandoDatoTecnico = false;
+      if (data) this.cargarFormulario(nominacion.id)
+    });
+  }
+  //#endregion
+
+  //#region Metodos Publicos    
   public trackByFn(index: any, item: any) {
     return index;
   }
@@ -229,28 +313,68 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       return true;
     return false;
   }
+  public obtenerListasDeNominacion(){
 
-  get datoTecnicoExportadorFormArray(): FormArray {
-    return this.datoTecnicoForm.get("nominacionDatoTecnicoExportador") as FormArray
+    this.datoTecnicoRegistroService.listarCombosDatoTecnico().pipe(takeUntil(this.destroy$)).subscribe((data: ProgramaEmbarqueNominacionDatoTecnico) =>{
+      this.listaMaterialPuerto = data.materialPuerto;
+      this.listaDestino = data.destino;
+      this.listaExportador = data.exportador;
+      this.listaBanderas = data.bandera;
+      this.listaCoordinadorPuerto = data.coordinadorPuerto;
+      this.listaATAPuerto = data.ataPuerto;
+      this.listaAgenciaMaritimaPuerto = data.agenciaMaritimaPuerto;
+      this.listaVapor = data.vaporInformacion;
+      this.listaTipoDeCalidad = data.tipoDeCalidad;   
+      this.listaSurveyor = data.surveyor;
+      this.listaTasaDeCarga = data.tasaDeCarga;
+      this.listaMuelleDeCarga = data.muelleDeCarga;
+      this.listaTipoDeContrato = data.tipoDeContrato; 
+      this.listaCalidadValor = data.calidadValor; 
+      this.cargandoDatoTecnico = false;
+      this.asignarNominacionParametros();
+    });
   }
-  get datoTecnicoDestinoFormArray(): FormArray {
-    return this.datoTecnicoForm.get("nominacionDatoTecnicoDestino") as FormArray
-  }
-  get datoTecnicoCoordinadorFormArray(): FormArray {
-    return this.datoTecnicoForm.get("nominacionDatoTecnicoCoordinadorPuerto") as FormArray
-  }
+  public configurarListasDeNominacion(){
+    this.formatoExportador = (exp: Exportador) => exp.nombre;
+    this.buscarExportador  = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaExportador.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+    this.formatoDestino = (exp: Destino) => exp.nombre;
+    this.buscarDestino = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaDestino.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
   
-  listaTipoDeCalidadxMaterial(materialPuerto){
+    this.formatoCoordinadorPuerto = (exp: CoordinadorPuerto) => exp.nombre;
+    this.buscarCoordinadorPuerto = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaCoordinadorPuerto.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+  
+    this.formatoVapor = (exp: VaporInformacion) => exp.nombreBuque;
+    this.buscarVapor = (text$: Observable<string>) => text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => this.listaVapor.filter(v => v.nombreBuque.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    )
+  }
+  public seleccionVapor($event) {
+    const bandera: Bandera =  $event.item.bandera;
+    this.datoTecnicoForm.controls['bandera'].setValue(null);
+    let banderaSeleccionada = this.listaBanderas.filter(x=> x.id == bandera.id);
+    if (banderaSeleccionada.length >0)
+      this.datoTecnicoForm.controls['bandera'].setValue(banderaSeleccionada[0]);
+  }
+  public listaTipoDeCalidadxMaterial(materialPuerto){
     return this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
   }
-  private cargarFormulario(nominacionId: number){
-    this.cargandoDatoTecnico = true;
-    this.mensajeDatoTecnico = Mensajes.cargando;
-    this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
-      this.cargandoDatoTecnico = false;
-      this.inicializarFormEdicion(this.datoTecnicoForm, data.nominacionDatoTecnico);
-    });
-  } 
+  //#endregion
+
+  //#region Eventos de controles   
   onEliminarDatoTecnicoExportador(index: number){
     const value = this.datoTecnicoExportadorFormArray.value;
     this.datoTecnicoExportadorFormArray.setValue(
@@ -278,7 +402,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     );
     this.datoTecnicoCoordinadorFormArray.removeAt(value.length - 1);
   }
-
   onActualizarListaCalidadValor(tipoDeCalidad, editarNominacion: boolean = false, nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[] = null) {
     if (tipoDeCalidad == null) return;
     this.listaNominacionDatoTecnicoCalidad = [];
@@ -323,128 +446,33 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   onSeleccionarTodos(event){
     this.listaNominacionDatoTecnicoCalidad.forEach(data=>{ data.esSeleccionado = event.currentTarget.checked;});
   }
-  private inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0){
-    return this.datoTecnicoRegistroService.inicializarFormExportador(exportador,nominacionDatoTecnico);   
-  }
-  private inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null, nominacionDatoTecnico: number = 0){
-    return this.datoTecnicoRegistroService.inicializarFormDestino(destino,nominacionDatoTecnico);   
-  }
-  private inicializarFormCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null, nominacionDatoTecnico: number = 0){
-    return this.datoTecnicoRegistroService.inicializarFormCoordinadorPuerto(coordinadorPuerto,nominacionDatoTecnico);   
-  }
-
-  public obtenerListasDeNominacion(){
-
-    this.datoTecnicoRegistroService.listarCombosDatoTecnico().pipe(takeUntil(this.destroy$)).subscribe((data: ProgramaEmbarqueNominacionDatoTecnico) =>{
-      this.listaMaterialPuerto = data.materialPuerto;
-      this.listaDestino = data.destino;
-      this.listaExportador = data.exportador;
-      this.listaBanderas = data.bandera;
-      this.listaCoordinadorPuerto = data.coordinadorPuerto;
-      this.listaATAPuerto = data.ataPuerto;
-      this.listaAgenciaMaritimaPuerto = data.agenciaMaritimaPuerto;
-      this.listaVapor = data.vaporInformacion;
-      this.listaTipoDeCalidad = data.tipoDeCalidad;   
-      this.listaSurveyor = data.surveyor;
-      this.listaTasaDeCarga = data.tasaDeCarga;
-      this.listaMuelleDeCarga = data.muelleDeCarga;
-      this.listaTipoDeContrato = data.tipoDeContrato; 
-      this.listaCalidadValor = data.calidadValor; 
-      this.cargandoDatoTecnico = false;
-      this.asignarNominacionParametros();
-    });
-  }
-
-  public configurarListasDeNominacion(){
-    this.formatoExportador = (exp: Exportador) => exp.nombre;
-    this.buscarExportador  = (text$: Observable<string>) => text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => this.listaExportador.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-    )
-    this.formatoDestino = (exp: Destino) => exp.nombre;
-    this.buscarDestino = (text$: Observable<string>) => text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => this.listaDestino.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-    )
-  
-    this.formatoCoordinadorPuerto = (exp: CoordinadorPuerto) => exp.nombre;
-    this.buscarCoordinadorPuerto = (text$: Observable<string>) => text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => this.listaCoordinadorPuerto.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-    )
-  
-    this.formatoVapor = (exp: VaporInformacion) => exp.nombreBuque;
-    this.buscarVapor = (text$: Observable<string>) => text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => this.listaVapor.filter(v => v.nombreBuque.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-    )
-  }
-
-  public seleccionVapor($event) {
-    const bandera: Bandera =  $event.item.bandera;
-    this.datoTecnicoForm.controls['bandera'].setValue(null);
-    let banderaSeleccionada = this.listaBanderas.filter(x=> x.id == bandera.id);
-    if (banderaSeleccionada.length >0)
-      this.datoTecnicoForm.controls['bandera'].setValue(banderaSeleccionada[0]);
-  }
-
-  public onGuardarDatoTecnico(){
+  onGuardarDatoTecnico(){
     this.grabarNominacion = true;
     if(this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)){
-      const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
-      let listaCalidadSeleccionada = [];
-      listaNominacionCalidad.forEach(calidad=>{
-        listaCalidadSeleccionada.push({
-          nominacionDatoTecnicoCalidad_Id: 0,
-          calidadValor: calidad.calidadValor,
-          nominacionDatoTecnico: null
-        });
-      });
-      this.datoTecnicoForm.controls['nominacionDatoTecnicoCalidad'].setValue(listaCalidadSeleccionada);
-      this.datoTecnicoForm.value.nominacionDatoTecnicoCalidad = listaCalidadSeleccionada;
-      let agenciaMaritimaPuerto = this.datoTecnicoForm.value.agenciaMaritimaPuerto;
-      let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
-      let surveyor = this.datoTecnicoForm.value.surveyor;
-
-      this.datoTecnicoForm.get('agenciaMaritimaPuerto').setValue(
-        agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
-          this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);
-
-      this.datoTecnicoForm.get('ataPuerto').setValue(
-        ataPuerto != null && ataPuerto.length > 0 ?
-          this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
-
-      this.datoTecnicoForm.get('surveyor').setValue(
-        surveyor != null && surveyor.length > 0 ?
-          this.listaSurveyor.find(x => x.id == surveyor[0].id) : null);          
-
-      let nominacion: Nominacion = new Nominacion();
-      nominacion.id = this._nominacionParametros.nominacion.id;
-      nominacion.fechaCreacion = new Date();
-      nominacion.embarque_Id = 0;
-      nominacion.nominacionDatoTecnico= this.datoTecnicoForm.value;
-      nominacion.nominacionDetalleIntervencion = null;
-      nominacion.nominacionRecibo = null;
-      this.cargandoDatoTecnico = true;
-      this.mensajeDatoTecnico = Mensajes.grabando;
-      this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
-        this.cargandoDatoTecnico = false;
-        if (data) this.cargarFormulario(nominacion.id)
+      const nominacionValida: NominacionValida = new NominacionValida();
+      nominacionValida.id = this._nominacionParametros.nominacion.id;
+      nominacionValida.materialPuerto = this.datoTecnicoForm.controls['materialPuerto'].value; 
+      nominacionValida.muelleDeCarga = this.datoTecnicoForm.controls['muelleDeCarga'].value; 
+      nominacionValida.vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value; 
+      let validacion: boolean = false;
+      console.log('antes de validar', new Date())
+      forkJoin([
+        this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida)
+      ]).pipe(takeUntil(this.destroy$)).subscribe(([validacion]) => {
+        this.guardarDatoTecnico(validacion);
       });
     }
   }
-
-  public onCancelarDatoTecnico(){
+  onCancelarDatoTecnico(){
     const nominacionId = this._nominacionParametros.nominacion.id;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarForm();
     this.cargarFormulario(nominacionId)
   }
+  //#endregion 
 
 }
+
+  //#region Clases adicionales
 export class ListaNominacionCalidad{
   calidadValor: CalidadValor;
   esSeleccionado: boolean;
@@ -453,3 +481,4 @@ enum Mensajes{
   cargando = "Cargando información de dato tecnico. Por favor, espere...",
   grabando = "Guardando información de dato tecnico. Por favor, espere..."
 }
+  //#endregion 
