@@ -10,12 +10,15 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public bool Precintado { get; set; }
+        public string PrecintadoACuentaDe { get; set; }
         public bool DraftSurvey { get; set; }
-        public string ACuentaDe { get; set; }
+        public string SurveyACuentaDe { get; set; }
         public bool PermisoDeEmbarque { get; set; }
         public bool EstibadorYTrimado { get; set; }
         public string Fumigacion { get; set; }
         public CompaniaDeFumigacionDto CompaniaDeFumigacion { get; set; }
+        public string ACuentaDe { get; set; }
+        public string Observaciones { get; set; }
         public TipoDeFumigacionDto TipoDeFumigacion { get; set; }
     }
 }
