@@ -34,18 +34,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Repositorio.GuardarCambios();
                     this.EliminarDetallesDatoTecnico(datoTecnico);
                     this.RegistrarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
-
-                    var nominacion = new Nominacion();
-                    nominacion.FechaCreacion = DateTime.Now;
-                    nominacion.EnviadoFumigador = false;
-                    nominacion.EnviadoSurveyor = false;
-                    nominacion.EnviadoOtros = false;
-                    nominacion.NominacionDatoTecnico = nominacionDatoTecnico;
-                    nominacion.NominacionDetalleIntervencion = null;
-                    nominacion.NominacionRecibo = null;
-                    nominacion.Embarque = null;
-                    Repositorio.Agregar(nominacion);
-                    Repositorio.GuardarCambios();
                 }
 
                 if (!comando.EsCreacion)
