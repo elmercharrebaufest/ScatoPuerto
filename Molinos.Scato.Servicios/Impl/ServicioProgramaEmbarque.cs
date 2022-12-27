@@ -108,6 +108,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+        
         public NominacionDto ObtenerNominacion(int id)
         {
             try
@@ -121,6 +122,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+        
         public IList<VaporInformacionDto> listarVaporInformacion()
         {
             try
@@ -192,6 +194,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+        
         public IList<ATAPuertoDto> listarATAPuerto()
         {
             try
@@ -214,6 +217,17 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
+        }
+
+        public bool ValidarCreacionNominacion(NominacionValidaDto nominacion)
+        {
+            bool bValidacion = true;
+            var listaNominaciones = Listar<Nominacion, NominacionDto>(x => x.NominacionDatoTecnico.MaterialPuerto.Id == nominacion.MaterialPuerto.Id &&
+                                                                      x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
+                                                                      x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
+                                                                      x.Id != nominacion.Id);
+            if (listaNominaciones.Count > 1) bValidacion = false;
+            return bValidacion;
         }
 
         #region Metodos Utiles

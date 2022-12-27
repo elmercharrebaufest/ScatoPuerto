@@ -706,6 +706,7 @@
     <Compile Include="Dto\NominacionDatoTecnicoDto.cs" />
     <Compile Include="Dto\NominacionDatoTecnicoExportadorDto.cs" />
     <Compile Include="Dto\NominacionDetalleIntervencionDto.cs" />
+    <Compile Include="Dto\NominacionValidaDto.cs" />
     <Compile Include="Dto\ProgramaEmbarqueDto.cs" />
     <Compile Include="Dto\NominacionDto.cs" />
     <Compile Include="Dto\NominacionReciboDto.cs" />

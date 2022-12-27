@@ -19,6 +19,8 @@ import { CalidadValor } from '@ScatoModels/programa-embarque/calidad-valor';
 import { TasaDeCarga } from '@ScatoModels/programa-embarque/tasa-de-carga';
 import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
 import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
+import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
+import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-valida';
 
 @Injectable({
     providedIn: 'root'
@@ -35,7 +37,7 @@ export class NominacionDatoTecnicoRegistroService {
         return this.buqueService.obtenerVaporInformacion(vaporId);
     }
 
-    private inicializarFormNuevo(): FormGroup{
+    private inicializarFormNuevo(): FormGroup {
         return this.formBuilder.group({
             id: [0, Validators.required],
             materialPuerto: ['', Validators.required],
@@ -62,19 +64,20 @@ export class NominacionDatoTecnicoRegistroService {
             nominacionDatoTecnicoDestino: this.formBuilder.array([]),
             nominacionDatoTecnicoCoordinadorPuerto: this.formBuilder.array([]),
         });
-    } 
+    }
 
     public inicializarForm() {
         return this.inicializarFormNuevo();
     }
-    public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null): FormGroup {
+
+    public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (exportador != null) {
             return this.formBuilder.group({
                 nominacionDatoTecnicoExportador_Id: exportador.nominacionDatoTecnicoExportador_Id,
                 exportador: exportador.exportador,
                 cantidad: exportador.cantidad,
                 tolerancia: exportador.tolerancia,
-                nominacionDatoTecnico_Id: exportador.nominacionDatoTecnico.id
+                nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
             return this.formBuilder.group({
@@ -86,13 +89,14 @@ export class NominacionDatoTecnicoRegistroService {
             })
         }
     }
-    public inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null): FormGroup {
+
+    public inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (destino != null) {
             return this.formBuilder.group({
                 nominacionDatoTecnicoDestino_Id: destino.nominacionDatoTecnicoDestino_Id,
-                exportador: destino.destino,
+                destino: destino.destino,
                 cantidad: destino.cantidad,
-                nominacionDatoTecnico_Id: destino.nominacionDatoTecnico.id
+                nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
             return this.formBuilder.group({
@@ -103,13 +107,14 @@ export class NominacionDatoTecnicoRegistroService {
             })
         }
     }
-    public inicializarFormCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null): FormGroup {
+
+    public inicializarFormCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (coordinadorPuerto != null) {
             return this.formBuilder.group({
                 nominacionDatoTecnicoCoordinador_Id: coordinadorPuerto.nominacionDatoTecnicoCoordinador_Id,
                 coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
                 cantidad: coordinadorPuerto.cantidad,
-                nominacionDatoTecnico_Id: coordinadorPuerto.nominacionDatoTecnico.id
+                nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
             return this.formBuilder.group({
@@ -120,6 +125,7 @@ export class NominacionDatoTecnicoRegistroService {
             })
         }
     }
+
     public validacionGrabar(datoTecnicoForm: FormGroup): boolean {
         let bValidacion: boolean = true;
         const tituloMensaje = 'Registro Nominación - Dato Tecnico';
@@ -173,13 +179,15 @@ export class NominacionDatoTecnicoRegistroService {
         }
         return bValidacion;
     }
-    public grabarNominacion(nominacion: Nominacion){
-        this.nominacionService.registroNominacion(nominacion).subscribe(data=> {console.log(data)});
+
+    public grabarNominacion(nominacion: Nominacion): Observable<boolean>{
+        return this.nominacionService.registroNominacion(nominacion).pipe(map((data: boolean) => { return data; }));
     }
 
-    
-    public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico>{
-        return this.nominacionService.listarCombosDatoTecnico().pipe(map((data: ProgramaEmbarqueNominacionDatoTecnico) => { return data;}));
+    public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico> {
+        return this.nominacionService.listarCombosDatoTecnico().pipe(map((data: ProgramaEmbarqueNominacionDatoTecnico) => { return data; }));
     }
-
+    public validarCreacionNominacion(nominacion: NominacionValida): Observable<boolean> {
+        return this.nominacionService.validarCreacionNominacion(nominacion).pipe(map((data: boolean) => { return data; }));
+    }
 }

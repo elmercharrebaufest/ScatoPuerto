@@ -65,5 +65,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<AgenciaMaritimaPuertoDto> listarAgenciaMaritimaPuerto();
+
+        [OperationContract]
+        bool ValidarCreacionNominacion(NominacionValidaDto nominacion);
+
     }
 }

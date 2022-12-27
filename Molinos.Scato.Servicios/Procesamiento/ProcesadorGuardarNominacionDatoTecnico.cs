@@ -6,57 +6,53 @@ using System.Threading.Tasks;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorGuardarNominacionDatoTecnico : ProcesadorModificar<GuardarNominacionDatoTecnico>
+    public class ProcesadorGuardarNominacionDatoTecnico : ProcesadorComando<GuardarNominacionDatoTecnico>
     {
-        public ProcesadorGuardarNominacionDatoTecnico(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
-            : base(repositorio, conversor, log, servicioRepositorio)
+        public ProcesadorGuardarNominacionDatoTecnico(IRepositorio repositorio, IConversor conversor, ILogger log)
+            : base(repositorio, conversor, log)
         {
         }
-        protected override void ModificarEntidad(GuardarNominacionDatoTecnico comando)
+        public override Resultado Ejecutar(GuardarNominacionDatoTecnico comando)
         {
-            if (comando.EsCreacion)
+            var resultado = new ResultadoCrear();
+
+            try
             {
-                var nominacionDatoTecnico = this.AsignarDatoTecnico(comando);
-                var datoTecnico = comando.Dto.NominacionDatoTecnico;
-                Repositorio.Agregar(nominacionDatoTecnico);
-                Repositorio.GuardarCambios();
 
-                this.AsignarDatoTecnicoDetalles(nominacionDatoTecnico, datoTecnico, comando.EsCreacion);
+                if (comando.EsCreacion)
+                {
+                    var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
+                    var datoTecnico = comando.Dto.NominacionDatoTecnico;
+                    Repositorio.Agregar(nominacionDatoTecnico);
+                    Repositorio.GuardarCambios();
+                    this.EliminarDetallesDatoTecnico(datoTecnico);
+                    this.RegistrarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
+                }
 
-                var nominacion = new Nominacion();
-                nominacion.FechaCreacion = DateTime.Now;
-                nominacion.EnviadoFumigador = false;
-                nominacion.EnviadoSurveyor = false;
-                nominacion.EnviadoOtros = false;
-                nominacion.NominacionDatoTecnico = nominacionDatoTecnico;
-                nominacion.NominacionDetalleIntervencion = null;
-                nominacion.NominacionRecibo = null;
-                nominacion.Embarque = null;
-                Repositorio.Agregar(nominacion);
-                Repositorio.GuardarCambios();
+                if (!comando.EsCreacion)
+                {
+                    var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
+                    var datoTecnico = comando.Dto.NominacionDatoTecnico;
+                    this.EliminarDetallesDatoTecnico(datoTecnico);
+                    this.RegistrarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
+                }
             }
-            
-            if (!comando.EsCreacion)
+            catch (Exception e)
             {
-                var nominacionDatoTecnico = this.AsignarDatoTecnico(comando);
-                var datoTecnico = comando.Dto.NominacionDatoTecnico;
-                Repositorio.Agregar(nominacionDatoTecnico);
-                Repositorio.GuardarCambios();
-
-                this.AsignarDatoTecnicoDetalles(nominacionDatoTecnico, datoTecnico, comando.EsCreacion);
+                resultado.Error("", Textos.Error_ActualizarGenerico);
+                Log.Error("Error al crear dato tecnico {0}", e.StackTrace);
             }
+            return resultado;
         }
 
-        protected override void Validar(GuardarNominacionDatoTecnico comando, Resultado resultado)
-        {
-        }
-        private NominacionDatoTecnico AsignarDatoTecnico(GuardarNominacionDatoTecnico comando)
+        private NominacionDatoTecnico RegistrarDatoTecnico(GuardarNominacionDatoTecnico comando)
         {
             var nominacionDatoTecnico = new NominacionDatoTecnico();
             var datoTecnico = comando.Dto.NominacionDatoTecnico;
@@ -102,24 +98,27 @@ namespace Molinos.Scato.Servicios.Procesamiento
             nominacionDatoTecnico.AgenciaMaritimaPuerto = agenciaMaritimaPuerto;
             nominacionDatoTecnico.Surveyor = surveyor;
             nominacionDatoTecnico.ObservacionesSurveyor = datoTecnico.ObservacionesSurveyor;
+            if (!comando.EsCreacion)
+                Repositorio.GuardarCambios();
 
             return nominacionDatoTecnico;
         }
-        private void AsignarDatoTecnicoDetalles(NominacionDatoTecnico nominacionDatoTecnico, NominacionDatoTecnicoDto datoTecnico, bool esCreacion)
+        private void EliminarDetallesDatoTecnico(NominacionDatoTecnicoDto datoTecnico)
         {
-            if (!esCreacion)
-            {
-                var calidades = Repositorio.Listar<NominacionDatoTecnicoCalidad>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
-                var coordinadores = Repositorio.Listar<NominacionDatoTecnicoCoordinadorPuerto>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
-                var destinos = Repositorio.Listar<NominacionDatoTecnicoDestino>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
-                var exportadores = Repositorio.Listar<NominacionDatoTecnicoExportador>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var calidades = Repositorio.Listar<NominacionDatoTecnicoCalidad>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var coordinadores = Repositorio.Listar<NominacionDatoTecnicoCoordinadorPuerto>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var destinos = Repositorio.Listar<NominacionDatoTecnicoDestino>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var exportadores = Repositorio.Listar<NominacionDatoTecnicoExportador>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
 
-                foreach (var calidad in calidades) Repositorio.Remover<NominacionDatoTecnicoCalidad>(calidad);
-                foreach (var coordinador in coordinadores) Repositorio.Remover<NominacionDatoTecnicoCoordinadorPuerto>(coordinador);
-                foreach (var destino in destinos) Repositorio.Remover<NominacionDatoTecnicoDestino>(destino);
-                foreach (var exportador in exportadores) Repositorio.Remover<NominacionDatoTecnicoExportador>(exportador);
-                Repositorio.GuardarCambios();
-            }
+            foreach (var calidad in calidades) Repositorio.Remover<NominacionDatoTecnicoCalidad>(calidad);
+            foreach (var coordinador in coordinadores) Repositorio.Remover<NominacionDatoTecnicoCoordinadorPuerto>(coordinador);
+            foreach (var destino in destinos) Repositorio.Remover<NominacionDatoTecnicoDestino>(destino);
+            foreach (var exportador in exportadores) Repositorio.Remover<NominacionDatoTecnicoExportador>(exportador);
+            Repositorio.GuardarCambios();
+        }
+        private void RegistrarDetallesDatoTecnico(NominacionDatoTecnico nominacionDatoTecnico, NominacionDatoTecnicoDto datoTecnico)
+        {
+
             if (datoTecnico.NominacionDatoTecnicoCalidad != null && datoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
             {
                 foreach (var calidad in datoTecnico.NominacionDatoTecnicoCalidad)
@@ -128,6 +127,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoCalidad.NominacionDatoTecnico = nominacionDatoTecnico;
                     datoTecnicoCalidad.CalidadValor = Repositorio.Obtener<CalidadValor>(x => x.Id == calidad.CalidadValor.Id);
                     Repositorio.Agregar(datoTecnicoCalidad);
+                    Repositorio.GuardarCambios();
                 }
             }
 
@@ -140,6 +140,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoCoordinadorPuerto.CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(x => x.Id == coordinador.CoordinadorPuerto.Id);
                     datoTecnicoCoordinadorPuerto.Cantidad = coordinador.Cantidad;
                     Repositorio.Agregar(datoTecnicoCoordinadorPuerto);
+                    Repositorio.GuardarCambios();
                 }
             }
 
@@ -152,6 +153,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoDestino.Destino = Repositorio.Obtener<Destino>(x => x.Id == destino.Destino.Id);
                     datoTecnicoDestino.Cantidad = destino.Cantidad;
                     Repositorio.Agregar(datoTecnicoDestino);
+                    Repositorio.GuardarCambios();
                 }
             }
 
@@ -165,6 +167,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoExportador.Cantidad = exportador.Cantidad;
                     datoTecnicoExportador.Tolerancia = exportador.Tolerancia;
                     Repositorio.Agregar(datoTecnicoExportador);
+                    Repositorio.GuardarCambios();
                 }
             }
 

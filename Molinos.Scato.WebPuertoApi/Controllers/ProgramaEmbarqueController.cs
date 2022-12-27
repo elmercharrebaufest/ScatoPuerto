@@ -94,6 +94,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUpExportar)]
+        //[Autorizacion(PermisosScato.LineUp_Exportar)]
+        [Route("api/ProgramaEmbarque/ValidarCreacionNominacion")]
+        public HttpResponseMessage ValidarCreacionNominacion(NominacionValidaDto nominacion)
+        {
+            try
+            {
+                bool validarCreacionNominacion = servicioProgramaEmbarque.ValidarCreacionNominacion(nominacion);
+                return Request.CreateResponse(HttpStatusCode.OK, validarCreacionNominacion);
+            }
+            catch (Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
 
 
         [HttpGet]
@@ -238,12 +255,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                comandos.Ejecutar(new GuardarNominacionDatoTecnico
+                Resultado resultado = new Resultado();
+                bool bGraboOK = true;
+                resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
                 {
                     Dto = nominacion,
-                    EsCreacion = true
+                    EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
                 });
-                return Request.CreateResponse(HttpStatusCode.OK);
+                bGraboOK = resultado.HayErrores ? false : true;
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
+
             }
             catch (Exception ex)
             {
