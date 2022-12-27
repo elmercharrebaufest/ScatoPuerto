@@ -104,7 +104,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                             && y.Destino.ToUpper().StartsWith(destino.ToUpper()))) &&
                                          (productos == null || (x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) &&
                                          (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado.ToUpper()))
-                                           ))).ToList();
+                                           ))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
         }
 
         public virtual List<HistorialDeBusquesDto> Ejecutar(DbContext contexto)
