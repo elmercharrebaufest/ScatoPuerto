@@ -29,6 +29,8 @@ import { NominacionDatoTecnicoRegistroService } from './nominacion-dato-tecnico.
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
+import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
+import { setTimeout } from 'timers';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -73,6 +75,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public cargandoDatoTecnico: boolean = true;
   public mostrarParametroCalidad: boolean = false;
   public grabarNominacion: boolean = false;
+  public mensajeDatoTecnico = '';
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
 
   private destroy$ = new Subject();
@@ -80,6 +83,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   constructor(private nominacionService: NominacionService,
     private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService) {
     this.cargandoDatoTecnico = true;
+    this.mensajeDatoTecnico = Mensajes.cargando;
     this.configurarListasDeNominacion();
     this.inicializarForm();
     this.obtenerListasDeNominacion();
@@ -112,8 +116,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
           nominacion: parametro.nominacion,
         };
         this.nominacionParametros = nominacionParametos;
-        if (nominacionParametos.nominacion!=null)
-        this.inicializarFormEdicion(this.datoTecnicoForm);
+        if (nominacionParametos.actualizarDatoTecnico){
+          if (nominacionParametos.nominacion!=null)
+          this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
+        }
       }
     });
   }
@@ -122,26 +128,55 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   private inicializarForm() {
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarForm();
   }
-  private inicializarFormEdicion(datoTecnicoForm: FormGroup) {
+  private inicializarFormEdicion(datoTecnicoForm: FormGroup, dataTecnico: NominacionDatoTecnico) {
     
-    const dataTecnico = this.nominacionParametros.nominacion.nominacionDatoTecnico;
-
-    let material: MaterialPuerto = this.listaMaterialPuerto.filter(x=> x.id == dataTecnico.materialPuerto.id)[0];
-    let datoTecnicoCalidadSel = dataTecnico.nominacionDatoTecnicoCalidad.filter(x=> x.calidadValor.tipoDeCalidad.materialPuerto.id == material.id)[0];
+    //const dataTecnico = this.nominacionParametros.nominacion.nominacionDatoTecnico;
+    let material: MaterialPuerto = null;
+    let datoTecnicoCalidadSel = null;
     let tipoDeCalidad: TipoDeCalidad = null;
+    let muelleDeCarga: MuelleDeCarga = null;
+    let tasaDeCarga: TasaDeCarga = null;
+    let tipoDeContrato: TipoDeContrato = null;
+    let surveyor: Surveyor = null;
+    let agenciaMaritimaPuerto: AgenciaMaritimaPuerto = null;
+    let ataPuerto: ATAPuerto = null;
+    let bandera: Bandera = null;
+    let etaRecalada  = null;
+    let obligacionDeCarga  = null;
+
+    if (dataTecnico.materialPuerto !=null)
+     material = this.listaMaterialPuerto.filter(x=> x.id == dataTecnico.materialPuerto.id)[0];
+    if (dataTecnico.materialPuerto !=null)
+     datoTecnicoCalidadSel = dataTecnico.nominacionDatoTecnicoCalidad.filter(x=> x.calidadValor.tipoDeCalidad.materialPuerto.id == material.id)[0];
     if (dataTecnico.nominacionDatoTecnicoCalidad !=null && dataTecnico.nominacionDatoTecnicoCalidad.length >0)
       tipoDeCalidad = this.listaTipoDeCalidad.filter(x=> x.id == datoTecnicoCalidadSel.calidadValor.tipoDeCalidad.id)[0];
+     
+    if (dataTecnico.muelleDeCarga !=null)
+      muelleDeCarga = this.listaMuelleDeCarga.filter(x=> x.id == dataTecnico.muelleDeCarga.id)[0];
 
-    let muelleDeCarga: MuelleDeCarga = this.listaMuelleDeCarga.filter(x=> x.id == dataTecnico.muelleDeCarga.id)[0];
-    let tasaDeCarga: TasaDeCarga = this.listaTasaDeCarga.filter(x=> x.id == dataTecnico.tasaDeCarga.id)[0];
-    let tipoDeContrato: TipoDeContrato = this.listaTipoDeContrato.filter(x=> x.id == dataTecnico.tipoDeContrato.id)[0];
-    let surveyor: Surveyor = this.listaSurveyor.filter(x=> x.id == dataTecnico.surveyor.id)[0];
-    let agenciaMaritimaPuerto: AgenciaMaritimaPuerto = this.listaAgenciaMaritimaPuerto.filter(x=> x.id == dataTecnico.agenciaMaritimaPuerto.id)[0];
-    let ataPuerto: ATAPuerto = this.listaATAPuerto.filter(x=> x.id == dataTecnico.ataPuerto.id)[0];
-    let bandera: Bandera = this.listaBanderas.filter(x=> x.id == dataTecnico.vaporInformacion.bandera.id)[0];
-   
-    let etaRecalada = new Date(dataTecnico.etaRecalada).toISOString().slice(0, 10);
-    let obligacionDeCarga = new Date(dataTecnico.obligacionDeCarga).toISOString().slice(0, 10);
+    if (dataTecnico.tasaDeCarga !=null)
+      tasaDeCarga = this.listaTasaDeCarga.filter(x=> x.id == dataTecnico.tasaDeCarga.id)[0];
+    
+    if (dataTecnico.tipoDeContrato !=null)
+      tipoDeContrato = this.listaTipoDeContrato.filter(x=> x.id == dataTecnico.tipoDeContrato.id)[0];
+    
+    if (dataTecnico.surveyor !=null)
+      surveyor = this.listaSurveyor.filter(x=> x.id == dataTecnico.surveyor.id)[0];
+    
+    if (dataTecnico.agenciaMaritimaPuerto !=null)
+      agenciaMaritimaPuerto = this.listaAgenciaMaritimaPuerto.filter(x=> x.id == dataTecnico.agenciaMaritimaPuerto.id)[0];
+    
+    if (dataTecnico.ataPuerto !=null)
+      ataPuerto = this.listaATAPuerto.filter(x=> x.id == dataTecnico.ataPuerto.id)[0];
+    
+    if (dataTecnico.vaporInformacion.bandera !=null)
+      bandera = this.listaBanderas.filter(x=> x.id == dataTecnico.vaporInformacion.bandera.id)[0];
+     
+    if (dataTecnico.etaRecalada !=null)
+      etaRecalada = new Date(dataTecnico.etaRecalada).toISOString().slice(0, 10);
+
+    if (dataTecnico.obligacionDeCarga !=null)
+      obligacionDeCarga = new Date(dataTecnico.obligacionDeCarga).toISOString().slice(0, 10);
 
     datoTecnicoForm.controls['id'].setValue(dataTecnico.id);
     datoTecnicoForm.controls['materialPuerto'].setValue(material);
@@ -159,10 +194,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['tipoDeContrato'].setValue(tipoDeContrato);
     datoTecnicoForm.controls['dem'].setValue(dataTecnico.dem);
     datoTecnicoForm.controls['des'].setValue(dataTecnico.des);
-    datoTecnicoForm.controls['surveyor'].setValue([surveyor]);
     datoTecnicoForm.controls['observacionesSurveyor'].setValue(dataTecnico.observacionesSurveyor);
-    datoTecnicoForm.get('agenciaMaritimaPuerto').setValue([agenciaMaritimaPuerto]);
-    datoTecnicoForm.controls['ataPuerto'].setValue([ataPuerto]);
+    if (surveyor!=null) datoTecnicoForm.controls['surveyor'].setValue([surveyor]);
+    if (agenciaMaritimaPuerto!=null) datoTecnicoForm.controls['agenciaMaritimaPuerto'].setValue([agenciaMaritimaPuerto]);
+    if (ataPuerto!=null) datoTecnicoForm.controls['ataPuerto'].setValue([ataPuerto]);
 
     this.mostrarParametroCalidad = true;
     const nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[] = dataTecnico.nominacionDatoTecnicoCalidad;
@@ -208,7 +243,14 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   listaTipoDeCalidadxMaterial(materialPuerto){
     return this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
   }
-
+  private cargarFormulario(nominacionId: number){
+    this.cargandoDatoTecnico = true;
+    this.mensajeDatoTecnico = Mensajes.cargando;
+    this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+      this.cargandoDatoTecnico = false;
+      this.inicializarFormEdicion(this.datoTecnicoForm, data.nominacionDatoTecnico);
+    });
+  } 
   onEliminarDatoTecnicoExportador(index: number){
     const value = this.datoTecnicoExportadorFormArray.value;
     this.datoTecnicoExportadorFormArray.setValue(
@@ -238,6 +280,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
 
   onActualizarListaCalidadValor(tipoDeCalidad, editarNominacion: boolean = false, nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[] = null) {
+    if (tipoDeCalidad == null) return;
     this.listaNominacionDatoTecnicoCalidad = [];
     const listaCalidad = this.listaCalidadValor.filter(x=> x.tipoDeCalidad.id == tipoDeCalidad.id);
     listaCalidad.forEach(calidad =>{
@@ -252,6 +295,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       };
       this.listaNominacionDatoTecnicoCalidad.push(calidadValor);
     });
+    
   }
   onAgregarDatoTecnicoExportador(){
     this.datoTecnicoExportadorFormArray.push(this.inicializarFormExportador());
@@ -310,6 +354,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.asignarNominacionParametros();
     });
   }
+
   public configurarListasDeNominacion(){
     this.formatoExportador = (exp: Exportador) => exp.nombre;
     this.buscarExportador  = (text$: Observable<string>) => text$.pipe(
@@ -340,7 +385,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
 
   public seleccionVapor($event) {
-    console.log('$event---->>', $event)
     const bandera: Bandera =  $event.item.bandera;
     this.datoTecnicoForm.controls['bandera'].setValue(null);
     let banderaSeleccionada = this.listaBanderas.filter(x=> x.id == bandera.id);
@@ -348,11 +392,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoForm.controls['bandera'].setValue(banderaSeleccionada[0]);
   }
 
-
   public onGuardarDatoTecnico(){
     this.grabarNominacion = true;
-    //if(this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)){
-      console.log('listaNominacionDatoTecnicoCalidad>>', this.listaNominacionDatoTecnicoCalidad);
+    if(this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)){
       const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
       let listaCalidadSeleccionada = [];
       listaNominacionCalidad.forEach(calidad=>{
@@ -381,23 +423,33 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
           this.listaSurveyor.find(x => x.id == surveyor[0].id) : null);          
 
       let nominacion: Nominacion = new Nominacion();
-      nominacion.id = 0;
+      nominacion.id = this._nominacionParametros.nominacion.id;
       nominacion.fechaCreacion = new Date();
       nominacion.embarque_Id = 0;
       nominacion.nominacionDatoTecnico= this.datoTecnicoForm.value;
       nominacion.nominacionDetalleIntervencion = null;
       nominacion.nominacionRecibo = null;
-
-      this.datoTecnicoRegistroService.grabarNominacion(nominacion);
-      console.log('this.datoTecnicoForm-->>', this.datoTecnicoForm);
-    //}
+      this.cargandoDatoTecnico = true;
+      this.mensajeDatoTecnico = Mensajes.grabando;
+      this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+        this.cargandoDatoTecnico = false;
+        if (data) this.cargarFormulario(nominacion.id)
+      });
+    }
   }
 
   public onCancelarDatoTecnico(){
+    const nominacionId = this._nominacionParametros.nominacion.id;
+    this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarForm();
+    this.cargarFormulario(nominacionId)
   }
 
 }
 export class ListaNominacionCalidad{
   calidadValor: CalidadValor;
   esSeleccionado: boolean;
+}
+enum Mensajes{
+  cargando = "Cargando información de dato tecnico. Por favor, espere...",
+  grabando = "Guardando información de dato tecnico. Por favor, espere..."
 }

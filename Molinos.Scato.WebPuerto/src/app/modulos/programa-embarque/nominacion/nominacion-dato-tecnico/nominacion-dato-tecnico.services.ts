@@ -179,8 +179,8 @@ export class NominacionDatoTecnicoRegistroService {
         return bValidacion;
     }
 
-    public grabarNominacion(nominacion: Nominacion) {
-        this.nominacionService.registroNominacion(nominacion).subscribe(data => { console.log(data) });
+    public grabarNominacion(nominacion: Nominacion): Observable<boolean>{
+        return this.nominacionService.registroNominacion(nominacion).pipe(map((data: boolean) => { return data; }));
     }
 
     public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico> {
