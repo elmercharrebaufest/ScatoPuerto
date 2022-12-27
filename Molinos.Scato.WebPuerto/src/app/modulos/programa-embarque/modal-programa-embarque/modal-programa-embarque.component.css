@@ -1,11 +1,10 @@
-.line {
-    background-color: #92B234;
-    height: 8px;
+.line {  
+    height: 7px;
     width: 100%;
 }
 
 .tabs{
-    width: 265px;
+    width: 33%;
     text-align: center;
     color: black !important;
     font-weight: bold;
@@ -28,3 +27,26 @@
 .nav-link.labelTabs.active{
     border-bottom: 2px solid #4461a8;
 }
+
+.tamanioLetraModal{
+    font-size: 14px;
+}
+
+.cursor{
+    cursor: pointer;
+}
+
+.header{
+    text-align: center;
+    background-color: #d8d8d8;
+}
+
+.tableFixHead          { overflow: auto; height: 360px; }
+.tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+
+table  { border-collapse: collapse; width: 100%; }
+th, td { padding: 8px 16px; }
+th     { background:#eee; }
+
+
+

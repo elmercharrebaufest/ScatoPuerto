@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
 import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
 import { FiltroProgramaEmbarqueComponent } from '../filtro-programa-embarque/filtro-programa-embarque.component';
-
+import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-listado-programa-embarque',
@@ -35,9 +35,10 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
   filtros: any;
   public estaCargando = false;
+  interval:any
   //#endregion
-  constructor(private progamaService: ProgramaEmbarqueService, 
-    private programaEmbarqueService: ProgramaEmbarqueService) { }
+  constructor(private progamaService: ProgramaEmbarqueService, private modalService: NgbModal,
+    public config: NgbModalConfig ) { }
 
   ngOnInit(): void {
     this.estaCargando = true;
@@ -50,12 +51,15 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.estaCargando = false; 
       }
     )  
-     
+    this.interval = setInterval(
+      () => {this.listarProgramas()},
+       60000)
   }
   ngOnDestroy(): void {
     this.subscripcionPrograma.unsubscribe();
+    clearInterval(this.interval)
   }
-
+  
   public getListaProgramaEmbarque() {
     return this.programa;
   }
@@ -67,7 +71,8 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       this.orderDirection = 1;
       this.orderedByColumn = column;
     }
-
+    var columArray = column.split('.')
+    if(columArray.length == 1){
     this.programa.sort((a, b) => {
       if (a[column] > b[column]) {
         return 1
@@ -76,8 +81,20 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         return -1
       }
       return 0
-    })
-    if(this.orderDirection < 0) this.programa= this.programa.reverse()
+    })}
+    else{
+      this.programa.sort((a, b) => {
+        if (a[columArray[0]][0][columArray[1]] > b[columArray[0]][0][columArray[1]]) {
+          return 1
+        }
+        if (a[columArray[0]][0][columArray[1]] < b[columArray[0]][0][columArray[1]]) {
+          return -1
+        }
+        return 0
+      })
+    }
+
+    if(this.orderDirection <= 0) this.programa= this.programa.reverse()
   }
 
   public retornarColor(color){
@@ -91,7 +108,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
     this.disabled = false;
-    this.programaEmbarqueService.ListarProgramaEmbarque(this.pageIndex, this.pageSize)
+    this.listarProgramas()
     
   }
 
@@ -114,13 +131,27 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
      "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"  
   }
 
-  public seleccionarNominacion(id: number){    
-    this.nominacion = this.programaEmbarqueService.obtenerNominacion(id)
-    document.getElementById("myModal").style.display = "block";
+  public seleccionarNominacion(id: number, modal){    
+    this.nominacion = this.progamaService.obtenerNominacion(id);    
+    this.onOpenModalGeo(modal);
+
    
   }
 
   public retornarColorEnvioMail(mailEnviado: any){
       return mailEnviado ? "#4D60A8" : "#999999"
+  }
+
+  public onOpenModalGeo(modal) {
+    
+    this.modalService.open(modal, {size:'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
+      .then(() => {
+        console.log('_modalService.open');
+      })
+      .catch((res) => { console.log(res) });
+  }
+
+  listarProgramas(){
+    this.progamaService.ListarProgramaEmbarque(this.pageIndex, this.pageSize)
   }
 }

@@ -71,3 +71,13 @@ width: 10px;
     border-left: none;
 }
 
+.cursor{
+    cursor: pointer !important;
+}
+
+.tableFixHead          { overflow: auto; height: 360px; }
+.tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+
+table  { border-collapse: collapse; width: 100%; }
+th, td { padding: 8px 13px; }
+th     { background:#666666; }

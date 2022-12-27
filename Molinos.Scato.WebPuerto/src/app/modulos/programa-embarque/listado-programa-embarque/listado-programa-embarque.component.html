@@ -1,10 +1,11 @@
 <ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
 
 
-<div style="overflow-x:auto;" class="table-responsive">
+<div style="overflow-x:auto; " class="table-responsive tableFixHead">
     <table class='table table-bordered lista-pe-table'>
         <thead class="lista-pe-header tamanioHeader">
-            <th class="noBorder"></th>
+            <tr>
+            <th class="noBorder"></th>          
             <th tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('producto')">
                 <div class="head noBorder">
                     Producto
@@ -97,9 +98,10 @@
             <th class="noBorder"></th>
             <th class="noBorder"></th>
             <th class="noBorder"></th>
+        </tr>
         </thead>
         <tbody *ngFor="let historial of getListaProgramaEmbarque()" style="text-align: center;">
-            <tr class="lista-buque-row" (click)="seleccionarNominacion(historial.id)" style="cursor:pointer">
+            <tr class="lista-buque-row cursor" (click)="seleccionarNominacion(historial.id, addPE)">
                 <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }"
                     class="noBorder anchoDeFila"></td>
                 <td class="lista-buque-row-item noBorder" style="font-size: 20px;">
@@ -140,8 +142,14 @@
         </tbody>
 
     </table>
+    </div>
     <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
         [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
         [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
         [pageIndex]="pageIndex" aria-label="Select page">
     </mat-paginator>
+
+<ng-template #addPE let-modal>
+    <app-modal-programa-embarque (cerrar)="modal.dismiss()"></app-modal-programa-embarque>
+</ng-template>
+ 
