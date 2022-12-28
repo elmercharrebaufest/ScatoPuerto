@@ -354,7 +354,7 @@
                                     [displayBy]="'nombre'">
                             </tag-input-dropdown>
                         </tag-input>
-                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="onAltaBajaMantenimiento(2)">
                     </div>
                 </div>
             </div>
@@ -376,7 +376,7 @@
                                     [displayBy]="'nombre'">
                             </tag-input-dropdown>
                         </tag-input>
-                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"(click)="onAltaBajaMantenimiento(1)">
                     </div>
                 </div>
             </div>
@@ -396,7 +396,7 @@
                                                 [displayBy]="'descripcion'">
                             </tag-input-dropdown>
                         </tag-input>
-                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"(click)="onAltaBajaMantenimiento(3)">
                     </div>
                 </div>
             </div>
@@ -417,3 +417,7 @@
         </div>
     </div>
 </div>
+
+<ng-template #modalABM let-modal>
+    <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal" (actualizarTipoLista)="onActualizarTipoLista($event)" ></app-alta-baja-mantenimiento>
+</ng-template>

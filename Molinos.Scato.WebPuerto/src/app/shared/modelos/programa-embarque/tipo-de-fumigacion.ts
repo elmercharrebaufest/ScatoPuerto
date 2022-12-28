@@ -1,5 +1,4 @@
-export class Surveyor{
+export class TipoDeFumigacion{
     id: number;
     descripcion : string;
-    mail : string;
 }

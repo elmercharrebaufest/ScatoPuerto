@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
 import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
@@ -32,6 +32,8 @@ import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-emb
 import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
 import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-valida';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { AltaBajaMantenimientoComponent } from 'app/shared/componentes/alta-baja-mantenimiento/alta-baja-mantenimiento.component';
+import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -41,6 +43,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
   //#region Variables
+  @ViewChild('modalABM') modalABM: TemplateRef<any>;
   private _nominacionParametros: NominacionParametros = null;
   public datoTecnicoForm: FormGroup;
   public datoTecnicoExportador: NominacionDatoTecnicoExportador[];
@@ -78,14 +81,18 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public mostrarParametroCalidad: boolean = false;
   public grabarNominacion: boolean = false;
   public mensajeDatoTecnico = '';
+  public tipoAltaBaja: number = 0;
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
+  @ViewChild('AltaBaja') altaBaja: AltaBajaMantenimientoComponent;
 
+  
   private destroy$ = new Subject();
   //#endregion
 
   //#region Contructor
   constructor(private nominacionService: NominacionService,
     private confirmationDialogService: ConfirmationDialogService,
+    private modalService: NgbModal,
     private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.cargando;
@@ -144,7 +151,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     });
   }
   private inicializarForm() {
-    this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarForm();
+    this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
   }
   private inicializarFormEdicion(datoTecnicoForm: FormGroup, dataTecnico: NominacionDatoTecnico) {
     
@@ -465,8 +472,38 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   onCancelarDatoTecnico(){
     const nominacionId = this._nominacionParametros.nominacion.id;
-    this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarForm();
+    this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
     this.cargarFormulario(nominacionId)
+  }
+  onAltaBajaMantenimiento(opcion) {
+    this.tipoAltaBaja = opcion;
+    return this.modalService.open(this.modalABM);
+  }
+  public onActualizarTipoLista(tipoLista: number) {
+    this.cargandoDatoTecnico = true;
+    this.mensajeDatoTecnico = Mensajes.listados;
+    switch (tipoLista) {
+      case AltaBajaTipo.Surveyor:
+        
+        this.datoTecnicoRegistroService.listarSurveyor().pipe(takeUntil(this.destroy$)).subscribe((data: Surveyor[]) =>{
+          this.listaSurveyor = data;
+          this.cargandoDatoTecnico = false;
+        });
+        break;
+      case AltaBajaTipo.AgenciaMaritimaPuerto:
+        this.datoTecnicoRegistroService.listarAgenciaMaritimaPuerto().pipe(takeUntil(this.destroy$)).subscribe((data: AgenciaMaritimaPuerto[]) =>{
+          this.listaAgenciaMaritimaPuerto = data;
+          this.cargandoDatoTecnico = false;
+        });
+        break;
+      case AltaBajaTipo.ATA:
+        this.datoTecnicoRegistroService.listarATAPuerto().pipe(takeUntil(this.destroy$)).subscribe((data: ATAPuerto[]) =>{
+          this.listaATAPuerto = data;
+          this.cargandoDatoTecnico = false;
+        });
+        break;
+    }
+
   }
   //#endregion 
 
@@ -479,6 +516,8 @@ export class ListaNominacionCalidad{
 }
 enum Mensajes{
   cargando = "Cargando información de dato tecnico. Por favor, espere...",
-  grabando = "Guardando información de dato tecnico. Por favor, espere..."
+  grabando = "Guardando información de dato tecnico. Por favor, espere...",
+  listados = "Cargando listados de dato tecnico. Por favor, espere...",
+
 }
   //#endregion 

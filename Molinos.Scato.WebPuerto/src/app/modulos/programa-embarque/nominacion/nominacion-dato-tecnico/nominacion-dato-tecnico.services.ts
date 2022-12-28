@@ -21,6 +21,9 @@ import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato'
 import { ProgramaEmbarqueNominacionDatoTecnico } from '@ScatoModels/programa-embarque/programa-embarque-nominacion-dato-tecnico';
 import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
 import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-valida';
+import { AgenciaMaritimaPuerto } from '@ScatoModels/agencia-maritima-puerto';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { ATAPuerto } from '@ScatoModels/ata-puerto';
 
 @Injectable({
     providedIn: 'root'
@@ -29,6 +32,7 @@ export class NominacionDatoTecnicoRegistroService {
 
     constructor(private confirmationDialogService: ConfirmationDialogService,
         private buqueService: BuqueService,
+        private embarqueService: EmbarqueService,
         private nominacionService: NominacionDatoTecnicoService,
         private formBuilder: FormBuilder) {
     }
@@ -37,7 +41,7 @@ export class NominacionDatoTecnicoRegistroService {
         return this.buqueService.obtenerVaporInformacion(vaporId);
     }
 
-    private inicializarFormNuevo(): FormGroup {
+    public inicializarFormNuevo(): FormGroup {
         return this.formBuilder.group({
             id: [0, Validators.required],
             materialPuerto: ['', Validators.required],
@@ -65,11 +69,6 @@ export class NominacionDatoTecnicoRegistroService {
             nominacionDatoTecnicoCoordinadorPuerto: this.formBuilder.array([]),
         });
     }
-
-    public inicializarForm() {
-        return this.inicializarFormNuevo();
-    }
-
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (exportador != null) {
             return this.formBuilder.group({
@@ -187,7 +186,20 @@ export class NominacionDatoTecnicoRegistroService {
     public listarCombosDatoTecnico(): Observable<ProgramaEmbarqueNominacionDatoTecnico> {
         return this.nominacionService.listarCombosDatoTecnico().pipe(map((data: ProgramaEmbarqueNominacionDatoTecnico) => { return data; }));
     }
+
     public validarCreacionNominacion(nominacion: NominacionValida): Observable<boolean> {
         return this.nominacionService.validarCreacionNominacion(nominacion).pipe(map((data: boolean) => { return data; }));
+    }
+
+    public listarAgenciaMaritimaPuerto(): Observable<AgenciaMaritimaPuerto[]> {
+        return this.embarqueService.obtenerListadoAgenciasMaritimas().pipe(map((data: AgenciaMaritimaPuerto[]) => { return data; }));
+    }
+
+    public listarATAPuerto(): Observable<ATAPuerto[]> {
+        return this.embarqueService.obtenerListadoATAPuerto().pipe(map((data: ATAPuerto[]) => { return data; }));
+    }
+
+    public listarSurveyor(): Observable<Surveyor[]> {
+        return this.nominacionService.obtenerSurveyor().pipe(map((data: Surveyor[]) => { return data; }));
     }
 }
