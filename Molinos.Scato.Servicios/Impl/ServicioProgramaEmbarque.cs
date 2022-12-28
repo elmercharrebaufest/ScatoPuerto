@@ -377,7 +377,46 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return bCreado;
         }
+        public NominacionDto GuardarNominacion(NominacionDto nominacion)
+        {
+            var nominacion_BD = new Nominacion();
 
+            try
+            {
+                if (nominacion.Id == 0)
+                {
+                    nominacion_BD.EnviadoFumigador = nominacion.EnviadoFumigador;
+                    nominacion_BD.EnviadoSurveyor = nominacion.EnviadoSurveyor;
+                    nominacion_BD.EnviadoOtros = nominacion.EnviadoOtros;
+                    nominacion_BD.FechaCreacion = nominacion.FechaCreacion;
+                    nominacion_BD.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
+                    nominacion_BD.FechaEliminacion = nominacion.FechaEliminacion;
+                    nominacion_BD.NominacionDatoTecnico = null;
+                    nominacion_BD.NominacionRecibo = null;
+                    nominacion_BD.NominacionDetalleIntervencion = null;
+                    repositorio.Agregar(nominacion_BD);
+                    repositorio.GuardarCambios();
+                    nominacion.Id = nominacion_BD.Id;
+                }
+                else
+                {
+                    nominacion_BD = repositorio.Obtener<Nominacion>(x => x.Id == nominacion.Id);
+                    nominacion_BD.EnviadoFumigador = nominacion.EnviadoFumigador;
+                    nominacion_BD.EnviadoSurveyor = nominacion.EnviadoSurveyor;
+                    nominacion_BD.EnviadoOtros = nominacion.EnviadoOtros;
+                    nominacion_BD.FechaCreacion = nominacion.FechaCreacion;
+                    nominacion_BD.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
+                    nominacion_BD.FechaEliminacion = nominacion.FechaEliminacion;
+                    repositorio.GuardarCambios();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return nominacion;
+        }
 
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
@@ -396,6 +435,8 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
         }
+
+
         #endregion
 
     }

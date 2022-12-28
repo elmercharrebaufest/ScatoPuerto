@@ -293,7 +293,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                Resultado resultado = new ResultadoCrear();
+                int nominacionId = 0;
+                bool bGraboOK = true;
+                NominacionDto nominacionDto = servicioProgramaEmbarque.GuardarNominacion(nominacion);
+                bGraboOK = nominacionDto.Id > 0 ? true : false;
+                if (bGraboOK)
+                {
+                    resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
+                    {
+                        Dto = nominacion,
+                        EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
+                    });
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
             catch (Exception ex)
             {

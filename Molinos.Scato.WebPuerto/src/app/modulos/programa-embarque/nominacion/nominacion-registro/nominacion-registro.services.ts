@@ -17,4 +17,7 @@ export class NominacionRegistroService {
             return data;
         }));
     }
+    public grabarNominacion(nominacion: Nominacion): Observable<boolean>{
+        return this.nominacionService.registroNominacion(nominacion).pipe(map((data: boolean) => { return data; }));
+    }
 }

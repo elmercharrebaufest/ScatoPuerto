@@ -83,5 +83,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         bool CrearCompaniaDeFumigacion(CompaniaDeFumigacionDto companiaDeFumigacion);
+
+        [OperationContract]
+        NominacionDto GuardarNominacion(NominacionDto nominacion);
     }
 }

@@ -32,6 +32,11 @@ export class NominacionService {
     // #endregion
 
     // #region Servicios
+
+    public registroNominacion(nominacion: Nominacion) {
+        return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacion`, nominacion, { 'withCredentials': true });
+    }
+
     public obtenerNominacion(id: number) {
         return this.http.get<Nominacion>(`${this.url}ProgramaEmbarque/ObtenerNominacion?id=${id}`, { 'withCredentials': true });
     }
