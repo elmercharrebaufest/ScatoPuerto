@@ -411,7 +411,7 @@
         </div>
     </form>
     <div class="row form-row">
-        <div class="col-md-12 botones-registro-centrado">
+        <div class="col-md-12 botones-registro-centrado" *ngIf="nominacionId > 0">
             <button class="btn btn-danger botones-registro-custom" (click)="onCancelarDatoTecnico()">Cancelar</button>
             <button class="btn btn-primary botones-registro-custom" (click)="onGuardarDatoTecnico()">Guardar</button>
         </div>

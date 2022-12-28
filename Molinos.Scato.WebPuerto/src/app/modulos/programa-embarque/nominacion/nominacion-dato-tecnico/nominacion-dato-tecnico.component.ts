@@ -82,6 +82,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public grabarNominacion: boolean = false;
   public mensajeDatoTecnico = '';
   public tipoAltaBaja: number = 0;
+  public nominacionId: number = 0;
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
   @ViewChild('AltaBaja') altaBaja: AltaBajaMantenimientoComponent;
 
@@ -143,6 +144,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
           nominacion: parametro.nominacion,
         };
         this.nominacionParametros = nominacionParametos;
+        this.nominacionId = this.nominacionParametros.nominacion_Id;
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null)
           this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
