@@ -85,8 +85,6 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       this.filtroBuquedaForm.controls.muelle.value,
       this.filtroBuquedaForm.controls.producto.value)
     this.estaCargando = false;
-
-
   }
 
   public setListaCombos() {
@@ -102,6 +100,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   }
 
   public getFiltroBusquedaForm() {
+    
     return this.filtroBuquedaForm;
   }
 

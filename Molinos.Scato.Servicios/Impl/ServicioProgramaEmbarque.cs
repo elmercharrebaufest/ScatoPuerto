@@ -114,7 +114,10 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 var nominacion = Obtener<Nominacion, NominacionDto>(id);
-                nominacion.Embarque = null;
+                if (nominacion != null)
+                {
+                    nominacion.Embarque = null;
+                }
                 return nominacion;
             }
             catch (Exception ex)

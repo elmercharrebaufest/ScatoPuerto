@@ -9,8 +9,8 @@ namespace Molinos.Scato.Dominio.Dto
     public sealed class ProgramaEmbarqueDto
     {
         public int Id { get; set; }
-        public bool EnviadoFumigador { get; set; }
-        public bool EnviadoSurveyor { get; set; }
+        public bool? EnviadoFumigador { get; set; }
+        public bool? EnviadoSurveyor { get; set; }
         public bool EnviadoOtros { get; set; }
         public DateTime? FechaCreacion { get; set; }
         public DateTime? FechaEnvioLineUp { get; set; }
