@@ -1,0 +1,31 @@
+.botones-registro-centrado{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .col-loca{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-right: 10px;
+}
+
+.row-loca{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+
+.basurerito { 
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    margin-top: 26px;
+}
+
+.basurero-right {
+    display: flex;
+    justify-content: flex-end;
+}

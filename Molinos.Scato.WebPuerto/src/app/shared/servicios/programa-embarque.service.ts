@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
+import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 import { environment } from 'environments/environment';
 import { Observable, Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
@@ -75,19 +75,26 @@ export class ProgramaEmbarqueService {
       );
   }
 
-  public actualizarFiltros(pagina: number,
-    itemsPorPagina: number,
-    fecha: Date,
-    buque: string,
-    muelle: string,
-    producto: string) {
-    this.filtros.buque = buque;
-    this.filtros.muelle = muelle;
-    this.filtros.producto = producto;
-    this.filtros.itemsPorPagina = itemsPorPagina;
-    this.filtros.pagina = pagina;
-    this.filtros.fecha = fecha
+  public registrarNominacionRecibo(nominacion_Id: number, nominacionRecibo: NominacionRecibo[]) {
+    return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionRecibo?nominacion_id=${nominacion_Id}`,nominacionRecibo, { 'withCredentials': true });
   }
+
+  public obtenerProgramaEmbarqueRecibo(nominacion_id: number): Observable<NominacionRecibo[]> {
+    return this.http.get<NominacionRecibo[]>(`${this.url}ProgramaEmbarque/ObtenerNominacionRecibos?nominacion_id=${nominacion_id}`,{ 'withCredentials': true });
+  }
+  actualizarFiltros(pagina: number, 
+    itemsPorPagina: number, 
+    fecha: Date, 
+    buque: string, 
+    muelle: string, 
+    producto: string){
+      this.filtros.buque = buque;
+      this.filtros.muelle = muelle;
+      this.filtros.producto = producto;
+      this.filtros.itemsPorPagina = itemsPorPagina;
+      this.filtros.pagina = pagina;
+      this.filtros.fecha = fecha  
+    }
   // #endregion
 
 }

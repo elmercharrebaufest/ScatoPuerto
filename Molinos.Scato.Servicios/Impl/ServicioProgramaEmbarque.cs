@@ -1,4 +1,5 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
@@ -7,6 +8,7 @@ using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Impl
@@ -222,6 +224,88 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<NominacionReciboDto> ObtenerNominacionRecibos(int nominacion_id)
+        {
+            try
+            {
+                return Listar<NominacionRecibo, NominacionReciboDto>(x => x.Nominacion.Id == nominacion_id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void GuardarNominacionRecibo(List<NominacionReciboDto> nominacionRecibo, int nominacion_id)
+        {
+            try
+            {
+                //Me traigo todos los nominacion recibo que tengo en la DB que corresponden a esa nominación.
+                var nominacionRecibos = repositorio.Listar<NominacionRecibo>(x => x.Nominacion.Id == nominacion_id);
+
+                //Recorro todos los recibos que tengo guardados en la base de datos que correspondan a esa nominación.
+                foreach (var recibo in nominacionRecibos)
+                {
+                    //Me fijo si el recibo está en la lista que voy a guardar.
+                    bool reciboBorrado = nominacionRecibo.FindAll(x => x.Id == recibo.Id).Count == 0;
+
+                    //En caso de no estar, lo elimino de la base de datos.
+                    if (reciboBorrado)
+                    {
+                        repositorio.Remover(recibo);
+                    }
+                }
+
+                //Recorro todos los recibos a guardar
+                foreach (var recibo in nominacionRecibo)
+                {
+                    //Me traigo el recibo de la DB.
+                    NominacionRecibo nominacionReciboDB = repositorio.Obtener<NominacionRecibo>(x => x.Id == recibo.Id);
+
+                    //En caso de que exista piso su data.
+                    if (nominacionReciboDB != null)
+                    {
+                        nominacionReciboDB.Formato = recibo.Formato;
+                        nominacionReciboDB.Exportador = repositorio.Obtener<Exportador>(x => x.Id == recibo.Exportador.Id);
+                        nominacionReciboDB.RecibosPorDia = recibo.RecibosPorDia; 
+                        nominacionReciboDB.MostrarDestinos = recibo.MostrarDestinos;
+                        nominacionReciboDB.MostrarBodegas = recibo.MostrarBodegas;
+                        nominacionReciboDB.Cantidad = recibo.Cantidad;
+                        nominacionReciboDB.Ajuste = recibo.Ajuste;
+                        nominacionReciboDB.DescripcionesBienes = recibo.DescripcionesBienes;
+                        nominacionReciboDB.PuertoDeCarga = recibo.PuertoDeCarga;
+                        nominacionReciboDB.PuertoDeDescarga = recibo.PuertoDeDescarga;
+                        nominacionReciboDB.Unidad = recibo.Unidad;
+                    }
+                    //Si no existe lo agrego a la DB.
+                    else
+                    {
+                        nominacionReciboDB = new NominacionRecibo()
+                        {
+                            Formato = recibo.Formato,
+                            Exportador = repositorio.Obtener<Exportador>(x => x.Id == recibo.Exportador.Id),
+                            DescripcionesBienes = recibo.DescripcionesBienes,
+                            Unidad = recibo.Unidad,
+                            PuertoDeDescarga = recibo.PuertoDeDescarga,
+                            PuertoDeCarga = recibo.PuertoDeCarga,
+                            Ajuste = recibo.Ajuste,
+                            Cantidad = recibo.Cantidad,
+                            MostrarBodegas = recibo.MostrarBodegas,
+                            MostrarDestinos = recibo.MostrarDestinos,
+                            RecibosPorDia = recibo.RecibosPorDia,
+                            Nominacion = repositorio.Obtener<Nominacion>(x => x.Id == nominacion_id)
+                        };
+                        //Guardo toda la data en la DB.
+                        repositorio.Agregar(nominacionReciboDB);
+                    }
+                }
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         public bool ValidarCreacionNominacion(NominacionValidaDto nominacion)
         {
             bool bValidacion = true;

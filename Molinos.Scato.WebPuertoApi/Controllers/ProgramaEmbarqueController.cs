@@ -287,13 +287,32 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
-        [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ProgramaEmbarque/RegistrarNominacionRecibo")]
-        public HttpResponseMessage RegistrarNominacionRecibo(NominacionDto nominacion)
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ObtenerNominacionRecibos")]
+        public HttpResponseMessage ObtenerNominacionRecibos(int nominacion_id)
         {
             try
             {
+                var nominacion = servicioProgramaEmbarque.ObtenerNominacionRecibos(nominacion_id);
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    nominacion
+                );
+            }
+            catch (Exception ex)
+            {
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarNominacionRecibo")]
+        public HttpResponseMessage GuardarNominacionRecibo(int nominacion_id, List<NominacionReciboDto> nominacionRecibo )
+        {
+            try
+            {
+                servicioProgramaEmbarque.GuardarNominacionRecibo(nominacionRecibo, nominacion_id);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -301,6 +320,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+
 
     }
 }

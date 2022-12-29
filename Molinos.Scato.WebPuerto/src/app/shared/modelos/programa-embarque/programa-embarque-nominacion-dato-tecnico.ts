@@ -14,18 +14,18 @@ import { TipoDeCalidad } from "./tipo-de-calidad";
 import { TipoDeContrato } from "./tipo-de-contrato";
 
 export class ProgramaEmbarqueNominacionDatoTecnico {
-    materialPuerto        : MaterialPuerto[]       ;
-    tipoDeCalidad         : TipoDeCalidad[]        ;
-    destino               : Destino[]              ;
-    exportador            : Exportador[]           ;
-    coordinadorPuerto     : CoordinadorPuerto[]    ;
-    vaporInformacion      : VaporInformacion[]     ;
-    bandera               : Bandera[]              ;
-    muelleDeCarga         : MuelleDeCarga[]        ;
-    tasaDeCarga           : TasaDeCarga[]          ;
-    tipoDeContrato        : TipoDeContrato[]       ;
-    ataPuerto             : ATAPuerto[]            ;
-    agenciaMaritimaPuerto : AgenciaMaritimaPuerto[];
-    surveyor              : Surveyor[]             ;
-    calidadValor          : CalidadValor[]         ;
+    materialPuerto: MaterialPuerto[];
+    tipoDeCalidad: TipoDeCalidad[];
+    destino: Destino[];
+    exportador: Exportador[];
+    coordinadorPuerto: CoordinadorPuerto[];
+    vaporInformacion: VaporInformacion[];
+    bandera: Bandera[];
+    muelleDeCarga: MuelleDeCarga[];
+    tasaDeCarga: TasaDeCarga[];
+    tipoDeContrato: TipoDeContrato[];
+    ataPuerto: ATAPuerto[];
+    agenciaMaritimaPuerto: AgenciaMaritimaPuerto[];
+    surveyor: Surveyor[];
+    calidadValor: CalidadValor[];
 }

@@ -17,8 +17,7 @@ const libComponents = [
   NominacionIntervencionesComponent
 ];
 @NgModule({
-
-  declarations: [libComponents],
+  declarations: [NominacionRegistroComponent, NominacionDatoTecnicoComponent, NominacionRecibosComponent, NominacionIntervencionesComponent],
   imports: [
     CommonModule,
     SharedModule,
