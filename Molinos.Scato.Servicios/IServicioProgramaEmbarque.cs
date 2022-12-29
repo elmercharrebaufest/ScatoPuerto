@@ -43,6 +43,12 @@ namespace Molinos.Scato.Servicios
         NominacionDto ObtenerNominacion(int id);
 
         [OperationContract]
+        IList<NominacionReciboDto> ObtenerNominacionRecibos(int nominacion_id);
+
+        [OperationContract]
+        void GuardarNominacionRecibo(List<NominacionReciboDto> nominacionRecibo, int nominacion_id);
+
+        [OperationContract]
         IList<VaporInformacionDto> listarVaporInformacion();
 
         [OperationContract]
