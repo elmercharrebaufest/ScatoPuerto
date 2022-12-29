@@ -235,12 +235,78 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarSurveyor")]
+        public HttpResponseMessage RegistrarSurveyor(SurveyorDto surveyor)
+        {
+            try
+            {
+
+                bool bGraboOK = servicioProgramaEmbarque.CrearSurveyor(surveyor);
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarTipoDeFumigacion")]
+        public HttpResponseMessage RegistrarTipoDeFumigacion(TipoDeFumigacionDto tipoDeFumigacion)
+        {
+            try
+            {
+
+                bool bGraboOK = servicioProgramaEmbarque.CrearTipoDeFumigacion(tipoDeFumigacion);
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/RegistrarCompaniaDeFumigacion")]
+        public HttpResponseMessage RegistrarCompaniaDeFumigacion(CompaniaDeFumigacionDto companiaDeFumigacion)
+        {
+            try
+            {
+
+                bool bGraboOK = servicioProgramaEmbarque.CrearCompaniaDeFumigacion(companiaDeFumigacion);
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarNominacion")]
         public HttpResponseMessage RegistrarNominacion(NominacionDto nominacion)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                Resultado resultado = new ResultadoCrear();
+                int nominacionId = 0;
+                bool bGraboOK = true;
+                NominacionDto nominacionDto = servicioProgramaEmbarque.GuardarNominacion(nominacion);
+                bGraboOK = nominacionDto.Id > 0 ? true : false;
+                if (bGraboOK)
+                {
+                    resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
+                    {
+                        Dto = nominacion,
+                        EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
+                    });
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
             catch (Exception ex)
             {

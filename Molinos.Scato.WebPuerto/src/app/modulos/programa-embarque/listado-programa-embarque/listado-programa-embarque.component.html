@@ -101,9 +101,9 @@
         </tr>
         </thead>
         <tbody *ngFor="let historial of getListaProgramaEmbarque()" style="text-align: center;">
-            <tr class="lista-buque-row cursor" (click)="seleccionarNominacion(historial.id, addPE)">
+            <tr class="lista-buque-row cursor">
                 <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }"
-                    class="noBorder anchoDeFila"></td>
+                    class="noBorder anchoDeFila" (click)="seleccionarNominacion(historial.id, addPE)"></td>
                 <td class="lista-buque-row-item noBorder" style="font-size: 20px;">
                     <strong>{{historial.producto}}
                     </strong>
@@ -132,7 +132,7 @@
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
                 </td>
                 <td class="noBorder">
-                    <div class='icon-editar'></div>
+                    <div class='icon-editar' style="cursor: pointer;" (click)="onEditarNominacion(historial.id)"></div>
                 </td>
                 <td class="noBorder-left">
                     <img src="assets/trashIcon-no-border.svg" class="eliminar" style="cursor: pointer;">

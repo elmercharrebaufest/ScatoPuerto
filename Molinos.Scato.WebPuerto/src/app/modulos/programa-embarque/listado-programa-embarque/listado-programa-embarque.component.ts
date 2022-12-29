@@ -6,6 +6,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
 import { FiltroProgramaEmbarqueComponent } from '../filtro-programa-embarque/filtro-programa-embarque.component';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-listado-programa-embarque',
@@ -37,8 +38,10 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public estaCargando = false;
   interval:any
   //#endregion
-  constructor(private progamaService: ProgramaEmbarqueService, private modalService: NgbModal,
-    public config: NgbModalConfig ) { }
+  constructor(private progamaService: ProgramaEmbarqueService,
+              private modalService: NgbModal,
+              private route: Router,
+              public config: NgbModalConfig ) { }
 
   ngOnInit(): void {
     this.estaCargando = true;
@@ -154,4 +157,9 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   listarProgramas(){
     this.progamaService.ListarProgramaEmbarque(this.pageIndex, this.pageSize)
   }
+
+  public onEditarNominacion(nominacionId: number){
+    this.route.navigate([`programa/nominacion/${nominacionId}`]);
+  }
+
 }

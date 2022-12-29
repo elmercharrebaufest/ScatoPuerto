@@ -1,0 +1,30 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{titulo}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="this.modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div [formGroup]="altaBajaForm">
+        <div class="row" *ngIf="tipoAltaBaja!=3">
+            <div class="form-group col-10">
+                <label for="nombre">Nombre</label>
+                <input formControlName="nombre" ngbAutofocus class="form-control" autocomplete="off">
+            </div>
+        </div>
+        <div class="row" *ngIf="tipoAltaBaja == 3">
+            <div class="form-group col-10">
+                <label for="descripcion">Descripcion</label>
+                <input formControlName="descripcion" ngbAutofocus class="form-control" autocomplete="off">
+            </div>
+            <div class="form-group col-10">
+                <label for="mail">Email</label>
+                <input formControlName="mail" ngbAutofocus class="form-control" autocomplete="off">
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="onGuardar()">Guardar</button>
+</div>

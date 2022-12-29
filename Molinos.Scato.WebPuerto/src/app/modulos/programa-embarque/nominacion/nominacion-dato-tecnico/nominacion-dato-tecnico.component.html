@@ -354,7 +354,7 @@
                                     [displayBy]="'nombre'">
                             </tag-input-dropdown>
                         </tag-input>
-                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="onAltaBajaMantenimiento(2)">
                     </div>
                 </div>
             </div>
@@ -376,7 +376,7 @@
                                     [displayBy]="'nombre'">
                             </tag-input-dropdown>
                         </tag-input>
-                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"(click)="onAltaBajaMantenimiento(1)">
                     </div>
                 </div>
             </div>
@@ -396,7 +396,7 @@
                                                 [displayBy]="'descripcion'">
                             </tag-input-dropdown>
                         </tag-input>
-                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2">
+                        <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"(click)="onAltaBajaMantenimiento(3)">
                     </div>
                 </div>
             </div>
@@ -411,9 +411,13 @@
         </div>
     </form>
     <div class="row form-row">
-        <div class="col-md-12 botones-registro-centrado">
+        <div class="col-md-12 botones-registro-centrado" *ngIf="nominacionId > 0">
             <button class="btn btn-danger botones-registro-custom" (click)="onCancelarDatoTecnico()">Cancelar</button>
             <button class="btn btn-primary botones-registro-custom" (click)="onGuardarDatoTecnico()">Guardar</button>
         </div>
     </div>
 </div>
+
+<ng-template #modalABM let-modal>
+    <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal" (actualizarTipoLista)="onActualizarTipoLista($event)" ></app-alta-baja-mantenimiento>
+</ng-template>

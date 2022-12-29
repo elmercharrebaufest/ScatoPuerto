@@ -1,4 +1,4 @@
-export class Surveyor{
+export class CompaniaDeFumigacion{
     id: number;
     descripcion : string;
     mail : string;

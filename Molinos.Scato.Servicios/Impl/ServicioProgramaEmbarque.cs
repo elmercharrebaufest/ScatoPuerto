@@ -110,7 +110,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-        
+
         public NominacionDto ObtenerNominacion(int id)
         {
             try
@@ -127,7 +127,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-        
+
         public IList<VaporInformacionDto> listarVaporInformacion()
         {
             try
@@ -199,7 +199,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-        
+
         public IList<ATAPuertoDto> listarATAPuerto()
         {
             try
@@ -316,6 +316,107 @@ namespace Molinos.Scato.Servicios.Impl
             if (listaNominaciones.Count > 1) bValidacion = false;
             return bValidacion;
         }
+        public bool CrearSurveyor(SurveyorDto surveyor)
+        {
+            bool bCreado = false;
+
+            try
+            {
+                var surveyor_BD = new Surveyor();
+                surveyor_BD.Descripcion = surveyor.Descripcion;
+                surveyor_BD.Mail = surveyor.Mail;
+                repositorio.Agregar(surveyor_BD);
+                repositorio.GuardarCambios();
+                bCreado = true;
+            }
+            catch (Exception ex)
+            {
+                bCreado = false;
+                throw ex;
+            }
+            return bCreado;
+
+        }
+        public bool CrearTipoDeFumigacion(TipoDeFumigacionDto tipoDeFumigacion)
+        {
+            bool bCreado = false;
+
+            try
+            {
+                var tipoDeFumigacion_BD = new TipoDeFumigacion();
+                tipoDeFumigacion_BD.Descripcion = tipoDeFumigacion.Descripcion;
+                repositorio.Agregar(tipoDeFumigacion_BD);
+                repositorio.GuardarCambios();
+                bCreado = true;
+            }
+            catch (Exception ex)
+            {
+                bCreado = false;
+                throw ex;
+            }
+            return bCreado;
+        }
+
+        public bool CrearCompaniaDeFumigacion(CompaniaDeFumigacionDto companiaDeFumigacion)
+        {
+            bool bCreado = false;
+
+            try
+            {
+                var companiaDeFumigacion_BD = new CompaniaDeFumigacion();
+                companiaDeFumigacion_BD.Descripcion = companiaDeFumigacion.Descripcion;
+                companiaDeFumigacion_BD.Mail = companiaDeFumigacion.Mail;
+                repositorio.Agregar(companiaDeFumigacion_BD);
+                repositorio.GuardarCambios();
+                bCreado = true;
+            }
+            catch (Exception ex)
+            {
+                bCreado = false;
+                throw ex;
+            }
+            return bCreado;
+        }
+        public NominacionDto GuardarNominacion(NominacionDto nominacion)
+        {
+            var nominacion_BD = new Nominacion();
+
+            try
+            {
+                if (nominacion.Id == 0)
+                {
+                    nominacion_BD.EnviadoFumigador = nominacion.EnviadoFumigador;
+                    nominacion_BD.EnviadoSurveyor = nominacion.EnviadoSurveyor;
+                    nominacion_BD.EnviadoOtros = nominacion.EnviadoOtros;
+                    nominacion_BD.FechaCreacion = nominacion.FechaCreacion;
+                    nominacion_BD.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
+                    nominacion_BD.FechaEliminacion = nominacion.FechaEliminacion;
+                    nominacion_BD.NominacionDatoTecnico = null;
+                    nominacion_BD.NominacionRecibo = null;
+                    nominacion_BD.NominacionDetalleIntervencion = null;
+                    repositorio.Agregar(nominacion_BD);
+                    repositorio.GuardarCambios();
+                    nominacion.Id = nominacion_BD.Id;
+                }
+                else
+                {
+                    nominacion_BD = repositorio.Obtener<Nominacion>(x => x.Id == nominacion.Id);
+                    nominacion_BD.EnviadoFumigador = nominacion.EnviadoFumigador;
+                    nominacion_BD.EnviadoSurveyor = nominacion.EnviadoSurveyor;
+                    nominacion_BD.EnviadoOtros = nominacion.EnviadoOtros;
+                    nominacion_BD.FechaCreacion = nominacion.FechaCreacion;
+                    nominacion_BD.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
+                    nominacion_BD.FechaEliminacion = nominacion.FechaEliminacion;
+                    repositorio.GuardarCambios();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return nominacion;
+        }
 
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
@@ -334,6 +435,8 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
         }
+
+
         #endregion
 
     }
