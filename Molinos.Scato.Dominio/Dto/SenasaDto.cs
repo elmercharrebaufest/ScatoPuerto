@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public sealed class SenasaDto
+    public class SenasaDto
     {
-        public int Id { get; set; }
-        public NominacionDetalleIntervencionDto NominacionDetalleIntervencion { get; set; }
+        public int Id { get; set; }      
         public ExportadorDto Exportador { get; set; }
         public DestinoDto Destino { get; set; }
         public bool TieneSenasa { get; set; }
