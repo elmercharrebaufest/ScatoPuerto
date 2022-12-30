@@ -1,11 +1,13 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { AgenciaMaritimaPuerto } from '@ScatoModels/agencia-maritima-puerto';
 import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 import { Subject } from 'rxjs';
@@ -28,7 +30,8 @@ export class AltaBajaMantenimientoComponent implements OnInit, OnDestroy {
   public altaBajaForm: FormGroup;
   private destroy$ = new Subject();
 
-  constructor(private altaBajaMantenimientoService: AltaBajaMantenimientoService) {
+  constructor(private altaBajaMantenimientoService: AltaBajaMantenimientoService,
+              private confirmationDialogService: ConfirmationDialogService) {
     this.inicializarForm();
   }
   ngOnInit(): void {
@@ -52,26 +55,38 @@ export class AltaBajaMantenimientoComponent implements OnInit, OnDestroy {
     let bValidar: boolean = true;
     const descripcion = this.altaBajaForm.controls['descripcion'].value;
     const mail = this.altaBajaForm.controls['mail'].value;
-    if (descripcion == '' || mail == '') bValidar = false;
+    if (descripcion == '' || mail == '') {
+      bValidar = false;
+      this.confirmationDialogService.confirm('Registro', 'Debe completar toda la información para el registro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+    } 
     return bValidar;
   }
   validarTipoDeFumigacion(): boolean {
     let bValidar: boolean = true;
     const descripcion = this.altaBajaForm.controls['descripcion'].value;
-    if (descripcion == '') bValidar = false;
+    if (descripcion == '') {
+      bValidar = false;
+      this.confirmationDialogService.confirm('Registro', 'Debe completar toda la información para el registro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+    } 
     return bValidar;
   }
   validarCompaniaDeFumigacion(): boolean {
     let bValidar: boolean = true;
     const descripcion = this.altaBajaForm.controls['descripcion'].value;
     const mail = this.altaBajaForm.controls['mail'].value;
-    if (descripcion == '' || mail == '') bValidar = false;
+    if (descripcion == '' || mail == ''){
+      bValidar = false;
+      this.confirmationDialogService.confirm('Registro', 'Debe completar toda la información para el registro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+    } 
     return bValidar;
   }
   validarAltaBaja(): boolean {
     let bValidar: boolean = true;
     const nombre = this.altaBajaForm.controls['nombre'].value;
-    if (nombre == '') bValidar = false;
+    if (nombre == ''){
+      bValidar = false;
+      this.confirmationDialogService.confirm('Registro', 'Debe completar toda la información para el registro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+    } 
     return bValidar;
   }
 
@@ -82,8 +97,6 @@ export class AltaBajaMantenimientoComponent implements OnInit, OnDestroy {
     surveyor.id = 0;
     surveyor.descripcion = descripcion;
     surveyor.mail = mail;
-    // this.datoTecnicoRegistroService.listarCombosDatoTecnico().pipe(takeUntil(this.destroy$)).subscribe((data: ProgramaEmbarqueNominacionDatoTecnico) =>{
-
     this.altaBajaMantenimientoService.registrarSurveyor(surveyor).pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.actualizarTipoLista.emit(AltaBajaTipo.Surveyor);
       this.modal.dismiss();

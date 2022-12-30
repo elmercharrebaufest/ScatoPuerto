@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
+import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
@@ -16,6 +17,8 @@ export class NominacionService {
     // #region Variables  
     private url: string = environment.apiUrl;
     private _nominacionParametros: BehaviorSubject<NominacionParametros> = new BehaviorSubject<NominacionParametros>(null);
+    private _nominacionExportadores: BehaviorSubject<NominacionExportadores> = new BehaviorSubject<NominacionExportadores>(null);
+
     // #endregion
 
     // #region Constructor
@@ -23,6 +26,12 @@ export class NominacionService {
     // #endregion
 
     // #region Compartir Datos
+    set NominacionExportadores(value: any) {
+        this._nominacionExportadores.next(value);
+    }
+    get NominacionExportadores() {
+        return this._nominacionExportadores.asObservable();
+    }
     set NominacionParametros(value: any) {
         this._nominacionParametros.next(value);
     }

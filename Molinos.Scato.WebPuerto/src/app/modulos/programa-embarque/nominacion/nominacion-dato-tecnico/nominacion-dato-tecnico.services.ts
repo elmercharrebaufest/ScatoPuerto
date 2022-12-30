@@ -128,14 +128,31 @@ export class NominacionDatoTecnicoRegistroService {
     public validacionGrabar(datoTecnicoForm: FormGroup): boolean {
         let bValidacion: boolean = true;
         const tituloMensaje = 'Registro Nominación - Dato Tecnico';
-        if (datoTecnicoForm.invalid) {
+        const datoTecnicoCoordinadorForm = datoTecnicoForm.controls['nominacionDatoTecnicoCoordinadorPuerto'];
+        const datoTecnicoDestinoForm = datoTecnicoForm.controls['nominacionDatoTecnicoDestino'];
+        const datoTecnicoExportadorForm = datoTecnicoForm.controls['nominacionDatoTecnicoExportador'];
+        
+        const datoTecnicoCoordinador = datoTecnicoCoordinadorForm != null || datoTecnicoCoordinadorForm != undefined ? datoTecnicoCoordinadorForm['controls']: null;
+        const datoTecnicoDestino = datoTecnicoDestinoForm !=null || datoTecnicoDestinoForm !=undefined ? datoTecnicoDestinoForm['controls'] : null;
+        const datoTecnicoExportador = datoTecnicoExportadorForm !=null || datoTecnicoExportadorForm != undefined ? datoTecnicoExportadorForm['controls'] : null;
+        
+        if (datoTecnicoCoordinador == null || datoTecnicoDestino == null || datoTecnicoExportador == null){
+            this.confirmationDialogService.confirm(tituloMensaje, 'Debe agregar destino, cargador y cliente para la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
             bValidacion = false;
+            return bValidacion;
+        }
+
+        if (datoTecnicoCoordinadorForm.status !='VALID' || datoTecnicoCoordinadorForm.status !='VALID' || datoTecnicoCoordinadorForm.status !='VALID'){
+            this.confirmationDialogService.confirm(tituloMensaje, 'Debe completar todos los datos en destino, cargador y cliente', 'Cerrar', '', null, null, Tipoalerta.Warning);
+            bValidacion = false;
+            return bValidacion;
+        }
+
+        if (!datoTecnicoForm.invalid) {
             let erroresDestinos: boolean = false;
             let erroresCoordinador: boolean = false;
             let erroresExportador: boolean = false;
-            const datoTecnicoCoordinador = datoTecnicoForm.controls['datoTecnicoCoordinador']['controls'];
-            const datoTecnicoDestino = datoTecnicoForm.controls['datoTecnicoDestino']['controls'];
-            const datoTecnicoExportador = datoTecnicoForm.controls['datoTecnicoExportador']['controls'];
+            
             if (datoTecnicoExportador.length == 0 || datoTecnicoDestino.length == 0 || datoTecnicoExportador.length == 0) {
                 this.confirmationDialogService.confirm(tituloMensaje, 'Debe agregar destino, cargador y cliente a la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
                 bValidacion = false;
@@ -175,6 +192,8 @@ export class NominacionDatoTecnicoRegistroService {
                     return bValidacion;
                 }
             }
+        }else{
+            bValidacion = false;
         }
         return bValidacion;
     }
