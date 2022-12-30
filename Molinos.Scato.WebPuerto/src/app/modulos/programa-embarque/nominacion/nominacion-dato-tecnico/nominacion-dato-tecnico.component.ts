@@ -34,6 +34,7 @@ import { NominacionValida } from '@ScatoModels/programa-embarque/nominacion-vali
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { AltaBajaMantenimientoComponent } from 'app/shared/componentes/alta-baja-mantenimiento/alta-baja-mantenimiento.component';
 import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
+import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -239,6 +240,19 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     dataTecnico.nominacionDatoTecnicoCoordinadorPuerto.forEach(coordinador =>{
       this.datoTecnicoCoordinadorFormArray.push(this.inicializarFormCoordinadorPuerto(coordinador, dataTecnico.id));
     });
+    this.enviarExportadoresRecibo();
+  }
+  private enviarExportadoresRecibo(){
+    let listaExportadores: Exportador[] = [];
+    this.datoTecnicoExportadorFormArray.controls.forEach(item=>{
+      const exportadoresForm = item['controls'].exportador;
+      let exportador: Exportador = new Exportador();
+      exportador.id = exportadoresForm.value.id;
+      exportador.nombre = exportadoresForm.value.nombre;
+      listaExportadores.push(exportador);
+    });
+    let nominacionExportadores:NominacionExportadores = new NominacionExportadores(true, listaExportadores);
+    this.nominacionService.NominacionExportadores = nominacionExportadores;
   }
   private cargarFormulario(nominacionId: number){
     this.cargandoDatoTecnico = true;
@@ -270,9 +284,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
       this.cargandoDatoTecnico = false;
       if (data) {
+        this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Dato tecnico guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
         this.inicializarForm();
         this.cargarFormulario(nominacion.id);
-        console.clear();
       }
     });
   }
@@ -343,6 +357,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       map(term => this.listaVapor.filter(v => v.nombreBuque.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
     )
   }
+
+  public seleccionExportador() {
+    setTimeout(() => this.enviarExportadoresRecibo(), 2000);
+  }
+
   public seleccionVapor($event) {
     const bandera: Bandera =  $event.item.bandera;
     this.datoTecnicoForm.controls['bandera'].setValue(null);
@@ -353,6 +372,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaTipoDeCalidadxMaterial(materialPuerto){
     return this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
   }
+  
   public validarDatoTecnico(): Subject<boolean>{
     let validacion: boolean = false;
     let subjectValidarDatoTecnico = new Subject<boolean>();
@@ -421,6 +441,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       ).concat(value[index]),
     );
     this.datoTecnicoExportadorFormArray.removeAt(value.length - 1);
+    setTimeout(() => this.enviarExportadoresRecibo(), 2000);
+
   }
   onEliminarDatoTecnicoDestino(index: number){
     const value = this.datoTecnicoDestinoFormArray.value;

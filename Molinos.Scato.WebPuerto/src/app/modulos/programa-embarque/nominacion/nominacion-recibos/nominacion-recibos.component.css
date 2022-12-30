@@ -29,3 +29,17 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.botones-registro-custom{ 
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: 500;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.input-error {
+    border: red 1px solid;
+}
+.color-linea-division{ 
+    background-color: #707070;
+}

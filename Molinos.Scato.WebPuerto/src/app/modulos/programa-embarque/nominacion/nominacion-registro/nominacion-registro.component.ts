@@ -4,6 +4,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 import { Subject } from 'rxjs';
@@ -53,23 +54,29 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
     return subjectNominacion;
   }
   public onGuardarNominacion(){
+    const nominacionRecibo:NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
+    let nominacion = new Nominacion();
+    let validacionRecibo: boolean = true;
     this.crearValidarObjetoNominacionDatoTecnico().subscribe(datoTecnico=>{
       if (datoTecnico!=null){
-        this.cargandoRegistro = true;
         this.mensajeRegistro = Mensajes.grabando;
-        let nominacion = new Nominacion();
         nominacion.fechaCreacion = new Date();
         nominacion.id = 0;
         nominacion.embarque_Id = 0;
         nominacion.nominacionDatoTecnico= datoTecnico;
         nominacion.nominacionDetalleIntervencion = null;
-        nominacion.nominacionRecibo = null;
-        this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
-          this.cargandoRegistro = false;
-          this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-          this.router.navigate(['programa']);
-
-        });
+        nominacion.nominacionRecibo = nominacionRecibo;
+        if (nominacionRecibo.length > 0){
+          validacionRecibo = this.datoRecibos.validarCreacionRecibo();
+        }
+        if (validacionRecibo){
+          this.cargandoRegistro = true;
+          this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+            this.cargandoRegistro = false;
+            this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+            this.router.navigate(['programa']);
+          });
+        }
       }
     });
   }
@@ -91,7 +98,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
       actualizarDatoTecnico : true,
       actualizarRecibos  : true,
       actualizarIntervenciones : true,
-      nominacion: null
+      nominacion: null,
     };
     if (nominacionId>0){
       this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{

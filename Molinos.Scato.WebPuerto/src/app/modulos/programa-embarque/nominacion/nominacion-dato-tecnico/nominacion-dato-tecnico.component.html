@@ -121,7 +121,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group col-1 botones-alineado-abajo">
-                                    <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)">
+                                    <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)"  alt="Eliminar">
                                 </div>
                         </div>
                     </div>
@@ -143,7 +143,9 @@
                                     class="form-control"
                                     formControlName="exportador"
                                     maxlength="50"
+                                    required
                                     placeholder="Seleccione un exportador"
+                                    (selectItem)="seleccionExportador()"
                                     [ngbTypeahead]="buscarExportador"
                                     [inputFormatter]="formatoExportador"
                                     [resultFormatter]="formatoExportador"
@@ -168,6 +170,7 @@
                                 <div class="input-group" >
                                 <input type="text" class="form-control"
                                         formControlName="tolerancia"
+                                        required
                                         (keypress)="numberOnly($event)">
                                 <div class="input-group-append">
                                     <span class="input-group-text">%</span>
@@ -175,7 +178,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-1 botones-alineado-abajo">
-                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoExportador(i)">
+                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoExportador(i)"  alt="Eliminar">
                             </div>
                         </div>
                     </div>
@@ -220,7 +223,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-1 botones-alineado-abajo">
-                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoCoordinador(i)">
+                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoCoordinador(i)"  alt="Eliminar">
                             </div>
                         </div>
                     </div>

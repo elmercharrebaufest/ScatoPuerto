@@ -300,11 +300,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 bGraboOK = nominacionDto.Id > 0 ? true : false;
                 if (bGraboOK)
                 {
+                    #region Registro de dato tecnico
+                    nominacion.Id = nominacionDto.Id;
                     resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
                     {
                         Dto = nominacion,
                         EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
                     });
+                    #endregion
+
+                    #region Registro de recibos
+
+                    var listaNominacionRecibo = (List<NominacionReciboDto>)nominacion.NominacionRecibo;
+                    servicioProgramaEmbarque.GuardarNominacionRecibo(listaNominacionRecibo, nominacion.Id);
+                    #endregion 
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
