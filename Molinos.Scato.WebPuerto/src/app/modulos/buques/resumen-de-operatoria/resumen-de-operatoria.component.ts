@@ -182,10 +182,9 @@ export class ResumenDeOperatoriaComponent implements OnInit {
         let bandera = null;
         let imoVapor = '';
         if (info != null) {
-          bandera = info.bandera;
+          bandera = info.bandera.nombre;
           imoVapor = info.imo;
         }
-        
         this.vaporInformacion = {
           bandera           : bandera,
           cantidadBodegasTks: embarque.cantidadBodegasTanques ,
@@ -217,11 +216,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.buqueService.obtenerVaporInformacion(this.idVaporOp).subscribe(res => {
       this.vaporInformacion = res;
       if (this.vaporInformacion != null && this.vaporInformacion != undefined){
-        this.embarqueService.obtenerBanderas().subscribe(res => {
-          const banderaSel = res.filter(p => p.id == this.vaporInformacion.bandera.id);
-          if (banderaSel.length >0)
-          this.banderasBuque =  banderaSel[0];
-        })
+        this.banderasBuque = this.vaporInformacion.bandera;
       }else{
         this.obtenerInformacionEmbarque();
       }
