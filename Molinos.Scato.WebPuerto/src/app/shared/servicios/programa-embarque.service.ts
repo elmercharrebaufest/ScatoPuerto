@@ -9,7 +9,7 @@ import { Observable, Subject } from 'rxjs';
 })
 export class ProgramaEmbarqueService {
 
-  // #region Variables  
+  // #region Variables
   private url: string = environment.apiUrl;
   listadoPrograma: any;
   programaEmbarqueModal: any;
@@ -32,7 +32,7 @@ export class ProgramaEmbarqueService {
   }
   // #endregion
 
-  // #region Metodos  
+  // #region Metodos
   public ListarProgramaEmbarque(pagina: number = this.filtros.pagina,
     itemsPorPagina: number = this.filtros.itemsPorPagina,
     fecha: Date = this.filtros.fecha,
@@ -82,18 +82,23 @@ export class ProgramaEmbarqueService {
   public obtenerProgramaEmbarqueRecibo(nominacion_id: number): Observable<NominacionRecibo[]> {
     return this.http.get<NominacionRecibo[]>(`${this.url}ProgramaEmbarque/ObtenerNominacionRecibos?nominacion_id=${nominacion_id}`,{ 'withCredentials': true });
   }
-  actualizarFiltros(pagina: number, 
-    itemsPorPagina: number, 
-    fecha: Date, 
-    buque: string, 
-    muelle: string, 
+  actualizarFiltros(pagina: number,
+    itemsPorPagina: number,
+    fecha: Date,
+    buque: string,
+    muelle: string,
     producto: string){
       this.filtros.buque = buque;
       this.filtros.muelle = muelle;
       this.filtros.producto = producto;
       this.filtros.itemsPorPagina = itemsPorPagina;
       this.filtros.pagina = pagina;
-      this.filtros.fecha = fecha  
+      this.filtros.fecha = fecha
+    }
+
+
+    public EliminarNominacion(id: number){
+      return this.http.post(`${this.url}ProgramaEmbarque/EliminarNominacion?nominacion_id=${id}`, { 'withCredentials': true });
     }
   // #endregion
 

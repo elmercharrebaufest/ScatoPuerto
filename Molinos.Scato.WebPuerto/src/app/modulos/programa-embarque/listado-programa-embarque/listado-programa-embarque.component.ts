@@ -7,6 +7,9 @@ import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-prog
 import { FiltroProgramaEmbarqueComponent } from '../filtro-programa-embarque/filtro-programa-embarque.component';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+
 
 @Component({
   selector: 'app-listado-programa-embarque',
@@ -14,14 +17,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./listado-programa-embarque.component.css']
 })
 export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
-  //#region Variables  
+  //#region Variables
   public orderedByColumn: string;
   public orderDirection: number;
   programa: any[]
   public nominacion: any;
-  subscripcionPrograma: Subscription 
-   
-  
+  subscripcionPrograma: Subscription
+
+
   paginator: any;
   length = 0;
   pageSize: number;
@@ -37,11 +40,13 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   filtros: any;
   public estaCargando = false;
   interval:any
+  confirmationDialogService: any;
   //#endregion
   constructor(private progamaService: ProgramaEmbarqueService,
               private modalService: NgbModal,
               private route: Router,
-              public config: NgbModalConfig ) { }
+              public config: NgbModalConfig,
+              confirmationDialogService: ConfirmationDialogService ) {    this.confirmationDialogService = confirmationDialogService; }
 
   ngOnInit(): void {
     this.estaCargando = true;
@@ -51,9 +56,9 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.length = this.programa.length > 0 ? this.programa[0].itemsTotales : this.programa.length;
         this.pageSize = this.programa.length > 0 ? this.programa[0].itemPorPagina : 10;
         this.pageIndex = this.programa.length > 0 ? this.programa[0].pagina : 1;
-        this.estaCargando = false; 
+        this.estaCargando = false;
       }
-    )  
+    )
     this.interval = setInterval(
       () => {this.listarProgramas()},
        60000)
@@ -62,7 +67,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     this.subscripcionPrograma.unsubscribe();
     clearInterval(this.interval)
   }
-  
+
   public getListaProgramaEmbarque() {
     return this.programa;
   }
@@ -103,7 +108,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public retornarColor(color){
     return color;
   }
- 
+
 
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
@@ -112,7 +117,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     this.pageIndex = e.pageIndex;
     this.disabled = false;
     this.listarProgramas()
-    
+
   }
 
   setPageSizeOptions(setPageSizeOptionsInput: string) {
@@ -123,27 +128,27 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   }
 
   public devolverColorEstado(estado){
-    //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs, 
+    //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs,
     //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
-    return estado == 1 ? "#53b229" : estado == 2 ? "#1c7cd5" : estado == 3 ? "#dddddd" : "#d9534f"  
+    return estado == 1 ? "#53b229" : estado == 2 ? "#1c7cd5" : estado == 3 ? "#dddddd" : "#d9534f"
   }
   public devolverMensajeDeEstados(estado){
-    //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs, 
+    //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs,
     //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
     return estado == 1 ? "Enviado a Line up" : estado == 2 ?
-     "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"  
+     "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"
   }
 
-  public seleccionarNominacion(id: number, modal){    
-    this.nominacion = this.progamaService.obtenerNominacion(id);    
-    this.onOpenModalProgramaEmbarque(modal);   
+  public seleccionarNominacion(id: number, modal){
+    this.nominacion = this.progamaService.obtenerNominacion(id);
+    this.onOpenModalProgramaEmbarque(modal);
   }
 
   public retornarColorEnvioMail(mailEnviado: any){
       return mailEnviado ? "#4D60A8" : "#999999"
   }
 
-  public onOpenModalProgramaEmbarque(modal) {    
+  public onOpenModalProgramaEmbarque(modal) {
     this.modalService.open(modal, {size:'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
       .then(() => {
         console.log('_modalService.open');
@@ -157,6 +162,23 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   public onEditarNominacion(nominacionId: number){
     this.route.navigate([`programa/nominacion/${nominacionId}`]);
+  }
+
+
+  public eliminarNominacion(nominacionId: number){
+
+    this.confirmationDialogService.confirm('¡Atención!', 'Se eliminara este producto del programa de embarque', 'Cancelar', 'Aceptar', null, null, Tipoalerta.Success)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
+          //this.guardando = false
+        });
+
+      }
+      else
+        return;
+    }).catch();
+
   }
 
 }

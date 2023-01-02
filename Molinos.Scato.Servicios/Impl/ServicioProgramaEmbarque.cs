@@ -418,6 +418,23 @@ namespace Molinos.Scato.Servicios.Impl
             return nominacion;
         }
 
+
+        public void EliminarNominacion(int nominacion_id)
+        {
+            try
+            {
+                var nominacion_BD = new Nominacion();
+                nominacion_BD = repositorio.Obtener<Nominacion>(x => x.Id == nominacion_id);
+                nominacion_BD.FechaEliminacion = DateTime.Now;
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {

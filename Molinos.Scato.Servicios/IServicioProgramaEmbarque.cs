@@ -86,5 +86,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         NominacionDto GuardarNominacion(NominacionDto nominacion);
+
+        [OperationContract]
+        void EliminarNominacion(int nominacion_id);
     }
 }
