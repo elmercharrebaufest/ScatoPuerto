@@ -31,6 +31,7 @@ export class EditarCrearBuquesComponent implements OnInit {
   tipoBuquePuerto: TipoDeBuquePuerto[];
   banderasBuque: Bandera[];
   vaporesPuerto: Vapor[];
+  vaporSeleccionado: Vapor = null;
   categoriasBuque: TipoDeBuquePuerto[];
   nombresBuquesLineUp: string[];
   listadoBanderasModificadas: boolean = false;
@@ -38,6 +39,7 @@ export class EditarCrearBuquesComponent implements OnInit {
   vaporInformacion: VaporInformacion;
   mostrarSpinner: boolean = false;
   mensajeBuque: string = '';
+
   // #endregion
 
   // #region Constructor
@@ -140,6 +142,9 @@ export class EditarCrearBuquesComponent implements OnInit {
     this.mostrarSpinner = true;
     this.mensajeBuque = 'Cargando información de buque...............';
     let { id, nombre } = $event.item
+    this.vaporSeleccionado = new Vapor();
+    this.vaporSeleccionado.id = id;
+    this.vaporSeleccionado.nombre = nombre;
     this.editarBuque = true
 
     this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
@@ -194,8 +199,8 @@ export class EditarCrearBuquesComponent implements OnInit {
     let buque = this.crearEditarBuqueForm.getRawValue();
     const objVapor = [
       {
-        vapor_Id: buque.nombreBuque.id,
-        bandera_Id: buque.bandera.id,
+        vapor: this.vaporSeleccionado,
+        bandera: buque.bandera,
         nombrebuque: buque.nombreBuque.nombre,
         tipoBuque: buque.tipoBuque.nombre,
         categoriaBuque: '',
@@ -236,9 +241,9 @@ export class EditarCrearBuquesComponent implements OnInit {
     let buque = this.crearEditarBuqueForm.getRawValue();
     const objVapor = [
       {
-        vapor_Id: 0,
+        vapor: null,
         // nombrebuque: typeof buque.nombreBuque.nombre !== 'object'  ? buque.nombreBuque : buque.nombreBuque.nombre,
-        bandera_Id: buque.bandera.id,
+        bandera: buque.bandera,
         nombrebuque: buque.nombreBuque,
         tipoBuque: buque.tipoBuque.nombre,
         categoriaBuque: '',

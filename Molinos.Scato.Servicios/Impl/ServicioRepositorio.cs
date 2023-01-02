@@ -11550,7 +11550,7 @@ namespace Molinos.Scato.Servicios.Impl
                     vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor.Id);
                 }
                 Bandera bandera = repositorio.Obtener<Bandera>(x => x.Id == item.Bandera.Id);
-                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == item.Vapor.Id);
+                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == vapor.Id);
 
 
                 if (vaporInformacion_Db != null)
