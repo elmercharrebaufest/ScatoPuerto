@@ -136,17 +136,14 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   public seleccionarNominacion(id: number, modal){    
     this.nominacion = this.progamaService.obtenerNominacion(id);    
-    this.onOpenModalGeo(modal);
-
-   
+    this.onOpenModalProgramaEmbarque(modal);   
   }
 
   public retornarColorEnvioMail(mailEnviado: any){
       return mailEnviado ? "#4D60A8" : "#999999"
   }
 
-  public onOpenModalGeo(modal) {
-    
+  public onOpenModalProgramaEmbarque(modal) {    
     this.modalService.open(modal, {size:'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
       .then(() => {
         console.log('_modalService.open');

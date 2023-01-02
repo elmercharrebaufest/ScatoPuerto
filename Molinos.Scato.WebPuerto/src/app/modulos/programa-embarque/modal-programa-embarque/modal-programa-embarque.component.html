@@ -2,8 +2,7 @@
 
 <div class="modal-content">
     <div class="margenes">
-        <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCorta }}</strong>
-            ({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>
+        <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCorta }}</strong>({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>
     </div>
     <div class="line" [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }" ></div>
     <div style="margin-top: 2px;">
@@ -148,7 +147,7 @@
                 </div>
             </div>
                 <div class="tab-pane fade" id="intervencion" role="tabpanel" aria-labelledby="intervencion-tab">
-                    <div style="overflow-x:auto; " class="table-responsive tableFixHead">
+                    <div style="overflow-x:auto; " class="table-responsive">
                         <table class='table table-bordered lista-pe-table'>  
                             <thead>                        
                             <tr class="header">
@@ -179,62 +178,57 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Estibado y trimado</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A' }}</td>
+                                    <td>-</td>
                                     <td>-</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Fumigación</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'NO' }}</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>SENASA - MOA</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.fumigacion == true ? 'SI' : 'NO' }}</td>
                                     <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Permiso de importacion (IP)</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>GMO</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Fitonisanitario (FITO)</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Muestras oficiales</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Certificado Inocuidad</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
-                                <tr>
-                                    <td>Certificado Veterinario</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
-                                    <td>-</td>
-                                </tr>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion }}</td>
+                                </tr>                              
                            
                             </tbody>
                        
                         </table>
+                    </div>
+                    <label><strong>SENASA</strong></label>              
+                        <div style="overflow-x:auto; height: 160px !important;" class="table-responsive tableFixHead">
+                            <table class='table table-bordered lista-pe-table'>
+                                <thead>        
+                                <tr class="header">
+                                <th>Exportador</th>
+                                <th>Corresponde SENASA</th>
+                                <th>Consumo</th>
+                                <th>A cuenta de</th>
+                                <th>Destino</th>
+                                <th>IP</th>
+                                <th>GMO</th>
+                                <th>FITO</th>
+                                <th>Muestras oficiales</th>
+                                <th>Certificado de inocuidad</th>
+                                <th>Certificado Veterinario</th>
+                                </tr>
+                            </thead>  
+                                <tbody *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index" [attr.data-index]="i"
+                                    style="text-align: center;">
+                                    <tr>                                       
+                                        <td>{{intervencion?.exportador?.nombre }}</td>
+                                        <td>{{intervencion?.tieneSenasa == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.consumo }}</td>
+                                        <td>{{intervencion?.aCuentaDe }}</td>
+                                        <td>{{intervencion?.destino?.nombre }}</td>
+                                        <td>{{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}</td>
+                                        <td>{{intervencion?.certificadoInocuidad == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.certificadoVeterinario == true ? 'SI' : 'NO'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                       
                     </div>
                 </div>          
         </div>

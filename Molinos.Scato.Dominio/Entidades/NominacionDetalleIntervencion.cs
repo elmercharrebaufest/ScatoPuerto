@@ -22,5 +22,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string ACuentaDe { get; set; }
         public virtual string Observaciones { get; set; }
         public virtual TipoDeFumigacion TipoDeFumigacion { get; set; }
+        public virtual ICollection<Senasa> Senasa { get; set; }
     }
 }

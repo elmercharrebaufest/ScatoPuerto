@@ -20,5 +20,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string ACuentaDe { get; set; }
         public string Observaciones { get; set; }
         public TipoDeFumigacionDto TipoDeFumigacion { get; set; }
+
+        public ICollection<SenasaDto> Senasa { get; set; }
     }
 }
