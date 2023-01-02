@@ -5,7 +5,7 @@
     <table class='table table-bordered lista-pe-table'>
         <thead class="lista-pe-header tamanioHeader">
             <tr>
-            <th class="noBorder"></th>          
+            <th class="noBorder"></th>
             <th tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('producto')">
                 <div class="head noBorder">
                     Producto
@@ -104,7 +104,7 @@
             <tr class="lista-buque-row">
                 <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }"
                     class="noBorder anchoDeFila"></td>
-                <td class="lista-buque-row-item cursor noBorder" 
+                <td class="lista-buque-row-item cursor noBorder"
                 (click)="seleccionarNominacion(historial.id, addPE)" style="font-size: 20px;">
                     <strong>{{historial.producto}}
                     </strong>
@@ -133,10 +133,10 @@
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
                 </td>
                 <td class="noBorder">
-                    <div class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
+                    <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
                 </td>
                 <td class="noBorder-left">
-                    <img src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                    <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
 
             </tr>
@@ -153,4 +153,3 @@
 <ng-template #addPE let-modal>
     <app-modal-programa-embarque (cerrar)="modal.dismiss()"></app-modal-programa-embarque>
 </ng-template>
- 

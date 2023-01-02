@@ -396,6 +396,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/EliminarNominacion")]
+        public HttpResponseMessage EliminarNominacion(int nominacion_id)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarNominacion(nominacion_id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
 
     }
