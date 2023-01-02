@@ -136,7 +136,7 @@
                     <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
                 </td>
                 <td class="noBorder-left">
-                    <img *ngIf="!historial.fechaEliminacion" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                    <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
 
             </tr>
