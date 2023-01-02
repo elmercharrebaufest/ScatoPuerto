@@ -14,6 +14,7 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         {
             Mapper.CreateMap<Nominacion, NominacionDto>();
             Mapper.CreateMap<NominacionDto, Nominacion>();
+
         }
     }
 }

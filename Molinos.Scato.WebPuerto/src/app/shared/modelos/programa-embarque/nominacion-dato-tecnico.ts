@@ -1,47 +1,66 @@
+import { MaterialPuerto } from "../material-puerto";
+import { AgenciaMaritimaPuerto } from "../agencia-maritima-puerto";
+import { Vapor } from "../vapor";
+import { ATAPuerto } from "../ata-puerto";
+import { TasaDeCarga } from "./tasa-de-carga";
+import { MuelleDeCarga } from "./muelle-de-carga";
+import { Surveyor } from "./surveyor";
+import { TipoDeContrato } from "./tipo-de-contrato";
+import { NominacionDatoTecnicoCalidad } from "./nominacion-dato-tecnico-calidad";
+import { VaporInformacion } from "@ScatoModels/Buques/VaporInformacion";
+import { NominacionDatoTecnicoDestino } from "./nominacion-dato-tecnico-destino";
+import { NominacionDatoTecnicoExportador } from "./nominacion-dato-tecnico-exportador";
+import { NominacionDatoTecnicoCoordinador } from "./nominacion-dato-tecnico-coordinador";
+
 
 export class NominacionDatoTecnico {
     id: number;
-    materialPuerto_Id: number;
+    materialPuerto: MaterialPuerto;
     cantidadTotal: number;
     tolerancia: number;
     observaciones: string;
-    vapor_Id: number;
-    eTARecalada: Date;
+    vaporInformacion: VaporInformacion;
+    etaRecalada: Date;
     obligacionDeCarga: Date;
-    muelleDeCarga_Id: number;
-    tasaDeCarga_Id: number;
+    muelleDeCarga: MuelleDeCarga;
+    tasaDeCarga: TasaDeCarga;
     tasaDeCargaValor: string;
-    dEM: number;
-    dES: number;
-    tipoContrato_Id: number;
-    aTAPuerto_Id: number;
-    agenciaMaritimaPuerto_Id: number;
-    surveyor_Id: number;
+    dem: number;
+    des: number;
+    tipoDeContrato: TipoDeContrato;
+    ataPuerto: ATAPuerto;
+    agenciaMaritimaPuerto: AgenciaMaritimaPuerto;
+    surveyor: Surveyor;
     observacionesSurveyor: string;
+    nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
+    nominacionDatoTecnicoDestino: NominacionDatoTecnicoDestino[];
+    nominacionDatoTecnicoExportador: NominacionDatoTecnicoExportador[];
+    nominacionDatoTecnicoCoordinadorPuerto: NominacionDatoTecnicoCoordinador[];
 
-    constructor(id                      ,materialPuerto_Id       ,cantidadTotal           ,
-                tolerancia              ,observaciones           ,vapor_Id                ,
-                eTARecalada             ,obligacionDeCarga       ,muelleDeCarga_Id        ,
-                tasaDeCarga_Id          ,tasaDeCargaValor        ,dEM                     ,
-                dES                     ,tipoContrato_Id         ,aTAPuerto_Id            ,
-                agenciaMaritimaPuerto_Id,surveyor_Id             ,observacionesSurveyor   ){
-        this.id                       = id                      ;
-        this.materialPuerto_Id        = materialPuerto_Id       ;
-        this.cantidadTotal            = cantidadTotal           ;
-        this.tolerancia               = tolerancia              ;
-        this.observaciones            = observaciones           ;
-        this.vapor_Id                 = vapor_Id                ;
-        this.eTARecalada              = eTARecalada             ;
-        this.obligacionDeCarga        = obligacionDeCarga       ;
-        this.muelleDeCarga_Id         = muelleDeCarga_Id        ;
-        this.tasaDeCarga_Id           = tasaDeCarga_Id          ;
-        this.tasaDeCargaValor         = tasaDeCargaValor        ;
-        this.dEM                      = dEM                     ;
-        this.dES                      = dES                     ;
-        this.tipoContrato_Id          = tipoContrato_Id         ;
-        this.aTAPuerto_Id             = aTAPuerto_Id            ;
-        this.agenciaMaritimaPuerto_Id = agenciaMaritimaPuerto_Id;
-        this.surveyor_Id              = surveyor_Id             ;
-        this.observacionesSurveyor    = observacionesSurveyor   ;
+    constructor(id, materialPuerto, cantidadTotal,
+        tolerancia, observaciones, vaporInformacion,
+        etaRecalada, obligacionDeCarga, muelleDeCarga,
+        tasaDeCarga, tasaDeCargaValor, dem,
+        des, tipoDeContrato, ataPuerto,
+        agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad) {
+        this.id = id;
+        this.materialPuerto = materialPuerto;
+        this.cantidadTotal = cantidadTotal;
+        this.tolerancia = tolerancia;
+        this.observaciones = observaciones;
+        this.vaporInformacion = vaporInformacion;
+        this.etaRecalada = etaRecalada;
+        this.obligacionDeCarga = obligacionDeCarga;
+        this.muelleDeCarga = muelleDeCarga;
+        this.tasaDeCarga = tasaDeCarga;
+        this.tasaDeCargaValor = tasaDeCargaValor;
+        this.dem = dem;
+        this.des = des;
+        this.tipoDeContrato = tipoDeContrato;
+        this.ataPuerto = ataPuerto;
+        this.agenciaMaritimaPuerto = agenciaMaritimaPuerto;
+        this.surveyor = surveyor;
+        this.observacionesSurveyor = observacionesSurveyor;
+        this.nominacionDatoTecnicoCalidad = nominacionDatoTecnicoCalidad;
     }
 }

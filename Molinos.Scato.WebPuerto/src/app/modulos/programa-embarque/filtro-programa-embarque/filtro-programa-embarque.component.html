@@ -1,11 +1,13 @@
-<form id="filtroForm">
+<ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<form id="filtroBuquedaForm" [formGroup]="getFiltroBusquedaForm()">
   <div class="row">   
     <div class="form-group col-md-2 input_img">
-      <input type="month" class="form-control" formControlName="mes">
+      <input type="month" class="form-control" formControlName="fecha">
     </div>
     <div class="form-group col-md-2 colorGris">
 
-      <ng-multiselect-dropdown formControlName="buque" [placeholder]="'Buque'"
+      <ng-multiselect-dropdown formControlName="buque" [placeholder]="'Buque'" class="dropdown-btn"
         [settings]="getConfigListaMultiple()" [data]="getListaBuques()">
       </ng-multiselect-dropdown>
 
@@ -28,7 +30,7 @@
       <button class="btn buscar" (click)="onBuscar()">Buscar</button>
     </div>
     <div class="form-group col-md-2">
-      <button class="btn limpiar" (click)="onLimpiarBusqueda()">Limpiar Búsqueda</button>
+      <button class="btn limpiar" (click)="onLimpiarFiltros()">Limpiar Búsqueda</button>
     </div>
   </div>
 

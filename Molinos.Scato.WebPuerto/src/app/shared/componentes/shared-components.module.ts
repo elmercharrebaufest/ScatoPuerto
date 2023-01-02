@@ -31,7 +31,7 @@ import { NavtabsCalidadComponent } from "./navtabs-calidad/navtabs-calidad.compo
 import { CardBuqueComponent } from './modulos/geo/card-buque/card-buque.component';
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
 import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-balanzas.component";
-import { TableModule } from 'primeng/table';
+import { AltaBajaMantenimientoComponent } from './alta-baja-mantenimiento/alta-baja-mantenimiento.component';
 
 const components = [
     AlertComponent,
@@ -52,7 +52,8 @@ const components = [
     AmarreComponent,
     NavtabsCalidadComponent,
     CardBuqueComponent,
-    EditarCrearBuquesComponent
+    EditarCrearBuquesComponent,
+    AltaBajaMantenimientoComponent
 ]
 const libs = [
     CommonModule,
@@ -67,8 +68,7 @@ const libs = [
     CalendarModule,
     RouterModule,
     KnobModule,
-    ToastModule,
-    TableModule
+    ToastModule
 ]
 
 @NgModule({
@@ -77,7 +77,7 @@ const libs = [
     ],
     declarations: [
         components,
-        IniciarSesionComponent,
+        IniciarSesionComponent
     ],
     exports: [
         components,

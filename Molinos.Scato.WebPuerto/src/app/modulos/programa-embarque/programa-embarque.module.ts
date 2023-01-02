@@ -7,12 +7,15 @@ import { ListadoProgramaEmbarqueComponent } from './listado-programa-embarque/li
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ProgramaEmbarqueComponent } from './programa-embarque.component';
 import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import { ModalProgramaEmbarqueComponent } from './modal-programa-embarque/modal-programa-embarque.component';
 
 @NgModule({
   declarations: [
     FiltroProgramaEmbarqueComponent, 
     ListadoProgramaEmbarqueComponent,
     ProgramaEmbarqueComponent,
+    ModalProgramaEmbarqueComponent
   ],
   imports: [
     CommonModule,
@@ -20,6 +23,7 @@ import { SharedComponentModule } from 'app/shared/componentes/shared-components.
     SharedComponentModule,
     ProgramaEmbarqueRoutingModule,
     NgMultiSelectDropDownModule.forRoot(),
+    MatPaginatorModule
   ]
 })
 export class ProgramaEmbarqueModule { }
