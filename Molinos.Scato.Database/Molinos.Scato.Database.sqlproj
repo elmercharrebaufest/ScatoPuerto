@@ -542,7 +542,7 @@
     <Build Include="dbo\Tables\VaporInformacion.sql" />
     <Build Include="dbo\Tables\HistoricoActores.sql" />
     <Build Include="dbo\Tables\CompaniaDeFumigacion.sql" />
-    <Build Include="dbo\Tables\TipoContrato.sql" />
+    <Build Include="dbo\Tables\TipoDeContrato.sql" />
     <Build Include="dbo\Tables\TasaDeCarga.sql" />
     <Build Include="dbo\Tables\MuelleDeCarga.sql" />
     <Build Include="dbo\Tables\Nominacion.sql" />
@@ -557,6 +557,7 @@
     <Build Include="dbo\Tables\CalidadValor.sql" />
     <Build Include="dbo\Tables\TipoDeCalidad.sql" />
     <Build Include="dbo\Tables\NominacionRecibo.sql" />
+    <Build Include="dbo\Tables\NominacionDatoTecnicoCalidad.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

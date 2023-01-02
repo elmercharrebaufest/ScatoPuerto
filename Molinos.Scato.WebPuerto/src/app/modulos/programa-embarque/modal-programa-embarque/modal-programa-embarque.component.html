@@ -1,0 +1,240 @@
+<ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<div class="modal-content">
+    <div class="margenes">
+        <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCorta }}</strong>({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>
+    </div>
+    <div class="line" [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }" ></div>
+    <div style="margin-top: 2px;">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item tabs cursor">
+                <label class="nav-link active labelTabs" id="tecnico-tab" data-toggle="tab" href="#tecnico" role="tab"
+                    aria-controls="tecnico" aria-selected="true">Datos Técnicos</label>
+            </li>
+            <li class="nav-item tabs cursor">
+                <label class="nav-link labelTabs" id="recibo-tab" data-toggle="tab" href="#recibo" role="tab"
+                    aria-controls="recibo" aria-selected="false">Datos de Recibo</label>
+            </li>
+            <li class="nav-item tabs cursor">
+                <label class="nav-link labelTabs" id="intervencion-tab" data-toggle="tab" href="#intervencion"
+                    role="tab" aria-controls="intervencion" aria-selected="false">Datos de
+                    Intervenciones</label>
+            </li>
+        </ul>
+    </div>
+    <div class="modal-body tamanioLetraModal">
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active"  id="tecnico" role="tabpanel" aria-labelledby="tecnico-tab">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <label><strong>Cantidad Total: </strong> {{ nominacion?.nominacionDatoTecnico?.cantidadTotal |
+                            number : '1.1-1'}}</label>
+                        <br>
+                        <label><strong>Calidad: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.Descripcion
+                            }}</label>
+                        <br>
+                        <label><strong>Tolerancia: </strong> +/- {{ nominacion?.nominacionDatoTecnico?.tolerancia
+                            }}</label>
+                        <br>
+                        <label><strong>Observaciones: </strong> {{ nominacion?.nominacionDatoTecnico?.observaciones
+                            }}</label>
+                        <br>
+                        <label><strong>ETA recalada: </strong> {{ nominacion?.nominacionDatoTecnico?.etaRecalada |
+                            date:'dd/MM/yyyy HH:mm'}}</label>
+                        <br>
+                        <label><strong>Obligacion de carga: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.obligacionDeCarga | date:'dd/MM/yyyy HH:mm'}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label><strong>Cantidad x destino: </strong></label>
+                        <div *ngFor="let destino of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino">
+                            {{ destino.destino.nombre }}:
+                            {{ destino.cantidad | number : '1.1-1'}}
+                        </div>
+                        <br>
+                        <label><strong>Cantidad x cargadores: </strong></label>
+                        <div
+                            *ngFor="let cargador of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador">
+                            {{ cargador.exportador.nombre }}:
+                            {{ cargador.cantidad | number : '1.1-1'}}
+                        </div>
+                        <br>
+                        <label><strong>Cantidad x cliente: </strong></label>
+                        <div
+                            *ngFor="let cliente of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto">
+                            {{ cliente.coordinadorPuerto.nombre }}:
+                            {{ cliente.cantidad | number : '1.1-1'}}
+                        </div>
+
+                    </div>
+                    <div class="col-md-4">
+                        <label><strong>Nombre buque: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.vaporInformacion?.nombreBuque}}</label>
+                        <br>
+                        <label><strong>Bandera: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.vaporInformacion?.bandera?.nombre}}</label>
+                        <br>
+                        <label><strong>Tipo de buque: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.vaporInformacion?.categoriaBuque}}</label>
+                        <br>
+                        <label><strong>IMO: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.vaporInformacion?.imoVapor}}</label>
+                        <br>
+                        <label><strong>Muelle de carga: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.muelleDeCarga?.descripcion}}</label>
+                        <br>
+                        <label><strong>ATA: </strong> {{ nominacion?.nominacionDatoTecnico?.ataPuerto?.nombre}}</label>
+                        <br>
+                        <label><strong>Surveyor: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.surveyor?.descripcion}}</label>
+                        <br>
+                        <label><strong>Observaciones del Surveyor: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.observacionSurveyor}}</label>
+                        <br>
+                        <label><strong>Loading rate: </strong> {{ nominacion?.nominacionDatoTecnico?.tasaDeCargaValor }}
+                            {{ nominacion?.nominacionDatoTecnico?.tasaDeCarga?.descripcion}}</label>
+                        <br>
+                        <label><strong>DEM/DES: </strong> u$ {{ nominacion?.nominacionDatoTecnico?.dem | number :
+                            '1.1-1'}}/{{ nominacion?.nominacionDatoTecnico?.des | number : '1.1-1'}}</label>
+                        <br>
+                        <label><strong>Tipo de contrato: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.tipoDeContrato?.descripcion }}</label>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="tab-pane fade" id="recibo" role="tabpanel" aria-labelledby="recibo-tab">
+                <div style="overflow-x:auto; " class="table-responsive tableFixHead">
+                    <table class='table table-bordered lista-pe-table'>
+                        <thead>        
+                        <tr class="header">
+                        <th>N° de recibo</th>
+                        <th>Cargador</th>
+                        <th>Formato</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Ajuste</th>
+                        <th>Loading Port</th>
+                        <th>Discharge Port</th>
+                        <th>Description of goods</th>
+                        <th>Recibos por dia</th>
+                        <th>Mostrar Destinos</th>
+                        <th>Mostrar Bodegas</th>
+                        </tr>
+                    </thead>  
+                        <tbody *ngFor="let nomi of nominacion?.nominacionRecibo; let i = index" [attr.data-index]="i"
+                            style="text-align: center;">
+                            <tr>
+                                <td>{{ i }}</td>
+                                <td>{{nomi?.exportador?.nombre }}</td>
+                                <td>{{nomi?.formato }}</td>
+                                <td>{{nomi?.cantidad | number : '1.1-1'}}</td>
+                                <td>{{nomi?.unidad }}</td>
+                                <td>{{nomi?.ajuste }}</td>
+                                <td>{{nomi?.puertoDeCarga }}</td>
+                                <td>{{nomi?.puertoDeDescarga }}</td>
+                                <td>{{nomi?.descripcionesBienes }}</td>
+                                <td>{{nomi?.recibosPorDia == true ? 'SI' : 'NO' }}</td>
+                                <td>{{nomi?.mostrarDestinos == true ? 'SI' : 'NO'}}</td>
+                                <td>{{nomi?.mostrarBodegas == true ? 'SI' : 'NO'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                <div class="tab-pane fade" id="intervencion" role="tabpanel" aria-labelledby="intervencion-tab">
+                    <div style="overflow-x:auto; " class="table-responsive">
+                        <table class='table table-bordered lista-pe-table'>  
+                            <thead>                        
+                            <tr class="header">
+                            <th></th>
+                            <th>Aplica</th>
+                            <th>A cuenta de</th>
+                            <th>Observaciones</th>
+                            </tr>                   
+                          </thead>         
+                            <tbody>                         
+                                <tr>
+                                    <td><strong>Precintado de bodegas</strong></td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO' }}</td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe }}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Draft Survey</strong></td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe }}</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Permiso de embarque</strong></td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO' }}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estibado y trimado</strong></td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A' }}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fumigación</strong></td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.fumigacion == true ? 'SI' : 'NO' }}</td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.aCuentaDe }}</td>
+                                    <td>{{nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion }}</td>
+                                </tr>                              
+                           
+                            </tbody>
+                       
+                        </table>
+                    </div>
+                    <label><strong>SENASA</strong></label>              
+                        <div style="overflow-x:auto; height: 160px !important;" class="table-responsive tableFixHead">
+                            <table class='table table-bordered lista-pe-table'>
+                                <thead>        
+                                <tr class="header">
+                                <th>Exportador</th>
+                                <th>Corresponde SENASA</th>
+                                <th>Consumo</th>
+                                <th>A cuenta de</th>
+                                <th>Destino</th>
+                                <th>IP</th>
+                                <th>GMO</th>
+                                <th>FITO</th>
+                                <th>Muestras oficiales</th>
+                                <th>Certificado de inocuidad</th>
+                                <th>Certificado Veterinario</th>
+                                </tr>
+                            </thead>  
+                                <tbody *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index" [attr.data-index]="i"
+                                    style="text-align: center;">
+                                    <tr>                                       
+                                        <td>{{intervencion?.exportador?.nombre }}</td>
+                                        <td>{{intervencion?.tieneSenasa == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.consumo }}</td>
+                                        <td>{{intervencion?.aCuentaDe }}</td>
+                                        <td>{{intervencion?.destino?.nombre }}</td>
+                                        <td>{{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}</td>
+                                        <td>{{intervencion?.certificadoInocuidad == true ? 'SI' : 'NO'}}</td>
+                                        <td>{{intervencion?.certificadoVeterinario == true ? 'SI' : 'NO'}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                       
+                    </div>
+                </div>          
+        </div>
+    </div>
+    <div class="line" [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }" ></div>
+</div>
+
+<!-- </div>
+</div> -->

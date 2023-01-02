@@ -10,8 +10,8 @@ namespace Molinos.Scato.Dominio.Dto
     public class VaporInformacionDto
     {
         public int Id { get; set; }
-        public int Vapor_Id { get; set; }
-        public int Bandera_Id { get; set; }
+        public VaporDto Vapor { get; set; }
+        public BanderaDto Bandera { get; set; }
         public string NombreBuque { get; set; }
         public string TipoBuque { get; set; }
         public string CategoriaBuque { get; set; }

@@ -13,18 +13,22 @@ namespace Molinos.Scato.Dominio.Dto
         public int CantidadTotal { get; set; }
         public int Tolerancia { get; set; }
         public string Observaciones { get; set; }
-        public VaporDto Vapor { get; set; }
+        public VaporInformacionDto VaporInformacion { get; set; }
         public DateTime? ETARecalada { get; set; }
         public DateTime? ObligacionDeCarga { get; set; }
         public MuelleDeCargaDto MuelleDeCarga { get; set; }
         public TasaDeCargaDto TasaDeCarga { get; set; }
-        public string TasaDeCargaValor { get; set; }
+        public int? TasaDeCargaValor { get; set; }
         public decimal DEM { get; set; }
         public decimal DES { get; set; }
-        public TipoContratoDto TipoContrato { get; set; }
+        public TipoDeContratoDto TipoDeContrato { get; set; }
         public ATAPuertoDto ATAPuerto { get; set; }
         public AgenciaMaritimaPuertoDto AgenciaMaritimaPuerto { get; set; }
         public SurveyorDto Surveyor { get; set; }
         public string ObservacionesSurveyor { get; set; }
+        public ICollection<NominacionDatoTecnicoCalidadDto> NominacionDatoTecnicoCalidad { get; set; }
+        public ICollection<NominacionDatoTecnicoCoordinadorPuertoDto> NominacionDatoTecnicoCoordinadorPuerto { get; set; }
+        public ICollection<NominacionDatoTecnicoExportadorDto> NominacionDatoTecnicoExportador { get; set; }
+        public ICollection<NominacionDatoTecnicoDestinoDto> NominacionDatoTecnicoDestino { get; set; }
     }
 }

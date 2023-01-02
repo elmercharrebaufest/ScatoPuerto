@@ -31,6 +31,11 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
             get { return (IServicioRepositorio)System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IServicioRepositorio)); }
            // get { return DependencyResolver.Current.GetService<IServicioRepositorio>(); }
         }
+        private static IServicioProgramaEmbarque ServicioProgramaEmbarque
+        {
+            get { return (IServicioProgramaEmbarque)System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IServicioProgramaEmbarque)); }
+            // get { return DependencyResolver.Current.GetService<IServicioRepositorio>(); }
+        }
         private static IServicioComandos ServicioComandos
         {
             get { return (IServicioComandos)System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IServicioComandos)); }

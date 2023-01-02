@@ -27,13 +27,15 @@ export class NominacionIntervencionesComponent implements OnInit {
 
   private asignarNominacionParametros(){
     this.nominacionService.NominacionParametros.subscribe(parametro =>{
-      
-      const nominacionParametos: NominacionParametros = {
-        nominacion_Id : parametro.nominacion_Id,
-        actualizarDatoTecnico : parametro.actualizarDatoTecnico,
-        actualizarRecibos  : parametro.actualizarRecibos,
-        actualizarIntervenciones : parametro.actualizarIntervenciones};
-      this.nominacionParametros = nominacionParametos;
+      if (parametro!=null){
+        const nominacionParametos: NominacionParametros = {
+          nominacion_Id : parametro.nominacion_Id,
+          actualizarDatoTecnico : parametro.actualizarDatoTecnico,
+          actualizarRecibos  : parametro.actualizarRecibos,
+          actualizarIntervenciones : parametro.actualizarIntervenciones,
+          nominacion : null};
+        this.nominacionParametros = nominacionParametos;
+      }
     });
   }
 

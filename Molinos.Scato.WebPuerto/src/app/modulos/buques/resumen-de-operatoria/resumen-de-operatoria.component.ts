@@ -179,15 +179,14 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     }, error=>{},
       ()=>{
         const info = embarque.embarqueInformacion.length > 0 ? embarque.embarqueInformacion[0] : null;
-        let bandera_Id = 0;
+        let bandera = null;
         let imoVapor = '';
         if (info != null) {
-          bandera_Id = info.bandera.id;
+          bandera = info.bandera.nombre;
           imoVapor = info.imo;
         }
-        
         this.vaporInformacion = {
-          bandera_Id        : bandera_Id,
+          bandera           : bandera,
           cantidadBodegasTks: embarque.cantidadBodegasTanques ,
           categoriaBuque    : ''                         ,
           eslora            : embarque.eslora            ,
@@ -199,7 +198,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
           porteNeto         : embarque.porteNeto         ,
           puntual           : embarque.puntal            ,
           tipoBuque         : embarque.tipoBuque         ,
-          vapor_Id          : embarque.vapor.id          
+          vapor             : embarque.vapor          
        };
       });
   }
@@ -217,11 +216,7 @@ export class ResumenDeOperatoriaComponent implements OnInit {
     this.buqueService.obtenerVaporInformacion(this.idVaporOp).subscribe(res => {
       this.vaporInformacion = res;
       if (this.vaporInformacion != null && this.vaporInformacion != undefined){
-        this.embarqueService.obtenerBanderas().subscribe(res => {
-          const banderaSel = res.filter(p => p.id == this.vaporInformacion.bandera_Id);
-          if (banderaSel.length >0)
-          this.banderasBuque =  banderaSel[0];
-        })
+        this.banderasBuque = this.vaporInformacion.bandera;
       }else{
         this.obtenerInformacionEmbarque();
       }

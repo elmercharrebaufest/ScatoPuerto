@@ -791,4 +791,19 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="AgenciaMaritimaPuerto_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="99ecb8a7-3079-4222-ab69-1f0ae7ef721d" ChangeDateTime="12/15/2022 16:50:56">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnico].[TipoContrato_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnico]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TipoDeContrato_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e4e4db58-ad24-4ada-9dbb-24efc0409ff5" ChangeDateTime="12/22/2022 14:28:10">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnico].[Vapor_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnico]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="VaporInformacion_Id" />
+  </Operation>
+  
 </Operations>

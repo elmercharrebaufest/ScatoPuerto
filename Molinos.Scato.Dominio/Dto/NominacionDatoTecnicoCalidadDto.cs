@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public sealed class TipoContratoDto
+    public class NominacionDatoTecnicoCalidadDto
     {
         public int Id { get; set; }
-        public string Descripcion { get; set; }
+        public CalidadValorDto CalidadValor { get; set; }
     }
 }

@@ -16,7 +16,8 @@
     [Manga] DECIMAL(18, 2) NULL, 
     [Puntual] DECIMAL(18, 2) NULL, 
     [CantidadBodegasTks] INT NULL, 
-    CONSTRAINT [PK_VaporInformacion] PRIMARY KEY ([Id]) 
-
+    CONSTRAINT [PK_VaporInformacion] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_dbo.VaporInformacion_dbo.Vapor_Vapor_Id] FOREIGN KEY ([Vapor_Id]) REFERENCES [dbo].[Vapor] ([Id]),
+    CONSTRAINT [FK_dbo.VaporInformacion_dbo.Bandera_Bandera_Id] FOREIGN KEY ([Bandera_Id]) REFERENCES [dbo].[Bandera] ([Id]),
 
 )

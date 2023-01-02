@@ -1,1 +1,175 @@
-<p>nominacion-recibos works!</p>
+<div class="row form-row">
+    <div class="form-group col-md-10">
+        <h5>
+            <b>
+                Recibos
+            </b>
+        </h5>
+    </div>
+    <div class="form-group col-md-2">
+        <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='agregarRecibo()'>
+            <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+            <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo recibo</span>
+        </div>
+    </div>
+</div>
+<p></p>
+<div [formGroup]="formRecibos">
+    <div formArrayName="recibos">
+        <div *ngFor="let recibo of formRecibos.controls['recibos']['controls']; let i = index">
+            <div [formGroupName]="i" >
+                <div class="row form-row">
+                    <div class="form-group col-md-11">
+                        <div><b>N° de recibo</b></div>
+                        <div >{{recibo.id}}</div>
+                    </div>
+                    <div class="form-group col-md-1 basurero-right">
+                        <ng-container>
+                            <img id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito" alt="Eliminar"
+                                (click)="onEliminarRecibo(i)">
+                        </ng-container>
+                    </div>
+                </div>
+                <div class="row form-row">
+                    <div class="form-group col-md-3">
+                        <div><b>Cargador</b></div>
+                        <div>
+                            <select formControlName='exportador' 
+                                    class="custom-select" 
+                                    [compareWith]='compareFields' >
+                                <option value=""></option>
+                                <option *ngFor='let exportador of exportadores' [ngValue]='exportador'>
+                                    {{exportador.nombre}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <div><b>Formato</b></div>
+                        <div>
+                            <select formControlName="formato" class="custom-select" >
+                                <option value=""></option>
+                                <option *ngFor='let formato of formatos' [ngValue]='formato'>
+                                    {{formato}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <div><b>Cantidad</b></div>
+                        <input class="form-control" formControlName="cantidad" type="text" (keypress)="numberOnly($event)">
+                    </div>
+                    <div class="form-group col-md-2" >
+                        <div><b>Unidad</b></div>
+                        <div>
+                            <select formControlName="unidad" class="custom-select" >
+                                <option value=""></option>
+                                <option *ngFor='let unidad of unidades' [ngValue]='unidad'>
+                                    {{unidad}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2" >
+                        <div><b>Ajuste</b></div>
+                        <input class="form-control"  formControlName="ajuste" type="text" (keypress)="numberOnly($event)">
+                    </div>
+                </div>
+                <div class="row form-row">
+                    <div class="form-group col-md-3">
+                        <div><b>Loading Port</b></div>
+                        <input class="form-control" formControlName="puertoDeCarga"  type="text" maxlength="250">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <div><b>Discharge Port</b></div>
+                        <input class="form-control" formControlName="puertoDeDescarga"  type="text" maxlength="250">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div><b>Description of goods</b></div>
+                        <input class="form-control" formControlName="descripcionesBienes"  type="text" maxlength="250">
+                    </div>
+                </div>
+                <p></p>
+                <div class="row form-row">
+                    <!-- Recibos por día -->
+                    <div class="form-group col-md-3">
+                        <div class="row form-row">
+                            <div class="form-group col-md-6">
+                                <b>Recibos por día</b>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"  id="reciboDiaSi"
+                                        formControlName="recibosPorDia" [value]="true" (change)="onActivarCantidad(recibo,true)">
+                                    <label class="form-check-label" for="reciboDiaSi">Si</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"  id="reciboDiaNo"
+                                        formControlName="recibosPorDia" [value]="false" (change)="onActivarCantidad(recibo,false)">
+                                    <label class="form-check-label" for="reciboDiaNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mostrar destinos -->
+                    <div class="form-group col-md-3">
+                        <div class="row form-row">
+                            <div class="form-group col-md-6">
+                                <b>Mostrar destinos</b>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" 
+                                        id="mostrarDestinosSi" formControlName="mostrarDestinos" [value]="true" (change)="onActivarDischargePort(recibo, true)">
+                                    <label class="form-check-label" for="mostrarDestinosSi">Si</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" 
+                                        id="mostrarDestinosNo" formControlName="mostrarDestinos" [value]="false" (change)="onActivarDischargePort(recibo, false)">
+                                    <label class="form-check-label" for="mostrarDestinosNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <!-- Mostrar bodegas -->
+                    <div class="form-group col-md-3">
+                        <div class="row form-row">
+                            <div class="form-group col-md-6">
+                                <b>Mostrar bodegas</b>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" 
+                                        id="mostrarBodegasSi" formControlName="mostrarBodegas" [value]="true">
+                                    <label class="form-check-label" for="mostrarBodegasSi">Si</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" 
+                                        id="mostrarBodegasNo" formControlName="mostrarBodegas" [value]="false">
+                                    <label class="form-check-label" for="mostrarBodegasNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="color-linea-division">
+                <p></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- BOTONES -->
+<div class="row form-row">
+    <div class="col-md-12 botones-registro-centrado" *ngIf="nominacionId > 0">
+        <button class="btn btn-danger botones-registro-custom" (click)="onCancelarRecibos()">Cancelar</button>
+        <button class="btn btn-primary botones-registro-custom" (click)="onGuardarRecibos()" [disabled]="guardando">Guardar</button>
+    </div>
+</div>
+
+<ship-spinner [message]="mensajeRecibos" *ngIf='cargandoRecibos'></ship-spinner>
