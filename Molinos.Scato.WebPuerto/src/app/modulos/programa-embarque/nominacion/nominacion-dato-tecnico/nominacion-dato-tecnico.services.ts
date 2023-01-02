@@ -148,7 +148,6 @@ export class NominacionDatoTecnicoRegistroService {
             return bValidacion;
         }
 
-        if (!datoTecnicoForm.invalid) {
             let erroresDestinos: boolean = false;
             let erroresCoordinador: boolean = false;
             let erroresExportador: boolean = false;
@@ -192,9 +191,7 @@ export class NominacionDatoTecnicoRegistroService {
                     return bValidacion;
                 }
             }
-        }else{
-            bValidacion = false;
-        }
+       
         return bValidacion;
     }
 
