@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
 import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-coordinador';
 import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
@@ -51,7 +51,7 @@ export class NominacionDatoTecnicoRegistroService {
             tolerancia: [''],
             observaciones: [''],
             vaporInformacion: [[], Validators.required],
-            bandera: [''],
+            bandera: [{value: '', disabled: true }],
             etaRecalada: ['', Validators.required],
             obligacionDeCarga: ['', Validators.required],
             muelleDeCarga: ['', Validators.required],
@@ -69,6 +69,7 @@ export class NominacionDatoTecnicoRegistroService {
             nominacionDatoTecnicoCoordinadorPuerto: this.formBuilder.array([]),
         });
     }
+
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (exportador != null) {
             return this.formBuilder.group({

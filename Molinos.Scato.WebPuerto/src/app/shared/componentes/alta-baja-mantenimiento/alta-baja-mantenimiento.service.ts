@@ -37,10 +37,10 @@ export class AltaBajaMantenimientoService {
   public registrarAgregarATAPuerto(ataPuerto: ATAPuerto) {
     return this.embarqueService.agregarATAPuerto(ataPuerto).subscribe(data => {return of(true)});
   }
-  public registrarTipoDeFumigacion(tipoDeFumigacion: TipoDeFumigacion): Observable<boolean> {
-    return this.nominacionService.registrarTipoDeFumigacion(tipoDeFumigacion);
+  public registrarTipoDeFumigacion(tipoDeFumigacion: TipoDeFumigacion) {
+    return this.nominacionService.registrarTipoDeFumigacion(tipoDeFumigacion).subscribe(data => {return of(true)});
   }
-  public registrarCompaniaDeFumigacion(companiaDeFumigacion: CompaniaDeFumigacion): Observable<boolean> {
-    return this.nominacionService.registrarCompaniaDeFumigacion(companiaDeFumigacion);
+  public registrarCompaniaDeFumigacion(companiaDeFumigacion: CompaniaDeFumigacion) {
+    return this.nominacionService.registrarCompaniaDeFumigacion(companiaDeFumigacion).subscribe(data => {return of(true)});
   }
 }
