@@ -49,6 +49,8 @@ export class AltaBajaMantenimientoComponent implements OnInit, OnDestroy {
     if (this.tipoAltaBaja == AltaBajaTipo.ATA) this.titulo += ' ATA';
     if (this.tipoAltaBaja == AltaBajaTipo.AgenciaMaritimaPuerto) this.titulo += ' Agencia Maritima Puerto';
     if (this.tipoAltaBaja == AltaBajaTipo.Surveyor) this.titulo += ' Surveyor';
+    if (this.tipoAltaBaja == AltaBajaTipo.TipoDeFumigacion) this.titulo += ' Tipo de fumigacion';
+    if (this.tipoAltaBaja == AltaBajaTipo.CompaniaDeFumigacion) this.titulo += ' Compañia de fumigacion';
   }
 
   validarSurveyor(): boolean {
@@ -134,10 +136,9 @@ export class AltaBajaMantenimientoComponent implements OnInit, OnDestroy {
     companiaDeFumigacion.id = 0;
     companiaDeFumigacion.descripcion = descripcion;
     companiaDeFumigacion.mail = mail;
-    this.altaBajaMantenimientoService.registrarCompaniaDeFumigacion(companiaDeFumigacion).pipe(takeUntil(this.destroy$)).subscribe(data => {
+    this.altaBajaMantenimientoService.registrarCompaniaDeFumigacion(companiaDeFumigacion);
       this.actualizarTipoLista.emit(AltaBajaTipo.CompaniaDeFumigacion);
       this.modal.dismiss();
-    });
   }
 
   onGuardar() {

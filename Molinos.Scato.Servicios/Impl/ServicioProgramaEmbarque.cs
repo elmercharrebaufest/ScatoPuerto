@@ -313,7 +313,7 @@ namespace Molinos.Scato.Servicios.Impl
                                                                       x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
                                                                       x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
                                                                       x.Id != nominacion.Id);
-            if (listaNominaciones.Count > 1) bValidacion = false;
+            if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;
         }
         public bool CrearSurveyor(SurveyorDto surveyor)
