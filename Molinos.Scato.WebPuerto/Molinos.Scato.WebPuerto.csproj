@@ -337,6 +337,7 @@
     <Content Include="src\assets\fotos\foto_buque005.jpg" />
     <Content Include="src\assets\fotos\foto_buque006.jpg" />
     <Content Include="src\assets\fotos\foto_buque007.jpg" />
+    <Content Include="src\assets\IconoHomeProgramaEmbarque.svg" />
     <Content Include="src\assets\Menos.svg" />
     <Content Include="src\assets\ojoIcon.svg" />
     <Content Include="src\assets\iconImDeshabilitada.svg" />

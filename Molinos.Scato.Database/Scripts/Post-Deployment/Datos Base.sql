@@ -731,8 +731,8 @@ if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'Tecnophos 
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'ADC S.R.L.') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('ADC S.R.L.','info@adc.com.ar') end
 
 --Scripts TipoContrato
-if not exists(select 1 from TipoContrato where Descripcion = 'FOB') begin insert into TipoContrato (Descripcion) values ('FOB') end
-if not exists(select 1 from TipoContrato where Descripcion = 'CIF') begin insert into TipoContrato (Descripcion) values ('CIF') end
+if not exists(select 1 from TipoDeContrato where Descripcion = 'FOB') begin insert into TipoDeContrato (Descripcion) values ('FOB') end
+if not exists(select 1 from TipoDeContrato where Descripcion = 'CIF') begin insert into TipoDeContrato (Descripcion) values ('CIF') end
 
 --Scripts MuelleDeCarga
 if not exists(select 1 from MuelleDeCarga where Descripcion = 'San Benito') begin insert into MuelleDeCarga (Descripcion) values ('San Benito') end
