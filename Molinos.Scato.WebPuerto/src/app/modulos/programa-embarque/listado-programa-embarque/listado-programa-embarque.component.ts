@@ -172,6 +172,8 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       if (confirmed) {
         this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
           //this.guardando = false
+          this.confirmationDialogService.confirm('¡Alerta!', "Se elimino el producto", 'Cerrar', '', null, null, Tipoalerta.Success);
+          this.listarProgramas();
         });
 
       }
