@@ -212,6 +212,7 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   onActivarDischargePort(recibo: FormGroup,estado: boolean) {
+    recibo.controls['puertoDeDescarga'].enable();
     if (!estado){
       recibo.controls['puertoDeDescarga'].setValue('-');
       recibo.controls['puertoDeDescarga'].disable();
@@ -223,14 +224,7 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   onEliminarRecibo(i: number) {
-    const value = this.formRecibos.controls["recibos"].value;
-    this.formRecibos.controls["recibos"].setValue(
-      value.slice(0, i).concat(
-        value.slice(i + 1),
-      ).concat(value[i]),
-    );
-
-    (this.formRecibos.controls["recibos"] as FormArray).removeAt(value.length - 1);
+    (this.formRecibos.controls["recibos"] as FormArray).removeAt(i);
   }
 
   public inicializarFormNuevo() {
