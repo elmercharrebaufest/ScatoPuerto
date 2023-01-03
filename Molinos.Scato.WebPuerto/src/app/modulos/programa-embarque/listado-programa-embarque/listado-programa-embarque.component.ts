@@ -10,6 +10,9 @@ import { Router } from '@angular/router';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-listado-programa-embarque',
@@ -39,14 +42,22 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
   filtros: any;
   public estaCargando = false;
-  interval:any
+  interval: any
   confirmationDialogService: any;
+
+  permisosScato: typeof PermisosScato = PermisosScato;
+  private user: Usuario;
   //#endregion
   constructor(private progamaService: ProgramaEmbarqueService,
-              private modalService: NgbModal,
-              private route: Router,
-              public config: NgbModalConfig,
-              confirmationDialogService: ConfirmationDialogService ) {    this.confirmationDialogService = confirmationDialogService; }
+    private modalService: NgbModal,
+    private route: Router,
+    public config: NgbModalConfig,
+    confirmationDialogService: ConfirmationDialogService,
+    public session: SessionService) {
+    this.confirmationDialogService = confirmationDialogService;
+    this.user = this.session.getUser();
+
+  }
 
   ngOnInit(): void {
     this.estaCargando = true;
@@ -60,8 +71,8 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       }
     )
     this.interval = setInterval(
-      () => {this.listarProgramas()},
-       60000)
+      () => { this.listarProgramas() },
+      60000)
   }
   ngOnDestroy(): void {
     this.subscripcionPrograma.unsubscribe();
@@ -80,17 +91,18 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       this.orderedByColumn = column;
     }
     var columArray = column.split('.')
-    if(columArray.length == 1){
-    this.programa.sort((a, b) => {
-      if (a[column] > b[column]) {
-        return 1
-      }
-      if (a[column] < b[column]) {
-        return -1
-      }
-      return 0
-    })}
-    else{
+    if (columArray.length == 1) {
+      this.programa.sort((a, b) => {
+        if (a[column] > b[column]) {
+          return 1
+        }
+        if (a[column] < b[column]) {
+          return -1
+        }
+        return 0
+      })
+    }
+    else {
       this.programa.sort((a, b) => {
         if (a[columArray[0]][0][columArray[1]] > b[columArray[0]][0][columArray[1]]) {
           return 1
@@ -102,10 +114,10 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       })
     }
 
-    if(this.orderDirection <= 0) this.programa= this.programa.reverse()
+    if (this.orderDirection <= 0) this.programa = this.programa.reverse()
   }
 
-  public retornarColor(color){
+  public retornarColor(color) {
     return color;
   }
 
@@ -127,57 +139,67 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     }
   }
 
-  public devolverColorEstado(estado){
+  public devolverColorEstado(estado) {
     //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs,
     //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
     return estado == 1 ? "#53b229" : estado == 2 ? "#1c7cd5" : estado == 3 ? "#dddddd" : "#d9534f"
   }
-  public devolverMensajeDeEstados(estado){
+  public devolverMensajeDeEstados(estado) {
     //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs,
     //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
     return estado == 1 ? "Enviado a Line up" : estado == 2 ?
-     "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"
+      "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"
   }
 
-  public seleccionarNominacion(id: number, modal){
+  public seleccionarNominacion(id: number, modal) {
     this.nominacion = this.progamaService.obtenerNominacion(id);
     this.onOpenModalProgramaEmbarque(modal);
   }
 
-  public retornarColorEnvioMail(mailEnviado: any){
-      return mailEnviado ? "#4D60A8" : "#999999"
+  public retornarColorEnvioMail(mailEnviado: any) {
+    return mailEnviado ? "#4D60A8" : "#999999"
   }
 
   public onOpenModalProgramaEmbarque(modal) {
-    this.modalService.open(modal, {size:'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
+    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
       .then(() => {
         console.log('_modalService.open');
       })
       .catch((res) => { console.log(res) });
   }
 
-  listarProgramas(){
+  listarProgramas() {
     this.progamaService.ListarProgramaEmbarque(this.pageIndex, this.pageSize)
   }
 
-  public onEditarNominacion(nominacionId: number){
+  public onEditarNominacion(nominacionId: number) {
     this.route.navigate([`programa/nominacion/${nominacionId}`]);
   }
 
+  tienePermisoEliminarNominacion() {
+    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Eliminar);
+  }
 
-  public eliminarNominacion(nominacionId: number){
+  tienePermisoModificarNominacion() {
+    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Modificar);
+  }
+
+
+
+
+  public eliminarNominacion(nominacionId: number) {
 
     this.confirmationDialogService.confirm('¡Atención!', 'Se eliminara este producto del programa de embarque', 'Cancelar', 'Aceptar', null, null, Tipoalerta.Success)
-    .then((confirmed) => {
-      if (confirmed) {
-        this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
-          //this.guardando = false
-        });
+      .then((confirmed) => {
+        if (confirmed) {
+          this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
+            //this.guardando = false
+          });
 
-      }
-      else
-        return;
-    }).catch();
+        }
+        else
+          return;
+      }).catch();
 
   }
 
