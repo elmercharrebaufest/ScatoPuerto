@@ -128,14 +128,14 @@
                     <div class='icon-fumigador'
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoFumigador) }"></div>
                 </td>
-                <td style="text-align: center;" class="noBorder">
+                <td style="text-align: center;" class="noBorder" *ngIf='tienePermisoEliminarNominacion()'>
                     <div class='icon-surveyor'
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
                 </td>
-                <td class="noBorder">
+                <td class="noBorder" *ngIf='tienePermisoModificarNominacion()'>
                     <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
                 </td>
-                <td class="noBorder-left">
+                <td class="noBorder-left" *ngIf='tienePermisoEliminarNominacion()'>
                     <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
 
