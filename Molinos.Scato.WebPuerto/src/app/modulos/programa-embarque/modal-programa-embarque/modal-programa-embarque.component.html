@@ -33,7 +33,7 @@
                             number : '1.1-1'}}</label>
                         <br>
                         <label><strong>Calidad: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.Descripcion
+                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.descripcion
                             }}</label>
                         <br>
                         <label><strong>Tolerancia: </strong> +/- {{ nominacion?.nominacionDatoTecnico?.tolerancia
@@ -78,7 +78,7 @@
                             nominacion?.nominacionDatoTecnico?.vaporInformacion?.bandera?.nombre}}</label>
                         <br>
                         <label><strong>Tipo de buque: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.vaporInformacion?.categoriaBuque}}</label>
+                            nominacion?.nominacionDatoTecnico?.vaporInformacion?.tipoBuque}}</label>
                         <br>
                         <label><strong>IMO: </strong> {{
                             nominacion?.nominacionDatoTecnico?.vaporInformacion?.imoVapor}}</label>
@@ -92,7 +92,7 @@
                             nominacion?.nominacionDatoTecnico?.surveyor?.descripcion}}</label>
                         <br>
                         <label><strong>Observaciones del Surveyor: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.observacionSurveyor}}</label>
+                            nominacion?.nominacionDatoTecnico?.observacionesSurveyor}}</label>
                         <br>
                         <label><strong>Loading rate: </strong> {{ nominacion?.nominacionDatoTecnico?.tasaDeCargaValor }}
                             {{ nominacion?.nominacionDatoTecnico?.tasaDeCarga?.descripcion}}</label>
@@ -129,7 +129,7 @@
                         <tbody *ngFor="let nomi of nominacion?.nominacionRecibo; let i = index" [attr.data-index]="i"
                             style="text-align: center;">
                             <tr>
-                                <td>{{ i }}</td>
+                                <td>{{ i + 1 }}</td>
                                 <td>{{nomi?.exportador?.nombre }}</td>
                                 <td>{{nomi?.formato }}</td>
                                 <td>{{nomi?.cantidad | number : '1.1-1'}}</td>
