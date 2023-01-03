@@ -190,11 +190,13 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public eliminarNominacion(nominacionId: number) {
 
     this.confirmationDialogService.confirm('¡Atención!', 'Se eliminara este producto del programa de embarque', 'Cancelar', 'Aceptar', null, null, Tipoalerta.Success)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
-            //this.guardando = false
-          });
+    .then((confirmed) => {
+      if (confirmed) {
+        this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
+          //this.guardando = false
+          this.confirmationDialogService.confirm('¡Alerta!', "Se elimino el producto", 'Cerrar', '', null, null, Tipoalerta.Success);
+          this.listarProgramas();
+        });
 
         }
         else
