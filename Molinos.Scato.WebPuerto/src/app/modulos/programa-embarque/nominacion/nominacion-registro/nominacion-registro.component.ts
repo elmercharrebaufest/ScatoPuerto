@@ -53,6 +53,9 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
     }); 
     return subjectNominacion;
   }
+  public onRegresarNominacion(){
+    this.router.navigate([`programa`]);
+  }
   public onGuardarNominacion(){
     const nominacionRecibo:NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
     let nominacion = new Nominacion();
