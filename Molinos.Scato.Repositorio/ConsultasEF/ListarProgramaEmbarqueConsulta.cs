@@ -48,7 +48,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 {
                                     Id = item.Id,
                                     ProductoColor = item.NominacionDatoTecnico.MaterialPuerto.Color,
-                                    Producto = item.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
+                                    Producto = item.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles,
                                     FechaEliminacion = item.FechaEliminacion.HasValue ? item.FechaEliminacion : null,
                                     FechaCreacion = item.FechaCreacion.HasValue ? item.FechaCreacion : null,
                                     FechaEnvioLineUp = item.FechaEnvioLineUp.HasValue ? item.FechaEnvioLineUp : null,
