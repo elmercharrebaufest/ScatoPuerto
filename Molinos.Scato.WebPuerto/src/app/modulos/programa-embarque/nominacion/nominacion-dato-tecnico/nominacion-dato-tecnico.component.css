@@ -42,3 +42,6 @@ input.largerCheckbox {
     cursor: pointer;
 
 }
+.input-error {
+    border: 1px solid red !important;
+}

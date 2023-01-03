@@ -375,6 +375,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   
   public validarDatoTecnico(): Subject<boolean>{
     let validacion: boolean = false;
+    this.grabarNominacion = true;
     let subjectValidarDatoTecnico = new Subject<boolean>();
 
     if(this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)){

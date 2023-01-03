@@ -32,8 +32,8 @@ width: 10px;
 .icon-fumigador{
     /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
-    -webkit-mask: url('/assets/fumigadorProgramaEmbarque.svg') no-repeat center;
-    mask-image: url('/assets/fumigadorProgramaEmbarque.svg') no-repeat center;
+    -webkit-mask: url('./assets/fumigadorProgramaEmbarque.svg') no-repeat center;
+    mask-image: url('./assets/fumigadorProgramaEmbarque.svg') no-repeat center;
     width: 27px;
     height: 27px;
 }
@@ -41,8 +41,8 @@ width: 10px;
 .icon-surveyor{
     /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
-    -webkit-mask: url('/assets/surveyorProgramaEmbarque.svg') no-repeat center;
-    mask-image: url('/assets/surveyorProgramaEmbarque.svg') no-repeat center;
+    -webkit-mask: url('./assets/surveyorProgramaEmbarque.svg') no-repeat center;
+    mask-image: url('./assets/surveyorProgramaEmbarque.svg') no-repeat center;
     width: 27px;
     height: 27px;    
 }
@@ -50,8 +50,8 @@ width: 10px;
 .icon-editar{
      /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
-    -webkit-mask: url('/assets/iconoEditar.svg') no-repeat center;
-    mask-image: url('/assets/iconoEditar.svg') no-repeat center;
+    -webkit-mask: url('./assets/iconoEditar.svg') no-repeat center;
+    mask-image: url('./assets/iconoEditar.svg') no-repeat center;
     width: 27px;
     height: 27px;  
     background-color: rgb(153, 153, 153);
