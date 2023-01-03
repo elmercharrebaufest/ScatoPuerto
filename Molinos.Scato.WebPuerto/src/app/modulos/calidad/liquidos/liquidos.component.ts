@@ -11,6 +11,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
@@ -37,8 +38,9 @@ export class LiquidosComponent implements OnInit {
   private _builder: FormBuilder,
   private moduloCargaService: ModuloDeCargaService,
   private modalService: NgbModal,
+  private session: SessionService,
   ) {
-
+    this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
     this.cargarModuloCarga();
   }
@@ -64,7 +66,7 @@ export class LiquidosComponent implements OnInit {
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 3, letterRendering: true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
-      pagebreak: { after: '.page-break' }  
+      pagebreak: { after: '.page-break' }
     };
 
     let ele = Array.from(document.getElementsByClassName('break'));
@@ -90,7 +92,7 @@ export class LiquidosComponent implements OnInit {
     html = html.then(() => {
       if (!imprimir) this.RecibidoresPdf = false;
       this._CalidadSharedService.retirarEstilosImprimirLiquido();
-   }).save();  
+   }).save();
   }
 
  /* SECCION GUARDAR FECHA DESAMARRE Y ZARPAR */
@@ -113,16 +115,16 @@ public openModalCargarAmarre(modal: any) {
 guardarAmarre()
 {
   if(
-      (this.amarreForm.value.fechaAmarro == '' || 
-       this.amarreForm.value.fechaAmarro == null || 
-       this.amarreForm.value.fechaAmarro == undefined) || 
-      (this.amarreForm.value.fechaDesamarro == '' || 
-       this.amarreForm.value.fechaDesamarro == null || 
-       this.amarreForm.value.fechaDesamarro == undefined) 
+      (this.amarreForm.value.fechaAmarro == '' ||
+       this.amarreForm.value.fechaAmarro == null ||
+       this.amarreForm.value.fechaAmarro == undefined) ||
+      (this.amarreForm.value.fechaDesamarro == '' ||
+       this.amarreForm.value.fechaDesamarro == null ||
+       this.amarreForm.value.fechaDesamarro == undefined)
     ){
     this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
     return false;
-  } 
+  }
 
   if(this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
     this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
