@@ -20,7 +20,10 @@ namespace Molinos.Scato.Dominio.Dto
 
         [StringLength(50, ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_ExcedeLargoMaximo")]
         public string DescripcionCorta { get; set; }
-        
+
+        [StringLength(50, ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_ExcedeLargoMaximo")]
+        public string DescripcionCortaIngles { get; set; }
+
         [Display(ResourceType = typeof(Textos), Name = "Material_AlmacenOrigen")]
         public int? Almacen_Id { get; set; }
 

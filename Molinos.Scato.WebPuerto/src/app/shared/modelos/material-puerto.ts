@@ -3,6 +3,7 @@ export class MaterialPuerto{
     codigoSAP : string;
     descripcion : string;
     descripcionCorta : string;
+    descripcionCortaIngles : string;
     almacenId : number;
     almacenDesc : string;
     esLiquido : boolean;

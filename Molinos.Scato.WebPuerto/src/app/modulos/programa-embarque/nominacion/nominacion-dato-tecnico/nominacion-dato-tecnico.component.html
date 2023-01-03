@@ -11,7 +11,7 @@
                         required 
                         (change)="onCargarTipoCalidad()">
                     <option value="">Seleccione</option>
-                    <option *ngFor="let material of listaMaterialPuerto" [ngValue]="material" >{{material.descripcionCorta}}</option>
+                    <option *ngFor="let material of listaMaterialPuerto" [ngValue]="material" ><b>{{material.descripcionCortaIngles}}</b>  ({{material.descripcion}})</option>
                 </select>
             </div>
             <div class="form-group col-md-3">
@@ -30,11 +30,14 @@
             <div class="form-group col-md-3">
                 <label for="tolerancia" class="font-weight-bold">Tolerencia</label>
                 <div class="input-group">
+                    <div class="input-group-append">
+                        <span class="input-group-text">+/-</span>
+                    </div>
                     <input type="text" class="form-control" placeholder="Ingrese la tolerancia"
                         formControlName="tolerancia"
                         (keypress)="numberOnly($event)">
                     <div class="input-group-append">
-                        <span class="input-group-text">Tn</span>
+                        <span class="input-group-text">%</span>
                     </div>
                 </div>
             </div>
@@ -168,13 +171,16 @@
                             <div class="form-group col-3">
                                 <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
                                 <div class="input-group" >
-                                <input type="text" class="form-control"
-                                        formControlName="tolerancia"
-                                        required
-                                        (keypress)="numberOnly($event)">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
-                                </div>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">+/-</span>
+                                    </div>
+                                    <input type="text" class="form-control"
+                                            formControlName="tolerancia"
+                                            required
+                                            (keypress)="numberOnly($event)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group col-1 botones-alineado-abajo">
@@ -262,7 +268,7 @@
                 <div class="input_img">
                     <input type="date" 
                            max="3000-12-31" 
-                           min="1000-01-01" 
+                           [min]="fechaMinimaEtaRecalada" 
                            class="form-control"
                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.etaRecalada.invalid}" required
                            formControlName="etaRecalada">
@@ -273,7 +279,7 @@
                 <div class="input_img">
                     <input type="date" 
                            max="3000-12-31" 
-                           min="1000-01-01" 
+                           [min]="fechaMinimaObligacionCarga" 
                            class="form-control"
                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.obligacionDeCarga.invalid}" required
                            formControlName="obligacionDeCarga">
@@ -312,23 +318,33 @@
                 </div>
             </div>
             <div class="input-group col-md-4">
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                     <label class="font-weight-bold">DEM</label>
-                    <input type="text" class="form-control" 
-                           formControlName="dem" maxlength="10" 
-                           (keypress)="decimalOnly($event)"
-                            />
+                    <div class="input-group">
+                        <div class="input-group-append">
+                            <span class="input-group-text">us$</span>
+                        </div>
+                        <input type="text" class="form-control" 
+                            formControlName="dem" maxlength="10" 
+                            (keypress)="decimalOnly($event)"
+                                />
+                    </div>
                 </div>
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                     <label class="font-weight-bold">DES</label>
-                    <input type="text" class="form-control" 
-                           formControlName="des" 
-                           maxlength="50" 
-                           placeholder=""
-                           (keypress)="decimalOnly($event)"
-                            />
+                    <div class="input-group">
+                        <div class="input-group-append">
+                            <span class="input-group-text">us$</span>
+                        </div>
+                        <input type="text" class="form-control" 
+                            formControlName="des" 
+                            maxlength="50" 
+                            placeholder=""
+                            (keypress)="decimalOnly($event)"
+                                />
+                    </div>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-4">
                     <label class="font-weight-bold">Tipo contrato</label>
                     <select class="custom-select" formControlName="tipoDeContrato" >
                         <option value=""></option>

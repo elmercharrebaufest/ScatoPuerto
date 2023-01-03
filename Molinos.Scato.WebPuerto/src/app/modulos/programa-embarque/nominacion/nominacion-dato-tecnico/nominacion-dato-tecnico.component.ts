@@ -66,6 +66,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaExportador: Exportador[];
   public listaCoordinadorPuerto: CoordinadorPuerto[];
   public listaVapor: VaporInformacion[];
+  public listaVaporFiltro: VaporInformacion[];
   public listaATAPuerto: ATAPuerto[];
   public listaAgenciaMaritimaPuerto: AgenciaMaritimaPuerto[];
   public listaBanderas: Bandera[];
@@ -82,6 +83,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public mostrarParametroCalidad: boolean = false;
   public grabarNominacion: boolean = false;
   public mensajeDatoTecnico = '';
+  public fechaMinimaEtaRecalada = '';
+  public fechaMinimaObligacionCarga = '';
   public tipoAltaBaja: number = 0;
   public nominacionId: number = 0;
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
@@ -98,8 +101,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.cargando;
-    this.configurarListasDeNominacion();
     this.inicializarForm();
+    this.calcularFechaMinimaEtaRecalada();
+    this.calcularFechaMinimaObligacionDeCarga();
+    this.configurarListasDeNominacion();
     this.obtenerListasDeNominacion();
   }
   //#endregion
@@ -115,6 +120,21 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   //#endregion
 
   //#region Propiedades
+  private calcularFechaMinimaEtaRecalada(fechaModificacion: Date = null){
+    const fechaActual = fechaModificacion !=null? fechaModificacion : new Date();
+    let dia = String(fechaActual.getDate()).padStart(2, '0');
+    let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); //January is 0!
+    let anio = fechaActual.getFullYear();
+    this.fechaMinimaEtaRecalada = anio + '-' + mes + '-' + dia;
+  }
+  private calcularFechaMinimaObligacionDeCarga(fechaModificacion: Date = null){
+    const fechaActual = fechaModificacion !=null? fechaModificacion : new Date();
+    let dia = String(fechaActual.getDate()).padStart(2, '0');
+    let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); //January is 0!
+    let anio = fechaActual.getFullYear();
+    this.fechaMinimaObligacionCarga = anio + '-' + mes + '-' + dia;
+  }
+
   public get frmDatosTecnicos() { return this.datoTecnicoForm.controls; }
   private get nominacionParametros(): NominacionParametros {
     return this._nominacionParametros;
@@ -147,8 +167,14 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.nominacionParametros = nominacionParametos;
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         if (nominacionParametos.actualizarDatoTecnico){
-          if (nominacionParametos.nominacion!=null)
-          this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
+          if (nominacionParametos.nominacion!=null){
+            this.inicializarForm();
+            this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
+            const etaRecalada = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.etaRecalada);
+            const obligacionDeCarga = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.obligacionDeCarga);
+            this.calcularFechaMinimaEtaRecalada(etaRecalada);
+            this.calcularFechaMinimaObligacionDeCarga(obligacionDeCarga);
+          }
         }
       }
     });
@@ -327,6 +353,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.listaCalidadValor = data.calidadValor; 
       this.cargandoDatoTecnico = false;
       this.asignarNominacionParametros();
+      this.actualizarExportadores(null);
     });
   }
   public configurarListasDeNominacion(){
@@ -354,7 +381,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.buscarVapor = (text$: Observable<string>) => text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
-      map(term => this.listaVapor.filter(v => v.nombreBuque.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+      map(term => this.listaVaporFiltro.filter(v => v.nombreBuque.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
     )
   }
 
@@ -372,7 +399,13 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaTipoDeCalidadxMaterial(materialPuerto){
     return this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
   }
-  
+  public actualizarExportadores(materialPuerto){
+    let tipoBuque: string = '';
+    console.log('materialPuerto-->>', materialPuerto);
+    if (materialPuerto!=null && materialPuerto.value != '')
+      tipoBuque= materialPuerto.value.esLiquido? 'Oil Tanker':'Bulk Carrier';
+    this.listaVaporFiltro = this.listaVapor.filter(x=> x.tipoBuque == tipoBuque);
+  }
   public validarDatoTecnico(): Subject<boolean>{
     let validacion: boolean = false;
     this.grabarNominacion = true;
@@ -494,6 +527,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.mostrarParametroCalidad = false;
     let materialPuerto = this.datoTecnicoForm.controls['materialPuerto'];
     this.listaTipoDeCalidadxMaterial(materialPuerto);
+    this.actualizarExportadores(materialPuerto);
   }
   onMostrarParametroCalidad(){
     this.mostrarParametroCalidad = !this.mostrarParametroCalidad;
