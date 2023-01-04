@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
 import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
+import { NominacionDetalleIntervencion } from '@ScatoModels/programa-embarque/nominacion-detalle-intervencion';
 import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
+import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
 import { environment } from 'environments/environment';
 import { Observable, Subject } from 'rxjs';
 @Injectable({
@@ -79,8 +82,20 @@ export class ProgramaEmbarqueService {
     return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionRecibo?nominacion_id=${nominacion_Id}`,nominacionRecibo, { 'withCredentials': true });
   }
 
+  public registrarNominacionDetalleIntervencion(nominacionDetalleIntervencion: NominacionDetalleIntervencion,nominacion_Id: number){
+    return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionDetalleIntervencion?nominacion_id=${nominacion_Id}`,nominacionDetalleIntervencion, { 'withCredentials': true });
+  }
+
   public obtenerProgramaEmbarqueRecibo(nominacion_id: number): Observable<NominacionRecibo[]> {
     return this.http.get<NominacionRecibo[]>(`${this.url}ProgramaEmbarque/ObtenerNominacionRecibos?nominacion_id=${nominacion_id}`,{ 'withCredentials': true });
+  }  
+
+  public ListarCompaniaDeFumigacion(): Observable<CompaniaDeFumigacion[]> {
+    return this.http.get<CompaniaDeFumigacion[]>(`${this.url}ProgramaEmbarque/ListarCompaniaDeFumigacion`,{ 'withCredentials': true });
+  }
+
+  public ListarTipoDeFumigacion(): Observable<TipoDeFumigacion[]> {
+    return this.http.get<TipoDeFumigacion[]>(`${this.url}ProgramaEmbarque/ListarTipoDeFumigacion`,{ 'withCredentials': true });
   }
   actualizarFiltros(pagina: number,
     itemsPorPagina: number,
