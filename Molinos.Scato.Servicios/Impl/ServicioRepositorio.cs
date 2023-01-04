@@ -11607,11 +11607,18 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
+             
                 Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
 
-            if (embarque != null)
-                embarque.FilePathImgLineUp = filePathImgLineUp;
-                repositorio.GuardarCambios();
+                GenerarLogging("GuardarCapturaImagenLineUp", filePathImgLineUp, "POST", "IMAGEN");
+                GenerarLogging("GuardarCapturaImagenLineUp", Newtonsoft.Json.JsonConvert.SerializeObject(embarque), "POST", "embarque");
+
+                if (embarque != null)
+                {
+                    embarque.FilePathImgLineUp = filePathImgLineUp;
+                    repositorio.GuardarCambios();
+                }
+                     
             }
             catch (Exception ex)
             {
