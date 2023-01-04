@@ -915,7 +915,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+                servicio.GenerarLogging("GuardarCapturaImagenLineUp", ex.InnerException.ToString(), "POST", base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException.Message);
             }
         }
 
