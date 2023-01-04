@@ -17,7 +17,7 @@ namespace Molinos.Scato.Dominio.Dto
         public bool EstibadorYTrimado { get; set; }
         public string Fumigacion { get; set; }
         public CompaniaDeFumigacionDto CompaniaDeFumigacion { get; set; }
-        public string ACuentaDe { get; set; }
+        public string CompaniaACuentaDe { get; set; }
         public string Observaciones { get; set; }
         public TipoDeFumigacionDto TipoDeFumigacion { get; set; }
 

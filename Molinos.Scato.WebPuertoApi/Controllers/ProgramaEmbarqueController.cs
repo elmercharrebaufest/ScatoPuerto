@@ -347,14 +347,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
+         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ProgramaEmbarque/RegistrarNominacionDetalleIntervenciones")]
-        public HttpResponseMessage RegistrarNominacionDetalleIntervencion(NominacionDto nominacion)
+        [Route("api/ProgramaEmbarque/RegistrarNominacionDetalleIntervencion")]
+        public HttpResponseMessage RegistrarNominacionDetalleIntervencion(NominacionDetalleIntervencionDto nominacionDetalleIntervencion, int nominacion_id)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                Resultado resultado = new Resultado();
+                bool bGraboOK = true;
+                resultado = comandos.Ejecutar(new GuardarNominacionDetalleIntervencion
+                {
+                    Dto = nominacionDetalleIntervencion,
+                    nominacion_id = nominacion_id
+                });
+                bGraboOK = resultado.HayErrores ? false : true;
+                return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
+
             }
             catch (Exception ex)
             {
@@ -406,6 +415,36 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicioProgramaEmbarque.EliminarNominacion(nominacion_id);
                 return Request.CreateResponse(HttpStatusCode.OK);
 
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+         [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarCompaniaDeFumigacion")]
+        public HttpResponseMessage listarCompaniaDeFumigacion()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ListarCompaniaDeFumigacion());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarTipoDeFumigacion")]
+        public HttpResponseMessage listarTipoDeFumigacion()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ListarTipoDeFumigacion());
             }
             catch (Exception ex)
             {

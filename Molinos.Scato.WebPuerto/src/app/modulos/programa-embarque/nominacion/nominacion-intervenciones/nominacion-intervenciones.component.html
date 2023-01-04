@@ -1,1 +1,390 @@
-<p>nominacion-intervenciones works!</p>
+<ship-spinner [message]="mensajeDatoTecnico" *ngIf='cargandoDatoIntervencion'></ship-spinner>
+
+<div [formGroup]="formIntervenciones">
+    <!-- Bodegas -->
+    <div class="row form-row center">
+        <!-- Precintado de bodegas -->
+        <div class="form-group col-md-2">
+            <div>
+                <div>
+                    <b>Precintado de bodegas</b>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="precintadoBodegasSi"
+                            formControlName="precintado" [value]="true">
+                        <label class="form-check-label" for="precintadoBodegasSi">Si</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="precintadoBodegasNo"
+                            formControlName="precintado" [value]="false">
+                        <label class="form-check-label" for="precintadoBodegasNo">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- A cuenta de -->
+        <div class="form-group col-md-2">
+            <div><b>A cuenta de</b></div>
+            <div>
+                <select formControlName='precintadoACuentaDe' class="custom-select">
+                    <option *ngFor='let precintadoACuentaDe of listaAcuentaDe' [ngValue]='precintadoACuentaDe.nombre'>
+                        {{precintadoACuentaDe.nombre}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <!-- Draft Survey -->
+        <div class="form-group col-md-2">
+            <div>
+                <div>
+                    <b>Draft Survey</b>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="draftSurveySi" formControlName="draftSurvey"
+                            [value]="true">
+                        <label class="form-check-label" for="draftSurveySi">Si</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="draftSurveyNo" formControlName="draftSurvey"
+                            [value]="false">
+                        <label class="form-check-label" for="draftSurveyNo">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- A cuenta de -->
+        <div class="form-group col-md-2">
+            <div><b>A cuenta de</b></div>
+            <div>
+                <select formControlName='surveyACuentaDe' class="custom-select">
+                    <option value=""></option>
+                    <option *ngFor='let surveyACuentaDe of listaAcuentaDe' [ngValue]='surveyACuentaDe.nombre'>
+                        {{surveyACuentaDe.nombre}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <!-- Permiso de embarque -->
+        <div class="form-group col-md-2">
+            <div>
+                <div>
+                    <b>Permiso de embarque</b>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="permisoDeEmbarqueSi"
+                            formControlName="permisoDeEmbarque" [value]="true">
+                        <label class="form-check-label" for="permisoDeEmbarqueSi">Si</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="permisoDeEmbarqueNo"
+                            formControlName="permisoDeEmbarque" [value]="false">
+                        <label class="form-check-label" for="permisoDeEmbarqueNo">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Estibado y trimado -->
+        <div class="form-group col-md-2">
+            <div>
+                <div>
+                    <b>Estibado y Trimado</b>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="estibadoYTrimadoSi"
+                            formControlName="estibadorYTrimado" [value]="true">
+                        <label class="form-check-label" for="estibadoYTrimadoSi">Si</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="estibadoYTrimadoNo"
+                            formControlName="estibadorYTrimado" [value]="false">
+                        <label class="form-check-label" for="estibadoYTrimadoNo">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <!-- Fumigación -->
+    <div class="row form-row center">
+        <!-- Fumigación -->
+        <div class="form-group col-md-2">
+            <div>
+                <div>
+                    <b>Fumigación</b>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="fumigacionSi" formControlName="fumigacion"
+                            value="Si">
+                        <label class="form-check-label" for="fumigacionSi">Si</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="fumigacionNo" formControlName="fumigacion"
+                            value="No">
+                        <label class="form-check-label" for="fumigacionNo">No</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="fumigacionEnOtroPuerto"
+                            formControlName="fumigacion" value="En otro puerto">
+                        <label class="form-check-label" for="fumigacionEnOtroPuerto">En otro puerto</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-md-5">
+            <div class="row form-row center">
+                <!-- Compañia -->
+                <div class="form-group col-md-6">
+                    <div class="row form-row center">
+                        <div class="form-group col-md-10">
+                            <div><b>Compañia</b></div>
+                            <div>
+                                <select formControlName='companiaDeFumigacion' class="custom-select"  [compareWith]='compareFumigacion'>
+                                    <option value=""></option>
+                                    <option *ngFor='let companiaDeFumigacion of companiasDeFumigacion' [ngValue]='companiaDeFumigacion'>
+                                        {{companiaDeFumigacion.descripcion}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <img src="assets/Mas.svg" style="margin-top: 25px;" (click)="onAltaBajaMantenimiento(5)">
+                        </div>
+                    </div>
+                </div>
+                <!-- Compañia A cuenta de  -->
+                <div class="form-group col-md-6">
+                    <div class="row form-row center">
+                        <div class="form-group col-md-12">
+                            <div><b>A cuenta de</b></div>
+                            <div>
+                                <select formControlName='companiaACuentaDe' class="custom-select">
+                                    <option value=""></option>
+                                    <option *ngFor='let companiaACuentaDe of listaAcuentaDe' [ngValue]='companiaACuentaDe.nombre'>
+                                        {{companiaACuentaDe.nombre}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Tipo de fumigación -->
+            <div class="row form-row center">
+                <div class="form-group col-md-11">
+                    <div><b>Tipo de fumigación</b></div>
+                    <div>
+                        <select formControlName='tipoDeFumigacion' class="custom-select"  [compareWith]='compareTipoFumigacion'>
+                            <option value=""></option>
+                            <option *ngFor='let tipoDeFumigacion of tiposDeFumigacion' [ngValue]='tipoDeFumigacion'>
+                                {{tipoDeFumigacion.descripcion}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-md-1">
+                    <img src="assets/Mas.svg" style="margin-top: 25px;" (click)="onAltaBajaMantenimiento(4)">
+                </div>
+            </div>
+        </div>
+        <!-- Observaciones -->
+        <div class="form-group col-md-5">
+            <div><b>Observaciones</b></div>
+            <input class="form-control" formControlName="observaciones" type="text">
+        </div>
+    </div>
+
+    <hr>
+    <div>
+        <div class="row form-row center">
+            <div class="form-group col-md-9" style="text-align: left; margin-top: 12px;">
+                <h6>SENASA</h6>
+            </div>
+            <div class="form-group col-md-3" style="text-align: -webkit-right;">
+                <div class='btn-add-container pt-btn-add' style="margin-top: 8px" (click)='agregarExportador()'>
+                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar Exportador</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Senasa -->
+    <div class="row form-row center form-group col-md-12">
+        <table class="table" formArrayName="senasa">
+            <thead>
+                <tr>
+                    <th>
+                        Exportador
+                    </th>
+                    <th>
+                        SI/NO
+                    </th>
+                    <th>
+                        Consumo
+                    </th>
+                    <th>
+                        A cuenta de
+                    </th>
+                    <th>
+                        Destino
+                    </th>
+                    <th>
+                        IP
+                    </th>
+                    <th>
+                        GMO
+                    </th>
+                    <th>
+                        FITO
+                    </th>
+                    <th>
+                        Muestras <br> Oficiales
+                    </th>
+                    <th>
+                        Certif. <br> Inocuidad
+                    </th>
+                    <th>
+                        Certif. <br> Vet.
+                    </th>
+                    <th>
+                        Observaciones
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody *ngFor="let senasa of formIntervenciones.get('senasa').value; let i = index">
+
+                <tr [formGroupName]="i">
+                    <!-- Exportador -->
+                    <td>
+                        <select formControlName='exportador' class="custom-select"  [compareWith]='compareExportador'>
+                            <option value=""></option>
+                            <option *ngFor='let item of exportadores' [ngValue]='item'>
+                                {{item.nombre}}
+                            </option>
+                        </select>
+                    </td>
+                    <!-- tiene senasa -->
+                    <td>
+                        <select formControlName='tieneSenasa' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- consumo -->
+                    <td>
+                        <select formControlName='consumo' class="custom-select">
+                            <option *ngFor='let consumo of consumos' [ngValue]='consumo'>
+                                {{consumo}}
+                            </option>
+                        </select>
+                    </td>
+                    <!-- aCuentasDe -->
+                    <td>
+                        <select formControlName='aCuentaDe' class="custom-select">
+                            <option value=""></option>
+                            <option *ngFor='let aCuentaDe of listaAcuentaDe' [ngValue]='aCuentaDe.nombre'>
+                                {{aCuentaDe.nombre}}
+                            </option>
+                        </select>
+                    </td>
+                    <!-- destinos -->
+                    <td>
+                        <select formControlName='destino' class="custom-select" [compareWith]='compareDestino'>
+                            <option value=""></option>
+                            <option *ngFor='let destino of destinos' [ngValue]='destino'>
+                                {{destino.nombre}}
+                            </option>
+                        </select>
+                    </td>
+                    <!-- IP -->
+                    <td>
+                        <select formControlName='IP' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- GMO -->
+                    <td>
+                        <select formControlName='GMO' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- FITO -->
+                    <td>
+                        <select formControlName='FITO' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- muestrasOficiales -->
+                    <td>
+                        <select formControlName='muestraOficial' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- certificadoInocuidad -->
+                    <td>
+                        <select formControlName='certificadoInocuidad' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- certificadoVeterinario -->
+                    <td>
+                        <select formControlName='certificadoVeterinario' class="custom-select">
+                            <option [value]="true">Si</option>
+                            <option [value]="false">No</option>
+                        </select>
+                    </td>
+                    <!-- observaciones -->
+                    <td>
+                        <input class="form-control" type="text" formControlName="observaciones">
+                    </td>
+                    <!-- Delete item -->
+                    <td>
+                        <img id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito"
+                            [disabled]="guardando"
+                            (click)="eliminarSenasa(i)">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- BOTONES -->
+<div class="form">
+    <div class="row">
+        <div class="col-md-12 botones-registro-centrado">
+            <button class="btn btn-primary botones-registro-custom" (click)="guardarIntervencion()"
+                [disabled]="guardando">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<ng-template #modalABM let-modal>
+
+    <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal" (actualizarTipoLista)="onActualizarTipoLista($event)" ></app-alta-baja-mantenimiento>
+
+</ng-template>
