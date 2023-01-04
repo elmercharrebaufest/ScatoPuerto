@@ -93,10 +93,6 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
     });
   }
 
-  public onCancelarNominacion(){
-    this.router.navigate([`programa`]);
-  }
-
   private cargarValoresNominacion() {   
     const nominacionId = this.route.snapshot.paramMap.get('idnominacion');
     this.nominacionId = nominacionId !=null? parseInt(nominacionId) : 0;
