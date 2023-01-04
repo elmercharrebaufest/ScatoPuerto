@@ -1,5 +1,5 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
@@ -17,16 +17,19 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
 import { NominacionDatoTecnicoRegistroService } from '../nominacion-dato-tecnico/nominacion-dato-tecnico.services';
 import { element } from 'protractor';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-nominacion-intervenciones',
   templateUrl: './nominacion-intervenciones.component.html',
   styleUrls: ['./nominacion-intervenciones.component.css']
 })
-export class NominacionIntervencionesComponent implements OnInit {
+export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
 
   private _nominacionParametros: NominacionParametros = null;
-
+  private destroy$ = new Subject();
+  
   formIntervenciones: FormGroup;
   listaAcuentaDe: ListaACuentaDe[] = [];
   consumos: string[] = ["", "Animal", "Humano"];
@@ -37,8 +40,9 @@ export class NominacionIntervencionesComponent implements OnInit {
   companiasDeFumigacion: CompaniaDeFumigacion[] = [];
   tiposDeFumigacion: TipoDeFumigacion[] = [];
   cargandoDatoIntervencion: boolean = false;
-  public mensajeDatoTecnico = '';
-  
+  public mensajeIntervencion = '';
+  public nominacionId: number = 0;
+
   guardando: boolean = false;
   public tipoAltaBaja: number = 0;
   @ViewChild('modalABM') modalABM: TemplateRef<any>;
@@ -47,7 +51,6 @@ export class NominacionIntervencionesComponent implements OnInit {
   constructor(private nominacionService: NominacionService,
     private planoDeCargaServices: PlanoDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
-    private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService,
     private modalService: NgbModal,
     private programaEmbarqueService: ProgramaEmbarqueService,
     private fb: FormBuilder) {
@@ -63,12 +66,17 @@ export class NominacionIntervencionesComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();  
+  }
   cargarListas() {
     this.listaAcuentaDe.push(new ListaACuentaDe(''));
     this.listaAcuentaDe.push(new ListaACuentaDe('MOA'));
     this.listaAcuentaDe.push(new ListaACuentaDe('Tercero'));
   }
   cargarFormulario(nominacionDetalleIntervencion: NominacionDetalleIntervencion = null): FormGroup {
+    console.log('nominacionDetalleIntervencion-->>', nominacionDetalleIntervencion);
     if (nominacionDetalleIntervencion == null) {
       return this.fb.group({
         id: 0,
@@ -138,7 +146,9 @@ export class NominacionIntervencionesComponent implements OnInit {
       this.destinos = res;
     })
   }
-
+  public trackByFn(index: any, item: any) {
+    return index;
+  }
   onAltaBajaMantenimiento(opcion) {
     this.tipoAltaBaja = opcion;
     return this.modalService.open(this.modalABM);
@@ -164,7 +174,7 @@ export class NominacionIntervencionesComponent implements OnInit {
     } else {
       return this.fb.group({
         id: 0,
-        exportador: [''],
+        exportador: ['', Validators.required],
         tieneSenasa: [false],
         consumo: [''],
         aCuentaDe: [''],
@@ -175,7 +185,7 @@ export class NominacionIntervencionesComponent implements OnInit {
         muestraOficial: [false],
         certificadoInocuidad: [false],
         certificadoVeterinario: [false],
-        observaciones: ['']
+        observaciones: ['',Validators.required]
       })
     }
   }
@@ -226,41 +236,69 @@ export class NominacionIntervencionesComponent implements OnInit {
           nominacion: parametro.nominacion
         };
         this.nominacionParametros = nominacionParametos;
+        this.nominacionId = this.nominacionParametros.nominacion_Id;
         //Si tiene nominación ID cargo los datos de la base
         if (this.nominacionParametros.nominacion_Id > 0) {
           this.formIntervenciones = this.cargarFormulario(this._nominacionParametros.nominacion.nominacionDetalleIntervencion);
-          this.cargarSenasa(this.nominacionParametros.nominacion.nominacionDetalleIntervencion.senasa);
+          if (this.nominacionParametros.nominacion.nominacionDetalleIntervencion != null)
+            this.cargarSenasa(this.nominacionParametros.nominacion.nominacionDetalleIntervencion.senasa);
         }
       }
     });
   }
 
-  guardarIntervencion() {
+  public crearObjectoIntervencion(): NominacionDetalleIntervencion{
+    let nominacionIntervencion: NominacionDetalleIntervencion = null;
+    const intervencion = this.formIntervenciones.value;
+    if (intervencion!=null)
+    nominacionIntervencion = intervencion;
+    return nominacionIntervencion;
+  }
 
-    let a: number = 0;
+  onCancelarIntervencion(){
+    this.cargarIntervencion();
+  }
+
+  private cargarIntervencion(){
+    this.cargandoDatoIntervencion = true;
+    this.mensajeIntervencion = Mensajes.cargando;
+    this.nominacionService.obtenerNominacion(this.nominacionParametros.nominacion_Id).subscribe(data =>{
+      this.formIntervenciones = this.cargarFormulario(data.nominacionDetalleIntervencion);
+      this.cargarSenasa(data.nominacionDetalleIntervencion.senasa);
+      this.cargandoDatoIntervencion = false;
+    });
+  }
+  public validacionIntervencion(): boolean{
+    let bValidacion: boolean = true;
     this.formSenasa.forEach(element => {
       if(element.exportador == null || element.exportador.id == undefined){
-        a++;
-        this.confirmationDialogService.confirm('¡Atención!', 'Deberás completar el campo exportador para guardar los cambios.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+        bValidacion = false;
+        this.confirmationDialogService.confirm('Registro Nominación - Intervención', 'Deberás completar el campo exportador en senasa para guardar los cambios.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+        return;
       }
-    })
+    });
+    return bValidacion;
+  }
 
-    if(a > 0){
-      return;
+  onGuardarIntervencion() {
+    if (this.validacionIntervencion()){
+      this.cargandoDatoIntervencion = true;
+      this.mensajeIntervencion = Mensajes.grabando;
+      this.guardando = true;
+      this.programaEmbarqueService.registrarNominacionDetalleIntervencion(this.formIntervenciones.value, this._nominacionParametros.nominacion_Id).subscribe((res: any) => {
+        this.guardando = false;
+        this.confirmationDialogService.confirm('Registro Nominación - Intervención', 'Intervención guardadas correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        this.cargandoDatoIntervencion = false;
+      }, ((e: any) => {
+        this.guardando = false;
+        this.cargandoDatoIntervencion = false;
+      }));
     }
-    
-    this.guardando = true;
-    this.programaEmbarqueService.registrarNominacionDetalleIntervencion(this.formIntervenciones.value, this._nominacionParametros.nominacion_Id).subscribe((res: any) => {
-      this.guardando = false;
-      this.confirmationDialogService.confirm('¡Atención!', 'Intervenciones guardadas correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
-    }, ((e: any) => {
-      this.guardando = false;
-    }));
   }
 
   onActualizarTipoLista(tipoLista: number) {
     this.cargandoDatoIntervencion = true;
-    this.mensajeDatoTecnico = Mensajes.listados;
+    this.mensajeIntervencion = Mensajes.listados;
     switch (tipoLista) {
       case AltaBajaTipo.TipoDeFumigacion :
         this.programaEmbarqueService.ListarTipoDeFumigacion().subscribe((res: TipoDeFumigacion[]) => {

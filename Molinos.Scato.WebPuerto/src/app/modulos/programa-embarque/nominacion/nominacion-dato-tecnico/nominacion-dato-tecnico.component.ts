@@ -401,7 +401,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   public actualizarExportadores(materialPuerto){
     let tipoBuque: string = '';
-    console.log('materialPuerto-->>', materialPuerto);
     if (materialPuerto!=null && materialPuerto.value != '')
       tipoBuque= materialPuerto.value.esLiquido? 'Oil Tanker':'Bulk Carrier';
     this.listaVaporFiltro = this.listaVapor.filter(x=> x.tipoBuque == tipoBuque);

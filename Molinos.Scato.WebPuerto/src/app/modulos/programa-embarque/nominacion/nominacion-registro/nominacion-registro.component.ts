@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
+import { NominacionDetalleIntervencion } from '@ScatoModels/programa-embarque/nominacion-detalle-intervencion';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -58,8 +59,11 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
   }
   public onGuardarNominacion(){
     const nominacionRecibo:NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
+    const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
     let nominacion = new Nominacion();
     let validacionRecibo: boolean = true;
+    let validacionIntervencion: boolean = true;
+
     this.crearValidarObjetoNominacionDatoTecnico().subscribe(datoTecnico=>{
       if (datoTecnico!=null){
         this.mensajeRegistro = Mensajes.grabando;
@@ -67,12 +71,17 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
         nominacion.id = 0;
         nominacion.embarque_Id = 0;
         nominacion.nominacionDatoTecnico= datoTecnico;
-        nominacion.nominacionDetalleIntervencion = null;
+        nominacion.nominacionDetalleIntervencion = nominacionIntervencion;
         nominacion.nominacionRecibo = nominacionRecibo;
-        if (nominacionRecibo.length > 0){
+        if (nominacionRecibo.length > 0)
           validacionRecibo = this.datoRecibos.validarCreacionRecibo();
-        }
-        if (validacionRecibo){
+        if(!validacionRecibo) return validacionRecibo;
+        
+        if (nominacionIntervencion !=null)
+          validacionIntervencion = this.datoIntervencion.validacionIntervencion();        
+        if(!validacionIntervencion) return validacionIntervencion;
+
+        if (validacionRecibo && validacionIntervencion){
           this.cargandoRegistro = true;
           this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
             this.cargandoRegistro = false;
@@ -82,10 +91,6 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
         }
       }
     });
-  }
-
-  public onCancelarNominacion(){
-    this.router.navigate([`programa`]);
   }
 
   private cargarValoresNominacion() {   
