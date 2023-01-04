@@ -19,7 +19,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool EstibadorYTrimado { get; set; }
         public virtual string Fumigacion { get; set; }
         public virtual CompaniaDeFumigacion CompaniaDeFumigacion { get; set; }
-        public virtual string ACuentaDe { get; set; }
+        public virtual string CompaniaACuentaDe { get; set; }
         public virtual string Observaciones { get; set; }
         public virtual TipoDeFumigacion TipoDeFumigacion { get; set; }
         public virtual ICollection<Senasa> Senasa { get; set; }

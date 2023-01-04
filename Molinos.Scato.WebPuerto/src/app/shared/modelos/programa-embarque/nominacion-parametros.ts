@@ -16,8 +16,7 @@ export class NominacionParametros {
         this.nominacion_Id = nominacion_Id;
         this.actualizarDatoTecnico = actualizarDatoTecnico;
         this.actualizarRecibos = actualizarRecibos;
-        this.actualizarIntervenciones = actualizarIntervenciones;
-        
+        this.actualizarIntervenciones = actualizarIntervenciones;        
     }
 
 }

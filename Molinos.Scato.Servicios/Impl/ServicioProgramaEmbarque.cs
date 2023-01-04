@@ -140,6 +140,30 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<CompaniaDeFumigacionDto> ListarCompaniaDeFumigacion()
+        {
+            try
+            {
+                return Listar<CompaniaDeFumigacion, CompaniaDeFumigacionDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IList<TipoDeFumigacionDto> ListarTipoDeFumigacion()
+        {
+            try
+            {
+                return Listar<TipoDeFumigacion, TipoDeFumigacionDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public IList<MaterialPuertoDto> listarMaterialPuerto()
         {
             try
@@ -244,7 +268,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var nominacionRecibos = repositorio.Listar<NominacionRecibo>(x => x.Nominacion.Id == nominacion_id);
 
                 //Recorro todos los recibos que tengo guardados en la base de datos que correspondan a esa nominación.
-                foreach (var recibo in nominacionRecibos)
+                foreach (var recibo in nominacionRecibos.ToList())
                 {
                     //Me fijo si el recibo está en la lista que voy a guardar.
                     bool reciboBorrado = nominacionRecibo.FindAll(x => x.Id == recibo.Id).Count == 0;

@@ -1,5 +1,5 @@
 import { NominacionDatoTecnico } from "./nominacion-dato-tecnico";
-import { NominacionDetalleIntervecion } from "./nominacion-detalle-intervencion";
+import { NominacionDetalleIntervencion } from "./nominacion-detalle-intervencion";
 import { NominacionRecibo } from "./nominacion-recibo";
 
 export class Nominacion {
@@ -12,6 +12,6 @@ export class Nominacion {
     fechaEliminacion : Date;
     embarque_Id : number;
     nominacionDatoTecnico:NominacionDatoTecnico;
-    nominacionDetalleIntervencion: NominacionDetalleIntervecion;
+    nominacionDetalleIntervencion: NominacionDetalleIntervencion;
     nominacionRecibo: NominacionRecibo[]
 }

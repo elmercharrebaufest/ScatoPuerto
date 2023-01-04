@@ -52,6 +52,12 @@ namespace Molinos.Scato.Servicios
         IList<VaporInformacionDto> listarVaporInformacion();
 
         [OperationContract]
+        IList<CompaniaDeFumigacionDto> ListarCompaniaDeFumigacion();
+
+        [OperationContract]
+        IList<TipoDeFumigacionDto> ListarTipoDeFumigacion();
+
+        [OperationContract]
         IList<MaterialPuertoDto> listarMaterialPuerto();
 
         [OperationContract]
