@@ -294,7 +294,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 Resultado resultado = new ResultadoCrear();
-                int nominacionId = 0;
                 bool bGraboOK = true;
                 NominacionDto nominacionDto = servicioProgramaEmbarque.GuardarNominacion(nominacion);
                 bGraboOK = nominacionDto.Id > 0 ? true : false;
@@ -310,10 +309,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     #endregion
 
                     #region Registro de recibos
-
                     var listaNominacionRecibo = (List<NominacionReciboDto>)nominacion.NominacionRecibo;
                     servicioProgramaEmbarque.GuardarNominacionRecibo(listaNominacionRecibo, nominacion.Id);
-                    #endregion 
+                    #endregion
+
+                    #region Registro de intervencion
+                    resultado = comandos.Ejecutar(new GuardarNominacionDetalleIntervencion
+                    {
+                        Dto = nominacion.NominacionDetalleIntervencion,
+                        nominacion_id = nominacion.Id
+                    });
+                    #endregion
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
@@ -363,7 +369,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 });
                 bGraboOK = resultado.HayErrores ? false : true;
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
-
             }
             catch (Exception ex)
             {

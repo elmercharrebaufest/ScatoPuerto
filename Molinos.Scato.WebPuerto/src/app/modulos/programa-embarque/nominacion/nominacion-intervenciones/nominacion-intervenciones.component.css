@@ -1,0 +1,26 @@
+.botones-registro-custom{ 
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: 500;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.botones-registro-centrado{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.basurerito { 
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    margin-top: 26px;
+}
+
+.basurero-right {
+    display: flex;
+    justify-content: flex-end;
+}
+.color-linea-division{ 
+    background-color: #707070;
+}

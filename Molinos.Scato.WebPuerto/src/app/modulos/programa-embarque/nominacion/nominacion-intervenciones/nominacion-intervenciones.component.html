@@ -1,4 +1,4 @@
-<ship-spinner [message]="mensajeDatoTecnico" *ngIf='cargandoDatoIntervencion'></ship-spinner>
+<ship-spinner [message]="mensajeIntervencion" *ngIf="cargandoDatoIntervencion"></ship-spinner>
 
 <div [formGroup]="formIntervenciones">
     <!-- Bodegas -->
@@ -63,7 +63,6 @@
             <div><b>A cuenta de</b></div>
             <div>
                 <select formControlName='surveyACuentaDe' class="custom-select">
-                    <option value=""></option>
                     <option *ngFor='let surveyACuentaDe of listaAcuentaDe' [ngValue]='surveyACuentaDe.nombre'>
                         {{surveyACuentaDe.nombre}}
                     </option>
@@ -175,7 +174,6 @@
                             <div><b>A cuenta de</b></div>
                             <div>
                                 <select formControlName='companiaACuentaDe' class="custom-select">
-                                    <option value=""></option>
                                     <option *ngFor='let companiaACuentaDe of listaAcuentaDe' [ngValue]='companiaACuentaDe.nombre'>
                                         {{companiaACuentaDe.nombre}}
                                     </option>
@@ -225,159 +223,133 @@
             </div>
         </div>
     </div>
-    <!-- Senasa -->
-    <div class="row form-row center form-group col-md-12">
-        <table class="table" formArrayName="senasa">
-            <thead>
-                <tr>
-                    <th>
-                        Exportador
-                    </th>
-                    <th>
-                        SI/NO
-                    </th>
-                    <th>
-                        Consumo
-                    </th>
-                    <th>
-                        A cuenta de
-                    </th>
-                    <th>
-                        Destino
-                    </th>
-                    <th>
-                        IP
-                    </th>
-                    <th>
-                        GMO
-                    </th>
-                    <th>
-                        FITO
-                    </th>
-                    <th>
-                        Muestras <br> Oficiales
-                    </th>
-                    <th>
-                        Certif. <br> Inocuidad
-                    </th>
-                    <th>
-                        Certif. <br> Vet.
-                    </th>
-                    <th>
-                        Observaciones
-                    </th>
-                    <th>
+    <div class="row form-row">
+        <div class="form-group col-md-12">
+            <div formArrayName="senasa">
+                <div class="input-group" *ngFor="let senasaDetalle of formIntervenciones.get('senasa').value; let i = index; trackBy:trackByFn">
+                    <div [formGroupName]="i" class="input-group">
+                        <!--Seccion Grupo-->
+                        <div class="row form-row col-12">
+                            <div class="form-group col-10">
+                            </div>
+                            <div class="form-group col-2 basurero-right">
+                                <ng-container>
+                                    <img id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito" alt="Eliminar"
+                                            [disabled]="guardando"
+                                            (click)="eliminarSenasa(i)">
+                                </ng-container>
+                            </div>
+                        </div>
+                        <div class="row form-row">
 
-                    </th>
-                </tr>
-            </thead>
-            <tbody *ngFor="let senasa of formIntervenciones.get('senasa').value; let i = index">
-
-                <tr [formGroupName]="i">
-                    <!-- Exportador -->
-                    <td>
-                        <select formControlName='exportador' class="custom-select"  [compareWith]='compareExportador'>
-                            <option value=""></option>
-                            <option *ngFor='let item of exportadores' [ngValue]='item'>
-                                {{item.nombre}}
-                            </option>
-                        </select>
-                    </td>
-                    <!-- tiene senasa -->
-                    <td>
-                        <select formControlName='tieneSenasa' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- consumo -->
-                    <td>
-                        <select formControlName='consumo' class="custom-select">
-                            <option *ngFor='let consumo of consumos' [ngValue]='consumo'>
-                                {{consumo}}
-                            </option>
-                        </select>
-                    </td>
-                    <!-- aCuentasDe -->
-                    <td>
-                        <select formControlName='aCuentaDe' class="custom-select">
-                            <option value=""></option>
-                            <option *ngFor='let aCuentaDe of listaAcuentaDe' [ngValue]='aCuentaDe.nombre'>
-                                {{aCuentaDe.nombre}}
-                            </option>
-                        </select>
-                    </td>
-                    <!-- destinos -->
-                    <td>
-                        <select formControlName='destino' class="custom-select" [compareWith]='compareDestino'>
-                            <option value=""></option>
-                            <option *ngFor='let destino of destinos' [ngValue]='destino'>
-                                {{destino.nombre}}
-                            </option>
-                        </select>
-                    </td>
-                    <!-- IP -->
-                    <td>
-                        <select formControlName='IP' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- GMO -->
-                    <td>
-                        <select formControlName='GMO' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- FITO -->
-                    <td>
-                        <select formControlName='FITO' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- muestrasOficiales -->
-                    <td>
-                        <select formControlName='muestraOficial' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- certificadoInocuidad -->
-                    <td>
-                        <select formControlName='certificadoInocuidad' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- certificadoVeterinario -->
-                    <td>
-                        <select formControlName='certificadoVeterinario' class="custom-select">
-                            <option [value]="true">Si</option>
-                            <option [value]="false">No</option>
-                        </select>
-                    </td>
-                    <!-- observaciones -->
-                    <td>
-                        <input class="form-control" type="text" formControlName="observaciones">
-                    </td>
-                    <!-- Delete item -->
-                    <td>
-                        <img id="btn-eliminar-lineas" src="assets/trashIcon-no-border.svg" class="basurerito"
-                            [disabled]="guardando"
-                            (click)="eliminarSenasa(i)">
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                            <!--Seccion 1-->
+                            <div class="form-group col-4">
+                                <label  class="font-weight-bold">Exportador</label>
+                                <select formControlName='exportador' class="custom-select"  [compareWith]='compareExportador'>
+                                    <option value=""></option>
+                                    <option *ngFor='let item of exportadores' [ngValue]='item'>
+                                        {{item.nombre}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-1">
+                                <label  class="font-weight-bold">SI/NO</label>
+                                <select formControlName='tieneSenasa' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label  class="font-weight-bold">Consumo</label>
+                                <select formControlName='consumo' class="custom-select">
+                                    <option *ngFor='let consumo of consumos' [ngValue]='consumo'>
+                                        {{consumo}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label  class="font-weight-bold">A cuenta de</label>
+                                <select formControlName='aCuentaDe' class="custom-select">
+                                    <option *ngFor='let aCuentaDe of listaAcuentaDe' [ngValue]='aCuentaDe.nombre'>
+                                        {{aCuentaDe.nombre}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label  class="font-weight-bold">Destino</label>
+                                <select formControlName='destino' class="custom-select" [compareWith]='compareDestino'>
+                                    <option value=""></option>
+                                    <option *ngFor='let destino of destinos' [ngValue]='destino'>
+                                        {{destino.nombre}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-1">
+                                <label  class="font-weight-bold">IP</label>
+                                <select formControlName='IP' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-1">
+                                <label  class="font-weight-bold">GMO</label>
+                                <select formControlName='GMO' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <!--Seccion 2-->
+                            <div class="form-group col-1">
+                                <label  class="font-weight-bold">FITO</label>
+                                <select formControlName='FITO' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label  class="font-weight-bold">Muestras Oficiales</label>
+                                <select formControlName='muestraOficial' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label  class="font-weight-bold">Certif. Inocuidad</label>
+                                <select formControlName='certificadoInocuidad' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label  class="font-weight-bold">Certif.Vet.</label>
+                                <select formControlName='certificadoVeterinario' class="custom-select">
+                                    <option [value]="true">Si</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-4">
+                                <label  class="font-weight-bold">Observaciones</label>
+                                <input class="form-control" formControlName="observaciones"  type="text" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="row form-row col-12">
+                            <div class="form-group col-12">
+                                <hr class="color-linea-division">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- Senasa -->
 </div>
 <!-- BOTONES -->
 <div class="form">
     <div class="row">
-        <div class="col-md-12 botones-registro-centrado">
-            <button class="btn btn-primary botones-registro-custom" (click)="guardarIntervencion()"
+        <div class="col-md-12 botones-registro-centrado" *ngIf="nominacionId > 0">
+            <button class="btn btn-danger botones-registro-custom" (click)="onCancelarIntervencion()">Cancelar</button>
+            <button class="btn btn-primary botones-registro-custom" (click)="onGuardarIntervencion()"
                 [disabled]="guardando">Guardar</button>
         </div>
     </div>
