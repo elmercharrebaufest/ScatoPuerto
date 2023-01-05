@@ -289,6 +289,7 @@ namespace Molinos.Scato.Servicios.Impl
                     //En caso de que exista piso su data.
                     if (nominacionReciboDB != null)
                     {
+                        nominacionReciboDB.NumeroRecibo = recibo.NumeroRecibo;
                         nominacionReciboDB.Formato = recibo.Formato;
                         nominacionReciboDB.Exportador = repositorio.Obtener<Exportador>(x => x.Id == recibo.Exportador.Id);
                         nominacionReciboDB.RecibosPorDia = recibo.RecibosPorDia; 
@@ -304,8 +305,13 @@ namespace Molinos.Scato.Servicios.Impl
                     //Si no existe lo agrego a la DB.
                     else
                     {
+                        int numeroRecibo = nominacionRecibos.Max(x=> x.NumeroRecibo);
+                        numeroRecibo = numeroRecibo == null ? 1 : numeroRecibo;
+                        numeroRecibo += 1;
+
                         nominacionReciboDB = new NominacionRecibo()
                         {
+                            NumeroRecibo = numeroRecibo,
                             Formato = recibo.Formato,
                             Exportador = repositorio.Obtener<Exportador>(x => x.Id == recibo.Exportador.Id),
                             DescripcionesBienes = recibo.DescripcionesBienes,
@@ -336,6 +342,7 @@ namespace Molinos.Scato.Servicios.Impl
             var listaNominaciones = Listar<Nominacion, NominacionDto>(x => x.NominacionDatoTecnico.MaterialPuerto.Id == nominacion.MaterialPuerto.Id &&
                                                                       x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
                                                                       x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
+                                                                      x.FechaEliminacion == null && 
                                                                       x.Id != nominacion.Id);
             if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;

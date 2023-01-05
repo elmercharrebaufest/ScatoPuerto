@@ -91,7 +91,7 @@
         <div class="row">
             <div class="col-md-12 botones-registro-centrado">
                 <button class="btn btn-danger botones-registro-custom" (click)="onRegresarNominacion()">Cancelar</button>
-                <button class="btn btn-primary botones-registro-custom" (click)="onGuardarNominacion()">Guardar</button>
+                <button class="btn btn-primary botones-registro-custom" (click)="onGuardarNominacion()" [disabled]="cargandoRegistro">Guardar</button>
             </div>
         </div>
     </div>

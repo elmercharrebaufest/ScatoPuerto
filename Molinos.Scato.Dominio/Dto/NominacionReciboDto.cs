@@ -9,6 +9,7 @@ namespace Molinos.Scato.Dominio.Dto
     public sealed class NominacionReciboDto
     {
         public int Id { get; set; }
+        public int NumeroRecibo { get; set; }
         public ExportadorDto Exportador { get; set; }
         public string Formato { get; set; }
         public int Cantidad { get; set; }
