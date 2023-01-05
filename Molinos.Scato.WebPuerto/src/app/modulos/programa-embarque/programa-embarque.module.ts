@@ -23,7 +23,8 @@ import { ModalProgramaEmbarqueComponent } from './modal-programa-embarque/modal-
     SharedComponentModule,
     ProgramaEmbarqueRoutingModule,
     NgMultiSelectDropDownModule.forRoot(),
-    MatPaginatorModule
+    MatPaginatorModule,
+    
   ]
 })
 export class ProgramaEmbarqueModule { }

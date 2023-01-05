@@ -39,15 +39,21 @@
                         <label><strong>Tolerancia: </strong> +/- {{ nominacion?.nominacionDatoTecnico?.tolerancia
                             }}</label>
                         <br>
+                       
                         <label><strong>Observaciones: </strong> {{ nominacion?.nominacionDatoTecnico?.observaciones
                             }}</label>
                         <br>
-                        <label><strong>ETA recalada: </strong> {{ nominacion?.nominacionDatoTecnico?.etaRecalada |
-                            date:'dd/MM/yyyy HH:mm'}}</label>
                         <br>
-                        <label><strong>Obligacion de carga: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.obligacionDeCarga | date:'dd/MM/yyyy HH:mm'}}</label>
-                    </div>
+                        <br>
+                        <br>
+                        <div><i class="fa fa-regular fa-calendar calendario"></i>
+                        <label class="margen"><strong>ETA recalada: </strong> {{ nominacion?.nominacionDatoTecnico?.etaRecalada |
+                            date:'dd/MM/yyyy'}}</label>
+                        <br>
+                        <label class="margen"><strong>Obligación de carga: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.obligacionDeCarga | date:'dd/MM/yyyy'}}</label>
+                        </div>
+                        </div>
                     <div class="col-md-4">
                         <label><strong>Cantidad x destino: </strong></label>
                         <div *ngFor="let destino of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino">
