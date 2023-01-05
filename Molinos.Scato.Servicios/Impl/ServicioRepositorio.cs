@@ -11607,7 +11607,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                GenerarLogging("GuardarCapturaImagenLineUp", embarque_Id, "POST", "EMBARQUE_ID");
+                GenerarLogging("GuardarCapturaImagenLineUp", Convert.ToString(embarque_Id), "POST", "EMBARQUE_ID");
                 Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
 
                 GenerarLogging("GuardarCapturaImagenLineUp", filePathImgLineUp, "POST", "IMAGEN");
