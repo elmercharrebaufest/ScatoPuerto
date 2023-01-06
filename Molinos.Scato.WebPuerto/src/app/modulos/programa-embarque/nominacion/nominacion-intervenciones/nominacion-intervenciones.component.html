@@ -254,7 +254,7 @@
                             </div>
                             <div class="form-group col-1">
                                 <label  class="font-weight-bold">SI/NO</label>
-                                <select formControlName='tieneSenasa' class="custom-select">
+                                <select formControlName='tieneSenasa' (change)="onTieneSenasaChange(i)" class="custom-select">
                                     <option [value]="true">Si</option>
                                     <option [value]="false">No</option>
                                 </select>
@@ -322,7 +322,7 @@
                             </div>
                             <div class="form-group col-2">
                                 <label  class="font-weight-bold">Certif.Vet.</label>
-                                <select formControlName='certificadoVeterinario' class="custom-select">
+                                <select formControlName='certificadoVeterinario' (change)="onCertificadoVeterinarioChange(i)"  class="custom-select">
                                     <option [value]="true">Si</option>
                                     <option [value]="false">No</option>
                                 </select>
