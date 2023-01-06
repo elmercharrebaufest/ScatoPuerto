@@ -54,8 +54,6 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
     private modalService: NgbModal,
     private programaEmbarqueService: ProgramaEmbarqueService,
     private fb: FormBuilder) {
-
-    this.formIntervenciones = this.cargarFormulario();
     this.inicializarCargadores();
     this.inicializarCompaniasDeFumigacion();
     this.inicializarTipoDeFumigacion();
@@ -75,7 +73,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
     this.listaAcuentaDe.push(new ListaACuentaDe('MOA'));
     this.listaAcuentaDe.push(new ListaACuentaDe('Tercero'));
   }
-  cargarFormulario(nominacionDetalleIntervencion: NominacionDetalleIntervencion = null): FormGroup {
+  cargarFormulario(nominacionDetalleIntervencion: NominacionDetalleIntervencion = null, esEdicion: boolean = false): FormGroup {
     if (nominacionDetalleIntervencion == null) {
       return this.fb.group({
         id: 0,
@@ -90,7 +88,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         companiaACuentaDe: [''],
         tipoDeFumigacion: [''],
         observaciones: [''],
-        senasa: this.fb.array([this.initSenasa()])
+        senasa: esEdicion? this.fb.array([]) : this.fb.array([this.initSenasa()])
       })
     } else {
       return this.fb.group({
@@ -112,9 +110,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
   }
 
   cargarSenasa(senasa: Senasa[]) {
-    this.formIntervenciones["controls"]["senasa"] = null;
-    this.formIntervenciones["controls"]["senasa"] = this.fb.array([]);
-    senasa.forEach((element: Senasa, index) => {
+    senasa.forEach((element: Senasa) => {
       (this.formIntervenciones["controls"]["senasa"] as FormArray).push(this.initSenasa(element));
     })
   }
@@ -168,7 +164,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         IP:   [{value: senasa.ip, disabled: !senasa.tieneSenasa}],
         GMO:  [{value: senasa.gmo, disabled: !senasa.tieneSenasa}],
         FITO:  [{value: senasa.fito, disabled: !senasa.tieneSenasa}],
-        muestraOficial:  [{value: senasa.muestraOficial, disabled: true}],
+        muestraOficial:  [{value: senasa.muestraOficial, disabled: !senasa.tieneSenasa}],
         certificadoInocuidad:  [{value: senasa.certificadoInocuidad, disabled: !senasa.tieneSenasa}],
         certificadoVeterinario:  [{value: senasa.certificadoVeterinario, disabled: !senasa.tieneSenasa}],
         observaciones:  [{value: senasa.observaciones, disabled: !senasa.tieneSenasa}]
@@ -291,10 +287,11 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         //Si tiene nominación ID cargo los datos de la base
         if (this.nominacionParametros.nominacion_Id > 0) {
-          this.formIntervenciones = this.cargarFormulario(this._nominacionParametros.nominacion.nominacionDetalleIntervencion);
+          this.formIntervenciones = null;
+          this.formIntervenciones = this.cargarFormulario(this._nominacionParametros.nominacion.nominacionDetalleIntervencion, true);
           if (this.nominacionParametros.nominacion.nominacionDetalleIntervencion != null)
             this.cargarSenasa(this.nominacionParametros.nominacion.nominacionDetalleIntervencion.senasa);
-        }
+        }else this.formIntervenciones = this.cargarFormulario();
       }
     });
   }
@@ -341,6 +338,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         this.guardando = false;
         this.confirmationDialogService.confirm('Registro Nominación - Intervención', 'Intervención guardadas correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
         this.cargandoDatoIntervencion = false;
+        this.cargarIntervencion();
       }, ((e: any) => {
         this.guardando = false;
         this.cargandoDatoIntervencion = false;
