@@ -2,6 +2,7 @@ import { Exportador } from "@ScatoModels/exportador";
 
 export class NominacionRecibo {
     id: number;
+    numeroRecibo: number;
     exportador: Exportador;
     formato: boolean;
     cantidad: number;

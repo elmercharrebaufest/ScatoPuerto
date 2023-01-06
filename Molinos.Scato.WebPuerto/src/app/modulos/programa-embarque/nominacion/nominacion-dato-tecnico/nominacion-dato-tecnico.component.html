@@ -107,6 +107,9 @@
                                         formControlName="destino"
                                         maxlength="50"
                                         placeholder="Seleccione un destino"
+                                        (blur)="validaSeleccionDestino($event, destino, i)"
+                                        ngbTooltip="{{mensajeValidaSeleccion}}"
+                                        triggers="blur"
                                         [ngbTypeahead]="buscarDestino"
                                         [inputFormatter]="formatoDestino"
                                         [resultFormatter]="formatoDestino"
@@ -140,18 +143,22 @@
                     <div class="input-group quitar-margen-detalles margen-superior-detalle" *ngFor="let exportador of datoTecnicoForm.get('nominacionDatoTecnicoExportador').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
                             <div class="form-group col-5">
-                                <label *ngIf="i==0" for="exportador" class="font-weight-bold">Exportador</label>
+                                <label *ngIf="i==0" for="exportador" class="font-weight-bold">Cargador</label>
                                 <input *ngIf="listaExportador"
                                     type="text"
                                     class="form-control"
                                     formControlName="exportador"
                                     maxlength="50"
                                     required
-                                    placeholder="Seleccione un exportador"
+                                    placeholder="Seleccione un cargador"
+                                    (blur)="validaSeleccionExportador($event, exportador, i)"
+                                    ngbTooltip="{{mensajeValidaSeleccion}}"
+                                    triggers="blur"
                                     (selectItem)="seleccionExportador()"
                                     [ngbTypeahead]="buscarExportador"
                                     [inputFormatter]="formatoExportador"
                                     [resultFormatter]="formatoExportador"
+                                    [ngClass]="{'input-error': grabarNominacion && exportador.exportador.invalid}"
                                     />
                             </div>
                             <div class="form-group col-3">
@@ -208,6 +215,9 @@
                                     formControlName="coordinadorPuerto"
                                     maxlength="50"
                                     placeholder="Seleccione un cliente"
+                                    (blur)="validaSeleccionCoordinadorPuerto($event, coordinador, i)"
+                                    ngbTooltip="{{mensajeValidaSeleccion}}"
+                                    triggers="blur"
                                     [ngbTypeahead]="buscarCoordinadorPuerto"
                                     [inputFormatter]="formatoCoordinadorPuerto"
                                     [resultFormatter]="formatoCoordinadorPuerto"
@@ -290,7 +300,7 @@
         <hr class="color-linea-division"/>
 
         <div class="row form-row">
-            <div class="input-group col-md-4">
+            <div class="input-group col-md-2">
                 <div class="form-group columa-ancho-total">
                     <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga</label>
                     <select class="custom-select" formControlName="muelleDeCarga" [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}" required>
@@ -299,8 +309,8 @@
                     </select>
                 </div>
             </div>
-            <div class="input-group col-md-4">
-                <div class="form-group col-md-3">
+            <div class="input-group col-md-5">
+                <div class="form-group col-md-4">
                     <label class="font-weight-bold">Loading</label>
                     <input type="text" class="form-control" 
                            formControlName="tasaDeCargaValor" 
@@ -309,7 +319,7 @@
                            (keypress)="numberOnly($event)"
                             />
                 </div>
-                <div class="form-group col-md-9">
+                <div class="form-group col-md-8">
                     <label class="font-weight-bold">Rate</label>
                     <select class="custom-select" formControlName="tasaDeCarga" >
                         <option value=""></option>
@@ -317,7 +327,7 @@
                     </select>
                 </div>
             </div>
-            <div class="input-group col-md-4">
+            <div class="input-group col-md-5">
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold">DEM</label>
                     <div class="input-group">

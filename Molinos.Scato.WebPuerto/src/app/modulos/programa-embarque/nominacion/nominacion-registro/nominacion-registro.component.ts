@@ -58,37 +58,55 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
     this.router.navigate([`programa`]);
   }
   public onGuardarNominacion(){
+    this.mensajeRegistro = Mensajes.grabando;
+    let validacionDatoTecnico: boolean = true;
+    let validacionIntervencion: boolean = true;
+    let validacionRecibo: boolean = true;
+    this.cargandoRegistro = true;
+
     const nominacionRecibo:NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
     const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
+    const nominacionDatoTecnico: NominacionDatoTecnico = this.datoTecnico.crearObjectoDatoTecnico().nominacionDatoTecnico;
+    validacionDatoTecnico = this.datoTecnico.validarRegistroDatoTecnico();
+    if(!validacionDatoTecnico) {
+      this.cargandoRegistro = false;
+      return validacionDatoTecnico;
+    }
     let nominacion = new Nominacion();
-    let validacionRecibo: boolean = true;
-    let validacionIntervencion: boolean = true;
 
-    this.crearValidarObjetoNominacionDatoTecnico().subscribe(datoTecnico=>{
-      if (datoTecnico!=null){
-        this.mensajeRegistro = Mensajes.grabando;
+    this.datoTecnico.validarCreacionNominacion().subscribe(validacion=>{
+      console.log('validacion-->>', validacion);
+      if (validacion){
         nominacion.fechaCreacion = new Date();
         nominacion.id = 0;
         nominacion.embarque_Id = 0;
-        nominacion.nominacionDatoTecnico= datoTecnico;
+        nominacion.nominacionDatoTecnico= nominacionDatoTecnico;
         nominacion.nominacionDetalleIntervencion = nominacionIntervencion;
         nominacion.nominacionRecibo = nominacionRecibo;
+
         if (nominacionRecibo.length > 0)
           validacionRecibo = this.datoRecibos.validarCreacionRecibo();
-        if(!validacionRecibo) return validacionRecibo;
+        if(!validacionRecibo) {
+          this.cargandoRegistro = false;
+          return validacionRecibo;
+        }
         
         if (nominacionIntervencion !=null)
-          validacionIntervencion = this.datoIntervencion.validacionIntervencion();        
-        if(!validacionIntervencion) return validacionIntervencion;
-
+          validacionIntervencion = this.datoIntervencion.validacionIntervencion();
+        if(!validacionIntervencion) {
+          this.cargandoRegistro = false;
+          return validacionIntervencion;
+        }
+        
         if (validacionRecibo && validacionIntervencion){
-          this.cargandoRegistro = true;
           this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
             this.cargandoRegistro = false;
-            this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+            this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
             this.router.navigate(['programa']);
           });
         }
+      }else{
+        this.cargandoRegistro = false;
       }
     });
   }

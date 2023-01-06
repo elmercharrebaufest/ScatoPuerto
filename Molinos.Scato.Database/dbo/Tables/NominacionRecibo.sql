@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [dbo].[NominacionRecibo](
 	[Id] [int] IDENTITY (1, 1) NOT NULL,
+	[NumeroRecibo] [int] NULL,
 	[Nominacion_Id] [int] NOT NULL,
 	[Exportador_Id] [int] NULL,
 	[Formato] [varchar](10) NULL,
