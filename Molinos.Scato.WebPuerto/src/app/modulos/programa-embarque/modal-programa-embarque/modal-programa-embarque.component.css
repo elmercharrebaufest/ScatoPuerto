@@ -49,4 +49,14 @@ th, td { padding: 8px 16px; }
 th     { background:#eee; }
 
 
+.calendario{
+    font-size: 45px;
+    position: absolute;
+}
+
+.margen{
+    margin-left: 50px;
+}
+
+
 

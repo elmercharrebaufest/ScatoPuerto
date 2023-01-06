@@ -87,6 +87,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public fechaMinimaObligacionCarga = '';
   public tipoAltaBaja: number = 0;
   public nominacionId: number = 0;
+  public mensajeValidaSeleccion='';
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
   @ViewChild('AltaBaja') altaBaja: AltaBajaMantenimientoComponent;
 
@@ -385,8 +386,41 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     )
   }
 
-  public seleccionExportador() {
+  public seleccionExportador($event) {
     setTimeout(() => this.enviarExportadoresRecibo(), 2000);
+  }
+  public validaSeleccionExportador($event, formulario: FormGroup, index: number) {
+    this.mensajeValidaSeleccion = '';
+    let formExportador: FormGroup[] = this.datoTecnicoForm.controls['nominacionDatoTecnicoExportador']['controls'];
+    const exportadorForm = formulario['exportador'];
+    if (typeof exportadorForm !== 'object') {
+      $event.target.value = '';
+      formulario['exportador'] = '';
+      formExportador[index].controls.exportador.setValue('');
+      this.mensajeValidaSeleccion = 'El cargador ingresado no existe.';
+    }
+  }
+  public validaSeleccionCoordinadorPuerto($event, formulario: FormGroup, index: number) {
+    this.mensajeValidaSeleccion = '';
+    let formCoordinadorPuerto: FormGroup[] = this.datoTecnicoForm.controls['nominacionDatoTecnicoCoordinadorPuerto']['controls'];
+    const destinoForm = formulario['coordinadorPuerto'];
+    if (typeof destinoForm !== 'object') {
+      $event.target.value = '';
+      formulario['coordinadorPuerto'] = '';
+      formCoordinadorPuerto[index].controls.coordinadorPuerto.setValue('');
+      this.mensajeValidaSeleccion = 'El cliente ingresado no existe.';
+    }
+  }
+  public validaSeleccionDestino($event, formulario: FormGroup, index: number) {
+    this.mensajeValidaSeleccion = '';
+    let formDestino: FormGroup[] = this.datoTecnicoForm.controls['nominacionDatoTecnicoDestino']['controls'];
+    const destinoForm = formulario['destino'];
+    if (typeof destinoForm !== 'object') {
+      $event.target.value = '';
+      formulario['destino'] = '';
+      formDestino[index].controls.destino.setValue('');
+      this.mensajeValidaSeleccion = 'El destino ingresado no existe.';
+    }
   }
 
   public seleccionVapor($event) {
@@ -405,12 +439,31 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       tipoBuque= materialPuerto.value.esLiquido? 'Oil Tanker':'Bulk Carrier';
     this.listaVaporFiltro = this.listaVapor.filter(x=> x.tipoBuque == tipoBuque);
   }
-  public validarDatoTecnico(): Subject<boolean>{
-    let validacion: boolean = false;
+  public validarRegistroDatoTecnico(): boolean{
     this.grabarNominacion = true;
+    return this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm);
+  }
+  public validarCreacionNominacion(): Subject<boolean>{
+    let subjectValidarDatoTecnico = new Subject<boolean>();
+    const nominacionValida: NominacionValida = new NominacionValida();
+    nominacionValida.id = this._nominacionParametros.nominacion != null? this._nominacionParametros.nominacion.id : 0;
+    nominacionValida.materialPuerto = this.datoTecnicoForm.controls['materialPuerto'].value; 
+    nominacionValida.muelleDeCarga = this.datoTecnicoForm.controls['muelleDeCarga'].value; 
+    nominacionValida.vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value; 
+    forkJoin([
+      this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida)
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([validacion]) => {
+      if (!validacion)
+        this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Ya existe una nominación para el buque, material y muelle de carga.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+        subjectValidarDatoTecnico.next(validacion);
+    });
+    return subjectValidarDatoTecnico;
+  }
+
+  public validarDatoTecnico(): Subject<boolean>{
     let subjectValidarDatoTecnico = new Subject<boolean>();
 
-    if(this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)){
+    if(this.validarRegistroDatoTecnico()){
       const nominacionValida: NominacionValida = new NominacionValida();
       nominacionValida.id = this._nominacionParametros.nominacion != null? this._nominacionParametros.nominacion.id : 0;
       nominacionValida.materialPuerto = this.datoTecnicoForm.controls['materialPuerto'].value; 
@@ -427,6 +480,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     return subjectValidarDatoTecnico;
   }
   public crearObjectoDatoTecnico(): Nominacion{
+    console.log('this.datoTecnicoForm.value--->>', this.datoTecnicoForm.value);
     let nominacion: Nominacion = new Nominacion();
     const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
     let listaCalidadSeleccionada = [];

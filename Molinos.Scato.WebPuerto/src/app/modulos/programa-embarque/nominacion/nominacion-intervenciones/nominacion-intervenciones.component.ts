@@ -76,7 +76,6 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
     this.listaAcuentaDe.push(new ListaACuentaDe('Tercero'));
   }
   cargarFormulario(nominacionDetalleIntervencion: NominacionDetalleIntervencion = null): FormGroup {
-    console.log('nominacionDetalleIntervencion-->>', nominacionDetalleIntervencion);
     if (nominacionDetalleIntervencion == null) {
       return this.fb.group({
         id: 0,
