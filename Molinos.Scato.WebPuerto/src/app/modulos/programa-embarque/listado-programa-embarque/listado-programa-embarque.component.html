@@ -105,35 +105,35 @@
             <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
                 <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }"
                 class="noBorder anchoDeFila" style="border-radius: 5px 0px 0px 5px;"></td>
-                <td class="lista-buque-row-item cursor noBorder alinearCentro"
+                <td class="lista-buque-row-item cursor noBorder alinearCentro centradoHorizontal"
                 (click)="seleccionarNominacion(historial.id, addPE)" style="font-size: 20px;">
                     <strong class="alinearJustificado">{{historial.producto}}
                     </strong>
                 </td>
-                <td class="noBorder"><i style="font-size: 25px;cursor:pointer"
+                <td class="noBorder centradoHorizontal"><i style="font-size: 25px;cursor:pointer"
                         [ngbTooltip]="devolverMensajeDeEstados(historial.estado)"
                         [ngStyle]="{ 'color': devolverColorEstado(historial.estado) }"
                         class="fa fa-duotone fa-circle"></i></td>
-                <td class="noBorder alinearCentro"><div class="alinearJustificado">{{historial.nombreBuque}}</div></td>
-                <td class="noBorder-rigth">{{historial.muelleDeCarga}}</td>
-                <td class="lista-buque-row-item noBorder alinearCentro">
+                <td class="noBorder alinearCentro centradoHorizontal"><div class="alinearJustificado">{{historial.nombreBuque}}</div></td>
+                <td class="noBorder-rigth centradoHorizontal">{{historial.muelleDeCarga}}</td>
+                <td class="lista-buque-row-item noBorder alinearCentro centradoHorizontal">
                     <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{ exportador.nombreExportador }}</div>
                 </td>
-                <td class="lista-buque-row-item noBorder alinearCentro">
+                <td class="lista-buque-row-item noBorder alinearCentro centradoHorizontal">
                     <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{ exportador.toneladas |
                         number:'0.0-0' }} tn</div>
                 </td>
-                <td class="lista-buque-row-item celda-nombre-buque noBorder-left">{{historial.contrato}}</td>
-                <td class="lista-buque-row-item noBorder-rigth">{{historial.etaRecalada | date:'dd/MM/yyyy'}}</td>
-                <td style="text-align: center;" class="noBorder">
+                <td class="lista-buque-row-item celda-nombre-buque noBorder-left centradoHorizontal">{{historial.contrato}}</td>
+                <td class="lista-buque-row-item noBorder-rigth centradoHorizontal">{{historial.etaRecalada | date:'dd/MM/yyyy'}}</td>
+                <td style="text-align: center;" class="noBorder centradoHorizontal">
                     <div class='icon-fumigador'
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoFumigador) }"></div>
                 </td>
-                <td style="text-align: center;" class="noBorder" *ngIf='tienePermisoEliminarNominacion()'>
+                <td style="text-align: center;" class="noBorder centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
                     <div class='icon-surveyor'
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
                 </td>
-                <td class="noBorder">
+                <td class="noBorder centradoHorizontal">
                     <div class="btn-group">
                         <button type="button" class="btn dropdown-toggle estiloBoton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           <strong>Nominar</strong>
@@ -146,10 +146,10 @@
                         </div>
                       </div>
                 </td>
-                <td class="noBorder" *ngIf='tienePermisoModificarNominacion()'>
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarNominacion()'>
                     <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
                 </td>
-                <td class="noBorder-left" *ngIf='tienePermisoEliminarNominacion()'>
+                <td class="noBorder-left centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
                     <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
 

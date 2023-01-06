@@ -58,5 +58,8 @@ th     { background:#eee; }
     margin-left: 50px;
 }
 
+.centradoHorizontal{
+    vertical-align: inherit;
+}
 
 

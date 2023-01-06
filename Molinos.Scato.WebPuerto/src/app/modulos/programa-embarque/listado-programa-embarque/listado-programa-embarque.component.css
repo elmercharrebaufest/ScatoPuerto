@@ -17,12 +17,16 @@
     border-radius: 4px 4px 0px 0px;
     background-color: #666666;
     color:white;
-    font-size: 13.5px;
+    font-size: 11.5px;
 }
 
 .noBorder{
     border-right: none;
     border-left: none;
+}
+
+.centradoHorizontal{
+    vertical-align: inherit;
 }
 
 .anchoDeFila{
@@ -61,6 +65,7 @@ width: 10px;
     color: #f57875;
     font-size: 21px;
     margin-top: 4px;
+    height: 30px !important
 }
 
 .noBorder-rigth{
