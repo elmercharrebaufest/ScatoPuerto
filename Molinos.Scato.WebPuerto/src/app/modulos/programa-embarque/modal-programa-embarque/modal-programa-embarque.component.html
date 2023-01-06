@@ -135,18 +135,18 @@
                         <tbody *ngFor="let nomi of nominacion?.nominacionRecibo; let i = index" [attr.data-index]="i"
                             style="text-align: center;">
                             <tr>
-                                <td>{{ i + 1 }}</td>
-                                <td>{{nomi?.exportador?.nombre }}</td>
-                                <td>{{nomi?.formato }}</td>
-                                <td>{{nomi?.cantidad | number : '1.1-1'}}</td>
-                                <td>{{nomi?.unidad }}</td>
-                                <td>{{nomi?.ajuste }}</td>
-                                <td>{{nomi?.puertoDeCarga }}</td>
-                                <td>{{nomi?.puertoDeDescarga }}</td>
-                                <td>{{nomi?.descripcionesBienes }}</td>
-                                <td>{{nomi?.recibosPorDia == true ? 'SI' : 'NO' }}</td>
-                                <td>{{nomi?.mostrarDestinos == true ? 'SI' : 'NO'}}</td>
-                                <td>{{nomi?.mostrarBodegas == true ? 'SI' : 'NO'}}</td>
+                                <td class="centradoHorizontal">{{ nomi?.numeroRecibo }}</td>
+                                <td class="centradoHorizontal">{{nomi?.exportador?.nombre }}</td>
+                                <td class="centradoHorizontal">{{nomi?.formato }}</td>
+                                <td class="centradoHorizontal">{{nomi?.cantidad | number : '1.1-1'}}</td>
+                                <td class="centradoHorizontal">{{nomi?.unidad }}</td>
+                                <td class="centradoHorizontal">{{nomi?.ajuste }}</td>
+                                <td class="centradoHorizontal">{{nomi?.puertoDeCarga }}</td>
+                                <td class="centradoHorizontal">{{nomi?.puertoDeDescarga }}</td>
+                                <td class="centradoHorizontal">{{nomi?.descripcionesBienes }}</td>
+                                <td class="centradoHorizontal">{{nomi?.recibosPorDia == true ? 'SI' : 'NO' }}</td>
+                                <td class="centradoHorizontal">{{nomi?.mostrarDestinos == true ? 'SI' : 'NO'}}</td>
+                                <td class="centradoHorizontal">{{nomi?.mostrarBodegas == true ? 'SI' : 'NO'}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -165,34 +165,34 @@
                           </thead>         
                             <tbody>                         
                                 <tr>
-                                    <td><strong>Precintado de bodegas</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe }}</td>
-                                    <td>-</td>
+                                    <td class="centradoHorizontal"><strong>Precintado de bodegas</strong></td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO' }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe }}</td>
+                                    <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Draft Survey</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe }}</td>
-                                    <td>-</td>
+                                    <td class="centradoHorizontal"><strong>Draft Survey</strong></td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe }}</td>
+                                    <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Permiso de embarque</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO' }}</td>
-                                    <td>-</td>
-                                    <td>-</td>
+                                    <td class="centradoHorizontal"><strong>Permiso de embarque</strong></td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO' }}</td>
+                                    <td class="centradoHorizontal">-</td>
+                                    <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Estibado y trimado</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A' }}</td>
-                                    <td>-</td>
-                                    <td>-</td>
+                                    <td class="centradoHorizontal"><strong>Estibado y trimado</strong></td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A' }}</td>
+                                    <td class="centradoHorizontal">-</td>
+                                    <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Fumigación</strong></td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.fumigacion }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe }}</td>
-                                    <td>{{nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion }}</td>
+                                    <td class="centradoHorizontal"><strong>Fumigación</strong></td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.fumigacion }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion }}</td>
                                 </tr>                              
                            
                             </tbody>
@@ -220,17 +220,17 @@
                                 <tbody *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index" [attr.data-index]="i"
                                     style="text-align: center;">
                                     <tr>                                       
-                                        <td>{{intervencion?.exportador?.nombre }}</td>
-                                        <td>{{intervencion?.tieneSenasa == true ? 'SI' : 'NO'}}</td>
-                                        <td>{{intervencion?.consumo }}</td>
-                                        <td>{{intervencion?.aCuentaDe }}</td>
-                                        <td>{{intervencion?.destino?.nombre }}</td>
-                                        <td>{{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
-                                        <td>{{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
-                                        <td>{{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
-                                        <td>{{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}</td>
-                                        <td>{{intervencion?.certificadoInocuidad == true ? 'SI' : 'NO'}}</td>
-                                        <td>{{intervencion?.certificadoVeterinario == true ? 'SI' : 'NO'}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.exportador?.nombre }}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.tieneSenasa == true ? 'SI' : 'NO'}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.consumo }}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.aCuentaDe }}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.destino?.nombre }}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.certificadoInocuidad == true ? 'SI' : 'NO'}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.certificadoVeterinario == true ? 'SI' : 'NO'}}</td>
                                     </tr>
                                 </tbody>
                             </table>
