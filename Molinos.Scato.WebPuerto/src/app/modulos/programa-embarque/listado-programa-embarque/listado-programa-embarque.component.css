@@ -17,7 +17,7 @@
     border-radius: 4px 4px 0px 0px;
     background-color: #666666;
     color:white;
-    font-size: 14px;
+    font-size: 13.5px;
 }
 
 .noBorder{
@@ -75,9 +75,25 @@ width: 10px;
     cursor: pointer !important;
 }
 
-.tableFixHead          { overflow: auto; height: 360px; }
+.tableFixHead          { overflow: auto; height: 500px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
 
 table  { border-collapse: collapse; width: 100%; }
 th, td { padding: 8px 13px; }
 th     { background:#666666; }
+
+.alinearJustificado{
+    text-align: justify;
+}
+
+.alinearCentro{
+    text-align: center;
+}
+
+.estiloBoton{
+    border-color: #999999;
+    color: #1cba63;
+}
+
+
+

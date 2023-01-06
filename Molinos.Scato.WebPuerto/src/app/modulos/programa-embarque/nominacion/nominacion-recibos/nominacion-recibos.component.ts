@@ -50,6 +50,7 @@ export class NominacionRecibosComponent implements OnInit {
   agregarRecibo() {
     this.recibosFormArray.push(this.fb.group({
       id                  :[ ''   ],
+      numeroRecibo        :[ '0'  ],
       exportador          :[ ''   ],
       formato             :[ ''   ],
       unidad              :[ ''   ],
@@ -92,11 +93,10 @@ export class NominacionRecibosComponent implements OnInit {
     const exportador = item['controls'].exportador.value;
     const formato = item['controls'].formato.value;
       if (exportador == '' || formato == ''){
-        this.confirmationDialogService.confirm('Registro Nominación - Recibos', 'Debe completar ingresar el exportador y formato.', 'Aceptar', '', null, null, Tipoalerta.Warning);
         bValidacion = false;
-        return;
       }
     });
+    if (!bValidacion) this.confirmationDialogService.confirm('Registro Nominación - Recibos', 'Debe completar ingresar el exportador y formato.', 'Aceptar', '', null, null, Tipoalerta.Warning);
     return bValidacion;
   }
   get recibosFormArray(): FormArray {
@@ -122,6 +122,7 @@ export class NominacionRecibosComponent implements OnInit {
       dataRecibos.forEach(element => {
         this.recibosFormArray.push(this.fb.group({
           id: element == null ? 0 : element.id,
+          numeroRecibo: element == null ? 0 : element.numeroRecibo,
           exportador: element == null ? '' : element.exportador,
           formato: element == null ? '' : element.formato,
           unidad: element == null ? '' : element.unidad,
@@ -166,8 +167,8 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   private cargarFormulario(){
-    this.cargandoRecibos = true;
     this.mensajeRecibos = Mensajes.cargando;
+    this.cargandoRecibos = true;
     this.nominacionService.obtenerNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
       this.cargandoRecibos = false;
       this.inicializarFormEdicion(data.nominacionRecibo);
@@ -176,8 +177,8 @@ export class NominacionRecibosComponent implements OnInit {
 
   onGuardarRecibos() {
     if (this.validarCreacionRecibo()){
-      this.cargandoRecibos = true;
       this.mensajeRecibos = Mensajes.grabando;
+      this.cargandoRecibos = true;
       this.programaEmbarqueService.registrarNominacionRecibo(this.nominacionId, this.formRecibos.controls["recibos"].value).subscribe((res: any) => {
         this.confirmationDialogService.confirm('Registro Nominación - Recibos', 'Recibos guardados correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
         this.cargandoRecibos = false;
@@ -204,7 +205,6 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   onActivarCantidad(recibo: FormGroup,estado: boolean) {
-    recibo.controls['cantidad'].setValue(0);
     if (estado)
       recibo.controls['cantidad'].disable();
     else
@@ -223,10 +223,12 @@ export class NominacionRecibosComponent implements OnInit {
     }
   }
 
-  onEliminarRecibo(i: number) {
+  onEliminarRecibo(i: number, recibo) {
     (this.formRecibos.controls["recibos"] as FormArray).removeAt(i);
   }
-
+  getNumeroRecibo(recibo) {
+    return recibo.controls.numeroRecibo.value; 
+  }
   public inicializarFormNuevo() {
     this.formRecibos = this.fb.group({
       recibos: this.fb.array([])
