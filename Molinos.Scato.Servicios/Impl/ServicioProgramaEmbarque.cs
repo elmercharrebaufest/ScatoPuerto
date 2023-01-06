@@ -301,14 +301,19 @@ namespace Molinos.Scato.Servicios.Impl
                         nominacionReciboDB.PuertoDeCarga = recibo.PuertoDeCarga;
                         nominacionReciboDB.PuertoDeDescarga = recibo.PuertoDeDescarga;
                         nominacionReciboDB.Unidad = recibo.Unidad;
+                        repositorio.GuardarCambios();
                     }
                     //Si no existe lo agrego a la DB.
                     else
                     {
-                        int numeroRecibo = nominacionRecibos.Max(x=> x.NumeroRecibo);
-                        numeroRecibo = numeroRecibo == null ? 1 : numeroRecibo;
-                        numeroRecibo += 1;
+                        var listaRecibos = repositorio.Listar<NominacionRecibo>(x => x.Nominacion.Id == nominacion_id);
 
+                        int numeroRecibo = 1;
+                        if (listaRecibos.Count > 0)
+                        {
+                            numeroRecibo = listaRecibos.Max(x => x.NumeroRecibo);
+                            numeroRecibo += 1;
+                        }
                         nominacionReciboDB = new NominacionRecibo()
                         {
                             NumeroRecibo = numeroRecibo,
@@ -327,6 +332,8 @@ namespace Molinos.Scato.Servicios.Impl
                         };
                         //Guardo toda la data en la DB.
                         repositorio.Agregar(nominacionReciboDB);
+                        repositorio.GuardarCambios();
+
                     }
                 }
                 repositorio.GuardarCambios();
@@ -419,7 +426,7 @@ namespace Molinos.Scato.Servicios.Impl
                     nominacion_BD.EnviadoFumigador = nominacion.EnviadoFumigador;
                     nominacion_BD.EnviadoSurveyor = nominacion.EnviadoSurveyor;
                     nominacion_BD.EnviadoOtros = nominacion.EnviadoOtros;
-                    nominacion_BD.FechaCreacion = nominacion.FechaCreacion;
+                    nominacion_BD.FechaCreacion = DateTime.Now;
                     nominacion_BD.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
                     nominacion_BD.FechaEliminacion = nominacion.FechaEliminacion;
                     nominacion_BD.NominacionDatoTecnico = null;

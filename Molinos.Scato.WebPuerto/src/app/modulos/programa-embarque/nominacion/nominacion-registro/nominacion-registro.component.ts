@@ -58,11 +58,11 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
     this.router.navigate([`programa`]);
   }
   public onGuardarNominacion(){
+    this.mensajeRegistro = Mensajes.grabando;
     let validacionDatoTecnico: boolean = true;
     let validacionIntervencion: boolean = true;
     let validacionRecibo: boolean = true;
     this.cargandoRegistro = true;
-    this.mensajeRegistro = Mensajes.grabando;
 
     const nominacionRecibo:NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
     const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
@@ -101,7 +101,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
         if (validacionRecibo && validacionIntervencion){
           this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
             this.cargandoRegistro = false;
-            this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+            this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
             this.router.navigate(['programa']);
           });
         }

@@ -440,6 +440,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.listaVaporFiltro = this.listaVapor.filter(x=> x.tipoBuque == tipoBuque);
   }
   public validarRegistroDatoTecnico(): boolean{
+    this.grabarNominacion = true;
     return this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm);
   }
   public validarCreacionNominacion(): Subject<boolean>{
@@ -460,7 +461,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
 
   public validarDatoTecnico(): Subject<boolean>{
-    this.grabarNominacion = true;
     let subjectValidarDatoTecnico = new Subject<boolean>();
 
     if(this.validarRegistroDatoTecnico()){
