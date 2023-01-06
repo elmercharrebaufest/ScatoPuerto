@@ -54,8 +54,6 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
     private modalService: NgbModal,
     private programaEmbarqueService: ProgramaEmbarqueService,
     private fb: FormBuilder) {
-
-    this.formIntervenciones = this.cargarFormulario();
     this.inicializarCargadores();
     this.inicializarCompaniasDeFumigacion();
     this.inicializarTipoDeFumigacion();
@@ -75,7 +73,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
     this.listaAcuentaDe.push(new ListaACuentaDe('MOA'));
     this.listaAcuentaDe.push(new ListaACuentaDe('Tercero'));
   }
-  cargarFormulario(nominacionDetalleIntervencion: NominacionDetalleIntervencion = null): FormGroup {
+  cargarFormulario(nominacionDetalleIntervencion: NominacionDetalleIntervencion = null, esEdicion: boolean = false): FormGroup {
     if (nominacionDetalleIntervencion == null) {
       return this.fb.group({
         id: 0,
@@ -90,7 +88,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         companiaACuentaDe: [''],
         tipoDeFumigacion: [''],
         observaciones: [''],
-        senasa: this.fb.array([])
+        senasa: esEdicion? this.fb.array([]) : this.fb.array([this.initSenasa()])
       })
     } else {
       return this.fb.group({
@@ -155,42 +153,93 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
 
   initSenasa(senasa: Senasa = null) {
     if (senasa != null) {
+      
       return this.fb.group({
         id: senasa.id,
         exportador: senasa.exportador,
-        tieneSenasa: senasa.tieneSenasa,
-        consumo: senasa.consumo,
-        aCuentaDe: senasa.aCuentaDe,
-        destino: senasa.destino,
-        IP: senasa.ip,
-        GMO: senasa.gmo,
-        FITO: senasa.fito,
-        muestraOficial: senasa.muestraOficial,
-        certificadoInocuidad: senasa.certificadoInocuidad,
-        certificadoVeterinario: senasa.certificadoVeterinario,
-        observaciones: senasa.observaciones
+        tieneSenasa: [senasa.tieneSenasa],
+        consumo: [{value: senasa.consumo, disabled: !senasa.tieneSenasa}],
+        aCuentaDe: [{value: senasa.aCuentaDe, disabled: !senasa.tieneSenasa}],
+        destino:  [{value: senasa.destino, disabled: !senasa.tieneSenasa}],
+        IP:   [{value: senasa.ip, disabled: !senasa.tieneSenasa}],
+        GMO:  [{value: senasa.gmo, disabled: !senasa.tieneSenasa}],
+        FITO:  [{value: senasa.fito, disabled: !senasa.tieneSenasa}],
+        muestraOficial:  [{value: senasa.muestraOficial, disabled: !senasa.tieneSenasa}],
+        certificadoInocuidad:  [{value: senasa.certificadoInocuidad, disabled: !senasa.tieneSenasa}],
+        certificadoVeterinario:  [{value: senasa.certificadoVeterinario, disabled: !senasa.tieneSenasa}],
+        observaciones:  [{value: senasa.observaciones, disabled: !senasa.tieneSenasa}]
       })
     } else {
       return this.fb.group({
         id: 0,
         exportador: ['', Validators.required],
         tieneSenasa: [false],
-        consumo: [''],
-        aCuentaDe: [''],
-        destino: [''],
-        IP: [false],
-        GMO: [false],
-        FITO: [false],
-        muestraOficial: [false],
-        certificadoInocuidad: [false],
-        certificadoVeterinario: [false],
-        observaciones: ['',Validators.required]
+        consumo: [{value: '', disabled: true}],
+        aCuentaDe: [{value: '', disabled: true}],
+        destino:  [{value: '', disabled: true}],
+        IP:   [{value: false, disabled: true}],
+        GMO:  [{value: false, disabled: true}],
+        FITO:  [{value: false, disabled: true}],
+        muestraOficial:  [{value: false, disabled: true}],
+        certificadoInocuidad:  [{value: false, disabled: true}],
+        certificadoVeterinario:  [{value: false, disabled: true}],
+        observaciones:  [{value: '', disabled: true}],
       })
     }
   }
 
   eliminarSenasa(i: number) {
     (this.formIntervenciones.controls["senasa"] as FormArray).removeAt(i);
+  }
+
+  onTieneSenasaChange(i: number){
+    let tieneSenasa:any;
+    tieneSenasa =  this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["tieneSenasa"].value as boolean;
+    if( tieneSenasa ==  true || tieneSenasa == 'true' ){
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["consumo"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["aCuentaDe"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["destino"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["IP"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["GMO"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["muestraOficial"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoInocuidad"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].enable();
+    }else{
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["consumo"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["consumo"].setValue('');
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["aCuentaDe"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["aCuentaDe"].setValue('');
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["destino"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["destino"].setValue('');
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["IP"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["IP"].setValue(false);
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["GMO"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["GMO"].setValue(false);
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].setValue(false);
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["muestraOficial"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["muestraOficial"].setValue(false);
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoInocuidad"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoInocuidad"].setValue(false);
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].setValue(false);
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].setValue('');
+    }
+
+    
+  }
+
+  onCertificadoVeterinarioChange(i: number){
+    if(this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].value == 'true'){
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].disable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].setValue(true);
+    } else{
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].enable();
+      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].setValue(false);
+    }
   }
 
   compareExportador(c1: Exportador, c2: Exportador) {
@@ -238,10 +287,11 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         //Si tiene nominación ID cargo los datos de la base
         if (this.nominacionParametros.nominacion_Id > 0) {
-          this.formIntervenciones = this.cargarFormulario(this._nominacionParametros.nominacion.nominacionDetalleIntervencion);
+          this.formIntervenciones = null;
+          this.formIntervenciones = this.cargarFormulario(this._nominacionParametros.nominacion.nominacionDetalleIntervencion, true);
           if (this.nominacionParametros.nominacion.nominacionDetalleIntervencion != null)
             this.cargarSenasa(this.nominacionParametros.nominacion.nominacionDetalleIntervencion.senasa);
-        }
+        }else this.formIntervenciones = this.cargarFormulario();
       }
     });
   }
@@ -288,6 +338,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         this.guardando = false;
         this.confirmationDialogService.confirm('Registro Nominación - Intervención', 'Intervención guardadas correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
         this.cargandoDatoIntervencion = false;
+        this.cargarIntervencion();
       }, ((e: any) => {
         this.guardando = false;
         this.cargandoDatoIntervencion = false;
