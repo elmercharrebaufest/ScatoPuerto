@@ -203,7 +203,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
      material = this.listaMaterialPuerto.filter(x=> x.id == dataTecnico.materialPuerto.id)[0];
     if (dataTecnico.materialPuerto !=null)
      datoTecnicoCalidadSel = dataTecnico.nominacionDatoTecnicoCalidad.filter(x=> x.calidadValor.tipoDeCalidad.materialPuerto.id == material.id)[0];
-    if (dataTecnico.nominacionDatoTecnicoCalidad !=null && dataTecnico.nominacionDatoTecnicoCalidad.length >0)
+
+    if (dataTecnico.nominacionDatoTecnicoCalidad !=null && dataTecnico.nominacionDatoTecnicoCalidad.length >0 && (datoTecnicoCalidadSel!=null || datoTecnicoCalidadSel!=undefined))
       tipoDeCalidad = this.listaTipoDeCalidad.filter(x=> x.id == datoTecnicoCalidadSel.calidadValor.tipoDeCalidad.id)[0];
      
     if (dataTecnico.muelleDeCarga !=null)
