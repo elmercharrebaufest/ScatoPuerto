@@ -35,6 +35,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { AltaBajaMantenimientoComponent } from 'app/shared/componentes/alta-baja-mantenimiento/alta-baja-mantenimiento.component';
 import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
 import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -99,7 +100,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   constructor(private nominacionService: NominacionService,
     private confirmationDialogService: ConfirmationDialogService,
     private modalService: NgbModal,
-    private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService) {
+    private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService,
+    private toastr: ToastrService
+    ) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.cargando;
     this.inicializarForm();
@@ -269,6 +272,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoCoordinadorFormArray.push(this.inicializarFormCoordinadorPuerto(coordinador, dataTecnico.id));
     });
     this.enviarExportadoresRecibo();
+    this.actualizarExportadores(material);
+
   }
   private enviarExportadoresRecibo(){
     let listaExportadores: Exportador[] = [];
@@ -354,8 +359,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.listaTipoDeContrato = data.tipoDeContrato; 
       this.listaCalidadValor = data.calidadValor; 
       this.cargandoDatoTecnico = false;
-      this.asignarNominacionParametros();
       this.actualizarExportadores(null);
+      this.asignarNominacionParametros();
     });
   }
   public configurarListasDeNominacion(){
@@ -436,9 +441,24 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   public actualizarExportadores(materialPuerto){
     let tipoBuque: string = '';
-    if (materialPuerto!=null && materialPuerto.value != '')
-      tipoBuque= materialPuerto.value.esLiquido? 'Oil Tanker':'Bulk Carrier';
-    this.listaVaporFiltro = this.listaVapor.filter(x=> x.tipoBuque == tipoBuque);
+    if (materialPuerto!=null && materialPuerto != ''){
+      tipoBuque= materialPuerto.esLiquido? 'Oil Tanker':'Bulk Carrier';
+      this.listaVaporFiltro = this.listaVapor.filter(x=> x.tipoBuque == tipoBuque);
+      let vaporIngresado = this.datoTecnicoForm.controls['vaporInformacion'];
+      if (materialPuerto !=null && vaporIngresado!=null)
+        this.validarBuqueIngresado(materialPuerto, vaporIngresado);
+    }
+  }
+  private validarBuqueIngresado(materialPuerto: MaterialPuerto, vaporIngresado){
+    const tipoBuqueMaterial = materialPuerto.esLiquido? 'Oil Tanker':'Bulk Carrier';
+    if (vaporIngresado.value == null && vaporIngresado.value == undefined) return false;
+    if (vaporIngresado.value.length == 0) return false;
+    if (vaporIngresado.value.tipoBuque != tipoBuqueMaterial){
+      let mensaje = `El buque ${vaporIngresado.value.nombreBuque} no corresponde al producto seleccionado, por favor ingresar un nuevo buque.`; 
+      this.toastr.error(mensaje,'Registro Nominación - Dato Tecnico');
+      this.datoTecnicoForm.controls['vaporInformacion'].setValue(null);
+      this.datoTecnicoForm.controls['bandera'].setValue(null);
+    }
   }
   public validarRegistroDatoTecnico(): boolean{
     this.grabarNominacion = true;
@@ -481,7 +501,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     return subjectValidarDatoTecnico;
   }
   public crearObjectoDatoTecnico(): Nominacion{
-    console.log('this.datoTecnicoForm.value--->>', this.datoTecnicoForm.value);
     let nominacion: Nominacion = new Nominacion();
     const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
     let listaCalidadSeleccionada = [];
@@ -580,8 +599,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   onCargarTipoCalidad(){
     this.mostrarParametroCalidad = false;
     let materialPuerto = this.datoTecnicoForm.controls['materialPuerto'];
+    this.listaNominacionDatoTecnicoCalidad = [];
     this.listaTipoDeCalidadxMaterial(materialPuerto);
-    this.actualizarExportadores(materialPuerto);
+    this.actualizarExportadores(materialPuerto.value);
   }
   onMostrarParametroCalidad(){
     this.mostrarParametroCalidad = !this.mostrarParametroCalidad;
