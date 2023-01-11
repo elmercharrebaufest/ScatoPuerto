@@ -42,7 +42,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 && (item.Embarque == null || item.Embarque.Ubicacion != 1)
                                 && (item.FechaEliminacion == null || (ayer < item.FechaEliminacion.Value && item.FechaEliminacion.Value < hoy))
 
-                                orderby item.NominacionDatoTecnico.ETARecalada descending
+                                orderby item.FechaCreacion descending 
 
                                 select new ProgramaEmbarqueDto
                                 {

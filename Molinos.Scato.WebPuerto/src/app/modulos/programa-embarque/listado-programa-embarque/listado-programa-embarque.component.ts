@@ -184,6 +184,10 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Modificar);
   }
 
+  tienePermisoParaNominar() {
+    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Nominar);
+  }
+
 
 
 

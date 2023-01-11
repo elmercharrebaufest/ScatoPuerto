@@ -2,6 +2,9 @@
 
 <div class="modal-content">
     <div class="margenes">
+        <button type="button" class="close" aria-label="Close" (click)="cerraModal()">
+            <span aria-hidden="true">&times;</span>
+          </button>
         <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCortaIngles  }}</strong> ({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>
     </div>
     <div class="line" [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }" ></div>
@@ -30,17 +33,20 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label><strong>Cantidad Total: </strong> {{ nominacion?.nominacionDatoTecnico?.cantidadTotal |
-                            number : '1.1-1'}}</label>
+                            number : '1.0-0'}} tn</label>
                         <br>
-                        <label><strong>Calidad: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.descripcion
+                        <label><strong>Calidad: </strong> {{                            
+                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad != null  ?
+                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.descripcion : "-"
                             }}</label>
                         <br>
                         <label><strong>Tolerancia: </strong> +/- {{ nominacion?.nominacionDatoTecnico?.tolerancia
-                            }}</label>
+                            }}%</label>
                         <br>
                        
-                        <label><strong>Observaciones: </strong> {{ nominacion?.nominacionDatoTecnico?.observaciones
+                        <label><strong>Observaciones: </strong> 
+                            {{ nominacion?.nominacionDatoTecnico?.observaciones != "" ?
+                            nominacion?.nominacionDatoTecnico?.observaciones : "-"
                             }}</label>
                         <br>
                         <br>
@@ -56,23 +62,27 @@
                         </div>
                     <div class="col-md-4">
                         <label><strong>Cantidad x destino: </strong></label>
+                        <label class="margenIzquiera5px" *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino"> - </label>                        
                         <div *ngFor="let destino of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino">
                             {{ destino.destino.nombre }}:
-                            {{ destino.cantidad | number : '1.1-1'}}
+                            {{ destino.cantidad | number : '1.0-0'}} tn
                         </div>
                         <br>
                         <label><strong>Cantidad x cargadores: </strong></label>
-                        <div
+                        <label class="margenIzquiera5px" *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador"> - </label>
+                        <div 
                             *ngFor="let cargador of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador">
                             {{ cargador.exportador.nombre }}:
-                            {{ cargador.cantidad | number : '1.1-1'}}
+                            {{ cargador.cantidad | number : '1.0-0'}} tn 
+                            +/- {{ cargador.tolerancia }}%
                         </div>
                         <br>
                         <label><strong>Cantidad x cliente: </strong></label>
+                        <label class="margenIzquiera5px" *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto"> - </label>
                         <div
                             *ngFor="let cliente of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto">
                             {{ cliente.coordinadorPuerto.nombre }}:
-                            {{ cliente.cantidad | number : '1.1-1'}}
+                            {{ cliente.cantidad | number : '1.0-0'}} tn
                         </div>
 
                     </div>
@@ -95,16 +105,18 @@
                         <label><strong>ATA: </strong> {{ nominacion?.nominacionDatoTecnico?.ataPuerto?.nombre}}</label>
                         <br>
                         <label><strong>Surveyor: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.surveyor?.descripcion}}</label>
+                            nominacion?.nominacionDatoTecnico?.surveyor != null ?
+                            nominacion?.nominacionDatoTecnico?.surveyor?.descripcion : "-"}}</label>
                         <br>
                         <label><strong>Observaciones del Surveyor: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.observacionesSurveyor}}</label>
+                            nominacion?.nominacionDatoTecnico != null ?
+                            nominacion?.nominacionDatoTecnico?.observacionesSurveyor : "-"}}</label>
                         <br>
                         <label><strong>Loading rate: </strong> {{ nominacion?.nominacionDatoTecnico?.tasaDeCargaValor }}
                             {{ nominacion?.nominacionDatoTecnico?.tasaDeCarga?.descripcion}}</label>
                         <br>
                         <label><strong>DEM/DES: </strong> u$ {{ nominacion?.nominacionDatoTecnico?.dem | number :
-                            '1.1-1'}}/{{ nominacion?.nominacionDatoTecnico?.des | number : '1.1-1'}}</label>
+                            '1.0-0'}}/{{ nominacion?.nominacionDatoTecnico?.des | number : '1.0-0'}}</label>
                         <br>
                         <label><strong>Tipo de contrato: </strong> {{
                             nominacion?.nominacionDatoTecnico?.tipoDeContrato?.descripcion }}</label>
@@ -121,7 +133,7 @@
                         <th>N° de recibo</th>
                         <th>Cargador</th>
                         <th>Formato</th>
-                        <th>Cantidad</th>
+                        <th>Cantidad (Tn)</th>
                         <th>Unidad</th>
                         <th>Ajuste</th>
                         <th>Loading Port</th>
@@ -138,15 +150,15 @@
                                 <td class="centradoHorizontal">{{ nomi?.numeroRecibo }}</td>
                                 <td class="centradoHorizontal">{{nomi?.exportador?.nombre }}</td>
                                 <td class="centradoHorizontal">{{nomi?.formato }}</td>
-                                <td class="centradoHorizontal">{{nomi?.cantidad | number : '1.1-1'}}</td>
-                                <td class="centradoHorizontal">{{nomi?.unidad }}</td>
-                                <td class="centradoHorizontal">{{nomi?.ajuste }}</td>
-                                <td class="centradoHorizontal">{{nomi?.puertoDeCarga }}</td>
-                                <td class="centradoHorizontal">{{nomi?.puertoDeDescarga }}</td>
-                                <td class="centradoHorizontal">{{nomi?.descripcionesBienes }}</td>
-                                <td class="centradoHorizontal">{{nomi?.recibosPorDia == true ? 'SI' : 'NO' }}</td>
-                                <td class="centradoHorizontal">{{nomi?.mostrarDestinos == true ? 'SI' : 'NO'}}</td>
-                                <td class="centradoHorizontal">{{nomi?.mostrarBodegas == true ? 'SI' : 'NO'}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.cantidad | number : '1.0-0') : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? nomi?.unidad : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? nomi?.ajuste : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? nomi?.puertoDeCarga : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? nomi?.puertoDeDescarga : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? nomi?.descripcionesBienes : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.recibosPorDia == true ? 'SI' : 'NO') : "-" }}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.mostrarDestinos == true ? 'SI' : 'NO') : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.mostrarBodegas == true ? 'SI' : 'NO') : "-"}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -166,33 +178,47 @@
                             <tbody>                         
                                 <tr>
                                     <td class="centradoHorizontal"><strong>Precintado de bodegas</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO' }}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                        (nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO') : "-"}}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null && 
+                                        nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe != null ? 
+                                        nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe : "-"}}</td>
                                     <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
                                     <td class="centradoHorizontal"><strong>Draft Survey</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO' }}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                         (nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO') : "-" }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
+                                        nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe != null ?
+                                        nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe : "-" }}</td>
                                     <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
                                     <td class="centradoHorizontal"><strong>Permiso de embarque</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO' }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                        (nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO') : "-" }}</td>
                                     <td class="centradoHorizontal">-</td>
                                     <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
                                     <td class="centradoHorizontal"><strong>Estibado y trimado</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A' }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                        (nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A') : "-" }}</td>
                                     <td class="centradoHorizontal">-</td>
                                     <td class="centradoHorizontal">-</td>
                                 </tr>
                                 <tr>
                                     <td class="centradoHorizontal"><strong>Fumigación</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.fumigacion }}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe }}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion }}</td>
+                                    <td class="centradoHorizontal">{{ nominacion?.nominacionDetalleIntervencion != null &&
+                                        nominacion?.nominacionDetalleIntervencion?.fumigacion != null ?
+                                        nominacion?.nominacionDetalleIntervencion?.fumigacion : "-" }}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null 
+                                        && nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe != null ? 
+                                        nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe : "-"}}</td>
+                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
+                                        nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion != null ? 
+                                        nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion : "-"}}</td>
                                 </tr>                              
                            
                             </tbody>
@@ -220,11 +246,13 @@
                                 <tbody *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index" [attr.data-index]="i"
                                     style="text-align: center;">
                                     <tr>                                       
-                                        <td class="centradoHorizontal">{{intervencion?.exportador?.nombre }}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.tieneSenasa == true ? 'SI' : 'NO'}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.consumo }}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.aCuentaDe }}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.destino?.nombre }}</td>
+                                        <td class="centradoHorizontal">{{intervencion != null ?
+                                            intervencion?.exportador?.nombre : "-" }}</td>
+                                        <td class="centradoHorizontal">{{intervencion != null ? 
+                                            (intervencion?.tieneSenasa == true ? 'SI' : 'NO') : "-"}}</td>
+                                        <td class="centradoHorizontal">{{intervencion != null ? intervencion?.consumo : "-"}}</td>
+                                        <td class="centradoHorizontal">{{intervencion != null ? intervencion?.aCuentaDe : "-"}}</td>
+                                        <td class="centradoHorizontal">{{intervencion?.destino != null ? intervencion?.destino?.nombre : "-"}}</td>
                                         <td class="centradoHorizontal">{{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
                                         <td class="centradoHorizontal">{{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
                                         <td class="centradoHorizontal">{{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
