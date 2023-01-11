@@ -15,8 +15,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   private listaBuques;
   private listaMuelles;
   private configListaMultiple;
-  private filtroBuquedaForm: FormGroup;
-  fecha = this.AnioMesActual();
+  private filtroBuquedaForm: FormGroup; ;
   combos: any;
   filtros = new Subject<any>();
   public estaCargando = true;
@@ -56,8 +55,13 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       unSelectAllText: 'Desmarcar Todos',
     };
   }
-  public AnioMesActual() {
-    return new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+
+  private SetearAnioMesActual(){
+    const date= new Date()
+    const month=("0" + (date.getMonth() + 1)).slice(-2)
+    const year=date.getFullYear();
+    this.filtroBuquedaForm['controls'].fecha.setValue(`${year}-${month}`)
+
   }
 
   public setFiltroBuquedaForm() {
@@ -65,8 +69,11 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       producto: '',
       buque: '',
       muelle: '',
-      fecha: this.AnioMesActual(),
+      fecha: '',
     });
+    
+    this.SetearAnioMesActual();
+
   }
 
   onLimpiarFiltros() {

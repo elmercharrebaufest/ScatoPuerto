@@ -31,7 +31,7 @@ export class ProgramaEmbarqueComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Enviar_LineUp);
   }
   tienePermisoCrearNuevaNominacion() {
-    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Nominar);
+    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Guardar);
   }
 
 }
