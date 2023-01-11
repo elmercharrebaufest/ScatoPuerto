@@ -20,9 +20,11 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         private static ProgramaEmbarqueDto ListarProgramaEmbarque(DbContext contexto)
         {
 
-            var hoy = DateTime.Now.AddHours(24);
+            var hoy = DateTime.Now;
+            var ayer = hoy.AddDays(-1);
             ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
             var resultado = from item in contexto.Set<Nominacion>()
+                            where (item.FechaEliminacion == null || (ayer < item.FechaEliminacion.Value && item.FechaEliminacion.Value < hoy))
                             select new
                             {
                                 Producto = item.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles,

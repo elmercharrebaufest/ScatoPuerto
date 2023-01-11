@@ -133,8 +133,8 @@
                     <div class='icon-surveyor'
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
                 </td>
-                <td class="noBorder centradoHorizontal">
-                    <div class="btn-group">
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoParaNominar()'>
+                    <div class="btn-group" *ngIf="!historial.fechaEliminacion">
                         <button type="button" class="btn dropdown-toggle estiloBoton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           <strong>Nominar</strong>
                         </button>

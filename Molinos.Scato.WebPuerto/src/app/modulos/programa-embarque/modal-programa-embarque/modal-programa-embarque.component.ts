@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
@@ -25,7 +25,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public nominacion: any;
   subscripcionProgramaModal: Subscription
   estaCargando: boolean;
-  
+  @Output() cerrar = new EventEmitter<void>()
   //#endregion
 
   // #region Observables
@@ -50,5 +50,8 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   public retornarColor(color){
     return color;
+  }
+  cerraModal(){
+    this.cerrar.emit();
   }
 }
