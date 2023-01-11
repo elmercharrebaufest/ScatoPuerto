@@ -129,7 +129,6 @@ export class NominacionDatoTecnicoRegistroService {
     public validacionGrabar(datoTecnicoForm: FormGroup): boolean {
         let bValidacion: boolean = true;
         const tituloMensaje = 'Registro Nominación - Dato Tecnico';
-        console.log('datoTecnicoForm-->>', datoTecnicoForm.invalid);
         if (datoTecnicoForm.invalid == true){
             this.confirmationDialogService.confirm(tituloMensaje, 'Revise que este completado los campos marcados en rojo, asi como la información en Destino, Cliente y Cargador.', 'Cerrar', '', null, null, Tipoalerta.Warning);
             bValidacion = false;
