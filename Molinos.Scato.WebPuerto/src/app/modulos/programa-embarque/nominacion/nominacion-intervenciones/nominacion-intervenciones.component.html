@@ -1,6 +1,6 @@
 <ship-spinner [message]="mensajeIntervencion" *ngIf="cargandoDatoIntervencion"></ship-spinner>
 
-<div [formGroup]="formIntervenciones">
+<div *ngIf="formIntervenciones" [formGroup]="formIntervenciones">
     <!-- Bodegas -->
     <div class="row form-row center">
         <!-- Precintado de bodegas -->
@@ -11,16 +11,16 @@
                 </div>
                 <div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" id="precintadoBodegasSi"
+                        <input class="form-check-input" type="radio" id="precintadoSi"
                             formControlName="precintado" [value]="true">
-                        <label class="form-check-label" for="precintadoBodegasSi">Si</label>
+                        <label class="form-check-label" for="precintadoSi">Si</label>
                     </div>
                 </div>
                 <div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" id="precintadoBodegasNo"
+                        <input class="form-check-input" type="radio" id="precintadoNo"
                             formControlName="precintado" [value]="false">
-                        <label class="form-check-label" for="precintadoBodegasNo">No</label>
+                        <label class="form-check-label" for="precintadoNo">No</label>
                     </div>
                 </div>
             </div>
