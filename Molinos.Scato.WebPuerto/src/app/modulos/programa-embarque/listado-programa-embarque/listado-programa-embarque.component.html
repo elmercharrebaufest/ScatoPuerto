@@ -139,10 +139,10 @@
                           <strong>Nominar</strong>
                         </button>
                         <div class="dropdown-menu">
-                          <a class="dropdown-item cursor">Fumigador</a>
-                          <a class="dropdown-item cursor">Surveyor</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Fumigador')">Fumigador</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Surveyor')">Surveyor</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item cursor">Otros</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
                         </div>
                       </div>
                 </td>

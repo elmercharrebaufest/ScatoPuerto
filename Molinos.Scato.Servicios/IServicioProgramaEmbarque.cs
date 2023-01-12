@@ -95,5 +95,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarNominacion(int nominacion_id);
+
+        [OperationContract]
+        MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipo);
     }
 }

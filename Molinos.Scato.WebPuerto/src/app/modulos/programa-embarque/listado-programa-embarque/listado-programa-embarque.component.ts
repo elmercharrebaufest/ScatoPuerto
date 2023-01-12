@@ -1,18 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { ProgramaEmbarqueService } from '@ScatoServicios/programa-embarque.service';
 import { Subscription } from 'rxjs';
-import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
-import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
-import { FiltroProgramaEmbarqueComponent } from '../filtro-programa-embarque/filtro-programa-embarque.component';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-
+import { Mail } from '@ScatoModels/mail';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { AlertService } from '@ScatoServicios/alert.service';
+import { Alerta } from '@ScatoModels/alerta';
+import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+
 
 @Component({
   selector: 'app-listado-programa-embarque',
@@ -47,13 +47,14 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
+  @Output() hideSpinner = new EventEmitter<boolean>();
   //#endregion
   constructor(private progamaService: ProgramaEmbarqueService,
     private modalService: NgbModal,
     private route: Router,
     public config: NgbModalConfig,
-    confirmationDialogService: ConfirmationDialogService,
-    public session: SessionService) {
+    confirmationDialogService: EnvioMailDialogService,
+    public session: SessionService, private alertService: AlertService,) {
     this.confirmationDialogService = confirmationDialogService;
     this.user = this.session.getUser();
 
@@ -208,5 +209,48 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
       }).catch();
 
   }
+
+  enviarMail(nominacionId: number, nombreBuque, tipoDeMail) {
+    var titulo = tipoDeMail;
+    var asunto = nombreBuque;
+    var text = "Cuerpo del mail:";
+    var inputPara = "Para:";
+    var inputTitleCopia = "CC:";
+    var mail = new Mail();
+    this.progamaService.ObtenerDatosMailProgramaEmbarque(nominacionId, tipoDeMail).subscribe(
+      (data: any) => {
+        mail.body = data.body,
+        mail.destinatarios = data.destinatarios,
+        mail.copia = data.copia
+      }
+    )   
+  
+    var button1 = 'Enviar';
+    var button2 = 'Cancelar';   
+    this.confirmationDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia,true)
+        .then((confirmed) => {
+        if (confirmed) {
+            this.hideSpinner.emit(true);
+            this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(data => {
+                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', 'Cerrar', '', null, null, Tipoalerta.Success)
+                    .then((confirmed) => {
+                    if (confirmed) {
+                        this.hideSpinner.emit(false);
+                        return;
+                    }
+                }).catch(() => window.location.reload());
+            }, error => {
+                this.alertService.mostrar(new Alerta(error.error, Tipoalerta.Error));
+                this.hideSpinner.emit(false);
+            });
+        }
+        else
+            this.hideSpinner.emit(false);
+    })
+        .catch(() => {
+        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+        this.hideSpinner.emit(false);
+    });
+}
 
 }

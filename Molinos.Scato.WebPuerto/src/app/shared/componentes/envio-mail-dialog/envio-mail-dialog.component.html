@@ -1,0 +1,58 @@
+<div class="margenes cierre" [ngClass]="{'bg-danger': esTipoError(), 'bg-warning': esTipoWarning()}">
+    <button type="button" class="close" aria-label="Close" (click)="dismiss()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <label><strong class="titulo">{{ title }}</strong></label>
+</div>
+<div class="line"></div>
+<div class="modal-body mb-4 cuerpoMail">
+    <div class="row">
+        <div class="col-md-1">
+            <strong>
+                <div [innerHTML]="inputPara"></div>
+            </strong>
+        </div>
+        <div class="col-md-11">
+            <tag-input *ngIf="mail != null" [(ngModel)]="mail.destinatarios" [modelAsStrings]="true"
+                [placeholder]="'Destinatarios'" [secondaryPlaceholder]="'Destinatarios'"
+                [validators]="validators"></tag-input>
+        </div>
+    </div>
+    <br>
+    <div class="separador"></div>
+    <br>
+    <div class="row">
+        <div class="col-md-1">
+            <strong>
+                <div [innerHTML]="inputCopia"></div>
+            </strong>
+        </div>
+        <div class="col-md-11">
+            <tag-input *ngIf="mail != null" [(ngModel)]="mail.copia" [modelAsStrings]="true" [placeholder]="'Copia'"
+                [secondaryPlaceholder]="'Copia'" [validators]="validators"></tag-input>
+        </div>
+    </div>
+    <br>
+    <div class="separador"></div>
+    <br>
+    <div class="row">
+        <div class="col-md-1">
+            <strong>Asunto:</strong>
+        </div>
+       <div class="col-md-11">
+        <div [innerHTML]="asunto"></div>
+       </div>   
+    </div>    
+    <br>
+    <div class="separador"></div>
+    <br>
+    <strong><div [innerHTML]="message"></div></strong>
+    <br>
+    
+    <div contenteditable="true" >{{mail.body}}</div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="decline()" [hidden]="!btnCancelVisible()">{{
+        btnCancelText }}</button>
+    <button type="button" ngbAutofocus class="btn btn-primary" (click)="accept()">{{ btnOkText }}</button>
+</div>
