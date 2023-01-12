@@ -520,6 +520,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]        
+        [Route("api/ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque")]
+        public HttpResponseMessage ObtenerDatosMailProgramaEmbarque(int nominacionId, string tipoDeMail)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
+                );
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+       
+
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp_Ver)]
