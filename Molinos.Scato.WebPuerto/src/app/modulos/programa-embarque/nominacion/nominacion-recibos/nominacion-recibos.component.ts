@@ -49,21 +49,21 @@ export class NominacionRecibosComponent implements OnInit {
 
   agregarRecibo() {
     this.recibosFormArray.push(this.fb.group({
-      id                  :[ ''   ],
-      numeroRecibo        :[ '0'  ],
-      exportador          :[ ''   ],
-      formato             :[ ''   ],
-      unidad              :[ ''   ],
-      cantidad            :[ '0'   ],
-      ajuste              :[ ''   ],
-      puertoDeCarga       :[ ''   ],
-      puertoDeDescarga    :[ ''   ],
-      descripcionesBienes :[ ''   ],
-      recibosPorDia       :[ false],
-      mostrarDestinos     :[ false],
-      mostrarBodegas      :[ false],
+      id: [''],
+      numeroRecibo: ['0'],
+      exportador: [''],
+      formato: [''],
+      unidad: [''],
+      cantidad: ['0'],
+      ajuste: [''],
+      puertoDeCarga: [''],
+      puertoDeDescarga: [''],
+      descripcionesBienes: [''],
+      recibosPorDia: [false],
+      mostrarDestinos: [false],
+      mostrarBodegas: [false],
     }));
-    this.recibosFormArray['controls'].forEach(item=>{
+    this.recibosFormArray['controls'].forEach(item => {
       const formulario: FormGroup = (item as FormGroup);
       const recibosPorDia = item['controls'].recibosPorDia.value;
       const mostrarDestinos = item['controls'].mostrarDestinos.value;
@@ -80,31 +80,31 @@ export class NominacionRecibosComponent implements OnInit {
     this._nominacionParametros = value;
   }
 
-  public crearObjectoRecibos(): NominacionRecibo[]{
+  public crearObjectoRecibos(): NominacionRecibo[] {
     let nominacionRecibo: NominacionRecibo[] = null;
     const recibos = this.formRecibos.controls["recibos"].value;
-    if (recibos!=null)
+    if (recibos != null)
       nominacionRecibo = recibos;
     return nominacionRecibo;
   }
   public validarCreacionRecibo(): boolean {
     let bValidacion: boolean = true;
-    this.recibosFormArray['controls'].forEach(item=>{
-    const exportador = item['controls'].exportador.value;
-    const formato = item['controls'].formato.value;
-      if (exportador == '' || formato == ''){
+    this.recibosFormArray['controls'].forEach(item => {
+      const exportador = item['controls'].exportador.value;
+      const formato = item['controls'].formato.value;
+      if (exportador == '' || formato == '') {
         bValidacion = false;
       }
     });
-    if (!bValidacion) this.confirmationDialogService.confirm('Registro Nominación - Recibos', 'Debe completar ingresar el exportador y formato.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+    if (!bValidacion) this.confirmationDialogService.confirm('Registro Nominación - Recibos', 'Debe completar ingresar el cargador y formato.', 'Aceptar', '', null, null, Tipoalerta.Warning);
     return bValidacion;
   }
   get recibosFormArray(): FormArray {
     return this.formRecibos.get("recibos") as FormArray
   }
-  private actualizarListaExportadores(){
-    this.nominacionService.NominacionExportadores.subscribe( (data:NominacionExportadores) =>{
-      if (data!=null && data.actualizar){
+  private actualizarListaExportadores() {
+    this.nominacionService.NominacionExportadores.subscribe((data: NominacionExportadores) => {
+      if (data != null && data.actualizar) {
         this.nominacionDatoTecnicoRegistroService.listarExportadores().pipe(takeUntil(this.destroy$)).subscribe((exportadores: Exportador[]) => {
           this.exportadores = exportadores;
           this.exportadores = this.exportadores.filter((expoData: Exportador) => {
@@ -136,7 +136,7 @@ export class NominacionRecibosComponent implements OnInit {
           mostrarBodegas: [{ value: element == null ? false : element.mostrarBodegas == true ? true : false, disabled: false }],
         }));
       });
-      this.recibosFormArray['controls'].forEach(item=>{
+      this.recibosFormArray['controls'].forEach(item => {
         const formulario: FormGroup = (item as FormGroup);
         const recibosPorDia = item['controls'].recibosPorDia.value;
         const mostrarDestinos = item['controls'].mostrarDestinos.value;
@@ -166,17 +166,17 @@ export class NominacionRecibosComponent implements OnInit {
     });
   }
 
-  private cargarFormulario(){
+  private cargarFormulario() {
     this.mensajeRecibos = Mensajes.cargando;
     this.cargandoRecibos = true;
-    this.nominacionService.obtenerNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+    this.nominacionService.obtenerNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.cargandoRecibos = false;
       this.inicializarFormEdicion(data.nominacionRecibo);
     });
   }
 
   onGuardarRecibos() {
-    if (this.validarCreacionRecibo()){
+    if (this.validarCreacionRecibo()) {
       this.mensajeRecibos = Mensajes.grabando;
       this.cargandoRecibos = true;
       this.programaEmbarqueService.registrarNominacionRecibo(this.nominacionId, this.formRecibos.controls["recibos"].value).subscribe((res: any) => {
@@ -187,7 +187,7 @@ export class NominacionRecibosComponent implements OnInit {
     }
   }
 
-  onCancelarRecibos(){
+  onCancelarRecibos() {
     const nominacionId = this._nominacionParametros.nominacion.id;
     this.inicializarFormNuevo();
     this.cargarFormulario();
@@ -204,21 +204,22 @@ export class NominacionRecibosComponent implements OnInit {
     });
   }
 
-  onActivarCantidad(recibo: FormGroup,estado: boolean) {
-    if (estado)
+  onActivarCantidad(recibo: FormGroup, estado: boolean) {
+    if (estado) {
       recibo.controls['cantidad'].disable();
-    else
-      recibo.controls['cantidad'].enable();  
+      recibo.controls['cantidad'].setValue('');
+    }
+    else {
+      recibo.controls['cantidad'].enable();
+    }
   }
 
-  onActivarDischargePort(recibo: FormGroup,estado: boolean) {
-    recibo.controls['puertoDeDescarga'].enable();
-    if (!estado){
-      recibo.controls['puertoDeDescarga'].setValue('-');
+  onActivarDischargePort(recibo: FormGroup, estado: boolean) {
+    if (!estado) {
       recibo.controls['puertoDeDescarga'].disable();
-    }
-    else{
       recibo.controls['puertoDeDescarga'].setValue('');
+    }
+    else {
       recibo.controls['puertoDeDescarga'].enable();
     }
   }
@@ -227,7 +228,7 @@ export class NominacionRecibosComponent implements OnInit {
     (this.formRecibos.controls["recibos"] as FormArray).removeAt(i);
   }
   getNumeroRecibo(recibo) {
-    return recibo.controls.numeroRecibo.value; 
+    return recibo.controls.numeroRecibo.value;
   }
   public inicializarFormNuevo() {
     this.formRecibos = this.fb.group({
@@ -245,7 +246,7 @@ export class NominacionRecibosComponent implements OnInit {
     return true;
   }
 }
-enum Mensajes{
+enum Mensajes {
   cargando = "Cargando información de recibos. Por favor, espere...",
   grabando = "Guardando información de recibos. Por favor, espere...",
   listados = "Cargando listados de recibos. Por favor, espere...",
