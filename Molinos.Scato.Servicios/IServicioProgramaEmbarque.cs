@@ -96,7 +96,6 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario);
-        
         [OperationContract]
         MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipo);
 
