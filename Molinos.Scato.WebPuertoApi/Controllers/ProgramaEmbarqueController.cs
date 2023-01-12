@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
@@ -467,7 +468,55 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 servicioProgramaEmbarque.EliminarNotificacion(notificacion.Id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
+			}
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/EnviarMailProgramaEmbarque")]
+        public void EnviarMailProgramaEmbarque(MailDto mail)
+        {
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+       
+            try
+            {
 
+                if (!HttpContext.Current.Request.IsLocal)
+                    // mail.Destinatarios.Add("scatoprodMOA@molinosagro.com.ar");
+
+                    // CARACTERES NO IMPRIMIBLES:
+                    // Enter: (\n -> <br/>)
+                    // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
+                    // Negrita: (\f -> <b>) (\f\f -> </b>)
+                    // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
+                    comandos.Ejecutar(new EnvioMail
+                {
+                    //Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                    //    .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                    //Destinatarios = mail.Destinatarios,
+                    //Titulo = $"Programa de embarque {DateTime.Now:dd-MM-yyyy HH:mm}",                   
+                    //AttachmentName = null
+                });
+            }
+            catch (Exception e)
+            {
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                throw new HttpResponseException(response);
+            }
+        }
+
+        [HttpGet]        
+        [Route("api/ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque")]
+        public HttpResponseMessage ObtenerDatosMailProgramaEmbarque(int nominacionId, string tipoDeMail)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
+                );
             }
             catch (Exception ex)
             {

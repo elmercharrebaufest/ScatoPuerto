@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Mail } from '@ScatoModels/mail';
 import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
 import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
 import { NominacionDetalleIntervencion } from '@ScatoModels/programa-embarque/nominacion-detalle-intervencion';
@@ -114,6 +115,14 @@ export class ProgramaEmbarqueService {
 
     public EliminarNominacion(id: number){
       return this.http.post(`${this.url}ProgramaEmbarque/EliminarNominacion?nominacion_id=${id}`, { 'withCredentials': true });
+    }
+
+    public ObtenerDatosMailProgramaEmbarque(nominacionId: number, tipoDeMail: string) {
+      return this.http.get(`${this.url}ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque?nominacionId=${nominacionId}&tipoDeMail=${tipoDeMail}`,{ 'withCredentials': true });
+    }
+
+    public EnviarMailProgramaEmbarque(mail: Mail) {
+      return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque`,mail,{ 'withCredentials': true });
     }
   // #endregion
 

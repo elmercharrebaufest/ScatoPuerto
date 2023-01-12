@@ -292,7 +292,7 @@ namespace Molinos.Scato.Servicios.Impl
                         nominacionReciboDB.NumeroRecibo = recibo.NumeroRecibo;
                         nominacionReciboDB.Formato = recibo.Formato;
                         nominacionReciboDB.Exportador = repositorio.Obtener<Exportador>(x => x.Id == recibo.Exportador.Id);
-                        nominacionReciboDB.RecibosPorDia = recibo.RecibosPorDia; 
+                        nominacionReciboDB.RecibosPorDia = recibo.RecibosPorDia;
                         nominacionReciboDB.MostrarDestinos = recibo.MostrarDestinos;
                         nominacionReciboDB.MostrarBodegas = recibo.MostrarBodegas;
                         nominacionReciboDB.Cantidad = recibo.Cantidad;
@@ -349,7 +349,7 @@ namespace Molinos.Scato.Servicios.Impl
             var listaNominaciones = Listar<Nominacion, NominacionDto>(x => x.NominacionDatoTecnico.MaterialPuerto.Id == nominacion.MaterialPuerto.Id &&
                                                                       x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
                                                                       x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
-                                                                      x.FechaEliminacion == null && 
+                                                                      x.FechaEliminacion == null &&
                                                                       x.Id != nominacion.Id);
             if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;
@@ -535,6 +535,42 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
+        }
+        
+        public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
+        {
+            // CARACTERES NO IMPRIMIBLES:
+            // Enter: (\n -> <br/>)
+            // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
+            // Negrita: (\f -> <b>) (\f\f -> </b>)
+            // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
+            var copia = new List<string>();
+            copia.Add(tipoDeMail == "Surveyor" ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" ?
+                nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+            var mail = new MailDto
+            {
+                Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
+                Copia = copia,
+            };
+            var body = "Estimados, por favor notar que fueron nominados para actuar en la carga del buque de referencia \n";
+            body += $"<b>CLIENTE</b>";
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
+            {
+                body += string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(x => x.CoordinadorPuerto.Nombre)) + "&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+            else
+            {
+                body += $" - &nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+            body += $" <b>NOMBRE BUQUE</b>                {(nominacion.NominacionDatoTecnico?.VaporInformacion != null && string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.NombreBuque) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque : "-") } <br/>";
+            body += $" \fMUELLE DE CARGA\f\f              {(nominacion.NominacionDatoTecnico?.MuelleDeCarga != null && string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion : "-") } \t>";
+            body += $" \fBANDERA\f\f                      {(nominacion.NominacionDatoTecnico?.VaporInformacion != null && nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera != null && string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.Bandera.Nombre) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera.Nombre : "-")} \n>";
+            body += $" \f LOADING RATE\f\f                {(nominacion.NominacionDatoTecnico?.TasaDeCargaValor != null ? nominacion.NominacionDatoTecnico?.TasaDeCargaValor : 0)}"; 
+            body += $"{(nominacion.NominacionDatoTecnico?.TasaDeCarga != null && nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion != null && string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion : " - ")} \t>"; 
+            body += $" \fATA\f\f                         {(nominacion.NominacionDatoTecnico?.ATAPuerto != null && nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre != null && string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre : "-")} \n>";
+
+            mail.Body = body;
+            return mail;
         }
 
         #region Metodos Utiles
