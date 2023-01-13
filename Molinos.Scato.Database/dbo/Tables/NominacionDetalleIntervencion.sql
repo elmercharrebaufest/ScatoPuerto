@@ -17,3 +17,22 @@ CONSTRAINT [FK_dbo.NominacionDetalleIntervencion_dbo.NominacionDetalleIntervenci
 
 )
 
+
+GO
+
+CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
+    ON [dbo].[NominacionDetalleIntervencion]
+    FOR  UPDATE
+    AS
+    BEGIN
+        IF((select CompaniaACuentaDe from deleted) <> (select CompaniaACuentaDe from inserted) )
+        BEGIN
+        insert into Auditoria
+        SELECT 'NominacionDetalleIntervencion', 'CompaniaACuentaDe', d.CompaniaACuentaDe,
+	        i.CompaniaACuentaDe , GETDATE()
+             FROM deleted AS d
+             JOIN inserted AS i
+             ON d.Id=i.Id
+
+        END
+    END

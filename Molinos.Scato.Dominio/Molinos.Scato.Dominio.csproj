@@ -980,6 +980,7 @@
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
+    <Compile Include="Entidades\Auditoria.cs" />
     <Compile Include="Entidades\BalanzasCortes.cs" />
     <Compile Include="Entidades\CalidadValor.cs" />
     <Compile Include="Entidades\CaracteristicasCartaPorteOtrosPuertos.cs" />
