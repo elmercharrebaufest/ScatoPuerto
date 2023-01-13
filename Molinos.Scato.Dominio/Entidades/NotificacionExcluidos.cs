@@ -10,6 +10,6 @@ namespace Molinos.Scato.Dominio.Entidades
         [Key]
         public virtual int Id { get; set; }
         public virtual string Username { get; set; }
-        public Notificacion Notificacion { get; set; }
+        public NotificacionProgramaDeEmbarque NotificacionProgramaDeEmbarque { get; set; }
     }
 }
