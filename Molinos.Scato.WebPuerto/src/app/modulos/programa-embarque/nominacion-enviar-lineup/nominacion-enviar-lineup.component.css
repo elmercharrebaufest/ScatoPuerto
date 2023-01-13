@@ -1,0 +1,26 @@
+.borde-izquierda{
+    border-radius: 5px 0px 0px 5px;
+}
+.borde-derecha{
+    border-radius: 0px 8px 0px 0px;
+}
+.sin-bordes{
+    border-right: none;
+    border-left: none;
+}
+.tabla-sin-border{
+    border: 0px !important;
+    border-spacing: 0px 0.5rem !important;
+    border-collapse: separate !important;
+}
+.fondo-cabecera {
+    border: 0;
+    border-radius: 4px 4px 0px 0px;
+    background-color: #666666;
+    color:white;
+    font-size: 14px;
+}
+input.largerCheckbox {
+    transform : scale(1.3);
+    margin-left: 10px;
+}

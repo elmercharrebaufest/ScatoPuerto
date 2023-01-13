@@ -10,7 +10,7 @@
     <div class="row" *ngIf='tienePermisoEnviarALineUp()'>
         <div class="col-md-10"></div>        
         <div class="col-md-2 alinearAlFinal">
-            <button class="btn enviarLineUp">ENVIAR A LINE UP</button>
+            <button class="btn enviarLineUp" (click)="onOpenModalEnviarLineUp(addPE)">ENVIAR A LINE UP</button>
         </div>
     </div>
     <br>
@@ -26,3 +26,7 @@
     </div>
   
 </div>
+
+<ng-template #addPE let-modal>
+    <app-nominacion-enviar-lineup (cerrar)="modal.dismiss()"></app-nominacion-enviar-lineup>
+</ng-template>

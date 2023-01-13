@@ -1,5 +1,4 @@
-﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
@@ -10,6 +9,7 @@ using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
@@ -855,6 +855,63 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
+
+public IList<VaporInformacionDto> ListarBuquesNominacion()
+        {
+            var listaNominacion = Listar<Nominacion, NominacionDto>(x => x.FechaEliminacion == null && x.FechaEnvioLineUp == null);
+            var listaVapores = listaNominacion.Select(s => s.NominacionDatoTecnico.VaporInformacion);
+            listaVapores = listaVapores.Distinct().ToArray();
+            List<VaporInformacionDto> vapores = new List<VaporInformacionDto>();
+            foreach(var vapor in listaVapores)
+            {
+                if (vapores.FindIndex(x=> x.Id == vapor.Id) == -1)
+                    vapores.Add(vapor);
+            }
+            return vapores;
+        }
+
+        public IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id)
+        {
+
+            List<NominacionLineUpDto> nominacionLineUps = new List<NominacionLineUpDto>();
+            NominacionLineUpDto nominacionLineUpDto = null;
+            var listaNominacion = Listar<Nominacion, NominacionDto>(x => x.FechaEliminacion == null && x.FechaEnvioLineUp == null && x.NominacionDatoTecnico.VaporInformacion.Id == vaporInformacion_Id) ;
+            foreach (var nominacion in listaNominacion)
+            {
+                nominacionLineUpDto = new NominacionLineUpDto();
+                nominacionLineUpDto.Nominacion_Id = nominacion.Id;
+                nominacionLineUpDto.MaterialPuerto = nominacion.NominacionDatoTecnico.MaterialPuerto;
+                nominacionLineUpDto.MuelleDeCarga = nominacion.NominacionDatoTecnico.MuelleDeCarga;
+                nominacionLineUpDto.Embarque_Id = nominacion.Embarque == null ? 0 : nominacion.Embarque.Id;
+                nominacionLineUpDto.EnviadoLineUp = nominacion.FechaEnvioLineUp !=null? true : false;
+                nominacionLineUpDto.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
+
+                var cargadorPorCantidad = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => new
+                {
+                    Exportador = x.Exportador,
+                    Cantidad = x.Cantidad
+                }).GroupBy(s => new { s.Exportador })
+                .Select(g => new
+                {
+                    Exportador = g.Key.Exportador,
+                    Cantidad = g.Sum(x=> x.Cantidad)
+                });
+                Collection<NominacionCargadorPorCantidadDto> mominacionCargadorPorCantidad = new Collection<NominacionCargadorPorCantidadDto>();
+                foreach (var cargador in cargadorPorCantidad)
+                {
+                    mominacionCargadorPorCantidad.Add(new NominacionCargadorPorCantidadDto
+                    {
+                        Exportador = cargador.Exportador,
+                        Cantidad = cargador.Cantidad
+                    });
+                }
+                nominacionLineUpDto.NominacionCargadorPorCantidad = mominacionCargadorPorCantidad;
+                nominacionLineUps.Add(nominacionLineUpDto);
+            }
+            return nominacionLineUps;
+        }
+
 
 
         #region Metodos Utiles

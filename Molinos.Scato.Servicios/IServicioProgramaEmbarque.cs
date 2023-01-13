@@ -107,5 +107,12 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);
+        
+        
+        [OperationContract]
+        IList<VaporInformacionDto> ListarBuquesNominacion();
+
+        [OperationContract]
+        IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id);
     }
 }
