@@ -473,6 +473,70 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public void EliminarNotificacion(int notificacion_id, string username)
+        {
+            try
+            {
+                var notificacionExcluidos = repositorio.Agregar(new NotificacionExcluidos
+                {
+                    Notificacion = repositorio.Obtener<Notificacion>(x => x.Id == notificacion_id),
+                    Username = username
+                });
+
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public IList<NotificacionDto> ObtenerNotificaciones(string nombreUsuario)
+        {
+            try
+            {
+                //Busco todas las notificaciones
+                var notificaciones = repositorio.Listar<Notificacion>();
+                var excluidas = repositorio.Listar<NotificacionExcluidos>().ToList();
+                if (notificaciones != null && notificaciones.Count > 0)
+                {
+                    foreach (Notificacion notificacion in notificaciones.ToList())
+                    {
+                        //Elimino de la base todas las anteriores a 10 días desde su creación.
+                        if (notificacion.Hora < DateTime.Now.AddDays(-10))
+                        {
+                            //también elimino las excluidas para que no explota la base.
+                            repositorio.RemoverTodos<NotificacionExcluidos>(excluidas.Where(x => x.Notificacion.Id == notificacion.Id));
+                            repositorio.Remover(notificacion);
+
+                        }
+                    }
+
+                    //guardo los cambios
+                    repositorio.GuardarCambios();
+                }
+
+                var notificacionesDto = Listar<Notificacion,NotificacionDto>();
+
+                var excluidasUsuario = repositorio.Listar<NotificacionExcluidos>(x => x.Username == nombreUsuario);
+
+                foreach (NotificacionDto notificacion1 in notificacionesDto.ToList())
+                {
+                    if(excluidasUsuario.Any(x => x.Notificacion.Id == notificacion1.Id))
+                    {
+                        notificacionesDto.Remove(notificacion1);
+                    }
+                }
+
+                return notificacionesDto;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {

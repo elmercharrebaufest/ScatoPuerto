@@ -1,0 +1,27 @@
+<div id="notificationDialog" *ngIf="notificaciones && notificaciones.length > 0"
+    class="popUpNotificaciones main-div">
+    <perfect-scrollbar [config]="{suppressScrollX: true, useBothWheelAxes: false, wheelSpeed: 0.2}">
+        <tbody>
+            <table id="tableNotificaciones">
+                <tr *ngFor="let item of notificaciones; let i; trackBy:trackByFn"
+                    >
+                    <div [@deleteItem]="item == deletedElement ? 'collapsed' : 'expanded'" class="row form-row col-12 negritaHover" style="text-align: right;">
+                        <div class="form-group col-8 text center-text-vertical"
+                            style="text-align: initial; width: 300px;">
+                            {{item.mensaje}}
+                        </div>
+                        <div class="form-group col-3 text center-text-vertical">
+                            {{item.hora | date: 'hh:mm'}}
+                            {{item.hora | date: 'dd/MM/yyyy'}}
+                        </div>
+                        <div class="form-group col-1 center-text-vertical">
+                            <img src="assets/trashIcon-no-border.svg" (click)="onEliminarNotificacion(item)"
+                                class="basurerito" style="cursor: pointer;">
+                        </div>
+                    </div>
+                    <hr *ngIf='i < notificaciones.length-1'>
+                </tr>
+            </table>
+        </tbody>
+    </perfect-scrollbar>
+</div>

@@ -32,6 +32,7 @@ import { CardBuqueComponent } from './modulos/geo/card-buque/card-buque.componen
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
 import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-balanzas.component";
 import { AltaBajaMantenimientoComponent } from './alta-baja-mantenimiento/alta-baja-mantenimiento.component';
+import { NotificacionesComponent } from "./notificaciones/notificaciones.component";
 
 const components = [
     AlertComponent,
@@ -53,7 +54,8 @@ const components = [
     NavtabsCalidadComponent,
     CardBuqueComponent,
     EditarCrearBuquesComponent,
-    AltaBajaMantenimientoComponent
+    AltaBajaMantenimientoComponent,
+    NotificacionesComponent
 ]
 const libs = [
     CommonModule,

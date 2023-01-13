@@ -18,8 +18,15 @@
     <label class="form-control mx-0">Usuario: {{session.getUser().username}}</label>
   </div>
   <div class='center-imgs'>
-    <button type="button" class="btn btn-light btn-sm bg-white rounded-img mr-2"><img class="mx-2" src="assets/notificationsBell.svg"></button>
+    <div class="notification-number" *ngIf="_cantidadNotificaciones > 0">
+      {{_cantidadNotificaciones}}
+    </div>
+    <button type="button" class="btn btn-light btn-sm bg-white rounded-img mr-2"><img class="mx-2" src="assets/notificationsBell.svg" (click)="showNotificacionesVisibles()"></button>
     <button type="button" class="btn btn-light btn-sm bg-white rounded-img"><img class="mx-2 img-user-rounded" src="assets/user.svg"></button>
   </div>
 </nav>
+<div *ngIf="notificacionesVisibles && router.url.includes('/programa')">
+  <app-notificaciones [notificaciones]="notificaciones" (eliminarNotificacion)="eliminarNotificacion($event)" (showNotifications)="showNotifications($event)"></app-notificaciones>
+</div>
+
 

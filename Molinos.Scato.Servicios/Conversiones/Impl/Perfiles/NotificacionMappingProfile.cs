@@ -5,7 +5,7 @@ using Molinos.Scato.Dominio.Entidades;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
-    public class NotifiacionMappingProfile : Profile
+    public class NotificacionMappingProfile : Profile
     {
         public override string ProfileName
         {

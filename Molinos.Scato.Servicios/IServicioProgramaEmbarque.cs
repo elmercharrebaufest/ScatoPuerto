@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceModel;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Molinos.Scato.Servicios
 {
@@ -95,5 +96,12 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarNominacion(int nominacion_id);
+
+
+        [OperationContract]
+        void EliminarNotificacion(int notificacion_id, string username);
+
+        [OperationContract]
+        IList<NotificacionDto> ObtenerNotificaciones(string nombreUsuario);
     }
 }
