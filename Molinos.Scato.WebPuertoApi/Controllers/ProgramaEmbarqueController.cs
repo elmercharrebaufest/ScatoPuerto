@@ -457,6 +457,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        //[HttpGet]
+        //[Autorizacion(PermisosScato.LineUp_Ver)]
+        //[Route("api/ProgramaEmbarque/ListarNotificaciones")]
+        //public HttpResponseMessage ListarNotificaciones()
+        //{
+        //    try
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ListarNotificaciones());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
+
 
     }
 }
