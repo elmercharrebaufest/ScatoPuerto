@@ -296,7 +296,7 @@ namespace Molinos.Scato.Servicios.Impl
             foreach (var puestoid in puestosId)
             {
                 var error = repositorio.ObtenerMayor<Notificacion, int>(x => x.TipoAlerta == TipoAlerta.Automatica && x.PuestoId == puestoid, x => x.Id);
-                if (error != null && !error.Leido)
+                if (error != null && error.Leido == false)
                 {
                     resultado.Add(conversor.Convertir<Notificacion, NotificacionDto>(error));
                 }
@@ -3905,7 +3905,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var lista =
                 Listar<Notificacion, NotificacionDto>(
-                    x => grupos.Contains(x.Grupo) && x.TipoAlerta != TipoAlerta.Sobre && !x.Leido, 30);
+                    x => grupos.Contains(x.Grupo) && x.TipoAlerta != TipoAlerta.Sobre && x.Leido == false, 30);
             return lista.OrderBy(x => x.TipoAlerta).ThenBy(x => x.Id).ToList();
         }
 
