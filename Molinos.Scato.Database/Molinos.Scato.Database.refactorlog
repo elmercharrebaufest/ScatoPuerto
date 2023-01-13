@@ -805,5 +805,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="VaporInformacion_Id" />
   </Operation>
-  
+  <Operation Name="Rename Refactor" Key="f29e2fe3-3b35-4b46-9e3b-1bedca9bd9e6" ChangeDateTime="01/13/2023 12:39:54">
+    <Property Name="ElementName" Value="[dbo].[NotificacionProgramaDeEmbarque].[Hora]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NotificacionProgramaDeEmbarque]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Fecha" />
+  </Operation>
 </Operations>

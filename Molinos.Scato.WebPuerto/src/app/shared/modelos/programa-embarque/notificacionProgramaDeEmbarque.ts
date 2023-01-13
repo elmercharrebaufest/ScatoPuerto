@@ -1,9 +1,9 @@
 import { Exportador } from "@ScatoModels/exportador";
 
-export class Notificacion {
+export class NotificacionProgramaDeEmbarque {
     id: number;
     mensaje: string;
-    hora: Date;
+    fecha: Date;
 }
 
 

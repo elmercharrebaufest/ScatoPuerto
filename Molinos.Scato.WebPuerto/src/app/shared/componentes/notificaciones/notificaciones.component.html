@@ -11,8 +11,8 @@
                             {{item.mensaje}}
                         </div>
                         <div class="form-group col-3 text center-text-vertical">
-                            {{item.hora | date: 'hh:mm'}}
-                            {{item.hora | date: 'dd/MM/yyyy'}}
+                            {{item.fecha | date: 'hh:mm'}}
+                            {{item.fecha | date: 'dd/MM/yyyy'}}
                         </div>
                         <div class="form-group col-1 center-text-vertical">
                             <img src="assets/trashIcon-no-border.svg" (click)="onEliminarNotificacion(item)"

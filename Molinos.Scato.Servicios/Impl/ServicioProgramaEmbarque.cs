@@ -479,7 +479,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var notificacionExcluidos = repositorio.Agregar(new NotificacionExcluidos
                 {
-                    Notificacion = repositorio.Obtener<Notificacion>(x => x.Id == notificacion_id),
+                    NotificacionProgramaDeEmbarque = repositorio.Obtener<NotificacionProgramaDeEmbarque>(x => x.Id == notificacion_id),
                     Username = username
                 });
 
@@ -492,22 +492,22 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public IList<NotificacionDto> ObtenerNotificaciones(string nombreUsuario)
+        public IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario)
         {
             try
             {
                 //Busco todas las notificaciones
-                var notificaciones = repositorio.Listar<Notificacion>();
+                var notificaciones = repositorio.Listar<NotificacionProgramaDeEmbarque>();
                 var excluidas = repositorio.Listar<NotificacionExcluidos>().ToList();
                 if (notificaciones != null && notificaciones.Count > 0)
                 {
-                    foreach (Notificacion notificacion in notificaciones.ToList())
+                    foreach (NotificacionProgramaDeEmbarque notificacion in notificaciones.ToList())
                     {
                         //Elimino de la base todas las anteriores a 10 días desde su creación.
-                        if (notificacion.Hora < DateTime.Now.AddDays(-10))
+                        if (notificacion.Fecha < DateTime.Now.AddDays(-10))
                         {
                             //también elimino las excluidas para que no explota la base.
-                            repositorio.RemoverTodos<NotificacionExcluidos>(excluidas.Where(x => x.Notificacion.Id == notificacion.Id));
+                            repositorio.RemoverTodos<NotificacionExcluidos>(excluidas.Where(x => x.NotificacionProgramaDeEmbarque.Id == notificacion.Id));
                             repositorio.Remover(notificacion);
 
                         }
@@ -517,13 +517,13 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.GuardarCambios();
                 }
 
-                var notificacionesDto = Listar<Notificacion,NotificacionDto>();
+                var notificacionesDto = Listar<NotificacionProgramaDeEmbarque, NotificacionProgramaDeEmbarqueDto>();
 
                 var excluidasUsuario = repositorio.Listar<NotificacionExcluidos>(x => x.Username == nombreUsuario);
 
-                foreach (NotificacionDto notificacion1 in notificacionesDto.ToList())
+                foreach (NotificacionProgramaDeEmbarqueDto notificacion1 in notificacionesDto.ToList())
                 {
-                    if(excluidasUsuario.Any(x => x.Notificacion.Id == notificacion1.Id))
+                    if(excluidasUsuario.Any(x => x.NotificacionProgramaDeEmbarque.Id == notificacion1.Id))
                     {
                         notificacionesDto.Remove(notificacion1);
                     }

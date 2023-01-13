@@ -3,6 +3,7 @@ using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
@@ -460,7 +461,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/EliminarNotificacion")]
-        public HttpResponseMessage eliminarNotificacion(NotificacionDto notificacion)
+        public HttpResponseMessage eliminarNotificacion(NotificacionProgramaDeEmbarqueDto notificacion)
         {
             try
             {

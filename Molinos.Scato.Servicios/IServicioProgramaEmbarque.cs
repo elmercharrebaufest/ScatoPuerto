@@ -1,15 +1,8 @@
-﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Enums;
-using Molinos.Scato.Dominio.Filtros;
-using Molinos.Scato.Dominio.Seguridad;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.ServiceModel;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Molinos.Scato.Servicios
 {
@@ -102,6 +95,6 @@ namespace Molinos.Scato.Servicios
         void EliminarNotificacion(int notificacion_id, string username);
 
         [OperationContract]
-        IList<NotificacionDto> ObtenerNotificaciones(string nombreUsuario);
+        IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario);
     }
 }

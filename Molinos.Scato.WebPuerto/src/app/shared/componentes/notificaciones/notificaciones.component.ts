@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { Notificacion } from '@ScatoModels/programa-embarque/notificaciones';
+import { NotificacionProgramaDeEmbarque } from '@ScatoModels/programa-embarque/notificacionProgramaDeEmbarque';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Router } from '@angular/router';
 @Component({
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
     trigger('deleteItem', [
       state('expanded', style({  })),
       state('collapsed', style({  opacity: '-1', margin: '-90px 0px 0px 0px' })),
-      transition('expanded <=> collapsed', [animate('750ms cubic-bezier(0.07, 0.13, 0.15, 0.4)')]),
+      transition('expanded <=> collapsed', [animate('900ms cubic-bezier(0.08, 0.15, 0.20, 0.47)')]),
     ]),
   ],
 })
@@ -20,9 +20,9 @@ export class NotificacionesComponent implements AfterViewInit {
   selectedItem = [];
   eliminando: boolean = false;
   router: Router;
-  @Input() notificaciones: Notificacion[] = []
+  @Input() notificaciones: NotificacionProgramaDeEmbarque[] = []
   @Output() showNotifications = new EventEmitter<boolean>();
-  @Output() eliminarNotificacion = new EventEmitter<Notificacion>();
+  @Output() eliminarNotificacion = new EventEmitter<NotificacionProgramaDeEmbarque>();
 
   ngAfterViewInit() {
     this.setNotificationsDialogHeight();
@@ -68,7 +68,7 @@ export class NotificacionesComponent implements AfterViewInit {
     }
   }
 
-  onEliminarNotificacion(item: Notificacion) {
+  onEliminarNotificacion(item: NotificacionProgramaDeEmbarque) {
     if(!this.eliminando){
       this.eliminando = true;
       this.deletedElement = this.notificaciones.find(e => e.id === item.id);
@@ -81,7 +81,7 @@ export class NotificacionesComponent implements AfterViewInit {
           this.showNotifications.emit(false);
         }
         this.eliminando = false;
-      }, 750);      
+      }, 900);      
     }
   }
 

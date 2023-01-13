@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
-import { Notificacion } from '@ScatoModels/programa-embarque/notificaciones';
+import { NotificacionProgramaDeEmbarque } from '@ScatoModels/programa-embarque/notificacionProgramaDeEmbarque';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +15,11 @@ export class NotificacionService {
 
   }
 
-  obtenerNotificaciones(): Observable<Notificacion[]> {
-    return this.http.get<Notificacion[]>(`${this.url}ProgramaEmbarque/ObtenerNotificaciones`, { 'withCredentials': true });
+  obtenerNotificaciones(): Observable<NotificacionProgramaDeEmbarque[]> {
+    return this.http.get<NotificacionProgramaDeEmbarque[]>(`${this.url}ProgramaEmbarque/ObtenerNotificaciones`, { 'withCredentials': true });
   }
 
-  eliminarNotificacion(notificacion : Notificacion) {
+  eliminarNotificacion(notificacion : NotificacionProgramaDeEmbarque) {
     return this.http.post(`${this.url}ProgramaEmbarque/EliminarNotificacion`, notificacion, { 'withCredentials': true });
   }
 }

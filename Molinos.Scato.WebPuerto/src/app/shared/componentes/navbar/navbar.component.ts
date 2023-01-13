@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Notificacion } from '@ScatoModels/programa-embarque/notificaciones';
-import { NotificacionService } from '@ScatoServicios/notificacion.service';
+import { NotificacionProgramaDeEmbarque } from '@ScatoModels/programa-embarque/notificacionProgramaDeEmbarque';
+import { NotificacionService } from '@ScatoServicios/notificacionProgramaDeEmbarque.service';
 import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
@@ -13,13 +13,13 @@ export class NavbarComponent implements OnInit {
 
   @Input() onClickHandler: any;
 
-  notificaciones: Notificacion[] = [];
+  notificaciones: NotificacionProgramaDeEmbarque[] = [];
 
   notificacionesVisibles: boolean = false;
   _cantidadNotificaciones: number = 0;
   constructor(
     public session: SessionService,
-    private router: Router,
+    public router: Router,
     private _notificacionService: NotificacionService) { }
 
   ngOnInit(): void {
@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
     }, 30000);
 
     setInterval(() => {
-      if(this.router.url.includes('/programa')){
+      if(this.router.url.includes('/lineup')){
         this._cantidadNotificaciones = this.notificaciones.length;
       } else{
         this._cantidadNotificaciones = 0
@@ -38,12 +38,12 @@ export class NavbarComponent implements OnInit {
   } 
 
   showNotificacionesVisibles(){
-    if(this.router.url.includes('/programa') && this.notificaciones.length > 0 || this.notificacionesVisibles)
+    if(this.router.url.includes('/lineup') && this.notificaciones.length > 0 || this.notificacionesVisibles)
       this.notificacionesVisibles = !this.notificacionesVisibles;
   }
 
   obtenerNotificaciones(){
-    this._notificacionService.obtenerNotificaciones().subscribe((res: Notificacion[]) => {
+    this._notificacionService.obtenerNotificaciones().subscribe((res: NotificacionProgramaDeEmbarque[]) => {
       this.notificaciones = res;
     })
   }
@@ -52,7 +52,7 @@ export class NavbarComponent implements OnInit {
     this._cantidadNotificaciones = cantidad;
   }
 
-  eliminarNotificacion(item: Notificacion){
+  eliminarNotificacion(item: NotificacionProgramaDeEmbarque){
     this._notificacionService.eliminarNotificacion(item).subscribe((res: any) => {
       
     })
