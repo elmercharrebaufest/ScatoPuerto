@@ -910,9 +910,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicio.GenerarLogging("GuardarCapturaImagenLineUp", capturaImagenLineUp.Embarque_Id.ToString(), "POST", base.nombreUsuario);
-                servicio.GenerarLogging("GuardarCapturaImagenLineUp", capturaImagenLineUp.FilePathImgLineUp, "POST", base.nombreUsuario);
-                
+             
                 servicio.GuardarCapturaImagenLineUp(capturaImagenLineUp.Embarque_Id, capturaImagenLineUp.FilePathImgLineUp);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
