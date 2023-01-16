@@ -20,6 +20,6 @@
 }
 
 .cuerpoMail{
-    overflow: scroll;
+    overflow-y: scroll;
     height: 450px;
 }
