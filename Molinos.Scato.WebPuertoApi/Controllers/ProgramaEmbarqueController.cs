@@ -482,24 +482,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
        
             try
-            {
-
-                if (!HttpContext.Current.Request.IsLocal)
-                    // mail.Destinatarios.Add("scatoprodMOA@molinosagro.com.ar");
-
+            {  
                     // CARACTERES NO IMPRIMIBLES:
                     // Enter: (\n -> <br/>)
                     // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
                     // Negrita: (\f -> <b>) (\f\f -> </b>)
                     // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
-                    comandos.Ejecutar(new EnvioMail
+                comandos.Ejecutar(new EnvioMail
                 {
-                    //Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                    //    .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
-                    //Destinatarios = mail.Destinatarios,
-                    //Titulo = $"Programa de embarque {DateTime.Now:dd-MM-yyyy HH:mm}",                   
-                    //AttachmentName = null
-                });
+                        Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                        .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                        Destinatarios = mail.Destinatarios,                        
+                        Titulo = mail.Titulo,
+                        AttachmentName = null
+                    });
             }
             catch (Exception e)
             {

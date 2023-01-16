@@ -47,7 +47,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
-  @Output() hideSpinner = new EventEmitter<boolean>();
+  public estaEnviando= false;
   //#endregion
   constructor(private progamaService: ProgramaEmbarqueService,
     private modalService: NgbModal,
@@ -219,37 +219,38 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     var mail = new Mail();
     this.progamaService.ObtenerDatosMailProgramaEmbarque(nominacionId, tipoDeMail).subscribe(
       (data: any) => {
-        mail.body = data.body,
-        mail.destinatarios = data.destinatarios,
-        mail.copia = data.copia
+        mail.body = data.body;
+        mail.destinatarios = data.destinatarios;
+        mail.copia = data.copia;
+        mail.titulo = asunto;
       }
     )   
   
     var button1 = 'Enviar';
     var button2 = 'Cancelar';   
-    this.confirmationDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia,true)
+    this.confirmationDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
         .then((confirmed) => {
         if (confirmed) {
-            this.hideSpinner.emit(true);
+          this.estaEnviando = true;
             this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(data => {
-                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', 'Cerrar', '', null, null, Tipoalerta.Success)
+                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '',null, null, Tipoalerta.Success, null, null, true)
                     .then((confirmed) => {
                     if (confirmed) {
-                        this.hideSpinner.emit(false);
+                      this.estaEnviando = false;
                         return;
                     }
-                }).catch(() => window.location.reload());
+                }).catch(() => this.listarProgramas());
             }, error => {
                 this.alertService.mostrar(new Alerta(error.error, Tipoalerta.Error));
-                this.hideSpinner.emit(false);
+                this.estaEnviando = false;
             });
         }
-        else
-            this.hideSpinner.emit(false);
+        else 
+        this.estaEnviando = false;
     })
         .catch(() => {
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-        this.hideSpinner.emit(false);
+        this.estaEnviando = false;
     });
 }
 

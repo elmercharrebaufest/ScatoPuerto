@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Mail } from '@ScatoModels/mail';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-inline';
 
 @Component({
   selector: 'app-envio-mail-dialog',
@@ -20,7 +21,8 @@ export class EnvioMailDialogComponent implements OnInit {
   @Input() tipo: Tipoalerta;
   @Input() inputPara : string;
   @Input() inputCopia : string;
-
+  public Editor = ClassicEditor;
+  public estaCargando = false;
   public validators = [ this.must_be_email.bind(this) ];
 
   private must_be_email(control: FormControl) {        
@@ -31,7 +33,12 @@ export class EnvioMailDialogComponent implements OnInit {
     return null;
 }
 
-
+public onReady( editor ) {
+  editor.ui.getEditableElement().parentElement.insertBefore(
+      editor.ui.view.toolbar.element,
+      editor.ui.getEditableElement()
+  );
+}
   constructor(private activeModal: NgbActiveModal) { }
 
   ngOnInit() {

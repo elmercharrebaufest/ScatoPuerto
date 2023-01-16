@@ -34,6 +34,7 @@ import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-bal
 import { AltaBajaMantenimientoComponent } from './alta-baja-mantenimiento/alta-baja-mantenimiento.component';
 import { NotificacionesComponent } from "./notificaciones/notificaciones.component";
 import { EnvioMailDialogComponent } from "./envio-mail-dialog/envio-mail-dialog.component";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 
 const components = [
     AlertComponent,
@@ -72,7 +73,8 @@ const libs = [
     CalendarModule,
     RouterModule,
     KnobModule,
-    ToastModule
+    ToastModule,
+    CKEditorModule
 ]
 
 @NgModule({
