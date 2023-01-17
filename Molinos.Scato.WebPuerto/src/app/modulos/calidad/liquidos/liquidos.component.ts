@@ -12,6 +12,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',

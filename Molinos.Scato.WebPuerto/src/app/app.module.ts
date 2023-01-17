@@ -24,6 +24,8 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 import { ToastrModule } from 'ngx-toastr';
 
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,7 +47,8 @@ import { ToastrModule } from 'ngx-toastr';
     NgxsModule.forRoot([
       ProductoState, 
       BuquesState
-    ])   
+    ]),
+   
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },

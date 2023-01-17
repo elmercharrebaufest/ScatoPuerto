@@ -1,0 +1,50 @@
+.popUpNotificaciones{
+    float: right;
+    background-color: white;
+    width: 400px;
+    height: 290px;
+    z-index: 200;
+    position: absolute;
+    right: 0;
+    border: solid;
+    border: 1px solid #6a76a1;
+    border-radius: 0px 0px 0px 10px;
+}
+
+    
+
+.container {
+    height: 200px;
+    position: relative;
+  }
+  
+  .vertical-center {
+    margin: 0;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .center-text-vertical{
+    font-size: 14px;
+    margin: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  
+.basurerito { 
+    cursor: pointer;
+    width: 27px;
+    height: 27px;
+}
+
+
+.negritaHover:hover {
+  font-weight: 500;
+}
+
+hr{
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: auto;
+}

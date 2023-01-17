@@ -3,6 +3,7 @@ using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
@@ -456,6 +458,83 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/EliminarNotificacion")]
+        public HttpResponseMessage eliminarNotificacion(NotificacionProgramaDeEmbarqueDto notificacion)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarNotificacion(notificacion.Id, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+			}
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/EnviarMailProgramaEmbarque")]
+        public HttpResponseMessage EnviarMailProgramaEmbarque(MailDto mail)
+        {       
+            try
+            {  
+                    // CARACTERES NO IMPRIMIBLES:
+                    // Enter: (\n -> <br/>)
+                    // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
+                    // Negrita: (\f -> <b>) (\f\f -> </b>)
+                    // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
+
+                comandos.Ejecutar(new EnvioMail
+                {
+                        Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                        .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                        Destinatarios = mail.Destinatarios,                        
+                        Titulo = mail.Titulo,
+                        AttachmentName = null
+                    });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]        
+        [Route("api/ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque")]
+        public HttpResponseMessage ObtenerDatosMailProgramaEmbarque(int nominacionId, string tipoDeMail)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
+                );
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }   
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ObtenerNotificaciones")]
+        public HttpResponseMessage obtenerNotificaciones()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ObtenerNotificaciones(base.nombreUsuario));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
 
 
     }

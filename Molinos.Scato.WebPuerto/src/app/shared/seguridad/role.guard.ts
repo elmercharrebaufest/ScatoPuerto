@@ -177,7 +177,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'buque': {
-                msje = 'No tiene permiso para Buque';
+                msje = 'No tiene permiso para visualizar Historial de Embarques';
                 break;
             }
             case 'programa': {
