@@ -495,6 +495,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         Titulo = mail.Titulo,
                         AttachmentName = null
                     });
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
