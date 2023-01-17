@@ -1,13 +1,7 @@
-﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Enums;
-using Molinos.Scato.Dominio.Filtros;
-using Molinos.Scato.Dominio.Seguridad;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
@@ -95,5 +89,12 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarNominacion(int nominacion_id);
+
+
+        [OperationContract]
+        void EliminarNotificacion(int notificacion_id, string username);
+
+        [OperationContract]
+        IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario);
     }
 }

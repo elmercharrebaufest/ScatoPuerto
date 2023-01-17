@@ -3,6 +3,7 @@ using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
@@ -456,6 +457,40 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/EliminarNotificacion")]
+        public HttpResponseMessage eliminarNotificacion(NotificacionProgramaDeEmbarqueDto notificacion)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarNotificacion(notificacion.Id, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ObtenerNotificaciones")]
+        public HttpResponseMessage obtenerNotificaciones()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ObtenerNotificaciones(base.nombreUsuario));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
 
 
     }

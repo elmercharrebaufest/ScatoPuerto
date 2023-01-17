@@ -473,6 +473,70 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public void EliminarNotificacion(int notificacion_id, string username)
+        {
+            try
+            {
+                var notificacionExcluidos = repositorio.Agregar(new NotificacionExcluidos
+                {
+                    NotificacionProgramaDeEmbarque = repositorio.Obtener<NotificacionProgramaDeEmbarque>(x => x.Id == notificacion_id),
+                    Username = username
+                });
+
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario)
+        {
+            try
+            {
+                //Busco todas las notificaciones
+                var notificaciones = repositorio.Listar<NotificacionProgramaDeEmbarque>();
+                var excluidas = repositorio.Listar<NotificacionExcluidos>().ToList();
+                if (notificaciones != null && notificaciones.Count > 0)
+                {
+                    foreach (NotificacionProgramaDeEmbarque notificacion in notificaciones.ToList())
+                    {
+                        //Elimino de la base todas las anteriores a 10 días desde su creación.
+                        if (notificacion.Fecha < DateTime.Now.AddDays(-10))
+                        {
+                            //también elimino las excluidas para que no explota la base.
+                            repositorio.RemoverTodos<NotificacionExcluidos>(excluidas.Where(x => x.NotificacionProgramaDeEmbarque.Id == notificacion.Id));
+                            repositorio.Remover(notificacion);
+
+                        }
+                    }
+
+                    //guardo los cambios
+                    repositorio.GuardarCambios();
+                }
+
+                var notificacionesDto = Listar<NotificacionProgramaDeEmbarque, NotificacionProgramaDeEmbarqueDto>();
+
+                var excluidasUsuario = repositorio.Listar<NotificacionExcluidos>(x => x.Username == nombreUsuario);
+
+                foreach (NotificacionProgramaDeEmbarqueDto notificacion1 in notificacionesDto.ToList())
+                {
+                    if(excluidasUsuario.Any(x => x.NotificacionProgramaDeEmbarque.Id == notificacion1.Id))
+                    {
+                        notificacionesDto.Remove(notificacion1);
+                    }
+                }
+
+                return notificacionesDto;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {
