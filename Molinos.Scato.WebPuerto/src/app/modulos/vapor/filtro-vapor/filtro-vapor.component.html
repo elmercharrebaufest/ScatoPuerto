@@ -1,0 +1,35 @@
+<ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<form id="filtroBuquedaForm" [formGroup]="getFiltroBusquedaForm()">
+  <div class="row">   
+    <div class="form-group col-md-2 colorGris">
+      <div class="form-group col-md-2 colorGris">
+        <input type="text" class="form-control" placeholder="Buque" formControlName="buque">
+    </div>
+    </div>
+    <div class="form-group col-md-2 colorGris">
+      <div class="form-group col-md-2 colorGris">
+        <input type="text" class="form-control" placeholder="IMO" formControlName="imo">
+    </div>
+    </div>
+    <div class="form-group col-md-2 colorGris">
+      <ng-multiselect-dropdown  formControlName="tipoBuque"
+        [placeholder]="'Tipo de Buque'" [settings]="getConfigListaMultiple()" [data]="getListaBandera()">
+      </ng-multiselect-dropdown>
+    </div>
+    <div class="form-group col-md-2 colorGris">
+      <ng-multiselect-dropdown  formControlName="bandera"
+        [placeholder]="'Bandera'" [settings]="getConfigListaMultiple()" [data]="getListaTipoBuque()">
+      </ng-multiselect-dropdown>
+    </div>
+   
+    <div class="form-group col-md-2">
+      <button class="btn buscar" (click)="onBuscar()">Buscar</button>
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn limpiar" (click)="onLimpiarFiltros()">Limpiar Búsqueda</button>
+    </div>
+  </div>
+
+
+</form>

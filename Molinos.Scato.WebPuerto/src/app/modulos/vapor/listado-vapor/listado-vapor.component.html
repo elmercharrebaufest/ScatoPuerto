@@ -1,0 +1,171 @@
+<ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<div style="overflow-x:auto; " class="table-responsive tableFixHead">
+    <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
+        <thead class="lista-pe-header tamanioHeader">
+            <tr>
+            <th class="noBorder" style=" border-radius: 5px 0px 0px 0px;"></th>
+            <th tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('nombreBuque')">
+                <div class="head noBorder">
+                    Nombre buque
+                    <span><i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('imoVapor')">
+                <div class="head">
+                    IMO
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'imoVapor' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'imoVapor' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('freebord')">
+                <div class="head">
+                    Freebord
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'freebord' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'freebord' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('porteNeto')">
+                <div class="head">
+                    Porte Neto
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'porteNeto' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'porteNeto' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1"
+                (click)="orderColumnBy('porteBruto')">
+                <div class="head">
+                    Porte Bruto
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'porteBruto' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'porteBruto' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cantidadBodegasTks')">
+                <div class="head">
+                    Cantidad Bodegas/Tks 
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cantidadBodegasTks' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cantidadBodegasTks' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('eslora')">
+                <div class="head">
+                    Eslora
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'eslora' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'eslora' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('manga')">
+                <div class="head">
+                    Manga
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'manga' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'manga' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('puntual')">
+                <div class="head">
+                    Puntal
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'puntual' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'puntual' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('tipoBuque')">
+                <div class="head">
+                    Tipo de buque
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'tipoBuque' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'tipoBuque' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('bandera')">
+                <div class="head">
+                    Bandera
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'bandera' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'bandera' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>            
+            <th class="noBorder"></th>
+            <th class="noBorder"></th>
+            <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
+        </tr>
+        </thead>
+        <tbody *ngFor="let vapor of getListaVapor()" style="text-align: center;">
+            <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
+                
+                <td class="lista-buque-row-item cursor noBorder alinearCentro" style="font-size: 20px;">
+                    <strong class="alinearJustificado">{{vapor.nombreBuque}}
+                    </strong>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal"><div class="alinearJustificado">{{vapor.imoVapor}}</div></td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.tipoBuque}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.bandera}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.freebord}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.porteNeto}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.porteBruto}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.cantidadBodegasTks}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.eslora}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.manga}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.puntual}}</td>
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarNominacion()'>
+                    <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
+                </td>
+                <td class="noBorder-left centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
+                    <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                </td>
+
+            </tr>
+        </tbody>
+
+    </table>
+    </div>
+    <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
+        [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+        [pageIndex]="pageIndex" aria-label="Select page">
+    </mat-paginator>
+
+<ng-template #addPE let-modal>
+    <app-modal-programa-embarque (cerrar)="modal.dismiss()"></app-modal-programa-embarque>
+</ng-template>
