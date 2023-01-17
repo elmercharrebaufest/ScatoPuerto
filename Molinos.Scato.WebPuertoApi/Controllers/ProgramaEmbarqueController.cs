@@ -477,10 +477,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         
         [HttpPost]
         [Route("api/ProgramaEmbarque/EnviarMailProgramaEmbarque")]
-        public void EnviarMailProgramaEmbarque(MailDto mail)
-        {
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
-       
+        public HttpResponseMessage EnviarMailProgramaEmbarque(MailDto mail)
+        {       
             try
             {  
                     // CARACTERES NO IMPRIMIBLES:
@@ -488,6 +486,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
                     // Negrita: (\f -> <b>) (\f\f -> </b>)
                     // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
+
                 comandos.Ejecutar(new EnvioMail
                 {
                         Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -496,11 +495,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         Titulo = mail.Titulo,
                         AttachmentName = null
                     });
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                response.StatusCode = HttpStatusCode.InternalServerError;
-                throw new HttpResponseException(response);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -513,6 +512,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK,
                     servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
                 );
+
             }
             catch (Exception ex)
             {
