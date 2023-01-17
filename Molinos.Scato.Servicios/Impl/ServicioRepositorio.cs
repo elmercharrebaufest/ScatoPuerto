@@ -1652,7 +1652,7 @@ namespace Molinos.Scato.Servicios.Impl
                     using (FileStream file = new FileStream(embarqueDto.FilePathImgLineUp, FileMode.Open, FileAccess.Read))
                     {
                         file.CopyTo(ms);
-                        embarqueDto.FilePathImgLineUp = Convert.ToBase64String(ms.ToArray());
+                        embarqueDto.FilePathImgLineUp = "data:image/png;base64,"+Convert.ToBase64String(ms.ToArray());
                     }
                 }
             }
@@ -11118,7 +11118,7 @@ namespace Molinos.Scato.Servicios.Impl
                 foreach (var em in embar)
                 {
                     var embarque = repositorio.Obtener<Embarque>(x => x.Id == em);
-                    
+
                     embarques.Add(conversor.Convertir<Embarque, EmbarqueDto>(embarque));
 
                 }
@@ -11612,9 +11612,16 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
 
-            if (embarque != null)
-                embarque.FilePathImgLineUp = filePathImgLineUp;
-                repositorio.GuardarCambios();
+                string filePath = @"c:\Img\Fotos\lineup\"+embarque.Patente+ "_"+ DateTime.Now.ToString("ddmmyyyy") + ".png";
+                File.WriteAllBytes(filePath, Convert.FromBase64String(filePathImgLineUp.Replace("data:image/png;base64,", String.Empty)));
+
+
+                if (embarque != null)
+                {
+                    embarque.FilePathImgLineUp = filePath;
+                    repositorio.GuardarCambios();
+                }
+                     
             }
             catch (Exception ex)
             {
