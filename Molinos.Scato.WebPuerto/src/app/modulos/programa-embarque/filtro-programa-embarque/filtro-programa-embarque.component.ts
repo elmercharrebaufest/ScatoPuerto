@@ -81,6 +81,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
     this.filtroBuquedaForm.controls.buque.setValue('');
     this.filtroBuquedaForm.controls.muelle.setValue('');
     this.filtroBuquedaForm.controls.fecha.setValue('');
+    this.onBuscar();    
   }
   onBuscar() {
     this.estaCargando = true;

@@ -292,7 +292,7 @@ namespace Molinos.Scato.Servicios.Impl
                         nominacionReciboDB.NumeroRecibo = recibo.NumeroRecibo;
                         nominacionReciboDB.Formato = recibo.Formato;
                         nominacionReciboDB.Exportador = repositorio.Obtener<Exportador>(x => x.Id == recibo.Exportador.Id);
-                        nominacionReciboDB.RecibosPorDia = recibo.RecibosPorDia; 
+                        nominacionReciboDB.RecibosPorDia = recibo.RecibosPorDia;
                         nominacionReciboDB.MostrarDestinos = recibo.MostrarDestinos;
                         nominacionReciboDB.MostrarBodegas = recibo.MostrarBodegas;
                         nominacionReciboDB.Cantidad = recibo.Cantidad;
@@ -349,7 +349,7 @@ namespace Molinos.Scato.Servicios.Impl
             var listaNominaciones = Listar<Nominacion, NominacionDto>(x => x.NominacionDatoTecnico.MaterialPuerto.Id == nominacion.MaterialPuerto.Id &&
                                                                       x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
                                                                       x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
-                                                                      x.FechaEliminacion == null && 
+                                                                      x.FechaEliminacion == null &&
                                                                       x.Id != nominacion.Id);
             if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;
@@ -523,7 +523,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 foreach (NotificacionProgramaDeEmbarqueDto notificacion1 in notificacionesDto.ToList())
                 {
-                    if(excluidasUsuario.Any(x => x.NotificacionProgramaDeEmbarque.Id == notificacion1.Id))
+                    if (excluidasUsuario.Any(x => x.NotificacionProgramaDeEmbarque.Id == notificacion1.Id))
                     {
                         notificacionesDto.Remove(notificacion1);
                     }
@@ -536,27 +536,234 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+            public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
+            {
+                // CARACTERES NO IMPRIMIBLES:
+                // Enter: (\n -> <br/>)
+                // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
+                // Negrita: (\f -> <b>) (\f\f -> </b>)
+                // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
+                var copia = new List<string>();
+                copia.Add(tipoDeMail == "Surveyor" ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" ?
+                    nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+                var mail = new MailDto
+                {
+                    Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
+                    Copia = copia,
+                };
+                var body = "Estimados, por favor notar que fueron nominados para actuar en la carga del buque de referencia.";
 
-        #region Metodos Utiles
-        private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
-        {
-            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
-        }
-        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
-        {
-            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
-        }
-        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
-        {
-            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
-        }
-        private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
-        {
-            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
-        }
+                body += $"<table style=\"border:none !important;\"> " +
+                        $" <tr>" +
+                        $" <td> <strong>PRODUCTO</strong>" +
+                        $" </td>" +
+                        $"<td> {nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles} ({nominacion.NominacionDatoTecnico.MaterialPuerto.Descripcion.Trim()})" +
+                        $" </td>";
+                body += $" <td> <strong>NOMBRE BUQUE</strong>" +
+                        $" </td>" +
+                        $" <td> { (nominacion.NominacionDatoTecnico?.VaporInformacion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.NombreBuque) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque : "-") } " +
+                        $" </td>" +
+                        $" </tr>" +
+                        $" <tr>" +
+                        $" <td><strong>MUELLE DE CARGA</strong>" +
+                        $" </td>" +
+                        $" <td>{(nominacion.NominacionDatoTecnico?.MuelleDeCarga != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion : "-") }" +
+                        $" </td>" +
+                        $" <td><strong>BANDERA</strong>" +
+                        $" </td>" +
+                        $" <td>{(nominacion.NominacionDatoTecnico?.VaporInformacion != null && nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.Bandera.Nombre) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera.Nombre : "-")}" +
+                        $" </td>" +
+                        $" </tr>" +
+                        $" <tr>" +
+                        $" <td><strong>LOADING RATE</strong>" +
+                        $" </td>" +
+                        $" <td>{(nominacion.NominacionDatoTecnico?.TasaDeCargaValor != null ? nominacion.NominacionDatoTecnico?.TasaDeCargaValor : 0)} {(nominacion.NominacionDatoTecnico?.TasaDeCarga != null && nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion : " - ") }" +
+                        $" </td>" +
+                        $" <td><strong>ATA</strong>" +
+                        $" </td>" +
+                        $" <td>{(nominacion.NominacionDatoTecnico?.ATAPuerto != null && nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre : "-")}" +
+                        $" </td>" +
+                        $" </tr>" +
+                        $" <tr>" +
+                        $" <td><strong>CLIENTE</strong> " +
+                        $" </td>";
+                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
+                {
+                    body += $"<td>{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(x => x.CoordinadorPuerto.Nombre)) }</td>";
+                }
+                else
+                {
+                    body += $"<td> - </td> ";
+                }
+                body += $" </tr>" +
+                        $"</table>";
+
+                //Calidad
+                body += $"<br/>";
+                body += $"<label><strong>CALIDAD</strong></label>";
+                body += $"<table style=\"border:none !important;\"> " +
+                        $" <tr>" +
+                        $"<thead> <td><strong> { ((nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0) ? nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault().CalidadValor?.TipoDeCalidad?.Descripcion.Trim() : "-")} </strong> </td><thead>";
+                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
+                {
+                    foreach (var item in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad)
+                    {
+                        body += $" <tr>";
+                        body += $"<td><strong> {item.CalidadValor.Parametro} </strong> {item.CalidadValor.Valor} - </td>";
+                        body += $"</tr>";
+                    }
+                }
+                else
+                {
+                    body += $" - </td>";
+                }
+                body += $" </tr>" +
+                        $"</table>";
+
+                //Recibo
+                body += $"<br/>";
+                if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
+                {
+                    body += $"<label><strong>RECIBO</strong></label>";
+                    body += $"<table style=\"border:none !important;\"> ";
+
+                    foreach (var item in nominacion.NominacionRecibo)
+                    {
+                        body += $" <tr>";
+                        body += $"<td> <strong> {item.Exportador.Nombre}</strong></td>";
+                        body += $"<td><strong>CANTIDAD (Tn)</strong>:   {item.Cantidad.ToString("n0")} </br>";
+                        body += $"<strong>FORMATO/UNIDAD</strong>:  {item.Formato }/{item.Unidad} </br>";
+                        body += $"<strong>AJUSTE</strong>:  {item.Ajuste } </br>";
+                        body += $"<strong>LOADING PORT</strong>:  {item.PuertoDeCarga } </br>";
+                        body += $"<strong>DISCHARGE PORT</strong>:  {item.PuertoDeCarga } </br>";
+                        body += $"<strong>DESCRIPTION OF GOODS</strong>:  {item.DescripcionesBienes} </td>";
+                        body += $"</tr>";
+                    }
+
+                    body += $"</table>";
+                }
+                body += $"<br/>";
+                body += $"<table style=\"border:none !important;\"> " +
+                        $" <tr>" +
+                        $" <td> <strong>CANTIDAD (Tn)</strong>" +
+                        $" </td>" +
+                        $" <td> { nominacion.NominacionDatoTecnico?.CantidadTotal.ToString("n0") }" +
+                        $" </td>" +
+                        $" <td> <strong>DEM/DES RATE</strong>" +
+                        $" </td>" +
+                        $" <td> u$ { nominacion.NominacionDatoTecnico?.DEM.ToString("n0")} / { nominacion.NominacionDatoTecnico?.DES.ToString("n0")}" +
+                        $" </td>" +
+                        $" </tr>" +
+                        $" <tr>" +
+                        $" <tr>" +
+                        $" <td> <strong>TOLERANCIA</strong>" +
+                        $" </td>" +
+                        $" <td> { nominacion.NominacionDatoTecnico?.Tolerancia }% +/- " +
+                        $" </td>" +
+                          $" <td> <strong>AGENCIA MARITIMA</strong>" +
+                        $" </td>" +
+                        $" <td> {(nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto?.Nombre : "-") }" +
+                        $" </td>" +
+                        $" </tr>" +
+                        $" <tr>" +
+                        $" <td> <strong>ETA RECALADA</strong>" +
+                        $" </td>" +
+                        $" <td> { (nominacion.NominacionDatoTecnico?.ETARecalada != null ? nominacion.NominacionDatoTecnico?.ETARecalada.Value.ToString("dd-MM-yyyy") : "-") }" +
+                        $" </td>" +
+                        $" <td> <strong>OBLIGACION DE CARGA</strong>" +
+                        $" </td>" +
+                        $" <td> {(nominacion.NominacionDatoTecnico?.ObligacionDeCarga != null ? nominacion.NominacionDatoTecnico?.ObligacionDeCarga.Value.ToString("dd-MM-yyyy") : "-") }" +
+                        $" </td>" +
+                        $" </tr>" +
+                        $" <tr>" +
+                        $" <td> <strong>CARGADOR</strong>" +
+                        $" </td>";
+                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Count > 0)
+                {
+                    body += $"<td>{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => x.Exportador.Nombre)) }</td>";
+                }
+                else
+                {
+                    body += $"<td> - </td> ";
+                };
+                body += $" <td> <strong>DESTINO</strong>" +
+                        $" </td>";
+                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Count > 0)
+                {
+                    body += $"<td>{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Select(x => x.Destino.Nombre)) }</td>";
+                }
+                else
+                {
+                    body += $"<td> - </td> ";
+                };
+                body += $" </tr>" +
+                      $" <tr>" +
+                      $" <td> <strong>TIPO FUMIGACIÓN</strong>" +
+                      $" </td>" +
+                      $" <td> {(nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion != null && !string.IsNullOrEmpty(nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion?.Descripcion) ? nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion?.Descripcion : "-") }" +
+                      $" </td>" +
+                      $" <td> <strong>ESTIBADO Y TRIMADO</strong>" +
+                      $" </td>" +
+                      $" <td> { ((nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.EstibadorYTrimado == true) ? "SI" : "N/A")}" +
+                      $" </td>" +
+                      $" </tr>" +
+                      $" <tr>" +
+                      $" <td> <strong>SURVEYOR</strong>" +
+                      $" </td>" +
+                      $" <td> {(nominacion.NominacionDatoTecnico?.Surveyor != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion) ? nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion : "-") }" +
+                      $" </td>" +
+                      $" </tr>";
+                body += $"</table>";
+
+                //Senasa
+                body += $"<br/>";
+                if (nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.Senasa != null && nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
+                {
+                    body += $"<label><strong>SENASA</strong</label>";
+                    body += $" <table>" +
+                                $"<thead>" +
+                                $"<tr>" +
+                                $"<th>Exportador</th>" +
+                                $"<th>Corresponde SENASA</th>" +
+                                $"<th>IP (Pedido de Importación)</th>" +
+                                $"<th>Muestras oficiales</th>" +
+                                $"</thead>";
+                    body += $"<tbody>";
+                    foreach (var item in nominacion.NominacionDetalleIntervencion.Senasa)
+                    {
+                        body += $"<tr> " +
+                                  $"<td> {item.Exportador.Nombre} </td>" +
+                                  $"<td> { (item.TieneSenasa ? "SI" : "NO") } </td>" +
+                                  $"<td> { (item.IP ? "SI" : "NO") } </td>" +
+                                  $"<td>{ (item.MuestraOficial ? "SI" : "NO") } </td> " +
+                                  $"</tr>";
+                    }
+                    body += $"</tbody>" +
+                           $"</table>";
+                }
+                mail.Body = body;
+                return mail;
+            }
+
+            #region Metodos Utiles
+            private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+            {
+                return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
+            }
+            private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+            {
+                return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
+            }
+            private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
+            {
+                return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
+            }
+            private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+            {
+                return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
+            }
 
 
-        #endregion
-
-    }
+            #endregion        
+    } 
 }

@@ -1,5 +1,5 @@
 <ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
-
+<ship-spinner [message]="'Enviando Mail. Por favor, espere...'" *ngIf='estaEnviando'></ship-spinner>
 
 <div style="overflow-x:auto; " class="table-responsive tableFixHead">
     <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
@@ -139,10 +139,10 @@
                           <strong>Nominar</strong>
                         </button>
                         <div class="dropdown-menu">
-                          <a class="dropdown-item cursor">Fumigador</a>
-                          <a class="dropdown-item cursor">Surveyor</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Fumigador')">Fumigador</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Surveyor')">Surveyor</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item cursor">Otros</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
                         </div>
                       </div>
                 </td>

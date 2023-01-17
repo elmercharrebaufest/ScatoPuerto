@@ -1,8 +1,8 @@
 <ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
 
 <div class="modal-content">
-    <div class="margenes">
-        <button type="button cierre" class="close" aria-label="Close" (click)="cerraModal()">
+    <div class="margenes cierre">
+        <button type="button" class="close" aria-label="Close" (click)="cerraModal()">
             <span aria-hidden="true">&times;</span>
           </button>
         <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCortaIngles  }}</strong> ({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>

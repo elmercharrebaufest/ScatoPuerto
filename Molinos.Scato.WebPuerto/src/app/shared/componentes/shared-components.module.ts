@@ -33,6 +33,8 @@ import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-b
 import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-balanzas.component";
 import { AltaBajaMantenimientoComponent } from './alta-baja-mantenimiento/alta-baja-mantenimiento.component';
 import { NotificacionesComponent } from "./notificaciones/notificaciones.component";
+import { EnvioMailDialogComponent } from "./envio-mail-dialog/envio-mail-dialog.component";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 
 const components = [
     AlertComponent,
@@ -55,7 +57,8 @@ const components = [
     CardBuqueComponent,
     EditarCrearBuquesComponent,
     AltaBajaMantenimientoComponent,
-    NotificacionesComponent
+    NotificacionesComponent,
+    EnvioMailDialogComponent
 ]
 const libs = [
     CommonModule,
@@ -70,7 +73,8 @@ const libs = [
     CalendarModule,
     RouterModule,
     KnobModule,
-    ToastModule
+    ToastModule,
+    CKEditorModule
 ]
 
 @NgModule({
