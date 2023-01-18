@@ -558,6 +558,7 @@
     <Build Include="dbo\Tables\TipoDeCalidad.sql" />
     <Build Include="dbo\Tables\NominacionRecibo.sql" />
     <Build Include="dbo\Tables\NominacionDatoTecnicoCalidad.sql" />
+    <Build Include="dbo\Tables\Auditoria.sql" />
     <Build Include="dbo\Tables\NotificacionesExcluidos.sql" />
     <Build Include="dbo\Tables\NotificacionProgramaDeEmbarque.sql" />
   </ItemGroup>

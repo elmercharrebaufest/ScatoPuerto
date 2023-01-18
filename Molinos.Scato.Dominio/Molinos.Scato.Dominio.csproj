@@ -687,6 +687,7 @@
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
+    <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
     <Compile Include="Dto\CompaniaDeFumigacionDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
@@ -980,6 +981,7 @@
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
+    <Compile Include="Entidades\Auditoria.cs" />
     <Compile Include="Entidades\BalanzasCortes.cs" />
     <Compile Include="Entidades\CalidadValor.cs" />
     <Compile Include="Entidades\CaracteristicasCartaPorteOtrosPuertos.cs" />

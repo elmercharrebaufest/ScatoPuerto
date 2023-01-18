@@ -99,5 +99,8 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipo);
+
+        [OperationContract]
+        IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
     }
 }
