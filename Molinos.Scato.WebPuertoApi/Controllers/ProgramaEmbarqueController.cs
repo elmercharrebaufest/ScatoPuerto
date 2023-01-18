@@ -480,21 +480,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public HttpResponseMessage EnviarMailProgramaEmbarque(MailDto mail)
         {       
             try
-            {  
-                    // CARACTERES NO IMPRIMIBLES:
-                    // Enter: (\n -> <br/>)
-                    // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
-                    // Negrita: (\f -> <b>) (\f\f -> </b>)
-                    // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
-
-                comandos.Ejecutar(new EnvioMail
+            {
+                if (!HttpContext.Current.Request.IsLocal)
                 {
-                        Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                        .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
-                        Destinatarios = mail.Destinatarios,                        
-                        Titulo = mail.Titulo,
-                        AttachmentName = null
-                    });
+                    mail.Destinatarios.Add("scatoprodMOA@molinosagro.com.ar");
+                }
+                servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

@@ -229,7 +229,8 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         mail.titulo = asunto;
       }
     )   
-  
+    mail.tipoDeMail = tipoDeMail;
+    mail.id = nominacionId;
     var button1 = 'Enviar';
     var button2 = 'Cancelar';   
     this.envioDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
