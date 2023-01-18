@@ -1,6 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { NominacionLineUp } from '@ScatoModels/programa-embarque/nominacion-lineup';
+import { ProgramaEmbarqueNominacion, ProgramaEmbarqueNominacionesEnvioLineUp } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-envio';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NominacionEnviarLineupService } from './nominacion-enviar-lineup.service';
@@ -16,8 +19,10 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
   public listaEnviarLineUp: NominacionLineUp[] = null;
   public esSeleccionarTodos:boolean = false;
   public cargandoNominaciones: boolean = false;
+  public mensajeEnvioLineUp: string = "";
   private destroy$ = new Subject();
-  constructor(private nominacionEnviarLineupService: NominacionEnviarLineupService) { 
+  constructor(private nominacionEnviarLineupService: NominacionEnviarLineupService,
+              private confirmationDialogService: ConfirmationDialogService) { 
     this.listarBuquesNominacion();
   }
 
@@ -45,8 +50,35 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
     });
     this.esSeleccionarTodos = seleccionado;
   }
+
+  public onEnviarNominacionLineUp(){
+    let nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp = new ProgramaEmbarqueNominacionesEnvioLineUp();
+    let listaNominaciones: ProgramaEmbarqueNominacion[] = [];
+    this.listaEnviarLineUp.forEach(item=>{
+      if (item.seleccionado)
+      listaNominaciones.push({
+        nominacion_Id: item.nominacion_Id
+      });
+    });
+    if (listaNominaciones.length == 0){
+      this.confirmationDialogService.confirm('Enviar a LineUp', 'Seleccione una nominación para enviar al lineup.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return false;
+    }
+    const vapor_Id = this.listaEnviarLineUp[0].vapor_Id;
+    this.cargandoNominaciones = true;
+    this.mensajeEnvioLineUp = Mensajes.procesando;
+    nominacionesEnvioLineUp.listaNominaciones = listaNominaciones;
+    this.nominacionEnviarLineupService.enviarNominacionLineUp(nominacionesEnvioLineUp).pipe(takeUntil(this.destroy$)).subscribe((data: boolean) =>{
+      this.confirmationDialogService.confirm('Enviar a LineUp', 'Se enviarón las nominaciones al lineup satisfactoriamente.', 'Cerrar', '', null, null, Tipoalerta.Success)
+      this.cargandoNominaciones = false;
+      this.esSeleccionarTodos = false;
+      this.listarNominacionPorBuque(vapor_Id);
+    });
+  }
+
   public listarBuquesNominacion(){
     this.cargandoNominaciones = true;
+    this.mensajeEnvioLineUp = Mensajes.cargando;
     this.nominacionEnviarLineupService.listarBuquesNominacion().pipe(takeUntil(this.destroy$)).subscribe((data: VaporInformacion[]) =>{
       this.listasVapores = data;
       this.cargandoNominaciones = false;
@@ -54,6 +86,7 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
   }
   private listarNominacionPorBuque(id: number){
     this.cargandoNominaciones = true;
+    this.mensajeEnvioLineUp = Mensajes.listados;
     this.nominacionEnviarLineupService.listarNominacionPorBuque(id).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionLineUp[]) =>{
       this.listaEnviarLineUp = data;
       this.listaEnviarLineUp.forEach(item=>{
@@ -63,4 +96,9 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
     });
   }
 
+}
+enum Mensajes{
+  cargando = "Cargando lista de buques. Por favor, espere...",
+  procesando = "Procesando envio a lineup. Por favor, espere...",
+  listados = "Cargando lista de nominaciones. Por favor, espere...",
 }

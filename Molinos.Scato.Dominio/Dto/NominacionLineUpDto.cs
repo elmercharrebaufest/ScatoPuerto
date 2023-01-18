@@ -8,6 +8,7 @@ namespace Molinos.Scato.Dominio.Dto
 {
     public class NominacionLineUpDto
     {
+        public int Vapor_Id { get; set; }
         public int Nominacion_Id { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public MuelleDeCargaDto MuelleDeCarga { get; set; }

@@ -6,6 +6,7 @@ import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
 import { NominacionLineUp } from '@ScatoModels/programa-embarque/nominacion-lineup';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { ProgramaEmbarqueNominacionesEnvioLineUp } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-envio';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
 import { environment } from 'environments/environment';
@@ -66,7 +67,10 @@ export class NominacionService {
     public listarNominacionPorBuque(vaporInformacion_Id: number):Observable<NominacionLineUp[]> {
         return this.http.get<NominacionLineUp[]>(`${this.url}ProgramaEmbarque/ListarNominacionPorBuque?vaporInformacion_Id=${vaporInformacion_Id}`, { 'withCredentials': true });
     }
-
+    public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp):Observable<boolean> {
+        return this.http.post<boolean>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`,nominacionesEnvioLineUp, { 'withCredentials': true });
+    }
+    
     // #endregion
     
 }

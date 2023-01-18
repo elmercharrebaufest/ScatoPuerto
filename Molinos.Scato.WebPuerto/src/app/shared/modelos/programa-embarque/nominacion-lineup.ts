@@ -3,6 +3,7 @@ import { MaterialPuerto } from "@ScatoModels/material-puerto";
 import { MuelleDeCarga } from "./muelle-de-carga";
 
 export class NominacionLineUp {
+    vapor_Id: number;
     nominacion_Id: number;
     materialPuerto: MaterialPuerto;
     muelleDeCarga: MuelleDeCarga;
