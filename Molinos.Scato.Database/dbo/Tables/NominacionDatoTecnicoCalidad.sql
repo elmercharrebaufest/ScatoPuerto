@@ -19,7 +19,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCalidad]
 
     select  @idNominacion = (select n.id from NominacionDatoTecnicoCalidad dt 
     inner join Nominacion n on dt.Id = n.NominacionDatoTecnico_Id
-    where dt.Id = deleted.id)
+    where dt.Id = (select id from  deleted))
 
 
          IF((select CalidadValor_Id from deleted) <> (select CalidadValor_Id from inserted) )

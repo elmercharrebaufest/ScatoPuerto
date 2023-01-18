@@ -22,13 +22,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
 	  select  @idNominacion = (select n.id from nominaciondatotecnicodestino dtd
 	inner join NominacionDatoTecnico dt on dtd.NominacionDatoTecnico_Id = dt.Id
 	inner join Nominacion n on dt.Id = n.NominacionDatoTecnico_Id
-	where dtd.Id = deleted.id)
+	where dtd.Id = (select id from  deleted))
 
 
         IF((select Destino_Id from deleted) <> (select Destino_Id from inserted) )
         BEGIN
         insert into Auditoria
-        SELECT @idNominacion , deleted.id, 'NominacionDatoTecnicoDestino', 'CompaniaACuentaDe', d.Destino_Id,
+        SELECT @idNominacion , d.id, 'NominacionDatoTecnicoDestino', 'CompaniaACuentaDe', d.Destino_Id,
 	        i.Destino_Id , GETDATE()
              FROM deleted AS d
              JOIN inserted AS i
@@ -38,7 +38,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
         ELSE IF((select Cantidad from deleted) <> (select Cantidad from inserted) )
         BEGIN
         insert into Auditoria
-        SELECT @idNominacion , deleted.id, 'NominacionDatoTecnicoDestino', 'CompaniaACuentaDe', d.Cantidad,
+        SELECT @idNominacion , d.id, 'NominacionDatoTecnicoDestino', 'CompaniaACuentaDe', d.Cantidad,
 	        i.Cantidad , GETDATE()
              FROM deleted AS d
              JOIN inserted AS i
