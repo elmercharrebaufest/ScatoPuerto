@@ -12,6 +12,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { AlertService } from '@ScatoServicios/alert.service';
 import { Alerta } from '@ScatoModels/alerta';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
 
 @Component({
@@ -44,6 +45,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public estaCargando = false;
   interval: any
   confirmationDialogService: any;
+  envioDialogService: any;
 
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
@@ -53,9 +55,11 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     private modalService: NgbModal,
     private route: Router,
     public config: NgbModalConfig,
-    confirmationDialogService: EnvioMailDialogService,
+    confirmationDialogService: ConfirmationDialogService,
+    envioDialogService: EnvioMailDialogService,
     public session: SessionService, private alertService: AlertService,) {
     this.confirmationDialogService = confirmationDialogService;
+    this.envioDialogService = envioDialogService;
     this.user = this.session.getUser();
 
   }
@@ -228,12 +232,12 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   
     var button1 = 'Enviar';
     var button2 = 'Cancelar';   
-    this.confirmationDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
+    this.envioDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
         .then((confirmed) => {
         if (confirmed) {
           this.estaEnviando = true;
             this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(data => {
-                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '',null, null, Tipoalerta.Success, null, null, true)
+                this.envioDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '',null, null, Tipoalerta.Success, null, null, true)
                     .then((confirmed) => {
                     if (confirmed) {
                       this.estaEnviando = false;
