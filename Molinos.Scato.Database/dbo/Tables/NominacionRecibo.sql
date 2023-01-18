@@ -38,7 +38,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-        ELSE IF((select Formato from deleted) <> (select Formato from inserted) )
+        IF((select Formato from deleted) <> (select Formato from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'Formato', d.Formato,
@@ -48,7 +48,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-         ELSE IF((select Cantidad from deleted) <> (select Cantidad from inserted) )
+          IF((select Cantidad from deleted) <> (select Cantidad from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'Cantidad', d.Cantidad,
@@ -58,7 +58,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-         ELSE IF((select Unidad from deleted) <> (select Unidad from inserted) )
+          IF((select Unidad from deleted) <> (select Unidad from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'Unidad', d.Unidad,
@@ -68,7 +68,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-         ELSE IF((select Ajuste from deleted) <> (select Ajuste from inserted) )
+          IF((select Ajuste from deleted) <> (select Ajuste from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'Ajuste', d.Ajuste,
@@ -78,7 +78,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-         ELSE IF((select PuertoDeDescarga from deleted) <> (select PuertoDeDescarga from inserted) )
+          IF((select PuertoDeDescarga from deleted) <> (select PuertoDeDescarga from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'PuertoDeDescarga', d.PuertoDeDescarga,
@@ -88,7 +88,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select DescripcionesBienes from deleted) <> (select DescripcionesBienes from inserted) )
+           IF((select DescripcionesBienes from deleted) <> (select DescripcionesBienes from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'DescripcionesBienes', d.DescripcionesBienes,
@@ -98,7 +98,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select RecibosPorDia from deleted) <> (select RecibosPorDia from inserted) )
+           IF((select RecibosPorDia from deleted) <> (select RecibosPorDia from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'RecibosPorDia', d.RecibosPorDia,
@@ -108,7 +108,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select MostrarDestinos from deleted) <> (select MostrarDestinos from inserted) )
+           IF((select MostrarDestinos from deleted) <> (select MostrarDestinos from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'MostrarDestinos', d.MostrarDestinos,
@@ -119,7 +119,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
 
         END
 
-            ELSE IF((select MostrarBodegas from deleted) <> (select MostrarBodegas from inserted) )
+             IF((select MostrarBodegas from deleted) <> (select MostrarBodegas from inserted) )
         BEGIN
        insert into Auditoria
         SELECT d.Nominacion_Id , d.id, 'NominacionRecibo', 'MostrarBodegas', d.MostrarBodegas,

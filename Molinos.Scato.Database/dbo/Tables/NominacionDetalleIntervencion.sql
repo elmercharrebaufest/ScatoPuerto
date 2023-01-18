@@ -43,7 +43,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-        ELSE IF((select PrecintadoACuentaDe from deleted) <> (select PrecintadoACuentaDe from inserted) )
+         IF((select PrecintadoACuentaDe from deleted) <> (select PrecintadoACuentaDe from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'PrecintadoACuentaDe', d.PrecintadoACuentaDe,
@@ -53,7 +53,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select DraftSurvey from deleted) <> (select DraftSurvey from inserted) )
+           IF((select DraftSurvey from deleted) <> (select DraftSurvey from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'DraftSurvey', d.DraftSurvey,
@@ -63,7 +63,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select SurveyACuentaDe from deleted) <> (select SurveyACuentaDe from inserted) )
+           IF((select SurveyACuentaDe from deleted) <> (select SurveyACuentaDe from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'SurveyACuentaDe', d.SurveyACuentaDe,
@@ -73,7 +73,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select PermisoDeEmbarque from deleted) <> (select PermisoDeEmbarque from inserted) )
+           IF((select PermisoDeEmbarque from deleted) <> (select PermisoDeEmbarque from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'PermisoDeEmbarque', d.PermisoDeEmbarque,
@@ -83,7 +83,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select EstibadorYTrimado from deleted) <> (select EstibadorYTrimado from inserted) )
+           IF((select EstibadorYTrimado from deleted) <> (select EstibadorYTrimado from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'EstibadorYTrimado', d.EstibadorYTrimado,
@@ -93,7 +93,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select Fumigacion from deleted) <> (select Fumigacion from inserted) )
+           IF((select Fumigacion from deleted) <> (select Fumigacion from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'Fumigacion', d.Fumigacion,
@@ -103,7 +103,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select CompaniaDeFumigacion_Id from deleted) <> (select CompaniaDeFumigacion_Id from inserted) )
+           IF((select CompaniaDeFumigacion_Id from deleted) <> (select CompaniaDeFumigacion_Id from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'CompaniaDeFumigacion_Id', d.CompaniaDeFumigacion_Id,
@@ -113,7 +113,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select CompaniaACuentaDe from deleted) <> (select CompaniaACuentaDe from inserted) )
+           IF((select CompaniaACuentaDe from deleted) <> (select CompaniaACuentaDe from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'CompaniaACuentaDe', d.CompaniaACuentaDe,
@@ -123,7 +123,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select Observaciones from deleted) <> (select Observaciones from inserted) )
+           IF((select Observaciones from deleted) <> (select Observaciones from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'Observaciones', d.Observaciones,
@@ -133,7 +133,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
              ON d.Id=i.Id
 
         END
-          ELSE IF((select TipoDeFumigacion_Id from deleted) <> (select TipoDeFumigacion_Id from inserted) )
+           IF((select TipoDeFumigacion_Id from deleted) <> (select TipoDeFumigacion_Id from inserted) )
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'TipoDeFumigacion_Id', d.TipoDeFumigacion_Id,

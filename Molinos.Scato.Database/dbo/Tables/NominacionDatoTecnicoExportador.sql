@@ -35,7 +35,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
              ON d.Id=i.Id
 
         END
-        ELSE IF((select Cantidad from deleted) <> (select Cantidad from inserted) )
+         IF((select Cantidad from deleted) <> (select Cantidad from inserted) )
         BEGIN
             insert into Auditoria
             SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Cantidad', d.Cantidad,
@@ -45,7 +45,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
                     ON d.Id=i.Id
 
         END
-          ELSE IF((select Tolerancia from deleted) <> (select Tolerancia from inserted) )
+           IF((select Tolerancia from deleted) <> (select Tolerancia from inserted) )
         BEGIN
             insert into Auditoria
             SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Tolerancia', d.Tolerancia,
