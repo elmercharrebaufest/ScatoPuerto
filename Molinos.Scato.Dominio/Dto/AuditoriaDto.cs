@@ -1,11 +1,9 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
-namespace Molinos.Scato.Dominio.Entidades
+namespace Molinos.Scato.Dominio.Dto
 {
-    public class Auditoria : IIdentificable
+    public class AuditoriaDto
     {
-        [Key]
         public virtual int Id { get; set; }
         public virtual int Nominacion_Id { get; set; }
         public virtual int Entidad_Id { get; set; }
@@ -14,6 +12,9 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string ValorAnterior { get; set; }
         public virtual string ValorNuevo { get; set; }
         public virtual DateTime FechaModificacion { get; set; }
-     
+
     }
 }
+
+
+
