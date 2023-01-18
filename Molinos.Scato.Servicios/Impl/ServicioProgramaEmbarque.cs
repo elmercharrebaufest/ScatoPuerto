@@ -745,8 +745,21 @@ namespace Molinos.Scato.Servicios.Impl
                 return mail;
             }
 
-            #region Metodos Utiles
-            private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+        public IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id)
+        {
+            try
+            {
+                return Listar<Auditoria, AuditoriaDto>(x => x.Nominacion_Id == nominacion_id);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        #region Metodos Utiles
+        private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
             {
                 return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
             }

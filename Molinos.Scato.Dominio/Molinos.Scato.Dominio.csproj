@@ -687,6 +687,7 @@
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
+    <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
     <Compile Include="Dto\CompaniaDeFumigacionDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
