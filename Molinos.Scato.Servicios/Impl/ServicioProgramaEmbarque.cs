@@ -8,8 +8,10 @@ using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Web;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -18,13 +20,14 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;
         private readonly ILogger log;
+        private readonly IServicioComandos comandos;
 
-        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log)
+        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
-
+            this.comandos = comandos;
         }
 
         public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null)
@@ -754,11 +757,86 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
+                throw ex;
+            }
+        }
+        public void ActualizarDatosYEnviarMail(MailDto mail, string usuario)
+        {
+            try
+            {
+                var nominacion = repositorio.Obtener<Nominacion>(x => x.Id == mail.Id);
+                if(mail.TipoDeMail == "Surveyor")
+                {
+                    nominacion.EnviadoSurveyor = true;
+                }else if (mail.TipoDeMail == "Fumigador")
+                {
+                    nominacion.EnviadoFumigador = true;
+                }
+                else
+                {
+                    nominacion.EnviadoOtros = true;
+                }
+                repositorio.GuardarCambios();
+                EnviarMail(mail, usuario);
+            }
+            catch (Exception ex)
+            {
                 throw ex;
             }
         }
 
+        public void EnviarMail(MailDto mail, string usuario)
+        {
+           var mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+            if (!string.IsNullOrEmpty(mailUsuarioCreador))
+            {
+                mail.Copia.Add(mailUsuarioCreador);
+            }
+            mail.Copia.Add(repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones);
+          
+            mail.Copia.RemoveAll(item => item == null);
+            mail.Destinatarios.RemoveAll(item => item == null);
+            comandos.Ejecutar(new EnvioMail
+            {
+                Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                       .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                Destinatarios = mail.Destinatarios,
+                Titulo = mail.Titulo,
+                Copia = mail.Copia,
+                AttachmentName = null,
+            });
+        }
+
+        private string ObtenerMailDeActiveDirectory(string UserName)
+        {
+            DirectoryEntry entry = new DirectoryEntry();
+            string userName = UserName;
+            try
+            {
+                var userNameArray = UserName.Split('\\');
+                userName = userNameArray.Length == 1 ? userNameArray[0] : userNameArray[1];
+
+            }
+            catch { }
+
+            DirectorySearcher search = new DirectorySearcher(entry);
+            search.Filter = String.Format("(sAMAccountName={0})", userName);
+            search.PropertiesToLoad.Add("givenName");   // first name
+            search.PropertiesToLoad.Add("sn");          // last name
+            search.PropertiesToLoad.Add("mail");        // smtp mail address
+
+            // perform the search
+            SearchResult result = search.FindOne();
+            try
+            {
+                return result.Properties.Contains("mail") ? result.Properties["mail"][0].ToString() : result.Properties["userPrincipalName"][0].ToString();
+            }
+            catch
+            {
+                log.Error($"No se encontró el mail en AD para el usuario {userName}");
+            }
+            return string.Empty;
+        }
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
             {

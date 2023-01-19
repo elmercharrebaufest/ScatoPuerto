@@ -4,7 +4,9 @@ export class Mail {
     titulo: string;
     adjunto: string | ArrayBuffer;
     nombre: string;
-    copia: string;
+    copia: string;   
+    tipoDeMail: string;
+    id: number; 
 
     constructor(titulo: string = null, body : string = null, destinatarios : string[] = null, 
         adjunto : string = null, nombre : string = null, copia : string = null){

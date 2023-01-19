@@ -102,5 +102,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
+        [OperationContract]
+        void ActualizarDatosYEnviarMail(MailDto mail, string usuario);
     }
 }
