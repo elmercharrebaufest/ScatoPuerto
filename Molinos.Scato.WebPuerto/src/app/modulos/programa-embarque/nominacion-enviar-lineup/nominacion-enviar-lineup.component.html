@@ -3,7 +3,7 @@
 
 <div class='modal-header'>
     <h4 class="modal-title">Enviar a Line Up</h4>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCerraModal()">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
@@ -25,7 +25,7 @@
                 <label class="font-weight-bold">Seleccione Producto(s)</label>
             </div>
             <div class="form-group col-md-4">
-                <button class="btn btn-success" style="float:right;" (click)="onEnviarNominacionLineUp()"> Enviar Nominaciones</button>
+                <button class="btn btn-success" style="float:right;" [disabled]="procesandoEnvioLineUp" (click)="onEnviarNominacionLineUp()"> Enviar Nominaciones</button>
             </div>
             <div class="form-group col-md-12">
                 <table class='table tabla-sin-border'
@@ -40,27 +40,27 @@
                                 (change)="onSeleccionarTodos($event)"
                                 />
                             </th>
-                            <th tabindex="0" rowspan="1" colspan="1" class="noBorder">
+                            <th tabindex="0" rowspan="1" colspan="1" class="noBorder" width="15%">
                                 <div class="head noBorder">
                                     Producto
                                 </div>
                             </th>
-                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1">
+                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1" width="15%">
                                 <div class="head">
                                     Muelle de carga
                                 </div>
                             </th>
-                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1">
+                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1" width="20%">
                                 <div class="head">
                                     Cargador
                                 </div>
                             </th>
-                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1">
+                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1"  width="15%">
                                 <div class="head">
                                     Cantidad x cargador
                                 </div>
                             </th>
-                            <th class="sin-bordes borde-derecha" tabindex="0" rowspan="1" colspan="1">
+                            <th class="sin-bordes borde-derecha" tabindex="0" rowspan="1" colspan="1" width="35%">
                                 <div class="head">
                                     Estado
                                 </div>
@@ -74,6 +74,7 @@
                                 id={{lineUp.nominacion_Id}} 
                                 type="checkbox" 
                                 [checked]="lineUp.seleccionado"
+                                [disabled]="lineUp.procesado"
                                 [value]="lineUp.nominacion_Id"
                                 (change)="onSeleccionarNominacion(lineUp.nominacion_Id)"
                                 />
@@ -90,7 +91,8 @@
                                     {{cargador.cantidad}}
                                 </div>
                             </td>
-                            <td>{{lineUp.enviadoLineUp? 'Enviado' : 'Pendiente'}}</td>
+                            <td *ngIf="!lineUp.procesado">{{lineUp.enviadoLineUp? 'Enviado' : 'Pendiente'}}</td>
+                            <td *ngIf="lineUp.procesado">{{lineUp.observaciones}}</td>
                         </tr>
                     </tbody>
                 </table>

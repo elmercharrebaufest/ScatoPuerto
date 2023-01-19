@@ -520,6 +520,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             var workflow = ConfigurationManager.AppSettings["Workflow"];
             var centro = int.Parse(ConfigurationManager.AppSettings["Centro"]);
+            ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp = new ResultadoEnvioLineUpDto();
+            programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp = new List<RespuestaEnvioLineUpDto>();
             try
             {
                 foreach(var programaEmbarqueNominacion in nominacionesEnvioLineUpDto.ListaNominaciones)
@@ -532,19 +534,29 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     
                     if (validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial == null) // Nuevo Embarque
                     {
-                        this.CrearAltaDeEmbarque(nominacion, centro, workflow);
+                        this.CrearAltaDeEmbarque(nominacion, centro, workflow, ref programaEmbarqueResultadoEnvioLineUp);
                     }
                     else
                     {
                         int embarque_Id = validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.Embarque.Id;
                         bool existeMaterial = validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.MaterialesExistentes.Existe;
                         if (embarque_Id > 0 && !existeMaterial)
-                            this.ModificarAltaDeEmbarque(nominacion, validacionEmbarques);
+                        {
+                            this.ModificarAltaDeEmbarque(nominacion, validacionEmbarques, ref programaEmbarqueResultadoEnvioLineUp);
+                        }
                         else
-                            servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque_Id, ProgramaEmbarqueMensajeEnvioLineUp.ENVIO_LINEUP_PRODUCTO_EXISTENTE);
+                        {
+                            servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque_Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE);
+                            programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                            {
+                                Nominacion_Id = nominacion.Id,
+                                Estado = 2,
+                                Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE
+                            });
+                        }
                     }
                 }
-                return Request.CreateResponse(HttpStatusCode.OK, true);
+                return Request.CreateResponse(HttpStatusCode.OK, programaEmbarqueResultadoEnvioLineUp);
             }
             catch (Exception ex)
             {
@@ -564,6 +576,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 embarqueDto.TipoDeBuque = filtroTipoDeBuque.ElementAt(0);
             embarqueDto.Agencias = nominacion.NominacionDatoTecnico.AgenciaMaritimaPuerto;
             embarqueDto.FechaRecalada = nominacion.NominacionDatoTecnico.ETARecalada;
+            DateTime etaRecalada = (DateTime)nominacion.NominacionDatoTecnico.ETARecalada;
+            embarqueDto.HoraRecalada = etaRecalada != null ? etaRecalada.ToString("HH:mm") : "";
             embarqueDto.ObligacionCarga = nominacion.NominacionDatoTecnico.ObligacionDeCarga;
             IList<MaterialPuertoCantidadDto> listaMaterialesPuertoCantidad = new List<MaterialPuertoCantidadDto>();
             MaterialPuertoCantidadDto materialPuertoCantidad = new MaterialPuertoCantidadDto()
@@ -576,8 +590,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             };
             listaMaterialesPuertoCantidad.Add(materialPuertoCantidad);
             embarqueDto.MaterialesPuertoCantidad = listaMaterialesPuertoCantidad;
-            var nominacionDatoTecnicoCoordinadorPuerto = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.ElementAt(0);
-            embarqueDto.Coordinadores = nominacionDatoTecnicoCoordinadorPuerto.CoordinadorPuerto;
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
+            {
+                var nominacionDatoTecnicoCoordinadorPuerto = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.ElementAt(0);
+                embarqueDto.Coordinadores = nominacionDatoTecnicoCoordinadorPuerto.CoordinadorPuerto;
+            }
+            embarqueDto.Agencias = nominacion.NominacionDatoTecnico.AgenciaMaritimaPuerto;
             embarqueDto.CentroId = centroId;
             embarqueDto.Patente = nominacion.NominacionDatoTecnico.VaporInformacion.NombreBuque;
             MuelleDeCargaDto muelleDeCarga = nominacion.NominacionDatoTecnico.MuelleDeCarga;
@@ -611,6 +629,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             IList<EmbarqueDto> listaEmbarqueDto = servicioProgramaEmbarque.ObtenerEmbarquePorVapor(nominacion.NominacionDatoTecnico.MaterialPuerto.Id, 
                                                                                                    nominacion.NominacionDatoTecnico.MuelleDeCarga.Id,
                                                                                                    nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Id);
+            string observaciones = string.Empty;
+            observaciones += $"Destinos: {Environment.NewLine}";
+
+            foreach (var destino in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino)
+            {
+                observaciones += $"{destino.Destino.Nombre.Trim()} / {destino.Cantidad} tn {Environment.NewLine}";
+            }
+
+            observaciones += $"{Environment.NewLine} {Environment.NewLine}";
+
+            observaciones += $"Cargadores: {Environment.NewLine}";
+
+            foreach (var exportador in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+            {
+                observaciones += $"{exportador.Exportador.Nombre.Trim()} / {exportador.Cantidad} tn {Environment.NewLine}";
+            }
+
+            embarqueDto.Observaciones = observaciones;
             if (listaEmbarqueDto != null && listaEmbarqueDto.Count > 0)
             {
                 var embarqueDtoSel = listaEmbarqueDto[0];
@@ -652,7 +688,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             embarqueInformacionDto.FechaRegistro = DateTime.Now;
             return embarqueInformacionDto;
         }
-        private bool CrearAltaDeEmbarque(NominacionDto nominacion, int centro, string workflow)
+        private bool CrearAltaDeEmbarque(NominacionDto nominacion, int centro, string workflow, ref ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp)
         {
             bool bCreacionEmbarque = false;
             int datosEmbarque = 0;
@@ -670,8 +706,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var datosEmbarqueAux = servicioWf.IngresarEmbarque(embarqueDto, workflow, workflowDefinicionId, controlRecorrido);
                 datosEmbarque = ((ResultadoCrear)datosEmbarqueAux).Id;
                 servicio.ActualizarEstadoBuque(datosEmbarque, 1);
-                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, datosEmbarque, ProgramaEmbarqueMensajeEnvioLineUp.ENVIO_LINEUP_OK);
+                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, datosEmbarque, MensajeEnvioLineUp.ENVIO_OK);
                 bCreacionEmbarque = datosEmbarque > 0 ? true : false;
+                programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                {
+                    Nominacion_Id = nominacion.Id,
+                    Estado = 1,
+                    Observacion = MensajeEnvioLineUp.ENVIO_OK
+                });
             }
             catch (Exception ex)
             {
@@ -679,16 +721,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             return bCreacionEmbarque;
         }
-        private bool ModificarAltaDeEmbarque(NominacionDto nominacion, ProgramaEmbarqueValidacionLineUpDto programaEmbarqueValidacionLineUp)
+        private bool ModificarAltaDeEmbarque(NominacionDto nominacion, ProgramaEmbarqueValidacionLineUpDto programaEmbarqueValidacionLineUp, ref ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp)
         {
             bool bModificacionEmbarque = false;
             try
             {
-                ProgramaEmbarqueMaterialDto programaEmbarqueEmbarqueMaterial = programaEmbarqueValidacionLineUp.ProgramaEmbarqueEmbarqueMaterial;
                 EmbarqueDto embarque = programaEmbarqueValidacionLineUp.ProgramaEmbarqueEmbarqueMaterial.Embarque;
                 servicioProgramaEmbarque.AgregarMaterialesPorNominacionEnviada(nominacion.Id, embarque.Id);
-                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque.Id, ProgramaEmbarqueMensajeEnvioLineUp.ENVIO_LINEUP_PRODUCTO_AGREGADO);
+                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque.Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_AGREGADO);
                 bModificacionEmbarque = true;
+                programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                {
+                    Nominacion_Id = nominacion.Id,
+                    Estado = 1,
+                    Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_AGREGADO
+                });
             }
             catch (Exception ex)
             {

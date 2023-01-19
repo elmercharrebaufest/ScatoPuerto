@@ -12,6 +12,8 @@ export class NominacionLineUp {
     enviadoLineUp: boolean;
     fechaEnvioLineUp: string | null;
     seleccionado: boolean=false;
+    observaciones: string | null;
+    procesado: boolean=false;
 }
 
 export class NominacionCargadorPorCantidad {

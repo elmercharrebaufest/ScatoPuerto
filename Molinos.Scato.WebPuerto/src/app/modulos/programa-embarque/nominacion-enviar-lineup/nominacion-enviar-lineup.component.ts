@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { NominacionLineUp } from '@ScatoModels/programa-embarque/nominacion-lineup';
 import { ProgramaEmbarqueNominacion, ProgramaEmbarqueNominacionesEnvioLineUp } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-envio';
+import { ProgramaEmbarqueResultadoResultado } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-resultado';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -15,12 +16,16 @@ import { NominacionEnviarLineupService } from './nominacion-enviar-lineup.servic
 })
 export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
 
+  @Output() modalCerrar = new EventEmitter<void>()
+
   public listasVapores: VaporInformacion[] = null;
   public listaEnviarLineUp: NominacionLineUp[] = null;
   public esSeleccionarTodos:boolean = false;
   public cargandoNominaciones: boolean = false;
+  public procesandoEnvioLineUp: boolean = false;
   public mensajeEnvioLineUp: string = "";
   private destroy$ = new Subject();
+
   constructor(private nominacionEnviarLineupService: NominacionEnviarLineupService,
               private confirmationDialogService: ConfirmationDialogService) { 
     this.listarBuquesNominacion();
@@ -34,8 +39,12 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.unsubscribe();  
   }
+
   onCargarNominaciones(event){
-    this.listarNominacionPorBuque(event.target.value);
+    this.listaEnviarLineUp = null;
+    let vaporSel = event.target.value;
+    if (vaporSel!='')
+      this.listarNominacionPorBuque(event.target.value);
   }
   onSeleccionarNominacion(id: number){
     let nominacion = this.listaEnviarLineUp.filter(x=> x.nominacion_Id == id);
@@ -46,16 +55,21 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
   onSeleccionarTodos(event){
     const seleccionado: boolean = event.target.checked;
     this.listaEnviarLineUp.forEach(lineUp =>{
+      if (!lineUp.procesado)
       lineUp.seleccionado = seleccionado;
     });
     this.esSeleccionarTodos = seleccionado;
+    this.procesandoEnvioLineUp = false;
+  }
+  onCerraModal(){
+    this.modalCerrar.emit();
   }
 
   public onEnviarNominacionLineUp(){
     let nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp = new ProgramaEmbarqueNominacionesEnvioLineUp();
     let listaNominaciones: ProgramaEmbarqueNominacion[] = [];
     this.listaEnviarLineUp.forEach(item=>{
-      if (item.seleccionado)
+      if (item.seleccionado && !item.procesado)
       listaNominaciones.push({
         nominacion_Id: item.nominacion_Id
       });
@@ -64,15 +78,16 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.confirm('Enviar a LineUp', 'Seleccione una nominación para enviar al lineup.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return false;
     }
-    const vapor_Id = this.listaEnviarLineUp[0].vapor_Id;
     this.cargandoNominaciones = true;
+    this.procesandoEnvioLineUp = true;
     this.mensajeEnvioLineUp = Mensajes.procesando;
     nominacionesEnvioLineUp.listaNominaciones = listaNominaciones;
-    this.nominacionEnviarLineupService.enviarNominacionLineUp(nominacionesEnvioLineUp).pipe(takeUntil(this.destroy$)).subscribe((data: boolean) =>{
+    this.nominacionEnviarLineupService.enviarNominacionLineUp(nominacionesEnvioLineUp).pipe(takeUntil(this.destroy$)).subscribe((data: ProgramaEmbarqueResultadoResultado) =>{
       this.confirmationDialogService.confirm('Enviar a LineUp', 'Se enviarón las nominaciones al lineup satisfactoriamente.', 'Cerrar', '', null, null, Tipoalerta.Success)
       this.cargandoNominaciones = false;
       this.esSeleccionarTodos = false;
-      this.listarNominacionPorBuque(vapor_Id);
+      this.procesandoEnvioLineUp = false;
+      this.actualizarResultadoNominacion(data);
     });
   }
 
@@ -84,6 +99,7 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
       this.cargandoNominaciones = false;
     });
   }
+
   private listarNominacionPorBuque(id: number){
     this.cargandoNominaciones = true;
     this.mensajeEnvioLineUp = Mensajes.listados;
@@ -96,7 +112,21 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
     });
   }
 
+  private actualizarResultadoNominacion(data: ProgramaEmbarqueResultadoResultado){
+    this.listaEnviarLineUp.forEach(lineUp =>{
+      let lineUpSel = data.resultadoEnvioLineUp.filter(x=> x.nominacion_Id == lineUp.nominacion_Id); 
+      if (lineUpSel.length > 0){
+        const procesado: boolean = lineUpSel[0].estado >0 ? true: false;
+        const observaciones: string = lineUpSel[0].observacion;
+        lineUp.seleccionado = false;
+        lineUp.procesado = procesado;
+        lineUp.observaciones = observaciones;
+      }
+    });
+  }
+
 }
+
 enum Mensajes{
   cargando = "Cargando lista de buques. Por favor, espere...",
   procesando = "Procesando envio a lineup. Por favor, espere...",

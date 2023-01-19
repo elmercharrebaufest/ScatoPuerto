@@ -7,6 +7,7 @@ import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacio
 import { NominacionLineUp } from '@ScatoModels/programa-embarque/nominacion-lineup';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { ProgramaEmbarqueNominacionesEnvioLineUp } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-envio';
+import { ProgramaEmbarqueResultadoResultado } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-resultado';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
 import { environment } from 'environments/environment';
@@ -67,8 +68,8 @@ export class NominacionService {
     public listarNominacionPorBuque(vaporInformacion_Id: number):Observable<NominacionLineUp[]> {
         return this.http.get<NominacionLineUp[]>(`${this.url}ProgramaEmbarque/ListarNominacionPorBuque?vaporInformacion_Id=${vaporInformacion_Id}`, { 'withCredentials': true });
     }
-    public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp):Observable<boolean> {
-        return this.http.post<boolean>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`,nominacionesEnvioLineUp, { 'withCredentials': true });
+    public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp):Observable<ProgramaEmbarqueResultadoResultado> {
+        return this.http.post<ProgramaEmbarqueResultadoResultado>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`,nominacionesEnvioLineUp, { 'withCredentials': true });
     }
     
     // #endregion

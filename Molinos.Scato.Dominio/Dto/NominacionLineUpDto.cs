@@ -16,6 +16,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Embarque_Id { get; set; }
         public bool EnviadoLineUp { get; set; }
         public DateTime? FechaEnvioLineUp { get; set; }
+        public string Observaciones { get; set; }
     }
 
     public class NominacionCargadorPorCantidadDto

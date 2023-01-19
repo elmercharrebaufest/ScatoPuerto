@@ -75,7 +75,6 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy{
     let nominacion = new Nominacion();
 
     this.datoTecnico.validarCreacionNominacion().subscribe(validacion=>{
-      console.log('validacion-->>', validacion);
       if (validacion){
         nominacion.fechaCreacion = new Date();
         nominacion.id = 0;
