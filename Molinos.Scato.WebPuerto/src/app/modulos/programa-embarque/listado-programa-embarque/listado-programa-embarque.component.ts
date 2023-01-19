@@ -93,11 +93,9 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   tieneAuditoria(nominacion_id: number[]){
     this.progamaService.tieneAuditoria(nominacion_id).subscribe((res: any[]) => {
-      let a = "";
       if (res != null && res != undefined){
         res.forEach(e => {
           let indexNominacion = this.programa.findIndex(x => x.id == e["item1"]);
-          // this.programa[indexNominacion]["tieneAuditoria"] = e["item2"];  
           //Lo oculto si no tiene notificaciones.
           (document.getElementsByClassName("auditoriaCheck")[indexNominacion] as HTMLElement) .style.visibility = e["item2"] == true ? 'visible' : 'hidden';
         })
