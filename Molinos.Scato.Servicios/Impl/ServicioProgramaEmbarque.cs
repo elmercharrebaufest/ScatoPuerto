@@ -6,6 +6,7 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
+using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -758,6 +759,25 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
+        public List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id)
+        {
+            try
+            {
+                List <Tuple<int, bool>> auditoriasNominaciones = new List<Tuple<int, bool>>();
+                foreach (int nominacion_id in nominaciones_id)
+                {
+                    auditoriasNominaciones.Add(new Tuple<int, bool>(nominacion_id, repositorio.Listar<Auditoria>(x => x.Nominacion_Id == nominacion_id).Count > 0 ? true : false));
+                }
+                return auditoriasNominaciones;
+                    
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
 
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class

@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Mail } from '@ScatoModels/mail';
+import { Auditoria } from '@ScatoModels/programa-embarque/auditoria';
 import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
 import { ListaProgramaEmbarque } from '@ScatoModels/programa-embarque/lista-programa-embarque';
+import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionDetalleIntervencion } from '@ScatoModels/programa-embarque/nominacion-detalle-intervencion';
 import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
@@ -18,7 +20,7 @@ export class ProgramaEmbarqueService {
   listadoPrograma: any;
   programaEmbarqueModal: any;
   observablePrograma = new Subject<ListaProgramaEmbarque[]>();
-  observableProgramaModal = new Subject<any[]>();
+  observableProgramaModal = new Subject<Nominacion>();
   filtros = {
     pagina: 1,
     itemsPorPagina: 20,
@@ -59,6 +61,18 @@ export class ProgramaEmbarqueService {
           this.observablePrograma.next(this.listadoPrograma.slice())
         }
       );
+  }
+
+  public tieneAuditoria(nominaciones_id: number []): Observable<any[]>{
+    return this.http.post<any[]>(`${this.url}ProgramaEmbarque/TieneAuditoria`, nominaciones_id,
+    { 'withCredentials': true });
+
+  }
+  
+  public obtenerAuditoria(nominacion_id: number): Observable<Auditoria[]>{
+    return this.http.get<Auditoria[]>(`${this.url}ProgramaEmbarque/ObtenerAuditoria?nominacion_id=${nominacion_id}`,
+    { 'withCredentials': true });
+
   }
 
   public obtenerDatosComboProgramaEmbarque(): Observable<any> {

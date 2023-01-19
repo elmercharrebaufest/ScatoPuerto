@@ -102,5 +102,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
+
+        [OperationContract]
+        List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);
     }
 }
