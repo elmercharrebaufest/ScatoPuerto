@@ -791,7 +791,9 @@ namespace Molinos.Scato.Servicios.Impl
             if (!string.IsNullOrEmpty(mailUsuarioCreador))
             {
                 mail.Copia.Add(mailUsuarioCreador);
-            }    
+            }
+            mail.Copia.Add(repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones);
+          
             mail.Copia.RemoveAll(item => item == null);
             mail.Destinatarios.RemoveAll(item => item == null);
             comandos.Ejecutar(new EnvioMail

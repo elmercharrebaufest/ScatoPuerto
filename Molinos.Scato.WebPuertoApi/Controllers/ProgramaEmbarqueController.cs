@@ -481,10 +481,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {       
             try
             {
-                if (!HttpContext.Current.Request.IsLocal)
-                {
-                    mail.Destinatarios.Add("scatoprodMOA@molinosagro.com.ar");
-                }
                 servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

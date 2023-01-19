@@ -122,6 +122,9 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaDeT
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaProgramaEmbarque') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaProgramaEmbarque', 'supervisorespuertosanlorenzo@molinosagro.com.ar; macarena.asqueri@molinosagro.com.ar; leandro.bolzan@molinosagro.com.ar; romina.escudero@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar; candela.kremzky@molinosagro.com.ar; antonela.labonia@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar; liz.pereira@molinosagro.com.ar; federico.romano@molinosagro.com.ar'); END
 GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaProgramaEmbarqueCopia') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaProgramaEmbarqueCopia', 'scatoprodMOA@molinosagro.com.ar'); END
+GO
+
 
 -- Puntos de Interes para geolocalizacion.
 if not exists(select 1 from PuntosInteresGeolocalizacion where Latitud = '-35.61958  ' and Longitud='-55.88947') BEGIN insert into PuntosInteresGeolocalizacion (Nombre, TipoUbicacion, Imagen,Puerto, Pais, HorasSanBenito, Latitud, Longitud, DistanciaKM, TipoZona, AgrupadorZona, PosicionZona, RadioPunto, Estado, FechaRegistro) values('Recalada','Fondeadero','ancla','','AR','30','-35.61958  ','-55.88947',5,'','','',15000,1,getdate()) END
