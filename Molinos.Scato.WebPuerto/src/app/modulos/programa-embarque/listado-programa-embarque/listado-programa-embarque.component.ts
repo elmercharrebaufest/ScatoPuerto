@@ -13,6 +13,7 @@ import { AlertService } from '@ScatoServicios/alert.service';
 import { Alerta } from '@ScatoModels/alerta';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 
 
 @Component({
@@ -73,6 +74,12 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.pageSize = this.programa.length > 0 ? this.programa[0].itemPorPagina : 10;
         this.pageIndex = this.programa.length > 0 ? this.programa[0].pagina : 1;
         this.estaCargando = false;
+        let idsNominacion: number[] = [];
+        
+        this.programa.forEach(element => {
+          idsNominacion.push(element.id)
+        })
+        this.tieneAuditoria(idsNominacion);
       }
     )
     this.interval = setInterval(
@@ -82,6 +89,18 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscripcionPrograma.unsubscribe();
     clearInterval(this.interval)
+  }
+
+  tieneAuditoria(nominacion_id: number[]){
+    this.progamaService.tieneAuditoria(nominacion_id).subscribe((res: any[]) => {
+      if (res != null && res != undefined){
+        res.forEach(e => {
+          let indexNominacion = this.programa.findIndex(x => x.id == e["item1"]);
+          //Lo oculto si no tiene notificaciones.
+          (document.getElementsByClassName("auditoriaCheck")[indexNominacion] as HTMLElement) .style.visibility = e["item2"] == true ? 'visible' : 'hidden';
+        })
+      }
+    })
   }
 
   public getListaProgramaEmbarque() {

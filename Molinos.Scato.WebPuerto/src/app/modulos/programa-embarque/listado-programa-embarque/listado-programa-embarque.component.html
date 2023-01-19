@@ -5,126 +5,140 @@
     <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
         <thead class="lista-pe-header tamanioHeader">
             <tr>
-            <th class="noBorder" style=" border-radius: 5px 0px 0px 0px;"></th>
-            <th tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('producto')">
-                <div class="head noBorder">
-                    Producto
-                    <span><i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'producto' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'producto' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('estado')">
-                <div class="head">
-                    Estado
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'estado' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'estado' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('nombreBuque')">
-                <div class="head">
-                    Buque
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('muelleDeCarga')">
-                <div class="head">
-                    Muelle de carga
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'muelleDeCarga' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'muelleDeCarga' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1"
-                (click)="orderColumnBy('cargadores.nombreExportador')">
-                <div class="head">
-                    Cargador
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.nombreExportador' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.nombreExportador' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('cargadores.toneladas')">
-                <div class="head">
-                    Cantidad (Tn)
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.toneladas' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.toneladas' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('contrato')">
-                <div class="head">
-                    Contrato
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'contrato' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'contrato' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('etaRecalada')">
-                <div class="head">
-                    ETA Recalada
-                    <span>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'etaRecalada' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'etaRecalada' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>
-            <th class="noBorder"></th>
-            <th class="noBorder"></th>
-            <th class="noBorder"></th>
-            <th class="noBorder"></th>
-            <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
-        </tr>
+                <th class="noBorder" style=" border-radius: 5px 0px 0px 0px;"></th>
+                <th tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('producto')">
+                    <div class="head noBorder">
+                        Producto
+                        <span><i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'producto' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'producto' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('estado')">
+                    <div class="head">
+                        Estado
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'estado' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'estado' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('nombreBuque')">
+                    <div class="head">
+                        Buque
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombreBuque' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('muelleDeCarga')">
+                    <div class="head">
+                        Muelle de carga
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'muelleDeCarga' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'muelleDeCarga' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1"
+                    (click)="orderColumnBy('cargadores.nombreExportador')">
+                    <div class="head">
+                        Cargador
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.nombreExportador' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.nombreExportador' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1"
+                    (click)="orderColumnBy('cargadores.toneladas')">
+                    <div class="head">
+                        Cantidad (Tn)
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.toneladas' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'cargadores.toneladas' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('contrato')">
+                    <div class="head">
+                        Contrato
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'contrato' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'contrato' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('etaRecalada')">
+                    <div class="head">
+                        ETA Recalada
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'etaRecalada' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'etaRecalada' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder"></th>
+                <th class="noBorder"></th>
+                <th class="noBorder"></th>
+                <th class="noBorder"></th>
+                <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
+            </tr>
         </thead>
-        <tbody *ngFor="let historial of getListaProgramaEmbarque()" style="text-align: center;">
+        <tbody *ngFor="let historial of getListaProgramaEmbarque(); let i = index" style="text-align: center;">
             <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
                 <td [ngStyle]="{ 'background-color': retornarColor(historial.productoColor) }"
-                class="noBorder anchoDeFila" style="border-radius: 5px 0px 0px 5px;"></td>
+                    class="noBorder anchoDeFila" style="border-radius: 5px 0px 0px 5px;"></td>
                 <td class="lista-buque-row-item cursor noBorder alinearCentro centradoHorizontal"
-                (click)="seleccionarNominacion(historial.id, addPE)" style="font-size: 20px;">
+                    (click)="seleccionarNominacion(historial.id, addPE)" style="font-size: 20px;">
                     <strong class="alinearJustificado">{{historial.producto}}
                     </strong>
                 </td>
-                <td class="noBorder centradoHorizontal"><i style="font-size: 25px;cursor:pointer"
+                <td class="noBorder centradoHorizontal">
+                    <i style="font-size: 25px;cursor:pointer"
                         [ngbTooltip]="devolverMensajeDeEstados(historial.estado)"
                         [ngStyle]="{ 'color': devolverColorEstado(historial.estado) }"
-                        class="fa fa-duotone fa-circle"></i></td>
-                <td class="noBorder alinearCentro centradoHorizontal"><div class="alinearJustificado">{{historial.nombreBuque}}</div></td>
+                        class="fa fa-duotone fa-circle">
+                    </i>
+                    <i style="font-size: 12px;cursor:pointer; position: absolute; color: rgb(216, 15, 15); visibility: hidden;"                        
+                        class="fa fa-duotone fa-circle auditoriaCheck"
+                        >
+                    </i>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                    <div class="alinearJustificado">{{historial.nombreBuque}}</div>
+                </td>
                 <td class="noBorder-rigth centradoHorizontal">{{historial.muelleDeCarga}}</td>
                 <td class="lista-buque-row-item noBorder alinearCentro centradoHorizontal">
-                    <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{ exportador.nombreExportador }}</div>
+                    <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{
+                        exportador.nombreExportador }}</div>
                 </td>
                 <td class="lista-buque-row-item noBorder alinearCentro centradoHorizontal">
-                    <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{ exportador.toneladas |
+                    <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{
+                        exportador.toneladas |
                         number:'0.0-0' }} tn</div>
                 </td>
-                <td class="lista-buque-row-item celda-nombre-buque noBorder-left centradoHorizontal">{{historial.contrato}}</td>
-                <td class="lista-buque-row-item noBorder-rigth centradoHorizontal">{{historial.etaRecalada | date:'dd/MM/yyyy'}}</td>
+                <td class="lista-buque-row-item celda-nombre-buque noBorder-left centradoHorizontal">
+                    {{historial.contrato}}</td>
+                <td class="lista-buque-row-item noBorder-rigth centradoHorizontal">{{historial.etaRecalada |
+                    date:'dd/MM/yyyy'}}</td>
                 <td style="text-align: center;" class="noBorder centradoHorizontal">
                     <div class='icon-fumigador'
                         [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoFumigador) }"></div>
@@ -135,34 +149,40 @@
                 </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoParaNominar()'>
                     <div class="btn-group" *ngIf="!historial.fechaEliminacion">
-                        <button type="button" class="btn dropdown-toggle estiloBoton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <strong>Nominar</strong>
+                        <button type="button" class="btn dropdown-toggle estiloBoton" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <strong>Nominar</strong>
                         </button>
                         <div class="dropdown-menu">
-                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Fumigador')">Fumigador</a>
-                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Surveyor')">Surveyor</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
+                            <a class="dropdown-item cursor"
+                                (click)="enviarMail(historial.id, historial.nombreBuque, 'Fumigador')">Fumigador</a>
+                            <a class="dropdown-item cursor"
+                                (click)="enviarMail(historial.id, historial.nombreBuque, 'Surveyor')">Surveyor</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item cursor"
+                                (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
                         </div>
-                      </div>
+                    </div>
                 </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarNominacion()'>
-                    <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor' (click)="onEditarNominacion(historial.id)"></div>
+                    <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor'
+                        (click)="onEditarNominacion(historial.id)"></div>
                 </td>
                 <td class="noBorder-left centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
-                    <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                    <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)"
+                        src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
 
             </tr>
         </tbody>
 
     </table>
-    </div>
-    <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
-        [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
-        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
-        [pageIndex]="pageIndex" aria-label="Select page">
-    </mat-paginator>
+</div>
+<mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
+    [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
+    [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize" [pageIndex]="pageIndex"
+    aria-label="Select page">
+</mat-paginator>
 
 <ng-template #addPE let-modal>
     <app-modal-programa-embarque (cerrar)="modal.dismiss()"></app-modal-programa-embarque>
