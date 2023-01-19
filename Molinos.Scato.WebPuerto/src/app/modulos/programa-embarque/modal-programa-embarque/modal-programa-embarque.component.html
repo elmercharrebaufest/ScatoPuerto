@@ -4,47 +4,66 @@
     <div class="margenes cierre">
         <button type="button" class="close" aria-label="Close" (click)="cerraModal()">
             <span aria-hidden="true">&times;</span>
-          </button>
-        <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCortaIngles  }}</strong> ({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>
+        </button>
+        <label><strong class="titulo">{{ nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcionCortaIngles
+                }}</strong> ({{nominacion?.nominacionDatoTecnico?.materialPuerto?.descripcion}})</label>
     </div>
-    <div class="line" [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }" ></div>
+    <div class="line"
+        [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }">
+    </div>
     <div style="margin-top: 2px;">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item tabs cursor">
-                <label class="nav-link active labelTabs" id="tecnico-tab" data-toggle="tab" href="#tecnico" role="tab"
-                    aria-controls="tecnico" aria-selected="true">Datos Técnicos</label>
+                <label class="nav-link active labelTabs tabDatoTecnicoAuditoria" id="tecnico-tab" data-toggle="tab"
+                    href="#tecnico" role="tab" aria-controls="tecnico" aria-selected="true">Datos Técnicos</label>
+                <i style="font-size: 12px;cursor:pointer; position: absolute; color: rgb(216, 15, 15); visibility: hidden;
+                margin-top: -27px; padding-left: 70px;" class="fa fa-duotone fa-circle auditoriaTecnicoCheck">
+                </i>
             </li>
             <li class="nav-item tabs cursor">
-                <label class="nav-link labelTabs" id="recibo-tab" data-toggle="tab" href="#recibo" role="tab"
-                    aria-controls="recibo" aria-selected="false">Datos de Recibo</label>
+                <label class="nav-link labelTabs tabDatosDeReciboAuditoria" id="recibo-tab" data-toggle="tab"
+                    href="#recibo" role="tab" aria-controls="recibo" aria-selected="false">Datos de Recibo</label>
+                <i style="font-size: 12px;cursor:pointer; position: absolute; color: rgb(216, 15, 15); visibility: hidden;
+                margin-top: -27px; padding-left: 72px;"
+                    class="fa fa-duotone fa-circle auditoriaReciboCheck">
+                </i>
             </li>
             <li class="nav-item tabs cursor">
-                <label class="nav-link labelTabs" id="intervencion-tab" data-toggle="tab" href="#intervencion"
-                    role="tab" aria-controls="intervencion" aria-selected="false">Datos de
+                <label class="nav-link labelTabs tabDetalleIntervencionAuditoria" id="intervencion-tab"
+                    data-toggle="tab" href="#intervencion" role="tab" aria-controls="intervencion"
+                    aria-selected="false">Datos de
                     Intervenciones</label>
+                <i style="font-size: 12px;cursor:pointer; position: absolute; color: rgb(216, 15, 15); visibility: hidden;
+                margin-top: -27px; padding-left: 103px;"
+                    class="fa fa-duotone fa-circle auditoriaIntervencionCheck">
+                </i>
             </li>
         </ul>
     </div>
     <div class="modal-body tamanioLetraModal">
 
         <div class="tab-content">
-            <div class="tab-pane fade show active"  id="tecnico" role="tabpanel" aria-labelledby="tecnico-tab">
+            <div class="tab-pane fade show active" id="tecnico" role="tabpanel" aria-labelledby="tecnico-tab">
 
                 <div class="row">
                     <div class="col-md-4">
-                        <label><strong>Cantidad Total: </strong> {{ nominacion?.nominacionDatoTecnico?.cantidadTotal |
+                        <label class="nominacionDatoTecnicocantidadTotalAuditoria"><strong>Cantidad Total: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.cantidadTotal |
                             number : '1.0-0'}} tn</label>
                         <br>
-                        <label><strong>Calidad: </strong> {{                            
-                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad != null  ?
-                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.descripcion : "-"
+                        <label class="nominacionDatoTecnicocalidadsAuditoria"><strong>Calidad: </strong> {{
+                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad
+                            != null ?
+                            nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCalidad[0]?.calidadValor?.tipoDeCalidad?.descripcion
+                            : "-"
                             }}</label>
                         <br>
-                        <label><strong>Tolerancia: </strong> +/- {{ nominacion?.nominacionDatoTecnico?.tolerancia
+                        <label class="nominacionDatoTecnicotoleranciaAuditoria"><strong>Tolerancia: </strong> +/- {{
+                            nominacion?.nominacionDatoTecnico?.tolerancia
                             }}%</label>
                         <br>
-                       
-                        <label><strong>Observaciones: </strong> 
+                        <label class="nominacionDatoTecnicoobservacionesAuditoria"><strong>Observaciones: </strong>
+
                             {{ nominacion?.nominacionDatoTecnico?.observaciones != "" ?
                             nominacion?.nominacionDatoTecnico?.observaciones : "-"
                             }}</label>
@@ -53,32 +72,39 @@
                         <br>
                         <br>
                         <div><i class="fa fa-regular fa-calendar calendario"></i>
-                        <label class="margen"><strong>ETA recalada: </strong> {{ nominacion?.nominacionDatoTecnico?.etaRecalada |
-                            date:'dd/MM/yyyy'}}</label>
-                        <br>
-                        <label class="margen"><strong>Obligación de carga: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.obligacionDeCarga | date:'dd/MM/yyyy'}}</label>
+                            <label class="nominacionDatoTecnicoetaRecaladaAuditoria" class="margen"><strong>ETA
+                                    recalada: </strong> {{
+                                nominacion?.nominacionDatoTecnico?.etaRecalada |
+                                date:'dd/MM/yyyy'}}</label>
+                            <br>
+                            <label class="nominacionDatoTecnicoobligacionDeCargaAuditoria"
+                                class="margen"><strong>Obligación de carga: </strong> {{
+                                nominacion?.nominacionDatoTecnico?.obligacionDeCarga | date:'dd/MM/yyyy'}}</label>
                         </div>
-                        </div>
+                    </div>
                     <div class="col-md-4">
                         <label><strong>Cantidad x destino: </strong></label>
-                        <label class="margenIzquiera5px" *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino"> - </label>                        
+                        <label class="margenIzquiera5px"
+                            *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino"> - </label>
                         <div *ngFor="let destino of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino">
                             {{ destino.destino.nombre }}:
                             {{ destino.cantidad | number : '1.0-0'}} tn
                         </div>
                         <br>
                         <label><strong>Cantidad x cargadores: </strong></label>
-                        <label class="margenIzquiera5px" *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador"> - </label>
-                        <div 
+                        <label class="margenIzquiera5px"
+                            *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador"> - </label>
+                        <div
                             *ngFor="let cargador of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador">
                             {{ cargador.exportador.nombre }}:
-                            {{ cargador.cantidad | number : '1.0-0'}} tn 
+                            {{ cargador.cantidad | number : '1.0-0'}} tn
                             +/- {{ cargador.tolerancia }}%
                         </div>
                         <br>
                         <label><strong>Cantidad x cliente: </strong></label>
-                        <label class="margenIzquiera5px" *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto"> - </label>
+                        <label class="margenIzquiera5px"
+                            *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto"> -
+                        </label>
                         <div
                             *ngFor="let cliente of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto">
                             {{ cliente.coordinadorPuerto.nombre }}:
@@ -128,108 +154,121 @@
             <div class="tab-pane fade" id="recibo" role="tabpanel" aria-labelledby="recibo-tab">
                 <div style="overflow-x:auto; " class="table-responsive tableFixHead">
                     <table class='table table-bordered lista-pe-table'>
-                        <thead>        
-                        <tr class="header">
-                        <th>N° de recibo</th>
-                        <th>Cargador</th>
-                        <th>Formato</th>
-                        <th>Cantidad (Tn)</th>
-                        <th>Unidad</th>
-                        <th>Ajuste</th>
-                        <th>Loading Port</th>
-                        <th>Discharge Port</th>
-                        <th>Description of goods</th>
-                        <th>Recibos por dia</th>
-                        <th>Mostrar Destinos</th>
-                        <th>Mostrar Bodegas</th>
-                        </tr>
-                    </thead>  
+                        <thead>
+                            <tr class="header">
+                                <th>N° de recibo</th>
+                                <th>Cargador</th>
+                                <th>Formato</th>
+                                <th>Cantidad (Tn)</th>
+                                <th>Unidad</th>
+                                <th>Ajuste</th>
+                                <th>Loading Port</th>
+                                <th>Discharge Port</th>
+                                <th>Description of goods</th>
+                                <th>Recibos por dia</th>
+                                <th>Mostrar Destinos</th>
+                                <th>Mostrar Bodegas</th>
+                            </tr>
+                        </thead>
                         <tbody *ngFor="let nomi of nominacion?.nominacionRecibo; let i = index" [attr.data-index]="i"
                             style="text-align: center;">
                             <tr>
                                 <td class="centradoHorizontal">{{ nomi?.numeroRecibo }}</td>
                                 <td class="centradoHorizontal">{{nomi?.exportador?.nombre }}</td>
-                                <td class="centradoHorizontal">{{nomi?.formato }}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.cantidad | number : '1.0-0') : "-"}}</td>
+                                <td class="centradoHorizontal nominacionReciboformatoAuditoria">{{nomi?.formato }}</td>
+                                <td class="centradoHorizontal nominacionRecibocantidadAuditoria">{{nomi != null ?
+                                    (nomi?.cantidad | number : '1.0-0') :
+                                    "-"}}</td>
                                 <td class="centradoHorizontal">{{nomi != null ? nomi?.unidad : "-"}}</td>
                                 <td class="centradoHorizontal">{{nomi != null ? nomi?.ajuste : "-"}}</td>
                                 <td class="centradoHorizontal">{{nomi != null ? nomi?.puertoDeCarga : "-"}}</td>
                                 <td class="centradoHorizontal">{{nomi != null ? nomi?.puertoDeDescarga : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? nomi?.descripcionesBienes : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.recibosPorDia == true ? 'SI' : 'NO') : "-" }}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.mostrarDestinos == true ? 'SI' : 'NO') : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.mostrarBodegas == true ? 'SI' : 'NO') : "-"}}</td>
+                                <td class="centradoHorizontal nominacionRecibodescripcionesBienesAuditoria">{{nomi !=
+                                    null ? nomi?.descripcionesBienes : "-"}}</td>
+                                <td class="centradoHorizontal nominacionReciborecibosPorDiaAuditoria">{{nomi != null ?
+                                    (nomi?.recibosPorDia == true ? 'SI' :
+                                    'NO') : "-" }}</td>
+                                <td class="centradoHorizontal nominacionRecibomostrarDestinosAuditoria">{{nomi != null ?
+                                    (nomi?.mostrarDestinos == true ? 'SI' :
+                                    'NO') : "-"}}</td>
+                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.mostrarBodegas == true ? 'SI' :
+                                    'NO') : "-"}}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-                <div class="tab-pane fade" id="intervencion" role="tabpanel" aria-labelledby="intervencion-tab">
-                    <div style="overflow-x:auto; " class="table-responsive">
-                        <table class='table table-bordered lista-pe-table'>  
-                            <thead>                        
+            <div class="tab-pane fade" id="intervencion" role="tabpanel" aria-labelledby="intervencion-tab">
+                <div style="overflow-x:auto; " class="table-responsive">
+                    <table class='table table-bordered lista-pe-table'>
+                        <thead>
                             <tr class="header">
-                            <th></th>
-                            <th>Aplica</th>
-                            <th>A cuenta de</th>
-                            <th>Observaciones</th>
-                            </tr>                   
-                          </thead>         
-                            <tbody>                         
-                                <tr>
-                                    <td class="centradoHorizontal"><strong>Precintado de bodegas</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
-                                        (nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO') : "-"}}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null && 
-                                        nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe != null ? 
-                                        nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe : "-"}}</td>
-                                    <td class="centradoHorizontal">-</td>
-                                </tr>
-                                <tr>
-                                    <td class="centradoHorizontal"><strong>Draft Survey</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
-                                         (nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO') : "-" }}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
-                                        nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe != null ?
-                                        nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe : "-" }}</td>
-                                    <td class="centradoHorizontal">-</td>
-                                </tr>
-                                <tr>
-                                    <td class="centradoHorizontal"><strong>Permiso de embarque</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
-                                        (nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO') : "-" }}</td>
-                                    <td class="centradoHorizontal">-</td>
-                                    <td class="centradoHorizontal">-</td>
-                                </tr>
-                                <tr>
-                                    <td class="centradoHorizontal"><strong>Estibado y trimado</strong></td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
-                                        (nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' : 'N/A') : "-" }}</td>
-                                    <td class="centradoHorizontal">-</td>
-                                    <td class="centradoHorizontal">-</td>
-                                </tr>
-                                <tr>
-                                    <td class="centradoHorizontal"><strong>Fumigación</strong></td>
-                                    <td class="centradoHorizontal">{{ nominacion?.nominacionDetalleIntervencion != null &&
-                                        nominacion?.nominacionDetalleIntervencion?.fumigacion != null ?
-                                        nominacion?.nominacionDetalleIntervencion?.fumigacion : "-" }}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null 
-                                        && nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe != null ? 
-                                        nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe : "-"}}</td>
-                                    <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
-                                        nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion != null ? 
-                                        nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion : "-"}}</td>
-                                </tr>                              
-                           
-                            </tbody>
-                       
-                        </table>
-                    </div>
-                    <label><strong>SENASA</strong></label>              
-                        <div style="overflow-x:auto; height: 160px !important;" class="table-responsive tableFixHead">
-                            <table class='table table-bordered lista-pe-table'>
-                                <thead>        
-                                <tr class="header">
+                                <th></th>
+                                <th>Aplica</th>
+                                <th>A cuenta de</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="nominacionDetalleIntervencionprecintadoAuditoria">
+                                <td class="centradoHorizontal"><strong>Precintado de bodegas</strong></td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                    (nominacion?.nominacionDetalleIntervencion?.precintado == true ? 'SI' : 'NO') :
+                                    "-"}}</td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
+                                    nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe != null ?
+                                    nominacion?.nominacionDetalleIntervencion?.precintadoACuentaDe : "-"}}</td>
+                                <td class="centradoHorizontal">-</td>
+                            </tr>
+                            <tr class="nominacionDetalleIntervenciondraftSurveyAuditoria">
+                                <td class="centradoHorizontal"><strong>Draft Survey</strong></td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                    (nominacion?.nominacionDetalleIntervencion?.draftSurvey == true ? 'SI' : 'NO') : "-"
+                                    }}</td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
+                                    nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe != null ?
+                                    nominacion?.nominacionDetalleIntervencion?.surveyACuentaDe : "-" }}</td>
+                                <td class="centradoHorizontal">-</td>
+                            </tr>
+                            <tr class="nominacionDetalleIntervencionpermisoDeEmbarqueAuditoria">
+                                <td class="centradoHorizontal"><strong>Permiso de embarque</strong></td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                    (nominacion?.nominacionDetalleIntervencion?.permisoDeEmbarque == true ? 'SI' : 'NO')
+                                    : "-" }}</td>
+                                <td class="centradoHorizontal">-</td>
+                                <td class="centradoHorizontal">-</td>
+                            </tr>
+                            <tr class="nominacionDetalleIntervencionestibadorYTrimadoAuditoria">
+                                <td class="centradoHorizontal"><strong>Estibado y trimado</strong></td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null ?
+                                    (nominacion?.nominacionDetalleIntervencion?.estibadorYTrimado == true ? 'SI' :
+                                    'N/A') : "-" }}</td>
+                                <td class="centradoHorizontal">-</td>
+                                <td class="centradoHorizontal">-</td>
+                            </tr>
+                            <tr class="nominacionDetalleIntervencionfumigacionAuditoria">
+                                <td class="centradoHorizontal"><strong>Fumigación</strong></td>
+                                <td class="centradoHorizontal">{{ nominacion?.nominacionDetalleIntervencion != null &&
+                                    nominacion?.nominacionDetalleIntervencion?.fumigacion != null ?
+                                    nominacion?.nominacionDetalleIntervencion?.fumigacion : "-" }}</td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null
+                                    && nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe != null ?
+                                    nominacion?.nominacionDetalleIntervencion?.companiaACuentaDe : "-"}}</td>
+                                <td class="centradoHorizontal">{{nominacion?.nominacionDetalleIntervencion != null &&
+                                    nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion != null ?
+                                    nominacion?.nominacionDetalleIntervencion?.tipoDeFumigacion?.descripcion : "-"}}
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+                <label><strong>SENASA</strong></label>
+                <div style="overflow-x:auto; height: 160px !important;" class="table-responsive tableFixHead">
+                    <table class='table table-bordered lista-pe-table'>
+                        <thead>
+                            <tr class="header">
                                 <th>Exportador</th>
                                 <th>Corresponde SENASA</th>
                                 <th>Consumo</th>
@@ -241,33 +280,55 @@
                                 <th>Muestras oficiales</th>
                                 <th>Certificado de inocuidad</th>
                                 <th>Certificado Veterinario</th>
-                                </tr>
-                            </thead>  
-                                <tbody *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index" [attr.data-index]="i"
-                                    style="text-align: center;">
-                                    <tr>                                       
-                                        <td class="centradoHorizontal">{{intervencion != null ?
-                                            intervencion?.exportador?.nombre : "-" }}</td>
-                                        <td class="centradoHorizontal">{{intervencion != null ? 
-                                            (intervencion?.tieneSenasa == true ? 'SI' : 'NO') : "-"}}</td>
-                                        <td class="centradoHorizontal">{{intervencion != null ? intervencion?.consumo : "-"}}</td>
-                                        <td class="centradoHorizontal">{{intervencion != null ? intervencion?.aCuentaDe : "-"}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.destino != null ? intervencion?.destino?.nombre : "-"}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.certificadoInocuidad == true ? 'SI' : 'NO'}}</td>
-                                        <td class="centradoHorizontal">{{intervencion?.certificadoVeterinario == true ? 'SI' : 'NO'}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                       
-                    </div>
-                </div>          
+                            </tr>
+                        </thead>
+                        <tbody
+                            *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index"
+                            [attr.data-index]="i" style="text-align: center;">
+                            <tr>
+                                <td class="centradoHorizontal nominacionDetalleIntervencionnombreAuditoria">
+                                    {{intervencion != null ?
+                                    intervencion?.exportador?.nombre : "-" }}</td>
+                                <td class="centradoHorizontal nominacionDetalleIntervenciontieneSenasaAuditoria">
+                                    {{intervencion != null ?
+                                    (intervencion?.tieneSenasa == true ? 'SI' : 'NO') : "-"}}</td>
+                                <td class="centradoHorizontal consumo--Auditoria">{{intervencion != null ?
+                                    intervencion?.consumo : "-"}}
+                                </td>
+                                <td class="centradoHorizontal nominacionDetalleIntervencionaCuentaDeAuditoria">
+                                    {{intervencion != null ? intervencion?.aCuentaDe : "-"}}
+                                </td>
+                                <td class="centradoHorizontal nominacionDetalleIntervenciondestinoAuditoria">
+                                    {{intervencion?.destino != null ?
+                                    intervencion?.destino?.nombre : "-"}}</td>
+                                <td class="centradoHorizontal nominacionDetalleIntervencionipAuditoria">
+                                    {{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
+                                <td class="centradoHorizontal nominacionDetalleIntervenciongmoAuditoria">
+                                    {{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
+                                <td class="centradoHorizontal nominacionDetalleIntervencionfitoAuditoria">
+                                    {{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
+                                <td class="centradoHorizontal nominacionDetalleIntervencionmuestraOficialAuditoria">
+                                    {{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}
+                                </td>
+                                <td
+                                    class="centradoHorizontal nominacionDetalleIntervencioncertificadoInocuidadAuditoria">
+                                    {{intervencion?.certificadoInocuidad == true ? 'SI' :
+                                    'NO'}}</td>
+                                <td
+                                    class="centradoHorizontal nominacionDetalleIntervencioncertificadoVeterinarioAuditoria">
+                                    {{intervencion?.certificadoVeterinario == true ? 'SI' :
+                                    'NO'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
         </div>
     </div>
-    <div class="line" [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }" ></div>
+    <div class="line"
+        [ngStyle]="{ 'background-color': retornarColor(nominacion?.nominacionDatoTecnico?.materialPuerto?.color) }">
+    </div>
 </div>
 
 <!-- </div>
