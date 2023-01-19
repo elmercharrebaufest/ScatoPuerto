@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
+using Molinos.Scato.Dominio.Comandos;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -1017,12 +1018,6 @@ public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id
                 throw ex;
             }
         }
-
-
-
-
-
-
 
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
