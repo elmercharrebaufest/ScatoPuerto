@@ -1,19 +1,12 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-10">
-            <label class="cargando-programa-embarque">Programa de Embarque</label>
+            <label class="cargando-programa-embarque">Buque</label>
         </div> 
-        <div class="col-md-2" *ngIf='tienePermisoCrearNuevaNominacion()'>
-            <button class="btn nominacion" (click)="onCrearNuevaNominacion()">NUEVA NOMINACIÓN</button>
+        <div class="col-md-2" *ngIf='tienePermisoCrearNuevoBuque()'>          
+        <app-editar-crear-buques></app-editar-crear-buques>
         </div>      
     </div>
-    <div class="row" *ngIf='tienePermisoEnviarALineUp()'>
-        <div class="col-md-10"></div>        
-        <div class="col-md-2 alinearAlFinal">
-            <button class="btn enviarLineUp">ENVIAR A LINE UP</button>
-        </div>
-    </div>
-    <br>
     <div class="row">
         <div class="col-md-12">
             <app-filtro-vapor></app-filtro-vapor>
@@ -21,7 +14,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <app-listado-vapor></app-listado-vapor>
+            <app-listado-vapor ></app-listado-vapor>
         </div>
     </div>
   

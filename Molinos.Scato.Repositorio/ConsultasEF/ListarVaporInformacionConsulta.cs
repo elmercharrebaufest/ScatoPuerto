@@ -37,12 +37,13 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                 ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
                 var resultado = from item in contexto.Set<VaporInformacion>()
-                                where item.NombreBuque.Contains(Buque) &&
-                                item.ImoVapor.Contains(IMO)
+                                where (Buque == null ||  item.NombreBuque.ToUpper().StartsWith(Buque)) &&
+                                (IMO == null || item.ImoVapor.ToUpper().StartsWith(IMO))
                                 orderby item.NombreBuque ascending
                                 select new VaporInformacionDto
                                 {
                                     Id = item.Id,
+                                    VaporId = item.Vapor.Id,
                                     NombreBuque = item.NombreBuque,
                                     ImoVapor = item.ImoVapor,
                                     Freeboard = item.Freeboard,

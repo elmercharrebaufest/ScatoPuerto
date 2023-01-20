@@ -14,6 +14,7 @@ import { Alerta } from '@ScatoModels/alerta';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { VaporService } from '@ScatoServicios/vapor.service';
 import { Buque } from '@ScatoModels/vapor/vapor';
+import { BuqueService } from '@ScatoServicios/buque.service';
 
 
 @Component({
@@ -41,7 +42,7 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   public estaCargando = false;
   interval: any
   confirmationDialogService: any;
-
+  vaporId: number;
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   public estaEnviando= false;
@@ -51,7 +52,8 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
     private route: Router,
     public config: NgbModalConfig,
     confirmationDialogService: EnvioMailDialogService,
-    public session: SessionService, private alertService: AlertService,) {
+    public session: SessionService, private alertService: AlertService, 
+    private buqueService: BuqueService) {
     this.confirmationDialogService = confirmationDialogService;
     this.user = this.session.getUser();
 
@@ -139,23 +141,23 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   
 
   listarVapores() {
-    this.vaporService.listadoVapor(this.pageIndex, this.pageSize)
+    this.vaporService.ListarVaporInformacion(this.pageIndex, this.pageSize)
+  }
+ 
+  tienePermisoModificarBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Editar);
   }
 
-  public onEditarNominacion(nominacionId: number) {
-    this.route.navigate([`programa/nominacion/${nominacionId}`]);
+  editarVapor(id, modal){ 
+    this.vaporId = id;
+    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
+    .then(() => {     
+      console.log('_modalService.open');
+    })
+    .catch((res) => { console.log(res) }); 
   }
 
-  tienePermisoEliminarNominacion() {
-    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Eliminar);
+  actualizarListaDeVapores(event){
+    this.listarVapores();
   }
-
-  tienePermisoModificarNominacion() {
-    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Modificar);
-  }
-
-  tienePermisoParaNominar() {
-    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Nominar);
-  }
-
 }

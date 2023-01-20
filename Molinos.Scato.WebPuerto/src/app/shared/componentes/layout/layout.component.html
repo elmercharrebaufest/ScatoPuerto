@@ -31,6 +31,14 @@
         </div>
       </a>
 
+      <hr *ngIf='tienePermiso("Vapor_Visualizar")'> 
+      <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "vapor"'>        
+          <div class='icon-vapor'></div>
+          <span *ngIf='opened'>Buque</span>
+        </div>
+      </a>
+
       <hr *ngIf='tienePermiso("Carga_Ver")'>
       <a routerLink='/carga' *ngIf='tienePermiso("Carga_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>

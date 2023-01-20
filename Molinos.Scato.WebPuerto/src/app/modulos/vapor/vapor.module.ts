@@ -13,7 +13,7 @@ import { VaporRoutingModule } from './vapor-routing.module';
   declarations: [    
     FiltroVaporComponent,
     ListadoVaporComponent,
-    VaporComponent
+    VaporComponent,
   ],
   imports: [
     CommonModule,

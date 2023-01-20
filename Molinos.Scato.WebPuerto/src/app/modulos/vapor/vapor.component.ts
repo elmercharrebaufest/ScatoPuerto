@@ -23,11 +23,8 @@ export class VaporComponent implements OnInit {
   }  
  
   
-  tienePermisoEnviarALineUp() {
-    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Enviar_LineUp);
+  tienePermisoCrearNuevoBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Crear);
   }
-  tienePermisoCrearNuevaNominacion() {
-    return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Guardar);
-  }
-
+ 
 }

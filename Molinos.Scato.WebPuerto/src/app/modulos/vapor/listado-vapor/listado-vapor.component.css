@@ -33,24 +33,6 @@
 width: 10px;
 }
 
-.icon-fumigador{
-    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
-    mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
-    -webkit-mask: url('assets/fumigadorProgramaEmbarque.svg') no-repeat center;
-    mask-image: url('assets/fumigadorProgramaEmbarque.svg') no-repeat center;
-    width: 27px;
-    height: 27px;
-}
-
-.icon-surveyor{
-    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
-    mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
-    -webkit-mask: url('assets/surveyorProgramaEmbarque.svg') no-repeat center;
-    mask-image: url('assets/surveyorProgramaEmbarque.svg') no-repeat center;
-    width: 27px;
-    height: 27px;    
-}
-
 .icon-editar{
      /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */

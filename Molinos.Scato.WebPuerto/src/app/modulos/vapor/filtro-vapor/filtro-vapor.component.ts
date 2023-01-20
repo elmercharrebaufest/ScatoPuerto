@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ProgramaEmbarqueService } from '@ScatoServicios/programa-embarque.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { Bandera } from '@ScatoModels/bandera';
+import { VaporService } from '@ScatoServicios/vapor.service';
 
 @Component({
   selector: 'app-filtro-vapor',
@@ -11,12 +13,12 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
   styleUrls: ['./filtro-vapor.component.css']
 })
 export class FiltroVaporComponent implements OnInit {
-  //#region Variables
-  private listaBandera;
+  //#region Variables  
   private buque;
   private listaTipoBuque: string[] = ['Bulk Carrier', 'Oil Tanker'];
   private configListaMultiple;
-  private filtroBuquedaForm: FormGroup; ;
+  private filtroBuquedaForm: FormGroup;
+  listaBandera: string[];
   combos: any;
   filtros = new Subject<any>();
   public estaCargando = true;
@@ -24,7 +26,7 @@ export class FiltroVaporComponent implements OnInit {
 
   // #region Observables
   constructor(private formBuilder: FormBuilder, private store: Store,
-    private programaEmbarqueService: ProgramaEmbarqueService, 
+    private vaporService: VaporService, 
     private embarqueService: EmbarqueService) {
     this.setFiltroBuquedaForm();
     this.onBuscar();
@@ -54,23 +56,13 @@ export class FiltroVaporComponent implements OnInit {
     };
   }
 
-  private SetearAnioMesActual(){
-    const date= new Date()
-    const month=("0" + (date.getMonth() + 1)).slice(-2)
-    const year=date.getFullYear();
-    this.filtroBuquedaForm['controls'].fecha.setValue(`${year}-${month}`)
-
-  }
-
   public setFiltroBuquedaForm() {
     this.filtroBuquedaForm = this.formBuilder.group({
       bandera: '',
       buque: '',
       imo: '',
       tipoBuque: '',
-    });
-    
-    this.SetearAnioMesActual();
+    });    
 
   }
 
@@ -83,22 +75,24 @@ export class FiltroVaporComponent implements OnInit {
   }
   onBuscar() {
     this.estaCargando = true;
-    this.programaEmbarqueService.ListarProgramaEmbarque(
+    this.vaporService.ListarVaporInformacion(
       null,
-      null,
-      this.filtroBuquedaForm.controls.bandera.value,
+      null,  
       this.filtroBuquedaForm.controls.buque.value,
       this.filtroBuquedaForm.controls.imo.value,
-      this.filtroBuquedaForm.controls.tipoBuque.value)
+      this.filtroBuquedaForm.controls.tipoBuque.value,
+      this.filtroBuquedaForm.controls.bandera.value)
     this.estaCargando = false;
   }
 
   public setListaCombos() {
     this.embarqueService.obtenerBanderas().subscribe(
-      (data: any) => {
-        this.listaBandera = data;
+      (data: Bandera[]) => {
+        var banderas = data.map(x => new Bandera(x.id, x.abreviatura, x.nombre));
+        this.listaBandera = banderas.map(({ nombre }) => nombre);
       }
     )
+    
   }
 
   public getFiltroBusquedaForm() {    

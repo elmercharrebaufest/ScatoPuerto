@@ -18,8 +18,8 @@ using Molinos.Scato.Dominio.Consultas;
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class VaporController : BaseController
-    {
-        public VaporController(IServicioRepositorio servicio) : base(servicio)
+    {       
+        public VaporController(IServicioRepositorio servicio, IServicioVapor servicioVapor) : base(servicio, null, servicioVapor)
         {
         }
 
