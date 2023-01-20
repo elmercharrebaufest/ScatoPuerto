@@ -37,9 +37,9 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
   public cargandoRegistro: boolean = false;
   public fechaActualizacion: string;
 
-  public fechaActualizacionNominacionRecibo: string;
-  public fechaActualizacionNominacionDatoTecnico: string;
-  public fechaActualizacionNominacionDetalleIntervencion: string;
+  public fechaActualizacionNominacionRecibo: Date;
+  public fechaActualizacionNominacionDatoTecnico: Date;
+  public fechaActualizacionNominacionDetalleIntervencion: Date;
   public fechasModificacion: Array<any> = [];
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -127,14 +127,14 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     this.nominacionId = nominacionId != null ? parseInt(nominacionId) : 0;
     this.titulo = this.nominacionId == 0 ? 'Nueva Nominación' : 'Editar Nominación';
     this.asignarNominacionParametros(this.nominacionId);
-    this.obtenerAuditorias();
+
   }
 
   obtenerAuditorias() {
 
 
 
-    this.programaEmbarqueService.obtenerAuditoria(this.nominacionId).subscribe((res: Auditoria[]) => {
+     this.programaEmbarqueService.obtenerAuditoria(this.nominacionId).subscribe((res: Auditoria[]) => {
 
 
       res.forEach(element => {
@@ -143,7 +143,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
           case 'NominacionRecibo':
             fecha = new Date(element.fechaModificacion);
             if (this.fechaActualizacionNominacionRecibo == undefined || fecha > new Date(this.fechaActualizacionNominacionRecibo))
-              this.fechaActualizacionNominacionRecibo = new Date(element.fechaModificacion).toLocaleString();
+              this.fechaActualizacionNominacionRecibo = new Date(element.fechaModificacion);
             break;
 
           case 'NominacionDatoTecnico':
@@ -153,19 +153,18 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
           case 'NominacionDatoTecnicoDestino':
             fecha = new Date(element.fechaModificacion);
             if (this.fechaActualizacionNominacionDatoTecnico == undefined || fecha > new Date(this.fechaActualizacionNominacionDatoTecnico))
-              this.fechaActualizacionNominacionDatoTecnico = new Date(element.fechaModificacion).toLocaleString();
+              this.fechaActualizacionNominacionDatoTecnico = new Date(element.fechaModificacion);
             break;
 
           case 'Senasa':
           case 'NominacionDetalleIntervencion':
             fecha = new Date(element.fechaModificacion);
             if (this.fechaActualizacionNominacionDetalleIntervencion == undefined || fecha > new Date(this.fechaActualizacionNominacionDetalleIntervencion))
-              this.fechaActualizacionNominacionDetalleIntervencion = new Date(element.fechaModificacion).toLocaleString();
+              this.fechaActualizacionNominacionDetalleIntervencion = new Date(element.fechaModificacion);
             break;
         }
 
       });
-
 
     }, error => { })
   }

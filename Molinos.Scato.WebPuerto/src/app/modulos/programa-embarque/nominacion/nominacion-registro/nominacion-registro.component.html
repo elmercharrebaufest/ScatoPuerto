@@ -37,7 +37,7 @@
                     Datos técnicos
                   </button>
                 </h5>
-                <label class="auditoria-fecha-actualizacion">{{fechaActualizacionNominacionDatoTecnico}}</label>
+                <label *ngIf="fechaActualizacionNominacionDatoTecnico!= undefined" class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionDatoTecnico | date: 'dd/MM/yyyy HH:mm'}}</label>
               </div>
             </div>
 
@@ -57,7 +57,7 @@
                     Datos de recibos
                   </button>
                 </h5>
-                <label class="auditoria-fecha-actualizacion">{{fechaActualizacionNominacionRecibo}}</label>
+                <label *ngIf="fechaActualizacionNominacionRecibo!= undefined" class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionRecibo| date: 'dd/MM/yyyy HH:mm'}}</label>
               </div>
             </div>
             <div id="collapseTwo" class="collapse" aria-labelledby="datoRecibos" data-parent="#accordionExample">
@@ -76,7 +76,7 @@
                     Datos de intervenciones
                   </button>
                 </h5>
-                <label class="auditoria-fecha-actualizacion">{{fechaActualizacionNominacionDetalleIntervencion}}</label>
+                <label *ngIf="fechaActualizacionNominacionDetalleIntervencion!= undefined"  class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionDetalleIntervencion | date: 'dd/MM/yyyy HH:mm'}}</label>
               </div>
             </div>
             <div id="collapseThree" class="collapse" aria-labelledby="datoIntervencion" data-parent="#accordionExample">
