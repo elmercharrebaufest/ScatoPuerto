@@ -1,9 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
+import { NominacionLineUp } from '@ScatoModels/programa-embarque/nominacion-lineup';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { ProgramaEmbarqueNominacionesEnvioLineUp } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-envio';
+import { ProgramaEmbarqueResultadoResultado } from '@ScatoModels/programa-embarque/programa-embarque-nominaciones-resultado';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
 import { environment } from 'environments/environment';
@@ -58,6 +62,16 @@ export class NominacionService {
     public registrarCompaniaDeFumigacion(companiaDeFumigacion: CompaniaDeFumigacion) {
         return this.http.post<boolean>(`${this.url}ProgramaEmbarque/RegistrarCompaniaDeFumigacion`, companiaDeFumigacion, { 'withCredentials': true });
     }
+    public listarBuquesNominacion():Observable<VaporInformacion[]> {
+        return this.http.get<VaporInformacion[]>(`${this.url}ProgramaEmbarque/ListarBuquesNominacion`, { 'withCredentials': true });
+    }
+    public listarNominacionPorBuque(vaporInformacion_Id: number):Observable<NominacionLineUp[]> {
+        return this.http.get<NominacionLineUp[]>(`${this.url}ProgramaEmbarque/ListarNominacionPorBuque?vaporInformacion_Id=${vaporInformacion_Id}`, { 'withCredentials': true });
+    }
+    public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp):Observable<ProgramaEmbarqueResultadoResultado> {
+        return this.http.post<ProgramaEmbarqueResultadoResultado>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`,nominacionesEnvioLineUp, { 'withCredentials': true });
+    }
+    
     // #endregion
     
 }

@@ -708,6 +708,7 @@
     <Compile Include="Dto\NominacionDatoTecnicoDto.cs" />
     <Compile Include="Dto\NominacionDatoTecnicoExportadorDto.cs" />
     <Compile Include="Dto\NominacionDetalleIntervencionDto.cs" />
+    <Compile Include="Dto\NominacionLineUpDto.cs" />
     <Compile Include="Dto\NominacionValidaDto.cs" />
     <Compile Include="Dto\NotificacionProgramaDeEmbarqueDto.cs" />
     <Compile Include="Dto\NotificacionExcluidosDto.cs" />
@@ -715,6 +716,7 @@
     <Compile Include="Dto\NominacionDto.cs" />
     <Compile Include="Dto\NominacionReciboDto.cs" />
     <Compile Include="Dto\ProgramaEmbarqueNominacionDatoTecnicoDto.cs" />
+    <Compile Include="Dto\ProgramaEmbarqueValidacionLineUpDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDetallesDto.cs" />
     <Compile Include="Dto\ReciboDeBuqueDto.cs" />
     <Compile Include="Dto\ParametrosDto.cs" />

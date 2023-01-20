@@ -1,0 +1,102 @@
+<ship-spinner [message]="mensajeEnvioLineUp" *ngIf='cargandoNominaciones'></ship-spinner>
+
+
+<div class='modal-header'>
+    <h4 class="modal-title">Enviar a Line Up</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCerraModal()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class='modal-body'>
+    <div class="form">
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label class="font-weight-bold">Buques</label>
+                <select class="custom-select" (change)="onCargarNominaciones($event)">
+                    <option value="">Seleccione</option>
+                    <option *ngFor="let vapor of listasVapores" [value]="vapor.id">
+                        <b>{{vapor.nombreBuque}}</b>
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-8">
+                <label class="font-weight-bold">Seleccione Producto(s)</label>
+            </div>
+            <div class="form-group col-md-4">
+                <button class="btn btn-success" style="float:right;" [disabled]="procesandoEnvioLineUp" (click)="onEnviarNominacionLineUp()"> Enviar Nominaciones</button>
+            </div>
+            <div class="form-group col-md-12">
+                <table class='table tabla-sin-border'
+                    style="border-spacing: 0px 0px; border-collapse: separate;">
+                    <thead class="fondo-cabecera tamanioHeader">
+                        <tr >
+                            <th class="sin-bordes borde-izquierda">
+                                <input class="largerCheckbox" 
+                                id="chkTodos" 
+                                type="checkbox" 
+                                [checked]="esSeleccionarTodos"
+                                (change)="onSeleccionarTodos($event)"
+                                />
+                            </th>
+                            <th tabindex="0" rowspan="1" colspan="1" class="noBorder" width="15%">
+                                <div class="head noBorder">
+                                    Producto
+                                </div>
+                            </th>
+                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1" width="15%">
+                                <div class="head">
+                                    Muelle de carga
+                                </div>
+                            </th>
+                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1" width="20%">
+                                <div class="head">
+                                    Cargador
+                                </div>
+                            </th>
+                            <th class="sin-bordes" tabindex="0" rowspan="1" colspan="1"  width="15%">
+                                <div class="head">
+                                    Cantidad x cargador
+                                </div>
+                            </th>
+                            <th class="sin-bordes borde-derecha" tabindex="0" rowspan="1" colspan="1" width="35%">
+                                <div class="head">
+                                    Estado
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let lineUp of listaEnviarLineUp" style="border-top: 2px solid #dee2e6;">
+                        <tr class ="lista-buque-row" style="background-color: white; box-shadow: 1px 2px 6px #cccccc;">
+                            <td>
+                                <input class="largerCheckbox" 
+                                id={{lineUp.nominacion_Id}} 
+                                type="checkbox" 
+                                [checked]="lineUp.seleccionado"
+                                [disabled]="lineUp.procesado"
+                                [value]="lineUp.nominacion_Id"
+                                (change)="onSeleccionarNominacion(lineUp.nominacion_Id)"
+                                />
+                            </td>
+                            <td>{{lineUp.materialPuerto.descripcionCortaIngles}}</td>
+                            <td>{{lineUp.muelleDeCarga.descripcion}}</td>
+                            <td>
+                                <div *ngFor="let cargador of lineUp.nominacionCargadorPorCantidad">
+                                    {{cargador.exportador.nombre}}
+                                </div>
+                            </td>
+                            <td>
+                                <div *ngFor="let cargador of lineUp.nominacionCargadorPorCantidad">
+                                    {{cargador.cantidad}}
+                                </div>
+                            </td>
+                            <td *ngIf="!lineUp.procesado">{{lineUp.enviadoLineUp? 'Enviado' : 'Pendiente'}}</td>
+                            <td *ngIf="lineUp.procesado">{{lineUp.observaciones}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

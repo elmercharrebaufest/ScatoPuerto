@@ -11,6 +11,7 @@ using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -22,13 +23,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     public class ProgramaEmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;
+        private readonly IListaDeWorkflows workflows;
+        private readonly IServicioRepositorio servicioRepositorio;
 
-        public ProgramaEmbarqueController(IServicioRepositorio servicio,
+        private readonly IServicioActividadFactory<IIngresarEmbarqueService> factory;
+
+        public ProgramaEmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory, IServicioRepositorio servicio,
             IServicioProgramaEmbarque servicioProgramaEmbarque,
-            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque)
+            IServicioComandos comandos,
+            IListaDeWorkflows workflows) : base(servicio, servicioProgramaEmbarque)
         {
+            this.factory = factory;
             this.comandos = comandos;
-
+            this.servicioRepositorio = servicio;
+            this.workflows = workflows;
         }
 
         [HttpGet]
@@ -459,62 +467,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
-        [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ProgramaEmbarque/EliminarNotificacion")]
-        public HttpResponseMessage eliminarNotificacion(NotificacionProgramaDeEmbarqueDto notificacion)
-        {
-            try
-            {
-                servicioProgramaEmbarque.EliminarNotificacion(notificacion.Id, this.nombreUsuario);
-                return Request.CreateResponse(HttpStatusCode.OK);
-			}
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-        
-        [HttpPost]
-        [Route("api/ProgramaEmbarque/EnviarMailProgramaEmbarque")]
-        public HttpResponseMessage EnviarMailProgramaEmbarque(MailDto mail)
-        {       
-            try
-            {
-                servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail, this.nombreUsuario);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpGet]        
-        [Route("api/ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque")]
-        public HttpResponseMessage ObtenerDatosMailProgramaEmbarque(int nominacionId, string tipoDeMail)
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK,
-                    servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
-                );
-
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }   
-
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ProgramaEmbarque/ObtenerNotificaciones")]
-        public HttpResponseMessage obtenerNotificaciones()
+        [Route("api/ProgramaEmbarque/ListarBuquesNominacion")]
+        public HttpResponseMessage ListarBuquesNominacion()
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ObtenerNotificaciones(base.nombreUsuario));
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ListarBuquesNominacion());
             }
             catch (Exception ex)
             {
@@ -537,6 +497,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarNominacionPorBuque")]
+        public HttpResponseMessage ListarNominacionPorBuque(int vaporInformacion_Id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ListarNominacionPorBuque(vaporInformacion_Id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/TieneAuditoria")]
@@ -551,7 +526,237 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        
+        [HttpPost]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/EnviarNominacionLineUp")]
+        public HttpResponseMessage EnviarNominacionLineUp(ProgramaEmbarqueNominacionesEnvioLineUpDto nominacionesEnvioLineUpDto)
+        {
+            var workflow = ConfigurationManager.AppSettings["Workflow"];
+            var centro = int.Parse(ConfigurationManager.AppSettings["Centro"]);
+            ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp = new ResultadoEnvioLineUpDto();
+            programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp = new List<RespuestaEnvioLineUpDto>();
+            try
+            {
+                foreach(var programaEmbarqueNominacion in nominacionesEnvioLineUpDto.ListaNominaciones)
+                {
+                    var nominacion = servicioProgramaEmbarque.ObtenerNominacion(programaEmbarqueNominacion.Nominacion_Id);
 
+                    var validacionEmbarques = servicioProgramaEmbarque.ObtenerEmbarque(nominacion.NominacionDatoTecnico.MaterialPuerto.Id, 
+                                                                             nominacion.NominacionDatoTecnico.MuelleDeCarga.Id,
+                                                                             nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Id);
+                    
+                    if (validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial == null) // Nuevo Embarque
+                    {
+                        this.CrearAltaDeEmbarque(nominacion, centro, workflow, ref programaEmbarqueResultadoEnvioLineUp);
+                    }
+                    else
+                    {
+                        int embarque_Id = validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.Embarque.Id;
+                        bool existeMaterial = validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.MaterialesExistentes.Existe;
+                        if (embarque_Id > 0 && !existeMaterial)
+                        {
+                            this.ModificarAltaDeEmbarque(nominacion, validacionEmbarques, ref programaEmbarqueResultadoEnvioLineUp);
+                        }
+                        else
+                        {
+                            servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque_Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE);
+                            programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                            {
+                                Nominacion_Id = nominacion.Id,
+                                Estado = 2,
+                                Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE
+                            });
+                        }
+                    }
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, programaEmbarqueResultadoEnvioLineUp);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
+        private EmbarqueDto CrearEmbarqueDto(NominacionDto nominacion, int centroId)
+        {
+            EmbarqueDto embarqueDto = new EmbarqueDto();
+            embarqueDto.Id = 0;
+            embarqueDto.NombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.NombreBuque;
+            IList<TipoDeBuquePuertoDto> tipoDeBuquePuerto = servicioRepositorio.ListarTipoDeBuquePuerto();
+            var filtroTipoDeBuque = tipoDeBuquePuerto.Where(x => x.Nombre == nominacion.NominacionDatoTecnico.VaporInformacion.TipoBuque);
+            embarqueDto.TipoBuque = nominacion.NominacionDatoTecnico.VaporInformacion.TipoBuque;
+            if (filtroTipoDeBuque != null)
+                embarqueDto.TipoDeBuque = filtroTipoDeBuque.ElementAt(0);
+            embarqueDto.Agencias = nominacion.NominacionDatoTecnico.AgenciaMaritimaPuerto;
+            embarqueDto.FechaRecalada = nominacion.NominacionDatoTecnico.ETARecalada;
+            DateTime etaRecalada = (DateTime)nominacion.NominacionDatoTecnico.ETARecalada;
+            embarqueDto.HoraRecalada = etaRecalada != null ? etaRecalada.ToString("HH:mm") : "";
+            embarqueDto.ObligacionCarga = nominacion.NominacionDatoTecnico.ObligacionDeCarga;
+            IList<MaterialPuertoCantidadDto> listaMaterialesPuertoCantidad = new List<MaterialPuertoCantidadDto>();
+            MaterialPuertoCantidadDto materialPuertoCantidad = new MaterialPuertoCantidadDto()
+            {
+                Cantidad = nominacion.NominacionDatoTecnico.CantidadTotal,
+                DescripcionCorta = nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
+                Color = nominacion.NominacionDatoTecnico.MaterialPuerto.Color,
+                MaterialId = nominacion.NominacionDatoTecnico.MaterialPuerto.Id,
+                EsLiquido = nominacion.NominacionDatoTecnico.MaterialPuerto.EsLiquido
+            };
+            listaMaterialesPuertoCantidad.Add(materialPuertoCantidad);
+            embarqueDto.MaterialesPuertoCantidad = listaMaterialesPuertoCantidad;
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
+            {
+                var nominacionDatoTecnicoCoordinadorPuerto = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.ElementAt(0);
+                embarqueDto.Coordinadores = nominacionDatoTecnicoCoordinadorPuerto.CoordinadorPuerto;
+            }
+            embarqueDto.Agencias = nominacion.NominacionDatoTecnico.AgenciaMaritimaPuerto;
+            embarqueDto.CentroId = centroId;
+            embarqueDto.Patente = nominacion.NominacionDatoTecnico.VaporInformacion.NombreBuque;
+            MuelleDeCargaDto muelleDeCarga = nominacion.NominacionDatoTecnico.MuelleDeCarga;
+            bool vicentin = muelleDeCarga.Descripcion == "Vicentin" ? true : false;
+            bool noryon = muelleDeCarga.Descripcion == "Nouryon" ? true : false;
+            bool sanBenito = muelleDeCarga.Descripcion == "San Benito" ? true : false;
+            bool otrosMuelles = muelleDeCarga.Descripcion == "Otros Muelles" ? true : false;
+            embarqueDto.Vicentin = vicentin;
+            embarqueDto.OtrosMuelles = otrosMuelles;
+            embarqueDto.Noryon = noryon;
+            embarqueDto.SanBenito = sanBenito;
+            embarqueDto.Ubicacion = 8;
+            IList<UbicacionDeBuquePuertoDto> ubicacionDeBuquePuertoDto = servicioRepositorio.ListarUbicacionDeBuquePuerto();
+            var filtroUbicacionDeBuquePuerto = ubicacionDeBuquePuertoDto.Where(x => x.Orden == 8);
+            embarqueDto.UbicacionDeBuque = filtroUbicacionDeBuquePuerto.ElementAt(0);
+            embarqueDto.Senasa = false;
+            embarqueDto.Freeboard = 0;
+            embarqueDto.PorteNeto = 0;
+            embarqueDto.PorteBruto = 0;
+            embarqueDto.Eslora = 0;
+            embarqueDto.Manga = 0;
+            embarqueDto.Puntal = 0;
+            embarqueDto.CantidadBodegasTanques = 0;
+            embarqueDto.Destino = null;
+            embarqueDto.ATA = nominacion.NominacionDatoTecnico.ATAPuerto;
+            embarqueDto.EsLiquido = nominacion.NominacionDatoTecnico.MaterialPuerto.EsLiquido;
+            embarqueDto.Vapor = nominacion.NominacionDatoTecnico.VaporInformacion.Vapor;
+            embarqueDto.EmbarqueInformacion = null;
+            embarqueDto.EmbarqueInformacionViaje = null;
+            embarqueDto.EmbarquePosicion = null;
+            IList<EmbarqueDto> listaEmbarqueDto = servicioProgramaEmbarque.ObtenerEmbarquePorVapor(nominacion.NominacionDatoTecnico.MaterialPuerto.Id, 
+                                                                                                   nominacion.NominacionDatoTecnico.MuelleDeCarga.Id,
+                                                                                                   nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Id);
+            string observaciones = string.Empty;
+            observaciones += $"Destinos: {Environment.NewLine}";
+
+            foreach (var destino in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino)
+            {
+                observaciones += $"{destino.Destino.Nombre.Trim()} / {destino.Cantidad} tn {Environment.NewLine}";
+            }
+
+            observaciones += $"{Environment.NewLine} {Environment.NewLine}";
+
+            observaciones += $"Cargadores: {Environment.NewLine}";
+
+            foreach (var exportador in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+            {
+                observaciones += $"{exportador.Exportador.Nombre.Trim()} / {exportador.Cantidad} tn {Environment.NewLine}";
+            }
+
+            embarqueDto.Observaciones = observaciones;
+            if (listaEmbarqueDto != null && listaEmbarqueDto.Count > 0)
+            {
+                var embarqueDtoSel = listaEmbarqueDto[0];
+                if (embarqueDtoSel.EmbarqueInformacion.Count > 0)
+                {
+                    embarqueDto.EmbarqueInformacion = embarqueDtoSel.EmbarqueInformacion;
+                    embarqueDto.EmbarqueInformacionViaje = embarqueDtoSel.EmbarqueInformacionViaje;
+                    embarqueDto.EmbarquePosicion = embarqueDtoSel.EmbarquePosicion;
+                }
+                else
+                {
+                    EmbarqueInformacionDto embarqueInformacionDto = this.CrearEmbarqueInformacion(nominacion.NominacionDatoTecnico);
+                    embarqueDto.EmbarqueInformacion.Add(embarqueInformacionDto);
+                    embarqueDto.EmbarqueInformacionViaje = null;
+                    embarqueDto.EmbarquePosicion = null;
+                }
+
+            }
+            else
+            {
+                EmbarqueInformacionDto embarqueInformacionDto = this.CrearEmbarqueInformacion(nominacion.NominacionDatoTecnico);
+                IList<EmbarqueInformacionDto> listEmbarqueInformacionDto = new List<EmbarqueInformacionDto>();
+                listEmbarqueInformacionDto.Add(embarqueInformacionDto);
+                embarqueDto.EmbarqueInformacion = listEmbarqueInformacionDto;
+            }
+            return embarqueDto;
+        }
+        private EmbarqueInformacionDto CrearEmbarqueInformacion(NominacionDatoTecnicoDto nominacionDatoTecnico)
+        {
+            EmbarqueInformacionDto embarqueInformacionDto = new EmbarqueInformacionDto();
+            embarqueInformacionDto.Id = 0;
+            embarqueInformacionDto.IMO = nominacionDatoTecnico.VaporInformacion.ImoVapor;
+            embarqueInformacionDto.MMSI = "";
+            embarqueInformacionDto.Bandera = nominacionDatoTecnico.VaporInformacion.Bandera;
+            embarqueInformacionDto.Tonelaje = 0;
+            embarqueInformacionDto.TonelajePesoMuerto = 0;
+            embarqueInformacionDto.LargoxAnchoExtremo = $"{nominacionDatoTecnico.VaporInformacion.Eslora} x {nominacionDatoTecnico.VaporInformacion.Manga}";
+            embarqueInformacionDto.FotoEmbarque = null;
+            embarqueInformacionDto.FechaRegistro = DateTime.Now;
+            return embarqueInformacionDto;
+        }
+        private bool CrearAltaDeEmbarque(NominacionDto nominacion, int centro, string workflow, ref ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp)
+        {
+            bool bCreacionEmbarque = false;
+            int datosEmbarque = 0;
+            try
+            {
+                EmbarqueDto embarqueDto = this.CrearEmbarqueDto(nominacion, centro);
+                var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
+                var servicioWf = factory.CrearServicio(workflowDefinicionId);
+                var controlRecorrido = new ControlRecorridoDto
+                {
+                    Actividad = Textos.ActIngresarEmbarque,
+                    ActividadXaml = "IngresarEmbarque",
+                    NombreUsuario = nombreUsuario
+                };
+                var datosEmbarqueAux = servicioWf.IngresarEmbarque(embarqueDto, workflow, workflowDefinicionId, controlRecorrido);
+                datosEmbarque = ((ResultadoCrear)datosEmbarqueAux).Id;
+                servicio.ActualizarEstadoBuque(datosEmbarque, 1);
+                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, datosEmbarque, MensajeEnvioLineUp.ENVIO_OK);
+                bCreacionEmbarque = datosEmbarque > 0 ? true : false;
+                programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                {
+                    Nominacion_Id = nominacion.Id,
+                    Estado = 1,
+                    Observacion = MensajeEnvioLineUp.ENVIO_OK
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return bCreacionEmbarque;
+        }
+        private bool ModificarAltaDeEmbarque(NominacionDto nominacion, ProgramaEmbarqueValidacionLineUpDto programaEmbarqueValidacionLineUp, ref ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp)
+        {
+            bool bModificacionEmbarque = false;
+            try
+            {
+                EmbarqueDto embarque = programaEmbarqueValidacionLineUp.ProgramaEmbarqueEmbarqueMaterial.Embarque;
+                servicioProgramaEmbarque.AgregarMaterialesPorNominacionEnviada(nominacion.Id, embarque.Id);
+                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque.Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_AGREGADO);
+                bModificacionEmbarque = true;
+                programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                {
+                    Nominacion_Id = nominacion.Id,
+                    Estado = 1,
+                    Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_AGREGADO
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return bModificacionEmbarque;
+        }
     }
 }

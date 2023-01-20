@@ -9,6 +9,7 @@ namespace Molinos.Scato.Servicios
     [ServiceContract]
     public interface IServicioProgramaEmbarque
     {
+
         [OperationContract]
         IList<TipoDeContratoDto> listarTipoDeContrato();
 
@@ -107,5 +108,25 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);
+        
+        
+        [OperationContract]
+        IList<VaporInformacionDto> ListarBuquesNominacion();
+
+        [OperationContract]
+        IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id);
+        
+        [OperationContract]
+        ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id);
+
+        [OperationContract]
+        IList<EmbarqueDto> ObtenerEmbarquePorVapor(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id);
+
+        [OperationContract]
+        void AsociarEmbarquePorNominacionEnviada(int nominacion_Id, int embarque_Id, string observacion);
+
+        [OperationContract]
+        void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id);
+
     }
 }
