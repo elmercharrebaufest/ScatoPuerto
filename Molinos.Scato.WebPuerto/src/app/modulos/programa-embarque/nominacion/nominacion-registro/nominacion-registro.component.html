@@ -1,102 +1,108 @@
 <br />
 <div class="margenes-nominacion">
-    <div class="form">
-        <div class="row">
+  <div class="form">
+    <div class="row">
 
-            <div class="col-4">
-                <button class="btn btn-outline-secondary" (click)="onRegresarNominacion()">
-                    < Volver </button>
-            </div>
-            <div class="col-4">
-            </div>
-            <div class="col-4"></div>
-        </div>
+      <div class="col-4">
+        <button class="btn btn-outline-secondary" (click)="onRegresarNominacion()">
+          Volver </button>
+      </div>
+      <div class="col-4">
+      </div>
+      <div class="col-4"></div>
     </div>
-    <br/><br/>
-    <!-- TITULO -->
-    <div class="form">
-        <div class="row">
-            <div class="col-md-12">
-                <h2>{{titulo}}</h2>
-            </div>
-        </div>
+  </div>
+  <br /><br />
+  <!-- TITULO -->
+  <div class="form">
+    <div class="row">
+      <div class="col-md-12">
+        <h2>{{titulo}}</h2>
+      </div>
     </div>
-    <br />
+  </div>
+  <br />
 
-    <!-- MENUS -->
-    <div class="form">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="accordion" id="accordionExample">
-                    <div class="card">
-                        <div class="card-header acordion-header-fondo" id="datoTecnico">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link acordion-header-titulo" type="button" data-toggle="collapse"
-                                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Datos técnicos
-                                </button>
-                            </h5>
-                        </div>
-
-                        <div id="collapseOne" class="collapse show" aria-labelledby="datoTecnico"
-                            data-parent="#accordionExample">
-                            <div class="card-body acordion-card-body">
-                                <app-nominacion-dato-tecnico *ngIf="nominacionId!=null"></app-nominacion-dato-tecnico>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                    <div class="card">
-                        <div class="card-header acordion-header-fondo" id="datoRecibos">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link acordion-header-titulo" type="button" data-toggle="collapse"
-                                    data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    Datos de recibos
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseTwo" class="collapse" aria-labelledby="datoRecibos"
-                            data-parent="#accordionExample">
-                            <div class="card-body acordion-card-body">
-                                <app-nominacion-recibos></app-nominacion-recibos>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                    <div class="card">
-                        <div class="card-header acordion-header-fondo" id="datoIntervencion">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link collapsed acordion-header-titulo" type="button"
-                                    data-toggle="collapse" data-target="#collapseThree" aria-expanded="false"
-                                    aria-controls="collapseThree">
-                                    Datos de intervenciones
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseThree" class="collapse" aria-labelledby="datoIntervencion"
-                            data-parent="#accordionExample">
-                            <div class="card-body acordion-card-body">
-                                <app-nominacion-intervenciones *ngIf="nominacionId!=null"></app-nominacion-intervenciones>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                </div>
+  <!-- MENUS -->
+  <div class="form">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="accordion" id="accordionExample">
+          <div class="card">
+            <div class="card-header acordion-header-fondo" id="datoTecnico">
+              <div class="auditoria-actualizacion">
+                <h5 class="mb-0">
+                  <button class="btn btn-link acordion-header-titulo" type="button" data-toggle="collapse"
+                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Datos técnicos
+                  </button>
+                </h5>
+                <label *ngIf="fechaActualizacionNominacionDatoTecnico!= undefined" class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionDatoTecnico | date: 'dd/MM/yyyy HH:mm'}}</label>
+              </div>
             </div>
-        </div>
-    </div>
 
-    <!-- BOTONES -->
-    <div class="form" *ngIf="nominacionId == 0">
-        <div class="row">
-            <div class="col-md-12 botones-registro-centrado">
-                <button class="btn btn-danger botones-registro-custom" (click)="onRegresarNominacion()">Cancelar</button>
-                <button class="btn btn-primary botones-registro-custom" (click)="onGuardarNominacion()" [disabled]="cargandoRegistro">Guardar</button>
+            <div id="collapseOne" class="collapse show" aria-labelledby="datoTecnico" data-parent="#accordionExample">
+              <div class="card-body acordion-card-body">
+                <app-nominacion-dato-tecnico *ngIf="nominacionId!=null"></app-nominacion-dato-tecnico>
+              </div>
             </div>
+          </div>
+          <br />
+          <div class="card">
+            <div class="card-header acordion-header-fondo" id="datoRecibos">
+              <div class="auditoria-actualizacion">
+                <h5 class="mb-0">
+                  <button class="btn btn-link acordion-header-titulo" type="button" data-toggle="collapse"
+                    data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Datos de recibos
+                  </button>
+                </h5>
+                <label *ngIf="fechaActualizacionNominacionRecibo!= undefined" class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionRecibo| date: 'dd/MM/yyyy HH:mm'}}</label>
+              </div>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="datoRecibos" data-parent="#accordionExample">
+              <div class="card-body acordion-card-body">
+                <app-nominacion-recibos></app-nominacion-recibos>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div class="card">
+            <div class="card-header acordion-header-fondo" id="datoIntervencion">
+              <div class="auditoria-actualizacion">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed acordion-header-titulo" type="button" data-toggle="collapse"
+                    data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Datos de intervenciones
+                  </button>
+                </h5>
+                <label *ngIf="fechaActualizacionNominacionDetalleIntervencion!= undefined"  class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionDetalleIntervencion | date: 'dd/MM/yyyy HH:mm'}}</label>
+              </div>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="datoIntervencion" data-parent="#accordionExample">
+              <div class="card-body acordion-card-body">
+                <app-nominacion-intervenciones *ngIf="nominacionId!=null"></app-nominacion-intervenciones>
+              </div>
+            </div>
+          </div>
+          <br />
         </div>
+      </div>
     </div>
-    <br />
-    <br />
+  </div>
+
+  <!-- BOTONES -->
+  <div class="form" *ngIf="nominacionId == 0">
+    <div class="row">
+      <div class="col-md-12 botones-registro-centrado">
+        <button class="btn btn-danger botones-registro-custom" (click)="onRegresarNominacion()">Cancelar</button>
+        <button class="btn btn-primary botones-registro-custom" (click)="onGuardarNominacion()"
+          [disabled]="cargandoRegistro">Guardar</button>
+      </div>
+    </div>
+  </div>
+  <br />
+  <br />
 </div>
 
 <ship-spinner [message]="mensajeRegistro" *ngIf='cargandoRegistro'></ship-spinner>
