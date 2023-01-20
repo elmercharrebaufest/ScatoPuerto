@@ -541,6 +541,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+      
             public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
             {
                 // CARACTERES NO IMPRIMIBLES:

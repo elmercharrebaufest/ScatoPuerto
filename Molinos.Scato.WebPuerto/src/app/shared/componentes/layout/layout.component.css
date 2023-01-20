@@ -125,3 +125,10 @@
     width: 27px;
     height: 30px;
 }
+
+.links-container a div.item-container div.icon-vapor{
+    -webkit-mask: url('assets/sidebar-icons/buques.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/buques.svg') no-repeat center;
+    width: 27px;
+    height: 30px;
+}

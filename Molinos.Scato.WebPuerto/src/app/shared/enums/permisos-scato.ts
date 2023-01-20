@@ -110,7 +110,14 @@ export enum PermisosScato {
   Comex_Nominacion_Modificar = "Comex_Nominacion_Modificar",
   Comex_Nominacion_Guardar = "Comex_Nominacion_Guardar",
   Comex_Nominacion_Ver = "Comex_Nominacion_Ver",
-  Comex_Nominacion_Enviar_LineUp = "Comex_Nominacion_Enviar_LineUp"
+  Comex_Nominacion_Enviar_LineUp = "Comex_Nominacion_Enviar_LineUp",
+
+  //Vapor
+
+  Vapor_Visualizar = "Vapor_Visualizar",
+  Vapor_Editar = "Vapor_Editar",
+  Vapor_Crear = "Vapor_Crear",
+  Vapor_Eliminar = "Vapor_Eliminar"
 
 
 }

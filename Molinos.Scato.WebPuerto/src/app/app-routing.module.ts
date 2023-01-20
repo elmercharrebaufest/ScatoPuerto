@@ -48,6 +48,11 @@ export const routeConfig: Routes = [
         path: 'programa',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/programa-embarque/programa-embarque.module').then(m => m.ProgramaEmbarqueModule)
+      },
+      {
+        path: 'vapor',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/vapor/vapor.module').then(m => m.VaporModule)
       }
     ]
   },
