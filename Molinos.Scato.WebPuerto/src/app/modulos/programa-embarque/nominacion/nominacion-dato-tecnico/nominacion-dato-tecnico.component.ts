@@ -52,6 +52,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
   public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
   public nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
+  public esEnvioLineUp: boolean = false;
+  public esMuelleDeCarga: boolean = false;
 
   public formatoDestino;
   public formatoVapor; 
@@ -66,8 +68,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaDestino: Destino[];
   public listaExportador: Exportador[];
   public listaCoordinadorPuerto: CoordinadorPuerto[];
-  public listaVapor: VaporInformacion[];
-  public listaVaporFiltro: VaporInformacion[];
+  public listaVapor: VaporInformacion[]=[];
+  public listaVaporFiltro: VaporInformacion[]=[];
   public listaATAPuerto: ATAPuerto[];
   public listaAgenciaMaritimaPuerto: AgenciaMaritimaPuerto[];
   public listaBanderas: Bandera[];
@@ -105,10 +107,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     ) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.cargando;
-    this.inicializarForm();
     this.calcularFechaMinimaEtaRecalada();
     this.calcularFechaMinimaObligacionDeCarga();
     this.configurarListasDeNominacion();
+    this.inicializarForm();
     this.obtenerListasDeNominacion();
   }
   //#endregion
@@ -172,23 +174,37 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null){
+            this.esEnvioLineUp = nominacionParametos.nominacion.fechaEnvioLineUp!= null? true : false;
+            this.esMuelleDeCarga = nominacionParametos.nominacion.enMuelleDeCarga? true : false;
             this.inicializarForm();
             this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
             const etaRecalada = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.etaRecalada);
             const obligacionDeCarga = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.obligacionDeCarga);
             this.calcularFechaMinimaEtaRecalada(etaRecalada);
             this.calcularFechaMinimaObligacionDeCarga(obligacionDeCarga);
+            setTimeout(() =>{this.deshabilitarEnvioLineUp()}, 10);
           }
         }
       }
     });
   }
   private inicializarForm() {
+    this.datoTecnicoForm = null;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
   }
+  private deshabilitarEnvioLineUp(){
+    if (this.esEnvioLineUp){
+      this.datoTecnicoForm.controls['vaporInformacion'].disable();
+    }
+    if (this.esMuelleDeCarga){
+      this.datoTecnicoForm.controls['materialPuerto'].disable();
+      this.datoTecnicoForm.controls['tipoDeCalidad'].disable();
+      this.datoTecnicoForm.controls['cantidadTotal'].disable();
+      this.datoTecnicoForm.controls['tolerancia'].disable();
+      this.datoTecnicoForm.controls['muelleDeCarga'].disable();
+    }
+  }
   private inicializarFormEdicion(datoTecnicoForm: FormGroup, dataTecnico: NominacionDatoTecnico) {
-    
-    //const dataTecnico = this.nominacionParametros.nominacion.nominacionDatoTecnico;
     let material: MaterialPuerto = null;
     let datoTecnicoCalidadSel = null;
     let tipoDeCalidad: TipoDeCalidad = null;
@@ -236,9 +252,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
     if (dataTecnico.obligacionDeCarga !=null)
       obligacionDeCarga = new Date(dataTecnico.obligacionDeCarga).toISOString().slice(0, 10);
-
     datoTecnicoForm.controls['id'].setValue(dataTecnico.id);
-    datoTecnicoForm.controls['materialPuerto'].setValue(material);
+    datoTecnicoForm.controls['materialPuerto'].setValue(material);   
     datoTecnicoForm.controls['tipoDeCalidad'].setValue(tipoDeCalidad);
     datoTecnicoForm.controls['cantidadTotal'].setValue(dataTecnico.cantidadTotal);
     datoTecnicoForm.controls['tolerancia'].setValue(dataTecnico.tolerancia);
@@ -437,7 +452,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoForm.controls['bandera'].setValue(banderaSeleccionada[0]);
   }
   public listaTipoDeCalidadxMaterial(materialPuerto){
-    return this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
+    var listaTipoDeCalidad = null;
+    if (materialPuerto!=null && materialPuerto != undefined && this.listaTipoDeCalidad!=null && this.listaTipoDeCalidad != undefined)
+      listaTipoDeCalidad = this.listaTipoDeCalidad.filter(x=> x.materialPuerto.id == materialPuerto.id);
+    return listaTipoDeCalidad
   }
   public actualizarExportadores(materialPuerto){
     let tipoBuque: string = '';

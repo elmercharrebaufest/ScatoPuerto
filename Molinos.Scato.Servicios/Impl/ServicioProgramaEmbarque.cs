@@ -123,6 +123,11 @@ namespace Molinos.Scato.Servicios.Impl
                 var nominacion = Obtener<Nominacion, NominacionDto>(id);
                 if (nominacion != null)
                 {
+                    if (nominacion.Embarque != null)
+                    {
+                        if (nominacion.Embarque.Ubicacion == 2)
+                            nominacion.EnMuelleDeCarga = true;
+                    }
                     nominacion.Embarque = null;
                 }
                 return nominacion;
