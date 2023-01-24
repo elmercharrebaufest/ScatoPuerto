@@ -9,13 +9,15 @@ import { ProgramaEmbarqueComponent } from './programa-embarque.component';
 import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { ModalProgramaEmbarqueComponent } from './modal-programa-embarque/modal-programa-embarque.component';
+import { NominacionEnviarLineupComponent } from './nominacion-enviar-lineup/nominacion-enviar-lineup.component';
 
 @NgModule({
   declarations: [
     FiltroProgramaEmbarqueComponent, 
     ListadoProgramaEmbarqueComponent,
     ProgramaEmbarqueComponent,
-    ModalProgramaEmbarqueComponent
+    ModalProgramaEmbarqueComponent,
+    NominacionEnviarLineupComponent
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,114 @@
+
+
+
+
+   <ship-spinner [message]="mensajeBuque" *ngIf='mostrarSpinner'></ship-spinner> 
+    <form [formGroup]="crearEditarBuqueForm">
+    
+        <div class='modal-body '>
+            <div *ngIf="!puedeCrearBuque">
+                <div class="alert alert-danger" role="alert">
+                  {{mensaje}}
+                  </div>
+            </div>
+            <div class="row margen font-weight-bold">
+                <div class="col pt-4">
+                    <label class="">Nombre buque</label>
+                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreBuque"/>
+                    </div> 
+                <div class="col pt-4">
+                    <label>Bandera</label>   
+                    <input
+                         type="text"
+                         class="form-control"
+                         id="ban"
+                         formControlName="bandera"
+                         maxlength="50"
+                         placeholder="Bandera"
+                         [ngbTypeahead]="searchBanderas"
+                         [editable]='false'
+                         [inputFormatter]="formatterBanderas"
+                         [resultFormatter]="formatterBanderas"
+                         (blur)="onBlurBandera()"
+                         (change)='sendBandera($event.target.value)'
+                         [ngClass]="{'input-error': submitted && f.bandera.invalid}" required
+                         />
+                    <!-- <select class="custom-select" formControlName="bandera" [ngClass]="{'input-error': submitted && f.bandera.invalid}" required>
+                        <option value=""></option>
+                        <option *ngFor="let t of paisesPuerto" [ngValue]="t" >{{ t.descripcion }}</option>
+                    </select> -->
+                </div>
+            </div>
+
+            <div class="row margen font-weight-bold">
+                <div class="col pt-4">
+                    <label>Tipo de buque</label>                                   
+                    <select  class="custom-select" formControlName="tipoBuque" [ngClass]="{'input-error': submitted && f.tipoBuque.invalid}" required>
+                        <option value=""></option>
+                        <option *ngFor="let t of tipoBuquePuerto" [ngValue]="t" >{{ t.nombre }}</option>
+                    </select>
+
+                </div>
+                <div class="col pt-4 font-weight-bold">
+                    <label>IMO</label>
+                    <input type="text" class="form-control maxWidthIMO" placeholder="XXXXXXX" formControlName="imoVapor" maxLength="7"/>
+                </div>               
+            </div>
+
+            <br>
+
+            <div class="row margen font-weight-bold">
+                <div class="col">
+                    <label>Freeboard</label>
+                    <input type="text" placeholder="Ej: 5.33" class="form-control"
+                     formControlName="freeboard" (keypress)="decimalOnly($event)"/>
+
+                    <!-- <input *ngIf="editarBuque" type="text" placeholder="Ej: 5.33" class="form-control"
+                     formControlName="freeboard" (keypress)="decimalOnly($event)" /> -->
+                </div>
+                <div class="col">
+                    <label>Porte Neto / TRN</label>
+                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="porteNeto" (keypress)="decimalOnly($event)"/>
+                </div>
+                <div class="col">
+                    <label>Porte Bruto</label>
+                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="porteBruto" (keypress)="decimalOnly($event)"/>
+                </div>
+                <div class="col font-weight-bold">
+                    <label>Cant. bodegas/tks.</label>
+                    <input type="text" class="form-control" placeholder="Ej: 10" formControlName="cantBodegastks" (keypress)="numberOnly($event)"/>
+                </div>
+                
+            </div>
+            
+            <br>
+
+            <div class="row margen">
+                <div class="col font-weight-bold">
+                    <label>Eslora</label>
+                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="eslora" (keypress)="decimalOnly($event)"/>
+                </div>
+                <div class="col font-weight-bold">
+                    <label>Manga</label>
+                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="manga" (keypress)="decimalOnly($event)"/>
+                </div>
+                <div class="col font-weight-bold">
+                    <label>Puntal</label>
+                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="puntual" (keypress)="decimalOnly($event)"/>
+                </div>
+                <div class="col font-weight-bold">
+                </div>
+                
+            </div>
+        </div>
+        <div class='modal-footer justify-content-center'>
+            <div class="">
+                <button type="button" class="btn btn-danger mx-5" (click)="onResetForm()">Cancelar</button>
+                <button type="button" class="btn btn-success" (click)="onCrearBuque()">Guardar</button>
+                <!-- <button *ngIf="editarBuque" type="button" class="btn btn-success" (click)="onEditarBuque()">EDITAR BUQUE</button> -->
+            </div>
+        </div>
+    </form>
+
+
+

@@ -61,7 +61,7 @@ export class NominacionDatoTecnicoRegistroService {
             des: [''],
             tipoDeContrato: [''],
             ataPuerto: [[]],
-            agenciaMaritimaPuerto: [[]],
+            agenciaMaritimaPuerto: [[], Validators.required],
             surveyor: [[]],
             observacionesSurveyor: [''],
             nominacionDatoTecnicoExportador: this.formBuilder.array([]),

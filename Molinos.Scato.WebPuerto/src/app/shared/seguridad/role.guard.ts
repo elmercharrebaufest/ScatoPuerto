@@ -109,6 +109,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             } 
+            case 'vapor': {
+                if (permisos.find(x => x === 'Vapor_Visualizar')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "vapor");
+                }
+                break;
+            } 
         }
     }
 
@@ -140,6 +148,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'Buque_Ver': {
                 this.router.navigate(['/programa']);
+                break;
+            }
+            case 'Vapor_Visualizar': {
+                this.router.navigate(['/vapor']);
                 break;
             }
         }
@@ -182,6 +194,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'programa': {
                 msje = 'No tiene permiso para visualizar Programa de Embarque';
+                break;
+            }
+            case 'vapor': {
+                msje = 'No tiene permiso para visualizar Buques';
                 break;
             }
         }

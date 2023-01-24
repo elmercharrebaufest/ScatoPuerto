@@ -8,3 +8,19 @@
 .warn{
     color: #F0AD4E;
 }
+
+
+.icon-editar{
+    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;image.png
+   mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
+   -webkit-mask: url('assets/iconoEditar.svg') no-repeat center;
+   mask-image: url('assets/iconoEditar.svg') no-repeat center;
+   width: 27px;
+   height: 27px;  
+   background-color: rgb(28, 124, 213);
+}
+
+
+.centradoHorizontal{
+    vertical-align: inherit;
+}

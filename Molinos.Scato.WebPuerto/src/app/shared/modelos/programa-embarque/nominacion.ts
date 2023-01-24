@@ -7,6 +7,7 @@ export class Nominacion {
     enviadoFumigador : boolean;
     enviadoSurveyor : boolean;
     enviadoOtros : boolean;
+    enMuelleDeCarga : boolean;
     fechaCreacion : Date;
     fechaEnvioLineUp : Date;
     fechaEliminacion : Date;
