@@ -2760,6 +2760,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
+
+        [OperationContract]
+        IList<NominacionDto> ListarNominaciones(int idEmbarque);
+
       
         [OperationContract]
         List<LogABM> ObtenerInformacionLog(int claseId);
