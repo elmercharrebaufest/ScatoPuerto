@@ -15,6 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime? FechaCreacion { get; set; }
         public DateTime? FechaEnvioLineUp { get; set; }
         public DateTime? FechaEliminacion { get; set; }
+        public bool? EnMuelleDeCarga { get; set; } = false;
         public EmbarqueDto Embarque { get; set; }
         public NominacionDatoTecnicoDto NominacionDatoTecnico { get; set; }
         public NominacionDetalleIntervencionDto NominacionDetalleIntervencion { get; set; }

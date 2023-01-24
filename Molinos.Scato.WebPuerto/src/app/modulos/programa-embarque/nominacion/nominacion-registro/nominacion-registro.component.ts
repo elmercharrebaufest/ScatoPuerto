@@ -75,9 +75,6 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     let validacionRecibo: boolean = true;
     this.cargandoRegistro = true;
 
-    const nominacionRecibo: NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
-    const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
-    const nominacionDatoTecnico: NominacionDatoTecnico = this.datoTecnico.crearObjectoDatoTecnico().nominacionDatoTecnico;
     validacionDatoTecnico = this.datoTecnico.validarRegistroDatoTecnico();
     if (!validacionDatoTecnico) {
       this.cargandoRegistro = false;
@@ -85,17 +82,22 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     }
     let nominacion = new Nominacion();
     this.datoTecnico.validarCreacionNominacion().subscribe(validacion => {
-      console.log('validacion-->>', validacion);
       if (validacion) {
+        const nominacionRecibo: NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
+        const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
+        const nominacionDatoTecnico: NominacionDatoTecnico = this.datoTecnico.crearObjectoDatoTecnico().nominacionDatoTecnico;
+    
         nominacion.fechaCreacion = new Date();
         nominacion.id = 0;
         nominacion.embarque_Id = 0;
         nominacion.nominacionDatoTecnico = nominacionDatoTecnico;
         nominacion.nominacionDetalleIntervencion = nominacionIntervencion;
-        nominacion.nominacionRecibo = nominacionRecibo;
 
-        if (nominacionRecibo.length > 0)
+        if (nominacionRecibo.length > 0){
           validacionRecibo = this.datoRecibos.validarCreacionRecibo();
+          nominacion.nominacionRecibo = nominacionRecibo;
+        }
+
         if (!validacionRecibo) {
           this.cargandoRegistro = false;
           return validacionRecibo;

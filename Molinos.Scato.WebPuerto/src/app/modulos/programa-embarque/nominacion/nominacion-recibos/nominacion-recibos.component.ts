@@ -81,9 +81,9 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   public crearObjectoRecibos(): NominacionRecibo[] {
-    let nominacionRecibo: NominacionRecibo[] = null;
+    let nominacionRecibo: NominacionRecibo[] = [];
     const recibos = this.formRecibos.controls["recibos"].value;
-    if (recibos != null)
+    if (recibos != null && recibos.length > 0)
       nominacionRecibo = recibos;
     return nominacionRecibo;
   }

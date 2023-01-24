@@ -237,7 +237,7 @@
             </div>
             <div class="form-group col-md-4">
                 <label for="bandera" class="font-weight-bold">Bandera</label>
-                <select class="custom-select" [disabled]="true" formControlName="bandera">
+                <select class="custom-select" formControlName="bandera">
                     <option value=""></option>
                     <option *ngFor="let bandera of listaBanderas" [ngValue]="bandera">{{bandera.nombre}}</option>
                 </select>

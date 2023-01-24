@@ -319,8 +319,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     #endregion
 
                     #region Registro de recibos
-                    var listaNominacionRecibo = (List<NominacionReciboDto>)nominacion.NominacionRecibo;
-                    servicioProgramaEmbarque.GuardarNominacionRecibo(listaNominacionRecibo, nominacion.Id);
+                    if (nominacion.NominacionRecibo != null)
+                    {
+                        var listaNominacionRecibo = (List<NominacionReciboDto>)nominacion.NominacionRecibo;
+                        servicioProgramaEmbarque.GuardarNominacionRecibo(listaNominacionRecibo, nominacion.Id);
+                    }
                     #endregion
 
                     #region Registro de intervencion
