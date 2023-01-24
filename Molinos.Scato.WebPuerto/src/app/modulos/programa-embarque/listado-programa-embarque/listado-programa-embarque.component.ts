@@ -233,9 +233,9 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   }
 
-  enviarMail(nominacionId: number, nombreBuque, tipoDeMail) {
+  enviarMail(nominacionId: number, nombreBuque, material, datos, tipoDeMail) {
     var titulo = tipoDeMail;
-    var asunto = nombreBuque;
+    var asunto = nombreBuque + " " + material + " - Nominación " + (datos != null || datos != undefined ? datos : "");
     var text = "Cuerpo del mail:";
     var inputPara = "Para:";
     var inputTitleCopia = "CC:";
