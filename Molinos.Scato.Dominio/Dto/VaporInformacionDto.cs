@@ -23,12 +23,12 @@ namespace Molinos.Scato.Dominio.Dto
         public decimal Manga { get; set; }
         public decimal Puntual { get; set; }
         public int CantidadBodegasTks { get; set; }
-        public string BanderaInformacion { get; set; }
-        public int ItemsTotales { get; set; }
-        public int Pagina { get; set; }
-        public int ItemPorPagina { get; set; }
-        public int VaporId { get; set; }
-        public string Usuario { get; set; }
-        public DateTime FechaModificacion { get; set; }
+        public string BanderaInformacion { get; set; } = null;
+        public int ItemsTotales { get; set; } = 0;
+        public int Pagina { get; set; } = 0;
+        public int ItemPorPagina { get; set; } = 0;
+        public int VaporId { get; set; } = 0;
+        public string Usuario { get; set; } = null;
+        public DateTime FechaModificacion { get; set; } = DateTime.Now;
     }
 }
