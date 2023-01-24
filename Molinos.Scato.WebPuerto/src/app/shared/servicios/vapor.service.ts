@@ -12,6 +12,8 @@ export class VaporService {
   private url: string = environment.apiUrl;
   listadoVapor: any;
   observableVapor = new Subject<any[]>();
+  observableVaporModal = new Subject<any[]>();
+  observableMensaje = new Subject<string>();
 
   filtros = {
     pagina: 1,
@@ -67,6 +69,31 @@ export class VaporService {
       this.filtros.bandera = bandera;
       this.filtros.itemsPorPagina = itemsPorPagina;
       this.filtros.pagina = pagina;
+    }
+
+    public guardarVaporInformacion(vaporInformacion: any) {
+      return this.http.post(`${this.url}Vapor/GuardarVaporInformacion`, vaporInformacion, { 'withCredentials': true });
+    }
+
+    public DevolverHistoricoVapor(id: number) {      
+      return this.http.get<any>(`${this.url}Vapor/DevolverHistoricoVapor?id=${id}`,
+        {
+          'withCredentials': true
+        })
+        .subscribe(
+          (data: any) => {
+            this.listadoVapor = data;
+            this.observableVaporModal.next(this.listadoVapor.slice())
+          }
+        );
+    }
+
+    public ValidarBuque(bandera: string, nombreBuque: string, imo: string, id: number) {      
+      return this.http.get<any>(`${this.url}Vapor/ValidarBuque?bandera=${bandera}&nombre=${nombreBuque}&imo=${imo}&id=${id}`,
+        {
+          'withCredentials': true
+        })
+        
     }
 
   // #endregion

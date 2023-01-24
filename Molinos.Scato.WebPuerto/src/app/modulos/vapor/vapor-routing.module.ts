@@ -5,7 +5,7 @@ import { VaporComponent } from "./vapor.component";
 const routes: Routes = [
     {
         path: '',
-        component: VaporComponent
+        component: VaporComponent        
     },
 ]
 

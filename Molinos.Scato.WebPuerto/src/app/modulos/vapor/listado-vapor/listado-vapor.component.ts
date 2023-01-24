@@ -148,11 +148,12 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
     return this.user.permisos.find(p => p === this.permisosScato.Vapor_Editar);
   }
 
-  editarVapor(id, modal){ 
+  editarVapor(id, modal, bandera, nombreBuque, imo){ 
     this.vaporId = id;
     this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
     .then(() => {     
       console.log('_modalService.open');
+
     })
     .catch((res) => { console.log(res) }); 
   }
@@ -160,4 +161,19 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   actualizarListaDeVapores(event){
     this.listarVapores();
   }
+
+
+  public visualizarHistorial(modal, id) {
+    this.onOpenModalHistorialVapor(modal,id);
+  }
+
+  public onOpenModalHistorialVapor(modal, id) {
+    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
+      .then(() => {
+        console.log('_modalService.open');
+      })
+      .catch((res) => { console.log(res) });
+      this.vaporService.DevolverHistoricoVapor(id)
+    }
+
 }

@@ -1,4 +1,4 @@
-<ship-spinner [message]="'Cargando Programa de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+<ship-spinner [message]="'Cargando Buques. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
 
 <div style="overflow-x:auto; " class="table-responsive tableFixHead">
     <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
@@ -132,20 +132,20 @@
             <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
                 
                 <td class="lista-buque-row-item cursor noBorder alinearCentro" style="font-size: 20px; border-radius: 5px 0px 0px 5px;">
-                    <strong class="alinearJustificado">{{vapor.nombreBuque}}
+                    <strong class="alinearJustificado" (click)="visualizarHistorial(addModalVapor, vapor.id)">{{vapor.nombreBuque}}
                     </strong>
                 </td>
                 <td class="alinearCentro centradoHorizontal"><div class="alinearJustificado">{{vapor.imoVapor}}</div></td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.tipoBuque}}</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.banderaInformacion}}</td>
-                <td class="noBorder-rigth centradoHorizontal">{{vapor.freebord}} mt</td>
+                <td class="noBorder-rigth centradoHorizontal">{{vapor.freeboard}} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.porteNeto | number:'0.0-0'}}</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.porteBruto | number:'0.0-0'}}</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.cantidadBodegasTks}}</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.eslora}} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.manga }} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.puntual}} mt</td>
-                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarBuque()' (click)="editarVapor(vapor.vaporId, addVapor)">
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarBuque()' (click)="editarVapor(vapor.vaporId, addVapor, vapor.nombreBuque, vapor.banderaInformacion, vapor.imoVapor)">
                     <div class='icon-editar cursor'></div>
                 </td>
                 <!-- <td class="noBorder-left centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
@@ -165,4 +165,9 @@
 
 <ng-template #addVapor let-modal>
     <app-modal-crear-buque (actualizarListaVapores)="actualizarListaDeVapores($event)" [id]="vaporId" (cerrar)="modal.dismiss()"></app-modal-crear-buque>
+</ng-template>
+
+
+<ng-template #addModalVapor let-modal>
+    <app-modal-vapor-historico (cerrar)="modal.dismiss()"></app-modal-vapor-historico>
 </ng-template>

@@ -6,6 +6,11 @@
     <form [formGroup]="crearEditarBuqueForm">
     
         <div class='modal-body '>
+            <div *ngIf="!puedeCrearBuque">
+                <div class="alert alert-danger" role="alert">
+                  {{mensaje}}
+                  </div>
+            </div>
             <div class="row margen font-weight-bold">
                 <div class="col pt-4">
                     <label class="">Nombre buque</label>

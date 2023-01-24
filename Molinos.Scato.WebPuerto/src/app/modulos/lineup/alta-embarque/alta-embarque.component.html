@@ -44,7 +44,7 @@
               </div>
               <div class="form-group col-md-6">
                 <label for="tipoDeBuquePuerto" class="font-weight-bold">Tipo de Buque</label>
-                <select class="custom-select" formControlName="tipoDeBuque" [ngClass]="{'input-error': submitted && f.tipoDeBuque.invalid}" required>
+                <select class="custom-select" formControlName="tipoDeBuque" [ngClass]="{'input-error': submitted && f.tipoDeBuque.invalid}" required disabled>
                   <option value=""></option>
                   <option *ngFor="let t of tipoDeBuquePuerto" [ngValue]="t" >{{ t.nombre }}</option>
                 </select>
@@ -75,7 +75,7 @@
               <div class="form-group col-md-6">
                 <label for="freeboard" class="font-weight-bold">Freeboard</label>
                 <input type="text" class="form-control" formControlName="freeboard"
-                      placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                      placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
               </div>
             </div>
             <div class="form-row">
@@ -365,7 +365,7 @@
                   <div class="form-group col">
                     <label for="Imo" class="font-weight-bold">IMO </label>
                     <input type="text" class="form-control" formControlName="imo"
-                          placeholder=""  minLength="0" maxLength="7">
+                          placeholder=""  minLength="0" maxLength="7" disabled>
                   </div>
                   <div class="form-group col">
                     <label for="bandera" class="font-weight-bold">Bandera</label>
@@ -382,7 +382,7 @@
                          [resultFormatter]="formatterBanderas"
                          (blur)="onBlurBandera()"
                          (change)='sendBandera($event.target.value)'
-                         [ngClass]="{'input-error': submitted && f.bandera.invalid}" required
+                         [ngClass]="{'input-error': submitted && f.bandera.invalid}" required disabled
                          />
                   </div>
                 </div>
@@ -391,13 +391,13 @@
                   <div class="form-group col">
                     <label for="puntal" class="font-weight-bold">Puntal</label>
                     <input type="text" class="form-control" formControlName="puntal"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
                   </div>
 
                   <div class="form-group col">
                     <label for="cantidadBodegasTanques" class="font-weight-bold">Cant Bodegas/TKS</label>
                     <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
-                          placeholder=""  >
+                          placeholder=""  disabled>
                   </div>
                 </div>
 
@@ -405,13 +405,13 @@
                   <div class="form-group col">
                     <label for="porteNeto" class="font-weight-bold">Porte Neto</label>
                     <input type="text" class="form-control" formControlName="porteNeto"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
                   </div>
 
                   <div class="form-group col">
                     <label for="porteBruto" class="font-weight-bold">Porte Bruto</label>
                     <input type="text" class="form-control" formControlName="porteBruto"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
                   </div>
                 </div>
 
@@ -419,13 +419,13 @@
                   <div class="form-group col">
                     <label for="eslora" class="font-weight-bold">Eslora</label>
                     <input type="text" class="form-control" formControlName="eslora"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
                   </div>
 
                   <div class="form-group col">
                     <label for="manga" class="font-weight-bold">Manga</label>
                     <input type="text" class="form-control" formControlName="manga"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)">
+                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled> 
                   </div>
 
 

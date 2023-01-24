@@ -15,10 +15,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         private readonly string Buque;
         private readonly string IMO;
         private readonly List<string> TipoBuque;
-        private readonly List<string> Bandera;
+        private readonly string Bandera;
         private readonly Paginacion paginacion;
 
-        public ListarVaporInformacionConsulta(Paginacion paginacion, string buque = null, string imo = null, List<string> tipoBuque = null, List<string> bandera = null)
+        public ListarVaporInformacionConsulta(Paginacion paginacion, string buque = null, string imo = null, List<string> tipoBuque = null, string bandera = null)
         {
 
             this.Bandera = bandera;
@@ -36,33 +36,36 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
 
                 ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
-                var resultado = from item in contexto.Set<VaporInformacion>()
-                                where (Buque == null ||  item.NombreBuque.ToUpper().StartsWith(Buque)) &&
-                                (IMO == null || item.ImoVapor.ToUpper().StartsWith(IMO))
-                                orderby item.NombreBuque ascending
+                var resultado = from vapor in contexto.Set<Vapor>()
+                                join vaporInformacion in contexto.Set<VaporInformacion>() on vapor.Id equals
+                                vaporInformacion.Vapor.Id into vaporJoined
+                                from vaporInfos in vaporJoined.DefaultIfEmpty()
+                                where (Buque == null || vapor.Nombre.ToUpper().StartsWith(Buque)) &&
+                                (IMO == null || vaporInfos.ImoVapor.ToUpper().StartsWith(IMO)) &&
+                                (Bandera == null || vaporInfos.Bandera.Nombre.ToUpper().StartsWith(Bandera))
+                                orderby vapor.Nombre ascending
                                 select new VaporInformacionDto
                                 {
-                                    Id = item.Id,
-                                    VaporId = item.Vapor.Id,
-                                    NombreBuque = item.NombreBuque,
-                                    ImoVapor = item.ImoVapor,
-                                    Freeboard = item.Freeboard,
-                                    PorteNeto = item.PorteNeto,
-                                    PorteBruto = item.PorteBruto, 
-                                    CantidadBodegasTks = item.CantidadBodegasTks,
-                                    Eslora = item.Eslora,
-                                    Manga = item.Manga,
-                                    Puntual = item.Puntual,
-                                    TipoBuque = item.TipoBuque,
-                                    BanderaInformacion = item.Bandera.Nombre,
+                                    Id = vaporInfos != null ? vaporInfos.Id : 0,
+                                    VaporId = vapor.Id,
+                                    NombreBuque = vapor.Nombre,
+                                    ImoVapor = vaporInfos != null ? !string.IsNullOrEmpty(vaporInfos.ImoVapor) ? vaporInfos.ImoVapor : "" : "",
+                                    Freeboard = vaporInfos != null ? vaporInfos.Freeboard : 0,
+                                    PorteNeto = vaporInfos != null ? vaporInfos.PorteNeto : 0,
+                                    PorteBruto = vaporInfos != null ? vaporInfos.PorteBruto : 0, 
+                                    CantidadBodegasTks = vaporInfos != null ? vaporInfos.CantidadBodegasTks : 0,
+                                    Eslora = vaporInfos != null ? vaporInfos.Eslora : 0,
+                                    Manga = vaporInfos != null ? vaporInfos.Manga : 0,
+                                    Puntual = vaporInfos != null ? vaporInfos.Puntual : 0,
+                                    TipoBuque = vaporInfos != null ? vaporInfos.TipoBuque : "",
+                                    BanderaInformacion = vaporInfos != null ? vaporInfos.Bandera.Nombre : "",
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
                                     ItemsTotales = 0
                                 };
 
                 var resultados = resultado.ToList().Where(x => (
-                (!string.IsNullOrEmpty(x.TipoBuque) && (TipoBuque == null || TipoBuque.Any(y => y.Contains(x.TipoBuque))))) &&              
-                (!string.IsNullOrEmpty(x.BanderaInformacion) && (Bandera == null || Bandera.Any(y => y.Contains(x.BanderaInformacion)))));
+                ((TipoBuque == null || TipoBuque.Any(y => y.Contains(x.TipoBuque))))));
 
                 var itemsTotales = resultados.Count();
                 resultados = resultados.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)

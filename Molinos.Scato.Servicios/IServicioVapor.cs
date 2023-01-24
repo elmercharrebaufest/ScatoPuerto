@@ -17,8 +17,16 @@ namespace Molinos.Scato.Servicios
     {
 
         [OperationContract]
-        ListaPaginada<VaporInformacionDto> ListarVaporInformacion(Paginacion paginacion, string buque = null, string imo = null, List<string> tipoBuque = null, List<string> bandera = null);
+        ListaPaginada<VaporInformacionDto> ListarVaporInformacion(Paginacion paginacion, string buque = null, string imo = null, List<string> tipoBuque = null, string bandera = null);
 
+        [OperationContract]
+        void GuardarVaporInformacion(VaporInformacionDto VaporInformacionDto);
+
+        [OperationContract]
+        List<VaporInformacionDto> DevolverHistoricoVapor(int id);
+
+        [OperationContract]
+        string ValidarBuque(string bandera, string nombreBuque, string IMO, int? id);
 
     }
 }
