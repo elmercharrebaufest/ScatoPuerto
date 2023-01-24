@@ -22,6 +22,7 @@ export class NominacionService {
     private url: string = environment.apiUrl;
     private _nominacionParametros: BehaviorSubject<NominacionParametros> = new BehaviorSubject<NominacionParametros>(null);
     private _nominacionExportadores: BehaviorSubject<NominacionExportadores> = new BehaviorSubject<NominacionExportadores>(null);
+    private _actualizarAuditoria: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
     // #endregion
 
@@ -35,6 +36,12 @@ export class NominacionService {
     }
     get NominacionExportadores() {
         return this._nominacionExportadores.asObservable();
+    }
+    set ActualizarAuditoria(value: any) {
+        this._actualizarAuditoria.next(value);
+    }
+    get ActualizarAuditoria() {
+        return this._actualizarAuditoria.asObservable();
     }
     set NominacionParametros(value: any) {
         this._nominacionParametros.next(value);

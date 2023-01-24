@@ -269,6 +269,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['dem'].setValue(dataTecnico.dem);
     datoTecnicoForm.controls['des'].setValue(dataTecnico.des);
     datoTecnicoForm.controls['observacionesSurveyor'].setValue(dataTecnico.observacionesSurveyor);
+
     if (surveyor!=null) datoTecnicoForm.controls['surveyor'].setValue([surveyor]);
     if (agenciaMaritimaPuerto!=null) datoTecnicoForm.controls['agenciaMaritimaPuerto'].setValue([agenciaMaritimaPuerto]);
     if (ataPuerto!=null) datoTecnicoForm.controls['ataPuerto'].setValue([ataPuerto]);
@@ -335,6 +336,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Dato tecnico guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
         this.inicializarForm();
         this.cargarFormulario(nominacion.id);
+        this.nominacionService.ActualizarAuditoria = true;
       }
     });
   }
@@ -546,7 +548,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.datoTecnicoForm.get('surveyor').setValue(
       surveyor != null && surveyor.length > 0 ?
         this.listaSurveyor.find(x => x.id == surveyor[0].id) : null);          
-
     nominacion.id = this._nominacionParametros.nominacion != null? this._nominacionParametros.nominacion.id : 0;
     nominacion.fechaCreacion = new Date();
     nominacion.embarque_Id = 0;

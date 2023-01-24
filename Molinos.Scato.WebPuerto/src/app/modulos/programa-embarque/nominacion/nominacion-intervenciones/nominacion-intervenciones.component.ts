@@ -342,6 +342,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
       }, ((e: any) => {
         this.guardando = false;
         this.cargandoDatoIntervencion = false;
+        this.nominacionService.ActualizarAuditoria = true;
       }));
     }
   }
