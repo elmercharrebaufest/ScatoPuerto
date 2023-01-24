@@ -48,7 +48,7 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConfiguracionProvider configuracion;
         private readonly IServicioOrquestador servicioOrquestador;
         private readonly ZSDWS_SCATO servicioSap;
-        private readonly IAdministradorDeCalles administradorDeCalles;
+        private readonly IAdministradorDeCalles administradorDeCalles;     
 
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
             ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
@@ -62,7 +62,7 @@ namespace Molinos.Scato.Servicios.Impl
             this.servicioOrquestador = servicioOrquestador;
             this.configuracion = configuracion;
             this.servicioSap = servicioSap;
-            this.administradorDeCalles = administradorDeCalles;
+            this.administradorDeCalles = administradorDeCalles;        
 
         }
 
@@ -11528,76 +11528,16 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto)
-        {
-            Vapor vapor = null;
-
-            foreach (var item in VaporInformacionDto)
-            {
-                if (item.Vapor == null)
-                {
-                    var NuevoVapor = new Vapor
-                    {
-                        Nombre = item.NombreBuque
-                    };
-                    repositorio.Agregar(NuevoVapor);
-                    repositorio.GuardarCambios();
-
-                    vapor = repositorio.Obtener<Vapor>(x => x.Id == NuevoVapor.Id);
-                }
-                else
-                {
-                    vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor.Id);
-                }
-                Bandera bandera = repositorio.Obtener<Bandera>(x => x.Id == item.Bandera.Id);
-                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == vapor.Id);
-
-
-                if (vaporInformacion_Db != null)
-                {
-                    vaporInformacion_Db.Bandera = bandera;
-                    vaporInformacion_Db.NombreBuque = item.NombreBuque;
-                    vaporInformacion_Db.TipoBuque = item.TipoBuque;
-                    vaporInformacion_Db.CategoriaBuque = item.CategoriaBuque;
-                    vaporInformacion_Db.ImoVapor = item.ImoVapor;
-                    vaporInformacion_Db.Freeboard = item.Freeboard;
-                    vaporInformacion_Db.Eslora = item.Eslora;
-                    vaporInformacion_Db.PorteNeto = item.PorteNeto;
-                    vaporInformacion_Db.PorteBruto = item.PorteBruto;
-                    vaporInformacion_Db.Manga = item.Manga;
-                    vaporInformacion_Db.Puntual = item.Puntual;
-                    vaporInformacion_Db.CantidadBodegasTks = item.CantidadBodegasTks;
-                }
-                else
-                {
-                    vaporInformacion_Db = new VaporInformacion()
-                    {
-                        Vapor = vapor,
-                        Bandera = bandera,
-                        NombreBuque = item.NombreBuque,
-                        TipoBuque = item.TipoBuque,
-                        CategoriaBuque = item.CategoriaBuque,
-                        ImoVapor = item.ImoVapor,
-                        Freeboard = item.Freeboard,
-                        Eslora = item.Eslora,
-                        PorteNeto = item.PorteNeto,
-                        PorteBruto = item.PorteBruto,
-                        Manga = item.Manga,
-                        Puntual = item.Puntual,
-                        CantidadBodegasTks = item.CantidadBodegasTks,
-                    };
-                    repositorio.Agregar(vaporInformacion_Db);
-                }
-            }
-            repositorio.GuardarCambios();
-
-        }
-
         public VaporInformacionDto ObtenerVaporInformacion(int vapor_id)
         {
             try
             {
                 var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor.Id == vapor_id);
+                if(infoVapor == null)
+                {
+                   var vapor = Obtener<Vapor, VaporDto>(x => x.Id == vapor_id);
+                    infoVapor = new VaporInformacionDto { VaporId = vapor_id, NombreBuque = vapor.Nombre };
+                }
                 return infoVapor;
             }
             catch (Exception ex)
@@ -12159,6 +12099,11 @@ namespace Molinos.Scato.Servicios.Impl
             var historial = repositorio.ListarConsulta(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto));
             CompletarDatosHistorialDeEmbarque(historial);
             return historial;
+        }
+
+        public List<LogABM> ObtenerInformacionLog(int claseId)
+        {            
+            return repositorio.Listar<LogABM>(x => x.ClaseId == claseId).OrderByDescending(x => x.Fecha).ToList(); 
         }
 
     }

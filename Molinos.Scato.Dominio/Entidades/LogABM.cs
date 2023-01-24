@@ -14,6 +14,9 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual DateTime Fecha { get; set; }
         public virtual EventoABM Evento { get; set; }
         public virtual string Entidad { get; set; }
-        
+
+        public virtual int? ClaseId { get; set; }
+
+
     }
 }

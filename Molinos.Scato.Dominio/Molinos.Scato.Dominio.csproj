@@ -106,6 +106,7 @@
     <Compile Include="Comandos\ConfirmarArribo.cs" />
     <Compile Include="Comandos\CrearMotivosLimpieza.cs" />
     <Compile Include="Comandos\CrearLogCambioDeModalidadCalle.cs" />
+    <Compile Include="Comandos\CrearBuque.cs" />
     <Compile Include="Comandos\EliminarCategoriaVehiculo.cs" />
     <Compile Include="Comandos\CrearRegistroInactividad.cs" />
     <Compile Include="Comandos\EliminarEtiquetaPuerto.cs" />

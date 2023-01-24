@@ -28,5 +28,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Pagina { get; set; }
         public int ItemPorPagina { get; set; }
         public int VaporId { get; set; }
+        public string Usuario { get; set; }
+        public DateTime FechaModificacion { get; set; }
     }
 }

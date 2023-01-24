@@ -534,6 +534,7 @@
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
+    <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloBalanza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />

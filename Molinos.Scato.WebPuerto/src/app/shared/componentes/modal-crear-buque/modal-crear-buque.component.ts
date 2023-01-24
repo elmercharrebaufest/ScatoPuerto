@@ -10,7 +10,8 @@ import { BuqueService } from '@ScatoServicios/buque.service';
 import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
-import { forkJoin, Observable } from 'rxjs';
+import { VaporService } from '@ScatoServicios/vapor.service';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 
@@ -41,6 +42,10 @@ export class ModalCrearBuqueComponent implements OnInit {
   mensajeBuque: string = '';
   @Input() id: number = 0;
   @Output() cerrar = new EventEmitter<void>()
+  subscripcionVaporMensaje: Subscription
+  mensaje: string;
+  mostrarMensaje: boolean;
+  puedeCrearBuque: boolean = true;
   // #endregion
 
   // #region Constructor
@@ -50,6 +55,7 @@ export class ModalCrearBuqueComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
     private buqueService: BuqueService,
+    private vaporService: VaporService
   ) {
     this.initFormCrearEditarBuque();
   }
@@ -58,7 +64,7 @@ export class ModalCrearBuqueComponent implements OnInit {
   // #region Eventos del Componente
   ngOnInit(): void {
     this.initListas();
-    
+
   }
   // #endregion
 
@@ -94,8 +100,8 @@ export class ModalCrearBuqueComponent implements OnInit {
 
       this.banderasBuque = res2;
       this.vaporesPuerto = res3;
-      
-      if(this.id > 0 ){
+
+      if (this.id > 0) {
         this.selectedVapor(this.id)
       }
     }, err => { console.log(err); });
@@ -135,7 +141,7 @@ export class ModalCrearBuqueComponent implements OnInit {
     }
   }
 
-  public formatterBanderas= (p: Bandera) => p.nombre;
+  public formatterBanderas = (p: Bandera) => p.nombre;
 
   public searchBanderas = (text$: Observable<string>) => text$.pipe(
     debounceTime(200),
@@ -153,14 +159,14 @@ export class ModalCrearBuqueComponent implements OnInit {
     this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
       this.vaporInfoBD = res;
       // console.log(this.vaporInfoBD);
-      if (this.vaporInfoBD!=null){
+      if (this.vaporInfoBD != null) {
         let bandera;
-        if(this.vaporInfoBD.bandera != null){
+        if (this.vaporInfoBD.bandera != null) {
           bandera = this.banderasBuque.filter(p => p.id == this.vaporInfoBD.bandera.id)
         }
         let tipoBuqueBD = this.tipoBuquePuerto.filter(tipo => tipo.nombre == this.vaporInfoBD.tipoBuque)
         let categoriaBuqueBD = this.categoriasBuque.filter(tipo => tipo.nombre == this.vaporInfoBD.categoriaBuque)
-  
+
         this.vaporInfoBD.freeboard !== null && this.crearEditarBuqueForm.controls.freeboard.setValue(this.vaporInfoBD.freeboard);
         this.vaporInfoBD.porteNeto !== null && this.crearEditarBuqueForm.controls.porteNeto.setValue(this.vaporInfoBD.porteNeto);
         this.vaporInfoBD.porteBruto !== null && this.crearEditarBuqueForm.controls.porteBruto.setValue(this.vaporInfoBD.porteBruto);
@@ -168,17 +174,17 @@ export class ModalCrearBuqueComponent implements OnInit {
         this.vaporInfoBD.manga !== null && this.crearEditarBuqueForm.controls.manga.setValue(this.vaporInfoBD.manga);
         this.vaporInfoBD.puntual !== null && this.crearEditarBuqueForm.controls.puntual.setValue(this.vaporInfoBD.puntual);
         this.vaporInfoBD.cantidadBodegasTks !== null && this.crearEditarBuqueForm.controls.cantBodegastks.setValue(this.vaporInfoBD.cantidadBodegasTks);
-        bandera !== null && this.crearEditarBuqueForm.controls.bandera.setValue(bandera[0] != null ? bandera[0] : null);
-        tipoBuqueBD !== null && this.crearEditarBuqueForm.controls.tipoBuque.setValue(tipoBuqueBD[0]);
+        this.crearEditarBuqueForm.controls.bandera.setValue((bandera != null || bandera != undefined) ? bandera[0] : null);
+        this.crearEditarBuqueForm.controls.tipoBuque.setValue((tipoBuqueBD !== null || tipoBuqueBD !== undefined) ? tipoBuqueBD[0] : null);
         categoriaBuqueBD !== null && this.crearEditarBuqueForm.controls.categoriaBuque.setValue(categoriaBuqueBD[0]);
         this.vaporInfoBD.imoVapor !== null && this.crearEditarBuqueForm.controls.imoVapor.setValue(this.vaporInfoBD.imoVapor);
         this.vaporInfoBD.nombreBuque !== null && this.crearEditarBuqueForm.controls.nombreBuque.setValue(this.vaporInfoBD.nombreBuque);
       }
-    }, error => {}
-     , () => {
-      this.mostrarSpinner = false;
-      this.mensajeBuque = '';
-     })
+    }, error => { }
+      , () => {
+        this.mostrarSpinner = false;
+        this.mensajeBuque = '';
+      })
   }
 
   public openModalEditarCrearBuque(modal: any) {
@@ -201,90 +207,106 @@ export class ModalCrearBuqueComponent implements OnInit {
   public onEditarBuque() {
     this.submitted = true
     let buque = this.crearEditarBuqueForm.getRawValue();
-    const objVapor = [
-      {
-        vapor: this.vaporSeleccionado,
-        bandera: buque.bandera,
-        nombrebuque: buque.nombreBuque.nombre,
-        tipoBuque: buque.tipoBuque.nombre,
-        categoriaBuque: '',
-        imoVapor: buque.imoVapor,
-        freeboard: buque.freeboard,
-        eslora: buque.eslora,
-        porteNeto: buque.porteNeto,
-        porteBruto: buque.porteBruto,
-        manga: buque.manga,
-        puntual: buque.puntual,
-        cantidadBodegasTks: buque.cantBodegastks,
-      }]
-      
-      if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid || 
-          this.crearEditarBuqueForm.controls['tipoBuque'].invalid || 
-          this.crearEditarBuqueForm.controls['bandera'].invalid){
-          this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-          return
-      }
-      this.mostrarSpinner = true;
-      this.mensajeBuque = 'Guardando información de buque';
-    this.buqueService.guardarVaporInformacion(objVapor).subscribe(
+    const objVapor =
+    {
+      vapor: this.vaporSeleccionado,
+      bandera: buque.bandera,
+      nombrebuque: buque.nombreBuque.nombre,
+      tipoBuque: buque.tipoBuque.nombre,
+      categoriaBuque: '',
+      imoVapor: buque.imoVapor,
+      freeboard: buque.freeboard,
+      eslora: buque.eslora,
+      porteNeto: buque.porteNeto,
+      porteBruto: buque.porteBruto,
+      manga: buque.manga,
+      puntual: buque.puntual,
+      cantidadBodegasTks: buque.cantBodegastks,
+    };
+
+    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
+      this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
+      this.crearEditarBuqueForm.controls['bandera'].invalid) {
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return
+    }
+    if (this.ValidarBuque(objVapor)) {return;}
+    this.mostrarSpinner = true;
+    this.mensajeBuque = 'Guardando información de buque';
+    this.vaporService.guardarVaporInformacion(objVapor).subscribe(
       res => res = objVapor
-    ,error=>{}
-    , () =>{
-      this.mostrarSpinner = false;
-      this.mensajeBuque = '';
-      this.actualizarListaVapores.emit(true);
-      this.onResetForm();
-      this.initListas();
-      this.modalService.dismissAll();
-    });
+      , error => { }
+      , () => {
+        this.mostrarSpinner = false;
+        this.mensajeBuque = '';
+        this.actualizarListaVapores.emit(true);
+        this.onResetForm();
+        this.initListas();
+        this.modalService.dismissAll();
+      });
 
   }
 
   public onCrearBuque() {
     this.submitted = true
     let buque = this.crearEditarBuqueForm.getRawValue();
-    if(this.id > 0){
+    if (this.id > 0) {
       this.vaporSeleccionado = new Vapor();
       this.vaporSeleccionado.id = this.id;
     }
-    const objVapor = [
-      {
-        vapor: this.id > 0 ? this.vaporSeleccionado : null,
-        // nombrebuque: typeof buque.nombreBuque.nombre !== 'object'  ? buque.nombreBuque : buque.nombreBuque.nombre,
-        bandera: buque.bandera,
-        nombrebuque: buque.nombreBuque,
-        tipoBuque: buque.tipoBuque.nombre,
-        categoriaBuque: '',
-        imoVapor: buque.imoVapor,
-        freeboard: buque.freeboard,
-        eslora: buque.eslora,
-        porteNeto: buque.porteNeto,
-        porteBruto: buque.porteBruto,
-        manga: buque.manga,
-        puntual: buque.puntual,
-        cantidadBodegasTks: buque.cantBodegastks,
-      }
-    ]
-    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid || 
-        this.crearEditarBuqueForm.controls['tipoBuque'].invalid || 
-        this.crearEditarBuqueForm.controls['bandera'].invalid){
+    const objVapor =
+    {
+      vapor: this.id > 0 ? this.vaporSeleccionado : null,
+      vaporId: this.id > 0 ? this.id  : null,
+      // nombrebuque: typeof buque.nombreBuque.nombre !== 'object'  ? buque.nombreBuque : buque.nombreBuque.nombre,
+      bandera: buque.bandera,
+      nombrebuque: buque.nombreBuque,
+      tipoBuque: buque.tipoBuque.nombre,
+      categoriaBuque: '',
+      imoVapor: buque.imoVapor,
+      freeboard: buque.freeboard,
+      eslora: buque.eslora,
+      porteNeto: buque.porteNeto,
+      porteBruto: buque.porteBruto,
+      manga: buque.manga,
+      puntual: buque.puntual,
+      cantidadBodegasTks: buque.cantBodegastks,
+    }
+  
+      if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
+        this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
+        this.crearEditarBuqueForm.controls['bandera'].invalid) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
         return
-    }
-    this.mostrarSpinner = true;
-    this.mensajeBuque = 'Guardando información de buque';
-    this.buqueService.guardarVaporInformacion(objVapor).subscribe(
-      res => res = objVapor
-    ,error=>{}
-    , () =>{
-      this.mostrarSpinner = false;
-      this.mensajeBuque = '';
-      this.actualizarListaVapores.emit(true);
-      this.onResetForm();
-      this.initListas();
-      this.modalService.dismissAll();
-    });
+      }
+
+    this.ValidarBuque(objVapor).subscribe(
+      (data)=> {
+        this.mensaje = data;        
+        if (this.mensaje != "") { this.mostrarSpinner = false; this.puedeCrearBuque = false; return; }
+        this.mostrarSpinner = true;
+        this.mensajeBuque = 'Guardando información de buque';
+        this.vaporService.guardarVaporInformacion(objVapor).subscribe(
+          res => res = objVapor
+          , error => { }
+          , () => {
+            this.mostrarSpinner = false;
+            this.mensajeBuque = '';
+            this.actualizarListaVapores.emit(true);
+            this.onResetForm();
+            this.initListas();
+            this.modalService.dismissAll();
+    
+          });
+      }
+    )
+    
+  }
+
+  public ValidarBuque(objVapor) {    
+     return this.vaporService.ValidarBuque(objVapor.bandera.nombre,
+      objVapor.nombrebuque, objVapor.imoVapor, this.id)
   }
   // #endregion
-  
+
 }

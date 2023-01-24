@@ -33,12 +33,9 @@ export class FiltroVaporComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.setListaCombos();
+   
   }
-
-  public getListaBandera() {
-    return this.listaBandera;
-  }
+  
   public getListaTipoBuque() {
     return this.listaTipoBuque;
   }
@@ -83,17 +80,7 @@ export class FiltroVaporComponent implements OnInit {
       this.filtroBuquedaForm.controls.tipoBuque.value,
       this.filtroBuquedaForm.controls.bandera.value)
     this.estaCargando = false;
-  }
-
-  public setListaCombos() {
-    this.embarqueService.obtenerBanderas().subscribe(
-      (data: Bandera[]) => {
-        var banderas = data.map(x => new Bandera(x.id, x.abreviatura, x.nombre));
-        this.listaBandera = banderas.map(({ nombre }) => nombre);
-      }
-    )
-    
-  }
+  } 
 
   public getFiltroBusquedaForm() {    
     return this.filtroBuquedaForm;

@@ -8,12 +8,14 @@ import { FiltroVaporComponent } from './filtro-vapor/filtro-vapor.component';
 import { ListadoVaporComponent } from './listado-vapor/listado-vapor.component';
 import { VaporComponent } from './vapor.component';
 import { VaporRoutingModule } from './vapor-routing.module';
+import { ModalVaporInformacionComponent } from './modal-vapor-historico/modal-vapor-historico.component';
 
 @NgModule({
   declarations: [    
     FiltroVaporComponent,
     ListadoVaporComponent,
     VaporComponent,
+    ModalVaporInformacionComponent
   ],
   imports: [
     CommonModule,
