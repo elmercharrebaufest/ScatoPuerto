@@ -17,16 +17,28 @@
     align-items: center;
     justify-content: center;
   }
-  
-.botones-registro-custom{ 
+
+.botones-registro-custom{
     padding-left: 20px;
     padding-right: 20px;
     font-weight: 500;
     margin-left: 10px;
     margin-right: 10px;
 }
-.acordion-card-body{ 
+.acordion-card-body{
     border-color: #ffffff;
     opacity: 1;
     box-shadow: 0px 3px 11px #00000029;
+}
+
+.auditoria-actualizacion{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.auditoria-fecha-actualizacion{
+  margin-top: auto;
+  color: white;
+  font-weight: 100;
 }

@@ -1,15 +1,19 @@
-﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
+using NPOI.Util;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Web;
+using Molinos.Scato.Dominio.Comandos;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -18,13 +22,14 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;
         private readonly ILogger log;
+        private readonly IServicioComandos comandos;
 
-        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log)
+        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
-
+            this.comandos = comandos;
         }
 
         public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null)
@@ -118,6 +123,11 @@ namespace Molinos.Scato.Servicios.Impl
                 var nominacion = Obtener<Nominacion, NominacionDto>(id);
                 if (nominacion != null)
                 {
+                    if (nominacion.Embarque != null)
+                    {
+                        if (nominacion.Embarque.Ubicacion == 2)
+                            nominacion.EnMuelleDeCarga = true;
+                    }
                     nominacion.Embarque = null;
                 }
                 return nominacion;
@@ -536,6 +546,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+      
             public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
             {
                 // CARACTERES NO IMPRIMIBLES:
@@ -746,8 +757,276 @@ namespace Molinos.Scato.Servicios.Impl
                 return mail;
             }
 
-            #region Metodos Utiles
-            private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+        public IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id)
+        {
+            try
+            {
+                return Listar<Auditoria, AuditoriaDto>(x => x.Nominacion_Id == nominacion_id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public void ActualizarDatosYEnviarMail(MailDto mail, string usuario)
+        {
+            try
+            {
+                var nominacion = repositorio.Obtener<Nominacion>(x => x.Id == mail.Id);
+                if(mail.TipoDeMail == "Surveyor")
+                {
+                    nominacion.EnviadoSurveyor = true;
+                }else if (mail.TipoDeMail == "Fumigador")
+                {
+                    nominacion.EnviadoFumigador = true;
+                }
+                else
+                {
+                    nominacion.EnviadoOtros = true;
+                }
+                repositorio.GuardarCambios();
+                EnviarMail(mail, usuario);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void EnviarMail(MailDto mail, string usuario)
+        {
+           var mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+            if (!string.IsNullOrEmpty(mailUsuarioCreador))
+            {
+                mail.Copia.Add(mailUsuarioCreador);
+            }
+            mail.Copia.Add(repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones);
+          
+            mail.Copia.RemoveAll(item => item == null);
+            mail.Destinatarios.RemoveAll(item => item == null);
+            comandos.Ejecutar(new EnvioMail
+            {
+                Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                       .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                Destinatarios = mail.Destinatarios,
+                Titulo = mail.Titulo,
+                Copia = mail.Copia,
+                AttachmentName = null,
+            });
+        }
+
+        private string ObtenerMailDeActiveDirectory(string UserName)
+        {
+            DirectoryEntry entry = new DirectoryEntry();
+            string userName = UserName;
+            try
+            {
+                var userNameArray = UserName.Split('\\');
+                userName = userNameArray.Length == 1 ? userNameArray[0] : userNameArray[1];
+
+            }
+            catch { }
+
+            DirectorySearcher search = new DirectorySearcher(entry);
+            search.Filter = String.Format("(sAMAccountName={0})", userName);
+            search.PropertiesToLoad.Add("givenName");   // first name
+            search.PropertiesToLoad.Add("sn");          // last name
+            search.PropertiesToLoad.Add("mail");        // smtp mail address
+
+            // perform the search
+            SearchResult result = search.FindOne();
+            try
+            {
+                return result.Properties.Contains("mail") ? result.Properties["mail"][0].ToString() : result.Properties["userPrincipalName"][0].ToString();
+            }
+            catch
+            {
+                log.Error($"No se encontró el mail en AD para el usuario {userName}");
+            }
+            return string.Empty;
+        }
+        public List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id)
+        {
+            try
+            {
+                List <Tuple<int, bool>> auditoriasNominaciones = new List<Tuple<int, bool>>();
+                foreach (int nominacion_id in nominaciones_id)
+                {
+                    auditoriasNominaciones.Add(new Tuple<int, bool>(nominacion_id, repositorio.Listar<Auditoria>(x => x.Nominacion_Id == nominacion_id).Count > 0 ? true : false));
+                }
+                return auditoriasNominaciones;
+                    
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+public IList<VaporInformacionDto> ListarBuquesNominacion()
+        {
+            List<VaporInformacionDto> vapores = new List<VaporInformacionDto>();
+            try
+            {
+                var listaNominacion = Listar<Nominacion, NominacionDto>(x => x.FechaEliminacion == null && x.FechaEnvioLineUp == null);
+                var listaVapores = listaNominacion.Select(s => s.NominacionDatoTecnico.VaporInformacion);
+                listaVapores = listaVapores.Distinct().ToArray();
+                foreach (var vapor in listaVapores)
+                {
+                    if (vapores.FindIndex(x => x.Id == vapor.Id) == -1)
+                        vapores.Add(vapor);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return vapores;
+
+        }
+
+        public IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id)
+        {
+            List<NominacionLineUpDto> nominacionLineUps = new List<NominacionLineUpDto>();
+            try
+            {
+                NominacionLineUpDto nominacionLineUpDto = null;
+                var listaNominacion = Listar<Nominacion, NominacionDto>(x => x.FechaEliminacion == null && x.FechaEnvioLineUp == null && x.NominacionDatoTecnico.VaporInformacion.Id == vaporInformacion_Id);
+                foreach (var nominacion in listaNominacion)
+                {
+                    nominacionLineUpDto = new NominacionLineUpDto();
+                    nominacionLineUpDto.Vapor_Id = nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Id;
+                    nominacionLineUpDto.Nominacion_Id = nominacion.Id;
+                    nominacionLineUpDto.MaterialPuerto = nominacion.NominacionDatoTecnico.MaterialPuerto;
+                    nominacionLineUpDto.MuelleDeCarga = nominacion.NominacionDatoTecnico.MuelleDeCarga;
+                    nominacionLineUpDto.Embarque_Id = nominacion.Embarque == null ? 0 : nominacion.Embarque.Id;
+                    nominacionLineUpDto.EnviadoLineUp = nominacion.FechaEnvioLineUp != null ? true : false;
+                    nominacionLineUpDto.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
+
+                    var cargadorPorCantidad = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => new
+                    {
+                        Exportador = x.Exportador,
+                        Cantidad = x.Cantidad
+                    }).GroupBy(s => new { s.Exportador })
+                    .Select(g => new
+                    {
+                        Exportador = g.Key.Exportador,
+                        Cantidad = g.Sum(x => x.Cantidad)
+                    });
+                    Collection<NominacionCargadorPorCantidadDto> mominacionCargadorPorCantidad = new Collection<NominacionCargadorPorCantidadDto>();
+                    foreach (var cargador in cargadorPorCantidad)
+                    {
+                        mominacionCargadorPorCantidad.Add(new NominacionCargadorPorCantidadDto
+                        {
+                            Exportador = cargador.Exportador,
+                            Cantidad = cargador.Cantidad
+                        });
+                    }
+                    nominacionLineUpDto.NominacionCargadorPorCantidad = mominacionCargadorPorCantidad;
+                    nominacionLineUps.Add(nominacionLineUpDto);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return nominacionLineUps;
+        }
+
+
+public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id)
+        {
+            ProgramaEmbarqueValidacionLineUpDto programaEmbarqueValidacionLineUp = new ProgramaEmbarqueValidacionLineUpDto();
+            try
+            {
+                var muelleDeCarga = Obtener<MuelleDeCarga, MuelleDeCargaDto>(x => x.Id == muelleDeCarga_Id);
+                bool vicentin = muelleDeCarga.Descripcion == "Vicentin" ? true : false;
+                bool noryon = muelleDeCarga.Descripcion == "Nouryon" ? true : false;
+                bool sanBenito = muelleDeCarga.Descripcion == "San Benito" ? true : false;
+                bool otrosMuelles = muelleDeCarga.Descripcion == "Otros Muelles" ? true : false;
+
+                var embarques = Listar<Embarque, EmbarqueDto>(x => x.Vapor.Id == vapor_Id &&
+                                                                         x.Vicentin == vicentin &&
+                                                                         x.SanBenito == sanBenito &&
+                                                                         x.OtrosMuelles == otrosMuelles &&
+                                                                         x.Noryon == noryon &&
+                                                                         x.EstadoBuque.Descripcion == "PreOperativo" &&
+                                                                         x.Ubicacion != 1);
+                if (embarques.Count > 0)
+                {
+                    foreach (var embarque in embarques)
+                    {
+                        var materialesPuertoCantidad = embarque.MaterialesPuertoCantidad.FirstOrDefault(x => x.MaterialId == materialPuerto_Id);
+                        MaterialPuertoCantidadExisteDto materialesExistentes = new MaterialPuertoCantidadExisteDto();
+
+                        materialesExistentes.MaterialesPuertoCantidad = materialesPuertoCantidad;
+                        materialesExistentes.Existe = materialesPuertoCantidad != null ? true : false;
+
+                        programaEmbarqueValidacionLineUp.ProgramaEmbarqueEmbarqueMaterial = new ProgramaEmbarqueMaterialDto()
+                        {
+                            Embarque = embarque,
+                            MaterialesExistentes = materialesExistentes
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return programaEmbarqueValidacionLineUp;
+        }
+
+        public IList<EmbarqueDto> ObtenerEmbarquePorVapor(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id)
+        {
+            try
+            {
+                return Listar<Embarque, EmbarqueDto>(x => x.Vapor.Id == vapor_Id && x.EstadoBuque.Descripcion == "PreOperativo" && x.Ubicacion != 1);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public void AsociarEmbarquePorNominacionEnviada(int nominacion_Id, int embarque_Id, string observacion)
+        {
+            try
+            {
+                Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
+                Embarque embarque = repositorio.Obtener<Embarque>(embarque_Id);
+                nominacion.Embarque = embarque;
+                nominacion.FechaEnvioLineUp = DateTime.Now;
+                nominacion.ObservacionEnvioLineUp = observacion;
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id)
+        {
+            try
+            {
+
+                Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
+                MaterialPuertoCantidad materialPuertoCantidad = new MaterialPuertoCantidad();
+                materialPuertoCantidad.Embarque = repositorio.Obtener<Embarque>(embarque_Id); 
+                materialPuertoCantidad.Cantidad = nominacion.NominacionDatoTecnico.CantidadTotal;
+                materialPuertoCantidad.MaterialPuerto = nominacion.NominacionDatoTecnico.MaterialPuerto;
+                materialPuertoCantidad.Color = nominacion.NominacionDatoTecnico.MaterialPuerto.Color;
+                repositorio.Agregar(materialPuertoCantidad);
+                repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #region Metodos Utiles
+        private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
             {
                 return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
             }

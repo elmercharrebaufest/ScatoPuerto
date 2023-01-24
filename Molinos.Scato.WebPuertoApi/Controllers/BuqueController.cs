@@ -113,15 +113,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //    {
         //        return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.InnerException);
         //    }
-        //}
-        [HttpPost]
-        [Autorizacion(PermisosScato.LineUp)]
-        [Route("api/Buque/GuardarVaporInformacion")]
-        public HttpResponseMessage GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto)
-        {
-            servicio.GuardarVaporInformacion(VaporInformacionDto);
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
+        //}      
         //[HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         //[Route("api/Buque/ObtenerVapores")]

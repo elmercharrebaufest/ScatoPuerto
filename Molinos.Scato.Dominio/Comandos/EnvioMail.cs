@@ -15,5 +15,7 @@ namespace Molinos.Scato.Dominio.Comandos
         public string AttachmentName2 { get; set; }
         public byte[] Attachment3 { get; set; }
         public string AttachmentName3 { get; set; }
+
+        public List<string> Copia { get; set; }
     }
 }

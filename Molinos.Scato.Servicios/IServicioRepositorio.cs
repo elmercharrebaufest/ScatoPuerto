@@ -2682,10 +2682,7 @@ namespace Molinos.Scato.Servicios
         void GuardarHistoricoActor(int Embarque_Id, string accion, string nombreUsuario);
 
         [OperationContract]
-        IList<VaporDto> ObtenerVapores();
-
-        [OperationContract]
-        void GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto);
+        IList<VaporDto> ObtenerVapores();   
 
         [OperationContract]
         VaporInformacionDto ObtenerVaporInformacion(int vapor_id);
@@ -2764,5 +2761,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
 
+        [OperationContract]
+        IList<NominacionDto> ListarNominaciones(int idEmbarque);
+
+      
+        [OperationContract]
+        List<LogABM> ObtenerInformacionLog(int claseId);
     }
 }

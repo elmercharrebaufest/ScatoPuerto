@@ -198,7 +198,15 @@ export class ResumenDeOperatoriaComponent implements OnInit {
           porteNeto         : embarque.porteNeto         ,
           puntual           : embarque.puntal            ,
           tipoBuque         : embarque.tipoBuque         ,
-          vapor             : embarque.vapor          
+          vapor             : embarque.vapor             ,
+          banderaInformacion:  null,
+          itemsTotales:  0,
+          pagina:  0,
+          itemPorPagina:  0,
+          vaporId:  0,
+          usuario:  null,
+          fechaModificacion:  null, 
+          id: 0
        };
       });
   }

@@ -91,6 +91,7 @@
     <Compile Include="ConsultasEF\ListarDetalleMovimientoIngreso.cs" />
     <Compile Include="ConsultasEF\ListarCpeAfipCacheadas.cs" />
     <Compile Include="ConsultasEF\ListarVagonesEnPesada.cs" />
+    <Compile Include="ConsultasEF\ListarVaporInformacionConsulta.cs" />
     <Compile Include="ConsultasEF\MonitorCPEsCacheadasConsulta.cs" />
     <Compile Include="ConsultasEF\ObtenerVehiculo.cs" />
     <Compile Include="ConsultasEF\ObtenerCalleNoGranos.cs" />

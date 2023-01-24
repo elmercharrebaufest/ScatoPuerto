@@ -5,6 +5,7 @@ import { Pais } from "./Pais";
 
 
 export class VaporInformacion {
+    id: number;
     vapor: Vapor;
     bandera: Bandera;
     nombreBuque: string;
@@ -18,5 +19,11 @@ export class VaporInformacion {
     manga: number;
     puntual: number;
     cantidadBodegasTks: number;
-
+    banderaInformacion: string = null;
+    itemsTotales: number = 0;
+    pagina: number = 0;
+    itemPorPagina: number = 0;
+    vaporId: number = 0;
+    usuario: string = null;
+    fechaModificacion: Date = null; 
 }

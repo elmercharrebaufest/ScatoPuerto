@@ -67,6 +67,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/buques'])
       if (this.user.permisos.find(x => x === 'Buque_Ver'))
       this.router.navigate(['/programa'])
+      if (this.user.permisos.find(x => x === 'Vapor_Visualizar'))
+      this.router.navigate(['/vapor'])
     this.opened = false;
   }
 

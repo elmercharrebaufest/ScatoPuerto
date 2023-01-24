@@ -63,6 +63,11 @@ export class IniciarSesionComponent implements OnInit {
             this.router.navigate(['/buques']);
             break;
         }
+
+        case 'Vapor_Visualizar': {
+          this.router.navigate(['/vapor']);
+          break;
+      }
     }
   }
 

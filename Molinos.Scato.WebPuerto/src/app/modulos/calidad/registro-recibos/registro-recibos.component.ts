@@ -8,6 +8,9 @@ import { forkJoin } from 'rxjs';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { FormGroup } from '@angular/forms';
+import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
+import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 
 @Component({
   selector: 'app-registro-recibos',
@@ -26,6 +29,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   // impresion:boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+  nominaciones: Nominacion[] = [];
 
   constructor
   (
@@ -75,16 +79,17 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
 
     forkJoin([
       this._embarqueService.obtenerEmbarque(this.idEmbarque),
-      this._reciboBuqueService.obtenerRecibos(this.idEmbarque)
-    ]).subscribe(([res1, res2,]) => {
+      this._reciboBuqueService.obtenerRecibos(this.idEmbarque),
+      this._reciboBuqueService.obtenerNominacionRecibos(this.idEmbarque),
+    ]).subscribe(([res1, res2, nominacionRecibos]) => {
       this.nombreBuque = res1.nombreBuque;
       this.recibosDeBuque = res2;
-            
-
+      this.nominaciones = nominacionRecibos;
       });
   }
 
   onVerReciboSelected(recibo){
+    recibo.desdeTabla = true;
     this._reciboSharingService.setFiltroRecibos(recibo);
     this.mostrarModal = true;
   
@@ -95,10 +100,29 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
       
     recibo.fechaHoraImpresion = new Date();
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {
-      console.log('200 Ok')
       this.refreshRecibos();
       this._reciboSharingService.setReciboImpresionSubject(recibo);
     });
+  }
+
+  precargarRecibo(nominacionRecibo: NominacionRecibo){
+    let reciboAGenerar: ReciboDeBuque = new ReciboDeBuque();
+    reciboAGenerar.embarque_Id = this.idEmbarque;
+    let reciboDetalle: ReciboDeBuqueDetalles = new ReciboDeBuqueDetalles();
+    reciboDetalle.esEuropeo = nominacionRecibo.formato == 'Europeo' || nominacionRecibo.formato == '' ? true: false;
+    reciboDetalle.cantidad = nominacionRecibo.cantidad;
+    reciboDetalle.exportador = nominacionRecibo.exportador.nombre;
+    reciboDetalle.valorEnKG = nominacionRecibo.unidad == 'Kg'? true: false;
+    reciboDetalle.puertoOrigen = nominacionRecibo.puertoDeCarga;
+    reciboDetalle.puertoDestino = nominacionRecibo.puertoDeDescarga;
+    reciboDetalle.cantidadLetrasYClaseCarga = nominacionRecibo.descripcionesBienes;
+    reciboDetalle.nombreBuque =  this.nombreBuque;
+    let reciboDeBuqueDetalles: ReciboDeBuqueDetalles[] = [];
+    reciboDeBuqueDetalles.push(reciboDetalle);
+    reciboAGenerar.reciboDeBuqueDetalles = reciboDeBuqueDetalles;
+    reciboAGenerar.desdeTabla = false;
+    this._reciboSharingService.setFiltroRecibos(reciboAGenerar);
+    this.mostrarModal = true;
   }
 
   hasPermisoRecibidores_Recibo_Imprimir() {
