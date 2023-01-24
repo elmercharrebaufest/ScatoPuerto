@@ -12100,6 +12100,20 @@ namespace Molinos.Scato.Servicios.Impl
             CompletarDatosHistorialDeEmbarque(historial);
             return historial;
         }
+        public IList<NominacionDto> ListarNominaciones(int idEmbarque)
+        {
+            try
+            {
+                List<NominacionDto> nominacionReciboDtos = Listar<Nominacion, NominacionDto>(x => x.Embarque.Id == idEmbarque).ToList();
+                nominacionReciboDtos = nominacionReciboDtos.Where(x => x.NominacionRecibo != null && x.NominacionRecibo.Count > 0).ToList();
+                return nominacionReciboDtos;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
 
         public List<LogABM> ObtenerInformacionLog(int claseId)
         {            
