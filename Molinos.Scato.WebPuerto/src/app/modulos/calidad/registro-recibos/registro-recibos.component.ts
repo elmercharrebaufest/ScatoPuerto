@@ -30,7 +30,6 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   nominaciones: Nominacion[] = [];
-  desdeTabla: boolean = false;
 
   constructor
   (
@@ -90,7 +89,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
   }
 
   onVerReciboSelected(recibo){
-    this.desdeTabla = true;
+    recibo.desdeTabla = true;
     this._reciboSharingService.setFiltroRecibos(recibo);
     this.mostrarModal = true;
   
@@ -121,8 +120,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     let reciboDeBuqueDetalles: ReciboDeBuqueDetalles[] = [];
     reciboDeBuqueDetalles.push(reciboDetalle);
     reciboAGenerar.reciboDeBuqueDetalles = reciboDeBuqueDetalles;
-
-    this.desdeTabla = false;
+    reciboAGenerar.desdeTabla = false;
     this._reciboSharingService.setFiltroRecibos(reciboAGenerar);
     this.mostrarModal = true;
   }
