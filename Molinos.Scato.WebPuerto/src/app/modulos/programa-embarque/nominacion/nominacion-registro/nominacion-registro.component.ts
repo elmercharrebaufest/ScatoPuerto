@@ -49,10 +49,17 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     private programaEmbarqueService: ProgramaEmbarqueService
   ) {
     this.cargarValoresNominacion();
+    this.actualizarAuditoria();
   }
 
   ngOnInit(): void {
 
+  }
+  private actualizarAuditoria(){
+    this.nominacionService.ActualizarAuditoria.subscribe(auditoria =>{
+      if (auditoria!=null && auditoria == true)
+        this.obtenerAuditorias();
+    });
   }
   private crearValidarObjetoNominacionDatoTecnico(): Subject<NominacionDatoTecnico> {
     let nominacion: NominacionDatoTecnico;
@@ -128,16 +135,10 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     this.nominacionId = nominacionId != null ? parseInt(nominacionId) : 0;
     this.titulo = this.nominacionId == 0 ? 'Nueva Nominación' : 'Editar Nominación';
     this.asignarNominacionParametros(this.nominacionId);
-
   }
 
   obtenerAuditorias() {
-
-
-
      this.programaEmbarqueService.obtenerAuditoria(this.nominacionId).subscribe((res: Auditoria[]) => {
-
-
       res.forEach(element => {
         let fecha: Date;
         switch (element.entidadNombre) {
@@ -183,7 +184,6 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
         nominacionParametos.nominacion = data;
         this.nominacionService.NominacionParametros = nominacionParametos;
         this.obtenerAuditorias();
-
       });
     } else {
       this.nominacionService.NominacionParametros = nominacionParametos;

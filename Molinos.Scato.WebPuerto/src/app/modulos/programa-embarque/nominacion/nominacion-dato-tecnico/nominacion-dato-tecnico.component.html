@@ -237,7 +237,7 @@
             </div>
             <div class="form-group col-md-4">
 
-                <label for="bandera" class="font-weight">Bandera *</label>
+                <label for="bandera" class="font-weight">Bandera</label>
                 <select class="custom-select" [disabled]="true" formControlName="bandera"
                  [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.bandera.invalid}" >
                     <option value=""></option>
@@ -314,7 +314,7 @@
                     </div>
                 </div>
                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Tipo contrato *</label>
+                    <label class="font-weight-bold">Tipo contrato   </label>
                     <select class="custom-select" formControlName="tipoDeContrato">
                         <option value=""></option>
                         <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [ngValue]="tipoDeContrato">

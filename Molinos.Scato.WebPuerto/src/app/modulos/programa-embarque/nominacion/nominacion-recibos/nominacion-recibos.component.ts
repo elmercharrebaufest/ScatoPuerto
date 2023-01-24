@@ -183,6 +183,7 @@ export class NominacionRecibosComponent implements OnInit {
         this.confirmationDialogService.confirm('Registro Nominación - Recibos', 'Recibos guardados correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
         this.cargandoRecibos = false;
         this.cargarFormulario();
+        this.nominacionService.ActualizarAuditoria = true;
       });
     }
   }
