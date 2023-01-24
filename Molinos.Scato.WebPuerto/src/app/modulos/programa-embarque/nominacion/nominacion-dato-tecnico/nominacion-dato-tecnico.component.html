@@ -4,7 +4,7 @@
     <form [formGroup]="datoTecnicoForm" class="mt-4">
         <div class="row form-row">
             <div class="form-group col-md-6">
-                <label for="materialPuerto" class="font-weight-bold">Producto</label>
+                <label for="materialPuerto" class="font-weight-bold">Producto *</label>
                 <select formControlName="materialPuerto" class="custom-select"
                     [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.materialPuerto.invalid}" required
                     (change)="onCargarTipoCalidad()">
@@ -14,7 +14,7 @@
                 </select>
             </div>
             <div class="form-group col-md-3">
-                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total</label>
+                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total *</label>
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadTotal"
@@ -227,7 +227,7 @@
         <hr class="color-linea-division" />
         <div class="row form-row">
             <div class="form-group col-md-6">
-                <label class="font-weight-bold">Nombre buque</label>
+                <label class="font-weight-bold">Nombre buque *</label>
                 <input *ngIf="listaVapor" type="text" class="form-control" formControlName="vaporInformacion"
                     maxlength="50" placeholder="Ingrese nombre del buque" [ngbTypeahead]="buscarVapor"
                     (selectItem)="seleccionVapor($event)" [inputFormatter]="formatoVapor"
@@ -236,14 +236,16 @@
                     required />
             </div>
             <div class="form-group col-md-4">
-                <label for="bandera" class="font-weight-bold">Bandera</label>
-                <select class="custom-select" formControlName="bandera">
+
+                <label for="bandera" class="font-weight">Bandera *</label>
+                <select class="custom-select" [disabled]="true" formControlName="bandera"
+                 [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.bandera.invalid}" >
                     <option value=""></option>
                     <option *ngFor="let bandera of listaBanderas" [ngValue]="bandera">{{bandera.nombre}}</option>
                 </select>
             </div>
             <div class="form-group col-md-3">
-                <label for="etaRecalada" class="font-weight-bold">ETA Recalada</label>
+                <label for="etaRecalada" class="font-weight-bold">ETA Recalada *</label>
                 <div class="input_img">
                     <input type="date" max="3000-12-31" [min]="fechaMinimaEtaRecalada" class="form-control"
                         [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.etaRecalada.invalid}" required
@@ -251,7 +253,7 @@
                 </div>
             </div>
             <div class="form-group col-md-3">
-                <label for="obligacionDeCarga" class="font-weight-bold">Obligación de carga</label>
+                <label for="obligacionDeCarga" class="font-weight-bold">Obligación de carga *</label>
                 <div class="input_img">
                     <input type="date" max="3000-12-31" [min]="fechaMinimaObligacionCarga" class="form-control"
                         [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.obligacionDeCarga.invalid}"
@@ -265,7 +267,7 @@
         <div class="row form-row">
             <div class="input-group col-md-2">
                 <div class="form-group columa-ancho-total">
-                    <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga</label>
+                    <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga *</label>
                     <select class="custom-select" formControlName="muelleDeCarga"
                         [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}"
                         required>
@@ -312,7 +314,7 @@
                     </div>
                 </div>
                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Tipo contrato</label>
+                    <label class="font-weight-bold">Tipo contrato *</label>
                     <select class="custom-select" formControlName="tipoDeContrato">
                         <option value=""></option>
                         <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [ngValue]="tipoDeContrato">
@@ -341,9 +343,10 @@
             </div>
             <div class="input-group col-md-4">
                 <div class="form-group columa-ancho-total">
-                    <label class="font-weight-bold">Agencia maritima</label>
+                    <label class="font-weight-bold">Agencia maritima *</label>
                     <div class="alinear-controles">
                         <tag-input *ngIf="listaAgenciaMaritimaPuerto" formControlName="agenciaMaritimaPuerto"
+                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.agenciaMaritimaPuerto.invalid}"
                             [placeholder]="'Ingrese la Agencia'" [secondaryPlaceholder]="'Ingrese la Agencia'"
                             [identifyBy]="'id'" [displayBy]="'nombre'" [maxItems]="1">
                             <tag-input-dropdown [showDropdownIfEmpty]="true"
@@ -381,6 +384,7 @@
                     formControlName="observacionesSurveyor"></textarea>
             </div>
         </div>
+        Campos obligatorios (*)
     </form>
     <div class="row form-row">
         <div class="col-md-12 botones-registro-centrado" *ngIf="nominacionId > 0">
