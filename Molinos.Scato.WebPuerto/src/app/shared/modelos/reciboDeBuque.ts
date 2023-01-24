@@ -6,6 +6,7 @@ export class ReciboDeBuque {
    emitio: string;
    superviso: string;
    fechaHoraImpresion: Date;
+   desdeTabla: boolean;
    reciboDeBuqueDetalles: ReciboDeBuqueDetalles[];
 }
 

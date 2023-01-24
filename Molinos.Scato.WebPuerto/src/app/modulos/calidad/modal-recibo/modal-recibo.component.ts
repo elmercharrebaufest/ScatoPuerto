@@ -32,7 +32,6 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   idEmbarque: number;
   nombreBuque: string;
   reciboDeBuqueForm: FormGroup;
-  @Input() desdeTabla: boolean;
   // enviado: boolean;
   @Input() mostrarModal: boolean = false;
   @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo: TemplateRef<any>;
@@ -58,6 +57,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       this.mostrarModalOjito();
     });
     this.initObtenerEmbarque();
+    
   }
   //#endregion
   ngOnInit(): void {
@@ -144,6 +144,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
 
   setModalOjito() {
 
+    this.reciboDeBuqueForm.enable();
+
     this.reciboDeBuqueForm.controls.puertoOrigen.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoOrigen);
     if (this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo != null && this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo != undefined){
       this.reciboDeBuqueForm.controls.fechaRecibo.setValue(formatDate(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo, 'yyyy-MM-dd', 'en'));
@@ -166,7 +168,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboDeBuqueForm.controls.incluirImpresionCalidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionCalidad);
     this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionEstibado);
     this.reciboDeBuqueForm.controls.esEuropeo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
-    if (this.desdeTabla) { this.reciboDeBuqueForm.disable(); }
+    if (this.reciboBuqueOjito.desdeTabla) { this.reciboDeBuqueForm.disable(); }
     else { this.reciboDeBuqueForm.enable(); }
 
   }
