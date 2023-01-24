@@ -1,58 +1,135 @@
 <div *ngIf="mostrarGrilla" class="mt-4 px-4 pb-4" style='background-color: white !important;'>
-    <app-collapse-button collapseSelectorId="collapseRegistroRecibos"></app-collapse-button>
-   
-    <h4 class="info-header colorTitle pt-4">Recibos</h4>
-    <h6  id="nombreBuqueRecibo" class="colorTitle mb-4">{{nombreBuque}}</h6>
-    
-    <div id="collapseRegistroRecibos" class="collapse show">  
+  <app-collapse-button collapseSelectorId="collapseRegistroRecibos"></app-collapse-button>
+
+  <h4 class="info-header colorTitle pt-4">Datos de recibos</h4>
+  <h6 id="nombreBuqueRecibo" class="colorTitle mb-4">{{nombreBuque}}</h6>
+
+  <div id="collapseRegistroRecibos">
+    <div *ngFor="let nominacion of nominaciones;let i = index">
+      <h6 class="colorTitle">
+        {{nominacion.nominacionDatoTecnico?.materialPuerto?.descripcionCortaIngles}}
+        ({{nominacion.nominacionDatoTecnico?.materialPuerto?.descripcion}})
+      </h6>
+      <table class="table table-bordered alCentro">
+        <thead>
+          <tr class="table-active ">
+            <th>
+              N° de recibo
+            </th>
+            <th>
+              Cargador
+            </th>
+            <th>
+              Formato
+            </th>
+            <th>
+              Cantidad
+            </th>
+            <th>
+              Unidad
+            </th>
+            <th>
+              Ajuste
+            </th>
+            <th>
+              Loading Port
+            </th>
+            <th>
+              Discharge Port
+            </th>
+            <th>
+              Description of goods
+            </th>
+            <th>
+
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let rc of nominacion.nominacionRecibo">
+            <td>
+              {{rc.numeroRecibo}}
+            </td>
+            <td>
+              {{rc.exportador.nombre}}
+            </td>
+            <td>
+              {{rc.formato}}
+            </td>
+            <td>
+              {{rc.cantidad}}
+            </td>
+            <td>
+              {{rc.unidad}}
+            </td>
+            <td>
+              {{rc.ajuste}}
+            </td>
+            <td>
+              {{rc.puertoDeCarga}}
+            </td>
+            <td>
+              {{rc.puertoDeDescarga}}
+            </td>
+            <td>
+              {{rc.descripcionesBienes}}
+            </td>
+            <td class="noBorder centradoHorizontal" style="text-align: -webkit-center;">
+              <div class='icon-editar cursor' (click)="precargarRecibo(rc)" ></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="collapse show">
       <div fxLayout='row wrap' class='info-desc'>
 
-          <table class="table table-bordered">
-            <thead>
-              <tr class="table-active">
-                <th class="alCentro ocultarPdf" data-html2canvas-ignore="true"> Ver </th>
-                <th class="alCentro"> N° de recibo </th>
-                <th class="alCentro"> Exportador </th>
-                <th class="alCentro"> Estado </th>
-                <th class="alCentro"> Emitió </th>
-                <th class="alCentro"> Supervisó </th>
-                <th class="alCentro"> Fecha y hora de impresión </th>
-                <th class="alCentro ocultarPdf" data-html2canvas-ignore="true"> Imprimir </th>
-              </tr>
-            </thead>
-            
-            <tbody>
+        <table class="table table-bordered alCentro">
+          <thead>
+            <tr class="table-active">
+              <th class="ocultarPdf" data-html2canvas-ignore="true"> Ver </th>
+              <th> N° de recibo </th>
+              <th> Exportador </th>
+              <th> Estado </th>
+              <th> Emitió </th>
+              <th> Supervisó </th>
+              <th> Fecha y hora de impresión </th>
+              <th class="ocultarPdf" data-html2canvas-ignore="true"> Imprimir </th>
+            </tr>
+          </thead>
 
-              <tr *ngFor="let recibo of recibosDeBuque, index as cont">
-                <td
-                class="alCentroIconos ocultarPdf"  data-html2canvas-ignore="true"
-                (click)="onVerReciboSelected(recibo)"
-                >
+          <tbody>
+
+            <tr *ngFor="let recibo of recibosDeBuque, index as cont">
+              <td class="alCentroIconos ocultarPdf" data-html2canvas-ignore="true"
+                (click)="onVerReciboSelected(recibo)">
                 <img src="assets\ojoIcon.svg" alt="">
-                </td>
-                <td class="alCentro"> {{idEmbarque}} - 0{{ cont+1 }} </td>
-                <td class="alCentro"> {{ recibo.reciboDeBuqueDetalles[0].exportador }} </td>
-                <td class="alCentro"> - </td>
-                <!-- <td class="alCentro"> <span [ngClass]="{'warn': recibo.estado == 'Pendiente'}">{{recibo.estado}} </span></td> -->
-                <td class="alCentro"> {{recibo.emitio}} </td>
-                <td class="alCentro"> - </td>
-                <!-- <td class="alCentro"> {{recibo.superviso}} </td> -->
-                <td *ngIf="recibo.fechaHoraImpresion == null" class="alCentro"> - </td>
-                <td *ngIf="recibo.fechaHoraImpresion !== null" class="alCentro"> {{recibo.fechaHoraImpresion | date:'short'}} </td>
-                <td class="alCentroIconos ocultarPdf" data-html2canvas-ignore="true" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
-                <!-- <td *ngIf="recibo.estado == 'Aprobado'" class="alCentroIconos" (click)="generarPDF(recibo)"> <img src="assets\iconoImpresion.svg" alt=""> </td>
-                <td *ngIf="recibo.estado == 'Pendiente'" class="alCentro"> <img src="assets\iconImDeshabilitada.svg" alt=""> </td> -->
-                
-              </tr>
-              
-            </tbody>
-          </table>
+              </td>
+              <td> {{idEmbarque}} - 0{{ cont+1 }} </td>
+              <td> {{ recibo.reciboDeBuqueDetalles[0].exportador }} </td>
+              <td> - </td>
+              <td> {{recibo.emitio}} </td>
+              <td> - </td>
+              <td *ngIf="recibo.fechaHoraImpresion == null"> - </td>
+              <td *ngIf="recibo.fechaHoraImpresion !== null"> {{recibo.fechaHoraImpresion |
+                date:'short'}} </td>
+              <td class="alCentroIconos ocultarPdf" data-html2canvas-ignore="true" (click)="generarPDF(recibo)"> <img
+                  src="assets\iconoImpresion.svg" alt=""> </td>
 
-          <div><app-recibodebuquepdf></app-recibodebuquepdf></div>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <div><app-recibodebuquepdf></app-recibodebuquepdf></div>
 
 
-          <div *ngIf="mostrarModal" > <app-modal-recibo [mostrarModal]="mostrarModal" (reciboEmitido)="reciboEmitido($event)"></app-modal-recibo> <div>
-        
+        <div *ngIf="mostrarModal"> <app-modal-recibo [mostrarModal]="mostrarModal" [desdeTabla]="desdeTabla"
+            ></app-modal-recibo>
+          <div>
+
+          </div>
         </div>
+      </div>
     </div>
-</div>
