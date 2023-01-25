@@ -41,7 +41,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     foreach (var email in comando.Copia)
                     {
-                        message.To.Add(new MailAddress(email));
+                        message.CC.Add(new MailAddress(email));
                     }              
                 }
 
