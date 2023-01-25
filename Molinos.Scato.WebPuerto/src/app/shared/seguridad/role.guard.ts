@@ -94,7 +94,7 @@ export class RoleGuard implements CanActivateChild{
             }
           
             case 'programa': {
-                if (permisos.find(x => x === 'Recibidores_Ver')){
+                if (permisos.find(x => x === 'Comex_Nominacion_Ver')){
                     return true;
                 }else{
                     this.navigate(permisos, "programa");
@@ -102,7 +102,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             } 
             case 'nominacion': {
-                if (permisos.find(x => x === 'Recibidores_Ver')){
+                if (permisos.find(x => x === 'Comex_Nominacion_Ver')){
                     return true;
                 }else{
                     this.navigate(permisos, "nominacion");

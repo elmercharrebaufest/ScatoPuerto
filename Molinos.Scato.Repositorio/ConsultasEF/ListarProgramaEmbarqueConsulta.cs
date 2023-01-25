@@ -42,7 +42,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 && (item.Embarque == null || item.Embarque.Ubicacion != 1)
                                 && (item.FechaEliminacion == null || (ayer < item.FechaEliminacion.Value && item.FechaEliminacion.Value < hoy))
 
-                                orderby item.FechaCreacion descending 
+                                orderby item.FechaCreacion descending
 
                                 select new ProgramaEmbarqueDto
                                 {
@@ -71,7 +71,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     : item.FechaCreacion < ayer && !item.FechaEliminacion.HasValue ? 3 : item.FechaEliminacion.HasValue ? 4 : 0,
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
-                                    ItemsTotales = 0
+                                    ItemsTotales = 0,
+                                    CompaniaFumigador = item.NominacionDetalleIntervencion != null && item.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ?
+                                    item.NominacionDetalleIntervencion.CompaniaDeFumigacion.Descripcion : "",
+                                    Surveyor = item.NominacionDatoTecnico.Surveyor != null ? item.NominacionDatoTecnico.Surveyor.Descripcion : ""
                                 };
 
                 var resultados = resultado.ToList().Where(x => (
