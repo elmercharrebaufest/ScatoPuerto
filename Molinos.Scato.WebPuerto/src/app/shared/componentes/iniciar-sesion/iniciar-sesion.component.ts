@@ -68,6 +68,11 @@ export class IniciarSesionComponent implements OnInit {
           this.router.navigate(['/vapor']);
           break;
       }
+
+      case 'Comex_Nominacion_Ver': {
+        this.router.navigate(['/programa']);
+        break;
+    }
     }
   }
 
