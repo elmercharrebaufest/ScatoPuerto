@@ -45,6 +45,7 @@ namespace Molinos.Scato.Dominio.Dto
         public decimal DES { get; set; }
         public decimal DEM { get; set; }
         public string TipoDeContrato { get; set; }
+        public string CompaniaFumigador { get; set; }
     }
 
     public class NominacionCargadorDto
