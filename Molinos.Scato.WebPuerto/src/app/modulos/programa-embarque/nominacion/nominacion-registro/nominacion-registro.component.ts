@@ -92,35 +92,37 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
       if (validacion) {
         const nominacionRecibo: NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
         const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
-        const nominacionDatoTecnico: NominacionDatoTecnico = this.datoTecnico.crearObjectoDatoTecnico().nominacionDatoTecnico;
     
         nominacion.fechaCreacion = new Date();
         nominacion.id = 0;
         nominacion.embarque_Id = 0;
-        nominacion.nominacionDatoTecnico = nominacionDatoTecnico;
-        nominacion.nominacionDetalleIntervencion = nominacionIntervencion;
+        nominacion.nominacionDatoTecnico = null;
+        nominacion.nominacionDetalleIntervencion = null;
+        nominacion.nominacionRecibo = null;
 
-        if (nominacionRecibo.length > 0){
+        if (nominacionRecibo.length > 0)
           validacionRecibo = this.datoRecibos.validarCreacionRecibo();
-          nominacion.nominacionRecibo = nominacionRecibo;
-        }
-
-        if (!validacionRecibo) {
-          this.cargandoRegistro = false;
-          return validacionRecibo;
-        }
+          if (!validacionRecibo) {
+            this.cargandoRegistro = false;
+            return validacionRecibo;
+          }
 
         if (nominacionIntervencion != null)
           validacionIntervencion = this.datoIntervencion.validacionIntervencion();
-        if (!validacionIntervencion) {
-          this.cargandoRegistro = false;
-          return validacionIntervencion;
-        }
+          if (!validacionIntervencion) {
+            this.cargandoRegistro = false;
+            return validacionIntervencion;
+          }
 
         if (validacionRecibo && validacionIntervencion) {
+          const nominacionDatoTecnico: NominacionDatoTecnico = this.datoTecnico.crearObjectoDatoTecnico().nominacionDatoTecnico;
+          nominacion.nominacionDatoTecnico = nominacionDatoTecnico;
+          nominacion.nominacionDetalleIntervencion = nominacionIntervencion;
+          nominacion.nominacionRecibo = nominacionRecibo;
           this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data => {
             this.cargandoRegistro = false;
             this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
+            console.clear();
             this.router.navigate(['programa']);
           });
         }
