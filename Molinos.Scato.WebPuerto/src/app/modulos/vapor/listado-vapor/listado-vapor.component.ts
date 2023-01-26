@@ -150,7 +150,7 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
 
   editarVapor(id, modal, bandera, nombreBuque, imo){ 
     this.vaporId = id;
-    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' }).result
+    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
     .then(() => {     
       console.log('_modalService.open');
 

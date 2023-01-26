@@ -207,6 +207,12 @@ export class ModalCrearBuqueComponent implements OnInit {
   public onEditarBuque() {
     this.submitted = true
     let buque = this.crearEditarBuqueForm.getRawValue();
+    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
+    this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
+    this.crearEditarBuqueForm.controls['bandera'].invalid) {
+    this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+    return
+  }
     const objVapor =
     {
       vapor: this.vaporSeleccionado,
@@ -224,12 +230,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       cantidadBodegasTks: buque.cantBodegastks,
     };
 
-    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
-      this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
-      this.crearEditarBuqueForm.controls['bandera'].invalid) {
-      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-      return
-    }
+  
     if (this.ValidarBuque(objVapor)) {return;}
     this.mostrarSpinner = true;
     this.mensajeBuque = 'Guardando información de buque';
@@ -254,6 +255,14 @@ export class ModalCrearBuqueComponent implements OnInit {
       this.vaporSeleccionado = new Vapor();
       this.vaporSeleccionado.id = this.id;
     }
+
+    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
+    this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
+    this.crearEditarBuqueForm.controls['bandera'].invalid) {
+    this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+    return
+  }
+
     const objVapor =
     {
       vapor: this.id > 0 ? this.vaporSeleccionado : null,
@@ -273,12 +282,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       cantidadBodegasTks: buque.cantBodegastks,
     }
   
-      if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
-        this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
-        this.crearEditarBuqueForm.controls['bandera'].invalid) {
-        this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-        return
-      }
+   
 
     this.ValidarBuque(objVapor).subscribe(
       (data)=> {
