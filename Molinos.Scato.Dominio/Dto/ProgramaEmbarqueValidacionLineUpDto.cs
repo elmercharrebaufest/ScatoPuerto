@@ -11,6 +11,8 @@ namespace Molinos.Scato.Dominio.Dto
         public static readonly string ENVIO_OK = "Se ha dado de alta un nuevo embarque.";
         public static readonly string ENVIO_PRODUCTO_EXISTENTE = "El producto ya existe para el embarque.";
         public static readonly string ENVIO_PRODUCTO_AGREGADO = "Se agrego el producto al embarque existente.";
+        public static readonly string ENVIO_MUELLE_CARGA = "El embarque existente, se encuentra en muelle de carga.";
+
     }
 
     public class ResultadoEnvioLineUpDto

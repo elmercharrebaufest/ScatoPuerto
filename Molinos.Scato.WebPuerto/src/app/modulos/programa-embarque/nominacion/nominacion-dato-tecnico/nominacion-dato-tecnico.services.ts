@@ -59,7 +59,7 @@ export class NominacionDatoTecnicoRegistroService {
             tasaDeCargaValor: [''],
             dem: [''],
             des: [''],
-            tipoDeContrato: [''],
+            tipoDeContrato: ['', Validators.required],
             ataPuerto: [[]],
             agenciaMaritimaPuerto: [[], Validators.required],
             surveyor: [[]],
