@@ -74,3 +74,6 @@ th     { background:#eee; }
     color: red;
 }
 
+.window-modal-vapor{
+    z-index: 1000 !important;
+}
