@@ -127,14 +127,20 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
   //#region Propiedades
   private calcularFechaMinimaEtaRecalada(fechaModificacion: Date = null){
-    const fechaActual = fechaModificacion !=null? fechaModificacion : new Date();
+    let fechaActual = fechaModificacion !=null? fechaModificacion : new Date();
+    const fechaHoy = new Date();
+    if (fechaHoy < fechaActual)
+      fechaActual = new Date();
     let dia = String(fechaActual.getDate()).padStart(2, '0');
     let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); //January is 0!
     let anio = fechaActual.getFullYear();
     this.fechaMinimaEtaRecalada = anio + '-' + mes + '-' + dia;
   }
   private calcularFechaMinimaObligacionDeCarga(fechaModificacion: Date = null){
-    const fechaActual = fechaModificacion !=null? fechaModificacion : new Date();
+    let fechaActual = fechaModificacion !=null? fechaModificacion : new Date();
+    const fechaHoy = new Date();
+    if (fechaHoy < fechaActual)
+      fechaActual = new Date();
     let dia = String(fechaActual.getDate()).padStart(2, '0');
     let mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); //January is 0!
     let anio = fechaActual.getFullYear();
@@ -156,6 +162,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   get datoTecnicoCoordinadorFormArray(): FormArray {
     return this.datoTecnicoForm.get("nominacionDatoTecnicoCoordinadorPuerto") as FormArray
+  }
+  private filtrarMaterialEnvioLineUp(esLiquido: boolean){
+    this.listaMaterialPuerto = this.listaMaterialPuerto.filter(x=> x.esLiquido == esLiquido);
   }
   //#endregion
 
@@ -194,6 +203,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   private deshabilitarEnvioLineUp(){
     if (this.esEnvioLineUp){
+      const vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value;
+      if (vaporInformacion!=null){
+        const esLiquido = vaporInformacion.tipoBuque == 'Bulk Carrier'? false: true;
+        this.filtrarMaterialEnvioLineUp(esLiquido);
+      }
       this.datoTecnicoForm.controls['vaporInformacion'].disable();
     }
     if (this.esMuelleDeCarga){
@@ -289,7 +303,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     });
     this.enviarExportadoresRecibo();
     this.actualizarExportadores(material);
-
   }
   private enviarExportadoresRecibo(){
     let listaExportadores: Exportador[] = [];
@@ -537,21 +550,16 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
     let surveyor = this.datoTecnicoForm.value.surveyor;
 
-    this.datoTecnicoForm.get('agenciaMaritimaPuerto').setValue(
-      agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
-        this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);
-
-    this.datoTecnicoForm.get('ataPuerto').setValue(
-      ataPuerto != null && ataPuerto.length > 0 ?
-        this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
-
-    this.datoTecnicoForm.get('surveyor').setValue(
-      surveyor != null && surveyor.length > 0 ?
-        this.listaSurveyor.find(x => x.id == surveyor[0].id) : null);          
+    let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.value));
+    
+    jsonDatoTecnico.agenciaMaritimaPuerto = (agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
+    this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);  
+    jsonDatoTecnico.ataPuerto = (ataPuerto != null && ataPuerto.length > 0 ? this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
+    jsonDatoTecnico.surveyor = (surveyor != null && surveyor.length > 0 ? this.listaSurveyor.find(x => x.id == surveyor[0].id) : null);    
     nominacion.id = this._nominacionParametros.nominacion != null? this._nominacionParametros.nominacion.id : 0;
     nominacion.fechaCreacion = new Date();
     nominacion.embarque_Id = 0;
-    nominacion.nominacionDatoTecnico= this.datoTecnicoForm.value;
+    nominacion.nominacionDatoTecnico= jsonDatoTecnico;
     nominacion.nominacionDetalleIntervencion = null;
     nominacion.nominacionRecibo = null;
     return nominacion;
@@ -643,6 +651,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       nominacionValida.muelleDeCarga = this.datoTecnicoForm.controls['muelleDeCarga'].value; 
       nominacionValida.vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value; 
       let validacion: boolean = false;
+
       forkJoin([
         this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida)
       ]).pipe(takeUntil(this.destroy$)).subscribe(([validacion]) => {

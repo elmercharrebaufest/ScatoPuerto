@@ -862,7 +862,7 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
 
-public IList<VaporInformacionDto> ListarBuquesNominacion()
+        public IList<VaporInformacionDto> ListarBuquesNominacion()
         {
             List<VaporInformacionDto> vapores = new List<VaporInformacionDto>();
             try
@@ -949,7 +949,6 @@ public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id
                                                                          x.SanBenito == sanBenito &&
                                                                          x.OtrosMuelles == otrosMuelles &&
                                                                          x.Noryon == noryon &&
-                                                                         x.EstadoBuque.Descripcion == "PreOperativo" &&
                                                                          x.Ubicacion != 1);
                 if (embarques.Count > 0)
                 {
