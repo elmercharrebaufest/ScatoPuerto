@@ -69,10 +69,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         public string ValidarBuque(string bandera, string nombreBuque, string IMO, int? id)
         {
-           // var vapores = repositorio.Listar<VaporInformacion>();
-
-            // if (vapores.Any(x => (id != null && x.Vapor.Id != id) && x.NombreBuque.ToUpper() == nombreBuque.ToUpper() && x.Bandera.Nombre.ToUpper() == bandera.ToUpper()))
-            if (repositorio.Existe<VaporInformacion>(x=> x.Vapor.Id != id && x.Vapor.Nombre.ToUpper() == nombreBuque.ToUpper() && x.Bandera.Nombre.ToUpper() == bandera.ToUpper()))
+          
+            if (repositorio.Existe<VaporInformacion>(x=> x.Vapor.Id != id && x.Vapor.Nombre.ToUpper() == nombreBuque.ToUpper()))
             {
                 return "El buque ingresado ya existe. Por favor verifique que los datos del buque sean correctos";
             }

@@ -319,7 +319,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     #endregion
 
                     #region Registro de recibos
-                    if (nominacion.NominacionRecibo != null)
+                    if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
                     {
                         var listaNominacionRecibo = (List<NominacionReciboDto>)nominacion.NominacionRecibo;
                         servicioProgramaEmbarque.GuardarNominacionRecibo(listaNominacionRecibo, nominacion.Id);

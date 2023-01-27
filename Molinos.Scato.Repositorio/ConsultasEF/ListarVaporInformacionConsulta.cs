@@ -65,7 +65,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 };
 
                 var resultados = resultado.ToList().Where(x => (
-                ((TipoBuque == null || TipoBuque.Any(y => y.Contains(x.TipoBuque))))));
+                ((TipoBuque == null || TipoBuque.Any(y => y.Contains(x.TipoBuque) && !string.IsNullOrEmpty(x.TipoBuque))))));
 
                 var itemsTotales = resultados.Count();
                 resultados = resultados.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)
