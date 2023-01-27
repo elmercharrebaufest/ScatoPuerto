@@ -314,8 +314,8 @@
                     </div>
                 </div>
                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Tipo contrato   </label>
-                    <select class="custom-select" formControlName="tipoDeContrato">
+                    <label class="font-weight-bold">Tipo contrato * </label>
+                    <select class="custom-select" formControlName="tipoDeContrato" required  [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.tipoDeContrato.invalid}">
                         <option value=""></option>
                         <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [ngValue]="tipoDeContrato">
                             {{tipoDeContrato.descripcion}}</option>

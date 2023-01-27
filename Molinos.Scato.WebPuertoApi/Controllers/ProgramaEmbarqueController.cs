@@ -621,20 +621,35 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     {
                         int embarque_Id = validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.Embarque.Id;
                         bool existeMaterial = validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.MaterialesExistentes.Existe;
-                        if (embarque_Id > 0 && !existeMaterial)
+
+                        if (validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial.Embarque.Ubicacion == 2)
                         {
-                            this.ModificarAltaDeEmbarque(nominacion, validacionEmbarques, ref programaEmbarqueResultadoEnvioLineUp);
-                        }
-                        else
-                        {
-                            servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque_Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE);
+                            servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque_Id, MensajeEnvioLineUp.ENVIO_MUELLE_CARGA);
                             programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
                             {
                                 Nominacion_Id = nominacion.Id,
                                 Estado = 2,
-                                Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE
+                                Observacion = MensajeEnvioLineUp.ENVIO_MUELLE_CARGA
                             });
                         }
+                        else
+                        {
+                            if (embarque_Id > 0 && !existeMaterial)
+                            {
+                                this.ModificarAltaDeEmbarque(nominacion, validacionEmbarques, ref programaEmbarqueResultadoEnvioLineUp);
+                            }
+                            else
+                            {
+                                servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque_Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE);
+                                programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
+                                {
+                                    Nominacion_Id = nominacion.Id,
+                                    Estado = 2,
+                                    Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE
+                                });
+                            }
+                        }
+                                                
                     }
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, programaEmbarqueResultadoEnvioLineUp);
@@ -816,7 +831,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     Nominacion_Id = nominacion.Id,
                     Estado = 1,
                     Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_AGREGADO
-                });
+                });                
             }
             catch (Exception ex)
             {
