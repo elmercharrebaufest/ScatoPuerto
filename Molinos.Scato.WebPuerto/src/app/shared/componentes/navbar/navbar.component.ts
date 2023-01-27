@@ -43,9 +43,11 @@ export class NavbarComponent implements OnInit {
   }
 
   obtenerNotificaciones(){
-    this._notificacionService.obtenerNotificaciones().subscribe((res: NotificacionProgramaDeEmbarque[]) => {
-      this.notificaciones = res;
-    })
+    if(this.router.url.includes('/lineup')){
+      this._notificacionService.obtenerNotificaciones().subscribe((res: NotificacionProgramaDeEmbarque[]) => {
+        this.notificaciones = res;
+      })
+    }    
   }
 
   cantidadNotificaciones(cantidad: number){

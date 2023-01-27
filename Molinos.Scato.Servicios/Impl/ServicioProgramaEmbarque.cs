@@ -508,18 +508,16 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 //Busco todas las notificaciones
                 var notificaciones = repositorio.Listar<NotificacionProgramaDeEmbarque>();
-                var excluidas = repositorio.Listar<NotificacionExcluidos>().ToList();
                 if (notificaciones != null && notificaciones.Count > 0)
-                {
+                { 
                     foreach (NotificacionProgramaDeEmbarque notificacion in notificaciones.ToList())
                     {
                         //Elimino de la base todas las anteriores a 10 días desde su creación.
                         if (notificacion.Fecha < DateTime.Now.AddDays(-10))
                         {
-                            //también elimino las excluidas para que no explota la base.
-                            repositorio.RemoverTodos<NotificacionExcluidos>(excluidas.Where(x => x.NotificacionProgramaDeEmbarque.Id == notificacion.Id));
+                            IList<NotificacionExcluidos> notificacionExcluidos = repositorio.Listar<NotificacionExcluidos>(x => x.NotificacionProgramaDeEmbarque.Id == notificacion.Id);
+                            repositorio.RemoverTodos(notificacionExcluidos);                         
                             repositorio.Remover(notificacion);
-
                         }
                     }
 
