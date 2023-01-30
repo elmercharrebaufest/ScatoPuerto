@@ -229,6 +229,8 @@
             <div class="form-group col-md-6">
                 <label class="font-weight-bold">Nombre buque *</label>
                 <input *ngIf="listaVapor" type="text" class="form-control" formControlName="vaporInformacion"
+                    (blur)="validaSeleccionVapor($event)"
+                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
                     maxlength="50" placeholder="Ingrese nombre del buque" [ngbTypeahead]="buscarVapor"
                     (selectItem)="seleccionVapor($event)" [inputFormatter]="formatoVapor"
                     [resultFormatter]="formatoVapor"
