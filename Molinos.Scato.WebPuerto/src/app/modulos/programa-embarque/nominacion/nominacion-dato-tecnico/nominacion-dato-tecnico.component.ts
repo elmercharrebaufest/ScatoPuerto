@@ -421,7 +421,17 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       map(term => this.listaVaporFiltro.filter(v => v.nombreBuque.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
     )
   }
-
+  public validaSeleccionVapor($event) {
+    console.log('evento vapor', $event);
+    this.mensajeValidaSeleccion = '';
+    let vapor = this.datoTecnicoForm.controls["vaporInformacion"].value;
+    console.log('evento vapor 2', vapor);
+    if (typeof vapor !== 'object') {
+      $event.target.value = '';
+      this.datoTecnicoForm.controls["vaporInformacion"].setValue('');
+      this.mensajeValidaSeleccion = 'El buque ingresado no existe.';
+    }
+  }
   public seleccionExportador($event) {
     setTimeout(() => this.enviarExportadoresRecibo(), 2000);
   }
@@ -551,7 +561,30 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     let surveyor = this.datoTecnicoForm.value.surveyor;
 
     let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.value));
-    
+    jsonDatoTecnico.id                                    =this.datoTecnicoForm.controls["id"].value;
+    jsonDatoTecnico.materialPuerto                        =this.datoTecnicoForm.controls["materialPuerto"].value;
+    jsonDatoTecnico.tipoDeCalidad                         =this.datoTecnicoForm.controls["tipoDeCalidad"].value;
+    jsonDatoTecnico.nominacionDatoTecnicoCalidad          =this.datoTecnicoForm.controls["nominacionDatoTecnicoCalidad"].value;
+    jsonDatoTecnico.cantidadTotal                         =this.datoTecnicoForm.controls["cantidadTotal"].value;
+    jsonDatoTecnico.tolerancia                            =this.datoTecnicoForm.controls["tolerancia"].value;
+    jsonDatoTecnico.observaciones                         =this.datoTecnicoForm.controls["observaciones"].value;
+    jsonDatoTecnico.vaporInformacion                      =this.datoTecnicoForm.controls["vaporInformacion"].value;
+    jsonDatoTecnico.bandera                               =this.datoTecnicoForm.controls["bandera"].value;
+    jsonDatoTecnico.etaRecalada                           =this.datoTecnicoForm.controls["etaRecalada"].value;
+    jsonDatoTecnico.obligacionDeCarga                     =this.datoTecnicoForm.controls["obligacionDeCarga"].value;
+    jsonDatoTecnico.muelleDeCarga                         =this.datoTecnicoForm.controls["muelleDeCarga"].value;
+    jsonDatoTecnico.tasaDeCarga                           =this.datoTecnicoForm.controls["tasaDeCarga"].value;
+    jsonDatoTecnico.tasaDeCargaValor                      =this.datoTecnicoForm.controls["tasaDeCargaValor"].value;
+    jsonDatoTecnico.dem                                   =this.datoTecnicoForm.controls["dem"].value;
+    jsonDatoTecnico.des                                   =this.datoTecnicoForm.controls["des"].value;
+    jsonDatoTecnico.tipoDeContrato                        =this.datoTecnicoForm.controls["tipoDeContrato"].value;
+    jsonDatoTecnico.ataPuerto                             =this.datoTecnicoForm.controls["ataPuerto"].value;
+    jsonDatoTecnico.agenciaMaritimaPuerto                 =this.datoTecnicoForm.controls["agenciaMaritimaPuerto"].value;
+    jsonDatoTecnico.surveyor                              =this.datoTecnicoForm.controls["surveyor"].value;
+    jsonDatoTecnico.observacionesSurveyor                 =this.datoTecnicoForm.controls["observacionesSurveyor"].value;
+    jsonDatoTecnico.nominacionDatoTecnicoExportador       =this.datoTecnicoForm.controls["nominacionDatoTecnicoExportador"].value;
+    jsonDatoTecnico.nominacionDatoTecnicoDestino          =this.datoTecnicoForm.controls["nominacionDatoTecnicoDestino"].value;
+    jsonDatoTecnico.nominacionDatoTecnicoCoordinadorPuerto=this.datoTecnicoForm.controls["nominacionDatoTecnicoCoordinadorPuerto"].value;   
     jsonDatoTecnico.agenciaMaritimaPuerto = (agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
     this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);  
     jsonDatoTecnico.ataPuerto = (ataPuerto != null && ataPuerto.length > 0 ? this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
@@ -651,7 +684,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       nominacionValida.muelleDeCarga = this.datoTecnicoForm.controls['muelleDeCarga'].value; 
       nominacionValida.vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value; 
       let validacion: boolean = false;
-
       forkJoin([
         this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida)
       ]).pipe(takeUntil(this.destroy$)).subscribe(([validacion]) => {
