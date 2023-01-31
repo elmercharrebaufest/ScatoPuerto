@@ -553,8 +553,8 @@ namespace Molinos.Scato.Servicios.Impl
                 // Negrita: (\f -> <b>) (\f\f -> </b>)
                 // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
                 var copia = new List<string>();
-                copia.Add(tipoDeMail == "Surveyor" ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" ?
-                    nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+                copia.Add(tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" &&
+                    nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
                 var mail = new MailDto
                 {
                     Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
