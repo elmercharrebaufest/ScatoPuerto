@@ -615,8 +615,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     
                     if (validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial == null) // Nuevo Embarque
                     {
-                        servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Agregar, null, nominacion.Embarque);
                         this.CrearAltaDeEmbarque(nominacion, centro, workflow, ref programaEmbarqueResultadoEnvioLineUp);
+                        
                     }
                     else
                     {
@@ -792,6 +792,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 EmbarqueDto embarqueDto = this.CrearEmbarqueDto(nominacion, centro);
+                servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Agregar, null, embarqueDto);
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
                 var servicioWf = factory.CrearServicio(workflowDefinicionId);
                 var controlRecorrido = new ControlRecorridoDto
