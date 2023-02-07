@@ -557,22 +557,40 @@ namespace Molinos.Scato.Servicios.Impl
         public void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null)
         {
             string mensaje = "";
+            string muelle = "";
 
-            if(embarqueDto != null)
+            if (embarqueDto != null)
             {
-                embarque = repositorio.Obtener<Embarque>(x => x.Id == embarqueDto.Id);
-            }
-            string muelle = (embarque.Vicentin == true ? "vicentin" : embarque.Noryon == true ? "Noryon" : embarque.SanBenito == true ? "San Benito" : "Otros muelles");
-            switch (tipoNotificacion)
-            {
-                case TipoNotificacion.Agregar:
-                    mensaje = "Se ha agregado un nuevo embarque - " + embarque.Vapor.Nombre + " + " + muelle;
-                    break;
+                muelle = (embarqueDto.Vicentin == true ? "vicentin" : embarqueDto.Noryon == true ? "Noryon" : embarqueDto.SanBenito == true ? "San Benito" : "Otros muelles");
+                switch (tipoNotificacion)
+                {
+                    case TipoNotificacion.Agregar:
+                        mensaje = "Se ha agregado un nuevo embarque - " + embarqueDto.Vapor.Nombre + " + " + muelle;
+                        break;
 
-                case TipoNotificacion.Eliminar:
-                    mensaje = "Se ha eliminado la nominación relacionado con el embarque: " + embarque.Vapor.Nombre + " + " + muelle;
-                    break;
+                    case TipoNotificacion.Eliminar:
+                        mensaje = "Se ha eliminado la nominación relacionado con el embarque: " + embarqueDto.Vapor.Nombre + " + " + muelle;
+                        break;
+                }
             }
+
+            if(embarque != null)
+            {
+                muelle = (embarque.Vicentin == true ? "vicentin" : embarque.Noryon == true ? "Noryon" : embarque.SanBenito == true ? "San Benito" : "Otros muelles");
+                switch (tipoNotificacion)
+                {
+                    case TipoNotificacion.Agregar:
+                        mensaje = "Se ha agregado un nuevo embarque - " + embarque.Vapor.Nombre + " + " + muelle;
+                        break;
+
+                    case TipoNotificacion.Eliminar:
+                        mensaje = "Se ha eliminado la nominación relacionado con el embarque: " + embarque.Vapor.Nombre + " + " + muelle;
+                        break;
+                }
+            }
+            
+            
+
             NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque = new NotificacionProgramaDeEmbarque()
             {
                 Fecha = DateTime.Now,
