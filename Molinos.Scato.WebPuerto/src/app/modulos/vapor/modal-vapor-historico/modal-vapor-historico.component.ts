@@ -21,7 +21,7 @@ export class ModalVaporInformacionComponent implements OnInit, OnDestroy {
   estaCargando: boolean;
   @Output() cerrar = new EventEmitter<void>()
   vapores: VaporInformacion[] = [];
-  tieneDatos: boolean = false;
+   tieneDatos: boolean = false;
 
   //#endregion
 

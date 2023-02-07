@@ -615,6 +615,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     
                     if (validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial == null) // Nuevo Embarque
                     {
+                        servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Agregar, null, nominacion.Embarque);
                         this.CrearAltaDeEmbarque(nominacion, centro, workflow, ref programaEmbarqueResultadoEnvioLineUp);
                     }
                     else
