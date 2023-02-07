@@ -1,8 +1,10 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using static Molinos.Scato.Servicios.Impl.ServicioProgramaEmbarque;
 
 namespace Molinos.Scato.Servicios
 {
@@ -126,6 +128,12 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id);
+
+        [OperationContract]
+        void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null);
+
+        [OperationContract]
+        void AgregarNotificacion(NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque);
 
     }
 }
