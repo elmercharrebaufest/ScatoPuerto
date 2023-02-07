@@ -475,6 +475,9 @@ namespace Molinos.Scato.Servicios.Impl
                 nominacion_BD = repositorio.Obtener<Nominacion>(x => x.Id == nominacion_id);
                 nominacion_BD.FechaEliminacion = DateTime.Now;
                 repositorio.GuardarCambios();
+                //Se ha eliminado la nominación relacionado con el embarque: “Nombre de buque- Muelle“
+
+                ProcesarNotificacion(TipoNotificacion.Eliminar, nominacion_BD.Embarque);
             }
             catch (Exception ex)
             {
@@ -544,8 +547,58 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-      
-            public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
+        public enum TipoNotificacion
+        {
+            Agregar = 0,
+            Eliminar = 1,
+            Modificar = 2
+        }
+
+        public void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null)
+        {
+            string mensaje = "";
+
+            if(embarqueDto != null)
+            {
+                embarque = repositorio.Obtener<Embarque>(x => x.Id == embarqueDto.Id);
+            }
+            string muelle = (embarque.Vicentin == true ? "vicentin" : embarque.Noryon == true ? "Noryon" : embarque.SanBenito == true ? "San Benito" : "Otros muelles");
+            switch (tipoNotificacion)
+            {
+                case TipoNotificacion.Agregar:
+                    mensaje = "Se ha agregado un nuevo embarque - " + embarque.Vapor.Nombre + " + " + muelle;
+                    break;
+
+                case TipoNotificacion.Eliminar:
+                    mensaje = "Se ha eliminado la nominación relacionado con el embarque: " + embarque.Vapor.Nombre + " + " + muelle;
+                    break;
+            }
+            NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque = new NotificacionProgramaDeEmbarque()
+            {
+                Fecha = DateTime.Now,
+                Mensaje = mensaje,
+                TipoAlerta = Dominio.Enums.TipoAlerta.CartaPorte
+            };
+            AgregarNotificacion(notificacionProgramaDeEmbarque);
+        }
+
+        public void AgregarNotificacion(NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque)
+        {
+            try
+            {               
+                if (notificacionProgramaDeEmbarque != null)
+                {
+                    repositorio.Agregar(notificacionProgramaDeEmbarque);
+                    repositorio.GuardarCambios();
+                }               
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
             {
                 // CARACTERES NO IMPRIMIBLES:
                 // Enter: (\n -> <br/>)
@@ -553,8 +606,8 @@ namespace Molinos.Scato.Servicios.Impl
                 // Negrita: (\f -> <b>) (\f\f -> </b>)
                 // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
                 var copia = new List<string>();
-                copia.Add(tipoDeMail == "Surveyor" ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" ?
-                    nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+                copia.Add(tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" &&
+                    nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
                 var mail = new MailDto
                 {
                     Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
