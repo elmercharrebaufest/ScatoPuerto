@@ -1,21 +1,8 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import { Subscription } from 'rxjs';
 import { ProgramaEmbarqueService } from '@ScatoServicios/programa-embarque.service';
-import { NominacionDatoTecnico } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico';
-import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
-import { NominacionIntervencionesComponent } from '../nominacion/nominacion-intervenciones/nominacion-intervenciones.component';
-import { NominacionDetalleIntervencion, Senasa } from '@ScatoModels/programa-embarque/nominacion-detalle-intervencion';
-import { NominacionDatoTecnicoCalidad } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-calidad';
-import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
-import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
-import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-coordinador';
-import { NgbActiveModal, NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Auditoria } from '@ScatoModels/programa-embarque/auditoria';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
-import { finalize } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-modal-programa-embarque',
@@ -53,7 +40,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.nominacion = data;
         this.estaCargando = false;
         //Obtengo las auditorias asociadas a esa nominación.
-        this.obtenerAuditorias();
+        setTimeout(() => this.obtenerAuditorias(), 200);
       }
     );
   }
@@ -62,6 +49,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
     //this.nominacion.id
     this.programaEmbarqueService.obtenerAuditoria(this.nominacion.id).subscribe((res: Auditoria[]) => {
       this.auditoria = res;
+      console.log('res-->>', res);
     }, error => { }, () => {
       this.nominacion;
       //Recoorro todas las variables de la nominación
@@ -77,11 +65,18 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
                 let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key2.toLowerCase())
                 if (audit != null && audit != undefined) {                  
                   //En caso de encontrarla me fijo si tiene la clase que valida auditoría y la pinto de rojo.
-                  document.getElementsByClassName(key + key2 + "Auditoria")[0].classList.add('texto-rojo');
+                  let auditoria = document.getElementsByClassName(key + key2 + "Auditoria");
+                  let tabDatoTecnicoAuditoria = document.getElementsByClassName("tabDatoTecnicoAuditoria")
+                  let auditoriaTecnicoCheck = document.getElementsByClassName("auditoriaTecnicoCheck");
+
+                  if (auditoria.length > 0)
+                    document.getElementsByClassName(key + key2 + "Auditoria")[0].classList.add('texto-rojo');
                   //También pinto el título del tab de la pantalla
-                  document.getElementsByClassName("tabDatoTecnicoAuditoria")[0].classList.add('texto-rojo');
+                  if (tabDatoTecnicoAuditoria.length > 0)
+                    document.getElementsByClassName("tabDatoTecnicoAuditoria")[0].classList.add('texto-rojo');
                   //Y le agrego el puntito rojo al tab.
-                  (document.getElementsByClassName("auditoriaTecnicoCheck")[0] as HTMLElement) .style.visibility ='visible';
+                  if (auditoriaTecnicoCheck.length > 0)
+                    (document.getElementsByClassName("auditoriaTecnicoCheck")[0] as HTMLElement) .style.visibility ='visible';
                 }
               }
             }
@@ -136,9 +131,16 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
                       let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key3.toLowerCase() && x.entidad_Id == id)
                       if (audit != null && audit != undefined) {
                         //Busco observacionesDatoTecnicoAuditoria y lo pongo rojo
-                        document.getElementsByClassName(key + key3 + "Auditoria")[i].classList.add('texto-rojo');
-                        document.getElementsByClassName("tabDatosDeReciboAuditoria")[0].classList.add('texto-rojo');
-                        (document.getElementsByClassName("auditoriaReciboCheck")[0] as HTMLElement) .style.visibility ='visible';
+                        let auditoria = document.getElementsByClassName(key + key3 + "Auditoria");
+                        let tabDatosDeReciboAuditoria = document.getElementsByClassName("tabDatosDeReciboAuditoria");
+                        let auditoriaReciboCheck = document.getElementsByClassName("auditoriaReciboCheck");
+
+                        if (auditoria.length > 0)
+                          auditoria[i].classList.add('texto-rojo');
+                        if (tabDatosDeReciboAuditoria.length > 0)                        
+                          tabDatosDeReciboAuditoria[0].classList.add('texto-rojo');
+                        if (auditoriaReciboCheck.length > 0)
+                          (auditoriaReciboCheck[0] as HTMLElement) .style.visibility ='visible';
                       }
                     }
                   }
