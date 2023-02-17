@@ -827,6 +827,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 EmbarqueDto embarque = programaEmbarqueValidacionLineUp.ProgramaEmbarqueEmbarqueMaterial.Embarque;
                 servicioProgramaEmbarque.AgregarMaterialesPorNominacionEnviada(nominacion.Id, embarque.Id);
                 servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, embarque.Id, MensajeEnvioLineUp.ENVIO_PRODUCTO_AGREGADO);
+                servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Modificar, null, embarque, nominacion);
                 bModificacionEmbarque = true;
                 programaEmbarqueResultadoEnvioLineUp.ResultadoEnvioLineUp.Add(new RespuestaEnvioLineUpDto()
                 {

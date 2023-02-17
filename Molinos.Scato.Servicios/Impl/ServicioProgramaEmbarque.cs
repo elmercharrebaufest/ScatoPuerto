@@ -554,7 +554,7 @@ namespace Molinos.Scato.Servicios.Impl
             Modificar = 2
         }
 
-        public void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null)
+        public void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null, NominacionDto nominacionDto = null)
         {
             string mensaje = "";
             string muelle = "";
@@ -570,6 +570,10 @@ namespace Molinos.Scato.Servicios.Impl
 
                     case TipoNotificacion.Eliminar:
                         mensaje = "Se ha eliminado la nominación relacionado con el embarque: " + embarqueDto.Vapor.Nombre + " + " + muelle;
+                        break;
+
+                    case TipoNotificacion.Modificar:
+                        mensaje = "Se ha editado un embarque " + embarqueDto.Vapor.Nombre + " + " + muelle + ": Producto -> " + nominacionDto.NominacionDatoTecnico.MaterialPuerto.Descripcion + ".";
                         break;
                 }
             }
