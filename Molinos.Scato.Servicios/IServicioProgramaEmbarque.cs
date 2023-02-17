@@ -130,7 +130,7 @@ namespace Molinos.Scato.Servicios
         void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id);
 
         [OperationContract]
-        void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null);
+        void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null, NominacionDto nominacionDto = null);
 
         [OperationContract]
         void AgregarNotificacion(NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque);
