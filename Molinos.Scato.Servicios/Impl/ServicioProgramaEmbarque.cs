@@ -539,8 +539,7 @@ namespace Molinos.Scato.Servicios.Impl
                         notificacionesDto.Remove(notificacion1);
                     }
                 }
-
-                return notificacionesDto;
+                return notificacionesDto.OrderByDescending(x => x.Fecha).ToList();
             }
             catch (Exception ex)
             {
