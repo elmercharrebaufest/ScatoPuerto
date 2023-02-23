@@ -539,8 +539,7 @@ namespace Molinos.Scato.Servicios.Impl
                         notificacionesDto.Remove(notificacion1);
                     }
                 }
-
-                return notificacionesDto;
+                return notificacionesDto.OrderByDescending(x => x.Fecha).ToList();
             }
             catch (Exception ex)
             {
@@ -873,7 +872,13 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 mail.Copia.Add(mailUsuarioCreador);
             }
-            mail.Copia.Add(repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones);
+            var mails = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia");
+            if (mails != null)
+            {
+                mail.Copia.Add(mails.Direcciones);
+            }
+
+            mail.Copia = mail.Copia.Distinct().ToList();
           
             mail.Copia.RemoveAll(item => item == null);
             mail.Destinatarios.RemoveAll(item => item == null);
