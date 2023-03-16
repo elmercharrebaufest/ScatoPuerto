@@ -871,7 +871,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var mailUsuarioCreador = "";
               
-                 mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+                 //mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
                
                 
                 if (!string.IsNullOrEmpty(mailUsuarioCreador))
