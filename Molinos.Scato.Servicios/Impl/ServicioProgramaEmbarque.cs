@@ -890,7 +890,7 @@ namespace Molinos.Scato.Servicios.Impl
                 }
 
                 mail.Copia = mail.Copia.Distinct().ToList();
-
+                mail.Destinatarios = mail.Destinatarios.Distinct().ToList();
                 mail.Copia.RemoveAll(item => item == null || item == "");
                 mail.Destinatarios.RemoveAll(item => item == null || item == "");
 
