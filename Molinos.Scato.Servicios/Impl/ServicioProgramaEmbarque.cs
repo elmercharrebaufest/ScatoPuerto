@@ -867,30 +867,49 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void EnviarMail(MailDto mail, string usuario)
         {
-           var mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
-            if (!string.IsNullOrEmpty(mailUsuarioCreador))
+            try
             {
-                mail.Copia.Add(mailUsuarioCreador);
-            }
-            var mails = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia");
-            if (mails != null)
-            {
-                mail.Copia.Add(mails.Direcciones);
-            }
+                var mailUsuarioCreador = "";
+                try
+                {
+                    mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+                }
+                catch (Exception)
+                {
 
-            mail.Copia = mail.Copia.Distinct().ToList();
-          
-            mail.Copia.RemoveAll(item => item == null);
-            mail.Destinatarios.RemoveAll(item => item == null);
-            comandos.Ejecutar(new EnvioMail
+                }
+                
+                if (!string.IsNullOrEmpty(mailUsuarioCreador))
+                {
+                    mail.Copia.Add(mailUsuarioCreador);
+                }
+                var mails = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia");
+                if (mails != null)
+                {
+                    mail.Copia.Add(mails.Direcciones);
+                }
+
+                mail.Copia = mail.Copia.Distinct().ToList();
+
+                mail.Copia.RemoveAll(item => item == null || item == "");
+                mail.Destinatarios.RemoveAll(item => item == null || item == "");
+
+                comandos.Ejecutar(new EnvioMail
+                {
+                    Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                           .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                    Destinatarios = mail.Destinatarios,
+                    Titulo = mail.Titulo,
+                    Copia = mail.Copia,
+                    AttachmentName = null,
+                });
+            }
+            catch (Exception)
             {
-                Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                       .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
-                Destinatarios = mail.Destinatarios,
-                Titulo = mail.Titulo,
-                Copia = mail.Copia,
-                AttachmentName = null,
-            });
+
+                throw;
+            }
+         
         }
 
         private string ObtenerMailDeActiveDirectory(string UserName)
