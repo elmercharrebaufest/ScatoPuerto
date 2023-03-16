@@ -856,8 +856,8 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     nominacion.EnviadoOtros = true;
                 }
-                repositorio.GuardarCambios();
                 EnviarMail(mail, usuario);
+                repositorio.GuardarCambios();
             }
             catch (Exception ex)
             {
@@ -870,14 +870,9 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 var mailUsuarioCreador = "";
-                try
-                {
-                    mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
-                }
-                catch (Exception)
-                {
-
-                }
+              
+                 mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+               
                 
                 if (!string.IsNullOrEmpty(mailUsuarioCreador))
                 {
@@ -904,10 +899,10 @@ namespace Molinos.Scato.Servicios.Impl
                     AttachmentName = null,
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
          
         }
