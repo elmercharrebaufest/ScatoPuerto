@@ -627,9 +627,14 @@ namespace Molinos.Scato.Servicios.Impl
                 // Negrita: (\f -> <b>) (\f\f -> </b>)
                 // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
                 var copia = new List<string>();
+                copia = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones.Split(';').ToList();
                 copia.Add(tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" &&
-                    nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
-                var mail = new MailDto
+                nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+
+                copia.RemoveAll(item => item == null || item == "");
+
+
+                 var mail = new MailDto
                 {
                     Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
                     Copia = copia,
@@ -871,7 +876,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var mailUsuarioCreador = "";
               
-                 //mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+                 mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
                
                 
                 if (!string.IsNullOrEmpty(mailUsuarioCreador))
