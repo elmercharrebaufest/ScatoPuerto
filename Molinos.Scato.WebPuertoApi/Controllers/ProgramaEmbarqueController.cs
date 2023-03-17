@@ -708,6 +708,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             IList<UbicacionDeBuquePuertoDto> ubicacionDeBuquePuertoDto = servicioRepositorio.ListarUbicacionDeBuquePuerto();
             var filtroUbicacionDeBuquePuerto = ubicacionDeBuquePuertoDto.Where(x => x.Orden == 8);
             embarqueDto.UbicacionDeBuque = filtroUbicacionDeBuquePuerto.ElementAt(0);
+
             embarqueDto.Senasa = false;
             embarqueDto.Freeboard = 0;
             embarqueDto.PorteNeto = 0;
@@ -715,6 +716,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             embarqueDto.Eslora = 0;
             embarqueDto.Manga = 0;
             embarqueDto.Puntal = 0;
+
+            if (nominacion.NominacionDetalleIntervencion.Senasa.Count>0)
+            {
+                var senasa = nominacion.NominacionDetalleIntervencion.Senasa.ElementAt(0);
+                embarqueDto.Senasa = senasa.TieneSenasa;                
+            }
+
+            
             embarqueDto.CantidadBodegasTanques = 0;
             embarqueDto.Destino = null;
             embarqueDto.ATA = nominacion.NominacionDatoTecnico.ATAPuerto;
