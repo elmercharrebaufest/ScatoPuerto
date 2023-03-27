@@ -1,229 +1,609 @@
-create table NominacionDatoTecnico(
-Id int IDENTITY (1, 1) NOT NULL,
-MaterialPuerto_Id  int NOT NULL ,
-CantidadTotal int NOT NULL ,
-Tolerancia int NULL ,
-Observaciones varchar(500) null,
-[VaporInformacion_Id] int NOT null,
-ETARecalada datetime ,
-ObligacionDeCarga datetime, 
-MuelleDeCarga_Id int NOT NULL, 
-TasaDeCarga_Id int  NULL,
-TasaDeCargaValor INT  NULL,
-DEM decimal(8,2),
-DES decimal(8,2),
-TipoDeContrato_Id int  NULL,
-ATAPuerto_Id int NULL,
-AgenciaMaritimaPuerto_Id int NULL,
-Surveyor_Id int NULL,
-ObservacionesSurveyor varchar(500),
-CONSTRAINT [PK_dbo.NominacionDatoTecnico] PRIMARY KEY CLUSTERED ([Id] ASC),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.VaporInformacion_VaporInformacion_Id] FOREIGN KEY ([VaporInformacion_Id]) REFERENCES [dbo].[VaporInformacion] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MuelleDeCarga_MuelleDeCarga_Id] FOREIGN KEY ([MuelleDeCarga_Id]) REFERENCES [dbo].[MuelleDeCarga] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.TasaDeCarga_TasaDeCarga_Id] FOREIGN KEY ([TasaDeCarga_Id]) REFERENCES [dbo].[TasaDeCarga] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.TipoDeContrato_TipoDeContrato_Id] FOREIGN KEY ([TipoDeContrato_Id]) REFERENCES [dbo].[TipoDeContrato] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.ATAPuerto_ATAPuerto_Id] FOREIGN KEY ([ATAPuerto_Id]) REFERENCES [dbo].[ATAPuerto] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.AgenciaMaritimaPuerto_AgenciaMaritimaPuerto_Id] FOREIGN KEY ([AgenciaMaritimaPuerto_Id]) REFERENCES [dbo].[AgenciaMaritimaPuerto] ([Id]),
-CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.Surveyor_Surveyor_Id] FOREIGN KEY ([Surveyor_Id]) REFERENCES [dbo].[Surveyor] ([Id]),
-
-)
+CREATE TABLE NominacionDatoTecnico (
+	Id INT IDENTITY(1, 1) NOT NULL
+	,MaterialPuerto_Id INT NOT NULL
+	,CantidadTotal INT NOT NULL
+	,Tolerancia INT NULL
+	,Observaciones VARCHAR(500) NULL
+	,[VaporInformacion_Id] INT NOT NULL
+	,ETARecalada DATETIME
+	,ObligacionDeCarga DATETIME
+	,MuelleDeCarga_Id INT NOT NULL
+	,TasaDeCarga_Id INT NULL
+	,TasaDeCargaValor INT NULL
+	,DEM DECIMAL(8, 2)
+	,DES DECIMAL(8, 2)
+	,TipoDeContrato_Id INT NULL
+	,ATAPuerto_Id INT NULL
+	,AgenciaMaritimaPuerto_Id INT NULL
+	,Surveyor_Id INT NULL
+	,ObservacionesSurveyor VARCHAR(500)
+	,CONSTRAINT [PK_dbo.NominacionDatoTecnico] PRIMARY KEY CLUSTERED ([Id] ASC)
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.VaporInformacion_VaporInformacion_Id] FOREIGN KEY ([VaporInformacion_Id]) REFERENCES [dbo].[VaporInformacion]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MuelleDeCarga_MuelleDeCarga_Id] FOREIGN KEY ([MuelleDeCarga_Id]) REFERENCES [dbo].[MuelleDeCarga]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.TasaDeCarga_TasaDeCarga_Id] FOREIGN KEY ([TasaDeCarga_Id]) REFERENCES [dbo].[TasaDeCarga]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.TipoDeContrato_TipoDeContrato_Id] FOREIGN KEY ([TipoDeContrato_Id]) REFERENCES [dbo].[TipoDeContrato]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.ATAPuerto_ATAPuerto_Id] FOREIGN KEY ([ATAPuerto_Id]) REFERENCES [dbo].[ATAPuerto]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.AgenciaMaritimaPuerto_AgenciaMaritimaPuerto_Id] FOREIGN KEY ([AgenciaMaritimaPuerto_Id]) REFERENCES [dbo].[AgenciaMaritimaPuerto]([Id])
+	,CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.Surveyor_Surveyor_Id] FOREIGN KEY ([Surveyor_Id]) REFERENCES [dbo].[Surveyor]([Id])
+	,
+	)
 GO
 
-CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnico]
-    ON [dbo].[NominacionDatoTecnico]
-    FOR  UPDATE
-    AS
-    BEGIN
-       
-    declare @idNominacion INT;
+CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnico] ON [dbo].[NominacionDatoTecnico]
+FOR UPDATE
+	,INSERT
+AS
+BEGIN
+	DECLARE @idNominacion INT;
+	DECLARE @idEmbarque INT;
+	DECLARE @muelle NVARCHAR(60);
+	DECLARE @nombreEmbarque NVARCHAR(60);
 
-    select  @idNominacion = (select n.id from NominacionDatoTecnico dt
-    inner join Nominacion n on dt.Id = n.NominacionDatoTecnico_Id
-    where dt.Id = (select id from  deleted))
+	SELECT @idNominacion = n.id
+		,@idEmbarque = n.Embarque_Id
+	FROM NominacionDatoTecnico dt
+	INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
+	WHERE dt.Id = (
+			SELECT id
+			FROM deleted
+			)
+
+	SELECT @nombreEmbarque = e.Patente
+		,@muelle = (
+			SELECT CASE 
+					WHEN e.Vicentin = 'true'
+						THEN 'Vicentin'
+					WHEN e.Noryon = 'true'
+						THEN 'Noryon'
+					WHEN e.SanBenito = 'true'
+						THEN 'San Benito'
+					ELSE 'Otros muelles'
+					END
+			)
+	FROM Embarque e
+	WHERE e.Id = @idEmbarque
+
+	IF (
+			(
+				SELECT MaterialPuerto_Id
+				FROM deleted
+				) <> (
+				SELECT MaterialPuerto_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'MaterialPuerto_Id'
+			,d.MaterialPuerto_Id
+			,i.MaterialPuerto_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
+
+		IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9,
+				'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> MaterialPuerto.',
+				GETDATE()
+				)
+		END
+	END
+
+	IF (
+			(
+				SELECT CantidadTotal
+				FROM deleted
+				) <> (
+				SELECT CantidadTotal
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'CantidadTotal'
+			,d.CantidadTotal
+			,i.CantidadTotal
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
+	END
+
+	IF (
+			(
+				SELECT Tolerancia
+				FROM deleted
+				) <> (
+				SELECT Tolerancia
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'Tolerancia'
+			,d.Tolerancia
+			,i.Tolerancia
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
 
-      IF((select MaterialPuerto_Id from deleted) <> (select MaterialPuerto_Id from inserted) )
-        BEGIN
-        insert into Auditoria
-        SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'MaterialPuerto_Id', d.MaterialPuerto_Id,
-	        i.MaterialPuerto_Id , GETDATE()
-             FROM deleted AS d
-             JOIN inserted AS i
-             ON d.Id=i.Id
 
-        END
-        IF((select CantidadTotal from deleted) <> (select CantidadTotal from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'CantidadTotal', d.CantidadTotal,
-	            i.CantidadTotal , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Tolerancia.'
+				,GETDATE()
+				)
+		END
+	END
+	ELSE IF (
+			(
+				SELECT Observaciones
+				FROM deleted
+				) <> (
+				SELECT Observaciones
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'Observaciones'
+			,d.Observaciones
+			,i.Observaciones
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        END
 
-          IF((select Tolerancia from deleted) <> (select Tolerancia from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'Tolerancia', d.Tolerancia,
-	            i.Tolerancia , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Observaciones.'
+				,GETDATE()
+				)
+		END
+	END
 
-        END
-         ELSE IF((select Observaciones from deleted) <> (select Observaciones from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'Observaciones', d.Observaciones,
-	            i.Observaciones , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+	IF (
+			(
+				SELECT VaporInformacion_Id
+				FROM deleted
+				) <> (
+				SELECT VaporInformacion_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'VaporInformacion_Id'
+			,d.VaporInformacion_Id
+			,i.VaporInformacion_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
+	END
 
-        END
+	IF (
+			(
+				SELECT ETARecalada
+				FROM deleted
+				) <> (
+				SELECT ETARecalada
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'ETARecalada'
+			,d.ETARecalada
+			,i.ETARecalada
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        IF((select VaporInformacion_Id from deleted) <> (select VaporInformacion_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'VaporInformacion_Id', d.VaporInformacion_Id,
-	            i.VaporInformacion_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Eta.'
+				,GETDATE()
+				)
+		END
+	END
 
-        END
+	IF (
+			(
+				SELECT ObligacionDeCarga
+				FROM deleted
+				) <> (
+				SELECT ObligacionDeCarga
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'ObligacionDeCarga'
+			,d.ObligacionDeCarga
+			,i.ObligacionDeCarga
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        IF((select ETARecalada from deleted) <> (select ETARecalada from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'ETARecalada', d.ETARecalada,
-	            i.ETARecalada , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> ObligacionDeCarga.'
+				,GETDATE()
+				)
+		END
+	END
 
-        END
+	IF (
+			(
+				SELECT MuelleDeCarga_Id
+				FROM deleted
+				) <> (
+				SELECT MuelleDeCarga_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'MuelleDeCarga_Id'
+			,d.MuelleDeCarga_Id
+			,i.MuelleDeCarga_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
+	END
 
-              IF((select ObligacionDeCarga from deleted) <> (select ObligacionDeCarga from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'ObligacionDeCarga', d.ObligacionDeCarga,
-	            i.ObligacionDeCarga , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+	IF (
+			(
+				SELECT TasaDeCarga_Id
+				FROM deleted
+				) <> (
+				SELECT TasaDeCarga_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'TasaDeCarga_Id'
+			,d.TasaDeCarga_Id
+			,i.TasaDeCarga_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        END
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Tasa.'
+				,GETDATE()
+				)
+		END
+	END
 
-              IF((select MuelleDeCarga_Id from deleted) <> (select MuelleDeCarga_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'MuelleDeCarga_Id', d.MuelleDeCarga_Id,
-	            i.MuelleDeCarga_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+	IF (
+			(
+				SELECT TasaDeCargaValor
+				FROM deleted
+				) <> (
+				SELECT TasaDeCargaValor
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'TasaDeCargaValor'
+			,d.TasaDeCargaValor
+			,i.TasaDeCargaValor
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
+	END
 
-        END
+	IF (
+			(
+				SELECT DEM
+				FROM deleted
+				) <> (
+				SELECT DEM
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'DEM'
+			,d.DEM
+			,i.DEM
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-                IF((select TasaDeCarga_Id from deleted) <> (select TasaDeCarga_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'TasaDeCarga_Id', d.TasaDeCarga_Id,
-	            i.TasaDeCarga_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+		IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> DEM.'
+				,GETDATE()
+				)
+		END
+	END
 
-        END
+	IF (
+			(
+				SELECT deleted.DES
+				FROM deleted
+				) <> (
+				SELECT inserted.DES
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'DES'
+			,d.DES
+			,i.DES
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-                IF((select TasaDeCargaValor from deleted) <> (select TasaDeCargaValor from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'TasaDeCargaValor', d.TasaDeCargaValor,
-	            i.TasaDeCargaValor , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> DES.'
+				,GETDATE()
+				)
+		END
+	END
 
-        END
+	IF (
+			(
+				SELECT TipoDeContrato_Id
+				FROM deleted
+				) <> (
+				SELECT TipoDeContrato_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'TipoDeContrato'
+			,d.TipoDeContrato_Id
+			,i.TipoDeContrato_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-                IF((select DEM from deleted) <> (select DEM from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'DEM', d.DEM,
-	            i.DEM , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Contrato.'
+				,GETDATE()
+				)
+		END
+	END
+	ELSE IF (
+			(
+				SELECT ATAPuerto_Id
+				FROM deleted
+				) <> (
+				SELECT ATAPuerto_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'ATAPuerto'
+			,d.ATAPuerto_Id
+			,i.ATAPuerto_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        END
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> ATA.'
+				,GETDATE()
+				)
+		END
+	END
 
-                IF((select deleted.DES from deleted) <> (select inserted.DES from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'DES', d.DES,
-	            i.DES , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+	IF (
+			(
+				SELECT AgenciaMaritimaPuerto_Id
+				FROM deleted
+				) <> (
+				SELECT AgenciaMaritimaPuerto_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'AgenciaMaritimaPuerto'
+			,d.AgenciaMaritimaPuerto_Id
+			,i.AgenciaMaritimaPuerto_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        END
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Agencia Maritima.'
+				,GETDATE()
+				)
+		END
+	END
 
-         IF((select TipoDeContrato_Id from deleted) <> (select TipoDeContrato_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'TipoDeContrato_Id', d.TipoDeContrato_Id,
-	            i.TipoDeContrato_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
+	IF (
+			(
+				SELECT Surveyor_Id
+				FROM deleted
+				) <> (
+				SELECT Surveyor_Id
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'Surveyor'
+			,d.Surveyor_Id
+			,i.Surveyor_Id
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
 
-        END
+			IF (@idEmbarque >0)
+		BEGIN
+			INSERT INTO NotificacionProgramaDeEmbarque (
+				[TipoAlerta]
+				,[Mensaje]
+				,[Fecha]
+				)
+			VALUES (
+				9
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Surveyor.'
+				,GETDATE()
+				)
+		END
+	END
 
-          ELSE IF((select ATAPuerto_Id from deleted) <> (select ATAPuerto_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'ATAPuerto_Id', d.ATAPuerto_Id,
-	            i.ATAPuerto_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
-
-        END
-
-           IF((select AgenciaMaritimaPuerto_Id from deleted) <> (select AgenciaMaritimaPuerto_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'AgenciaMaritimaPuerto_Id', d.AgenciaMaritimaPuerto_Id,
-	            i.AgenciaMaritimaPuerto_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
-
-        END
-            IF((select Surveyor_Id from deleted) <> (select Surveyor_Id from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'Surveyor_Id', d.Surveyor_Id,
-	            i.Surveyor_Id , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
-
-        END
-            IF((select ObservacionesSurveyor from deleted) <> (select ObservacionesSurveyor from inserted) )
-        BEGIN
-            insert into Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnico', 'ObservacionesSurveyor', d.ObservacionesSurveyor,
-	            i.ObservacionesSurveyor , GETDATE()
-                    FROM deleted AS d
-                    JOIN inserted AS i
-                    ON d.Id=i.Id
-
-        END
-
-    END
+	IF (
+			(
+				SELECT ObservacionesSurveyor
+				FROM deleted
+				) <> (
+				SELECT ObservacionesSurveyor
+				FROM inserted
+				)
+			)
+	BEGIN
+		INSERT INTO Auditoria
+		SELECT @idNominacion
+			,d.id
+			,'NominacionDatoTecnico'
+			,'ObservacionesSurveyor'
+			,d.ObservacionesSurveyor
+			,i.ObservacionesSurveyor
+			,GETDATE()
+		FROM deleted AS d
+		JOIN inserted AS i ON d.Id = i.Id
+	END
+END
