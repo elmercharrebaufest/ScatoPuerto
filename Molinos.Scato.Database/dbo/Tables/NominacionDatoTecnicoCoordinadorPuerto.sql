@@ -16,6 +16,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
     AS
     BEGIN
         
+
              declare @idNominacion INT;
 
     select  @idNominacion = (select n.id from NominacionDatoTecnicoCoordinadorPuerto dtp

@@ -59,11 +59,12 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
           //Me fijo si el objeto es un dato técnico
           if (key == 'nominacionDatoTecnico') {
             //Recorro todas las variables del dato técnico.
-            for (const [key2, value2] of Object.entries(value)) {              
-              if (key2 != null && key2 != undefined && value != null && value2 != undefined && typeof value2 != 'object') {
+            for (const [key2, value2] of Object.entries(value)) {
+              //if (key2 != null && key2 != undefined && value != null && value2 != undefined && typeof value2 != 'object') {
+                if (key2 != null && key2 != undefined && value != null && value2 != undefined) {
                 //Busco si esa variable existe en mi tabla de auditorías.
                 let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key2.toLowerCase())
-                if (audit != null && audit != undefined) {                  
+                if (audit != null && audit != undefined) {
                   //En caso de encontrarla me fijo si tiene la clase que valida auditoría y la pinto de rojo.
                   let auditoria = document.getElementsByClassName(key + key2 + "Auditoria");
                   let tabDatoTecnicoAuditoria = document.getElementsByClassName("tabDatoTecnicoAuditoria")
@@ -82,7 +83,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
             }
           //Me fijo si el objeto es un detalle intervención
           } else if (key == 'nominacionDetalleIntervencion') {
-            //Recorro todas las variables del objeto            
+            //Recorro todas las variables del objeto
             for (const [key2, value2] of Object.entries(value)) {
               let id: number = 0;
               //Me fijo si es el array de senasa.
@@ -104,7 +105,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
                   }
                   i++;
                 }
-              } else{ 
+              } else{
                 if (key2 != null && key2 != undefined && value != null && value2 != undefined && typeof value2 != 'object') {
                   //Busco si esa variable existe en mi tabla de auditorías.
                   let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key2.toLowerCase())
@@ -137,7 +138,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
                         if (auditoria.length > 0)
                           auditoria[i].classList.add('texto-rojo');
-                        if (tabDatosDeReciboAuditoria.length > 0)                        
+                        if (tabDatosDeReciboAuditoria.length > 0)
                           tabDatosDeReciboAuditoria[0].classList.add('texto-rojo');
                         if (auditoriaReciboCheck.length > 0)
                           (auditoriaReciboCheck[0] as HTMLElement) .style.visibility ='visible';
