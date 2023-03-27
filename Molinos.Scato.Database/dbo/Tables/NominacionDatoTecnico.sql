@@ -94,7 +94,7 @@ BEGIN
 				)
 			VALUES (
 				9,
-				'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> MaterialPuerto.',
+				'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> MaterialPuerto.',
 				GETDATE()
 				)
 		END
@@ -154,7 +154,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Tolerancia.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Tolerancia.'
 				,GETDATE()
 				)
 		END
@@ -190,7 +190,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Observaciones.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Observaciones.'
 				,GETDATE()
 				)
 		END
@@ -248,7 +248,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Eta.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Eta.'
 				,GETDATE()
 				)
 		END
@@ -284,7 +284,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> ObligacionDeCarga.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> ObligacionDeCarga.'
 				,GETDATE()
 				)
 		END
@@ -342,7 +342,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Tasa.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Tasa.'
 				,GETDATE()
 				)
 		END
@@ -400,7 +400,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> DEM.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> DEM.'
 				,GETDATE()
 				)
 		END
@@ -436,7 +436,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> DES.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> DES.'
 				,GETDATE()
 				)
 		END
@@ -472,7 +472,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Contrato.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Contrato.'
 				,GETDATE()
 				)
 		END
@@ -507,7 +507,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> ATA.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> ATA.'
 				,GETDATE()
 				)
 		END
@@ -543,7 +543,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Agencia Maritima.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Agencia Maritima.'
 				,GETDATE()
 				)
 		END
@@ -579,7 +579,7 @@ BEGIN
 				)
 			VALUES (
 				9
-				,'Se ha editado un embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Surveyor.'
+				,'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Surveyor.'
 				,GETDATE()
 				)
 		END
