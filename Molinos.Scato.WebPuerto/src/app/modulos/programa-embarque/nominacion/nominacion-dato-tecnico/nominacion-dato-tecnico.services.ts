@@ -138,11 +138,11 @@ export class NominacionDatoTecnicoRegistroService {
         const datoTecnicoCoordinadorForm = datoTecnicoForm.controls['nominacionDatoTecnicoCoordinadorPuerto'];
         const datoTecnicoDestinoForm = datoTecnicoForm.controls['nominacionDatoTecnicoDestino'];
         const datoTecnicoExportadorForm = datoTecnicoForm.controls['nominacionDatoTecnicoExportador'];
-        
+
         const datoTecnicoCoordinador = datoTecnicoCoordinadorForm != null || datoTecnicoCoordinadorForm != undefined ? datoTecnicoCoordinadorForm['controls']: null;
         const datoTecnicoDestino = datoTecnicoDestinoForm !=null || datoTecnicoDestinoForm !=undefined ? datoTecnicoDestinoForm['controls'] : null;
         const datoTecnicoExportador = datoTecnicoExportadorForm !=null || datoTecnicoExportadorForm != undefined ? datoTecnicoExportadorForm['controls'] : null;
-        
+        const material =datoTecnicoForm.controls['materialPuerto'];
         if (datoTecnicoCoordinador == null || datoTecnicoDestino == null || datoTecnicoExportador == null){
             this.confirmationDialogService.confirm(tituloMensaje, 'Debe agregar destino, cargador y cliente para la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
             bValidacion = false;
@@ -158,7 +158,7 @@ export class NominacionDatoTecnicoRegistroService {
             let erroresDestinos: boolean = false;
             let erroresCoordinador: boolean = false;
             let erroresExportador: boolean = false;
-            
+
             if (datoTecnicoExportador.length == 0 || datoTecnicoDestino.length == 0 || datoTecnicoExportador.length == 0) {
                 this.confirmationDialogService.confirm(tituloMensaje, 'Debe agregar destino, cargador y cliente a la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
                 bValidacion = false;
@@ -182,7 +182,7 @@ export class NominacionDatoTecnicoRegistroService {
                 const datos = detalle['controls'];
                 if (datos.exportador.value == '' ||
                     (datos.cantidad.value == '' || datos.cantidad.value == '0') ||
-                    (datos.tolerancia.value == '' || datos.tolerancia.value == '0')) {
+                    (!material.value.esLiquido && (datos.tolerancia.value == '' || datos.tolerancia.value == '0'))) {
                     erroresExportador = true;
                     return;
                 }
@@ -198,7 +198,7 @@ export class NominacionDatoTecnicoRegistroService {
                     return bValidacion;
                 }
             }
-       
+
         return bValidacion;
     }
 
