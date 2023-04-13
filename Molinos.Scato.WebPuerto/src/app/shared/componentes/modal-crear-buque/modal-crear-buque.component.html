@@ -2,9 +2,9 @@
 
 
 
-   <ship-spinner [message]="mensajeBuque" *ngIf='mostrarSpinner'></ship-spinner> 
+   <ship-spinner [message]="mensajeBuque" *ngIf='mostrarSpinner'></ship-spinner>
     <form [formGroup]="crearEditarBuqueForm">
-    
+
         <div class='modal-body '>
             <div *ngIf="!puedeCrearBuque">
                 <div class="alert alert-danger" role="alert">
@@ -14,10 +14,10 @@
             <div class="row margen font-weight-bold">
                 <div class="col pt-4">
                     <label class="">Nombre buque</label>
-                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreBuque"/>
-                    </div> 
+                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreBuque" (input)="onInputNombreBuque($event)"/>
+                    </div>
                 <div class="col pt-4">
-                    <label>Bandera</label>   
+                    <label>Bandera</label>
                     <input
                          type="text"
                          class="form-control"
@@ -42,7 +42,7 @@
 
             <div class="row margen font-weight-bold">
                 <div class="col pt-4">
-                    <label>Tipo de buque</label>                                   
+                    <label>Tipo de buque</label>
                     <select  class="custom-select" formControlName="tipoBuque" [ngClass]="{'input-error': submitted && f.tipoBuque.invalid}" required>
                         <option value=""></option>
                         <option *ngFor="let t of tipoBuquePuerto" [ngValue]="t" >{{ t.nombre }}</option>
@@ -52,7 +52,7 @@
                 <div class="col pt-4 font-weight-bold">
                     <label>IMO</label>
                     <input type="text" class="form-control maxWidthIMO" placeholder="XXXXXXX" formControlName="imoVapor" maxLength="7"/>
-                </div>               
+                </div>
             </div>
 
             <br>
@@ -78,9 +78,9 @@
                     <label>Cant. bodegas/tks.</label>
                     <input type="text" class="form-control" placeholder="Ej: 10" formControlName="cantBodegastks" (keypress)="numberOnly($event)"/>
                 </div>
-                
+
             </div>
-            
+
             <br>
 
             <div class="row margen">
@@ -98,7 +98,7 @@
                 </div>
                 <div class="col font-weight-bold">
                 </div>
-                
+
             </div>
         </div>
         <div class='modal-footer justify-content-center'>
