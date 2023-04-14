@@ -57,7 +57,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       this.mostrarModalOjito();
     });
     this.initObtenerEmbarque();
-    
+
   }
   //#endregion
   ngOnInit(): void {
@@ -156,7 +156,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].nombreBuque);
     this.reciboDeBuqueForm.controls.exportador.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].exportador);
     this.reciboDeBuqueForm.controls.puertoDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoDestino);
-    this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
+    this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].valorEnKG);
     this.reciboDeBuqueForm.controls.cantidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad);
     this.reciboDeBuqueForm.controls.cantidadLetras.setValue(this.getCantidadEnLetras(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad));
     this.reciboDeBuqueForm.controls.claseCarga.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga);
