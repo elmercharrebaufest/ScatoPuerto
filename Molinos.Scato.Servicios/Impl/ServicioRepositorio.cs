@@ -8108,6 +8108,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var cargaComercial = new CargaComercialDto();
                     cargaComercial.Cantidad = datosTecnicosExportador.Cantidad;
+                    cargaComercial.Exportador = new ExportadorDto();
                     cargaComercial.Exportador.Id = datosTecnicosExportador.Exportador.Id;
                     cargaComercial.Exportador.Nombre = datosTecnicosExportador.Exportador.Nombre;
                     if (datosTecnicosExportador.Exportador.Almacen != null)
