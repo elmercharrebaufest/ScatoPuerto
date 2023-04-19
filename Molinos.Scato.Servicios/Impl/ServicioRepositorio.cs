@@ -8099,6 +8099,29 @@ namespace Molinos.Scato.Servicios.Impl
         public PlanoDeCargaDto ObtenerPlanoDeCarga(int planoDeCargaId)
         {
             var planoDeCargaDto = Obtener<PlanoDeCarga, PlanoDeCargaDto>(x => x.Id == planoDeCargaId);
+
+            if (planoDeCargaDto.FechaDeCreacion == null)
+            {
+                var lineup = repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == planoDeCargaDto.Id);
+                var nominacion = repositorio.Obtener<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
+                var cargasComerciales = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => 
+                {
+                    var res = new CargaComercialDto() {
+                        Cantidad = x.Cantidad,
+                        Exportador =
+                        {
+                            Id = x.Exportador.Id,
+                            Nombre = x.Exportador.Nombre,
+                            Almacen_Id = x.Exportador.Almacen.Id,
+                            AlmacenDesc = x.Exportador.Almacen.Descripcion
+                        },
+                        MaterialPuerto = Obtener<MaterialPuerto, MaterialPuertoDto>(y => y.Id == x.NominacionDatoTecnico.MaterialPuerto.Id)
+                    };
+                    return res;                
+                });
+                planoDeCargaDto.CargasComerciales = cargasComerciales.ToList();
+            }
+
             if (File.Exists(planoDeCargaDto.FilePathPlano))
             {
                 MemoryStream ms = new MemoryStream();
