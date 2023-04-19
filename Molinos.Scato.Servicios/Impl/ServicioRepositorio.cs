@@ -8104,22 +8104,20 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var lineup = repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == planoDeCargaDto.Id);
                 var nominacion = repositorio.Obtener<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
-                var cargasComerciales = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => 
+                foreach (var datosTecnicosExportador in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
                 {
-                    var res = new CargaComercialDto() {
-                        Cantidad = x.Cantidad,
-                        Exportador =
-                        {
-                            Id = x.Exportador.Id,
-                            Nombre = x.Exportador.Nombre,
-                            Almacen_Id = x.Exportador.Almacen.Id,
-                            AlmacenDesc = x.Exportador.Almacen.Descripcion
-                        },
-                        MaterialPuerto = Obtener<MaterialPuerto, MaterialPuertoDto>(y => y.Id == x.NominacionDatoTecnico.MaterialPuerto.Id)
-                    };
-                    return res;                
-                });
-                planoDeCargaDto.CargasComerciales = cargasComerciales.ToList();
+                    var cargaComercial = new CargaComercialDto();
+                    cargaComercial.Cantidad = datosTecnicosExportador.Cantidad;
+                    cargaComercial.Exportador.Id = datosTecnicosExportador.Exportador.Id;
+                    cargaComercial.Exportador.Nombre = datosTecnicosExportador.Exportador.Nombre;
+                    if (datosTecnicosExportador.Exportador.Almacen != null)
+                    {
+                        cargaComercial.Exportador.Almacen_Id = datosTecnicosExportador.Exportador.Almacen.Id;
+                        cargaComercial.Exportador.AlmacenDesc = datosTecnicosExportador.Exportador.Almacen.Descripcion;
+                    }
+                    cargaComercial.MaterialPuerto = conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(datosTecnicosExportador.NominacionDatoTecnico.MaterialPuerto);
+                    planoDeCargaDto.CargasComerciales.Add(cargaComercial);
+                }
             }
 
             if (File.Exists(planoDeCargaDto.FilePathPlano))
