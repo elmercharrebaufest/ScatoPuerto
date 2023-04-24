@@ -180,9 +180,7 @@ export class NominacionDatoTecnicoRegistroService {
             });
             datoTecnicoExportador.forEach(detalle => {
                 const datos = detalle['controls'];
-                if (datos.exportador.value == '' ||
-                    (datos.cantidad.value == '' || datos.cantidad.value == '0') ||
-                    (!material.value.esLiquido && (datos.tolerancia.value == '' || datos.tolerancia.value == '0'))) {
+                if (!datos.exportador.value || !datos.cantidad.value || datos.tolerancia == '') {
                     erroresExportador = true;
                     return;
                 }
