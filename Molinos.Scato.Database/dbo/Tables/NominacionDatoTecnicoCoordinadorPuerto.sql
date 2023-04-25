@@ -12,7 +12,7 @@ GO
 
 CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
     ON [dbo].[NominacionDatoTecnicoCoordinadorPuerto]
-    FOR INSERT, UPDATE
+    FOR INSERT, UPDATE, DELETE
     AS
     BEGIN
         
