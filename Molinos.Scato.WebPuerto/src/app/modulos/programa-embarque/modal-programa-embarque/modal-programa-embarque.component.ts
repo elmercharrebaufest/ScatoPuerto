@@ -158,6 +158,11 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
         }
       }
 
+      // Recorro las variables de Coordinador, Exportador y Destino
+      this.auditoria.filter(a => /NominacionDatoTecnico.{1,}/g.test(a.entidadNombre)).forEach(a => {
+        const elemento = document.getElementsByClassName(a.entidadNombre + a.entidad_Id)[0];
+        elemento.classList.add('texto-rojo');
+      });
 
       // Object.keys(this.nominacion).forEach(e => {
       //   if(e.ty)

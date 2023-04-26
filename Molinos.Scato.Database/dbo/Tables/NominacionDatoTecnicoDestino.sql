@@ -19,10 +19,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
       
         DECLARE @idNominacion INT,
                 @idEmbarque INT,
+                @dateDiff INT,
                 @muelle NVARCHAR(60),
-                @nombreEmbarque NVARCHAR(60);
+                @nombreEmbarque NVARCHAR(60),
+                @destinoPrevio NVARCHAR(60),
+                @destinoNuevo NVARCHAR(60);
 
-	    SELECT @idNominacion = n.id, @idEmbarque = Embarque_Id 
+	    SELECT @idNominacion = n.id, @idEmbarque = Embarque_Id, @dateDiff = DATEDIFF(MINUTE, n.FechaCreacion)
         FROM nominaciondatotecnicodestino dtd
 	    INNER JOIN NominacionDatoTecnico dt ON dtd.NominacionDatoTecnico_Id = dt.Id
 	    INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
@@ -33,6 +36,9 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
             ) a
             WHERE NominacionDatoTecnico_Id IS NOT NULL
         )
+
+        SELECT @destinoPrevio = D.Nombre from deleted DEL INNER JOIN Destino D ON DEL.Destino_Id = D.Id
+        SELECT @destinoNuevo = D.Nombre from inserted I INNER JOIN Destino D ON I.Destino_Id = D.Id
 
         IF (@idEmbarque > 0) BEGIN
             SELECT @nombreEmbarque = Patente,
@@ -53,7 +59,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
 
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Destino', GETDATE())
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino (' + @destinoPrevio + ' -> ' + @destinoNuevo + ')', GETDATE())
                 END
             END
 
@@ -65,16 +71,30 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
 
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Destino cantidad', GETDATE())
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino (' + @destinoNuevo + ') cantidad', GETDATE())
                 END
             END
         END
-        ELSE IF EXISTS (SELECT * FROM inserted) AND (@idEmbarque > 0) BEGIN -- INSERT
-            INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-            VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Nuevo destino', GETDATE())
+        ELSE IF EXISTS (SELECT * FROM inserted) BEGIN -- INSERT
+            IF(@dateDiff > 1) BEGIN -- EXCLUYE PRIMER INSERT
+                INSERT INTO Auditoria
+                SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', NULL, @destinoNuevo , GETDATE()
+                FROM inserted
+            END
+
+            IF(@idEmbarque > 0) BEGIN
+                INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Nuevo destino (' + @destinoNuevo + ')', GETDATE())
+            END
         END
-        ELSE IF (@idEmbarque > 0) BEGIN -- DELETE
-            INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-            VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Destino removido', GETDATE())
+        ELSE BEGIN -- DELETE
+            INSERT INTO Auditoria
+            SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', @destinoPrevio, NULL , GETDATE()
+            FROM deleted
+
+            IF (@idEmbarque > 0) BEGIN
+                INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino eliminado (' + @destinoPrevio + ')', GETDATE())
+            END
         END
     END

@@ -18,11 +18,14 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
     BEGIN
        
         DECLARE @idNominacion INT,
+                @dateDiff INT,
                 @idEmbarque INT,
                 @muelle NVARCHAR(60),
-                @nombreEmbarque NVARCHAR(60);
+                @nombreEmbarque NVARCHAR(60),
+                @exportadorPrevio NVARCHAR(60),
+                @exportadorNuevo NVARCHAR(60);
 
-        SELECT @idNominacion = n.Id, @idEmbarque = n.Embarque_Id 
+        SELECT @idNominacion = n.Id, @idEmbarque = n.Embarque_Id, @dateDiff = DATEDIFF(MINUTE, n.FechaCreacion)
         FROM NominacionDatoTecnicoExportador dte
         INNER JOIN NominacionDatoTecnico dt ON dte.NominacionDatoTecnico_Id = dt.Id
         INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
@@ -33,6 +36,9 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
             ) a
             WHERE NominacionDatoTecnico_Id IS NOT NULL
         )
+
+        SELECT @exportadorPrevio = E.Nombre from deleted D INNER JOIN Exportador E ON D.Exportador_Id = E.Id
+        SELECT @exportadorNuevo = E.Nombre from inserted I INNER JOIN Exportador E ON I.Exportador_Id = E.Id
 
         IF (@idEmbarque > 0) BEGIN
             SELECT @nombreEmbarque = Patente,
@@ -54,7 +60,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
 
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Exportador', GETDATE())
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Exportador (' + @exportadorPrevio + ' -> ' + @exportadorNuevo + ')', GETDATE())
                 END
             END
 
@@ -67,29 +73,38 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
 
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Exportador cantidad', GETDATE())
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Exportador (' + @exportadorNuevo + ') cantidad', GETDATE())
                 END
             END
 
-            -- Tolareancia
+            -- Tolerancia
             IF((SELECT Tolerancia FROM deleted) <> (SELECT Tolerancia FROM inserted) )
             BEGIN
                 INSERT INTO Auditoria
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Tolerancia', d.Tolerancia, i.Tolerancia , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-
-                 IF(@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Exportador tolerancia', GETDATE())
-                END
             END
         END
-        ELSE IF EXISTS (SELECT * FROM inserted) AND (@idEmbarque > 0) BEGIN -- INSERT
-            INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-            VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Nuevo exportador', GETDATE())
+        ELSE IF EXISTS (SELECT * FROM inserted) BEGIN -- INSERT
+            IF(@dateDiff > 1) BEGIN -- EXCLUYE PRIMER INSERT
+                INSERT INTO Auditoria
+                SELECT @idNominacion , id, 'NominacionDatoTecnicoExportador', 'Exportador', NULL, @exportadorNuevo, GETDATE()
+                FROM inserted
+            END
+
+            IF (@idEmbarque > 0)  BEGIN
+                INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Nuevo exportador (' + @exportadorNuevo + ')', GETDATE())
+            END
         END
-        ELSE IF (@idEmbarque > 0) BEGIN -- DELETE
-            INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-            VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Exportador removido', GETDATE())
+        ELSE BEGIN -- DELETE
+            INSERT INTO Auditoria
+            SELECT @idNominacion , id, 'NominacionDatoTecnicoExportador', 'Exportador', @exportadorPrevio, NULL, GETDATE()
+            FROM deleted
+
+            IF (@idEmbarque > 0)  BEGIN
+                INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Exportador eliminado (' + @exportadorPrevio + ')', GETDATE())
+            END
         END
     END
