@@ -24,7 +24,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
                 @coordinadorPrevio NVARCHAR(60),
                 @coordinadorNuevo NVARCHAR(60);
 
-        SELECT @idNominacion = n.Id, @idEmbarque = n.Embarque_Id, @dateDiff = DATEDIFF(MINUTE, n.FechaCreacion)
+        SELECT @idNominacion = n.Id, @idEmbarque = n.Embarque_Id, @dateDiff = DATEDIFF(MINUTE, n.FechaCreacion, GETDATE())
         FROM NominacionDatoTecnicoExportador dte
         INNER JOIN NominacionDatoTecnico dt ON dte.NominacionDatoTecnico_Id = dt.Id
         INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
