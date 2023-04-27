@@ -85,7 +85,8 @@
                         <label><strong>Cantidad x destino: </strong></label>
                         <label class="margenIzquiera5px"
                             *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino"> - </label>
-                        <div *ngFor="let destino of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino">
+                        <div *ngFor="let destino of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoDestino"
+                          [class]="'NominacionDatoTecnicoDestino' + destino.id">
                             {{ destino.destino.nombre }}:
                             {{ destino.cantidad | number : '1.0-0'}} tn
                         </div>
@@ -93,8 +94,8 @@
                         <label><strong>Cantidad x cargadores: </strong></label>
                         <label class="margenIzquiera5px"
                             *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador"> - </label>
-                        <div
-                            *ngFor="let cargador of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador">
+                        <div *ngFor="let cargador of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoExportador"
+                          [class]="'NominacionDatoTecnicoExportador' + cargador.id">
                             {{ cargador.exportador.nombre }}:
                             {{ cargador.cantidad | number : '1.0-0'}} tn
                             +/- {{ cargador.tolerancia }}%
@@ -104,8 +105,8 @@
                         <label class="margenIzquiera5px"
                             *ngIf="nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto"> -
                         </label>
-                        <div
-                            *ngFor="let cliente of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto">
+                        <div *ngFor="let cliente of nominacion?.nominacionDatoTecnico?.nominacionDatoTecnicoCoordinadorPuerto"
+                          [class]="'NominacionDatoTecnicoCoordinadorPuerto' + cliente.id">
                             {{ cliente.coordinadorPuerto.nombre }}:
                             {{ cliente.cantidad | number : '1.0-0'}} tn
                         </div>

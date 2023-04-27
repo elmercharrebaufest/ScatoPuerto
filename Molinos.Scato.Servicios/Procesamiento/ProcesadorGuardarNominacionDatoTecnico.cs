@@ -44,8 +44,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
                     var datoTecnico = comando.Dto.NominacionDatoTecnico;
-                    this.EliminarDetallesDatoTecnico(datoTecnico);
-                    this.RegistrarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
+                    this.ActualizarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
+                    //this.EliminarDetallesDatoTecnico(datoTecnico);
+                    //this.RegistrarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
                 }
             }
             catch (Exception e)
@@ -175,6 +176,120 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
+        }
+
+        private void ActualizarDetallesDatoTecnico(NominacionDatoTecnico nominacionDatoTecnico, NominacionDatoTecnicoDto datoTecnico)
+        {
+            #region Armado de listados
+            var calidades = Repositorio.Listar<NominacionDatoTecnicoCalidad>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var calidadesInsertar = datoTecnico.NominacionDatoTecnicoCalidad.Where(x => x.Id == 0);
+            var calidadesEliminar = calidades.Where(x => !datoTecnico.NominacionDatoTecnicoCalidad.Select(y => y.Id).Contains(x.Id));
+            var calidadesActualizar = calidades.Where(x => datoTecnico.NominacionDatoTecnicoCalidad.Select(y => y.Id).Contains(x.Id));
+
+            var coordinadores = Repositorio.Listar<NominacionDatoTecnicoCoordinadorPuerto>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var coordinadoresInsertar = datoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Where(x => x.Id == 0);
+            var coordinadoresEliminar = coordinadores.Where(x => !datoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(y => y.Id).Contains(x.Id));
+            var coordinadoresActualizar = coordinadores.Where(x => datoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(y => y.Id).Contains(x.Id));
+
+            var destinos = Repositorio.Listar<NominacionDatoTecnicoDestino>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var destinosInsertar = datoTecnico.NominacionDatoTecnicoDestino.Where(x => x.Id == 0);
+            var destinosEliminar = destinos.Where(x => !datoTecnico.NominacionDatoTecnicoDestino.Select(y => y.Id).Contains(x.Id));
+            var destinosActualizar = destinos.Where(x => datoTecnico.NominacionDatoTecnicoDestino.Select(y => y.Id).Contains(x.Id));
+
+            var exportadores = Repositorio.Listar<NominacionDatoTecnicoExportador>(x => x.NominacionDatoTecnico.Id == datoTecnico.Id);
+            var exportadoresInsertar = datoTecnico.NominacionDatoTecnicoExportador.Where(x => x.Id == 0);
+            var exportadoresEliminar = exportadores.Where(x => !datoTecnico.NominacionDatoTecnicoExportador.Select(y => y.Id).Contains(x.Id));
+            var exportadoresActualizar = exportadores.Where(x => datoTecnico.NominacionDatoTecnicoExportador.Select(y => y.Id).Contains(x.Id));
+            #endregion
+
+            #region Eliminacion
+            foreach (var calidad in calidadesEliminar) Repositorio.Remover(calidad);
+            foreach (var coordinador in coordinadoresEliminar) Repositorio.Remover(coordinador);
+            foreach (var destino in destinosEliminar) Repositorio.Remover(destino);
+            foreach (var exportador in exportadoresEliminar) Repositorio.Remover(exportador);
+            Repositorio.GuardarCambios();
+            #endregion
+
+            #region Insercion
+            foreach (var calidad in calidadesInsertar)
+            {
+                var datoTecnicoCalidad = new NominacionDatoTecnicoCalidad();
+                datoTecnicoCalidad.NominacionDatoTecnico = nominacionDatoTecnico;
+                datoTecnicoCalidad.CalidadValor = Repositorio.Obtener<CalidadValor>(x => x.Id == calidad.CalidadValor.Id);
+                Repositorio.Agregar(datoTecnicoCalidad);
+                Repositorio.GuardarCambios();
+            }
+
+            foreach (var coordinador in coordinadoresInsertar)
+            {
+                var datoTecnicoCoordinadorPuerto = new NominacionDatoTecnicoCoordinadorPuerto();
+                datoTecnicoCoordinadorPuerto.NominacionDatoTecnico = nominacionDatoTecnico;
+                datoTecnicoCoordinadorPuerto.CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(x => x.Id == coordinador.CoordinadorPuerto.Id);
+                datoTecnicoCoordinadorPuerto.Cantidad = coordinador.Cantidad;
+                Repositorio.Agregar(datoTecnicoCoordinadorPuerto);
+                Repositorio.GuardarCambios();
+            }
+
+            foreach (var destino in destinosInsertar)
+            {
+                var datoTecnicoDestino = new NominacionDatoTecnicoDestino();
+                datoTecnicoDestino.NominacionDatoTecnico = nominacionDatoTecnico;
+                datoTecnicoDestino.Destino = Repositorio.Obtener<Destino>(x => x.Id == destino.Destino.Id);
+                datoTecnicoDestino.Cantidad = destino.Cantidad;
+                Repositorio.Agregar(datoTecnicoDestino);
+                Repositorio.GuardarCambios();
+            }
+
+            foreach (var exportador in exportadoresInsertar)
+            {
+                var datoTecnicoExportador = new NominacionDatoTecnicoExportador();
+                datoTecnicoExportador.NominacionDatoTecnico = nominacionDatoTecnico;
+                datoTecnicoExportador.Exportador = Repositorio.Obtener<Exportador>(x => x.Id == exportador.Exportador.Id);
+                datoTecnicoExportador.Cantidad = exportador.Cantidad;
+                datoTecnicoExportador.Tolerancia = exportador.Tolerancia;
+                Repositorio.Agregar(datoTecnicoExportador);
+                Repositorio.GuardarCambios();
+            }
+            #endregion
+
+            #region Actualizacion
+            foreach (var calidad in calidadesActualizar)
+            {
+                var dto = datoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault(x => x.Id == calidad.Id);
+                calidad.NominacionDatoTecnico = nominacionDatoTecnico;
+                calidad.CalidadValor = Repositorio.Obtener<CalidadValor>(x => x.Id == dto.CalidadValor.Id);
+                Repositorio.GuardarCambios();
+            }
+
+            foreach (var coordinador in coordinadoresActualizar)
+            {
+                var dto = datoTecnico.NominacionDatoTecnicoCoordinadorPuerto.FirstOrDefault(x => x.Id == coordinador.Id);
+                coordinador.NominacionDatoTecnico = nominacionDatoTecnico;
+                coordinador.CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(x => x.Id == dto.CoordinadorPuerto.Id);
+                coordinador.Cantidad = dto.Cantidad;
+                Repositorio.GuardarCambios();
+            }
+
+            foreach (var destino in destinosActualizar)
+            {
+                var dto = datoTecnico.NominacionDatoTecnicoDestino.FirstOrDefault(x => x.Id == destino.Id);
+                destino.NominacionDatoTecnico = nominacionDatoTecnico;
+                destino.Destino = Repositorio.Obtener<Destino>(x => x.Id == dto.Destino.Id);
+                destino.Cantidad = dto.Cantidad;
+                Repositorio.GuardarCambios();
+            }
+
+            foreach (var exportador in exportadoresActualizar)
+            {
+                var dto = datoTecnico.NominacionDatoTecnicoExportador.FirstOrDefault(x => x.Id == exportador.Id);
+                exportador.NominacionDatoTecnico = nominacionDatoTecnico;
+                exportador.Exportador = Repositorio.Obtener<Exportador>(x => x.Id == dto.Exportador.Id);
+                exportador.Cantidad = dto.Cantidad;
+                exportador.Tolerancia = dto.Tolerancia;
+                Repositorio.GuardarCambios();
+            }
+
+            #endregion
         }
     }
 }
