@@ -29,10 +29,10 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
 
   private _nominacionParametros: NominacionParametros = null;
   private destroy$ = new Subject();
-  
+
   formIntervenciones: FormGroup;
   listaAcuentaDe: ListaACuentaDe[] = [];
-  consumos: string[] = ["", "Animal", "Humano"];
+  consumos: string[] = ["", "Animal", "Humano", "Industrial"];
   //Vars Senasa
 
   destinos: Destino[] = [];
@@ -66,7 +66,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
   }
   ngOnDestroy(): void {
     this.destroy$.next();
-    this.destroy$.unsubscribe();  
+    this.destroy$.unsubscribe();
   }
   cargarListas() {
     this.listaAcuentaDe.push(new ListaACuentaDe(''));
@@ -131,7 +131,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
       this.companiasDeFumigacion = res;
     });
   }
-  
+
   inicializarTipoDeFumigacion() {
     this.programaEmbarqueService.ListarTipoDeFumigacion().subscribe((res: TipoDeFumigacion[]) => {
       this.tiposDeFumigacion = res;
@@ -153,7 +153,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
 
   initSenasa(senasa: Senasa = null) {
     if (senasa != null) {
-      
+
       return this.fb.group({
         id: senasa.id,
         exportador: senasa.exportador,
@@ -229,7 +229,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].setValue('');
     }
 
-    
+
   }
 
   onCertificadoVeterinarioChange(i: number){

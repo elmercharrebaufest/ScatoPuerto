@@ -129,6 +129,10 @@ export class ModalCrearBuqueComponent implements OnInit {
 
   public formatterVapores = (v: Vapor) => v.nombre;
 
+  public onInputNombreBuque(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.crearEditarBuqueForm['controls'].nombreBuque.setValue(input.value.toUpperCase());
+  }
 
   public onBlurBandera() {
     this.listadoBanderasModificadas = !this.crearEditarBuqueForm.value.bandera;
@@ -230,7 +234,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       cantidadBodegasTks: buque.cantBodegastks,
     };
 
-  
+
     if (this.ValidarBuque(objVapor)) {return;}
     this.mostrarSpinner = true;
     this.mensajeBuque = 'Guardando información de buque';
@@ -281,12 +285,12 @@ export class ModalCrearBuqueComponent implements OnInit {
       puntual: buque.puntual,
       cantidadBodegasTks: buque.cantBodegastks,
     }
-  
-   
+
+
 
     this.ValidarBuque(objVapor).subscribe(
       (data)=> {
-        this.mensaje = data;        
+        this.mensaje = data;
         if (this.mensaje != "") { this.mostrarSpinner = false; this.puedeCrearBuque = false; return; }
         this.mostrarSpinner = true;
         this.mensajeBuque = 'Guardando información de buque';
@@ -300,14 +304,14 @@ export class ModalCrearBuqueComponent implements OnInit {
             this.onResetForm();
             this.initListas();
             this.modalService.dismissAll();
-    
+
           });
       }
     )
-    
+
   }
 
-  public ValidarBuque(objVapor) {    
+  public ValidarBuque(objVapor) {
      return this.vaporService.ValidarBuque(objVapor.bandera.nombre,
       objVapor.nombrebuque, objVapor.imoVapor, this.id)
   }
