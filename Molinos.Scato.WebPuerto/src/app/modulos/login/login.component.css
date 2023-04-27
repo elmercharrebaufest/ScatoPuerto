@@ -1,25 +1,18 @@
-body > div.container.unified_container {
-  background: url(assets/login/puerto.jpg)
-      center center no-repeat fixed;
+div.container.unified_container {
+  background: url(assets/login/puerto.jpg) center center no-repeat fixed;
   background-size: cover;
   width: 100%;
+  max-width: 100%;
 }
 
-.unified_container {
-  background: url(assets/login/puerto.jpg)
-      center center no-repeat fixed;
-  background-size: cover;
-  width: 100%;
+.unified_container > .row > .col-md-4 {
+  padding-right: 0;
 }
 
-
-body > div.container.unified_container > div > div {
-  width: 100%;
-  padding-right: 0px;
-}
-
-div.row {
-  background: transparent;
+@media (min-width: 992px) {
+  .col-md-offset-8 {
+    margin-left: 66.66666667%;
+  }
 }
 
 img {
@@ -30,18 +23,16 @@ img {
 }
 
 .panel-body {
+  height: auto;
+  overflow: auto;
+  min-height: 100vh;
+  background-color: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 15px;
   font-size: 14px;
-}
-
-body > div.container.unified_container > div > div > div > div {
-  height: auto;
-  overflow: auto;
-  min-height: 100vh;
 }
 
 div#api {
@@ -135,7 +126,7 @@ body > div.container.self_asserted_container > div {
 
 body > div.container.self_asserted_container {
   background: url(https://b2cmoagro.blob.core.windows.net/moaoperaciones/login.jpg)
-      center center no-repeat fixed;
+    center center no-repeat fixed;
   background-size: cover;
   width: 100%;
 }
@@ -222,4 +213,10 @@ li {
 
 .error {
   color: #dd441e;
+}
+
+div.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
