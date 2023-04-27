@@ -73,7 +73,7 @@ export class NominacionDatoTecnicoRegistroService {
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (exportador != null) {
             return this.formBuilder.group({
-                nominacionDatoTecnicoExportador_Id: exportador.nominacionDatoTecnicoExportador_Id,
+                id: exportador.id,
                 exportador: exportador.exportador,
                 cantidad: exportador.cantidad,
                 tolerancia: exportador.tolerancia,
@@ -81,7 +81,7 @@ export class NominacionDatoTecnicoRegistroService {
             })
         } else {
             return this.formBuilder.group({
-                nominacionDatoTecnicoExportador_Id: '',
+                id: '',
                 exportador: ['', Validators.required],
                 cantidad: [0, Validators.required],
                 tolerancia: [0, Validators.required],
@@ -93,14 +93,14 @@ export class NominacionDatoTecnicoRegistroService {
     public inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (destino != null) {
             return this.formBuilder.group({
-                nominacionDatoTecnicoDestino_Id: destino.nominacionDatoTecnicoDestino_Id,
+                id: destino.id,
                 destino: destino.destino,
                 cantidad: destino.cantidad,
                 nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
             return this.formBuilder.group({
-                nominacionDatoTecnicoDestino_Id: 0,
+                id: 0,
                 destino: ['', Validators.required],
                 cantidad: [0, Validators.required],
                 nominacionDatoTecnico_Id: 0
@@ -111,14 +111,14 @@ export class NominacionDatoTecnicoRegistroService {
     public inicializarFormCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null, nominacionDatoTecnico: number = 0): FormGroup {
         if (coordinadorPuerto != null) {
             return this.formBuilder.group({
-                nominacionDatoTecnicoCoordinador_Id: coordinadorPuerto.nominacionDatoTecnicoCoordinador_Id,
+                id: coordinadorPuerto.id,
                 coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
                 cantidad: coordinadorPuerto.cantidad,
                 nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
             return this.formBuilder.group({
-                nominacionDatoTecnicoCoordinador_Id: 0,
+                id: 0,
                 coordinadorPuerto: ['', Validators.required],
                 cantidad: [0, Validators.required],
                 nominacionDatoTecnico_Id: 0
