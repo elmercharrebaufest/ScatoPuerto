@@ -69,7 +69,8 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Cliente (' + @coordinadorNuevo + ') cantidad', GETDATE())
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Cliente cantidad (' + 
+                        (SELECT @coordinadorNuevo + ' ' + D.Cantidad + ' -> ' + I.Cantidad FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
                 END
             END
         END

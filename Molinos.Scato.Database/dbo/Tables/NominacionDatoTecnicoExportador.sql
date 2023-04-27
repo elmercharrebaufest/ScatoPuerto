@@ -73,7 +73,8 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
 
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Exportador (' + @exportadorNuevo + ') cantidad', GETDATE())
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Exportador cantidad (' + 
+                        (SELECT @exportadorNuevo + ' ' + D.Cantidad + ' -> ' + I.Cantidad FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
                 END
             END
 
@@ -83,6 +84,12 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
                 INSERT INTO Auditoria
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Tolerancia', d.Tolerancia, i.Tolerancia , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+
+                IF(@idEmbarque > 0) BEGIN
+                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Exportador tolerancia (' + 
+                        (SELECT @exportadorNuevo + ' ' + D.Tolerancia + ' -> ' + I.Tolerancia FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
+                END
             END
         END
         ELSE IF EXISTS (SELECT * FROM inserted) BEGIN -- INSERT
