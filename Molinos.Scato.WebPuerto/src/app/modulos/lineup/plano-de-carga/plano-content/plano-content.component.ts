@@ -41,6 +41,7 @@ export class PlanoContentComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild('modalEditarAgenteControlPrivado') modalEditarAgenteControlPrivado: TemplateRef<any>;
   @ViewChild('modalABM') modalABM: TemplateRef<any>;
+  @ViewChild('modalExportadorABM') modalExportadorABM: TemplateRef<any>;
   mostrarContent: boolean = false;
   estadoPuerto: EstadoPuerto;
   embarque: Embarque;
@@ -198,18 +199,18 @@ export class PlanoContentComponent implements OnInit {
       //     this.materialesPuerto.find(x => x.id == res.cargasComerciales[index].materialPuerto.id)
       //   );
       // }
-      
-      if(res.cargasComerciales && res.cargasComerciales.length > 0){
-        res.cargasComerciales.forEach((cargaComercial,index) => {
+
+      if (res.cargasComerciales && res.cargasComerciales.length > 0) {
+        res.cargasComerciales.forEach((cargaComercial, index) => {
           this.cargasComercialesFormArray.push(this.initCargaComercial(cargaComercial))
           this.cargasComercialesFormArray.at(index).get('materialPuerto').setValue(
-                 this.materialesPuerto.find(x => x.id == cargaComercial.materialPuerto.id)
-               );
+            this.materialesPuerto.find(x => x.id == cargaComercial.materialPuerto.id)
+          );
         })
-      }else{
+      } else {
         this.cargasComercialesFormArray.push(this.initCargaComercial());
       }
-      
+
 
       this.mostrarFumigadora = res.fumigacion;
 
@@ -223,16 +224,16 @@ export class PlanoContentComponent implements OnInit {
     }, 3000);
   }
 
-  initCargaComercial(cargaComercial: CargaComercial = null){
-    if(cargaComercial != null){
+  initCargaComercial(cargaComercial: CargaComercial = null) {
+    if (cargaComercial != null) {
       return this.formBuilder.group({
         id: cargaComercial.id,
         exportador: cargaComercial.exportador,
         nombre: cargaComercial.exportador.nombre,
         cantidad: cargaComercial.cantidad,
         materialPuerto: cargaComercial.materialPuerto
-      })    
-    }else{
+      })
+    } else {
       return this.formBuilder.group({
         id: '',
         exportador: [],
@@ -240,14 +241,14 @@ export class PlanoContentComponent implements OnInit {
         materialPuerto: [],
         cantidad: '',
       })
-    }    
+    }
   }
-  
-  agregarCargaComercial(){
+
+  agregarCargaComercial() {
     this.cargasComercialesFormArray.push(this.initCargaComercial());
   }
 
-  eliminarCargaComercial(index: number){
+  eliminarCargaComercial(index: number) {
     const value = this.cargasComercialesFormArray.value;
 
     this.cargasComercialesFormArray.setValue(
@@ -596,6 +597,10 @@ export class PlanoContentComponent implements OnInit {
     return this.modalService.open(this.modalABM);
   }
 
+  abrirModalExportador() {
+    return this.modalService.open(this.modalExportadorABM);
+  }
+
   public descargarArchivo(tipo: string) {
     if (tipo == 'secuencia') {
       if (this.fileNameSecuencia == 'Ningun archivo elegido')
@@ -610,7 +615,7 @@ export class PlanoContentComponent implements OnInit {
       var imageName = this.fileNamePlano;
     }
     const imageBlob = this.dataURItoBlob(base64);
-    
+
     if ((window.navigator as any).msSaveOrOpenBlob) {
       (window.navigator as any).msSaveBlob(imageBlob, imageName);
     }
@@ -662,7 +667,7 @@ export class PlanoContentComponent implements OnInit {
   calcularTotal() {
     if (this.esLiquido)
       this._turnoService.setTnTotales(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
-      
+
     this._procesoService.sendTotalPlanoDeEmbarque.emit(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
     return this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0);
   }
@@ -935,53 +940,77 @@ export class PlanoContentComponent implements OnInit {
     }
   }
 
+  public submitExportadorABM(nombre: string) {
+    if (!nombre || !nombre.trim()) {
+      // El nombre es nulo o vacío
+      this.confirmationDialogService.confirm('¡Error!', 'Por favor complete el nombre', 'Cerrar', '', null, null, Tipoalerta.Success);
+      return;
+    }
+    if (this.exportadores.some(exp => exp.nombre.toLowerCase() == nombre.toLowerCase())) {
+      // Ya existe el exportador
+      this.confirmationDialogService.confirm('¡Error!', 'Ya existe el exportador', 'Cerrar', '', null, null, Tipoalerta.Success);
+      return;
+    }
+    const exportador: Exportador = new Exportador();
+    exportador.nombre = nombre.toUpperCase();
+    this.planoDeCargaService.agregarExportador(exportador).subscribe((res) => {
+      this.modalService.dismissAll();
+      this.planoDeCargaService.obtenerExportadores().subscribe(res => {
+        this.exportadores = res;
+      });
+      this.confirmationDialogService.confirm('Guardado', 'El exportador fue creado con éxito');
+    }, (err) => {
+      this.confirmationDialogService.confirm('¡Error!', 'Ha ocurrido un error al guardar el exportador', 'Cerrar', '', null, null, Tipoalerta.Success);
+      throw err;
+    });
+  }
+
   sendExportador(value: any, j: number) {
-    if( this.cargasComercialesFormArray.controls[j]['controls'].exportador.value === undefined ){
+    if (this.cargasComercialesFormArray.controls[j]['controls'].exportador.value === undefined) {
       this.planoDeCargaForm.get('cargasComerciales')['controls'][j]['controls'].exportador.value = null;
       this.planoDeCargaForm.get('cargasComerciales').value[j].exportador = null;
       (<HTMLInputElement>document.getElementsByClassName("prueba22")[j]).value = '';
     }
     this.sendExportadores();
-    
+
     this.verificarCargaComercial();
   }
 
-  sendExportadores(){
+  sendExportadores() {
     let exportadores: Exportador[] = []
     var arrCargasComerciales = (this.cargasComercialesFormArray as FormArray).value;
     arrCargasComerciales.forEach(cargaComercial => {
-      if(cargaComercial.exportador != null) exportadores.push(cargaComercial.exportador);
+      if (cargaComercial.exportador != null) exportadores.push(cargaComercial.exportador);
     });
 
-    this._turnoService.setExportadores(exportadores);    
+    this._turnoService.setExportadores(exportadores);
   }
 
-  sendMaterialPuerto(value: any) {    
+  sendMaterialPuerto(value: any) {
     this.sendExportadores();
     this.verificarCargaComercial();
   }
 
-  verificarCargaComercial(){
+  verificarCargaComercial() {
     let cant = 0;
-    for(let i=0; i<this.cargasComercialesFormArray.controls.length; i++ ){
-      if( (( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null ||
-          this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
-          (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== null ||
-            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== '') ) ||
-          ((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== null || 
+    for (let i = 0; i < this.cargasComercialesFormArray.controls.length; i++) {
+      if ((((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null ||
+        this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
+        (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== null ||
+          this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== '')) ||
+        ((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== null ||
           this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== '') &&
           (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
-            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === '') ))  &&
-          !( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null || 
-            this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') && 
-            (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
-            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === '') ) )
-      {
+            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === ''))) &&
+        !((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null ||
+          this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
+          (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
+            this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === ''))) {
         cant += 1;
       }
     }
 
-    if(cant>0) 
+    if (cant > 0)
       this.cargaComercialIncompleto = true;
     else
       this.cargaComercialIncompleto = false;
@@ -1028,44 +1057,44 @@ export class PlanoContentComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.PlanoDeCarga_CaladoSalida_Modificar);
   }
 
-  controlarPermisos(){
-    if(!this.hasPermisoPlanoDeCarga_Bodegas_Modificar()){
-      if(this.esLiquido){
+  controlarPermisos() {
+    if (!this.hasPermisoPlanoDeCarga_Bodegas_Modificar()) {
+      if (this.esLiquido) {
         this.planoDeCargaBodegasFormArray.disable();
-      }else{
+      } else {
         this.planoDeCargaForm.get('planoDeCargaBodegas').disable();
       }
     }
 
-    if(!this.hasPermisoPlanoDeCarga_CargasComerciales_Modificar())
-        this.planoDeCargaForm.get('cargasComerciales').disable();
+    if (!this.hasPermisoPlanoDeCarga_CargasComerciales_Modificar())
+      this.planoDeCargaForm.get('cargasComerciales').disable();
 
-    if(!this.hasPermisoPlanoDeCarga_DefensasMoviles_Modificar())
-        this.planoDeCargaForm.get('defensasMoviles').disable();
+    if (!this.hasPermisoPlanoDeCarga_DefensasMoviles_Modificar())
+      this.planoDeCargaForm.get('defensasMoviles').disable();
 
-    if(!this.hasPermisoPlanoDeCarga_Fumigacion_Modificar()){
-        this.planoDeCargaForm.get('fumigacion').disable();
-        this.planoDeCargaForm.get('empresaFumigadora').disable();
+    if (!this.hasPermisoPlanoDeCarga_Fumigacion_Modificar()) {
+      this.planoDeCargaForm.get('fumigacion').disable();
+      this.planoDeCargaForm.get('empresaFumigadora').disable();
     }
     // TODO: INI - no están impactando
-    if(!this.hasPermisoPlanoDeCarga_Estiba_Modificar()){
-        this.planoDeCargaForm.get('estiba').disable();
-        this.planoDeCargaForm.get('estibasList').disable();
+    if (!this.hasPermisoPlanoDeCarga_Estiba_Modificar()) {
+      this.planoDeCargaForm.get('estiba').disable();
+      this.planoDeCargaForm.get('estibasList').disable();
     }
-    if(!this.hasPermisoPlanoDeCarga_AgenciaControlPrivado_Modificar()){
-        this.planoDeCargaForm.get('agenciaControlPrivado').disable();
-        this.planoDeCargaForm.get('agenciasControlPrivadoList').disable();
+    if (!this.hasPermisoPlanoDeCarga_AgenciaControlPrivado_Modificar()) {
+      this.planoDeCargaForm.get('agenciaControlPrivado').disable();
+      this.planoDeCargaForm.get('agenciasControlPrivadoList').disable();
     }
-    if(!this.hasPermisoPlanoDeCarga_AgentesControlPrivado_Modificar()){
-        this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').disable();
-        this.planoDeCargaForm.get('agentesControlPrivadoList').disable();
+    if (!this.hasPermisoPlanoDeCarga_AgentesControlPrivado_Modificar()) {
+      this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').disable();
+      this.planoDeCargaForm.get('agentesControlPrivadoList').disable();
     }
     // FIN - no están impactando
-    if(!this.hasPermisoPlanoDeCarga_Observaciones_Modificar()){
-        this.planoDeCargaForm.get('observaciones').disable();
+    if (!this.hasPermisoPlanoDeCarga_Observaciones_Modificar()) {
+      this.planoDeCargaForm.get('observaciones').disable();
     }
-    if(!this.hasPermisoPlanoDeCarga_CaladoSalida_Modificar()){
-        this.planoDeCargaForm.get('caladoSalida').disable();
+    if (!this.hasPermisoPlanoDeCarga_CaladoSalida_Modificar()) {
+      this.planoDeCargaForm.get('caladoSalida').disable();
     }
   }
 
