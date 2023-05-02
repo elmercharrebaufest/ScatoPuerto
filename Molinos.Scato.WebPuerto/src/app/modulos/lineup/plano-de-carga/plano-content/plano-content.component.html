@@ -121,9 +121,13 @@
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
                 </div>
+                <div class='btn-add-container' (click)='abrirModalExportador()'>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Crear exportador</span>
+              </div>
               </ng-container>
             </div>
-            
+
               <div *ngFor="let exp of planoDeCargaForm.get('cargasComerciales').value; let j = index; trackBy:trackByFn"
                   class="row" formArrayName="cargasComerciales" style="margin-bottom: -8px;">
                 <ng-container [formGroupName]="j">
@@ -376,12 +380,12 @@
           <label for="nombre">Nombre</label>
           <input id="nombre" ngbAutofocus class="form-control" autocomplete="off"
                  value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto(1)}}">
-          
+
           <div *ngIf="this.pantallaSeleccionada != 'Agencia'">
             <label for="apellido">Apellido</label>
             <input id="apellido" class="form-control" autocomplete="off"
               value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto(2)}}">
-          </div>   
+          </div>
         </div>
       </div>
     </form>
@@ -395,3 +399,24 @@
 </ng-template>
 <!--PANTALLA ABM: AGREGAR, MOFIFICAR Y ELIMINAR-->
 <!----------------------------------------------->
+<!-- #region MODAL AÑADIR EXPORTADOR -->
+<ng-template #modalExportadorABM let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Crear exportador</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-6">
+        <label for="nombreExportador">Nombre</label>
+        <input id="nombreExportador" ngAutofocus class="form-control" autocomplete="off" #nombreExportador>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="submitExportadorABM(nombreExportador.value)">Guardar</button>
+  </div>
+</ng-template>
+<!-- #endregion MODAL AÑADIR EXPORTADOR -->
