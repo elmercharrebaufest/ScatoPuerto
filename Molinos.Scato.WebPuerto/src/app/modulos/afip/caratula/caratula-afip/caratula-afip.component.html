@@ -1,0 +1,69 @@
+<ship-spinner [message]="'Cargando Historial de carátulas. Por favor, espere...'"
+    *ngIf='buscarHistorialCaratulas'></ship-spinner>
+
+<div style="overflow-x:auto;" class="table-responsive">
+    <table class='table table-bordered lista-caratula-table'>
+        <thead class="lista-caratula-header">
+
+            <th>Id carátula AFIP</th>
+            <th>Buque</th>
+            <th>IMO</th>
+            <th>Puerto Destino</th>
+            <th>Fecha Arribo</th>
+            <th>Fecha Zarpada</th>
+            <th>Fecha Registro</th>
+            <th>Rectificar</th>
+            <th>Anular</th>
+            <th>Estados</th>
+        </thead>
+        <tbody *ngFor="let historial of getListaHistorialCaratula()">
+            <tr class="lista-caratula-row" *ngIf="historial.numeroPaginado == getPaginaActual()">
+                <td class="lista-caratula-row-item">{{historial.idCaratula}}</td>
+                <td class="lista-caratula-row-item">{{historial.buqueCaratula}}</td>
+                <td class="lista-caratula-row-item">{{historial.imoCaratula}}</td>
+                <td class="lista-caratula-row-item">{{ historial.puertoDestinoCaratula }}</td>
+                <td class="lista-caratula-row-item">{{ historial.fechaArriboCaratula }}</td>
+                <td class="lista-caratula-row-item">{{ historial.fechaZarpadaCaratula }}</td>
+                <td class="lista-caratula-row-item">{{ historial.fechaRegistroCaratula}}</td>
+                <td class="lista-caratula-row-item" (click)="editarCaratula(historial,editCaratula)">
+                    <div class='icon-editar cursor'></div>
+                </td>
+                <td class="lista-caratula-row-item">
+                    <div class='icon-eliminar cursor'></div>
+                </td>
+                <td class="lista-caratula-row-item">{{historial.estadoCaratula}}</td>
+            </tr>
+            <div class="lista-caratula-espacio" *ngIf="historial.numeroPaginado == getPaginaActual()">
+            </div>
+        </tbody>
+    </table>
+
+ <!-- <nav aria-label="Page navigation example" class="centrado"
+        *ngIf="getListaHistorialCaratula()?.length > 0">
+        <ul class="pagination justify-content-center paginado-buque-fondo">
+            <li [ngClass]="{'page-item disabled': getPaginaActual() == 1 }">
+                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() - 1)">
+                 << </a>
+            </li>
+            <li *ngFor="let pagina of getListaPaginas(); let index = index"
+                [ngClass]="{'page-item disabled': getPaginaActual() == (index + 1)}">
+                <a class="page-link" [ngClass]="{'paginado-buque-activo': getPaginaActual() == (index + 1)}"
+                    href="javascript:void(0);" (click)="setPaginaActual(index + 1)">{{index + 1}}</a>
+            </li>
+            <li [ngClass]="{'page-item disabled': getPaginaActual() >= getTotalPaginas() }">
+                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() + 1)"> >>
+                </a>
+            </li>
+        </ul>
+    </nav> -->
+    <!-- <div *ngIf="esNoExisteRegistros && !esResumenOperatoria">
+        No se encontraron registros para los filtros ingresados.
+    </div>  -->
+
+
+
+</div>
+
+<ng-template #editCaratula let-modal>
+    <app-modal-crear-caratula (actualizarListaVapores)="actualizarListaDeVapores($event)" [id]="caratulaId" [title]="'Rectificar Caratula Nro '+ caratulaImo"></app-modal-crear-caratula>
+</ng-template>
