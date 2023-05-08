@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-
+import { AutenticadorService } from '@ScatoServicios/autenticador.service';
+import { Session } from 'protractor';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  constructor(private autenticar: AutenticadorService) { }
 
   ngOnInit(): void {
   }
@@ -20,7 +21,11 @@ export class LoginComponent implements OnInit {
 
 public iniciarSession()
 {
+  this.username=(window.document.getElementsByName("email")[0] as HTMLInputElement).value;
+  this.pass= (window.document.getElementsByName("Contraseña")[0]as HTMLInputElement).value;
+  this.autenticar.autenticarUsuarioAd(this.username, this.pass).subscribe((res: any) => {
 
+  });
 }
 
 }

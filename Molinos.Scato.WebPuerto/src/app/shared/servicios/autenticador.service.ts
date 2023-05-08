@@ -10,19 +10,25 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 })
 export class AutenticadorService {
   url: string = environment.apiUrl;
-  
-  constructor(private http: HttpClient, 
+
+  constructor(private http: HttpClient,
               private sessionService: SessionService) { }
 
   /**
-   * 
+   *
    * @returns {Observable<any>} Observable<any>
    * @memberof AutenticadorService
    */
-  public autenticarUsuario() {
+  /* public autenticarUsuario() {
     return this.http.get(`${this.url}AutenticarUsuarioAD`, { 'withCredentials': true });
-  }
+  } */
 
+   public autenticarUsuario() {
+    return this.http.get(`${this.url}AutenticarUsuarioAzureAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
+  }
+  public autenticarUsuarioAd(username, password) {
+    return this.http.get(`${this.url}AutenticarUsuarioAzureAD?username=${'username'}&password=${'password'}`, { 'withCredentials': true });
+  }
   public renovarAuthUsuario(){
     this.autenticarUsuario().subscribe((res: Usuario) => {
       this.sessionService.clear();

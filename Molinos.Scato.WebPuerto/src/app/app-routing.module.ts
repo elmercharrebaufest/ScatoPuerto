@@ -58,12 +58,12 @@ export const routeConfig: Routes = [
       }
     ]
   },
-  {
-    path: 'login',
-    component: IniciarSesionComponent,
-  }
 /*   {
     path: 'login',
-    component: LoginComponent,
+    component: IniciarSesionComponent,
   } */
+  {
+    path: 'login',
+    component: LoginComponent,
+  }
 ];

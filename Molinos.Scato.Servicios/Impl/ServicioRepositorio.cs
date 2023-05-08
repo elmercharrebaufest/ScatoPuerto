@@ -35,6 +35,12 @@ using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using NPOI.SS.Formula.Functions;
 using System.Drawing.Text;
+using Microsoft.Identity.Client;
+using System.Threading;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -52,7 +58,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
             ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
-            , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap)
+            , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap, AzureAD.conexionAzure azure)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
@@ -2288,6 +2294,7 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
+       
 
 
         public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
@@ -12144,6 +12151,30 @@ namespace Molinos.Scato.Servicios.Impl
         {            
             return repositorio.Listar<LogABM>(x => x.ClaseId == claseId).OrderByDescending(x => x.Fecha).ToList(); 
         }
+
+        public  Task<List<string>> ListarPermisosPorUsuarioAzureAD(string username, string password)
+        {
+          
+            try
+            {
+                List<string> gruposPermisos = new List<string>();
+                string clientId = "";
+                string tenantId = "";
+                var redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient";
+
+                AzureAD.conexionAzure conexion = new AzureAD.conexionAzure();
+                Task<List<string>> gruposPermisos1 =  conexion.ListarPermisosPorUsuarioAzureAD(username, password);
+                    return gruposPermisos1;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error en listar permisos Azure AD", ex.InnerException);
+                throw ex.InnerException;
+            }
+
+
+        }
+        
 
     }
 }

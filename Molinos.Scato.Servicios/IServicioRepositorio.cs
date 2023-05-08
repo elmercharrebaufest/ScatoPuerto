@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios
 {
@@ -2767,5 +2768,8 @@ namespace Molinos.Scato.Servicios
       
         [OperationContract]
         List<LogABM> ObtenerInformacionLog(int claseId);
+
+        [OperationContract]
+        Task<List<string>> ListarPermisosPorUsuarioAzureAD(string username, string password);
     }
 }
