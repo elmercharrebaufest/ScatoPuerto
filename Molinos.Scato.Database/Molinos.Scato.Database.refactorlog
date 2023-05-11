@@ -812,4 +812,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Fecha" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2619c636-3e25-4a8b-9348-2980714e3d83" ChangeDateTime="05/09/2023 18:52:22">
+    <Property Name="ElementName" Value="[dbo].[Afip_Caratulas].[BuqueId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Afip_Caratulas]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CodigoAduana" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="43b641ca-c117-42c8-a5fa-041745e6cac0" ChangeDateTime="05/10/2023 19:17:51">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdentificadorCaratula" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d1adf032-ad7d-4865-9ae3-2de59226a207" ChangeDateTime="05/10/2023 19:20:48">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[ Puerto]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Puerto" />
+  </Operation>
 </Operations>
