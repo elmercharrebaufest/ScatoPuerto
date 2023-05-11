@@ -1,16 +1,19 @@
+<ship-spinner *ngIf='iniciandoSession'  [message]="'Iniciando Sesión...'"></ship-spinner>
 <div class="container unified_container">
   <div class="row">
     <div class="col-md-4 col-md-offset-8 col-xs-12">
       <div class="login panel panel-default">
         <div class="panel-body">
-          <img alt="Company Logo" class="companyLogo"
-            src="https://b2cmoagro.blob.core.windows.net/moaoperaciones/logo.png" />
+   <!--        <img alt="Company Logo" class="companyLogo"
+            src="https://b2cmoagro.blob.core.windows.net/moaoperaciones/logo.png" /> -->
+            <img alt="Company Logo" class="companyLogo"
+            src="assets/logoInicio.png" />
           <div id="api" data-name="Unified">
             <div class="intro">
-              Sistema de gestion del Puerto
+              SISTEMA DE GESTION DEL PUERTO
             </div>
-            <div class="error pageLevel" aria-hidden="true" role="alert" style="display: none">
-              <p></p>
+            <div class="error pageLevel" aria-hidden="true" role="alert" id="error"  style="text-align:center; display: none">
+              <p>{{mensajeError}}</p>
             </div>
             <div class="entry">
               <div class="entry-item">
@@ -18,7 +21,7 @@
                 <div class="error itemLevel" aria-hidden="true" role="alert" style="display: none">
                   <p></p>
                 </div>
-                <input type="email" id="email" name="email"
+                <input type="email" id="email" name="email" class="form-control"
                   pattern="^[a-zA-Z0-9!#$%&amp;'+^_`{}~-]+(?:\.[a-zA-Z0-9!#$%&amp;'+^_`{}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$"
                   placeholder="Ingrese su e-mail" value="" />
               </div>
@@ -29,12 +32,11 @@
                 <div class="error itemLevel" aria-hidden="true" style="display: none">
                   <p role="alert"></p>
                 </div>
-                <input type="password" id="password" name="Contraseña" placeholder="Contraseña" />
+                <input type="password" id="password" name="Contraseña" class="form-control"  placeholder="password" />
               </div>
-              <div class="working"></div>
 
               <div class="buttons">
-                <button id="next" type="button" (click)="iniciarSession()">
+                <button id="next"  class="btn btn-primary ml-2" type="button" (click)="iniciarSession()">
                   Iniciar sesión
                 </button>
               </div>

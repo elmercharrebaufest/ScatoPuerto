@@ -15,7 +15,7 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
 
         public void Init(HttpApplication context)
         {
-            context.PostAuthenticateRequest += Context_PostAuthenticateRequest;
+          //  context.PostAuthenticateRequest += Context_PostAuthenticateRequest;
         }
 
          void Context_PostAuthenticateRequest(object sender, EventArgs e)

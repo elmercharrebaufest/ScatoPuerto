@@ -10,7 +10,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 })
 export class AutenticadorService {
   url: string = environment.apiUrl;
-
+  urlAzure: string = environment.apiAzureUrl;
   constructor(private http: HttpClient,
               private sessionService: SessionService) { }
 
@@ -26,15 +26,20 @@ export class AutenticadorService {
    public autenticarUsuario() {
     return this.http.get(`${this.url}AutenticarUsuarioAzureAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
   }
+  public ObtenerGruposAD(grupos: string[]) {
+    return this.http.post(`${this.url}ObtenerGruposAD`, grupos, { 'withCredentials': true });
+    //return this.http.get(`${this.url}ObtenerGruposAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
+  }
+
   public autenticarUsuarioAd(username, password) {
-    return this.http.get(`${this.url}AutenticarUsuarioAzureAD?username=${'username'}&password=${'password'}`, { 'withCredentials': true });
+    return this.http.get(`${this.urlAzure}azure/${username}/${password}`, { 'withCredentials': false });
   }
   public renovarAuthUsuario(){
-    this.autenticarUsuario().subscribe((res: Usuario) => {
+   /*  this.autenticarUsuario().subscribe((res: Usuario) => {
       this.sessionService.clear();
       res.autenticado = true;
       this.sessionService.setUser(res);
-    })
+    }) */
   }
 
   // public getUserName() {

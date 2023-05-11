@@ -2770,6 +2770,6 @@ namespace Molinos.Scato.Servicios
         List<LogABM> ObtenerInformacionLog(int claseId);
 
         [OperationContract]
-        Task<List<string>> ListarPermisosPorUsuarioAzureAD(string username, string password);
+        IList<string> ObtenerGruposAD(List<string> grupos);
     }
 }

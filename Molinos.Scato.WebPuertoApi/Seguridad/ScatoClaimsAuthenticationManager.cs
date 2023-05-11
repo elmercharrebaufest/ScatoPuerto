@@ -148,7 +148,7 @@ namespace Molinos.Scato.WebPuertoApi.Seguridad
 
             //log.Info("Agregando claims de permisos de Scato para el usuario {0}", nombreUsuario);
 
-            var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAzureAD("lucas.olivella@molinosagro.com.ar", "inicio00");
+        //    var permisosAd = ServicioRepositorio.ListarPermisosPorUsuarioAzureAD("lucas.olivella@molinosagro.com.ar", "inicio00");
             //foreach (string permiso in permisosAd)
             //{
             //    identity.AddClaim(new Claim(ClaimTypes.Role, permiso));
