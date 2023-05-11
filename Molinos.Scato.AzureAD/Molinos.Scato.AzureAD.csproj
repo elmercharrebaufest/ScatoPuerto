@@ -215,6 +215,8 @@
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="VICSCATOPROD.DeployParameters.xml" />
+    <Content Include="VICSCATOQA.DeployParameters.xml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -281,7 +283,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>53778</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/Molinos.Scato.AzureAD</IISUrl>
+          <IISUrl>http://localhost/Scato.AzureAD</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
           <IISAppRootUrl>http://localhost/Scato.AzureAD</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
