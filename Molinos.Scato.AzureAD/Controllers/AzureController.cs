@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Http;
 using System.Web.Configuration;
+using Microsoft.Identity;
 
 namespace Molinos.Scato.AzureAD.Controllers
 {
