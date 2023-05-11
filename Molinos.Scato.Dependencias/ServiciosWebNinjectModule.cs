@@ -42,7 +42,8 @@ namespace Molinos.Scato.Dependencias
             Bind<IAdministradorDeCalles, AdministradorDeCalles>().To<AdministradorDeCalles>().InScope(ctx => OperationContext.Current);
             Bind<IServicioProgramaEmbarque, ServicioProgramaEmbarque>().To<ServicioProgramaEmbarque>().InScope(ctx => OperationContext.Current);
             Bind<IServicioVapor, ServicioVapor>().To<ServicioVapor>().InScope(ctx => OperationContext.Current);
-            
+            Bind<IServicioAfip, ServicioAfip>().To<ServicioAfip>().InScope(ctx => OperationContext.Current);
+
             this.BindChannelFactory<IServicioNotificarUsuario>("ServicioNotificarUsuario");
             Bind<IServicioEstadoPuesto, ServicioEstadoPuesto>().To<ServicioEstadoPuesto>().InSingletonScope();
 
@@ -53,7 +54,7 @@ namespace Molinos.Scato.Dependencias
             this.BindChannelFactory<calpesSoap>("calpesSoap");
             this.BindChannelFactory<IServicioOrquestador>("Orquestador");
             this.BindChannelFactory<IServicioImpresion>("ServicioImpresion");
-            
+
             this.BindChannelFactory<CpePortType>("CpeEndPoint");
 
 

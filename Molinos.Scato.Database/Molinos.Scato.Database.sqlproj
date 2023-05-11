@@ -91,6 +91,7 @@
     <Folder Include="Scripts\20160524 - Configuracion de Workflows" />
     <Folder Include="Scripts\20200512 - Credenciales MercadoPago" />
     <Folder Include="Scripts\bkp16052022" />
+    <Folder Include="dbo\Tables\AfipPuerto" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -514,7 +515,6 @@
     <Build Include="dbo\Tables\MotivoInactividad.sql" />
     <Build Include="dbo\Tables\RegistroInactividad.sql" />
     <Build Include="dbo\Tables\RegistroStockOtrosPuertos.sql" />
-    <!-- <Build Include="dbo\Tables\ConfiguracionGeneral.sql" /> -->
     <Build Include="dbo\Tables\NotificacionAplicacion.sql" />
     <Build Include="dbo\Tables\PinchazosPorCalada.sql" />
     <Build Include="dbo\Tables\RamalFerroviario.sql" />
@@ -561,6 +561,8 @@
     <Build Include="dbo\Tables\Auditoria.sql" />
     <Build Include="dbo\Tables\NotificacionesExcluidos.sql" />
     <Build Include="dbo\Tables\NotificacionProgramaDeEmbarque.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCaratula.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCaratulaItinerario.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
