@@ -1,5 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using System;
+﻿using System;
 using System.IdentityModel.Services;
 using System.Security.Claims;
 using System.Threading;
