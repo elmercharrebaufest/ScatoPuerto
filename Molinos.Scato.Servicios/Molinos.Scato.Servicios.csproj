@@ -360,6 +360,8 @@
     <Compile Include="IFirmware.cs" />
     <Compile Include="IFirmwareFactory.cs" />
     <Compile Include="Impl\AdministradorDeCalles.cs" />
+    <Compile Include="IServicioAfip.cs" />
+    <Compile Include="Impl\ServicioAfip.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
     <Compile Include="Impl\ServicioEstadoPuesto.cs" />
     <Compile Include="Impl\ServicioProgramaEmbarque.cs" />
