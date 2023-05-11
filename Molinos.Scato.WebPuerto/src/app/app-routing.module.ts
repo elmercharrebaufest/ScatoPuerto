@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './modulos/login/login.component';
 import { IniciarSesionComponent } from './shared/componentes/iniciar-sesion/iniciar-sesion.component';
 import { LayoutComponent } from "./shared/componentes/layout/layout.component";
 import { LoginGuard } from './shared/seguridad/login.guard';
@@ -12,13 +13,14 @@ export const routeConfig: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/lineup',
+       redirectTo: '/lineup',
+    //   redirectTo: '/login',
         pathMatch: 'full'
       },
-      // {
-      //   path: 'login',
-      //   component: IniciarSesionComponent,
-      // },
+     /*   {
+         path: 'login',
+         component: IniciarSesionComponent,
+       }, */
       {
         path: "lineup",
         canActivateChild: [RoleGuard],
@@ -56,8 +58,12 @@ export const routeConfig: Routes = [
       }
     ]
   },
-  {
+/*   {
     path: 'login',
     component: IniciarSesionComponent,
+  } */
+  {
+    path: 'login',
+    component: LoginComponent,
   }
 ];
