@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: '/api/',
-  apiAzureUrl: 'http://localhost/Molinos.Scato.AzureAD/'
+  apiAzureUrl: 'http://localhost/Scato.AzureAD/'
 };
 
 /*
