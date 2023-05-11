@@ -32,7 +32,7 @@
                 <div class="error itemLevel" aria-hidden="true" style="display: none">
                   <p role="alert"></p>
                 </div>
-                <input type="password" id="password" name="Contraseña" class="form-control"  placeholder="password" />
+                <input type="password" id="password" name="Contraseña" class="form-control" (keyup.enter)="iniciarSession()"  placeholder="password" />
               </div>
 
               <div class="buttons">

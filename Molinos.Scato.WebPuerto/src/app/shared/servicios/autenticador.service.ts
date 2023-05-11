@@ -23,16 +23,20 @@ export class AutenticadorService {
     return this.http.get(`${this.url}AutenticarUsuarioAD`, { 'withCredentials': true });
   } */
 
-   public autenticarUsuario() {
+/*    public autenticarUsuario() {
     return this.http.get(`${this.url}AutenticarUsuarioAzureAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
-  }
+  } */
   public ObtenerGruposAD(grupos: string[]) {
     return this.http.post(`${this.url}ObtenerGruposAD`, grupos, { 'withCredentials': true });
     //return this.http.get(`${this.url}ObtenerGruposAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
   }
-
+/*
   public autenticarUsuarioAd(username, password) {
     return this.http.get(`${this.urlAzure}azure/${username}/${password}`, { 'withCredentials': false });
+  } */
+
+  public autenticarUsuarioAd(parametros:string[]) {
+    return this.http.post(`${this.urlAzure}azure`,parametros, { 'withCredentials': false });
   }
   public renovarAuthUsuario(){
    /*  this.autenticarUsuario().subscribe((res: Usuario) => {

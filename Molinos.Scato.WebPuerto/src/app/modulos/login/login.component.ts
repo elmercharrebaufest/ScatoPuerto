@@ -36,12 +36,17 @@ public iniciarSession()
   this.username=(window.document.getElementsByName("email")[0] as HTMLInputElement).value;
   this.pass= (window.document.getElementsByName("Contraseña")[0]as HTMLInputElement).value;
   this.autenticar();
-  this.iniciandoSession=false;
+
 }
 
 
 autenticar() {
-  this.autenticarAd.autenticarUsuarioAd(this.username, this.pass).subscribe(
+  var parametros= new Array();
+
+  parametros.push(this.username);
+  parametros.push(this.pass);
+/*   this.autenticarAd.autenticarUsuarioAd(this.username, this.pass).subscribe( */
+this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
     (res: Usuario) => {
       if (res) {
         console.log('========== autenticarUsuario ==========', res);
@@ -58,12 +63,14 @@ autenticar() {
             }
             else
             {
+              this.iniciandoSession=false;
               this.mensajeError="No tiene permisos para ingresar";
             }
           });
 
 
       } else {
+        this.iniciandoSession=false;
         this.messageService.add({ severity: 'error', detail: 'Error al iniciar sesión', summary: 'No se ha encontrado el usuario' })
       }
     },  error => {
@@ -86,6 +93,7 @@ navigate(permisos) {
   let primerPermiso = permisos.find((p: string) => p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
   if(primerPermiso == undefined)
   {
+    this.iniciandoSession=false;
     this.mensajeError="No tiene permisos para ingresar";
     this.mostrarError();
   }
