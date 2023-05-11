@@ -35,7 +35,12 @@ using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using NPOI.SS.Formula.Functions;
 using System.Drawing.Text;
-
+using System.Threading;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using Microsoft.Identity.Client;
 namespace Molinos.Scato.Servicios.Impl
 {
     public class ServicioRepositorio : IServicioRepositorio
@@ -48,11 +53,12 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConfiguracionProvider configuracion;
         private readonly IServicioOrquestador servicioOrquestador;
         private readonly ZSDWS_SCATO servicioSap;
-        private readonly IAdministradorDeCalles administradorDeCalles;     
+        private readonly IAdministradorDeCalles administradorDeCalles;
+ 
 
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
             ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
-            , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap)
+            , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap )
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
@@ -62,7 +68,9 @@ namespace Molinos.Scato.Servicios.Impl
             this.servicioOrquestador = servicioOrquestador;
             this.configuracion = configuracion;
             this.servicioSap = servicioSap;
-            this.administradorDeCalles = administradorDeCalles;        
+            this.administradorDeCalles = administradorDeCalles;
+         
+
 
         }
 
@@ -2288,6 +2296,7 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
+       
 
 
         public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
@@ -12144,6 +12153,30 @@ namespace Molinos.Scato.Servicios.Impl
         {            
             return repositorio.Listar<LogABM>(x => x.ClaseId == claseId).OrderByDescending(x => x.Fecha).ToList(); 
         }
+
+        public IList<string> ObtenerGruposAD(List<string> grupos)
+        {
+            List<string> gruposPermisos = new List<string>();
+            // iterate over all groups
+            foreach (var permisoAd in grupos)
+            {
+
+                var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
+                                   join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                   join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                   join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                   join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                   where a.NombreGrupoAd == permisoAd
+                                   select (e.NombrePermiso);
+
+                gruposPermisos.AddRange(permisoGrupo);
+
+            }
+
+            return gruposPermisos;
+
+        }
+
 
     }
 }
