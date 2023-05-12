@@ -152,7 +152,7 @@
       <DeployParametersModuloImpresor Include="$(DeployParametersModuloImpresor)"/>
       <DeployParametersWebPuerto Include="$(DeployParametersWebPuerto)"/>
       <DeployParametersWebPuerto Include="$(DeployParametersWebPuertoApi)"/>
-      <DeployParametersWebPuerto Include="$(DeployParametersAzureAD)"/>
+      <DeployParametersAzureAD Include="$(DeployParametersAzureAD)"/>
     </ItemGroup>
     
     <Copy SourceFiles="@(DeployParametersWeb)" DestinationFiles="@(DeployParametersWeb->'$(OutputPackWebDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
