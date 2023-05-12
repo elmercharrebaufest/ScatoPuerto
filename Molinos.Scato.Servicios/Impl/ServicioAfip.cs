@@ -32,17 +32,17 @@ namespace Molinos.Scato.Servicios.Impl
             this.comandos = comandos;
         }
 
-        public IList<object> ListarCaratulas()
+        public IList<AfipCaratulaDto> ListarCaratulas()
         {
-            return new List<object>();
+            return new List<AfipCaratulaDto>();
         }
 
-        public object ObtenerCaratula(string id)
+        public AfipCaratulaDto ObtenerCaratula(string id)
         {
-            return new object();
+            return new AfipCaratulaDto();
         }
 
-        public string RegistrarCaratula(object caratula)
+        public string RegistrarCaratula(AfipCaratulaDto caratula)
         {
             // TODO: Rectificar si tiene ID
             return "";

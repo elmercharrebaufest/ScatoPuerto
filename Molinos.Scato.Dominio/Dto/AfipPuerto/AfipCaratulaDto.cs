@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    internal class AfipCaratulaDto
+    public class AfipCaratulaDto
     {
         public string Id { get; set; }
         public string CodigoAduana { get; set; }

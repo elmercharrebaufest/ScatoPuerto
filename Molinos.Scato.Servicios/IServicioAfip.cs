@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Molinos.Scato.Dominio.Dto;
+using System.Collections.Generic;
 using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
@@ -9,13 +10,13 @@ namespace Molinos.Scato.Servicios
         void AnularCaratula(string id);
 
         [OperationContract]
-        IList<object> ListarCaratulas();
+        IList<AfipCaratulaDto> ListarCaratulas();
 
         [OperationContract]
-        object ObtenerCaratula(string id);
+        AfipCaratulaDto ObtenerCaratula(string id);
 
         [OperationContract]
-        string RegistrarCaratula(object caratula);
+        string RegistrarCaratula(AfipCaratulaDto caratula);
 
         [OperationContract]
         void SolicitarCambioBuque(object cambioBuque);
