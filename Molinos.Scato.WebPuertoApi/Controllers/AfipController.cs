@@ -1,4 +1,6 @@
 ﻿using Molinos.Scato.Actividades.Servicios;
+using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Servicios;
 using System;
 using System.Collections.Generic;
@@ -11,8 +13,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class AfipController : BaseController
     {
-        public AfipController(IServicioRepositorio servicio) : base(servicio)
+        private readonly IServicioAfip servicioAfip;
+        private readonly IServicioComandos comandos;
+        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip, IServicioComandos comandos) : base(servicio)
         {
+            this.servicioAfip = servicioAfip;
+            this.comandos = comandos;
         }
 
         #region Caratula
@@ -23,7 +29,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCaratulas());
             }
             catch (Exception e)
             {
@@ -37,7 +43,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ObtenerCaratula(id));
             }
             catch (Exception e)
             {
@@ -47,12 +53,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/RegistrarCaratula")]
-        public HttpResponseMessage RegistrarCaratula(object caratula)
+        public HttpResponseMessage RegistrarCaratula(AfipCaratulaDto caratula)
         {
             try
             {
-                // TODO: hacer distincion entre Registrar y Rectificar según si tiene ID
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var resultado = comandos.Ejecutar(new AfipRegistrarCaratula { Dto = caratula });
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
             {
@@ -62,7 +68,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/AnularCaratula")]
-        public HttpResponseMessage AnularCaratula(int id)
+        public HttpResponseMessage AnularCaratula(string id)
         {
             try
             {
