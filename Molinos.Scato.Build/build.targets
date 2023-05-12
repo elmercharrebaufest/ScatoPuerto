@@ -14,7 +14,7 @@
     <PackageModuloImpresor>..\Molinos.Scato.ModuloImpresor\obj\Jenkins\Package\**\*</PackageModuloImpresor>
     <PackageWebPuerto>..\Molinos.Scato.WebPuerto\obj\Jenkins\Package\**\*</PackageWebPuerto>
     <PackageWebPuertoApi>..\Molinos.Scato.WebPuertoApi\obj\Jenkins\Package\**\*</PackageWebPuertoApi>
-    <PackageAzureAD>..\Molinos.Scato.AzureAD\obj\Jenkins\Package\**\*</PackageAzureAD>
+
     
     <XamlxWorkflow>..\Molinos.Scato.Workflow\**\*.xamlx</XamlxWorkflow>
 
@@ -40,7 +40,7 @@
     <OutputPackModuloImpresorDir>..\Deploy\DeployPack\ModuloImpresor</OutputPackModuloImpresorDir>
     <OutputPackWebPuertoDir>..\Deploy\DeployPack\WebPuerto</OutputPackWebPuertoDir>
     <OutputPackWebPuertoApiDir>..\Deploy\DeployPack\WebPuertoApi</OutputPackWebPuertoApiDir>
-    <OutputPackAzureAD>..\Deploy\DeployPack\AzureAD</OutputPackAzureAD>
+    
 
     <ZipDir>..\Deploy\**\*.zip</ZipDir>
     <CmdDir>..\Deploy\**\*.cmd</CmdDir>
@@ -53,7 +53,7 @@
     <DeployParametersModuloImpresor>..\Molinos.Scato.ModuloImpresor\*.DeployParameters.xml</DeployParametersModuloImpresor>
     <DeployParametersWebPuerto>..\Molinos.Scato.WebPuerto\*.DeployParameters.xml</DeployParametersWebPuerto>
     <DeployParametersWebPuertoApi>..\Molinos.Scato.WebPuertoApi\*.DeployParameters.xml</DeployParametersWebPuertoApi>
-    <DeployParametersAzureAD>..\Molinos.Scato.AzureAD\*.DeployParameters.xml</DeployParametersAzureAD>
+
     <MsiDir>..\Deploy\EditorWF\</MsiDir>
     <QaMsiDir>..\Deploy\EditorWF\**\*.qa.msi</QaMsiDir>
     <ProdMsiDir>..\Deploy\EditorWF\**\*.prod.msi</ProdMsiDir>
