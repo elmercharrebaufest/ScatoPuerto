@@ -14,7 +14,8 @@
     <PackageModuloImpresor>..\Molinos.Scato.ModuloImpresor\obj\Jenkins\Package\**\*</PackageModuloImpresor>
     <PackageWebPuerto>..\Molinos.Scato.WebPuerto\obj\Jenkins\Package\**\*</PackageWebPuerto>
     <PackageWebPuertoApi>..\Molinos.Scato.WebPuertoApi\obj\Jenkins\Package\**\*</PackageWebPuertoApi>
-
+    <PackageWebPuertoApi>..\Molinos.Scato.AzureAD\obj\Jenkins\Package\**\*</PackageWebPuertoApi>
+    
     <XamlxWorkflow>..\Molinos.Scato.Workflow\**\*.xamlx</XamlxWorkflow>
 
     <OpenCoverTool>C:\Program Files (x86)\OpenCover\OpenCover.Console.exe</OpenCoverTool>
@@ -39,6 +40,7 @@
     <OutputPackModuloImpresorDir>..\Deploy\DeployPack\ModuloImpresor</OutputPackModuloImpresorDir>
     <OutputPackWebPuertoDir>..\Deploy\DeployPack\WebPuerto</OutputPackWebPuertoDir>
     <OutputPackWebPuertoApiDir>..\Deploy\DeployPack\WebPuertoApi</OutputPackWebPuertoApiDir>
+    <OutputPackWebPuertoApiDir>..\Deploy\DeployPack\AzureAD</OutputPackWebPuertoApiDir>
 
     <ZipDir>..\Deploy\**\*.zip</ZipDir>
     <CmdDir>..\Deploy\**\*.cmd</CmdDir>
@@ -51,7 +53,7 @@
     <DeployParametersModuloImpresor>..\Molinos.Scato.ModuloImpresor\*.DeployParameters.xml</DeployParametersModuloImpresor>
     <DeployParametersWebPuerto>..\Molinos.Scato.WebPuerto\*.DeployParameters.xml</DeployParametersWebPuerto>
     <DeployParametersWebPuertoApi>..\Molinos.Scato.WebPuertoApi\*.DeployParameters.xml</DeployParametersWebPuertoApi>
-
+    <DeployParametersWebPuertoApi>..\Molinos.Scato.AzureAD\*.DeployParameters.xml</DeployParametersWebPuertoApi>
     <MsiDir>..\Deploy\EditorWF\</MsiDir>
     <QaMsiDir>..\Deploy\EditorWF\**\*.qa.msi</QaMsiDir>
     <ProdMsiDir>..\Deploy\EditorWF\**\*.prod.msi</ProdMsiDir>
