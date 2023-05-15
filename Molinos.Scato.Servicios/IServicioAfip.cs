@@ -4,27 +4,19 @@ using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
 {
+    [ServiceContract]
     public interface IServicioAfip
     {
-        [OperationContract]
-        void AnularCaratula(string id);
-
         [OperationContract]
         IList<AfipCaratulaDto> ListarCaratulas();
 
         [OperationContract]
-        AfipCaratulaDto ObtenerCaratula(string id);
+        AfipCaratulaDto ObtenerCaratula(int id);
 
         [OperationContract]
-        string RegistrarCaratula(AfipCaratulaDto caratula);
+        bool RegistrarCaratula(AfipCaratulaDto caratula);
 
         [OperationContract]
-        void SolicitarCambioBuque(object cambioBuque);
-
-        [OperationContract]
-        void SolicitarCambioFechas(object cambioFechas);
-
-        [OperationContract]
-        void SolicitarCambioLOT(object cambioLOT);
+        void AnularCaratula(int id);
     }
 }

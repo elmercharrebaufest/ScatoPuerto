@@ -833,4 +833,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Puerto" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="7987cd8d-0b6e-41a7-af5f-a26d997aaddf" ChangeDateTime="05/15/2023 17:31:32">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[IdentificadorCaratula]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdCaratula" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="69c36b1f-304f-47d3-a0b2-50a76339106a" ChangeDateTime="05/15/2023 18:41:07">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[IdAfipCaratula]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AfipCaratula_Id" />
+  </Operation>
 </Operations>
