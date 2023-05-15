@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class AfipCaratula
+    public class AfipCaratula : IIdentificable
     {
         [Key]
-        public virtual string Id { get; set; }
+        public virtual int Id { get; set; }
+        public virtual string IdentificadorCaratula { get; set; }
         public virtual string CodigoAduana { get; set; }
         public virtual string CodigoLugarOperativo { get; set; }
         public virtual DateTime FechaArribo { get; set; }
