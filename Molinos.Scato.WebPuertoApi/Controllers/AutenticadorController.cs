@@ -79,10 +79,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ObtenerGruposAD")]
-        public HttpResponseMessage ObtenerGruposAD(List<string> grupos )
+        public HttpResponseMessage ObtenerGruposAD(List<string> grupos, string username )
         {
             try
             {
+                System.Web.HttpContext.Current.Session.Add("usuario", username);
                 var listadoPermisos = servicio.ObtenerGruposAD(grupos);
 
                 return Request.CreateResponse(HttpStatusCode.OK, new
