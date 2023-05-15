@@ -8,7 +8,8 @@ namespace Molinos.Scato.Dominio.Dto
 {
     public class AfipCaratulaDto
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string IdentificadorCaratula { get; set; }
         public string CodigoAduana { get; set; }
         public string CodigoLugarOperativo { get; set; }
         public DateTime FechaArribo { get; set; }

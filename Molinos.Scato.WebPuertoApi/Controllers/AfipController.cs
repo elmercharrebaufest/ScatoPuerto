@@ -13,12 +13,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class AfipController : BaseController
     {
-        private readonly IServicioAfip servicioAfip;
-        private readonly IServicioComandos comandos;
-        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip, IServicioComandos comandos) : base(servicio)
+        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip)
         {
-            this.servicioAfip = servicioAfip;
-            this.comandos = comandos;
+
         }
 
         #region Caratula
@@ -39,7 +36,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/afip/ObtenerCaratula")]
-        public HttpResponseMessage ObtenerCaratula(string id)
+        public HttpResponseMessage ObtenerCaratula(int id)
         {
             try
             {
@@ -57,7 +54,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var resultado = comandos.Ejecutar(new AfipRegistrarCaratula { Dto = caratula });
+                var resultado = servicioAfip.RegistrarCaratula(caratula);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -68,49 +65,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/AnularCaratula")]
-        public HttpResponseMessage AnularCaratula(string id)
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("api/afip/SolicitarCambioBuque")]
-        public HttpResponseMessage SolicitarCambioBuque(object cambioBuque)
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("api/afip/SoliciarCambioFechas")]
-        public HttpResponseMessage SolicitarCambioFechas(object cambioFechas)
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("api/afip/SolicitarCambioLOT")]
-        public HttpResponseMessage SolicitarCambioLOT(object cambioLOT)
+        public HttpResponseMessage AnularCaratula(int id)
         {
             try
             {

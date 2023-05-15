@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    public class AfipCaratulaItinerario
+    public class AfipCaratulaItinerario : IIdentificable
     {
-        public virtual AfipCaratula Caratula { get; set; }
-        public string Puerto { get; set; }
+        [Key]
+        public virtual int Id { get; set; }
+        public virtual AfipCaratula AfipCaratula { get; set; }
+        public virtual string Puerto { get; set; }
     }
 }

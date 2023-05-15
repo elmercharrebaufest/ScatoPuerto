@@ -9,7 +9,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         protected readonly IServicioProgramaEmbarque servicioProgramaEmbarque;
         protected string nombreUsuario;
         protected readonly IServicioVapor servicioVapor;
-        public BaseController(IServicioRepositorio servicio, IServicioProgramaEmbarque servicioProgramaEmbarque = null, IServicioVapor servicioVapor = null)
+        protected readonly IServicioAfip servicioAfip;
+        public BaseController(IServicioRepositorio servicio, IServicioProgramaEmbarque servicioProgramaEmbarque = null, IServicioVapor servicioVapor = null, IServicioAfip servicioAfip = null)
         {
             if(System.Web.HttpContext.Current.Session !=null)
                 this.nombreUsuario = System.Web.HttpContext.Current.Session["usuario"] as string;
@@ -17,6 +18,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicio = servicio;
             this.servicioProgramaEmbarque = servicioProgramaEmbarque;
             this.servicioVapor = servicioVapor;
-        }        
+            this.servicioAfip = servicioAfip;
+        }
     }
-}   
+}

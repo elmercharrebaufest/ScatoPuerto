@@ -24,12 +24,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var caratula = comando.Dto;
-                if (String.IsNullOrEmpty(caratula.Id)) // Registro
+                if (String.IsNullOrEmpty(caratula.IdentificadorCaratula)) // Registro
                 {
-                    var id = Guid.NewGuid().ToString("N").Substring(-16);
+                    var guid = Guid.NewGuid().ToString("N");
                     var caratulaDb = new AfipCaratula
                     {
-                        Id = id,
+                        IdentificadorCaratula = guid.Substring(guid.Length - 16),
                         CodigoAduana = caratula.CodigoAduana,
                         CodigoLugarOperativo = caratula.CodigoLugarOperativo,
                         FechaArribo = caratula.FechaArribo,
@@ -39,7 +39,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         PuertoDestino = caratula.PuertoDestino,
                         Via = caratula.Via
                     };
-                    var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { Caratula = caratulaDb, Puerto = x.Puerto }).ToList();
+                    var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = x.Puerto }).ToList();
                     caratulaDb.Itinerario = itinerario;
                     Repositorio.Agregar(caratulaDb);
                 }
@@ -59,7 +59,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     caratulaDb.NumeroViaje = caratula.NumeroViaje;
                     caratulaDb.PuertoDestino = caratula.PuertoDestino;
                     caratulaDb.Via = caratula.Via;
-                    var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { Caratula = caratulaDb, Puerto = x.Puerto }).ToList();
+                    var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = x.Puerto }).ToList();
                     caratulaDb.Itinerario = itinerario;
                 }
                 Repositorio.GuardarCambios();

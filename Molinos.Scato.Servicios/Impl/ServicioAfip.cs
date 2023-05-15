@@ -22,38 +22,53 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;
         private readonly ILogger log;
-        private readonly IServicioComandos comandos;
+        private readonly IServicioComandos servicioComandos;
+        private readonly IServicioRepositorio servicioRepositorio;
 
-        public ServicioAfip(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos)
+        public ServicioAfip(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos, IServicioRepositorio servicioRepositorio)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
-            this.comandos = comandos;
+            this.servicioComandos = comandos;
+            this.servicioRepositorio = servicioRepositorio;
         }
+
+        #region Metodos Utiles
+        private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
+        }
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
+        }
+        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
+        {
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
+        }
+        private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
+        }
+        #endregion
 
         public IList<AfipCaratulaDto> ListarCaratulas()
         {
-            return new List<AfipCaratulaDto>();
+            return Listar<AfipCaratula, AfipCaratulaDto>();
         }
 
-        public AfipCaratulaDto ObtenerCaratula(string id)
+        public AfipCaratulaDto ObtenerCaratula(int id)
         {
-            return new AfipCaratulaDto();
+            return Obtener<AfipCaratula, AfipCaratulaDto>(id);
         }
 
-        public string RegistrarCaratula(AfipCaratulaDto caratula)
+        public bool RegistrarCaratula(AfipCaratulaDto caratula)
         {
-            // TODO: Rectificar si tiene ID
-            return "";
+            var res = this.servicioComandos.Ejecutar(new AfipRegistrarCaratula { Dto = caratula });
+            return !res.HayErrores;
         }
 
-        public void AnularCaratula(string id) { }
-
-        public void SolicitarCambioBuque(object cambioBuque) { }
-
-        public void SolicitarCambioFechas(object cambioFechas) { }
-
-        public void SolicitarCambioLOT(object cambioLOT) { }
+        public void AnularCaratula(int id) { }
     }
 }
