@@ -46,13 +46,16 @@ autenticar() {
   parametros.push(this.username);
   parametros.push(this.pass);
 /*   this.autenticarAd.autenticarUsuarioAd(this.username, this.pass).subscribe( */
+
 this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
     (res: Usuario) => {
       if (res) {
         console.log('========== autenticarUsuario ==========', res);
         this.session.clear();
         res.autenticado = true;
-        this.autenticarAd.ObtenerGruposAD(res.permisos).subscribe(
+
+        var usuario= this.username.split("@")[0].toString();
+        this.autenticarAd.ObtenerGruposAD(res.permisos, usuario).subscribe(
           (respuesta: any) => {
             if(respuesta.permisos.length>0)
             {

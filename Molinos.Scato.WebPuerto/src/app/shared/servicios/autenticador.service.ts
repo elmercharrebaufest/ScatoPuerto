@@ -26,8 +26,8 @@ export class AutenticadorService {
     public autenticarUsuario() {
     return this.http.get(`${this.url}AutenticarUsuarioAzureAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
   }
-  public ObtenerGruposAD(grupos: string[]) {
-    return this.http.post(`${this.url}ObtenerGruposAD`, grupos, { 'withCredentials': true });
+  public ObtenerGruposAD(grupos: string[], usuario:string) {
+    return this.http.post(`${this.url}ObtenerGruposAD?username=${usuario}`, grupos, { 'withCredentials': true });
     //return this.http.get(`${this.url}ObtenerGruposAD?username=${'embarque_id'}&password=${'fechaHorastring'}`, { 'withCredentials': true });
   }
 /*
