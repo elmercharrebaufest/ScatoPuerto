@@ -1,0 +1,19 @@
+<div class="container-fluid">
+    <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
+        <div class="col-md-10 col-sm-11">
+            <label class="cargando-caratula">Caratula</label>
+        </div>
+        <div class="col-md-2 col-sm-1 align-self-center" style="display: flex; flex-direction: row-reverse;">
+            <button (click)='openModalEditarCrearCaratula(editarCrearCaratula)' class="btn btn-success">Nueva Caratula</button>
+        </div>
+    </div>
+    <div class="row m-lg-4">
+        <div class="col-md-12">
+            <app-caratula-afip></app-caratula-afip>
+        </div>
+    </div>
+</div>
+
+<ng-template #editarCrearCaratula let-modal>
+    <app-modal-crear-caratula></app-modal-crear-caratula>
+</ng-template>

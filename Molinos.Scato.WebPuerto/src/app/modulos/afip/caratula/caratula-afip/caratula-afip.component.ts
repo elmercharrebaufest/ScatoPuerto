@@ -1,3 +1,5 @@
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { Caratula } from '@ScatoModels/afip/caratula';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -17,6 +19,9 @@ export class CaratulaAfipComponent implements OnInit {
   private listaPaginas: any;
   caratulaId:number;
   caratulaImo:string;
+
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(private modalService: NgbModal) { }
 
@@ -56,6 +61,14 @@ export class CaratulaAfipComponent implements OnInit {
   
       })
       .catch((res) => { console.log(res) }); 
+  }
+
+  tienePermisoModificarCaratula() {
+    return this.user.permisos.find(p => p === this.permisosScato.Caratula_Editar);
+  }
+
+  tienePermisoEliminarCaratula() {
+    return this.user.permisos.find(p => p === this.permisosScato.Caratula_Eliminar);
   }
 
 }

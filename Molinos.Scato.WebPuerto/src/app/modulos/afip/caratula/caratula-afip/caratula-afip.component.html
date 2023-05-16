@@ -29,7 +29,7 @@
                     <div class='icon-editar cursor'></div>
                 </td>
                 <td class="lista-caratula-row-item">
-                    <div class='icon-eliminar cursor'></div>
+                    <img src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
                 <td class="lista-caratula-row-item">{{historial.estadoCaratula}}</td>
             </tr>
@@ -37,8 +37,8 @@
             </div>
         </tbody>
     </table>
-
- <!-- <nav aria-label="Page navigation example" class="centrado"
+<!-- 
+  <nav aria-label="Page navigation example" class="centrado"
         *ngIf="getListaHistorialCaratula()?.length > 0">
         <ul class="pagination justify-content-center paginado-buque-fondo">
             <li [ngClass]="{'page-item disabled': getPaginaActual() == 1 }">
@@ -55,7 +55,7 @@
                 </a>
             </li>
         </ul>
-    </nav> -->
+    </nav>  -->
     <!-- <div *ngIf="esNoExisteRegistros && !esResumenOperatoria">
         No se encontraron registros para los filtros ingresados.
     </div>  -->

@@ -1,0 +1,43 @@
+
+
+    
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{titleCode}}</h5>
+          <button (click)="closeModalEditarCrearCode()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form [formGroup]="crearEditarCodeForm">
+            <div class="modal-body">
+                <!-- <div *ngIf="!puedeCrearBuque">
+                    <div class="alert alert-danger" role="alert">
+                    {{mensaje}}
+                    </div>
+                </div> -->
+                <div class="row margen font-weight-bold">
+                    <div class="col">
+                        User Details
+                    </div>
+                </div>
+                <div class="row margen ">
+                    <div class="col-md-12 pt-4 col-sm-12">
+                        <label class="">Id de Caratula</label>
+                        <input type="text" class="form-control" placeholder="Ingrese id de Caratula" formControlName="idCaratula"  [ngClass]="{'input-error': submitted && f.nombreImo.invalid}" required/>
+                    </div>
+                    <div class="col-md-12 col-sm-12 pt-4">
+                        <label class="">Id de Viaje</label>
+                        <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="idViaje" [ngClass]="{'input-error': submitted && f.nombreBuque.invalid}" required/>
+                    </div>
+                    <div class="col-md-12 col-sm-12 pt-4">
+                        <label class="">COEM</label>
+                        <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="coemCode" />
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onCrearCode()">Guardar</button>
+          <button type="button" class="btn btn-danger">Cancelar</button>
+        </div>
+      </div>

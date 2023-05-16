@@ -1,0 +1,20 @@
+
+<div class="container-fluid">
+    <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
+        <div class="col-md-10 col-sm-11">
+            <label class="cargando-caratula">Comunicación de Embarque Previa (COEM)</label>
+        </div>
+        <div class="col-md-2 col-sm-1 align-self-center" style="display: flex; flex-direction: row-reverse;">
+            <button  class="btn btn-success" (click)="openModalCrearCaratula(crearCoem)">Nuevo COEM</button>
+        </div>
+    </div>
+    <div class="row m-lg-4">
+        <div class="col-md-12">
+            <app-coem-afip></app-coem-afip>
+        </div>
+    </div>
+</div>
+
+<ng-template #crearCoem let-modal>
+    <app-modal-crear-coem></app-modal-crear-coem>
+</ng-template>

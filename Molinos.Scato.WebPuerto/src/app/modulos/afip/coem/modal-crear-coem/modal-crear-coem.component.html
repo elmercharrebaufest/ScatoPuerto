@@ -1,0 +1,54 @@
+
+
+    
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{titleCoem}}</h5>
+          <button (click)="closeModalEditarCrearCoem()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+            <div class="modal-body">
+              <form [formGroup]="crearEditarCodeForm">
+                <div class="row margen ">
+                    <div class="form-group col-md-4">
+                        <label class="font-weight-bold">Id Carátula Afip</label>
+                        <select formControlName="idCaratula" class="custom-select">
+                          <option *ngFor="let p of idsCaratula" [ngValue]="p">{{ p }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;" class="table-responsive">
+                  <table class='table table-bordered lista-coem-table'>
+                    <thead class="lista-coem-header">
+                        <th>Id</th>
+                        <th>Código de Embalaje</th>
+                        <th>Cant. de Bultos</th>
+                        <th>Peso en kilos de la mercadería</th>
+                        <th>Identificador de la declaración</th>
+                        <th></th>
+                    </thead>
+                    <tbody formArrayName="mercaderiasSueltas">
+                      <tr class="lista-coem-row" *ngFor="let exportador of mercaderiasSueltasFormArray.controls; let i = index;last as isLast" [formGroupName]="i">
+                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="idCoem" placeholder=""></td>
+                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="codEmbalaje" placeholder=""></td>
+                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="cantBultos" placeholder=""></td>
+                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="pesoKilosMercaderia" placeholder=""></td>
+                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="idDeclaracion" placeholder=""></td>
+                          <td class="lista-coem-row-item">
+                            <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer"
+                                  (click)="eliminarNuevoCoem(i)"    alt="Eliminar">
+                            <button *ngIf="isLast" type="button" class="btn btn-dark bt-circle" (click)="agregarNuevoCoem()">+</button>
+                          </td>
+                      </tr>
+                  </tbody>
+                  </table>
+                </div>
+              </form> 
+            
+            </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onCrearCoem()">Guardar</button>
+          <button type="button" class="btn btn-danger">Cancelar</button>
+        </div>
+      </div>

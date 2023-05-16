@@ -13,10 +13,6 @@ export class AfipComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  openModalEditarCrearCaratula(modal: any) {
-    // this.errorMessage = false;
-    
-    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
-  }
+
 
 }

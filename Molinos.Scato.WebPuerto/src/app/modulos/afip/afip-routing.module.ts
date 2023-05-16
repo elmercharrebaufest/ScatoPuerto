@@ -1,11 +1,22 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AfipComponent } from './afip.component';
+import { CaratulaComponent } from './caratula/caratula.component';
+import { CoemComponent } from './coem/coem.component';
+import { CodeComponent } from './code/code.component';
 
 const routes: Routes = [
   {
-    path: '',
-    component: AfipComponent
+    path: 'caratula',
+    component: CaratulaComponent
+  },
+  {
+    path: 'coem',
+    component: CoemComponent
+  },
+  {
+    path: 'code',
+    component: CodeComponent
   },
 ];
 

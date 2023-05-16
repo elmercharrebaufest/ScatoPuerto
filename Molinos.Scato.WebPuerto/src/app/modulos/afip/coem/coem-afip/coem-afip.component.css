@@ -1,0 +1,72 @@
+.lista-coem-table {
+    border: 0;
+    border-radius: 4px 4px 0px 0px;
+}
+.lista-coem-header {
+    /* position: sticky; */
+    top:0;
+    z-index: 10;
+    background: #3376A1 0% 0% no-repeat padding-box;
+    color: #ffffff;
+    font-family: roboto;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 4px 4px 0px 0px;
+    opacity: 1;
+    height: 59px;
+    border: 0px;
+} 
+
+.lista-coem-row {
+    height: 55px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 11px #00000029;
+    border-radius: 4px;
+    text-align: left;
+    font: normal normal normal 16px/24px Roboto;
+    letter-spacing: 0px;
+    color: #1A1A1A;
+    opacity: 1;
+    
+}
+.celda-nombre-coem {
+    font-weight: bold;
+    cursor: pointer;
+    color: #1A1A1A;
+    opacity: 1;
+}
+.celda-nombre-coem-detalle {
+    color: #1A1A1A;
+    opacity: 1;
+}
+.lista-coem-row-item {
+    border-bottom: 0px;
+    border-top: 0px;
+}   
+.lista-coem-espacio {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.ritmo-carga-normal{
+    margin: 0;
+    padding: 0;
+    color: #75C77B;
+}
+
+.icon-editar{
+    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
+   mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
+   -webkit-mask: url('assets/iconoEditar.svg') no-repeat center;
+   mask-image: url('assets/iconoEditar.svg') no-repeat center;
+   width: 27px;
+   height: 27px;  
+   background-color: rgb(153, 153, 153);
+}
+
+.icon-eliminar{
+   color: #f57875;
+   font-size: 21px;
+   margin-top: 4px;
+   height: 30px !important
+}

@@ -10,6 +10,11 @@ import { CoemAfipComponent } from './coem/coem-afip/coem-afip.component';
 import { CodeAfipComponent } from './code/code-afip/code-afip.component';
 import { CaratulaAfipComponent } from './caratula/caratula-afip/caratula-afip.component';
 import { ModalCrearCaratulaComponent } from './caratula/modal-crear-caratula/modal-crear-caratula.component';
+import { CaratulaComponent } from './caratula/caratula.component';
+import { CoemComponent } from './coem/coem.component';
+import { CodeComponent } from './code/code.component';
+import { ModalCrearCoemComponent } from './coem/modal-crear-coem/modal-crear-coem.component';
+import { ModalCrearCodeComponent } from './code/modal-crear-code/modal-crear-code.component';
 
 
 
@@ -17,7 +22,12 @@ import { ModalCrearCaratulaComponent } from './caratula/modal-crear-caratula/mod
   declarations: [
     AfipComponent,
     CoemAfipComponent,
+    CoemComponent,
+    ModalCrearCoemComponent,
+    CodeComponent,
+    ModalCrearCodeComponent,
     CodeAfipComponent,
+    CaratulaComponent,
     CaratulaAfipComponent,
     ModalCrearCaratulaComponent
   ],

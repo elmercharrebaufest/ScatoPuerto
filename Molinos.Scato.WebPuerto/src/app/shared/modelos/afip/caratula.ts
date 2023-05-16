@@ -1,5 +1,5 @@
 export class Caratula {  
-    idCaratula: string;
+    idCaratula?: string;
     buqueCaratula: string;
     imoCaratula: string;
     puertoDestinoCaratula: string;

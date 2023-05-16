@@ -23,14 +23,14 @@ import { NgxPermissionsModule, NgxPermissionsService } from 'ngx-permissions';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 import { ToastrModule } from 'ngx-toastr';
+import { ModalCrearCodeComponent } from './modulos/afip/code/modal-crear-code/modal-crear-code.component';
 
 
 
 
 @NgModule({
   declarations: [
-    AppComponent
-  ],
+    AppComponent  ],
   imports: [
     CommonModule,
     BrowserModule,
