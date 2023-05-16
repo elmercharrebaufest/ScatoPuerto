@@ -10,6 +10,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public string IdentificadorCaratula { get; set; }
+        public string IdentificadorBuque { get; set; }
         public string CodigoAduana { get; set; }
         public string CodigoLugarOperativo { get; set; }
         public DateTime FechaArribo { get; set; }
