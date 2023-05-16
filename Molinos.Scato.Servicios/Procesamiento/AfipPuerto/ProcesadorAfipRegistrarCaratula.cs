@@ -30,6 +30,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var caratulaDb = new AfipCaratula
                     {
                         IdentificadorCaratula = guid.Substring(guid.Length - 16),
+                        IdentificadorBuque = caratula.IdentificadorBuque,
                         CodigoAduana = caratula.CodigoAduana,
                         CodigoLugarOperativo = caratula.CodigoLugarOperativo,
                         FechaArribo = caratula.FechaArribo,
@@ -51,6 +52,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("No existe una carátula con el id especificado");
                     }
                     Repositorio.RemoverTodos(caratulaDb.Itinerario);
+                    caratulaDb.IdentificadorBuque = caratula.IdentificadorBuque;
                     caratulaDb.CodigoAduana = caratula.CodigoAduana;
                     caratulaDb.CodigoLugarOperativo = caratula.CodigoLugarOperativo;
                     caratulaDb.FechaArribo = caratula.FechaArribo;
