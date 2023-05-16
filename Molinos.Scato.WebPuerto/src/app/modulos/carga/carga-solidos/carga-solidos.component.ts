@@ -47,7 +47,7 @@ export class CargaSolidosComponent implements OnInit {
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(NIRComponent) nirComponent: NIRComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
-  
+
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
   celdasManoDeEmbarque: CeldaManoDeEmbarque[];
@@ -62,9 +62,9 @@ export class CargaSolidosComponent implements OnInit {
   terminaImprimir: boolean = false;
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
-  estadosBuque = [{id: 1, descripcion: 'PreOperativo'}, 
-                  {id: 2, descripcion: 'Cargando'}, 
-                  {id: 3, descripcion: 'ControlCalidad'}, 
+  estadosBuque = [{id: 1, descripcion: 'PreOperativo'},
+                  {id: 2, descripcion: 'Cargando'},
+                  {id: 3, descripcion: 'ControlCalidad'},
                   {id: 4, descripcion: 'PostOperativo'}];
 
   constructor(
@@ -96,7 +96,7 @@ export class CargaSolidosComponent implements OnInit {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
-        let estado = res.estadoBuque.descripcion.trim();
+        let estado = res.estadoBuque?.descripcion.trim();
         this.mostrarTableristaOperando = (estado != "PreOperativo")
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
@@ -142,7 +142,7 @@ export class CargaSolidosComponent implements OnInit {
       .subscribe(res => {
 
         console.log('obtenerModuloDeCarga: ', res);
-        
+
 
         this.enviado = res.enviado;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
@@ -170,7 +170,7 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   imprimir(imprimir: boolean = false, finalizado?: boolean){
-    
+
     this.ocultarBotonesImpresion();
 
     if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
@@ -204,7 +204,7 @@ export class CargaSolidosComponent implements OnInit {
     if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => {        
+      reader.onload = () => {
         this.adjunto = reader.result;
         this.enviarMail();
       }
@@ -322,7 +322,7 @@ export class CargaSolidosComponent implements OnInit {
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }
-  
+
   obtenerInicioCarga(inicioCarga){
     this.inicioCarga = inicioCarga;
   }

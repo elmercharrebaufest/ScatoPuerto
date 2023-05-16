@@ -40,39 +40,39 @@ export class IniciarSesionComponent implements OnInit {
     )
   }
 
-  navigate(permisos){
-    let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
-    switch(primerPermiso){
-        case 'LineUp_Ver': {
-            this.router.navigate(['/lineup']);
-            break;
-        };
-        case 'Carga_Ver': {
-            this.router.navigate(['/carga']);
-            break;
-        }
-        case 'Recibidores_Ver': {
-            this.router.navigate(['/calidad']);
-            break;
-        }
-        case 'Geolocalizacion_Ver': {
-            this.router.navigate(['/geolocalizacion']);
-            break;
-        }
-        case 'Buque_Ver': {
-            this.router.navigate(['/buques']);
-            break;
-        }
+  navigate(permisos) {
+    let primerPermiso = permisos.find((p: string) => p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+    switch (primerPermiso) {
+      case 'LineUp_Ver': {
+        this.router.navigate(['/lineup']);
+        break;
+      };
+      case 'Carga_Ver': {
+        this.router.navigate(['/carga']);
+        break;
+      }
+      case 'Recibidores_Ver': {
+        this.router.navigate(['/calidad']);
+        break;
+      }
+      case 'Geolocalizacion_Ver': {
+        this.router.navigate(['/geolocalizacion']);
+        break;
+      }
+      case 'Buque_Ver': {
+        this.router.navigate(['/buques']);
+        break;
+      }
 
-        case 'Vapor_Visualizar': {
-          this.router.navigate(['/vapor']);
-          break;
+      case 'Vapor_Visualizar': {
+        this.router.navigate(['/vapor']);
+        break;
       }
 
       case 'Comex_Nominacion_Ver': {
         this.router.navigate(['/programa']);
         break;
-    }
+      }
     }
   }
 

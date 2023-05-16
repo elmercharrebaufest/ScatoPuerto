@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRegistrarCaratula.cs" />
     <Compile Include="Comandos\AutomatizacionEtapas.cs" />
     <Compile Include="Comandos\CambiarNotificacionAplicacionComando.cs" />
     <Compile Include="Comandos\CambiarPinchazosComando.cs" />
@@ -687,6 +688,8 @@
     <Compile Include="Dto\ADPuertoPermisosDto.cs" />
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCaratulaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCaratulaItinerarioDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
@@ -982,6 +985,8 @@
     <Compile Include="Entidades\ADPuertoPermisos.cs" />
     <Compile Include="Entidades\ADPuertoRoles.cs" />
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCaratula.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCaratulaItinerario.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
     <Compile Include="Entidades\Auditoria.cs" />
@@ -1711,6 +1716,7 @@
     <None Include="Resources\DescuentosDeCalidadMailEsp.txt" />
     <None Include="Resources\DiferenciaPesoOrigenMailEsp.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
