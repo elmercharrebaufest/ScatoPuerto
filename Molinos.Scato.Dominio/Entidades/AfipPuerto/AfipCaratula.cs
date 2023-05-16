@@ -9,6 +9,7 @@ namespace Molinos.Scato.Dominio.Entidades
         [Key]
         public virtual int Id { get; set; }
         public virtual string IdentificadorCaratula { get; set; }
+        public virtual string IdentificadorBuque { get; set; }
         public virtual string CodigoAduana { get; set; }
         public virtual string CodigoLugarOperativo { get; set; }
         public virtual DateTime FechaArribo { get; set; }
