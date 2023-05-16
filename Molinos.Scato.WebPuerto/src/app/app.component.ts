@@ -17,8 +17,8 @@ export class AppComponent {
     private primeConfig: PrimeNGConfig,
     private auth: AutenticadorService,
     private router: Router
-    ) { 
-      this.auth.autenticarUsuario();
+    ) {
+      //this.auth.autenticarUsuario();
       this.subscription = router.events.subscribe((event) => {
         if (event instanceof NavigationStart) {
           browserRefresh = !router.navigated;

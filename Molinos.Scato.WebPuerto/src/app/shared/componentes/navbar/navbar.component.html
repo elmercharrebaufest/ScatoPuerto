@@ -15,7 +15,8 @@
     </a>
   </div>
   <div class="col-lg-2 col-md-3 col-sm-6 d-none d-md-block">
-    <label class="form-control mx-0">Usuario: {{session.getUser().username}}</label>
+    <!-- <label class="form-control mx-0">Usuario: {{session.getUser().username}}</label> -->
+    <label class="form-control mx-0">{{session.getUser().username.split("@")[0]}}</label>
   </div>
   <div class='center-imgs'>
     <div class="notification-number" *ngIf="_cantidadNotificaciones > 0">
