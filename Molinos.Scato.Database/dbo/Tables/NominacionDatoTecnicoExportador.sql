@@ -75,7 +75,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
                     VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Exportador cantidad (' + 
-                    (select @exportadorNuevo + ' ' + d.Cantidad + ' -> ' + i.Cantidad FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', getdate())
+                    (select @exportadorNuevo + ' ' + CAST(d.Cantidad   AS VARCHAR)+ ' -> ' + CAST(i.Cantidad  AS VARCHAR) FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', getdate())
                 END
             END
 
@@ -89,7 +89,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
                     VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Exportador tolerancia (' + 
-                        (SELECT @exportadorNuevo + ' ' + D.Tolerancia + ' -> ' + I.Tolerancia FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
+                        (SELECT @exportadorNuevo + ' ' + CAST(D.Tolerancia   AS VARCHAR) + ' -> ' + CAST(I.Tolerancia AS VARCHAR) FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
                 END
             END
         END
