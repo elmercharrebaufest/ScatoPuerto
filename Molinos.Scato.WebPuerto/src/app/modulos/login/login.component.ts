@@ -1,10 +1,13 @@
+import { unsupported } from '@angular/compiler/src/render3/view/util';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { environment } from 'environments/environment';
 import { MessageService } from 'primeng/api';
 import { Session } from 'protractor';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -27,7 +30,7 @@ export class LoginComponent implements OnInit {
   loginButtonEnable = true;
   captchaOk: any = null;
   mensajeError:string=null;
-
+  production:boolean=environment.production;
 public iniciarSession()
 {
  this.iniciandoSession=true;
@@ -35,7 +38,20 @@ public iniciarSession()
   mensaje.style.setProperty("display","none");
   this.username=(window.document.getElementsByName("email")[0] as HTMLInputElement).value;
   this.pass= (window.document.getElementsByName("Contraseña")[0]as HTMLInputElement).value;
-  this.autenticar();
+
+  if(this.production)
+  {
+    this.autenticar();
+  }
+  else
+  {
+    let permi:string[]=["LAD_MOAAPP_PUERTO_SISTEMA"];
+    let user= {} as Usuario;
+user.username = this.username.split("@")[0].toString();
+    user.autenticado=true;
+    user.permisos=permi;
+    this.obtenerGruposAD(user);
+  }
 
 }
 
@@ -54,22 +70,8 @@ this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
         this.session.clear();
         res.autenticado = true;
 
-        var usuario= this.username.split("@")[0].toString();
-        this.autenticarAd.ObtenerGruposAD(res.permisos, usuario).subscribe(
-          (respuesta: any) => {
-            if(respuesta.permisos.length>0)
-            {
-              res.permisos = respuesta.permisos;
-            this.session.setUser(res);
-            // this.router.navigateByUrl('/lineup');
-            this.navigate(res.permisos);
-            }
-            else
-            {
-              this.iniciandoSession=false;
-              this.mensajeError="No tiene permisos para ingresar";
-            }
-          });
+
+        this.obtenerGruposAD(res);
 
 
       } else {
@@ -86,6 +88,27 @@ this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
   )
 }
 
+obtenerGruposAD(res:Usuario)
+{
+  var usuario= this.username.split("@")[0].toString();
+  this.autenticarAd.ObtenerGruposAD(res.permisos, usuario).subscribe(
+    (respuesta: any) => {
+      if(respuesta.permisos.length>0)
+      {
+        res.permisos = respuesta.permisos;
+      this.session.setUser(res);
+      // this.router.navigateByUrl('/lineup');
+      this.navigate(res.permisos);
+      }
+      else
+      {
+        this.iniciandoSession=false;
+        this.mensajeError="No tiene permisos para ingresar";
+      }
+    });
+
+}
+
 mostrarError()
 {
 var mensaje = document.getElementById("error");
@@ -93,7 +116,7 @@ mensaje.style.removeProperty("display");
 
 }
 navigate(permisos) {
-  let primerPermiso = permisos.find((p: string) => p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+  let primerPermiso = permisos.find((p: string) => p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver' || p=='Comex_Nominacion_Ver' || p=='Vapor_Visualizar');
   if(primerPermiso == undefined)
   {
     this.iniciandoSession=false;
