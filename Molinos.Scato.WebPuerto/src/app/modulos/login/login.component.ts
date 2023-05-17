@@ -47,7 +47,7 @@ public iniciarSession()
   {
     let permi:string[]=["LAD_MOAAPP_PUERTO_SISTEMA"];
     let user= {} as Usuario;
-
+user.username = this.username.split("@")[0].toString();
     user.autenticado=true;
     user.permisos=permi;
     this.obtenerGruposAD(user);
