@@ -1,11 +1,12 @@
 export class Caratula {  
-    idCaratula?: string;
+    identificadorCaratula?: string;
+    identificadorBuque: string;
+    fechaArribo: string;
+    fechaZarpada: string;
+    puertoDestino: string;
+
     buqueCaratula: string;
-    imoCaratula: string;
-    puertoDestinoCaratula: string;
-    fechaArriboCaratula: string;
-    fechaZarpadaCaratula: string;
     fechaRegistroCaratula: string;
     estadoCaratula: string;
-    numeroPaginado:any
+    numeroPaginado:any=false
 }

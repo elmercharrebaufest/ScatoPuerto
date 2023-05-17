@@ -13,6 +13,11 @@ export class CaratulaAfipService {
   constructor(private http: HttpClient) { }
 
   public registrarNuevaCaratula(caratul:Caratula): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}ProgramaEmbarque/ListarMuelleDeCarga`, { 'withCredentials': true });
+    console.log(caratul)
+    return this.http.post<any[]>(`${this.url}Afip/RegistrarCarula`, { 'withCredentials': true });
+  }
+
+  public listarCaratulas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}Afip/ListarCaratulas`, { 'withCredentials': true });
   }
 }

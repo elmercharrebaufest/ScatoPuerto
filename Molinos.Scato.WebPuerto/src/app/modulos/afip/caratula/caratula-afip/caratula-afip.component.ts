@@ -1,6 +1,7 @@
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Caratula } from '@ScatoModels/afip/caratula';
+import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -15,7 +16,6 @@ export class CaratulaAfipComponent implements OnInit {
   private listaHistorialCaratulas: Caratula[]=[];
   public buscarHistorialCaratulas: boolean = false;
   private paginaActual: number = 1;
-  caratula: Caratula=new Caratula();
   private listaPaginas: any;
   caratulaId:number;
   caratulaImo:string;
@@ -23,17 +23,13 @@ export class CaratulaAfipComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
 
-  constructor(private modalService: NgbModal) { }
+  constructor(private modalService: NgbModal, private caratulaService: CaratulaAfipService) {   }
 
   ngOnInit(): void {
-    
-    this.caratula.idCaratula='001'
-    this.caratula.buqueCaratula='Jerry Matedi'
-    this.caratula.imoCaratula='1231231';
-    this.caratula.puertoDestinoCaratula='San Benito'
-    this.caratula.numeroPaginado=1;
-    this.listaHistorialCaratulas.push(this.caratula)
-    console.log(this.listaHistorialCaratulas)
+
+    this.caratulaService.listarCaratulas().subscribe((datos)=>{
+      this.listaHistorialCaratulas=datos
+    })
   }
 
   public getListaHistorialCaratula() {

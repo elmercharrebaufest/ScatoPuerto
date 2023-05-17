@@ -17,14 +17,14 @@
             <th>Estados</th>
         </thead>
         <tbody *ngFor="let historial of getListaHistorialCaratula()">
-            <tr class="lista-caratula-row" *ngIf="historial.numeroPaginado == getPaginaActual()">
-                <td class="lista-caratula-row-item">{{historial.idCaratula}}</td>
-                <td class="lista-caratula-row-item">{{historial.buqueCaratula}}</td>
-                <td class="lista-caratula-row-item">{{historial.imoCaratula}}</td>
-                <td class="lista-caratula-row-item">{{ historial.puertoDestinoCaratula }}</td>
-                <td class="lista-caratula-row-item">{{ historial.fechaArriboCaratula }}</td>
-                <td class="lista-caratula-row-item">{{ historial.fechaZarpadaCaratula }}</td>
-                <td class="lista-caratula-row-item">{{ historial.fechaRegistroCaratula}}</td>
+            <tr class="lista-caratula-row" >
+                <td class="lista-caratula-row-item">{{historial.identificadorCaratula}}</td>
+                <td class="lista-caratula-row-item">{{historial.nombreMedioTransporte}}</td>
+                <td class="lista-caratula-row-item">{{historial.identificadorBuque}}</td>
+                <td class="lista-caratula-row-item">{{ historial.puertoDestino }}</td>
+                <td class="lista-caratula-row-item">{{ historial.fechaArribo | date:'dd/MM/yyyy'}}</td>
+                <td class="lista-caratula-row-item">{{ historial.fechaZarpada | date:'dd/MM/yyyy'}}</td>
+                <td class="lista-caratula-row-item">{{ historial.fechaRegistroCaratula | date:'dd/MM/yyyy'}}</td>
                 <td class="lista-caratula-row-item" (click)="editarCaratula(historial,editCaratula)">
                     <div class='icon-editar cursor'></div>
                 </td>
