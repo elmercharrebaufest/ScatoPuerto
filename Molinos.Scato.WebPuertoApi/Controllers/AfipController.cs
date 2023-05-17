@@ -65,7 +65,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/AnularCaratula")]
-        public HttpResponseMessage AnularCaratula(int id)
+        public HttpResponseMessage AnularCaratula(string id)
         {
             try
             {
