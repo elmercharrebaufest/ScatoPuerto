@@ -11,5 +11,8 @@
     [NombreMedioTransporte] NVARCHAR(100) NOT NULL, 
     [PuertoDestino] NVARCHAR(5) NOT NULL, 
     [NumeroViaje] NVARCHAR(16) NULL, 
-    CONSTRAINT [PK_AfipCaratula] PRIMARY KEY ([Id])
+    [FechaRegistro] DATETIME NOT NULL,
+    [AfipCaratulaEstado_Id] INT NOT NULL
+    CONSTRAINT [PK_AfipCaratula] PRIMARY KEY ([Id]), 
+    CONSTRAINT [FK_dbo.AfipCaratula_dbo.AfipCaratulaEstado_Id] FOREIGN KEY ([AfipCaratulaEstado_Id]) REFERENCES [AfipCaratulaEstado]([Id]),
 )

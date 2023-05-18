@@ -17,6 +17,9 @@ namespace Molinos.Scato.Servicios
         bool RegistrarCaratula(AfipCaratulaDto caratula);
 
         [OperationContract]
-        void AnularCaratula(int id);
+        IList<AfipCaratulaEstadoDto> ListarEstadosCaratula();
+
+        [OperationContract]
+        bool CambiarEstadoCaratula(int id, int idEstado);
     }
 }

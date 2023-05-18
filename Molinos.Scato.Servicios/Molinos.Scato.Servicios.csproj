@@ -155,6 +155,7 @@
   <ItemGroup>
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaEstadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaItinerarioMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoGruposAdMappingProfile.cs" />

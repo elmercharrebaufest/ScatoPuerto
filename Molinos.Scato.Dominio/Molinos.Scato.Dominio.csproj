@@ -689,6 +689,7 @@
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCaratulaEstadoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaItinerarioDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\AuditoriaDto.cs" />
@@ -986,6 +987,7 @@
     <Compile Include="Entidades\ADPuertoRoles.cs" />
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratula.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCaratulaEstado.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratulaItinerario.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />

@@ -847,4 +847,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="AfipCaratula_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="572ed7b5-fcc1-42f8-876b-57a32cfc5994" ChangeDateTime="05/17/2023 13:14:10">
+    <Property Name="ElementName" Value="[dbo].[AfipCoem].[IdentificadorCaratula]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdentificadorCOEM" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="deb40f9d-efdb-4728-8dfb-8db2834414cc" ChangeDateTime="05/17/2023 13:36:17">
+    <Property Name="ElementName" Value="[dbo].[AfipCoemContenedorConCarga].[IdentificadorCoem]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoemContenedorConCarga]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdentificadorContenedor" />
+  </Operation>
 </Operations>
