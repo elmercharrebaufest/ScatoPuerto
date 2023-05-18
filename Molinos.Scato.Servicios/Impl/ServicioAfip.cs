@@ -69,6 +69,26 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
-        public void AnularCaratula(int id) { }
+        public IList<AfipCaratulaEstadoDto> ListarEstadosCaratula()
+        {
+            return Listar<AfipCaratulaEstado, AfipCaratulaEstadoDto>();
+        }
+
+        public bool CambiarEstadoCaratula(int id, int idEstado)
+        {
+            try
+            {
+                var caratula = this.repositorio.Obtener<AfipCaratula>(id);
+                var estadoDb = this.repositorio.Obtener<AfipCaratulaEstado>(idEstado);
+                caratula.AfipCaratulaEstado = estadoDb;
+                var res = this.repositorio.GuardarCambios();
+                return true;
+            }
+            catch (Exception e)
+            {
+                this.log.Error("Error al cambiar estado caratula {0}", e.StackTrace);
+                return false;
+            }
+        }
     }
 }

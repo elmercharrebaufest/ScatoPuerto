@@ -63,13 +63,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/afip/AnularCaratula")]
-        public HttpResponseMessage AnularCaratula(string id)
+        [HttpGet]
+        [Route("api/afip/ListarEstadosCaratula")]
+        public HttpResponseMessage ListarEstadosCaratula()
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var resultado = servicioAfip.ListarEstadosCaratula();
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/afip/CambiarEstadoCaratula")]
+        public HttpResponseMessage CambiarEstadoCaratula(int id, int idEstado)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.CambiarEstadoCaratula(id, idEstado));
             }
             catch (Exception e)
             {

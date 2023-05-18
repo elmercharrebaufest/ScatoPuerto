@@ -24,8 +24,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var caratula = comando.Dto;
-                if (String.IsNullOrEmpty(caratula.IdentificadorCaratula)) // Registro
+                if (caratula.Id == 0) // Registro
                 {
+                    var estado = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Aceptado"));
                     var guid = Guid.NewGuid().ToString("N");
                     var caratulaDb = new AfipCaratula
                     {
@@ -38,7 +39,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         NombreMedioTransporte = caratula.NombreMedioTransporte,
                         NumeroViaje = caratula.NumeroViaje,
                         PuertoDestino = caratula.PuertoDestino,
-                        Via = caratula.Via
+                        Via = caratula.Via,
+                        FechaRegistro = DateTime.Now,
+                        AfipCaratulaEstado = estado
                     };
                     var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = x.Puerto }).ToList();
                     caratulaDb.Itinerario = itinerario;
@@ -46,12 +49,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
                 else // Rectificación
                 {
+                    var itinerariosDb = Repositorio.Listar<AfipCaratulaItinerario>(x => x.AfipCaratula.Id == caratula.Id);
+                    foreach (var itinerario in itinerariosDb) Repositorio.Remover(itinerario);
                     var caratulaDb = Repositorio.Obtener<AfipCaratula>(caratula.Id);
                     if (caratula == null)
                     {
                         throw new Exception("No existe una carátula con el id especificado");
                     }
-                    Repositorio.RemoverTodos(caratulaDb.Itinerario);
+                    var estado = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Rectificado"));
                     caratulaDb.IdentificadorBuque = caratula.IdentificadorBuque;
                     caratulaDb.CodigoAduana = caratula.CodigoAduana;
                     caratulaDb.CodigoLugarOperativo = caratula.CodigoLugarOperativo;
@@ -61,8 +66,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     caratulaDb.NumeroViaje = caratula.NumeroViaje;
                     caratulaDb.PuertoDestino = caratula.PuertoDestino;
                     caratulaDb.Via = caratula.Via;
-                    var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = x.Puerto }).ToList();
-                    caratulaDb.Itinerario = itinerario;
+                    caratulaDb.AfipCaratulaEstado = estado;
+                    foreach(var itinerario in caratula.Itinerario)
+                    {
+                        var itinerarioDb = new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = itinerario.Puerto };
+                        caratulaDb.Itinerario.Add(itinerarioDb);
+                    }
                 }
                 Repositorio.GuardarCambios();
             }

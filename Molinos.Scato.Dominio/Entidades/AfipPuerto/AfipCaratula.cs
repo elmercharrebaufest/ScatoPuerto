@@ -19,5 +19,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string PuertoDestino { get; set; }
         public virtual string NumeroViaje { get; set; }
         public virtual ICollection<AfipCaratulaItinerario> Itinerario { get; set; }
+        public virtual DateTime FechaRegistro { get; set; }
+        public virtual AfipCaratulaEstado AfipCaratulaEstado { get; set; }
     }
 }
