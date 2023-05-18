@@ -36,21 +36,31 @@ export class ModalCrearCaratulaComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleCaratula=this.title
-    // this.initFormCrearEditarCaratula();
+    if(!this.title.includes('Nueva')){
+      this.caratulaAfipService.obtenerCaratulaId(this.id).subscribe((datos)=>{
+        this.crearEditarCaratulaForm.controls['fechaArribo'].setValue(datos.fechaArribo);
+        this.crearEditarCaratulaForm.controls['fechaZarpada'].setValue(datos.fechaZarpada);
+        this.crearEditarCaratulaForm.controls['identificadorBuque'].setValue(datos.identificadorBuque);
+        this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].setValue(datos.nombreMedioTransporte);
+        this.crearEditarCaratulaForm.controls['puertoDestino'].setValue(datos.puertoDestino);
+        this.crearEditarCaratulaForm.controls['codigoAduana'].setValue(datos.codigoAduana);
+        this.crearEditarCaratulaForm.controls['codigoLugarOperativo'].setValue(datos.codigoLugarOperativo);
+        this.crearEditarCaratulaForm.controls['via'].setValue(datos.via);
+      })
+    }
   }
 
   private initFormCrearEditarCaratula() {
     this.crearEditarCaratulaForm = null;
     this.crearEditarCaratulaForm = this.formBuilder.group({
-      imoCaratula: ['', Validators.required],
-      buqueCaratula: ['', Validators.required],
-      puertoDestinoCaratula: [],
+      identificadorBuque: ['', Validators.required],
+      nombreMedioTransporte: ['', Validators.required],
+      puertoDestino: [''],
       codigoAduana: ['', Validators.required],
       codigoLugarOperativo: ['', Validators.required],
-      nombreMedioTransporte: ['', Validators.required],
-      codigoVia: ['', Validators.required,new FormControl('', Validators.minLength(5))],
-      fechaArriboCaratula: ['', Validators.required],
-      fechaZarpadaCaratula: ['', Validators.required]
+      via: ['', Validators.required,new FormControl('', Validators.minLength(1))],
+      fechaArribo: ['', Validators.required],
+      fechaZarpada: ['', Validators.required]
     })
   }
 
@@ -61,16 +71,16 @@ export class ModalCrearCaratulaComponent implements OnInit {
   }
 
   public onCrearCaratula() {
+    console.log(this.crearEditarCaratulaForm.value)
     this.submitted = true
-    let buque = this.crearEditarCaratulaForm.getRawValue();
-    if (this.crearEditarCaratulaForm.controls['imoCaratula'].invalid ||
-    this.crearEditarCaratulaForm.controls['buqueCaratula'].invalid ||
+    // let buque = this.crearEditarCaratulaForm.getRawValue();
+    if (this.crearEditarCaratulaForm.controls['identificadorBuque'].invalid ||
+    this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].invalid ||
     this.crearEditarCaratulaForm.controls['codigoAduana'].invalid ||
     this.crearEditarCaratulaForm.controls['codigoLugarOperativo'].invalid ||
-    this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].invalid ||
-    this.crearEditarCaratulaForm.controls['codigoVia'].invalid ||
-    this.crearEditarCaratulaForm.controls['fechaArriboCaratula'].invalid ||
-    this.crearEditarCaratulaForm.controls['fechaZarpadaCaratula'].invalid ) {
+    this.crearEditarCaratulaForm.controls['via'].invalid ||
+    this.crearEditarCaratulaForm.controls['fechaArribo'].invalid ||
+    this.crearEditarCaratulaForm.controls['fechaZarpada'].invalid ) {
     this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }else{
       this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de crear una nueva Caratula?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)

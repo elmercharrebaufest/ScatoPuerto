@@ -27,9 +27,7 @@ export class CaratulaAfipComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.caratulaService.listarCaratulas().subscribe((datos)=>{
-      this.listaHistorialCaratulas=datos
-    })
+    this.listarCaratulas();
   }
 
   public getListaHistorialCaratula() {
@@ -48,9 +46,15 @@ export class CaratulaAfipComponent implements OnInit {
     return this.listaPaginas;
   }
 
+  listarCaratulas(){
+    this.caratulaService.listarCaratulas().subscribe((datos)=>{
+      this.listaHistorialCaratulas=datos
+    })
+  }
+
   public editarCaratula(historial,modal){
-      this.caratulaId = historial.idCaratula;
-      this.caratulaImo = historial.imoCaratula
+      this.caratulaId = historial.id;
+      this.caratulaImo = historial.identificadorBuque
       this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
       .then(() => {     
         console.log('_modalService.open');

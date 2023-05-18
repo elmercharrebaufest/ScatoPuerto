@@ -4,9 +4,13 @@ export class Caratula {
     fechaArribo: string;
     fechaZarpada: string;
     puertoDestino: string;
+    nombreMedioTransporte: string;
 
-    buqueCaratula: string;
     fechaRegistroCaratula: string;
     estadoCaratula: string;
     numeroPaginado:any=false
+
+    codigoAduana?:string;
+    codigoLugarOperativo?:string;
+    via?:string;
 }

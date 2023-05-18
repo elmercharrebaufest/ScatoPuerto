@@ -20,4 +20,8 @@ export class CaratulaAfipService {
   public listarCaratulas(): Observable<any[]> {
     return this.http.get<any[]>(`${this.url}Afip/ListarCaratulas`, { 'withCredentials': true });
   }
+
+  public obtenerCaratulaId(id:number): Observable<Caratula> {
+    return this.http.get<Caratula>(`${this.url}Afip/ObtenerCaratula?id=${id}`, { 'withCredentials': true });
+  }
 }
