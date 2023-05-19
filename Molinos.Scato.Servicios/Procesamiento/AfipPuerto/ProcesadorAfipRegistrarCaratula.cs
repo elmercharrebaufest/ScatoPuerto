@@ -41,13 +41,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         PuertoDestino = caratula.PuertoDestino,
                         Via = caratula.Via,
                         FechaRegistro = DateTime.Now,
-                        AfipCaratulaEstado = estado
+                        AfipCaratulaEstado = estado,
+                        Itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { Puerto = x.Puerto }).ToList()
                     };
-                    foreach (var itinerario in caratula.Itinerario)
-                    {
-                        var itinerarioDb = new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = itinerario.Puerto };
-                        caratulaDb.Itinerario.Add(itinerarioDb);
-                    }
                     Repositorio.Agregar(caratulaDb);
                 }
                 else // Rectificación
