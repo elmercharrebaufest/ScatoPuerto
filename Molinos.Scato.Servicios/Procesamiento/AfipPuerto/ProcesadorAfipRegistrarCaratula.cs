@@ -43,8 +43,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         FechaRegistro = DateTime.Now,
                         AfipCaratulaEstado = estado
                     };
-                    var itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = x.Puerto }).ToList();
-                    caratulaDb.Itinerario = itinerario;
+                    foreach (var itinerario in caratula.Itinerario)
+                    {
+                        var itinerarioDb = new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = itinerario.Puerto };
+                        caratulaDb.Itinerario.Add(itinerarioDb);
+                    }
                     Repositorio.Agregar(caratulaDb);
                 }
                 else // Rectificación
@@ -67,7 +70,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     caratulaDb.PuertoDestino = caratula.PuertoDestino;
                     caratulaDb.Via = caratula.Via;
                     caratulaDb.AfipCaratulaEstado = estado;
-                    foreach(var itinerario in caratula.Itinerario)
+                    foreach (var itinerario in caratula.Itinerario)
                     {
                         var itinerarioDb = new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = itinerario.Puerto };
                         caratulaDb.Itinerario.Add(itinerarioDb);
