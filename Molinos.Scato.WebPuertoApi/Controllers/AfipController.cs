@@ -93,6 +93,95 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         #endregion
+
+        #region COEMs
+
+        [HttpGet]
+        [Route("api/afip/ListarCoems")]
+        public HttpResponseMessage ListarCoems()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoems());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ObtenerCoem")]
+        public HttpResponseMessage ObtenerCoem(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ObtenerCoem(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarCoemsPorCaratula")]
+        public HttpResponseMessage ListarCoemsPorCaratula(int idCaratula)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoemsPorCaratula(idCaratula));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/afip/RegistrarCoem")]
+        public HttpResponseMessage RegistrarCoem(AfipCoemDto coem)
+        {
+            try
+            {
+                servicioAfip.RegistrarCoem(coem);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarEstadosCoem")]
+        public HttpResponseMessage ListarEstadosCoem()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarEstadosCoem());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/afip/CambiarEstadoCoem")]
+        public HttpResponseMessage CambiarEstadoCoem(int idCoem, int idEstado)
+        {
+            try
+            {
+                servicioAfip.CambiarEstadoCoem(idCoem, idEstado);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        #endregion
     }
 
 }

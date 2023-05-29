@@ -861,4 +861,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="IdentificadorContenedor" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="129f5082-2e6d-4391-bc64-edd434995dec" ChangeDateTime="05/23/2023 19:27:00">
+    <Property Name="ElementName" Value="[dbo].[AfipCoemEstado].[Siglas]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoemEstado]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Codigo" />
+  </Operation>
 </Operations>
