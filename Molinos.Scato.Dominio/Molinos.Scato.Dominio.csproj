@@ -82,6 +82,7 @@
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCaratula.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRegistrarCoem.cs" />
     <Compile Include="Comandos\AutomatizacionEtapas.cs" />
     <Compile Include="Comandos\CambiarNotificacionAplicacionComando.cs" />
     <Compile Include="Comandos\CambiarPinchazosComando.cs" />
@@ -691,6 +692,14 @@
     <Compile Include="Dto\AfipPuerto\AfipCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaEstadoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaItinerarioDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaDeclaracionDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaPrecintoDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorVacioDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemEstadoDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaEmbalajeDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
@@ -989,6 +998,14 @@
     <Compile Include="Entidades\AfipPuerto\AfipCaratula.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratulaEstado.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratulaItinerario.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoem.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCargaPrecinto.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCargaDeclaracion.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCarga.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorVacio.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemEstado.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSuelta.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
     <Compile Include="Entidades\Auditoria.cs" />

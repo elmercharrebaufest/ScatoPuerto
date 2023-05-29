@@ -14,6 +14,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
 using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto.AfipPuerto;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -53,6 +54,8 @@ namespace Molinos.Scato.Servicios.Impl
         }
         #endregion
 
+        #region Caratulas
+
         public IList<AfipCaratulaDto> ListarCaratulas()
         {
             return Listar<AfipCaratula, AfipCaratulaDto>();
@@ -90,5 +93,41 @@ namespace Molinos.Scato.Servicios.Impl
                 return false;
             }
         }
+        #endregion
+
+        #region COEMs
+        public IList<AfipCoemDto> ListarCoems()
+        {
+            return Listar<AfipCoem, AfipCoemDto>();
+        }
+
+        public IList<AfipCoemDto> ListarCoemsPorCaratula(int idCaratula)
+        {
+            return Listar<AfipCoem, AfipCoemDto>(x => x.AfipCaratula.Id == idCaratula);
+        }
+
+        public AfipCoemDto ObtenerCoem(int id)
+        {
+            return Obtener<AfipCoem, AfipCoemDto>(id);
+        }
+
+        public void RegistrarCoem(AfipCoemDto coem)
+        {
+            this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coem });
+        }
+
+        public IList<AfipCoemEstadoDto> ListarEstadosCoem()
+        {
+            return Listar<AfipCoemEstado, AfipCoemEstadoDto>();
+        }
+
+        public void CambiarEstadoCoem(int idCoem, int idEstado)
+        {
+            var coem = this.repositorio.Obtener<AfipCoem>(idCoem);
+            var estado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
+            coem.AfipCoemEstado = estado;
+            this.repositorio.GuardarCambios();
+        }
+        #endregion
     }
 }
