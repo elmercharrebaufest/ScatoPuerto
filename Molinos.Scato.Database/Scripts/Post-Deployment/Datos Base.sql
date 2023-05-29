@@ -809,3 +809,7 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 
+
+/* SCRIPTS DATOS AFIP */
+IF NOT EXISTS(SELECT 1 FROM AfipCaratulaEstado) BEGIN INSERT INTO AfipCaratulaEstado (Estado) VALUES ('Aceptado'), ('Rectificado'), ('Enviado (Ya asociado COEM)'), ('Eliminado') END
+IF NOT EXISTS(SELECT 1 FROM AfipCoemEstado) BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'), ('PRE', 'Presentada'), ('AUTO', 'Autorizada'), ('CAN', 'Cancelada'), ('ANU', 'Anulada') END

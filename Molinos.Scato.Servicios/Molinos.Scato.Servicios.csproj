@@ -155,12 +155,20 @@
   <ItemGroup>
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemContenedorConCargaDeclaracionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaEstadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaItinerarioMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoGruposAdMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoPermisosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoRolesMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemContenedorConCargaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemContenedorConCargaPrecintoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemContenedorVacioMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemEstadoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMercaderiaSueltaEmbalajeMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMercaderiaSueltaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ArchivosPuertoMappingProfile.cs" />
@@ -547,6 +555,7 @@
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCaratula.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCoem.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />

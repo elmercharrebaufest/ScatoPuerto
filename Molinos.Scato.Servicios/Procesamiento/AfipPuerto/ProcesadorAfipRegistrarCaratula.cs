@@ -27,6 +27,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (caratula.Id == 0) // Registro
                 {
                     var estado = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Aceptado"));
+                    if (estado == null)
+                    {
+                        throw new Exception("No se encuentra el estado de caratula \"Aceptado\" en la Base de datos");
+                    }
                     var guid = Guid.NewGuid().ToString("N");
                     var caratulaDb = new AfipCaratula
                     {
