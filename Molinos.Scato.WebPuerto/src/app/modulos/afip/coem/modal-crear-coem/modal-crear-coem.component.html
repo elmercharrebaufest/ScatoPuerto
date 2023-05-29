@@ -9,14 +9,17 @@
           </button>
         </div>
             <div class="modal-body">
-              <form [formGroup]="crearEditarCodeForm">
+              <form [formGroup]="crearEditarCoemForm">
                 <div class="row margen ">
-                    <div class="form-group col-md-4">
-                        <label class="font-weight-bold">Id Carátula Afip</label>
-                        <select formControlName="idCaratula" class="custom-select">
-                          <option *ngFor="let p of idsCaratula" [ngValue]="p">{{ p }}</option>
-                        </select>
+                    <div class="form-group col-md-12">
+                      <label class="font-weight-bold">Id Carátula Afip</label>
                     </div>
+                    <div class="form-group col-md-4">
+                    <select class="custom-select" id="inputGroupSelect01" formControlName="identificadorCaratula" [ngClass]="{ 'input-error': submitted && crearEditarCoemForm.get('identificadorCaratula').invalid }" required>
+                      <option selected value="" disabled>Selecciona</option>
+                      <option *ngFor="let p of idsCaratula" [ngValue]="p">{{p}}</option>
+                    </select>
+                  </div>
                 </div>
                 <div style="overflow-x:auto;" class="table-responsive">
                   <table class='table table-bordered lista-coem-table'>
@@ -29,18 +32,18 @@
                         <th></th>
                     </thead>
                     <tbody formArrayName="mercaderiasSueltas">
-                      <tr class="lista-coem-row" *ngFor="let exportador of mercaderiasSueltasFormArray.controls; let i = index;last as isLast" [formGroupName]="i">
-                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="idCoem" placeholder=""></td>
-                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="codEmbalaje" placeholder=""></td>
-                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="cantBultos" placeholder=""></td>
-                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="pesoKilosMercaderia" placeholder=""></td>
-                          <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="idDeclaracion" placeholder=""></td>
-                          <td class="lista-coem-row-item">
-                            <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer"
-                                  (click)="eliminarNuevoCoem(i)"    alt="Eliminar">
-                            <button *ngIf="isLast" type="button" class="btn btn-dark bt-circle" (click)="agregarNuevoCoem()">+</button>
-                          </td>
-                      </tr>
+                      <tr class="lista-coem-row" *ngFor="let mercaderia of mercaderiasSueltasFormArray.controls; let i = index;last as isLast" [formGroupName]="i">
+                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="cuitATA" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cuitATA').invalid}" required></td>
+                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="codigoEmbalaje" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('codigoEmbalaje').invalid}" required></td>
+                        <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="cantidadBultos" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cantidadBultos').invalid}" required></td>
+                        <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="peso" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('peso').invalid}" required></td>
+                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="identificadorDeclaracion" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('identificadorDeclaracion').invalid}" required></td>
+                        <td class="lista-coem-row-item">
+                          <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer"
+                                (click)="eliminarNuevoCoem(i)"    alt="Eliminar">
+                          <button *ngIf="isLast" type="button" class="btn btn-dark bt-circle" (click)="agregarNuevoCoem()">+</button>
+                        </td>
+                    </tr>
                   </tbody>
                   </table>
                 </div>

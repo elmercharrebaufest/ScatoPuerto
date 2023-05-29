@@ -4,7 +4,6 @@
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-coem-table'>
         <thead class="lista-coem-header">
-
             <th>Id COEM</th>
             <th>Caratula</th>
             <th>Mercaderías Sueltas</th>
@@ -13,20 +12,25 @@
             <th>Anular COEM</th>
         </thead>
         <tbody *ngFor="let historial of getListaHistorialCoem()">
-            <tr class="lista-coem-row" *ngIf="historial.numeroPaginado == getPaginaActual()">
+            <tr class="lista-coem-row" >
                 <td class="lista-coem-row-item">{{historial.idCoem}}</td>
                 <td class="lista-coem-row-item">{{historial.caratulaCoem}}</td>
                 <td class="lista-coem-row-item">{{historial.mercaderiasSueltasCoem}}</td>
-                <td class="lista-coem-row-item">{{ historial.estadoCoem }}</td>
+                <td class="lista-coem-row-item">
+                    <div class="btn-group">
+                        <select class="custom-select" id="inputGroupSelect01" (change)="cambiarEstado($event)">
+                            <option selected value="" disabled>Estado</option>
+                            <option *ngFor="let p of listaEstados" [value]="p.id">{{p.estado}}</option>
+                          </select>
+                    </div>
+                </td>
                 <td class="lista-coem-row-item" (click)="editarCoem(historial,editCoem)">
                     <div class='icon-editar cursor'></div>
                 </td>
-                <td class="lista-coem-row-item">
+                <td class="lista-coem-row-item" (click)="eliminarCoem(historial.idCoem)">
                     <img src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
             </tr>
-            <div class="lista-coem-espacio" *ngIf="historial.numeroPaginado == getPaginaActual()">
-            </div>
         </tbody>
     </table>
 <!-- 

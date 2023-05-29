@@ -23,7 +23,7 @@
                 <div class="row margen ">
                     <div class="col-md-4 pt-4 col-sm-12">
                         <label class="">IMO</label>
-                        <input type="text" class="form-control" placeholder="Ingrese IMO" formControlName="identificadorBuque"  [ngClass]="{'input-error': submitted && f.identificadorBuque.invalid}" maxLength="7" required/>
+                        <input type="text" class="form-control" placeholder="Ingrese IMO" formControlName="identificadorBuque"  [ngClass]="{'input-error': submitted && f.identificadorBuque.invalid}" maxLength="7" minlength="7" required/>
                     </div>
                     <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Buque</label>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Puerto</label>
-                        <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="puertoDestino" />
+                        <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="puertoDestino" maxLength="5"/>
                     </div>
                     
                 </div>
@@ -48,27 +48,26 @@
                         <label class="">Nombre del Medio de Transporte</label>
                         <input type="text" class="form-control" placeholder="Ingrese el nombre del medio de transporte" formControlName="nombreMedioTransporte" [ngClass]="{'input-error': submitted && f.nombreMedioTransporte.invalid}" required/>
                     </div> -->
-                    <div class="col-md-4 col-sm-12 pt-4">
+                    <!-- <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Código de Vía</label>
                         <input type="text" class="form-control" maxlength="1" placeholder="Ingrese el código de vía" formControlName="via" [ngClass]="{'input-error': submitted && f.via.invalid}" required/>
-                    </div>
-                </div>
-                <div class="row margen">
-                   
+                    </div> -->
                     <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Fecha de Arribo</label>
                         <input type="datetime-local" [value]="crearEditarCaratulaForm.get('fechaArribo').value | date:'yyyy-MM-ddTHH:mm:ss'" class="form-control" placeholder="Ingrese la fecha de arribo" formControlName="fechaArribo" [ngClass]="{'input-error': submitted && f.fechaArribo.invalid}" required/>
                     </div>
+                </div>
+                <div class="row margen">
                     <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Fecha de Zarpado</label>
-                        <input type="datetime-local" [value]="crearEditarCaratulaForm.get('fechaZarpada').value | date:'yyyy-MM-ddTHH:mm:ss'" class="form-control" placeholder="Ingrese la fecha de zarpado" formControlName="fechaZarpada"  [ngClass]="{'input-error': submitted && f.fechaZarpada.invalid}" required/>
+                        <input type="datetime-local" [value]="crearEditarCaratulaForm.get('fechaZarpada').value | date:'yyyy-MM-ddTHH:mm:ss'" class="form-control" placeholder="Ingrese la fecha de zarpado" formControlName="fechaZarpada"  [ngClass]="{'input-error': submitted && f.fechaZarpada.invalid}" [min]="crearEditarCaratulaForm.get('fechaArribo').value" required/>
                     </div>
                 </div>
         
             </div>
         </form>
         <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onCrearCaratula()">Guardar</button>
+          <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onCrearEditarCaratula()">Guardar</button>
           <button type="button" class="btn btn-danger" (click)="closeModalEditarCrearCaratula()">Cancelar</button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 export class NuevasMercaderiasSueltasCoem{
-    idCoem: string;
-    codEmbalaje: string;
-    cantBultos: string;
-    pesoKilosMercaderia: string;
-    idDeclaracion: string;
+    cuitATA: string;
+    codigoEmbalaje: string;
+    cantidadBultos: string;
+    peso: string;
+    identificadorDeclaracion: string;
 }

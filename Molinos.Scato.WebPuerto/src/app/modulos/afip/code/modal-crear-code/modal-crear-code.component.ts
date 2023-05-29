@@ -30,15 +30,14 @@ export class ModalCrearCodeComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleCode=this.title
-    // this.initFormCrearEditarCaratula();
   }
 
   private initFormCrearEditarCode() {
     this.crearEditarCodeForm = null;
     this.crearEditarCodeForm = this.formBuilder.group({
-      idCaratula: ['', Validators.required],
-      idViaje: ['', Validators.required],
-      coemCode: []
+      identificadorCaratula: ['', Validators.required],
+      numeroViaje: ['', Validators.required],
+      identificadorCOEM: ['', Validators.required]
     })
   }
 
@@ -50,14 +49,40 @@ export class ModalCrearCodeComponent implements OnInit {
 
   public onCrearCode() {
     this.submitted = true
-    let buque = this.crearEditarCodeForm.getRawValue();
-    if (this.crearEditarCodeForm.controls['nombreImo'].invalid ||
-    this.crearEditarCodeForm.controls['nombreBuque'].invalid ||
-    this.crearEditarCodeForm.controls['codigoAduana'].invalid ||
-    this.crearEditarCodeForm.controls['codigoLugarOperativo'].invalid ||
-    this.crearEditarCodeForm.controls['nombreMedioTransporte'].invalid) {
+    if (this.crearEditarCodeForm.controls['identificadorCaratula'].invalid ||
+    this.crearEditarCodeForm.controls['numeroViaje'].invalid ||
+    this.crearEditarCodeForm.controls['identificadorCOEM'].invalid ) {
     this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-    return
+    }else{
+      let operacion : boolean = true
+      // let condition : boolean = true
+      this.title.includes('Nueva') ? operacion : operacion= false;
+
+      // if(condition){
+        this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de ${operacion? 'crear un nuevo':'editar el'} Code?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+        .then((confirmed) => {
+          if (confirmed) {
+            //Si llegamos hasta aca es porque tenemos que crear un nuevo Code.
+            // this.caratulaAfipService.registrarOEditarCaratula(this.crearEditarCaratulaForm.value).subscribe((data) => {
+            //   if(data){
+            //     this.editFinish.emit();
+            //     this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${operacion? 'creado una nueva':'editado la'} Caratula con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success)
+            //   }else{
+            //     this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula`, 'Cerrar', '', null, null, Tipoalerta.Error)
+            //   }
+            // },(error) => {
+            //   this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
+            // })
+            // this.modalService.dismissAll();
+          }
+        }).catch(() => {
+          this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear un nuevo':'editar el'} Code`, 'Cerrar', '', null, null, Tipoalerta.Error)
+          this.modalService.dismissAll()
+        });
+      // }else{
+      //   this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear un nuevo':'editar el'} Code, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
+      // }
+      
     }
   }
 

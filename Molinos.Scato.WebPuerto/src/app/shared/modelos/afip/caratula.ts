@@ -1,14 +1,18 @@
-export class Caratula {  
+import { EstadoCaratula } from "./estadoCaratula";
+
+export class Caratula { 
+    id?:number;
     identificadorCaratula?: string;
     identificadorBuque: string;
     fechaArribo: string;
     fechaZarpada: string;
     puertoDestino: string;
     nombreMedioTransporte: string;
+    fechaRegistro: string;
+    afipCaratulaEstado: EstadoCaratula;
 
-    fechaRegistroCaratula: string;
-    estadoCaratula: string;
-    numeroPaginado:any=false
+    numeroPaginado:any=false;
+    itinerario:string[]=[];
 
     codigoAduana?:string;
     codigoLugarOperativo?:string;

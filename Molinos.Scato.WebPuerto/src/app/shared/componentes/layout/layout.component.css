@@ -132,3 +132,17 @@
     width: 27px;
     height: 30px;
 }
+
+@media screen and (max-width: 480px) {
+    /* Estilos para pantallas de hasta 480px de ancho */
+    ::ng-deep .ng-sidebar {
+        width: 60vw;
+    }
+  }
+
+  @media screen and (min-width: 481px) and (max-width: 1024px) {
+    /* Estilos para pantallas entre 481px y 1024px de ancho */
+    ::ng-deep .ng-sidebar {
+        width: 33vw;
+    }
+  }

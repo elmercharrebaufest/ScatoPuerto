@@ -23,15 +23,15 @@
                 <div class="row margen ">
                     <div class="col-md-12 pt-4 col-sm-12">
                         <label class="">Id de Caratula</label>
-                        <input type="text" class="form-control" placeholder="Ingrese id de Caratula" formControlName="idCaratula"  [ngClass]="{'input-error': submitted && f.nombreImo.invalid}" required/>
+                        <input type="text" class="form-control" placeholder="Ingrese id de Caratula" formControlName="identificadorCaratula"  [ngClass]="{'input-error': submitted && f.identificadorCaratula.invalid}" maxlength="16" required/>
                     </div>
                     <div class="col-md-12 col-sm-12 pt-4">
                         <label class="">Id de Viaje</label>
-                        <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="idViaje" [ngClass]="{'input-error': submitted && f.nombreBuque.invalid}" required/>
+                        <input type="text" class="form-control" placeholder="Ingrese Id del viaje" formControlName="numeroViaje" [ngClass]="{'input-error': submitted && f.numeroViaje.invalid}" maxlength="16" required/>
                     </div>
                     <div class="col-md-12 col-sm-12 pt-4">
                         <label class="">COEM</label>
-                        <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="coemCode" />
+                        <input type="text" class="form-control" placeholder="Ingrese el COEM" formControlName="identificadorCOEM" [ngClass]="{'input-error': submitted && f.identificadorCOEM.invalid}" />
                     </div>
                 </div>
             </div>

@@ -12,9 +12,8 @@ export class CaratulaAfipService {
   private url: string = environment.apiUrl;
   constructor(private http: HttpClient) { }
 
-  public registrarNuevaCaratula(caratul:Caratula): Observable<any[]> {
-    console.log(caratul)
-    return this.http.post<any[]>(`${this.url}Afip/RegistrarCarula`, { 'withCredentials': true });
+  public registrarOEditarCaratula(caratula:Caratula): Observable<any[]> {
+    return this.http.post<any[]>(`${this.url}Afip/RegistrarCaratula`, caratula ,{ 'withCredentials': true });
   }
 
   public listarCaratulas(): Observable<any[]> {
@@ -23,5 +22,9 @@ export class CaratulaAfipService {
 
   public obtenerCaratulaId(id:number): Observable<Caratula> {
     return this.http.get<Caratula>(`${this.url}Afip/ObtenerCaratula?id=${id}`, { 'withCredentials': true });
+  }
+
+  public eliminarCaratula(id:number): Observable<any> {
+    return this.http.post<any>(`${this.url}Afip/CambiarEstadoCaratula?id=${id}&idEstado=4`, { 'withCredentials': true });
   }
 }

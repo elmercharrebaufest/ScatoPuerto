@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -16,6 +16,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
 
   @Input() id: number = 0;
   @Input() title: string = "Nueva Caratula";
+  @Output() editFinish = new EventEmitter<void>();
 
   errorMessage: boolean = false;
   submitted = false;
@@ -38,14 +39,16 @@ export class ModalCrearCaratulaComponent implements OnInit {
     this.titleCaratula=this.title
     if(!this.title.includes('Nueva')){
       this.caratulaAfipService.obtenerCaratulaId(this.id).subscribe((datos)=>{
+        this.crearEditarCaratulaForm.controls['id'].setValue(datos.id);
         this.crearEditarCaratulaForm.controls['fechaArribo'].setValue(datos.fechaArribo);
         this.crearEditarCaratulaForm.controls['fechaZarpada'].setValue(datos.fechaZarpada);
-        this.crearEditarCaratulaForm.controls['identificadorBuque'].setValue(datos.identificadorBuque);
-        this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].setValue(datos.nombreMedioTransporte);
+        
         this.crearEditarCaratulaForm.controls['puertoDestino'].setValue(datos.puertoDestino);
         this.crearEditarCaratulaForm.controls['codigoAduana'].setValue(datos.codigoAduana);
         this.crearEditarCaratulaForm.controls['codigoLugarOperativo'].setValue(datos.codigoLugarOperativo);
         this.crearEditarCaratulaForm.controls['via'].setValue(datos.via);
+        this.crearEditarCaratulaForm.controls['identificadorBuque'].setValue(datos.identificadorBuque);
+        this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].setValue(datos.nombreMedioTransporte);
       })
     }
   }
@@ -53,15 +56,19 @@ export class ModalCrearCaratulaComponent implements OnInit {
   private initFormCrearEditarCaratula() {
     this.crearEditarCaratulaForm = null;
     this.crearEditarCaratulaForm = this.formBuilder.group({
+      id:[''],
+      itinerario:[[]],
       identificadorBuque: ['', Validators.required],
       nombreMedioTransporte: ['', Validators.required],
-      puertoDestino: [''],
+      puertoDestino: ['SanB'],
       codigoAduana: ['', Validators.required],
       codigoLugarOperativo: ['', Validators.required],
-      via: ['', Validators.required,new FormControl('', Validators.minLength(1))],
+      via: ['8'],
       fechaArribo: ['', Validators.required],
       fechaZarpada: ['', Validators.required]
     })
+
+    this.crearEditarCaratulaForm.get('puertoDestino').disable();
   }
 
   
@@ -70,32 +77,51 @@ export class ModalCrearCaratulaComponent implements OnInit {
     this.modalService.dismissAll()
   }
 
-  public onCrearCaratula() {
-    console.log(this.crearEditarCaratulaForm.value)
+  public onCrearEditarCaratula() {
     this.submitted = true
     // let buque = this.crearEditarCaratulaForm.getRawValue();
-    if (this.crearEditarCaratulaForm.controls['identificadorBuque'].invalid ||
-    this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].invalid ||
-    this.crearEditarCaratulaForm.controls['codigoAduana'].invalid ||
-    this.crearEditarCaratulaForm.controls['codigoLugarOperativo'].invalid ||
-    this.crearEditarCaratulaForm.controls['via'].invalid ||
-    this.crearEditarCaratulaForm.controls['fechaArribo'].invalid ||
-    this.crearEditarCaratulaForm.controls['fechaZarpada'].invalid ) {
-    this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-    }else{
-      this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de crear una nueva Caratula?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
-      .then((confirmed) => {
-        if (confirmed) {
-          //Si llegamos hasta aca es porque tenemos que crear una nueva Caratula.
-          this.caratulaAfipService.registrarNuevaCaratula(this.crearEditarCaratulaForm.value).subscribe(() => {
-            this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha creado una nueva Caratula con éxito', 'Cerrar', '', null, null, Tipoalerta.Success)
+    
+      if (this.crearEditarCaratulaForm.controls['identificadorBuque'].invalid ||
+      this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].invalid ||
+      this.crearEditarCaratulaForm.controls['codigoAduana'].invalid ||
+      this.crearEditarCaratulaForm.controls['codigoLugarOperativo'].invalid ||
+      this.crearEditarCaratulaForm.controls['fechaArribo'].invalid ||
+      this.crearEditarCaratulaForm.controls['fechaZarpada'].invalid ) {
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      }else{
+        let operacion : boolean = true
+        let condition : boolean = true
+        this.title.includes('Nueva') ? operacion : operacion= false;
+        (!operacion && this.crearEditarCaratulaForm.get('id').value) || (operacion && !this.crearEditarCaratulaForm.get('id').value) ? condition = true : condition = false;
+
+        if(condition){
+          this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de ${operacion? 'crear una nueva':'editar la'} Caratula?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+          .then((confirmed) => {
+            if (confirmed) {
+              this.crearEditarCaratulaForm.get('puertoDestino').enable();
+              //Si llegamos hasta aca es porque tenemos que crear una nueva Caratula.
+              this.caratulaAfipService.registrarOEditarCaratula(this.crearEditarCaratulaForm.value).subscribe((data) => {
+                if(data){
+                  this.editFinish.emit();
+                  this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${operacion? 'creado una nueva':'editado la'} Caratula con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success)
+                }else{
+                  this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula`, 'Cerrar', '', null, null, Tipoalerta.Error)
+                }
+              },(error) => {
+                this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
+              })
+              this.modalService.dismissAll();
+            }
+          }).catch(() => {
+            this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula`, 'Cerrar', '', null, null, Tipoalerta.Error)
+            this.modalService.dismissAll()
           });
-          this.modalService.dismissAll();
+        }else{
+          this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
         }
-      }).catch(() => {
-        this.modalService.dismissAll()
-      });
-    }
+        
+      }
+    
   }
 
   get f() { return this.crearEditarCaratulaForm.controls; }
