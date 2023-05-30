@@ -93,6 +93,13 @@ namespace Molinos.Scato.Servicios.Impl
                 return false;
             }
         }
+
+        public IList<AfipCaratulaDto> ComboCaratulas()
+        {
+            var caratulas = repositorio.Listar(x => new { Id = x.Id, Identificador = x.IdentificadorCaratula }, (AfipCaratula x) => true);
+            var res = caratulas.Select(x => new AfipCaratulaDto { Id = x.Id, IdentificadorCaratula = x.Identificador }).ToList();
+            return res;
+        }
         #endregion
 
         #region COEMs
