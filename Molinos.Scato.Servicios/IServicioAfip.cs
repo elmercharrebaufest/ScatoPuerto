@@ -24,6 +24,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         bool CambiarEstadoCaratula(int id, int idEstado);
+
+        [OperationContract]
+        IList<AfipCaratulaDto> ComboCaratulas();
         #endregion
 
         #region COEMs
