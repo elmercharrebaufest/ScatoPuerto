@@ -67,10 +67,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("No existe la COEM con el id especificado");
                     }
-                    //var estado = Repositorio.Obtener<AfipCoemEstado>(coem.AfipCoemEstado.Id);
-                    //coemDb.AfipCoemEstado = estado;
-                    coemDb.IdentificadorCOEM = coem.IdentificadorCOEM;
-                    coemDb.IdentificadorCaratula = coem.IdentificadorCaratula;
+
                     foreach (var contenedorConCarga in coem.ContenedoresConCarga)
                     {
                         var contenedorConCargaDb = this.Conversor.Convertir<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(contenedorConCarga);
