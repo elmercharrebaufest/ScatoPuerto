@@ -58,7 +58,9 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AfipCaratulaDto> ListarCaratulas()
         {
-            return Listar<AfipCaratula, AfipCaratulaDto>();
+            var caratulas = Listar<AfipCaratula, AfipCaratulaDto>();
+            foreach (var caratula in caratulas) caratula.Itinerario = null;
+            return caratulas;
         }
 
         public AfipCaratulaDto ObtenerCaratula(int id)
@@ -96,8 +98,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AfipCaratulaDto> ComboCaratulas()
         {
-            var caratulas = repositorio.Listar(x => new { Id = x.Id, Identificador = x.IdentificadorCaratula }, (AfipCaratula x) => true);
-            var res = caratulas.Select(x => new AfipCaratulaDto { Id = x.Id, IdentificadorCaratula = x.Identificador }).ToList();
+            var caratulas = repositorio.Listar(x => new { x.Id, x.IdentificadorCaratula }, (AfipCaratula x) => true);
+            var res = caratulas.Select(x => new AfipCaratulaDto { Id = x.Id, IdentificadorCaratula = x.IdentificadorCaratula }).ToList();
             return res;
         }
         #endregion
@@ -110,7 +112,14 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AfipCoemDto> ListarCoemsPorCaratula(int idCaratula)
         {
-            return Listar<AfipCoem, AfipCoemDto>(x => x.AfipCaratula.Id == idCaratula);
+            var caratulas = Listar<AfipCoem, AfipCoemDto>(x => x.AfipCaratula.Id == idCaratula);
+            foreach (var caratula in caratulas)
+            {
+                caratula.MercaderiasSueltas = null;
+                caratula.ContenedoresConCarga = null;
+                caratula.ContenedoresVacios = null;
+            }
+            return caratulas;
         }
 
         public AfipCoemDto ObtenerCoem(int id)
