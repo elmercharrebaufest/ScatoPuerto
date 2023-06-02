@@ -51,7 +51,7 @@
                 </div>
                 <div class="col pt-4 font-weight-bold">
                     <label>IMO</label>
-                    <input type="text" class="form-control maxWidthIMO" placeholder="XXXXXXX" formControlName="imoVapor" maxLength="7"/>
+                    <input type="text" class="form-control maxWidthIMO" placeholder="XXXXXXX" formControlName="imoVapor" maxLength="7" [ngClass]="{'input-error': submitted && f.imoVapor.invalid}" required/>
                 </div>
             </div>
 
