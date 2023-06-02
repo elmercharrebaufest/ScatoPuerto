@@ -67,7 +67,7 @@ export class EditarCrearBuquesComponent implements OnInit {
       eslora: [],
       manga: [],
       puntual: [],
-      imoVapor: [],
+      imoVapor: ['', Validators.required],
       tipoBuquePuerto: [] //este es el arr de tipos de buques
     })
   }

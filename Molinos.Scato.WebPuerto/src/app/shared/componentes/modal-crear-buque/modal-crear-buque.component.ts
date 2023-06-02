@@ -84,7 +84,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       eslora: [],
       manga: [],
       puntual: [],
-      imoVapor: [],
+      imoVapor: ['', Validators.required],
       tipoBuquePuerto: [] //este es el arr de tipos de buques
     })
   }
@@ -213,7 +213,8 @@ export class ModalCrearBuqueComponent implements OnInit {
     let buque = this.crearEditarBuqueForm.getRawValue();
     if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
     this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
-    this.crearEditarBuqueForm.controls['bandera'].invalid) {
+    this.crearEditarBuqueForm.controls['bandera'].invalid ||
+    this.crearEditarBuqueForm.controls['imoVapor'].invalid) {
     this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
     return
   }
@@ -262,7 +263,8 @@ export class ModalCrearBuqueComponent implements OnInit {
 
     if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
     this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
-    this.crearEditarBuqueForm.controls['bandera'].invalid) {
+    this.crearEditarBuqueForm.controls['bandera'].invalid ||
+    this.crearEditarBuqueForm.controls['imoVapor'].invalid) {
     this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
     return
   }
