@@ -16,15 +16,13 @@ export class ModalCrearCaratulaComponent implements OnInit {
 
   @Input() id: number = 0;
   @Input() title: string = "Nueva Caratula";
-  @Output() editFinish = new EventEmitter<void>();
+  @Output() editOCrearFinish = new EventEmitter<void>();
 
   errorMessage: boolean = false;
   submitted = false;
   titleCaratula:string
   crearEditarCaratulaForm: FormGroup;
-
- 
-
+  load : boolean = true;
 
   constructor(
     private modalService: NgbModal,
@@ -51,6 +49,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
         this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].setValue(datos.nombreMedioTransporte);
       })
     }
+    
   }
 
   private initFormCrearEditarCaratula() {
@@ -102,7 +101,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
               //Si llegamos hasta aca es porque tenemos que crear una nueva Caratula.
               this.caratulaAfipService.registrarOEditarCaratula(this.crearEditarCaratulaForm.value).subscribe((data) => {
                 if(data){
-                  this.editFinish.emit();
+                  this.editOCrearFinish.emit();
                   this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${operacion? 'creado una nueva':'editado la'} Caratula con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success)
                 }else{
                   this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${operacion? 'crear una nueva':'editar la'} Caratula`, 'Cerrar', '', null, null, Tipoalerta.Error)

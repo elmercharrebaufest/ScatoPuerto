@@ -1,5 +1,5 @@
 <ship-spinner [message]="'Cargando Historial de carátulas. Por favor, espere...'"
-    *ngIf='buscarHistorialCaratulas'></ship-spinner>
+    *ngIf='cargarCaratulas'></ship-spinner>
 
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-caratula-table'>
@@ -16,7 +16,7 @@
             <th>Anular</th>
             <th>Estados</th>
         </thead>
-        <tbody *ngFor="let historial of tablaPaginada">
+        <tbody *ngFor="let historial of displayedItems">
             <tr class="lista-caratula-row" >
                 <td class="lista-caratula-row-item">{{historial.identificadorCaratula}}</td>
                 <td class="lista-caratula-row-item">{{historial.nombreMedioTransporte}}</td>
@@ -33,30 +33,32 @@
                 </td>
                 <td class="lista-caratula-row-item font-weight-bold" >{{historial.afipCaratulaEstado.estado}}</td>
             </tr>
-            <!-- <div class="lista-caratula-espacio" *ngIf="historial.numeroPaginado == getPaginaActual()"> -->
-            <!-- </div> -->
         </tbody>
     </table>
 </div>
-<nav aria-label="Page navigation example" class="centrado"
-        >
-        <ul class="pagination justify-content-center paginado-buque-fondo">
-            <li (click)="paginaAnterior()" [class.disabled]="currentPage === 1">
-                <a class="page-link"  >
-                 << </a>
-            </li>
-            <li *ngFor="let page of paginas" (click)="irAPagina(page)" [class.active]="page === currentPage">
-                <a class="page-link">{{ page }}</a>
-              </li>
-            <li (click)="paginaSiguiente()" [class.disabled]="currentPage === getTotalPages()">
-                <a class="page-link"  > >>
-                </a>
-            </li>
-        </ul>
-    </nav>  
-    <div *ngIf="esNoExisteRegistros">
-        No se encontraron registros para los filtros ingresados.
-    </div> 
+<div *ngIf="esNoExisteRegistros">
+    No se encontraron registros para los filtros ingresados.
+</div> 
+<!--Paginado -->
+<nav aria-label="Page navigation example" class="centrado" *ngIf="!esNoExisteRegistros">
+    <ul class="pagination justify-content-center paginado-buque-fondo">
+        <li [ngClass]="{'page-item disabled': currentPage === 1}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
+             << </a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
+        <li *ngFor="let page of visiblePages"
+            [ngClass]="{'page-item disabled': page == currentPage}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
+        <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)"> >>
+            </a>
+        </li>
+    </ul>
+</nav> 
+    
 
 <ng-template #editCaratula let-modal>
     <app-modal-crear-caratula (editFinish)="editFinish($event)" [id]="caratulaId" [title]="'Rectificar Caratula Nro '+ caratulaImo"></app-modal-crear-caratula>

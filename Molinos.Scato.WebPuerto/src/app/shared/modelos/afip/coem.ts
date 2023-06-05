@@ -1,10 +1,11 @@
 import { Caratula } from "./caratula";
 import { EstadoCOEM } from "./estadoCoem";
+import { NuevasMercaderiasSueltasCoem } from "./nuevasMercaderiasSueltasCoem";
 
 export class COEM{
-    idCoem:number;
-    caratulaCoem:Caratula;
-    mercaderiasSueltasCoem:string;
-    estadosCoem:EstadoCOEM;
-    numeroPaginado:boolean;
+    id?:number;
+    identificadorCaratula:string;
+    contenedoresConCarga?:Array<any>=[];
+    contenedoresVacios?:Array<any>=[];
+    mercaderiasSueltas: Array<NuevasMercaderiasSueltasCoem>;
 }

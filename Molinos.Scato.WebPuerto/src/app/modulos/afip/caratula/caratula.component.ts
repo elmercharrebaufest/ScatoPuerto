@@ -1,7 +1,8 @@
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CaratulaAfipComponent } from './caratula-afip/caratula-afip.component';
 
 @Component({
   selector: 'app-caratula',
@@ -9,6 +10,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./caratula.component.css']
 })
 export class CaratulaComponent implements OnInit {
+
+  @ViewChild(CaratulaAfipComponent) caratulaAfipComponent: CaratulaAfipComponent;
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -22,6 +25,10 @@ export class CaratulaComponent implements OnInit {
     // this.errorMessage = false;
     
     this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
+  }
+
+  crearFinish(event) {
+    this.caratulaAfipComponent.listarCaratulas();
   }
 
   tienePermisoVisualizarCaratula() {

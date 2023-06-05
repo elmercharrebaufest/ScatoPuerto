@@ -16,10 +16,7 @@ export class CaratulaAfipComponent implements OnInit {
 
   // #region Variables
   private listaHistorialCaratulas: Caratula[]=[];
-  public buscarHistorialCaratulas: boolean = true;
-  private paginaActual: number = 1;
-  private listaPaginas: any;
-  private totalPaginas: number = 0;
+  public cargarCaratulas: boolean = true;
   caratulaId:number;
   caratulaImo:string;
   esNoExisteRegistros:boolean= true;
@@ -27,78 +24,37 @@ export class CaratulaAfipComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
 
-  datosTabla: any[]=[]; // Datos completos de la tabla
-  tablaPaginada: any[]; // Datos paginados de la tabla
-  pageSize: number = 5; // Tamaño de página 
+  // Paginado
   currentPage: number = 1; // Página actual
-  paginas: number[] = [];
+  totalPages: number; // Total de páginas
+  totalItems: number; // Total de elementos
+  itemsPerPage: number = 5; // Elementos por página
+  visiblePages: number[] = []; // Páginas visibles en la paginación
+  showEllipsisStart: boolean = false; // Mostrar puntos suspensivos al inicio
+  showEllipsisEnd: boolean = false; // Mostrar puntos suspensivos al final
+  displayedItems: any[] = []; // Elementos mostrados en la tabla
 
   constructor(private modalService: NgbModal, private confirmationDialogService: ConfirmationDialogService, private caratulaService: CaratulaAfipService) 
-  {  this.listarCaratulas(); }
+  {   }
 
   ngOnInit(): void {
-
-    
-   
+    this.listarCaratulas();
   }
-
-  actualizarTabla() {
-    // Calcular el índice de inicio y fin de los datos paginados
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    console.log(startIndex)
-    console.log(endIndex)
-    // Obtener los datos paginados de la tabla
-    this.tablaPaginada = this.datosTabla.slice(startIndex, endIndex);
-    console.log(this.tablaPaginada)
-  }
-
-  paginaAnterior() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.actualizarTabla();
-      this.calcularPaginas()
-    }
-  }
-
-  paginaSiguiente() {
-    const totalPages = Math.ceil(this.datosTabla.length / this.pageSize);
-    if (this.currentPage < totalPages) {
-      this.currentPage++;
-      this.actualizarTabla();
-      this.calcularPaginas()
-    }
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.datosTabla.length / this.pageSize);
-  }
-  irAPagina(page: number) {
-    this.currentPage = page;
-    this.actualizarTabla();
-  }
-
-  calcularPaginas() {
-    const totalPages = this.getTotalPages();
-    const startPage = Math.max(1, this.currentPage - 2);
-    const endPage = Math.min(totalPages, this.currentPage + 2);
-    console.log(totalPages)
-    console.log(startPage)
-    console.log(endPage)
-    this.paginas = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-    console.log(this.paginas)
-  }
-
- 
 
   listarCaratulas(){
     this.caratulaService.listarCaratulas().subscribe((datos)=>{
-      datos.length == 0 ? this.esNoExisteRegistros : this.esNoExisteRegistros = false;
       this.listaHistorialCaratulas=datos;
-      this.datosTabla=datos;
-      this.buscarHistorialCaratulas=false
-      this.actualizarTabla();
-      this.calcularPaginas();
+      this.listaHistorialCaratulas.length == 0 ? this.esNoExisteRegistros : this.esNoExisteRegistros = false;
+      this.cargarCaratulas=false
+      // Calcular el total de elementos y las páginas
+      this.totalItems = this.listaHistorialCaratulas.length;
+      this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+
+      // Mostrar los elementos de la página actual
+      this.displayedItems = this.getItemsForPage(this.currentPage);
+
+        // Calcular las páginas visibles
+      this.calculateVisiblePages();
     })
   }
 
@@ -108,7 +64,6 @@ export class CaratulaAfipComponent implements OnInit {
       this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
       .then(() => {     
         console.log('_modalService.open');
-  
       })
       .catch((res) => { console.log(res) }); 
   }
@@ -125,8 +80,6 @@ export class CaratulaAfipComponent implements OnInit {
         })
       }
     })
-
-    
   }
 
   editFinish(event) {
@@ -139,6 +92,56 @@ export class CaratulaAfipComponent implements OnInit {
 
   tienePermisoEliminarCaratula() {
     return this.user.permisos.find(p => p === this.permisosScato.Caratula_Eliminar);
+  }
+
+  // Paginado
+  goToPage(page: number) {
+    // Validar que la página esté dentro de los límites
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.displayedItems = this.getItemsForPage(this.currentPage);
+      this.calculateVisiblePages();
+    }
+  }
+
+  getItemsForPage(page: number): any[] {
+    const startIndex = (page - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.listaHistorialCaratulas.slice(startIndex, endIndex);
+  }
+
+  calculateVisiblePages() {
+    const pagesToShow = 5; // Número máximo de páginas visibles
+    const half = Math.floor(pagesToShow / 2); // Mitad de las páginas visibles
+
+    // Inicializar las banderas
+    this.showEllipsisStart = false;
+    this.showEllipsisEnd = false;
+
+    // Calcular el rango de páginas visibles
+    let start = Math.max(1, this.currentPage - half);
+    let end = Math.min(start + pagesToShow - 1, this.totalPages);
+
+    // Ajustar el rango si está cerca de los extremos
+    if (end - start + 1 < pagesToShow) {
+      start = Math.max(1, end - pagesToShow + 1);
+    }
+
+    // Mostrar puntos suspensivos al inicio si hay páginas ocultas
+    if (start > 1) {
+      this.showEllipsisStart = true;
+    }
+
+    // Mostrar puntos suspensivos al final si hay páginas ocultas
+    if (end < this.totalPages) {
+      this.showEllipsisEnd = true;
+    }
+
+    // Generar el arreglo de páginas visibles
+    this.visiblePages = [];
+    for (let i = start; i <= end; i++) {
+      this.visiblePages.push(i);
+    }
   }
 
 }

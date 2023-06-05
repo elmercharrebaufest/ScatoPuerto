@@ -15,5 +15,5 @@
 </div>
 
 <ng-template #editarCrearCaratula let-modal>
-    <app-modal-crear-caratula></app-modal-crear-caratula>
+    <app-modal-crear-caratula (editOCrearFinish)="crearFinish($event)"></app-modal-crear-caratula>
 </ng-template>

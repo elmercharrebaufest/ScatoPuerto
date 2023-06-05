@@ -16,5 +16,5 @@
 </div>
 
 <ng-template #crearCoem let-modal>
-    <app-modal-crear-coem></app-modal-crear-coem>
+    <app-modal-crear-coem (editOCrearFinish)="crearFinish($event)"></app-modal-crear-coem>
 </ng-template>

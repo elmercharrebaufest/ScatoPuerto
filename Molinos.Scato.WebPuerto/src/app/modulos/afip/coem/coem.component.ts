@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CoemAfipComponent } from './coem-afip/coem-afip.component';
 
 @Component({
   selector: 'app-coem',
@@ -7,6 +8,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./coem.component.css']
 })
 export class CoemComponent implements OnInit {
+
+  @ViewChild(CoemAfipComponent) coemAfipComponent: CoemAfipComponent;
 
   constructor(private modalService: NgbModal) { }
 
@@ -17,6 +20,11 @@ export class CoemComponent implements OnInit {
     // this.errorMessage = false;
     
     this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
+  }
+
+  crearFinish(event) {
+    this.coemAfipComponent.listarEstados();
+    this.coemAfipComponent.listarCoems();
   }
 
 }

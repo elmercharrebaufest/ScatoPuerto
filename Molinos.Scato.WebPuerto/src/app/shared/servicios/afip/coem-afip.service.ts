@@ -13,26 +13,34 @@ export class CoemAfipService {
   constructor(private http: HttpClient) { }
 
   public registrarCoem(coem:COEM): Observable<any[]> {
-    return this.http.post<any[]>(`${this.url}Afip/`, coem ,{ 'withCredentials': true });
+    return this.http.post<any[]>(`${this.url}Afip/RegistrarCoem`, coem ,{ 'withCredentials': true });
+  }
+
+  public editarCoem(coem:COEM): Observable<any[]> {
+    return this.http.post<any[]>(`${this.url}Afip/RegistrarCoem`, coem ,{ 'withCredentials': true });
   }
 
   public listarCoems(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}Afip/`, { 'withCredentials': true });
+    return this.http.get<any[]>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true });
   }
 
   public estadosCoem(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}Afip/`, { 'withCredentials': true });
+    return this.http.get<any[]>(`${this.url}Afip/ListarEstadosCoem`, { 'withCredentials': true });
   }
 
-  public cambiarEstadosCoem(id): Observable<any[]> {
-    return this.http.post<any[]>(`${this.url}Afip/`, { 'withCredentials': true });
+  public cambiarEstadosCoem(id,idCoem): Observable<any[]> {
+    return this.http.post<any[]>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${idCoem}&idEstado=${id}`, { 'withCredentials': true });
   }
 
-  // public obtenerCoemId(id:number): Observable<Caratula> {
-  //   return this.http.get<Caratula>(`${this.url}Afip/ObtenerCaratula?id=${id}`, { 'withCredentials': true });
-  // }
+  public obtenerCoemId(id:number): Observable<any> {
+    return this.http.get<any>(`${this.url}Afip/ObtenerCoem?id=${id}`, { 'withCredentials': true });
+  }
+
+  public comboCaratulas(): Observable<any> {
+    return this.http.get<any>(`${this.url}Afip/ComboCaratulas`, { 'withCredentials': true });
+  }
 
   public eliminarCoem(id:number): Observable<any> {
-    return this.http.post<any>(`${this.url}Afip/?id=${id}&idEstado=4`, { 'withCredentials': true });
+    return this.http.post<any>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${id}&idEstado=5`, { 'withCredentials': true });
   }
 }

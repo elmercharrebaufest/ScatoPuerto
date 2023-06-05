@@ -17,7 +17,7 @@
                     <div class="form-group col-md-4">
                     <select class="custom-select" id="inputGroupSelect01" formControlName="identificadorCaratula" [ngClass]="{ 'input-error': submitted && crearEditarCoemForm.get('identificadorCaratula').invalid }" required>
                       <option selected value="" disabled>Selecciona</option>
-                      <option *ngFor="let p of idsCaratula" [ngValue]="p">{{p}}</option>
+                      <option *ngFor="let p of idsCaratula" [value]="p.identificadorCaratula" [selected]="p.identificadorCaratula==idCaratula">{{p.identificadorCaratula}}</option>
                     </select>
                   </div>
                 </div>
@@ -33,11 +33,11 @@
                     </thead>
                     <tbody formArrayName="mercaderiasSueltas">
                       <tr class="lista-coem-row" *ngFor="let mercaderia of mercaderiasSueltasFormArray.controls; let i = index;last as isLast" [formGroupName]="i">
-                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="cuitATA" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cuitATA').invalid}" required></td>
-                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="codigoEmbalaje" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('codigoEmbalaje').invalid}" required></td>
+                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="cuitATA" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cuitATA').invalid}" maxlength="11" ></td>
+                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="codigoEmbalaje" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('codigoEmbalaje').invalid}" maxlength="2" required></td>
                         <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="cantidadBultos" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cantidadBultos').invalid}" required></td>
                         <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="peso" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('peso').invalid}" required></td>
-                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="identificadorDeclaracion" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('identificadorDeclaracion').invalid}" required></td>
+                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="identificadorDeclaracion" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('identificadorDeclaracion').invalid}" maxlength="16" required></td>
                         <td class="lista-coem-row-item">
                           <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer"
                                 (click)="eliminarNuevoCoem(i)"    alt="Eliminar">

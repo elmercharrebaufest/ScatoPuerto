@@ -1,5 +1,5 @@
 <ship-spinner [message]="'Cargando Historial de COEM. Por favor, espere...'"
-    *ngIf='buscarHistorialCoem'></ship-spinner>
+    *ngIf='load'></ship-spinner>
 
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-coem-table'>
@@ -13,53 +13,58 @@
         </thead>
         <tbody *ngFor="let historial of getListaHistorialCoem()">
             <tr class="lista-coem-row" >
-                <td class="lista-coem-row-item">{{historial.idCoem}}</td>
-                <td class="lista-coem-row-item">{{historial.caratulaCoem}}</td>
-                <td class="lista-coem-row-item">{{historial.mercaderiasSueltasCoem}}</td>
+                <td class="lista-coem-row-item">{{historial.identificadorCOEM}}</td>
+                <td class="lista-coem-row-item">{{historial.identificadorCaratula}}</td>
+                <td class="lista-coem-row-item">{{historial.mercaderiasSueltas[0].cuitATA}}</td>
                 <td class="lista-coem-row-item">
                     <div class="btn-group">
-                        <select class="custom-select" id="inputGroupSelect01" (change)="cambiarEstado($event)">
+                        <select class="custom-select" id="inputGroupSelect01" (change)="cambiarEstado($event,historial.id,historial.identificadorCOEM)" [disabled]="historial.afipCoemEstado.codigo=='ANU'">
                             <option selected value="" disabled>Estado</option>
-                            <option *ngFor="let p of listaEstados" [value]="p.id">{{p.estado}}</option>
+                            <option *ngFor="let p of listaEstados" [value]="p.id" [selected]="historial.afipCoemEstado.id===p.id">{{p.codigo}}</option>
                           </select>
                     </div>
                 </td>
-                <td class="lista-coem-row-item" (click)="editarCoem(historial,editCoem)">
-                    <div class='icon-editar cursor'></div>
+                <td class="lista-coem-row-item">
+                    <div class='icon-editar cursor' *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="editarCoem(historial,editCoem)"></div>
                 </td>
-                <td class="lista-coem-row-item" (click)="eliminarCoem(historial.idCoem)">
-                    <img src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                <td class="lista-coem-row-item" >
+                    <img src="assets/trashIcon-no-border.svg" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="eliminarCoem(historial.id, historial.identificadorCOEM)" class="eliminar cursor">
                 </td>
             </tr>
         </tbody>
     </table>
-<!-- 
-  <nav aria-label="Page navigation example" class="centrado"
-        *ngIf="getListaHistorialCaratula()?.length > 0">
+</div>
+<!-- <div *ngIf="esNoExisteRegistros">
+    No se encontraron registros para los filtros ingresados.
+</div>  -->
+
+<!--Paginado -->
+  <nav aria-label="Page navigation example" class="centrado">
         <ul class="pagination justify-content-center paginado-buque-fondo">
-            <li [ngClass]="{'page-item disabled': getPaginaActual() == 1 }">
-                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() - 1)">
+            <li [ngClass]="{'page-item disabled': currentPage === 1}">
+                <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
                  << </a>
             </li>
-            <li *ngFor="let pagina of getListaPaginas(); let index = index"
-                [ngClass]="{'page-item disabled': getPaginaActual() == (index + 1)}">
-                <a class="page-link" [ngClass]="{'paginado-buque-activo': getPaginaActual() == (index + 1)}"
-                    href="javascript:void(0);" (click)="setPaginaActual(index + 1)">{{index + 1}}</a>
+            <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
+            <li *ngFor="let page of visiblePages"
+                [ngClass]="{'page-item disabled': page == currentPage}">
+                <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
             </li>
-            <li [ngClass]="{'page-item disabled': getPaginaActual() >= getTotalPaginas() }">
-                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() + 1)"> >>
+            <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
+            <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
+                <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)"> >>
                 </a>
             </li>
         </ul>
-    </nav>  -->
-    <!-- <div *ngIf="esNoExisteRegistros && !esResumenOperatoria">
+    </nav> 
+    <!-- <div *ngIf="esNoExisteRegistros && ">
         No se encontraron registros para los filtros ingresados.
     </div>  -->
 
 
 
-</div>
+
 
 <ng-template #editCoem let-modal>
-    <app-modal-crear-coem [id]="coemId" [title]="'Rectificar Coem Nro '+ coemId"></app-modal-crear-coem>
+    <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId" [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
 </ng-template>
