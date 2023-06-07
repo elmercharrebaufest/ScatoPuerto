@@ -145,5 +145,22 @@ namespace Molinos.Scato.Servicios.Impl
             this.repositorio.GuardarCambios();
         }
         #endregion
+
+        #region CODE
+        public IList<AfipCodeDto> ListarCode()
+        {
+            return Listar<AfipCode, AfipCodeDto>();
+        }
+
+        public AfipCodeDto ObtenerCode(int id)
+        {
+            return Obtener<AfipCode, AfipCodeDto>(id);
+        }
+
+        public void RegistrarCode(AfipCodeDto code)
+        {
+            this.servicioComandos.Ejecutar(new AfipRegistrarCode { Dto = code });
+        }
+        #endregion
     }
 }

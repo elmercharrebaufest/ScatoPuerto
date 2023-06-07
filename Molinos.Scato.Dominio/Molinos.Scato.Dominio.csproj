@@ -82,6 +82,7 @@
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCaratula.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRegistrarCode.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCoem.cs" />
     <Compile Include="Comandos\AutomatizacionEtapas.cs" />
     <Compile Include="Comandos\CambiarNotificacionAplicacionComando.cs" />
@@ -692,6 +693,8 @@
     <Compile Include="Dto\AfipPuerto\AfipCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaEstadoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaItinerarioDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCodeCoemDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCodeDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaDeclaracionDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaPrecintoDto.cs" />
@@ -998,6 +1001,8 @@
     <Compile Include="Entidades\AfipPuerto\AfipCaratula.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratulaEstado.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratulaItinerario.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCode.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCodeCoem.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoem.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCargaPrecinto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCargaDeclaracion.cs" />
