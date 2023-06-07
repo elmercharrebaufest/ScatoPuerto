@@ -155,6 +155,8 @@
   <ItemGroup>
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeCoemMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemContenedorConCargaDeclaracionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaEstadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaItinerarioMappingProfile.cs" />
@@ -555,6 +557,7 @@
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCaratula.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCode.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCoem.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />

@@ -572,6 +572,8 @@
     <Build Include="dbo\Tables\AfipPuerto\AfipCoemMercaderiaSuelta.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipCaratulaEstado.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCode.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCodeCoem.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

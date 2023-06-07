@@ -196,6 +196,51 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
         #endregion
+
+        #region CODE
+        [HttpGet]
+        [Route("api/afip/ListarCode")]
+        public HttpResponseMessage ListarCode()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCode());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ObtenerCode")]
+        public HttpResponseMessage ObtenerCode(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ObtenerCode(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/afip/RegistrarCode")]
+        public HttpResponseMessage RegistrarCode(AfipCodeDto code)
+        {
+            try
+            {
+                servicioAfip.RegistrarCode(code);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        #endregion
     }
 
 }

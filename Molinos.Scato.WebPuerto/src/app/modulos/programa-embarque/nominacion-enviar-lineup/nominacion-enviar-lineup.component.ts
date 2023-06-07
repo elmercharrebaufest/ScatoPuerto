@@ -27,7 +27,7 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject();
 
   constructor(private nominacionEnviarLineupService: NominacionEnviarLineupService,
-              private confirmationDialogService: ConfirmationDialogService) { 
+              private confirmationDialogService: ConfirmationDialogService) {
     this.listarBuquesNominacion();
   }
 
@@ -37,7 +37,7 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroy$.next();
-    this.destroy$.unsubscribe();  
+    this.destroy$.unsubscribe();
   }
 
   onCargarNominaciones(event){
@@ -48,7 +48,7 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
   }
   onSeleccionarNominacion(id: number){
     let nominacion = this.listaEnviarLineUp.filter(x=> x.nominacion_Id == id);
-    nominacion[0].seleccionado=!nominacion[0].seleccionado; 
+    nominacion[0].seleccionado=!nominacion[0].seleccionado;
     this.esSeleccionarTodos = false;
 
   }
@@ -88,6 +88,10 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
       this.esSeleccionarTodos = false;
       this.procesandoEnvioLineUp = false;
       this.actualizarResultadoNominacion(data);
+    }, (e) => {
+      this.cargandoNominaciones = false;
+      this.procesandoEnvioLineUp = false;
+      throw e;
     });
   }
 
@@ -114,7 +118,7 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
 
   private actualizarResultadoNominacion(data: ProgramaEmbarqueResultadoResultado){
     this.listaEnviarLineUp.forEach(lineUp =>{
-      let lineUpSel = data.resultadoEnvioLineUp.filter(x=> x.nominacion_Id == lineUp.nominacion_Id); 
+      let lineUpSel = data.resultadoEnvioLineUp.filter(x=> x.nominacion_Id == lineUp.nominacion_Id);
       if (lineUpSel.length > 0){
         const procesado: boolean = lineUpSel[0].estado >0 ? true: false;
         const observaciones: string = lineUpSel[0].observacion;

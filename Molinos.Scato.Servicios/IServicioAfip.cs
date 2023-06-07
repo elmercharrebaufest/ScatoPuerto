@@ -47,6 +47,15 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void CambiarEstadoCoem(int idCoem, int idEstado);
+
+        [OperationContract]
+        IList<AfipCodeDto> ListarCode();
+
+        [OperationContract]
+        AfipCodeDto ObtenerCode(int idCode);
+
+        [OperationContract]
+        void RegistrarCode(AfipCodeDto code);
         #endregion
     }
 }
