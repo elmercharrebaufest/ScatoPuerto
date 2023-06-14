@@ -103,12 +103,14 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   initFormulario() {
+    debugger
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
 
         // this.mostrarTableristaOperando = res.estadoBuque.descripcion == "Operando";
         //Lo dejo como PreOperativo si no trae estado.
+        debugger
         let estado = res.estadoBuque ? res.estadoBuque.descripcion.trim() : "PreOperativo";
         this.mostrarTableristaOperando = (estado != "PreOperativo")
 
