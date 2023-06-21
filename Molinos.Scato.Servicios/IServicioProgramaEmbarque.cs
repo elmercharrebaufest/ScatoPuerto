@@ -135,5 +135,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void AgregarNotificacion(NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque);
 
+        [OperationContract]
+        IList<NominacionDto> ListarNominacionesExcel();
+
     }
 }

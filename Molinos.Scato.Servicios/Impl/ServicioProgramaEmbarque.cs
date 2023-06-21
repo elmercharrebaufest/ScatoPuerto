@@ -14,6 +14,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
 using Molinos.Scato.Dominio.Comandos;
+using System.Xml.Linq;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -1119,6 +1120,12 @@ public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id
             {
                 throw ex;
             }
+        }
+
+        public IList<NominacionDto> ListarNominacionesExcel()
+        {
+            var nominaciones = Listar<Nominacion, NominacionDto>(x => x.Embarque != null && x.FechaEnvioLineUp != null).OrderBy(x => x.Embarque.Vapor.Nombre).ToList();
+            return nominaciones;
         }
 
         #region Metodos Utiles
