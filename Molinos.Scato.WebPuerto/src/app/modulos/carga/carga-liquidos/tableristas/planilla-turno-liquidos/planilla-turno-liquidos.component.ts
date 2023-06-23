@@ -829,7 +829,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaInicialMM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalCM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalMM.setValue(0);
-        controSel['controls'][index]['controls'].destino.setValue(0);
+        //controSel['controls'][index]['controls'].destino.setValue(0);
         controSel['controls'][index]['controls'].tk.setValue(0);
 
         controSel['controls'][index]['controls'].temperatura.disable();
@@ -839,7 +839,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaFinalMM.disable();
         controSel['controls'][index]['controls'].medidaInicialCMyMM.disable();
         controSel['controls'][index]['controls'].medidaFinalCMyMM.disable();
-        controSel['controls'][index]['controls'].destino.disable();
+        //controSel['controls'][index]['controls'].destino.disable();
         controSel['controls'][index]['controls'].tk.disable();
       }
     }
