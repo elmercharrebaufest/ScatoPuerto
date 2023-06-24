@@ -1,9 +1,11 @@
-﻿using System;
+﻿using log4net.Config;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Molinos.Scato.ServiciosWindows
 {
@@ -14,12 +16,28 @@ namespace Molinos.Scato.ServiciosWindows
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            XmlConfigurator.Configure(new FileInfo("~/log4net.config"));
+            // Verificar si se debe ejecutar como servicio o en modo de ventana
+            if (Environment.UserInteractive)
             {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                // Crear una instancia del formulario o ventana principal
+                var mainForm = new Form1();
+
+                // Ejecutar la aplicación de Windows Forms
+                Application.Run(mainForm);
+            }
+            else
+            {
+                ServiceBase[] ServicesToRun;
+                ServicesToRun = new ServiceBase[]
+                {
                 new EmailService()
-            };
-            ServiceBase.Run(ServicesToRun);
+                };
+                ServiceBase.Run(ServicesToRun);
+            }
         }
     }
 }

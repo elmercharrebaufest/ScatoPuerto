@@ -1,47 +1,45 @@
-﻿using log4net;
-using Molinos.Scato.ServiciosWindows.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.ServiceProcess;
-using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Molinos.Scato.ServiciosWindows.Utils;
+using System.Net.Http;
 using System.Timers;
+using log4net;
 
 namespace Molinos.Scato.ServiciosWindows
 {
-    public partial class EmailService : ServiceBase
+    public partial class Form1 : Form
     {
-        private Timer timer;
+
+        private System.Timers.Timer timer;
         private List<TimeSpan> horariosEnvio = ConfigurationHelper.HorariosEjecucion;
-        private static readonly ILog log = LogManager.GetLogger(typeof(EmailService));
-        public EmailService()
+        private static readonly ILog log = LogManager.GetLogger(typeof(Form1));
+        public Form1()
         {
             InitializeComponent();
         }
 
-        protected override void OnStart(string[] args)
+        private void start_Click(object sender, EventArgs e)
         {
             // Obtener la hora actual y calcular el tiempo hasta el próximo horario de envío
             DateTime ahora = DateTime.Now;
             TimeSpan tiempoHastaProximoEnvio = ObtenerTiempoHastaProximoEnvio(ahora);
 
             // Crear y configurar el temporizador
-            timer = new Timer(tiempoHastaProximoEnvio.TotalMilliseconds);
+            timer = new System.Timers.Timer(tiempoHastaProximoEnvio.TotalMilliseconds);
             timer.Elapsed += EnviarCorreoElectronico;
             timer.AutoReset = true;
             timer.Enabled = true;
+
         }
 
-        protected override void OnStop()
+        private void stop_Click(object sender, EventArgs e)
         {
             timer.Stop();
             timer.Dispose();
         }
+
 
         private void EnviarCorreoElectronico(object sender, ElapsedEventArgs e)
         {
@@ -76,8 +74,8 @@ namespace Molinos.Scato.ServiciosWindows
                 }
             }
 
-           // Calcular el tiempo hasta el próximo horario de envío
-           TimeSpan tiempoHastaProximoEnvio = ObtenerTiempoHastaProximoEnvio(DateTime.Now);
+            // Calcular el tiempo hasta el próximo horario de envío
+            TimeSpan tiempoHastaProximoEnvio = ObtenerTiempoHastaProximoEnvio(DateTime.Now);
 
             // Reiniciar el temporizador para el próximo envío
             timer.Interval = tiempoHastaProximoEnvio.TotalMilliseconds;

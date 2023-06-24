@@ -4,12 +4,14 @@ using System.Configuration;
 
 namespace Molinos.Scato.ServiciosWindows.Utils
 {
+    using log4net;
     using System;
     using System.Collections.Generic;
     using System.Configuration;
 
     public static class ConfigurationHelper
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(ConfigurationHelper));
         public static List<TimeSpan> HorariosEjecucion { get; } = ObtenerHorariosEjecucion();
         public static string UrlApi { get; } = ObtenerUrlApi();
 
@@ -34,7 +36,7 @@ namespace Molinos.Scato.ServiciosWindows.Utils
                 }
                 else
                 {
-                    // Manejar error en el formato del horario
+                    log.Error("Formato de fecha invalido. El formato correcto es HH:mm:ss, el valor ingresado: " + value);
                 }
             }
 
