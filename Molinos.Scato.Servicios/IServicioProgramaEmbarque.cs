@@ -26,7 +26,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null);
-        
+
         [OperationContract]
         ProgramaEmbarqueDto ListarDatosCombo();
 
@@ -35,7 +35,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<TipoDeCalidadDto> listarTipoDeCalidad();
-        
+
         [OperationContract]
         NominacionDto ObtenerNominacion(int id);
 
@@ -109,14 +109,14 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);
-        
-        
+
+
         [OperationContract]
         IList<VaporInformacionDto> ListarBuquesNominacion();
 
         [OperationContract]
         IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id);
-        
+
         [OperationContract]
         ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id);
 
@@ -138,5 +138,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<NominacionDto> ListarNominacionesExcel();
 
+        [OperationContract]
+        void EnviarMailNominacionesExcel(byte[] archivo);
     }
 }
