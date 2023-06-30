@@ -14,6 +14,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
 using Molinos.Scato.Dominio.Comandos;
+using System.Xml.Linq;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -512,14 +513,14 @@ namespace Molinos.Scato.Servicios.Impl
                 //Busco todas las notificaciones
                 var notificaciones = repositorio.Listar<NotificacionProgramaDeEmbarque>();
                 if (notificaciones != null && notificaciones.Count > 0)
-                { 
+                {
                     foreach (NotificacionProgramaDeEmbarque notificacion in notificaciones.ToList())
                     {
                         //Elimino de la base todas las anteriores a 10 días desde su creación.
                         if (notificacion.Fecha < DateTime.Now.AddDays(-10))
                         {
                             IList<NotificacionExcluidos> notificacionExcluidos = repositorio.Listar<NotificacionExcluidos>(x => x.NotificacionProgramaDeEmbarque.Id == notificacion.Id);
-                            repositorio.RemoverTodos(notificacionExcluidos);                         
+                            repositorio.RemoverTodos(notificacionExcluidos);
                             repositorio.Remover(notificacion);
                         }
                     }
@@ -577,7 +578,7 @@ namespace Molinos.Scato.Servicios.Impl
                 }
             }
 
-            if(embarque != null)
+            if (embarque != null)
             {
                 muelle = (embarque.Vicentin == true ? "vicentin" : embarque.Noryon == true ? "Noryon" : embarque.SanBenito == true ? "San Benito" : "Otros muelles");
                 switch (tipoNotificacion)
@@ -591,8 +592,8 @@ namespace Molinos.Scato.Servicios.Impl
                         break;
                 }
             }
-            
-            
+
+
 
             NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque = new NotificacionProgramaDeEmbarque()
             {
@@ -606,12 +607,12 @@ namespace Molinos.Scato.Servicios.Impl
         public void AgregarNotificacion(NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque)
         {
             try
-            {               
+            {
                 if (notificacionProgramaDeEmbarque != null)
                 {
                     repositorio.Agregar(notificacionProgramaDeEmbarque);
                     repositorio.GuardarCambios();
-                }               
+                }
             }
             catch (Exception ex)
             {
@@ -620,219 +621,219 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
         public MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail)
+        {
+            // CARACTERES NO IMPRIMIBLES:
+            // Enter: (\n -> <br/>)
+            // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
+            // Negrita: (\f -> <b>) (\f\f -> </b>)
+            // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
+            var copia = new List<string>();
+            copia = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones.Split(';').ToList();
+            copia.Add(tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" &&
+            nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+
+            copia.RemoveAll(item => item == null || item == "");
+
+
+            var mail = new MailDto
             {
-                // CARACTERES NO IMPRIMIBLES:
-                // Enter: (\n -> <br/>)
-                // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
-                // Negrita: (\f -> <b>) (\f\f -> </b>)
-                // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
-                var copia = new List<string>();
-                copia = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones.Split(';').ToList();
-                copia.Add(tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" &&
-                nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+                Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
+                Copia = copia,
+            };
+            var body = "<div style=\"font-family: Arial, Helvetica, sans-serif;\"> Estimados, por favor notar que fueron nominados para actuar en la carga del buque de referencia. <br/> <br/>";
 
-                copia.RemoveAll(item => item == null || item == "");
+            body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; background-color: lightgrey;\"> " +
+                    $" <tr>" +
+                    $" <td style=\"padding: 5px;\"> <strong>PRODUCTO</strong>" +
+                    $" </td>" +
+                    $"<td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles} ({nominacion.NominacionDatoTecnico.MaterialPuerto.Descripcion.Trim()})" +
+                    $" </td>";
+            body += $" <td style=\"padding: 5px;\"> <strong>NOMBRE BUQUE</strong>" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.VaporInformacion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.NombreBuque) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque : "-")} " +
+                    $" </td>" +
+                    $" </tr>" +
+                    $" <tr>" +
+                    $" <td style=\"padding: 5px;\"><strong>MUELLE DE CARGA</strong>" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.MuelleDeCarga != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion : "-")}" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\"><strong>BANDERA</strong>" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.VaporInformacion != null && nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.Bandera.Nombre) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera.Nombre : "-")}" +
+                    $" </td>" +
+                    $" </tr>" +
+                    $" <tr>" +
+                    $" <td style=\"padding: 5px;\"><strong>LOADING RATE</strong>" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.TasaDeCargaValor != null ? nominacion.NominacionDatoTecnico?.TasaDeCargaValor : 0)} {(nominacion.NominacionDatoTecnico?.TasaDeCarga != null && nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion : " - ")}" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\"><strong>ATA</strong>" +
+                    $" </td>" +
+                    $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.ATAPuerto != null && nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre : "-")}" +
+                    $" </td>" +
+                    $" </tr>" +
+                    $" <tr>" +
+                    $" <td style=\"padding: 5px;\"><strong>CLIENTE</strong> " +
+                    $" </td>";
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
+            {
+                body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(x => x.CoordinadorPuerto.Nombre))}</td>";
+            }
+            else
+            {
+                body += $"<td style=\"padding: 5px;\"> - </td> ";
+            }
+            body += $" </tr>" +
+                    $"</table>";
 
-
-                 var mail = new MailDto
+            //Calidad
+            body += $"<br />";
+            body += $"<label><strong>CALIDAD</strong></label>";
+            body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
+                    $" <tr>" +
+                    $"<thead> <td style=\"border: 1px solid #ddd;padding: 8px; background-color: #ddd;\"><strong> {((nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0) ? nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault().CalidadValor?.TipoDeCalidad?.Descripcion.Trim() : "-")} </strong> </td><thead>";
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
+            {
+                foreach (var item in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad)
                 {
-                    Destinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarque").Direcciones.Split(';').ToList(),
-                    Copia = copia,
-                };
-                var body = "<div style=\"font-family: Arial, Helvetica, sans-serif;\"> Estimados, por favor notar que fueron nominados para actuar en la carga del buque de referencia. <br/> <br/>";
-
-                body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%; background-color: lightgrey;\"> " +
-                        $" <tr>" +
-                        $" <td style=\"padding: 5px;\"> <strong>PRODUCTO</strong>" +
-                        $" </td>" +
-                        $"<td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles} ({nominacion.NominacionDatoTecnico.MaterialPuerto.Descripcion.Trim()})" +
-                        $" </td>";
-                body += $" <td style=\"padding: 5px;\"> <strong>NOMBRE BUQUE</strong>" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\"> { (nominacion.NominacionDatoTecnico?.VaporInformacion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.NombreBuque) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque : "-") } " +
-                        $" </td>" +
-                        $" </tr>" +
-                        $" <tr>" +
-                        $" <td style=\"padding: 5px;\"><strong>MUELLE DE CARGA</strong>" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.MuelleDeCarga != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion : "-") }" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\"><strong>BANDERA</strong>" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.VaporInformacion != null && nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.Bandera.Nombre) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera.Nombre : "-")}" +
-                        $" </td>" +
-                        $" </tr>" +
-                        $" <tr>" +
-                        $" <td style=\"padding: 5px;\"><strong>LOADING RATE</strong>" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.TasaDeCargaValor != null ? nominacion.NominacionDatoTecnico?.TasaDeCargaValor : 0)} {(nominacion.NominacionDatoTecnico?.TasaDeCarga != null && nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion : " - ") }" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\"><strong>ATA</strong>" +
-                        $" </td>" +
-                        $" <td style=\"padding: 5px;\">{(nominacion.NominacionDatoTecnico?.ATAPuerto != null && nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre : "-")}" +
-                        $" </td>" +
-                        $" </tr>" +
-                        $" <tr>" +
-                        $" <td style=\"padding: 5px;\"><strong>CLIENTE</strong> " +
-                        $" </td>";
-                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
-                {
-                    body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(x => x.CoordinadorPuerto.Nombre)) }</td>";
-                }
-                else
-                {
-                    body += $"<td style=\"padding: 5px;\"> - </td> ";
-                }
-                body += $" </tr>" +
-                        $"</table>";
-
-                //Calidad
-                body += $"<br />";
-                body += $"<label><strong>CALIDAD</strong></label>";
-                body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
-                        $" <tr>" +
-                        $"<thead> <td style=\"border: 1px solid #ddd;padding: 8px; background-color: #ddd;\"><strong> { ((nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0) ? nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault().CalidadValor?.TipoDeCalidad?.Descripcion.Trim() : "-")} </strong> </td><thead>";
-                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
-                {
-                    foreach (var item in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad)
-                    {                       
-                        body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong> {item.CalidadValor.Parametro} </strong> {item.CalidadValor.Valor} - </td>";
-                        body += $"</tr>";
+                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong> {item.CalidadValor.Parametro} </strong> {item.CalidadValor.Valor} - </td>";
+                    body += $"</tr>";
                 }
 
-                }
-                else
+            }
+            else
+            {
+                body += $" - </td>";
+            }
+            body += $" </tr>" +
+                    $"</table>";
+
+            //Recibo
+            body += $"<br/>";
+            if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
+            {
+                body += $"<label><strong>RECIBO</strong></label>";
+                body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">";
+
+                foreach (var item in nominacion.NominacionRecibo)
                 {
-                    body += $" - </td>";
+                    body += $" <tr>";
+                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"> <strong> {item.Exportador.Nombre}</strong></td>";
+                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong>CANTIDAD (Tn)</strong>:   {item.Cantidad.ToString("n0")} </br>";
+                    body += $"<strong>FORMATO/UNIDAD</strong>:  {item.Formato}/{item.Unidad} </br>";
+                    body += $"<strong>AJUSTE</strong>:  {item.Ajuste} </br>";
+                    body += $"<strong>LOADING PORT</strong>:  {item.PuertoDeCarga} </br>";
+                    body += $"<strong>DISCHARGE PORT</strong>:  {item.PuertoDeCarga} </br>";
+                    body += $"<strong>DESCRIPTION OF GOODS</strong>:  {item.DescripcionesBienes} </td>";
+                    body += $"</tr>";
                 }
-                body += $" </tr>" +
-                        $"</table>";
 
-                //Recibo
-                body += $"<br/>";
-                if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
-                {
-                    body += $"<label><strong>RECIBO</strong></label>";
-                    body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">";
-
-                    foreach (var item in nominacion.NominacionRecibo)
-                    {
-                        body += $" <tr>";
-                        body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"> <strong> {item.Exportador.Nombre}</strong></td>";
-                        body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong>CANTIDAD (Tn)</strong>:   {item.Cantidad.ToString("n0")} </br>";
-                        body += $"<strong>FORMATO/UNIDAD</strong>:  {item.Formato }/{item.Unidad} </br>";
-                        body += $"<strong>AJUSTE</strong>:  {item.Ajuste } </br>";
-                        body += $"<strong>LOADING PORT</strong>:  {item.PuertoDeCarga } </br>";
-                        body += $"<strong>DISCHARGE PORT</strong>:  {item.PuertoDeCarga } </br>";
-                        body += $"<strong>DESCRIPTION OF GOODS</strong>:  {item.DescripcionesBienes} </td>";
-                        body += $"</tr>";
-                    }
-
-                    body += $"</table>";
-                }
+                body += $"</table>";
+            }
 
             body += $"<br>";
             body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;background-color: lightgrey;\"> " +
                         $" <tr>" +
                         $" <td style=\"padding: 5px;\"> <strong>CANTIDAD (Tn)</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> { nominacion.NominacionDatoTecnico?.CantidadTotal.ToString("n0") }" +
+                        $" <td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico?.CantidadTotal.ToString("n0")}" +
                         $" </td>" +
                         $" <td style=\"padding: 5px;\"> <strong>DEM/DES RATE</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> u$ { nominacion.NominacionDatoTecnico?.DEM.ToString("n0")} / { nominacion.NominacionDatoTecnico?.DES.ToString("n0")}" +
+                        $" <td style=\"padding: 5px;\"> u$ {nominacion.NominacionDatoTecnico?.DEM.ToString("n0")} / {nominacion.NominacionDatoTecnico?.DES.ToString("n0")}" +
                         $" </td>" +
                         $" </tr>" +
                         $" <tr>" +
                         $" <tr>" +
                         $" <td style=\"padding: 5px;\"> <strong>TOLERANCIA</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> { nominacion.NominacionDatoTecnico?.Tolerancia }% +/- " +
+                        $" <td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico?.Tolerancia}% +/- " +
                         $" </td>" +
                           $" <td style=\"padding: 5px;\"> <strong>AGENCIA MARITIMA</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto?.Nombre : "-") }" +
+                        $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.AgenciaMaritimaPuerto?.Nombre : "-")}" +
                         $" </td>" +
                         $" </tr>" +
                         $" <tr>" +
                         $" <td style=\"padding: 5px;\"> <strong>ETA RECALADA</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> { (nominacion.NominacionDatoTecnico?.ETARecalada != null ? nominacion.NominacionDatoTecnico?.ETARecalada.Value.ToString("dd-MM-yyyy") : "-") }" +
+                        $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.ETARecalada != null ? nominacion.NominacionDatoTecnico?.ETARecalada.Value.ToString("dd-MM-yyyy") : "-")}" +
                         $" </td>" +
                         $" <td style=\"padding: 5px;\"> <strong>OBLIGACION DE CARGA</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.ObligacionDeCarga != null ? nominacion.NominacionDatoTecnico?.ObligacionDeCarga.Value.ToString("dd-MM-yyyy") : "-") }" +
+                        $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.ObligacionDeCarga != null ? nominacion.NominacionDatoTecnico?.ObligacionDeCarga.Value.ToString("dd-MM-yyyy") : "-")}" +
                         $" </td>" +
                         $" </tr>" +
                         $" <tr>" +
                         $" <td style=\"padding: 5px;\"> <strong>CARGADOR</strong>" +
                         $" </td>";
-                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Count > 0)
-                {
-                    body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => x.Exportador.Nombre)) }</td>";
-                }
-                else
-                {
-                    body += $"<td style=\"padding: 5px;\"> - </td> ";
-                };
-                body += $" <td style=\"padding: 5px;\"> <strong>DESTINO</strong>" +
-                        $" </td>";
-                if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Count > 0)
-                {
-                    body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Select(x => x.Destino.Nombre)) }</td>";
-                }
-                else
-                {
-                    body += $"<td > - </td> ";
-                };
-                body += $" </tr>" +
-                      $" <tr>" +
-                      $" <td style=\"padding: 5px;\"> <strong>TIPO FUMIGACIÓN</strong>" +
-                      $" </td>" +
-                      $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion != null && !string.IsNullOrEmpty(nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion?.Descripcion) ? nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion?.Descripcion : "-") }" +
-                      $" </td>" +
-                      $" <td style=\"padding: 5px;\"> <strong>ESTIBADO Y TRIMADO</strong>" +
-                      $" </td>" +
-                      $" <td style=\"padding: 5px;\"> { ((nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.EstibadorYTrimado == true) ? "SI" : "N/A")}" +
-                      $" </td>" +
-                      $" </tr>" +
-                      $" <tr>" +
-                      $" <td style=\"padding: 5px;\"> <strong>SURVEYOR</strong>" +
-                      $" </td>" +
-                      $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.Surveyor != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion) ? nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion : "-") }" +
-                      $" </td>" +
-                      $" </tr>";
-                body += $"</table>";
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Count > 0)
+            {
+                body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => x.Exportador.Nombre))}</td>";
+            }
+            else
+            {
+                body += $"<td style=\"padding: 5px;\"> - </td> ";
+            };
+            body += $" <td style=\"padding: 5px;\"> <strong>DESTINO</strong>" +
+                    $" </td>";
+            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Count > 0)
+            {
+                body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Select(x => x.Destino.Nombre))}</td>";
+            }
+            else
+            {
+                body += $"<td > - </td> ";
+            };
+            body += $" </tr>" +
+                  $" <tr>" +
+                  $" <td style=\"padding: 5px;\"> <strong>TIPO FUMIGACIÓN</strong>" +
+                  $" </td>" +
+                  $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion != null && !string.IsNullOrEmpty(nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion?.Descripcion) ? nominacion.NominacionDetalleIntervencion?.TipoDeFumigacion?.Descripcion : "-")}" +
+                  $" </td>" +
+                  $" <td style=\"padding: 5px;\"> <strong>ESTIBADO Y TRIMADO</strong>" +
+                  $" </td>" +
+                  $" <td style=\"padding: 5px;\"> {((nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.EstibadorYTrimado == true) ? "SI" : "N/A")}" +
+                  $" </td>" +
+                  $" </tr>" +
+                  $" <tr>" +
+                  $" <td style=\"padding: 5px;\"> <strong>SURVEYOR</strong>" +
+                  $" </td>" +
+                  $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.Surveyor != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion) ? nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion : "-")}" +
+                  $" </td>" +
+                  $" </tr>";
+            body += $"</table>";
             //Senasa
             body += $"<br/>";
-                if (nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.Senasa != null && nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
+            if (nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.Senasa != null && nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
+            {
+                body += $"<label><strong>SENASA</strong></label>";
+                body += $" <table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
+                            $"<thead>" +
+                            $"<tr style=\"background-color: #ddd; color: black; text-align: center;border: 1px solid #ddd;\">" +
+                            $"<th>Exportador</th>" +
+                            $"<th>Corresponde SENASA</th>" +
+                            $"<th>IP (Pedido de Importación)</th>" +
+                            $"<th>Muestras oficiales</th>" +
+                            $"</tr>" +
+                            $"</thead>";
+                body += $"<tbody>";
+                foreach (var item in nominacion.NominacionDetalleIntervencion.Senasa)
                 {
-                    body += $"<label><strong>SENASA</strong></label>";
-                    body += $" <table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
-                                $"<thead>" +
-                                $"<tr style=\"background-color: #ddd; color: black; text-align: center;border: 1px solid #ddd;\">" +
-                                $"<th>Exportador</th>" +
-                                $"<th>Corresponde SENASA</th>" +
-                                $"<th>IP (Pedido de Importación)</th>" +
-                                $"<th>Muestras oficiales</th>" +
-                                $"</tr>" +
-                                $"</thead>";
-                    body += $"<tbody>";
-                    foreach (var item in nominacion.NominacionDetalleIntervencion.Senasa)
-                    {
-                        body += $"<tr style=\"border: text-align:center;\">" +
-                                  $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {item.Exportador.Nombre} </td>" +
-                                  $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> { (item.TieneSenasa ? "SI" : "NO") } </td>" +
-                                  $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> { (item.IP ? "SI" : "NO") } </td>" +
-                                  $"<td style=\"border: 1px solid #ddd;padding: 5px;\">{ (item.MuestraOficial ? "SI" : "NO") } </td> " +
-                                  $"</tr>";
-                    }
-                    body += $"</tbody>" +
-                           $"</table></div>";
+                    body += $"<tr style=\"border: text-align:center;\">" +
+                              $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {item.Exportador.Nombre} </td>" +
+                              $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {(item.TieneSenasa ? "SI" : "NO")} </td>" +
+                              $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {(item.IP ? "SI" : "NO")} </td>" +
+                              $"<td style=\"border: 1px solid #ddd;padding: 5px;\">{(item.MuestraOficial ? "SI" : "NO")} </td> " +
+                              $"</tr>";
                 }
-                mail.Body = body;
-                return mail;
+                body += $"</tbody>" +
+                       $"</table></div>";
             }
+            mail.Body = body;
+            return mail;
+        }
 
         public IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id)
         {
@@ -850,10 +851,11 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 var nominacion = repositorio.Obtener<Nominacion>(x => x.Id == mail.Id);
-                if(mail.TipoDeMail == "Surveyor")
+                if (mail.TipoDeMail == "Surveyor")
                 {
                     nominacion.EnviadoSurveyor = true;
-                }else if (mail.TipoDeMail == "Fumigador")
+                }
+                else if (mail.TipoDeMail == "Fumigador")
                 {
                     nominacion.EnviadoFumigador = true;
                 }
@@ -875,10 +877,10 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 var mailUsuarioCreador = "";
-              
-                 mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
-               
-                
+
+                mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
+
+
                 if (!string.IsNullOrEmpty(mailUsuarioCreador))
                 {
                     mail.Copia.Add(mailUsuarioCreador);
@@ -909,7 +911,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 throw ex;
             }
-         
+
         }
 
         private string ObtenerMailDeActiveDirectory(string UserName)
@@ -946,13 +948,13 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                List <Tuple<int, bool>> auditoriasNominaciones = new List<Tuple<int, bool>>();
+                List<Tuple<int, bool>> auditoriasNominaciones = new List<Tuple<int, bool>>();
                 foreach (int nominacion_id in nominaciones_id)
                 {
                     auditoriasNominaciones.Add(new Tuple<int, bool>(nominacion_id, repositorio.Listar<Auditoria>(x => x.Nominacion_Id == nominacion_id).Count > 0 ? true : false));
                 }
                 return auditoriasNominaciones;
-                    
+
             }
             catch (Exception ex)
             {
@@ -1032,7 +1034,7 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
 
-public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id)
+        public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id)
         {
             ProgramaEmbarqueValidacionLineUpDto programaEmbarqueValidacionLineUp = new ProgramaEmbarqueValidacionLineUpDto();
             try
@@ -1108,7 +1110,7 @@ public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id
 
                 Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
                 MaterialPuertoCantidad materialPuertoCantidad = new MaterialPuertoCantidad();
-                materialPuertoCantidad.Embarque = repositorio.Obtener<Embarque>(embarque_Id); 
+                materialPuertoCantidad.Embarque = repositorio.Obtener<Embarque>(embarque_Id);
                 materialPuertoCantidad.Cantidad = nominacion.NominacionDatoTecnico.CantidadTotal;
                 materialPuertoCantidad.MaterialPuerto = nominacion.NominacionDatoTecnico.MaterialPuerto;
                 materialPuertoCantidad.Color = nominacion.NominacionDatoTecnico.MaterialPuerto.Color;
@@ -1121,25 +1123,48 @@ public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id
             }
         }
 
+        public IList<NominacionDto> ListarNominacionesExcel()
+        {
+            var nominaciones = Listar<Nominacion, NominacionDto>(x => x.Embarque != null && x.FechaEnvioLineUp != null).OrderBy(x => x.Embarque.Vapor.Nombre).ToList();
+            return nominaciones;
+        }
+
+        public void EnviarMailNominacionesExcel(byte[] archivo)
+        {
+            var objDestinatarios = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "NominacionesExcel");
+            if (objDestinatarios == null) throw new Exception("No se encuentran los destinatarios en la base de datos");
+            var destinatarios = objDestinatarios.Direcciones.Split(';').ToList();
+            destinatarios.RemoveAll(x => String.IsNullOrEmpty(x));
+            if (destinatarios.Count == 0) throw new Exception("No se encuentran los destinatarios en la base de datos");
+            comandos.Ejecutar(new EnvioMail
+            {
+                Cuerpo = "Se adjunta planilla excel con los programas de embarque",
+                Destinatarios = destinatarios,
+                Titulo = "Planilla programa de embarque" + DateTime.Now.ToString("dd/MM/yyyy"),
+                Attachment = archivo,
+                AttachmentName = "Planilla programa de embarque.xls"
+            });
+        }
+
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
-            {
-                return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
-            }
-            private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
-            {
-                return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
-            }
-            private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
-            {
-                return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
-            }
-            private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
-            {
-                return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
-            }
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
+        }
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
+        }
+        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
+        {
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
+        }
+        private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
+        }
 
 
-            #endregion        
-    } 
+        #endregion
+    }
 }
