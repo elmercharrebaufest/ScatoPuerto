@@ -116,6 +116,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
     let dia = dateRecibo.getDate();
     dateRecibo.setDate(dia);
     arrFecha = dateRecibo.toDateString().split(' ',4)
+    arrFecha[1] = dateRecibo.toLocaleDateString('EN-US', { 'month': 'long' });    
     
     // FECHA
     doc.text(arrFecha[1].toUpperCase() + "    " + arrFecha[2], 145, 34.5, null, 'center');

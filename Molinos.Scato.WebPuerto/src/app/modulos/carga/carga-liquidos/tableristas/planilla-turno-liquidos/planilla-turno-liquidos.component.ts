@@ -829,7 +829,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaInicialMM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalCM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalMM.setValue(0);
-        controSel['controls'][index]['controls'].destino.setValue(0);
+        //controSel['controls'][index]['controls'].destino.setValue(0);
         controSel['controls'][index]['controls'].tk.setValue(0);
 
         controSel['controls'][index]['controls'].temperatura.disable();
@@ -839,7 +839,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaFinalMM.disable();
         controSel['controls'][index]['controls'].medidaInicialCMyMM.disable();
         controSel['controls'][index]['controls'].medidaFinalCMyMM.disable();
-        controSel['controls'][index]['controls'].destino.disable();
+        //controSel['controls'][index]['controls'].destino.disable();
         controSel['controls'][index]['controls'].tk.disable();
       }
     }
@@ -1137,7 +1137,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalCM: [{ value: medidaFinalCM , disabled: bloqueoVicentin }],
       medidaFinalMM: [{ value: medidaFinalMM , disabled: bloqueoVicentin }],
       destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
-      cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: false }],
+      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
     });
     return formulario;

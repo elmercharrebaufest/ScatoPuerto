@@ -935,7 +935,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-        }
+        }        
 
         public class CapturaImagenLineUp
         {
