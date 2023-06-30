@@ -1,7 +1,7 @@
 ﻿.vs
 *.vspscc
-*/bin
-*/obj
+**/bin/
+**/obj/
 *.user
 *.dbmdl
 *.jfm
