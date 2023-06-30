@@ -354,5 +354,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                             servicio.ListarCargaBalanzaPuerto()
                         );
         }
+
+        [HttpGet]
+        [Route("api/PlanoDeCarga/listarBodegas")]
+        public HttpResponseMessage ListarBodegas(int idPlanoDeCarga)
+        {
+            var response = Request.CreateResponse(HttpStatusCode.OK,
+                servicio.ListarBodegasNir(idPlanoDeCarga)
+                );
+            return response;
+        }
     }
 }
