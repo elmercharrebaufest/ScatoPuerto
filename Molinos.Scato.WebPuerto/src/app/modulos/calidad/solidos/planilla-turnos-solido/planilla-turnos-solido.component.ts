@@ -781,10 +781,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let contador = 0;
     // return 0;
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
-      contador += Math.ceil(this.getCantDia(dia));
+      contador += this.getCantDia(dia);
     }
-    contador = Math.round(contador)/1000;
-    contador = parseInt(contador.toString());
     this.totalABordo = contador;
     return contador;
   }

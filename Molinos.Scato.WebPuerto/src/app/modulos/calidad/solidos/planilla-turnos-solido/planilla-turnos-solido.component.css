@@ -10,10 +10,10 @@
     padding-top:13px;
     padding-left: 10px;
 }
-.fila-turno-alto{ 
+.fila-turno-alto{
     height: 40px !important;
 }
-.fila-turno-alto-defecto{ 
+.fila-turno-alto-defecto{
     height: auto !important;
 }
 .column-center{
@@ -55,11 +55,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .input_img input { margin:0;}
 select { margin: 0; height: 30px;}
 
-.imgClockInput1 { 
-    display:block; 
-    position:absolute; 
-    top:0.3rem; 
-    right: 0.3rem; 
+.imgClockInput1 {
+    display:block;
+    position:absolute;
+    top:0.3rem;
+    right: 0.3rem;
 }
 
 .label-float label{
@@ -146,9 +146,10 @@ table.turnos table.tabla-embebida th{
     font-size: 12px;
 }
 
-.toneladas{
+.kilos{
     color: #2486AC;
-    font-size: 24px;
+    font-size: 18px;
+    white-space: nowrap;
 }
 
 .turno{
@@ -211,7 +212,7 @@ table.turnos table.tabla-embebida th{
     vertical-align: middle;
 }
 .celda-elimina-corte{
-    justify-content: flex-start;    
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
 }
