@@ -9238,6 +9238,14 @@ namespace Molinos.Scato.Servicios.Impl
             return body;
         }
 
+        public IList<BodegaDto> ListarBodegasNir(int planoDeCargaId)
+        {            
+            var bodegasId = repositorio.Listar<PlanoDeCargaBodega>(x => x.PlanoDeCarga.Id == planoDeCargaId).Select(b => b.BodegaParcel);
+            var bodegas = Listar<Bodega, BodegaDto>(x => bodegasId.Contains(x.Id));
+            
+            return bodegas;
+        }
+
         public IList<ATAPuertoDto> ListarATAPuerto()
         {
             return Listar<ATAPuerto, ATAPuertoDto>();
