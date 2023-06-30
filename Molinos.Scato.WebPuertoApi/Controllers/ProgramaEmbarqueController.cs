@@ -670,15 +670,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 var nominaciones = servicioProgramaEmbarque.ListarNominacionesExcel();
                 var excel = new ExcelProgramaEmbarque(nominaciones).GenerarArchivo();
-                List<string> destinatarios = new List<string>() { "mleiva@baufest.com" };
-                comandos.Ejecutar(new EnvioMail 
-                { 
-                    Cuerpo = "Se adjunta planilla excel",
-                    Destinatarios = destinatarios,
-                    Titulo = "Planilla programa de embarque",
-                    Attachment = excel,
-                    AttachmentName = "Planilla programa de embarque.xls"
-                });
+                servicioProgramaEmbarque.EnviarMailNominacionesExcel(excel);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

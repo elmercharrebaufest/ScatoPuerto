@@ -2771,5 +2771,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<string> ObtenerGruposAD(List<string> grupos);
+
+        [OperationContract]
+        IList<BodegaDto> ListarBodegasNir(int planoDeCargaId);
     }
 }
