@@ -16,7 +16,9 @@ namespace Molinos.Scato.ServiciosWindows
         /// </summary>
         static void Main()
         {
-            XmlConfigurator.Configure(new FileInfo("~/log4net.config"));
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string configPath = Path.Combine(basePath, "log4net.config");
+            XmlConfigurator.Configure(new FileInfo(configPath));
             // Verificar si se debe ejecutar como servicio o en modo de ventana
             if (Environment.UserInteractive)
             {
