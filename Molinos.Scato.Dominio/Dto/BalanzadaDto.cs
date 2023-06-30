@@ -59,7 +59,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Cargado { get; set; }
         public int RestaCargar { get; set; }
         public int Excedente { get; set; }
-
+        public int Programado { get; set; }
     }
 
     public sealed class BalanzadasCompletasDto
