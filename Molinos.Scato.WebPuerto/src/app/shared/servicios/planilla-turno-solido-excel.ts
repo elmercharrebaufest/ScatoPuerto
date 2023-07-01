@@ -133,13 +133,11 @@ export class PlanillaTurnoSolidoExcelService {
         const nombreTurno = turno.turnoPuerto.nombre;
         let inicioTurnoMerge = offset;
         let finTurnoMerge    = inicioTurnoMerge;
-        let toneladas: number = 0;
+        let kilos: number = 0;
         turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach(item => {
-          toneladas+= item.cantidad;
+          kilos+= item.cantidad;
         });
-        toneladas = toneladas/1000;
-        toneladas = parseInt(toneladas.toString());
-        console.log('toneladas--->>', toneladas)
+        console.log('kilos --->>', kilos)
         if(esTurnoSinDetalle){
             let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
             numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
@@ -163,15 +161,13 @@ export class PlanillaTurnoSolidoExcelService {
             let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
             numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
             registrosTurno += numeroObservaciones;
-            let toneladas: number = 0;
+            let kilos: number = 0;
             turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach(item => {
-              toneladas+= item.cantidad;
+              kilos += item.cantidad;
             });
-            toneladas = toneladas/1000;
-            toneladas = parseInt(toneladas.toString());
             let finTurnoMerge = offset + registrosTurno;
             worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
-            worksheet.getCell(`B${inicioTurnoMerge}`).value = `${nombreTurno} \r\n ${toneladas} tn`;
+            worksheet.getCell(`B${inicioTurnoMerge}`).value = `${nombreTurno} \r\n ${kilos} kg`;
             worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true}
             worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
             worksheet.getCell(`B${offset}`).border = borders;
@@ -180,14 +176,13 @@ export class PlanillaTurnoSolidoExcelService {
 
     private setDetallePlanillaTurno(turno, worksheet, offset, borders) {
 
-      let toneladas = turno.cantidad/1000;
-      toneladas = parseInt(toneladas.toString());
+      const kilos = turno.cantidad;
       worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
       worksheet.getRow(offset).getCell(3).value = turno.exportador?.nombre;
       worksheet.getRow(offset).getCell(4).value = turno.bodega.nombre;
       worksheet.getRow(offset).getCell(5).value = turno.materialPuerto?.descripcion;
       worksheet.getRow(offset).getCell(6).value = turno.destino?.nombre;
-      worksheet.getRow(offset).getCell(7).value = toneladas;
+      worksheet.getRow(offset).getCell(7).value = kilos;
 
       let celdaDetalle = 2
       for (let indexCell = 1; indexCell <= 6; indexCell++) {
@@ -473,21 +468,19 @@ export class PlanillaTurnoSolidoExcelService {
 
           const fechaTurno = this.obtenerFechaTurno(fechaDia);
 
-          /* Toneladas por fecha */
-          let toneladas: number = 0;
+          /* Kilos por fecha */
+          let kilos: number = 0;
           planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
             const fechaTurnoVal = this.obtenerFechaTurno(new Date(turno.fecha));
             if (fechaTurno == fechaTurnoVal){
               turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach(item =>{
                 console.log('item...', item)
-                toneladas += item.cantidad;
+                kilos += item.cantidad;
               })
             }
           });
-          toneladas = toneladas/1000;
-          toneladas = parseInt(toneladas.toString());
           /* Contenido Fecha */
-          worksheet.getCell(`A${baseCell + 1}`).value = `${fechaTurno} \r\n ${toneladas} tn`;
+          worksheet.getCell(`A${baseCell + 1}`).value = `${fechaTurno} \r\n ${kilos} kg`;
           worksheet.getCell(`A${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true}
           worksheet.getCell(`A${baseCell + 1}`).border = borders;
 

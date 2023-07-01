@@ -1,4 +1,4 @@
-    <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>    
+    <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>
     <div class="mt-4 px-4 pb-4" style='background-color: white !important;'>
         <app-collapse-button collapseSelectorId='collapsePlanillaTurnosSolido'></app-collapse-button>
         <div class="divHeaderRightLeft">
@@ -27,7 +27,7 @@
                             <th class="header-fijo">Bodega</th>
                             <th class="header-fijo">Producto</th>
                             <th class="header-fijo">Destino</th>
-                            <th class="header-fijo">Cant. Tn</th>
+                            <th class="header-fijo">Cant. Kg</th>
                             <th class="header-fijo">Tipo Carga</th>
                         </tr>
                     </thead>
@@ -40,7 +40,7 @@
                                     <td [attr.rowspan]='getRowSpan(dia)'>
                                         <div class='column-center'>
                                             <span><b>{{getDia(d)}}</b></span>
-                                            <span class='toneladas'>{{ (getCantDia(dia)/1000) | number: '1.0-0'  }} <span class='turno'>Tn</span></span>
+                                            <span class='kilos'>{{ (getCantDia(dia)) | number: '1.0-0'  }} <span class='turno'>Kg</span></span>
                                             <span class='turno'>por día</span>
                                         </div>
                                     </td>
@@ -51,7 +51,7 @@
                                             <td [attr.rowspan]='getRowSpanTurno(turno)'>
                                                 <div class="column-center">
                                                     <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
-                                                    <span class='toneladas'>{{ (getCantTurno(turno)/1000) | number: '1.0-0' }} <span class='turno'>Tn</span></span>
+                                                    <span class='kilos'>{{ (getCantTurno(turno)) | number: '1.0-0' }} <span class='turno'>Kg</span></span>
                                                     <span class='turno'>por turno</span>
                                                     <button class='btn btn btn-success'
                                                             *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
@@ -85,7 +85,7 @@
                                                         {{result.controls.destino?.value}}
                                                     </td>
                                                     <td [ngClass]="getBajaCargaColor(result)">
-                                                        {{ soloEnteros(result.controls.cantidad.value / 1000) }}
+                                                        {{ result.controls.cantidad.value | number }}
                                                     </td>
                                                     <td [ngClass]="getBajaCargaColor(result)">
                                                         {{result.controls.idBalanzaCorte.value > 0 ? 'Carga Normal' : 'Baja Carga'}}
@@ -205,8 +205,7 @@
                 </div>
             </div>
             <div fxFlex='50' class='right-side' *ngIf="getCantTotalABordo() > 0">
-                <div class='bt-total' >Total a bordo: {{ getCantTotalABordo() }}<div class='img-tn ocultarPdf'></div>
-                </div>
+                <div class='bt-total' >Total a bordo: {{ getCantTotalABordo() | number }} Kg</div>
             </div>
         </div>
 
