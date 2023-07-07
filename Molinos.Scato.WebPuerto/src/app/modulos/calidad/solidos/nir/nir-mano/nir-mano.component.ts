@@ -192,9 +192,7 @@ constructor(
     }
   }
 
-  obtenerBodegas(){
-    debugger
-    
+  obtenerBodegas(){      
     let planoDeCargaId = this.datosEmbarqueProcesoService.getPlanoDeCargaId();
     this.planoDeCargaService.obtenerBodegas(planoDeCargaId).subscribe(
       bodegas => {

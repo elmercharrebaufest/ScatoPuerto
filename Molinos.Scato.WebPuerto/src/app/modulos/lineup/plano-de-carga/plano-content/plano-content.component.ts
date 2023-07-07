@@ -371,15 +371,15 @@ export class PlanoContentComponent implements OnInit {
   calcularRecomendacionDefensas(estadoPuerto?: any) {
     this.estadoPuerto = estadoPuerto;
 
-    if (this.embarque.freeboard == 0 && this.estadoAlturaValor == 0) {
+    if (this.embarque?.freeboard == 0 && this.estadoAlturaValor == 0) {
       this.recomendacionDefensas = "Altura y Freeboard desconocidos, no se pueden calcular las defensas móviles";
-    } else if (this.embarque.freeboard == 0) {
+    } else if (this.embarque?.freeboard == 0) {
       this.recomendacionDefensas = "Freeboard desconocido, no se pueden calcular las defensas móviles";
     } else if (this.estadoAlturaValor == 0) {
       this.recomendacionDefensas = "Altura desconocida, no se pueden calcular las defensas móviles";
     } else {
-      var result = this.embarque.freeboard +
-        (this.estadoAlturaValor ? this.estadoAlturaValor : Number(this.estadoPuerto.alturaDelRio)) - 1
+      var result = this.embarque?.freeboard +
+        (this.estadoAlturaValor ? this.estadoAlturaValor : Number(this.estadoPuerto?.alturaDelRio)) - 1
       if (result > 5) {
         this.recomendacionDefensas = "No usar defensas móviles";
         this.planoDeCargaForm.get('defensasMoviles').setValue('No');
