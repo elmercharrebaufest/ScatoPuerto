@@ -468,6 +468,18 @@ insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Alma
                     values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,0        ,'#CDAD0D','RSFO')
 END
 GO
+IF NOT EXISTS (select 1 from MaterialPuerto where CodigoSap = '99056') 
+BEGIN
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color) 
+    values ('LECITINA DE SOJA','LEC','99056', 0, '#FFFFFF') 
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where CodigoSap = '98855') 
+BEGIN
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color) 
+    values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF')
+END
+GO
 
 update MaterialPuerto set DescripcionCortaIngles = 'SB'    ,Color = '#D3B177' where descripcion = 'POROTO DE SOJA'
 update MaterialPuerto set DescripcionCortaIngles = 'SBMHP' ,Color = '#FFE0A8' where descripcion = 'HARINA DE SOJA*' -- DUDA DE NOMBRE
@@ -810,3 +822,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 
+-- Nuevos Paises
+if not exists (select 1 from Pais where Descripcion = 'Georgia') begin insert into Pais (Descripcion) values ('Georgia'); end
+if not exists (select 1 from Pais where Descripcion = 'Liberia') begin insert into Pais (Descripcion) values ('Liberia'); end
+
+-- Nuevos Coordinadores
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Agrocorp') begin insert into CoordinadorPuerto (Nombre) values ('Agrocorp'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Invictus') begin insert into CoordinadorPuerto (Nombre) values ('Invictus'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'The Andersons') begin insert into CoordinadorPuerto (Nombre) values ('The Andersons'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin insert into CoordinadorPuerto (Nombre) values ('Panocean'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
