@@ -281,6 +281,7 @@ export class PlanillaTurnoLiquidoExcelService {
 
         if (!esRecibidores){
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
+            worksheet.getRow(offset).height = 50;
             worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
             worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
@@ -319,7 +320,7 @@ export class PlanillaTurnoLiquidoExcelService {
     }
     private setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder){      
         planillaDeTurnos = planillaDeTurnos.sort((a, b) => {
-            return (new Date(a.fecha).getDate() - new Date(b.fecha).getDate());
+            return (new Date(b.fecha).getDate() - new Date(a.fecha).getDate());
           });
 
 
@@ -651,7 +652,7 @@ export class PlanillaTurnoLiquidoExcelService {
         
           /* Contenido Fecha */
           worksheet.getCell(`A${baseCell + 1}`).value = `${fechaTurno} \r\n ${cantidadToneladasPorFecha} tn`;
-          worksheet.getCell(`A${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center' }
+          worksheet.getCell(`A${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
           worksheet.getCell(`A${baseCell + 1}`).border = borders;     
 
           /* Cabeceras Fecha */
@@ -664,10 +665,10 @@ export class PlanillaTurnoLiquidoExcelService {
 
           /* Cabeceras Turno */
           worksheet.getCell(`B${baseCell}`).value  = "Turno";
+          worksheet.getCell(`B${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
           worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
           worksheet.getCell(`B${baseCell}`).border = borders;
-          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
-          worksheet.getCell(`B${baseCell + 1}`).alignment = {  wrapText: true, vertical: 'middle', horizontal: 'center' }
+          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}          
           
           baseCell = baseCell + (CantRows > 0 ? CantRows : CantRows);
 

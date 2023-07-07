@@ -564,16 +564,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
     }
 
-    this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
-    this.bodegas = this._turnosService.getBodega();
+    this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');   
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.vientoAmarre = this.procesoService.getVientoAmarre();
     this.direccionViento = this.procesoService.getDireccionViento();
     let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
-    this.getDestinos();
-    this.getProductos();
+
+    this.cargarTurnosBodegasDestinos();    
     this.getMotivosCorte();
   }
 
@@ -1219,7 +1218,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.destinos = new Array();
     if (this.bodegas != null || this.bodegas != undefined) {
       this.bodegas.forEach(b => {
-        if (!this.destinos.find(d => d.nombre == b.destino.nombre)) {
+        if (!this.destinos?.find(d => d.nombre == b.destino.nombre)) {
           this.destinos.push(b.destino);
         }
       });
