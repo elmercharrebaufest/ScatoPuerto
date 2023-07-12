@@ -468,16 +468,16 @@ insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Alma
                     values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,0        ,'#CDAD0D','RSFO')
 END
 GO
-IF NOT EXISTS (select 1 from MaterialPuerto where CodigoSap = '99056') 
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'LECITINA DE SOJA') 
 BEGIN
-    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color) 
-    values ('LECITINA DE SOJA','LEC','99056', 0, '#FFFFFF') 
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
+    values ('LECITINA DE SOJA','LEC','99056', 0, '#FFFFFF', 'LEC') 
 END
 GO
-IF NOT EXISTS (select 1 from MaterialPuerto where CodigoSap = '98855') 
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'ACEITE DE SOJA NEUTRALIZADO') 
 BEGIN
-    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color) 
-    values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF')
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
+    values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF', 'SBO NEU')
 END
 GO
 
@@ -492,6 +492,8 @@ update MaterialPuerto set DescripcionCortaIngles = 'CSFOHO',Color = '#FFFFFF' wh
 update MaterialPuerto set DescripcionCortaIngles = 'WHEAT' ,Color = '#92B234' where descripcion = 'TRIGO'
 update MaterialPuerto set DescripcionCortaIngles = 'SBMLP' ,Color = '#FFCF79' where descripcion = 'SoyBean Low Pro' --ESTÁ MAL EL COLOR SEGÚN LA TABLA
 update MaterialPuerto set DescripcionCortaIngles = 'SFPMP' ,Color = '#555554' where descripcion = 'Pellet de girasol'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'LEC'   ,Color = '#FFFFFF' WHERE Descripcion = 'LECITINA DE SOJA'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'SBO NEU', Color = '#FFFFFF' WHERE Descripcion = 'ACEITE DE SOJA NEUTRALIZADO'
 
 
 declare @SB     int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SB'     )
@@ -823,8 +825,12 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 
 -- Nuevos Paises
-if not exists (select 1 from Pais where Descripcion = 'Georgia') begin insert into Pais (Descripcion) values ('Georgia'); end
-if not exists (select 1 from Pais where Descripcion = 'Liberia') begin insert into Pais (Descripcion) values ('Liberia'); end
+if not exists (select 1 from Pais where Descripcion = 'GEORGIA') begin insert into Pais (Descripcion) values ('GEORGIA'); end
+if not exists (select 1 from Pais where Descripcion = 'LIBERIA') begin insert into Pais (Descripcion) values ('LIBERIA'); end
+
+if not exists (select 1 from Destino where Nombre = 'GEORGIA') begin insert into Destino (Nombre) values ('GEORGIA'); end
+if not exists (select 1 from Destino where Nombre = 'LIBERIA') begin insert into Destino (Nombre) values ('LIBERIA'); end
+
 
 -- Nuevos Coordinadores
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Agrocorp') begin insert into CoordinadorPuerto (Nombre) values ('Agrocorp'); end
