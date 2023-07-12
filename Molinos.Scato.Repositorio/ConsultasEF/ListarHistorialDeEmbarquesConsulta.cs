@@ -100,8 +100,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
          
             return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || String.IsNullOrEmpty(destino) ||
                                          (x.ProductoExportador != null && x.ProductoExportador
-                                            .Any(y => y.NombreExportador.ToUpper().StartsWith(exportador.ToUpper()) 
-                                            && y.Destino.ToUpper().StartsWith(destino.ToUpper()))) &&
+                                            .Any(y => y.NombreExportador.ToUpper().StartsWith(exportador.ToUpper()) && y.Destino.ToUpper().StartsWith(destino.ToUpper()))) &&
                                          (productos == null || (x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) &&
                                          (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado.ToUpper()))
                                            ))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
