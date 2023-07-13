@@ -165,12 +165,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   cargarTurnosBodegasDestinos() {
-    this._turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;
-      if (this.formExportarExcel) this.addParcelChecks();
-      this.getProductos();
-      this.getDestinos();
-    });
+    this.bodegas = this._turnosService.getBodega();
+    
+    if (this.formExportarExcel) this.addParcelChecks();
+
+    this.getProductos();
+    this.getDestinos();
+    
   }
 
   expandir() {
@@ -543,9 +544,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   getCombos() {
-    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
     let lineasPlanilla = [];
-    this.lineas.forEach(function (item) {
+    this.lineas?.forEach(function (item) {
       var i = lineasPlanilla.findIndex(x => x.linea == item.linea);
       if (i <= -1) {
         lineasPlanilla.push({ id: item.id, linea: item.linea });
@@ -569,7 +570,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.vientoAmarre = this.procesoService.getVientoAmarre();
     this.direccionViento = this.procesoService.getDireccionViento();
-    let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
+    let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[])?.filter(x => x.esLiquido == true);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
 
     this.cargarTurnosBodegasDestinos();    
