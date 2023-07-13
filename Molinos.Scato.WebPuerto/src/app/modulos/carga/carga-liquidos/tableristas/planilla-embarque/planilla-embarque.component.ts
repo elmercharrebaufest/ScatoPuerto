@@ -84,8 +84,9 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   newForm() {
     console.log('this.lineas...>>')
     console.log(this.lineas)
+    
     if (this.lineas == undefined || this.lineas == null){
-      this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
     }          
 
     // Evangelino Se considera exportadores unicos no duplicados
@@ -98,13 +99,11 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
 
     //antes de iniciar las lineas vacias me fijo cuantos registros hay de la DB.
-    this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
+    this.planillaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeEmbarque;
 
-    this.turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;      
-      this.getProductos();
-      this.getTanqueAbordo();
-    });    
+    this.bodegas = this.turnosService.getBodega();
+    this.getProductos();
+    this.getTanqueAbordo();    
     
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.lineasEmbarque = new FormGroup({
