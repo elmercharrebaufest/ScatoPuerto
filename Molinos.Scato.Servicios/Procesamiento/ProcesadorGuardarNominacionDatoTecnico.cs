@@ -25,7 +25,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             try
             {
-
                 if (comando.EsCreacion)
                 {
                     var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
@@ -45,8 +44,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
                     var datoTecnico = comando.Dto.NominacionDatoTecnico;
                     this.ActualizarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
-                    //this.EliminarDetallesDatoTecnico(datoTecnico);
-                    //this.RegistrarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
                 }
             }
             catch (Exception e)
@@ -60,63 +57,51 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private NominacionDatoTecnico RegistrarDatoTecnico(GuardarNominacionDatoTecnico comando)
         {
-            try
+            var datoTecnico = comando.Dto.NominacionDatoTecnico;
+            var nominacionDatoTecnico = comando.EsCreacion ? new NominacionDatoTecnico() : Repositorio.Obtener<NominacionDatoTecnico>(datoTecnico.Id);
+
+            MuelleDeCarga muelleDeCarga = null;
+            TasaDeCarga tasaDeCarga = null;
+            TipoDeContrato tipoDeContrato = null;
+            ATAPuerto ataPuerto = null;
+            AgenciaMaritimaPuerto agenciaMaritimaPuerto = null;
+            Surveyor surveyor = null;
+            VaporInformacion vaporInformacion = null;
+            MaterialPuerto materialPuerto = null;
+
+            muelleDeCarga = datoTecnico.MuelleDeCarga != null ? Repositorio.Obtener<MuelleDeCarga>(x => x.Id == datoTecnico.MuelleDeCarga.Id) : muelleDeCarga;
+            tasaDeCarga = datoTecnico.TasaDeCarga != null ? Repositorio.Obtener<TasaDeCarga>(x => x.Id == datoTecnico.TasaDeCarga.Id) : tasaDeCarga;
+            tipoDeContrato = datoTecnico.TipoDeContrato != null ? Repositorio.Obtener<TipoDeContrato>(x => x.Id == datoTecnico.TipoDeContrato.Id) : tipoDeContrato;
+            ataPuerto = datoTecnico.ATAPuerto != null ? Repositorio.Obtener<ATAPuerto>(x => x.Id == datoTecnico.ATAPuerto.Id) : ataPuerto;
+            agenciaMaritimaPuerto = datoTecnico.AgenciaMaritimaPuerto != null ? Repositorio.Obtener<AgenciaMaritimaPuerto>(x => x.Id == datoTecnico.AgenciaMaritimaPuerto.Id) : agenciaMaritimaPuerto;
+            surveyor = datoTecnico.Surveyor != null ? Repositorio.Obtener<Surveyor>(x => x.Id == datoTecnico.Surveyor.Id) : surveyor;
+            vaporInformacion = datoTecnico.VaporInformacion != null ? Repositorio.Obtener<VaporInformacion>(x => x.Id == datoTecnico.VaporInformacion.Id) : vaporInformacion;
+            materialPuerto = datoTecnico.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(x => x.Id == datoTecnico.MaterialPuerto.Id) : materialPuerto;
+
+            nominacionDatoTecnico.MaterialPuerto = materialPuerto;
+            nominacionDatoTecnico.CantidadTotal = datoTecnico.CantidadTotal;
+            nominacionDatoTecnico.Tolerancia = datoTecnico.Tolerancia;
+            nominacionDatoTecnico.Observaciones = datoTecnico.Observaciones;
+            nominacionDatoTecnico.VaporInformacion = vaporInformacion;
+            nominacionDatoTecnico.ETARecalada = datoTecnico.ETARecalada;
+            nominacionDatoTecnico.ObligacionDeCarga = datoTecnico.ObligacionDeCarga;
+            nominacionDatoTecnico.MuelleDeCarga = muelleDeCarga;
+            nominacionDatoTecnico.TasaDeCarga = tasaDeCarga;
+            nominacionDatoTecnico.TasaDeCargaValor = datoTecnico.TasaDeCargaValor;
+            nominacionDatoTecnico.DEM = datoTecnico.DEM;
+            nominacionDatoTecnico.DES = datoTecnico.DES;
+            nominacionDatoTecnico.TipoDeContrato = tipoDeContrato;
+            nominacionDatoTecnico.ATAPuerto = ataPuerto;
+            nominacionDatoTecnico.AgenciaMaritimaPuerto = agenciaMaritimaPuerto;
+            nominacionDatoTecnico.Surveyor = surveyor;
+            nominacionDatoTecnico.ObservacionesSurveyor = datoTecnico.ObservacionesSurveyor;
+
+            if (!comando.EsCreacion)
             {
-                var nominacionDatoTecnico = new NominacionDatoTecnico();
-                var datoTecnico = comando.Dto.NominacionDatoTecnico;
-
-                if (comando.EsCreacion)
-                    nominacionDatoTecnico = new NominacionDatoTecnico();
-
-                if (!comando.EsCreacion)
-                    nominacionDatoTecnico = Repositorio.Obtener<NominacionDatoTecnico>(x => x.Id == comando.Dto.NominacionDatoTecnico.Id);
-
-                MuelleDeCarga muelleDeCarga = null;
-                TasaDeCarga tasaDeCarga = null;
-                TipoDeContrato tipoDeContrato = null;
-                ATAPuerto ataPuerto = null;
-                AgenciaMaritimaPuerto agenciaMaritimaPuerto = null;
-                Surveyor surveyor = null;
-                VaporInformacion vaporInformacion = null;
-                MaterialPuerto materialPuerto = null;
-
-                muelleDeCarga = datoTecnico.MuelleDeCarga != null ? Repositorio.Obtener<MuelleDeCarga>(x => x.Id == datoTecnico.MuelleDeCarga.Id) : muelleDeCarga;
-                tasaDeCarga = datoTecnico.TasaDeCarga != null ? Repositorio.Obtener<TasaDeCarga>(x => x.Id == datoTecnico.TasaDeCarga.Id) : tasaDeCarga;
-                tipoDeContrato = datoTecnico.TipoDeContrato != null ? Repositorio.Obtener<TipoDeContrato>(x => x.Id == datoTecnico.TipoDeContrato.Id) : tipoDeContrato;
-                ataPuerto = datoTecnico.ATAPuerto != null ? Repositorio.Obtener<ATAPuerto>(x => x.Id == datoTecnico.ATAPuerto.Id) : ataPuerto;
-                agenciaMaritimaPuerto = datoTecnico.AgenciaMaritimaPuerto != null ? Repositorio.Obtener<AgenciaMaritimaPuerto>(x => x.Id == datoTecnico.AgenciaMaritimaPuerto.Id) : agenciaMaritimaPuerto;
-                surveyor = datoTecnico.Surveyor != null ? Repositorio.Obtener<Surveyor>(x => x.Id == datoTecnico.Surveyor.Id) : surveyor;
-                vaporInformacion = datoTecnico.VaporInformacion != null ? Repositorio.Obtener<VaporInformacion>(x => x.Id == datoTecnico.VaporInformacion.Id) : vaporInformacion;
-                materialPuerto = datoTecnico.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(x => x.Id == datoTecnico.MaterialPuerto.Id) : materialPuerto;
-
-                nominacionDatoTecnico.MaterialPuerto = materialPuerto;
-                nominacionDatoTecnico.CantidadTotal = datoTecnico.CantidadTotal;
-                nominacionDatoTecnico.Tolerancia = datoTecnico.Tolerancia;
-                nominacionDatoTecnico.Observaciones = datoTecnico.Observaciones;
-                nominacionDatoTecnico.VaporInformacion = vaporInformacion;
-                nominacionDatoTecnico.ETARecalada = datoTecnico.ETARecalada;
-                nominacionDatoTecnico.ObligacionDeCarga = datoTecnico.ObligacionDeCarga;
-                nominacionDatoTecnico.MuelleDeCarga = muelleDeCarga;
-                nominacionDatoTecnico.TasaDeCarga = tasaDeCarga;
-                nominacionDatoTecnico.TasaDeCargaValor = datoTecnico.TasaDeCargaValor;
-                nominacionDatoTecnico.DEM = datoTecnico.DEM;
-                nominacionDatoTecnico.DES = datoTecnico.DES;
-                nominacionDatoTecnico.TipoDeContrato = tipoDeContrato;
-                nominacionDatoTecnico.ATAPuerto = ataPuerto;
-                nominacionDatoTecnico.AgenciaMaritimaPuerto = agenciaMaritimaPuerto;
-                nominacionDatoTecnico.Surveyor = surveyor;
-                nominacionDatoTecnico.ObservacionesSurveyor = datoTecnico.ObservacionesSurveyor;
-                if (!comando.EsCreacion)
-                    Repositorio.GuardarCambios();
-
-                return nominacionDatoTecnico;
+                Repositorio.GuardarCambios();
             }
-            catch (Exception)
-            {
 
-                throw;
-            }
-           
+            return nominacionDatoTecnico;
         }
         private void EliminarDetallesDatoTecnico(NominacionDatoTecnicoDto datoTecnico)
         {
@@ -138,7 +123,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 throw;
             }
-         
+
         }
         private void RegistrarDetallesDatoTecnico(NominacionDatoTecnico nominacionDatoTecnico, NominacionDatoTecnicoDto datoTecnico)
         {
@@ -317,7 +302,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 throw;
             }
-           
+
         }
     }
 }

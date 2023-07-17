@@ -24,7 +24,8 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
                 @coordinadorPrevio NVARCHAR(60),
                 @coordinadorNuevo NVARCHAR(60);
 
-        SELECT @idNominacion = n.Id, @idEmbarque = n.Embarque_Id, @dateDiff = DATEDIFF(MINUTE, n.FechaCreacion, GETDATE())
+        SELECT  @idNominacion = n.Id, @idEmbarque = n.Embarque_Id, 
+                @dateDiff = DATEDIFF(SECOND, n.FechaCreacion, GETDATE()) -- Segundos entre la creación de la nominación y la inserción del coordinador
         FROM NominacionDatoTecnicoExportador dte
         INNER JOIN NominacionDatoTecnico dt ON dte.NominacionDatoTecnico_Id = dt.Id
         INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
@@ -49,7 +50,8 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
             FROM Embarque WHERE Id = @idEmbarque
         END
 
-        IF EXISTS (SELECT * FROM deleted) AND EXISTS (SELECT * FROM inserted) BEGIN -- UPDATE
+        -- UPDATE
+        IF EXISTS (SELECT 1 FROM deleted) AND EXISTS (SELECT 1 FROM inserted) BEGIN
             IF((SELECT CoordinadorPuerto_Id FROM deleted) <> (SELECT CoordinadorPuerto_Id FROM inserted) )
             BEGIN
                 INSERT INTO Auditoria
@@ -74,19 +76,19 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
                 END
             END
         END
-        ELSE IF EXISTS (SELECT * FROM inserted) BEGIN -- INSERT
-            IF(@dateDiff > 1) BEGIN -- EXCLUYE PRIMER INSERT
-                INSERT INTO Auditoria
-                SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', NULL, @coordinadorNuevo, GETDATE()
-                FROM inserted
-            END
+        -- INSERT (Excepto que sea en el mismo momento de la creación de la nominación)
+        ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 3 BEGIN 
+            INSERT INTO Auditoria
+            SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', NULL, @coordinadorNuevo, GETDATE()
+            FROM inserted
 
             IF(@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
                 VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Nuevo cliente (' + @coordinadorNuevo + ')', GETDATE())
             END
         END
-        ELSE BEGIN -- DELETE
+        -- DELETE
+        ELSE BEGIN
             INSERT INTO Auditoria
             SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', @coordinadorPrevio, NULL, GETDATE()
             FROM deleted
