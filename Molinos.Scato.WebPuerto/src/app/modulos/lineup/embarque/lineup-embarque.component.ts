@@ -92,7 +92,7 @@ export class LineupEmbarqueComponent implements OnInit {
     this._procesoService.disposeData();
     this.embarquesPuerto = this.observador != null ? this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
-   // this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { 
+   // this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
       //this.ubicacionDeBuquePuerto = res;
       this.listadoUbicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.map(u => u.nombre);
     //});
@@ -115,13 +115,13 @@ export class LineupEmbarqueComponent implements OnInit {
           this.mensajeBuque = "No se encontró. Completar IMO";
           this.hayBuque =  false;
         }
-      
+
     }else{
       this.mensajeBuque = "Ver en el mapa."
       this.hayBuque =  true;
     }
     this.ruta = this.hayBuque ? "assets/verMapa.svg" : "assets/existImo.svg";
-    this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';  
+    this.colorMapa = this.hayBuque ? 'color-text-mapa' : 'color-text-imo';
   }
 
   getListaBuquesGeolocalizacion() {
@@ -133,7 +133,7 @@ export class LineupEmbarqueComponent implements OnInit {
       this.router.navigate(['/geolocalizacion'], { queryParams: { embarque_id: embarque_Id, tipo: 'zoom' } });
     }
   }
-  
+
   public modificarLineUp(campo: string) {
     if (this.hasPermisoLineUp_EditarChecksEmbarque()) {
       switch (campo) {
@@ -200,23 +200,19 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public openConfirmationDialog(titulo: string, texto: string, button1: string = 'OK', button2: string = 'Cancel') {
-    this.confirmationDialogService.confirm(titulo, texto, button1, button2)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.showSpinner.emit(true)
-          this.workflowService.eliminar(this.instanciaWorkflow.id)
-            .subscribe(res => {
-              this.showSpinner.emit(false)
-              this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha eliminado con éxito el embarque del buque "' + this.instanciaWorkflow.embarque.nombreBuque + '"', 'Cerrar', '')
-                .then((confirmed) => { if (this.observador) this.observador.Actualizar(this); });
-            },
-              errmess => {
-                this.confirmationDialogService.confirm('¡Error!', 'Error al eliminar el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-                this.showSpinner.emit(false)
-              });
-        }
-      })
-      .catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
+    this.confirmationDialogService.confirm(titulo, texto, button1, button2).then((confirmed) => {
+      if (confirmed) {
+        this.showSpinner.emit(true)
+        this.workflowService.eliminar(this.instanciaWorkflow.id).subscribe(res => {
+          this.showSpinner.emit(false)
+          this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha eliminado con éxito el embarque del buque "' + this.instanciaWorkflow.embarque.nombreBuque + '"', 'Cerrar', '')
+            .then((confirmed) => { if (this.observador) this.observador.Actualizar(this); });
+        }, errmess => {
+          this.confirmationDialogService.confirm('¡Error!', 'Error al eliminar el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+          this.showSpinner.emit(false)
+        });
+      }
+    }).catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
   }
 
   public fechaRecaladaCorrecta() {
@@ -277,7 +273,7 @@ export class LineupEmbarqueComponent implements OnInit {
     let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
     lineUpDto.moduloDeCarga = null;
     lineUpDto.planoDeCarga = null;
-    this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => { 
+    this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
     }, error =>{}
      , () =>{
 
@@ -286,7 +282,7 @@ export class LineupEmbarqueComponent implements OnInit {
 
       if (this.observador)
           this.observador.Actualizar();
-      
+
       this.mostrarSpinnerCaptura = false;
     });
   }
@@ -296,11 +292,11 @@ export class LineupEmbarqueComponent implements OnInit {
 
     const divEmbarqueLineUp = document.getElementById('divEmbarqueLineUp');
     let divLineUpAcciones = document.getElementById('listadoAcciones');
-    
+
     divLineUpAcciones.className += 'ocultar-division';
     divLineUpAcciones.classList.add('ocultar-division')
     let base64data='';
-    htmlToImage.toPng(divEmbarqueLineUp, { 
+    htmlToImage.toPng(divEmbarqueLineUp, {
           quality: 0.8,
           backgroundColor: '#ffffff',
         })
@@ -317,7 +313,7 @@ export class LineupEmbarqueComponent implements OnInit {
         });
   }
 
-  guardarImagenLineUp =(base64data) => { 
+  guardarImagenLineUp =(base64data) => {
     const capturaImagenLineUp = {
       embarque_Id : this.instanciaWorkflow.embarque.id,
       filePathImgLineUp : base64data,
@@ -389,7 +385,7 @@ export class LineupEmbarqueComponent implements OnInit {
     }
 
   }
-  
+
   nombreUbicacionDeBuquePuerto(numero): string {
     return numero > 0 && numero != null && this.ubicacionDeBuquePuerto != null && this.ubicacionDeBuquePuerto.find(x => x.orden == numero) != undefined ? this.ubicacionDeBuquePuerto.find(x => x.orden == numero).nombre.toString() : '';
   }
@@ -541,25 +537,25 @@ export class LineupEmbarqueComponent implements OnInit {
     }
 
     if(!this.nombreArchivo[0] || this.nombreArchivo[0].tipoArchivo == undefined || this.nombreArchivo[0].tipoArchivo == ""){
-      this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
-      return;
-    }
-    
-    if (this.fileToUpload.name  == "" ){
-      this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);  
+      this.confirmationDialogService.confirm('Atención','No has seleccionado un tipo de archivo.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
 
-    if(this.fileToUpload.size >= 5000000){  
+    if (this.fileToUpload.name  == "" ){
+      this.confirmationDialogService.confirm('Atención','El archivo no tiene nombre.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
+    if(this.fileToUpload.size >= 5000000){
       this.confirmationDialogService.confirm('Atención','El tamaño del archivo debe ser menor a 5MB.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
-    }    
+    }
 
-    
+
     const reader = new FileReader();
     reader.readAsDataURL(this.fileToUpload);
     reader.onload = () => {
-      var file = reader.result.toString(); 
+      var file = reader.result.toString();
         if(file.includes("data:image") || file.includes("openxmlformats") || file.includes("data:application/pdf") || file.includes("text/plain")){
 
           let fileToAdd = new ArchivoPuerto;
@@ -567,7 +563,7 @@ export class LineupEmbarqueComponent implements OnInit {
           fileToAdd.archivo = file;
           fileToAdd.fecha = new Date;
           fileToAdd.embarque_Id = this.instanciaWorkflow.embarque.id;
-          fileToAdd.nombreArchivo = this.fileToUpload.name        
+          fileToAdd.nombreArchivo = this.fileToUpload.name
           fileToAdd.tipoArchivoPuerto = this.nombreArchivo[0];
           fileToAdd.id = 0;
 
@@ -575,16 +571,16 @@ export class LineupEmbarqueComponent implements OnInit {
           this.ArchivosPuerto = this.ArchivosPuerto.sort((a,b) => a.id - b.id)
           this.nombreArchivo = null;
           this.fileToUpload = null
-    
+
       }else{
-        //Salgo y no lo dejo agregar 
+        //Salgo y no lo dejo agregar
         this.confirmationDialogService.confirm('Atención','El archivo tiene un formato inválido.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       }
     }
-      
+
       //Lo agrego a la lista de existentes, para saber cuales guardar van a ser los que tengan id en 0 o nulo
       //Primero valido que esté toda la data necesaria completa
-    
+
   }
 
 }
