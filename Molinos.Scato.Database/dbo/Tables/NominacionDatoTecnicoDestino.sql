@@ -25,7 +25,8 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
                 @destinoPrevio NVARCHAR(60),
                 @destinoNuevo NVARCHAR(60);
 
-	    SELECT @idNominacion = n.id, @idEmbarque = Embarque_Id, @dateDiff = DATEDIFF(MINUTE, n.FechaCreacion, GETDATE())
+	    SELECT  @idNominacion = n.id, @idEmbarque = Embarque_Id, 
+                @dateDiff = DATEDIFF(SECOND, n.FechaCreacion, GETDATE()) -- Segundos entre la creación de la nominación y el insert de destino
         FROM nominaciondatotecnicodestino dtd
 	    INNER JOIN NominacionDatoTecnico dt ON dtd.NominacionDatoTecnico_Id = dt.Id
 	    INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
@@ -50,9 +51,9 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
             FROM Embarque WHERE Id = @idEmbarque
         END
 
-        IF EXISTS (SELECT * FROM deleted) AND EXISTS (SELECT * FROM inserted) BEGIN -- UPDATE
-            IF((SELECT Destino_Id FROM deleted) <> (SELECT Destino_Id FROM inserted))
-            BEGIN
+        -- UPDATE
+        IF EXISTS (SELECT 1 FROM deleted) AND EXISTS (SELECT 1 FROM inserted) BEGIN 
+            IF((SELECT Destino_Id FROM deleted) <> (SELECT Destino_Id FROM inserted)) BEGIN
                 INSERT INTO Auditoria
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoDestino', 'Destino_Id', d.Destino_Id, i.Destino_Id , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
@@ -63,8 +64,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
                 END
             END
 
-            IF((select Cantidad from deleted) <> (select Cantidad from inserted))
-            BEGIN
+            IF ((SELECT ISNULL(Cantidad, 0) FROM deleted) <> (SELECT ISNULL(Cantidad, 0) FROM inserted)) BEGIN
                 INSERT INTO Auditoria
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoDestino', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
@@ -72,23 +72,25 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
                 IF(@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
                     VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino cantidad (' + 
-                        (SELECT @destinoNuevo + ' ' + D.Cantidad + ' -> ' + I.Cantidad FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
+                        (SELECT @destinoNuevo + ' ' + ISNULL(D.Cantidad, 0) + ' -> ' + ISNULL(I.Cantidad, 0) 
+                        FROM deleted D JOIN inserted I ON D.id = I.id ) + ')'
+                        , GETDATE())
                 END
             END
         END
-        ELSE IF EXISTS (SELECT * FROM inserted) BEGIN -- INSERT
-            IF(@dateDiff > 1) BEGIN -- EXCLUYE PRIMER INSERT
-                INSERT INTO Auditoria
-                SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', NULL, @destinoNuevo , GETDATE()
-                FROM inserted
-            END
-
+        -- INSERT (A menos que el insert del destino sea al momento de la creación de la nominación)
+        ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 3 BEGIN 
+            INSERT INTO Auditoria
+            SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', NULL, @destinoNuevo , GETDATE()
+            FROM inserted
+                
             IF(@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
                 VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Nuevo destino (' + @destinoNuevo + ')', GETDATE())
             END
         END
-        ELSE BEGIN -- DELETE
+        -- DELETE
+        ELSE BEGIN 
             INSERT INTO Auditoria
             SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', @destinoPrevio, NULL , GETDATE()
             FROM deleted

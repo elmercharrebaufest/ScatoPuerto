@@ -68,7 +68,8 @@ export class TanquesComponent implements OnInit {
   obtenerModuloDeCarga() {
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.moduloDeCarga = this._procesoService.getModuloDeCarga();
-    if (this.moduloDeCarga.cargado) {
+    
+    if (this.moduloDeCarga?.cargado) {
       this.tankGroup.get('Tanque1').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque1);
       this.tankGroup.get('Tanque2').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque2);
       this.tankGroup.get('Tanque7').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque7);

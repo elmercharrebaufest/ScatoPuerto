@@ -4,8 +4,11 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { Mano, NirManualPuerto } from '@ScatoModels/nir';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
@@ -28,7 +31,9 @@ constructor(
     private moduloDeCargaService: ModuloDeCargaService,
     private calidadSharedService: CalidadSharedService,
     private session: SessionService,
-    private fb: FormBuilder) {
+    private fb: FormBuilder,
+    private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
+    private planoDeCargaService: PlanoDeCargaService) {
       this.user = this.session.getUser();
       this.obtenerNir();
     }
@@ -187,9 +192,13 @@ constructor(
     }
   }
 
-  obtenerBodegas(){
-    this.moduloDeCargaService.obtenerListadoBodegas()
-    .subscribe( bod =>  this.bodegas = bod);
+  obtenerBodegas(){      
+    let planoDeCargaId = this.datosEmbarqueProcesoService.getPlanoDeCargaId();
+    this.planoDeCargaService.obtenerBodegas(planoDeCargaId).subscribe(
+      bodegas => {
+        this.bodegas = bodegas;      
+      }
+    )
   }
 
   getNir(): NirManualPuerto[]{

@@ -124,7 +124,8 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaPro
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaProgramaEmbarqueCopia') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaProgramaEmbarqueCopia', 'scatoprodMOA@molinosagro.com.ar'); END
 GO
-
+IF NOT EXISTs (select 1 from ConfiguracionMail where TemplateMail = 'NominacionesExcel') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('NominacionesExcel', 'macarena.asqueri@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar; cintia.maltoni@molinosagro.com.ar; alejandra.sarquis@molinosagro.com.ar; hugo.baratto@molinosagro.com.ar; omar.mazany@molinosagro.com.ar; diego.mazettelle@molinosagro.com.ar; mauricio.mezzavilla@molinosagro.com.ar; nestor.kantt@molinosagro.com.ar; pablo.noceda@molinosagro.com.ar; edgardo.ponce@molinosagro.com.ar; sergio.mossin@molinosagro.com.ar; pablo.kieffer@molinosagro.com.ar; mauro.ortega@molinosagro.com.ar; cristian.frank@molinosagro.com.ar; rodrigo.gonzalez@molinosagro.com.ar; adrian.mauri@molinosagro.com.ar; martin.amado@molinosagro.com.ar; federico.romano@molinosagro.com.ar; damian.calvet@molinosagro.com.ar; daniel.santos@molinosagro.com.ar; sebastian.bertazzo@molinosagro.com.ar; ruben.bisson@molinosagro.com.ar; fabricio.herrera@molinosagro.com.ar; sebastian.muniz@molinosagro.com.ar; marcelo.gustavo.lopez@molinosagro.com.ar; jose.luis.gomez@molinosagro.com.ar; cristian.leonori@molinosagro.com.ar; nestor.sosaguerci@Molinosagro.com.ar; norberto.moriconi@molinosagro.com.ar; sebastian.bolger@molinosagro.com.ar; matias.abramor@molinosagro.com.ar; martin.manoni@molinosagro.com.ar; mauro.mir@molinosagro.com.ar; leandro.armendari@molinosagro.com.ar; lucioano.arario@molinosagro.com.ar; Antonela.Labonia@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar; melina.corio@mocommodities.com; ileana.rodriguez@mocommodities.com; rosario.viana@mocommodities.com; liz.pereira@molinosagro.com.ar; Trading@mocommodities.com; leandro.varela@molinosagro.com.ar; german.turcutto@molinosagro.com.ar; GrupoPeritosDeEmbarque@molinosagro.com.ar; Ariel.Lascano@molinosagro.com.ar; joaquin.sarachaga@mocommodities.com; German.Castagnani@molinosagro.com.ar; jimena.rodriguez@molinosagro.com.ar; emanuel.venica@molinosagro.com.ar; Candela.Kremzky@molinosagro.com.ar; juan.lapissonde@molinosagro.com.ar; hernan.ferreira@mocommodities.com') END
+GO
 
 -- Puntos de Interes para geolocalizacion.
 if not exists(select 1 from PuntosInteresGeolocalizacion where Latitud = '-35.61958  ' and Longitud='-55.88947') BEGIN insert into PuntosInteresGeolocalizacion (Nombre, TipoUbicacion, Imagen,Puerto, Pais, HorasSanBenito, Latitud, Longitud, DistanciaKM, TipoZona, AgrupadorZona, PosicionZona, RadioPunto, Estado, FechaRegistro) values('Recalada','Fondeadero','ancla','','AR','30','-35.61958  ','-55.88947',5,'','','',15000,1,getdate()) END
@@ -467,6 +468,18 @@ insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Alma
                     values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,0        ,'#CDAD0D','RSFO')
 END
 GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'LECITINA DE SOJA') 
+BEGIN
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
+    values ('LECITINA DE SOJA','LEC','99056', 0, '#FFFFFF', 'LEC') 
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'ACEITE DE SOJA NEUTRALIZADO') 
+BEGIN
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
+    values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF', 'SBO NEU')
+END
+GO
 
 update MaterialPuerto set DescripcionCortaIngles = 'SB'    ,Color = '#D3B177' where descripcion = 'POROTO DE SOJA'
 update MaterialPuerto set DescripcionCortaIngles = 'SBMHP' ,Color = '#FFE0A8' where descripcion = 'HARINA DE SOJA*' -- DUDA DE NOMBRE
@@ -479,6 +492,8 @@ update MaterialPuerto set DescripcionCortaIngles = 'CSFOHO',Color = '#FFFFFF' wh
 update MaterialPuerto set DescripcionCortaIngles = 'WHEAT' ,Color = '#92B234' where descripcion = 'TRIGO'
 update MaterialPuerto set DescripcionCortaIngles = 'SBMLP' ,Color = '#FFCF79' where descripcion = 'SoyBean Low Pro' --ESTÁ MAL EL COLOR SEGÚN LA TABLA
 update MaterialPuerto set DescripcionCortaIngles = 'SFPMP' ,Color = '#555554' where descripcion = 'Pellet de girasol'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'LEC'   ,Color = '#FFFFFF' WHERE Descripcion = 'LECITINA DE SOJA'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'SBO NEU', Color = '#FFFFFF' WHERE Descripcion = 'ACEITE DE SOJA NEUTRALIZADO'
 
 
 declare @SB     int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SB'     )
@@ -809,6 +824,20 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
 
+-- Nuevos Paises
+if not exists (select 1 from Pais where Descripcion = 'GEORGIA') begin insert into Pais (Descripcion) values ('GEORGIA'); end
+if not exists (select 1 from Pais where Descripcion = 'LIBERIA') begin insert into Pais (Descripcion) values ('LIBERIA'); end
+
+if not exists (select 1 from Destino where Nombre = 'GEORGIA') begin insert into Destino (Nombre) values ('GEORGIA'); end
+if not exists (select 1 from Destino where Nombre = 'LIBERIA') begin insert into Destino (Nombre) values ('LIBERIA'); end
+
+
+-- Nuevos Coordinadores
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Agrocorp') begin insert into CoordinadorPuerto (Nombre) values ('Agrocorp'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Invictus') begin insert into CoordinadorPuerto (Nombre) values ('Invictus'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'The Andersons') begin insert into CoordinadorPuerto (Nombre) values ('The Andersons'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin insert into CoordinadorPuerto (Nombre) values ('Panocean'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
 
 /* SCRIPTS DATOS AFIP */
 IF NOT EXISTS(SELECT 1 FROM AfipCaratulaEstado) BEGIN INSERT INTO AfipCaratulaEstado (Estado) VALUES ('Aceptado'), ('Rectificado'), ('Enviado (Ya asociado COEM)'), ('Eliminado') END

@@ -165,12 +165,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   cargarTurnosBodegasDestinos() {
-    this._turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;
-      if (this.formExportarExcel) this.addParcelChecks();
-      this.getProductos();
-      this.getDestinos();
-    });
+    this.bodegas = this._turnosService.getBodega();
+    
+    if (this.formExportarExcel) this.addParcelChecks();
+
+    this.getProductos();
+    this.getDestinos();
+    
   }
 
   expandir() {
@@ -543,9 +544,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   getCombos() {
-    this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
     let lineasPlanilla = [];
-    this.lineas.forEach(function (item) {
+    this.lineas?.forEach(function (item) {
       var i = lineasPlanilla.findIndex(x => x.linea == item.linea);
       if (i <= -1) {
         lineasPlanilla.push({ id: item.id, linea: item.linea });
@@ -564,16 +565,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
     }
 
-    this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
-    this.bodegas = this._turnosService.getBodega();
+    this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');   
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.vientoAmarre = this.procesoService.getVientoAmarre();
     this.direccionViento = this.procesoService.getDireccionViento();
-    let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
+    let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[])?.filter(x => x.esLiquido == true);
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
-    this.getDestinos();
-    this.getProductos();
+
+    this.cargarTurnosBodegasDestinos();    
     this.getMotivosCorte();
   }
 
@@ -829,7 +829,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaInicialMM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalCM.setValue(0);
         controSel['controls'][index]['controls'].medidaFinalMM.setValue(0);
-        controSel['controls'][index]['controls'].destino.setValue(0);
+        //controSel['controls'][index]['controls'].destino.setValue(0);
         controSel['controls'][index]['controls'].tk.setValue(0);
 
         controSel['controls'][index]['controls'].temperatura.disable();
@@ -839,7 +839,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].medidaFinalMM.disable();
         controSel['controls'][index]['controls'].medidaInicialCMyMM.disable();
         controSel['controls'][index]['controls'].medidaFinalCMyMM.disable();
-        controSel['controls'][index]['controls'].destino.disable();
+        //controSel['controls'][index]['controls'].destino.disable();
         controSel['controls'][index]['controls'].tk.disable();
       }
     }
@@ -1137,7 +1137,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalCM: [{ value: medidaFinalCM , disabled: bloqueoVicentin }],
       medidaFinalMM: [{ value: medidaFinalMM , disabled: bloqueoVicentin }],
       destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
-      cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: false }],
+      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
     });
     return formulario;
@@ -1219,7 +1219,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.destinos = new Array();
     if (this.bodegas != null || this.bodegas != undefined) {
       this.bodegas.forEach(b => {
-        if (!this.destinos.find(d => d.nombre == b.destino.nombre)) {
+        if (!this.destinos?.find(d => d.nombre == b.destino.nombre)) {
           this.destinos.push(b.destino);
         }
       });

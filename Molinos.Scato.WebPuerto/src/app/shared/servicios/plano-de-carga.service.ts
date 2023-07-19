@@ -10,6 +10,8 @@ import { AgenteControlPrivado } from '@ScatoModels/agente-control-privado';
 import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
 import { Mail } from '@ScatoModels/mail';
 import { Embarque } from '@ScatoModels/embarque';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { Bodega } from '@ScatoModels/balanzadas/balanza';
 
 
 @Injectable({
@@ -59,6 +61,10 @@ export class PlanoDeCargaService {
 
   obtenerPlanoDeCarga(planoDeCargaId: number) {
     return this.http.get<PlanoDeCarga>(`${this.url}PlanoDeCarga/ObtenerPlanoDeCarga?id=`+planoDeCargaId, { 'withCredentials' : true});
+  }
+
+  obtenerBodegas(idPlanoDeCarga: number): Observable<Bodega[]>{
+    return this.http.get<Bodega[]>(`${this.url}PlanoDeCarga/listarBodegas?idPlanoDeCarga=`+idPlanoDeCarga, {'withCredentials': true});
   }
 
   agregarEstiba(estiba: Estiba) {
