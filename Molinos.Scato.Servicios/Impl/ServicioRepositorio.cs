@@ -9239,10 +9239,10 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
         public IList<BodegaDto> ListarBodegasNir(int planoDeCargaId)
-        {            
+        {
             var bodegasId = repositorio.Listar<PlanoDeCargaBodega>(x => x.PlanoDeCarga.Id == planoDeCargaId).Select(b => b.BodegaParcel);
             var bodegas = Listar<Bodega, BodegaDto>(x => bodegasId.Contains(x.Id));
-            
+
             return bodegas;
         }
 
@@ -11160,6 +11160,7 @@ namespace Molinos.Scato.Servicios.Impl
                     var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
                     InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
                     {
+                        Id = lineupDto.InstanciaWorkflow,
                         Embarque = embarque,
                         LineUp = lineupDto
                     });

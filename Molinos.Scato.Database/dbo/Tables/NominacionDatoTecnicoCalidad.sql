@@ -13,29 +13,20 @@ GO
 
 CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCalidad]
     ON [dbo].[NominacionDatoTecnicoCalidad]
-    FOR  UPDATE
+    FOR UPDATE
     AS
     BEGIN
        
-        declare @idNominacion INT;
+        DECLARE @idNominacion INT;
  
-	select  @idNominacion = (select n.id from NominacionDatoTecnicoCalidad dtc 
-    inner join NominacionDatoTecnico dt on dtc.NominacionDatoTecnico_Id = dt.Id
-    inner join Nominacion n on dt.Id = n.NominacionDatoTecnico_Id
-    where dt.Id = (select id from  deleted))
+	    SELECT @idNominacion = (SELECT n.id FROM NominacionDatoTecnicoCalidad dtc 
+        INNER JOIN NominacionDatoTecnico dt ON dtc.NominacionDatoTecnico_Id = dt.Id
+        INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
+        WHERE dt.Id = (SELECT id FROM deleted))
 
-
-      IF((select CalidadValor_Id from deleted) <> (select CalidadValor_Id from inserted) )
-        BEGIN
-
-		 insert into Auditoria
-        SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCalidad', 'CalidadValor_Id', d.CalidadValor_Id,
-	        i.CalidadValor_Id , GETDATE()
-             FROM deleted AS d
-			  JOIN inserted AS i
-             ON d.Id=i.Id
-
+        IF((SELECT ISNULL(CalidadValor_Id, 0) FROM deleted) <> (SELECT ISNULL(CalidadValor_Id, 0) FROM inserted)) BEGIN
+            INSERT INTO Auditoria
+            SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCalidad', 'CalidadValor_Id', d.CalidadValor_Id, i.CalidadValor_Id , GETDATE()
+            FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
         END
-        
-
     END
