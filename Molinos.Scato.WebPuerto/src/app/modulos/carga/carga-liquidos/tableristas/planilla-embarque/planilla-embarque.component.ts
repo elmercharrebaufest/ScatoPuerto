@@ -48,13 +48,16 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       this.getProductos();
       this.getTanqueAbordo();
     });
-    this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
-      if (data) {
-        this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-          this.lineas = resp.moduloDeCargaLineasDeEmbarque;
-        });
-      }
-    });
+    setTimeout(() => {
+      this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
+        if (data) {
+          this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+            this.lineas = resp.moduloDeCargaLineasDeEmbarque;
+          });
+        }
+      });
+    }, 1200);
+    
   }
 
   ngAfterViewInit(): void {
@@ -113,15 +116,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     // this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
 
     //Si tengo items en la planilla de embarque los agrego a la tabla.
-    if (this.planillaDeEmbarque){
+    setTimeout(() => {
+      if (this.planillaDeEmbarque){
 
-      if (this.planillaDeEmbarque.length > 0){
-        this.fillPlanillaDeEmbarque();
-      }else{
-        //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
-        this.getPlanillaDeEmbarque().push(this.initLinea());
+        if (this.planillaDeEmbarque.length > 0){
+          this.fillPlanillaDeEmbarque();
+        }else{
+          //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
+          this.getPlanillaDeEmbarque().push(this.initLinea());
+        }
       }
-    }
+    }, 1000);
+    
   }
 
   fillPlanillaDeEmbarque(){
