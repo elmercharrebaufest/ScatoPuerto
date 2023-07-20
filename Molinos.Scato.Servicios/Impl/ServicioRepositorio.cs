@@ -8112,24 +8112,22 @@ namespace Molinos.Scato.Servicios.Impl
             if (planoDeCargaDto.FechaDeCreacion == null)
             {
                 var lineup = repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == planoDeCargaDto.Id);
-                var nominacion = repositorio.Obtener<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
-                if (nominacion != null)
+                var nominaciones = repositorio.Listar<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
+                var datosTecnicosExportadores = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador);
+                foreach (var datosTecnicosExportador in datosTecnicosExportadores)
                 {
-                    foreach (var datosTecnicosExportador in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+                    var cargaComercial = new CargaComercialDto();
+                    cargaComercial.Cantidad = datosTecnicosExportador.Cantidad;
+                    cargaComercial.Exportador = new ExportadorDto();
+                    cargaComercial.Exportador.Id = datosTecnicosExportador.Exportador.Id;
+                    cargaComercial.Exportador.Nombre = datosTecnicosExportador.Exportador.Nombre;
+                    if (datosTecnicosExportador.Exportador.Almacen != null)
                     {
-                        var cargaComercial = new CargaComercialDto();
-                        cargaComercial.Cantidad = datosTecnicosExportador.Cantidad;
-                        cargaComercial.Exportador = new ExportadorDto();
-                        cargaComercial.Exportador.Id = datosTecnicosExportador.Exportador.Id;
-                        cargaComercial.Exportador.Nombre = datosTecnicosExportador.Exportador.Nombre;
-                        if (datosTecnicosExportador.Exportador.Almacen != null)
-                        {
-                            cargaComercial.Exportador.Almacen_Id = datosTecnicosExportador.Exportador.Almacen.Id;
-                            cargaComercial.Exportador.AlmacenDesc = datosTecnicosExportador.Exportador.Almacen.Descripcion;
-                        }
-                        cargaComercial.MaterialPuerto = conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(datosTecnicosExportador.NominacionDatoTecnico.MaterialPuerto);
-                        planoDeCargaDto.CargasComerciales.Add(cargaComercial);
+                        cargaComercial.Exportador.Almacen_Id = datosTecnicosExportador.Exportador.Almacen.Id;
+                        cargaComercial.Exportador.AlmacenDesc = datosTecnicosExportador.Exportador.Almacen.Descripcion;
                     }
+                    cargaComercial.MaterialPuerto = conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(datosTecnicosExportador.NominacionDatoTecnico.MaterialPuerto);
+                    planoDeCargaDto.CargasComerciales.Add(cargaComercial);
                 }
             }
 
