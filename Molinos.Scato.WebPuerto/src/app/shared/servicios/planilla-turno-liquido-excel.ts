@@ -296,6 +296,7 @@ export class PlanillaTurnoLiquidoExcelService {
             worksheet.getRow(offset).getCell(14).value = turno.cantidad;
         }else{
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
+            worksheet.getRow(offset).height = 50;
             worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
             worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
@@ -665,7 +666,7 @@ export class PlanillaTurnoLiquidoExcelService {
 
           /* Cabeceras Turno */
           worksheet.getCell(`B${baseCell}`).value  = "Turno";
-          worksheet.getCell(`B${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+          worksheet.getCell(`B${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };          
           worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
           worksheet.getCell(`B${baseCell}`).border = borders;
           worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}          

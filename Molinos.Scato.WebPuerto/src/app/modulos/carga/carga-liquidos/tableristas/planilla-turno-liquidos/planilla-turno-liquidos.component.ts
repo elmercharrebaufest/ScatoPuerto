@@ -1481,7 +1481,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
             const objTurnosDetalles = {
               bodegaParcel: bodegaParcelVal,
-              cantidad: cantidad,
+              cantidad: Math.round(cantidad),
               destino: turnoDestinoVal,
               exportador: exportadorVal,
               id: turnoDetalle.value.id,
