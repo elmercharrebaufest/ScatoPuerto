@@ -1,76 +1,92 @@
-.line {  
-    height: 7px;
-    width: 100%;
+.line {
+  height: 7px;
+  width: 100%;
 }
 
-.tabs{
-    width: 33%;
-    text-align: center;
-    color: black !important;
-    font-weight: bold;
-
+.tabs {
+  width: 33%;
+  text-align: center;
+  color: black !important;
+  font-weight: bold;
 }
 
-.labelTabs{
-    cursor: pointer;
+.labelTabs {
+  cursor: pointer;
 }
 
 .margenes {
-    margin-left: 12px;
-    margin-top: 16px;
+  margin-left: 12px;
+  margin-top: 16px;
 }
 
-.titulo{
-    font-size: 16px;
+.titulo {
+  font-size: 16px;
 }
 
-.nav-link.labelTabs.active{
-    border-bottom: 2px solid #4461a8;
+.nav-link.labelTabs.active {
+  border-bottom: 2px solid #4461a8;
 }
 
-.tamanioLetraModal{
-    font-size: 14px;
+.tamanioLetraModal {
+  font-size: 14px;
 }
 
-.cursor{
-    cursor: pointer;
+.cursor {
+  cursor: pointer;
 }
 
-.header{
-    text-align: center;
-    background-color: #d8d8d8;
+.header {
+  text-align: center;
+  background-color: #d8d8d8;
 }
 
-.tableFixHead          { overflow-y: auto; height: 360px; }
-.tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
-
-table  { border-collapse: collapse; width: 100%; }
-th, td { padding: 8px 16px; }
-th     { background:#eee; }
-
-
-.calendario{
-    font-size: 45px;
-    position: absolute;
+.tableFixHead {
+  overflow-y: auto;
+  height: 360px;
+}
+.tableFixHead thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-.margen{
-    margin-left: 50px;
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  padding: 8px 16px;
+}
+th {
+  background: #eee;
 }
 
-.centradoHorizontal{
-    vertical-align: inherit;
+.calendario {
+  font-size: 45px;
+  position: absolute;
 }
 
-.margenIzquiera5px{
-    margin-left: 5px;
+.margen {
+  margin-left: 50px;
 }
 
-.cierre{
- margin-right: 10px;   
+.centradoHorizontal {
+  vertical-align: inherit;
+}
+
+.margenIzquiera5px {
+  margin-left: 5px;
+}
+
+.cierre {
+  margin-right: 10px;
 }
 
 .texto-rojo {
-    color: red;
+  color: red;
 }
 
+tr.nuevo-elemento {
+  border-left: 2px solid red;
+}

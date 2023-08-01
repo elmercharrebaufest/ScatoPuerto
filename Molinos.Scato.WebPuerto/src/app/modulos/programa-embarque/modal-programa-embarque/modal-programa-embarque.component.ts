@@ -31,7 +31,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   cerraModal() {
     this.cerrar.emit();
-   }
+  }
 
   ngOnInit(): void {
     this.estaCargando = true;
@@ -49,129 +49,77 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
     //this.nominacion.id
     this.programaEmbarqueService.obtenerAuditoria(this.nominacion.id).subscribe((res: Auditoria[]) => {
       this.auditoria = res;
-      console.log('res-->>', res);
     }, error => { }, () => {
-      this.nominacion;
-      //Recoorro todas las variables de la nominación
-      for (const [key, value] of Object.entries(this.nominacion)) {
-        //Me fijo si el values es de tipo object
-        if (value != null && value != undefined && typeof value == 'object') {
-          //Me fijo si el objeto es un dato técnico
-          if (key == 'nominacionDatoTecnico') {
-            //Recorro todas las variables del dato técnico.
-            for (const [key2, value2] of Object.entries(value)) {
-              //if (key2 != null && key2 != undefined && value != null && value2 != undefined && typeof value2 != 'object') {
-                if (key2 != null && key2 != undefined && value != null && value2 != undefined) {
-                //Busco si esa variable existe en mi tabla de auditorías.
-                let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key2.toLowerCase())
-                if (audit != null && audit != undefined) {
-                  //En caso de encontrarla me fijo si tiene la clase que valida auditoría y la pinto de rojo.
-                  let auditoria = document.getElementsByClassName(key + key2 + "Auditoria");
-                  let tabDatoTecnicoAuditoria = document.getElementsByClassName("tabDatoTecnicoAuditoria")
-                  let auditoriaTecnicoCheck = document.getElementsByClassName("auditoriaTecnicoCheck");
+      // #region Tabs
 
-                  if (auditoria.length > 0)
-                    document.getElementsByClassName(key + key2 + "Auditoria")[0].classList.add('texto-rojo');
-                  //También pinto el título del tab de la pantalla
-                  if (tabDatoTecnicoAuditoria.length > 0)
-                    document.getElementsByClassName("tabDatoTecnicoAuditoria")[0].classList.add('texto-rojo');
-                  //Y le agrego el puntito rojo al tab.
-                  if (auditoriaTecnicoCheck.length > 0)
-                    (document.getElementsByClassName("auditoriaTecnicoCheck")[0] as HTMLElement) .style.visibility ='visible';
-                }
-              }
-            }
-          //Me fijo si el objeto es un detalle intervención
-          } else if (key == 'nominacionDetalleIntervencion') {
-            //Recorro todas las variables del objeto
-            for (const [key2, value2] of Object.entries(value)) {
-              let id: number = 0;
-              //Me fijo si es el array de senasa.
-              if (key2 == 'senasa') {
-                let i: number = 0;
-                for (const [key3, value3] of Object.entries(value2)) {
-                  for (const [key4, value4] of Object.entries(value3)) {
-                    //Me guardo el ID para poder buscar en la auditoría.
-                    if (key4.toLowerCase() == 'id') {
-                      if (typeof value4 == 'number') id = value4;
-                    }
-                    let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key2.toLowerCase() && x.propiedad.toLowerCase() == key4.toLowerCase() && x.entidad_Id == id)
-                    if (audit != null && audit != undefined) {
-                      //Busco observacionesDatoTecnicoAuditoria y lo pongo rojo
-                      document.getElementsByClassName(key + key4 + "Auditoria")[i].classList.add('texto-rojo');
-                      document.getElementsByClassName("tabDetalleIntervencionAuditoria")[0].classList.add('texto-rojo');
-                      (document.getElementsByClassName("auditoriaIntervencionCheck")[0] as HTMLElement) .style.visibility ='visible';
-                    }
-                  }
-                  i++;
-                }
-              } else{
-                if (key2 != null && key2 != undefined && value != null && value2 != undefined && typeof value2 != 'object') {
-                  //Busco si esa variable existe en mi tabla de auditorías.
-                  let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key2.toLowerCase())
-                  if (audit != null && audit != undefined) {
-                    //En caso de encontrarla me fijo si tiene la clase que valida auditoría y la pinto de rojo.
-                    document.getElementsByClassName(key + key2 + "Auditoria")[0].classList.add('texto-rojo');
-                    document.getElementsByClassName("tabDetalleIntervencionAuditoria")[0].classList.add('texto-rojo');
-                    (document.getElementsByClassName("auditoriaIntervencionCheck")[0] as HTMLElement) .style.visibility ='visible';
-                  }
-                }
-              }
-            }
-          } else if (key == 'nominacionRecibo') {
-            let i: number = 0;
-            if (value != null) {
-              for (const [key2, value2] of Object.entries(value)) {
-                let id: number = 0;
-                if (value2 != null) {
-                  for (const [key3, value3] of Object.entries(value2)) {
-                    if (key3 != null && key3 != undefined && value2 != null && value3 != undefined && typeof value3 != 'object') {
-                      if (key3.toLowerCase() == 'id') {
-                        if (typeof value3 == 'number') id = value3;
-                      }
-                      let audit: any = this.auditoria.find(x => x.entidadNombre?.toLowerCase() == key.toLowerCase() && x.propiedad.toLowerCase() == key3.toLowerCase() && x.entidad_Id == id)
-                      if (audit != null && audit != undefined) {
-                        //Busco observacionesDatoTecnicoAuditoria y lo pongo rojo
-                        let auditoria = document.getElementsByClassName(key + key3 + "Auditoria");
-                        let tabDatosDeReciboAuditoria = document.getElementsByClassName("tabDatosDeReciboAuditoria");
-                        let auditoriaReciboCheck = document.getElementsByClassName("auditoriaReciboCheck");
-
-                        if (auditoria.length > 0)
-                          auditoria[i].classList.add('texto-rojo');
-                        if (tabDatosDeReciboAuditoria.length > 0)
-                          tabDatosDeReciboAuditoria[0].classList.add('texto-rojo');
-                        if (auditoriaReciboCheck.length > 0)
-                          (auditoriaReciboCheck[0] as HTMLElement) .style.visibility ='visible';
-                      }
-                    }
-                  }
-                }
-                i++;
-              }
-            }
-          }
-
-
-        } else {
-          //es una variable
-          this.auditoria.find(x => x.entidadNombre == "nominacion" && x.propiedad == key)
-        }
+      // Dato técnico
+      if (this.auditoria.some(a => a.entidadNombre.startsWith('NominacionDatoTecnico'))) {
+        document.getElementsByClassName("tabDatoTecnicoAuditoria")[0]?.classList.add('texto-rojo');
+        const puntoRojo = document.getElementsByClassName("auditoriaTecnicoCheck")[0] as HTMLElement;
+        if (puntoRojo) puntoRojo.style.visibility = 'visible';
       }
 
-      // Recorro las variables de Coordinador, Exportador y Destino para pintar de rojo
-      this.auditoria.filter(a => /NominacionDatoTecnico.{1,}/g.test(a.entidadNombre)).forEach(a => {
-        const campo = document.getElementsByClassName(a.entidadNombre + a.entidad_Id)[0];
-        const tituloTab = document.getElementsByClassName("tabDatoTecnicoAuditoria")[0];
-        const puntoRojoTab = document.getElementsByClassName("auditoriaTecnicoCheck")[0] as HTMLElement;
-        campo.classList.add('texto-rojo');
-        tituloTab.classList.add('texto-rojo');
-        puntoRojoTab.style.visibility = 'visible';
+      // Detalles Intervención
+      if (this.auditoria.some(a => ['NominacionDetalleIntervencion', 'Senasa'].includes(a.entidadNombre))) {
+        // color rojo en nombre de tab y aparición de punto rojo
+        document.getElementsByClassName("tabDetalleIntervencionAuditoria")[0]?.classList.add('texto-rojo');
+        const puntoRojo = document.getElementsByClassName("auditoriaIntervencionCheck")[0] as HTMLElement;
+        if (puntoRojo) puntoRojo.style.visibility = 'visible';
+      }
+
+      // Recibos
+      if (this.auditoria.some(a => a.entidadNombre == 'NominacionRecibo')) {
+        document.getElementsByClassName("tabDatosDeReciboAuditoria")[0]?.classList.add('texto-rojo');
+        const puntoRojo = document.getElementsByClassName("auditoriaReciboCheck")[0] as HTMLElement;
+        if (puntoRojo) puntoRojo.style.visibility = 'visible';
+      }
+
+      // #endregion Tabs
+
+      const fnCase = (str: string) => str.charAt(0).toLocaleLowerCase() + str.slice(1); // funcion para pasar de PascalCase a camelCase
+
+      // Se recorren los valores de de auditoria y se ponen en rojo las propiedades que aparecen. Se excluyen arrays
+      this.auditoria.filter(a => !/Senasa|NominacionRecibo|NominacionDatoTecnico(?=\w)/i.test(a.entidadNombre)).forEach(a => {
+        const [entidad, propiedad] = [fnCase(a.entidadNombre), fnCase(a.propiedad)];
+        const elemento = document.getElementsByClassName(entidad + propiedad + 'Auditoria')[0] || document.getElementsByClassName(entidad + propiedad.toLocaleLowerCase() + 'Auditoria')[0];
+        elemento?.classList.add('texto-rojo');
       });
 
-      // Object.keys(this.nominacion).forEach(e => {
-      //   if(e.ty)
-      //   this.auditoria.find(x => x.entidadNombre == 'nominacionDatoTecnico' && x.propiedad == e)
-      // })
+      // Coordinador, Exportador y Destino
+      this.auditoria.filter(a => /NominacionDatoTecnico.{1,}/g.test(a.entidadNombre)).forEach(a => {
+        const campo = document.getElementsByClassName(a.entidadNombre + a.entidad_Id)[0];
+        campo.classList.add('texto-rojo');
+      });
+
+      // Recibos
+      this.auditoria.filter(a => a.entidadNombre == 'NominacionRecibo').forEach(a => {
+        const tr = document.querySelector(`tr[data-reciboid="${a.entidad_Id}"]`);
+        if (tr) { // Puede no existir al tratarse de una eliminación
+          if (a.propiedad == 'Exportador') { // Nuevo recibo
+            tr.classList.add('nuevo-elemento')
+          } else {
+            const selector = fnCase(a.entidadNombre) + fnCase(a.propiedad) + 'Auditoria';
+            const elemento = tr.getElementsByClassName(selector)[0];
+            elemento?.classList.add('texto-rojo');
+          }
+        }
+      });
+
+      // Senasa
+      this.auditoria.filter(a => a.entidadNombre == 'Senasa').forEach(a => {
+        const tr = document.querySelector(`tr[data-senasaid="${a.entidad_Id}"]`);
+        if (tr) { // Puede no existir al tratarse de una eliminación
+          if (a.propiedad == 'Exportador') { // Nuevo SENASA
+            tr.classList.add('nuevo-elemento')
+          } else {
+            const selector = fnCase(a.entidadNombre) + fnCase(a.propiedad) + 'Auditoria';
+            console.log(selector);
+            const elemento = tr.getElementsByClassName(selector)[0];
+            elemento?.classList.add('texto-rojo');
+          }
+        }
+      });
+
       this.verificarEstado();
     })
   }
