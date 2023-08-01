@@ -52,50 +52,51 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
 
         -- UPDATE
         IF EXISTS (SELECT 1 FROM deleted) AND EXISTS (SELECT 1 FROM inserted) BEGIN
-            IF((SELECT CoordinadorPuerto_Id FROM deleted) <> (SELECT CoordinadorPuerto_Id FROM inserted) )
+            IF ((SELECT CoordinadorPuerto_Id FROM deleted) <> (SELECT CoordinadorPuerto_Id FROM inserted) )
             BEGIN
                 INSERT INTO Auditoria
                 SELECT @idNominacion, d.id, 'NominacionDatoTecnicoCoordinadorPuerto', 'CoordinadorPuerto_Id', d.CoordinadorPuerto_Id, i.CoordinadorPuerto_Id , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF(@idEmbarque > 0) BEGIN
+                IF (@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Cliente (' + @coordinadorPrevio + ' -> ' + @coordinadorNuevo + ')', GETDATE())
+                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Cliente (', @coordinadorPrevio, ' -> ', @coordinadorNuevo, ')'), GETDATE()
                 END
             END
 
-            IF((SELECT Cantidad FROM deleted) <> (SELECT Cantidad FROM inserted) )
+            IF ((SELECT Cantidad FROM deleted) <> (SELECT Cantidad FROM inserted) )
             BEGIN
                 INSERT INTO Auditoria
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                IF(@idEmbarque > 0) BEGIN
+
+                IF (@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Cliente cantidad (' + 
-                        (SELECT @coordinadorNuevo + ' ' + D.Cantidad + ' -> ' + I.Cantidad FROM deleted D JOIN inserted I ON D.id = I.id ) + ')', GETDATE())
+                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Cliente cantidad (', @coordinadorNuevo, ' ', D.Cantidad, ' -> ', I.Cantidad, ')'), GETDATE()
+                    FROM deleted D JOIN inserted I ON D.id = I.id
                 END
             END
         END
         -- INSERT (Excepto que sea en el mismo momento de la creación de la nominación)
-        ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 3 BEGIN 
+        ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 5 BEGIN 
             INSERT INTO Auditoria
             SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', NULL, @coordinadorNuevo, GETDATE()
             FROM inserted
 
-            IF(@idEmbarque > 0) BEGIN
+            IF (@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Nuevo cliente (' + @coordinadorNuevo + ')', GETDATE())
+                SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Nuevo cliente (', @coordinadorNuevo, ')'), GETDATE()
             END
         END
         -- DELETE
-        ELSE BEGIN
+        ELSE IF EXISTS (SELECT 1 FROM deleted) BEGIN
             INSERT INTO Auditoria
             SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', @coordinadorPrevio, NULL, GETDATE()
             FROM deleted
             
-            IF(@idEmbarque > 0) BEGIN
+            IF (@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Cliente eliminado (' + @coordinadorPrevio + ')', GETDATE())
+                SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Cliente eliminado (', @coordinadorPrevio, ')'), GETDATE()
             END
         END
     END
