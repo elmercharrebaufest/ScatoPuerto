@@ -53,14 +53,14 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
 
         -- UPDATE
         IF EXISTS (SELECT 1 FROM deleted) AND EXISTS (SELECT 1 FROM inserted) BEGIN 
-            IF((SELECT Destino_Id FROM deleted) <> (SELECT Destino_Id FROM inserted)) BEGIN
+            IF ((SELECT Destino_Id FROM deleted) <> (SELECT Destino_Id FROM inserted)) BEGIN
                 INSERT INTO Auditoria
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoDestino', 'Destino_Id', d.Destino_Id, i.Destino_Id , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF(@idEmbarque > 0) BEGIN
+                IF (@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino (' + @destinoPrevio + ' -> ' + @destinoNuevo + ')', GETDATE())
+                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Destino (', @destinoPrevio, ' -> ', @destinoNuevo, ')'), GETDATE()
                 END
             END
 
@@ -69,35 +69,33 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoDestino]
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoDestino', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF(@idEmbarque > 0) BEGIN
+                IF (@idEmbarque > 0) BEGIN
                     INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino cantidad (' + 
-                        (SELECT @destinoNuevo + ' ' + ISNULL(D.Cantidad, 0) + ' -> ' + ISNULL(I.Cantidad, 0) 
-                        FROM deleted D JOIN inserted I ON D.id = I.id ) + ')'
-                        , GETDATE())
+                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Destino cantidad (', @destinoNuevo, ' ', ISNULL(D.Cantidad, 0), ' -> ', ISNULL(I.Cantidad, 0), ')'), GETDATE()
+                    FROM deleted D JOIN inserted I ON D.id = I.id
                 END
             END
         END
         -- INSERT (A menos que el insert del destino sea al momento de la creación de la nominación)
-        ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 3 BEGIN 
+        ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 5 BEGIN 
             INSERT INTO Auditoria
             SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', NULL, @destinoNuevo , GETDATE()
             FROM inserted
                 
-            IF(@idEmbarque > 0) BEGIN
+            IF (@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Nuevo destino (' + @destinoNuevo + ')', GETDATE())
+                SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Nuevo destino (', @destinoNuevo, ')'), GETDATE()
             END
         END
         -- DELETE
-        ELSE BEGIN 
+        ELSE IF EXISTS (SELECT 1 FROM deleted) BEGIN
             INSERT INTO Auditoria
             SELECT @idNominacion , id, 'NominacionDatoTecnicoDestino', 'Destino', @destinoPrevio, NULL , GETDATE()
             FROM deleted
 
             IF (@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Destino eliminado (' + @destinoPrevio + ')', GETDATE())
+                SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Destino eliminado (', @destinoPrevio, ')'), GETDATE()
             END
         END
     END
