@@ -193,10 +193,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public eliminarEmbarque() {
-    this.openConfirmationDialog('¡Atención!',
-      'Está a punto de eliminar por completo un buque',
-      'Eliminar buque',
-      'Cancelar');
+    this.openConfirmationDialog('¡Atención!', 'Está a punto de eliminar por completo un buque', 'Eliminar buque', 'Cancelar');
   }
 
   public openConfirmationDialog(titulo: string, texto: string, button1: string = 'OK', button2: string = 'Cancel') {
