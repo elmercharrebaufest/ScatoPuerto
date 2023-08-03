@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
@@ -12,6 +13,11 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<AfipCaratula, AfipCaratulaDto>()
                 .ForMember(x => x.Itinerario, x => x.MapFrom(y => y.Itinerario));
             Mapper.CreateMap<AfipCaratulaDto, AfipCaratula>();
+            Mapper.CreateMap<AfipCaratulaDto, Caratula>()
+                .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
+            Mapper.CreateMap<AfipCaratulaItinerarioDto, Puerto>()
+            .ForMember(dest => dest.CodigoPuerto, opt => opt.MapFrom(src => src.Puerto));
+
         }
     }
 }

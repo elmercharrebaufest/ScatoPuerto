@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="https://wsaduhomoext.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx?wsdl" docRef="https://wsaduhomoext.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="https://wsaduhomoext.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx" xmlns:q1="Ar.Gob.Afip.Dga.wgescomunicacionembarque" binding="q1:wgescomunicacionembarqueSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="https://wsaduhomoext.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx" xmlns:q2="Ar.Gob.Afip.Dga.wgescomunicacionembarque" binding="q2:wgescomunicacionembarqueSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

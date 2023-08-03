@@ -422,7 +422,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         {
                             cuitTransportista = transportecuitTransportista,
                             nroVagon = transportenroVagon,
-                            nroPrecinto = nroPrecinto,
+                            nroPrecinto = nroPrecinto.Split(new char[]{ ';',' ', '_', '-' }, StringSplitOptions.RemoveEmptyEntries),
                             nroOperativo = nroOperativo,
                             ramal = new Ramal
                             {
@@ -652,7 +652,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         RamalFerroviario = responseCp?.respuesta?.transporte?.ramal?.codigo,
 
                         //NumeroOperativo
-                        NumeroPrecinto = responseCp?.respuesta?.transporte?.nroPrecinto,
+                        NumeroPrecinto = responseCp?.respuesta?.transporte?.nroPrecinto.ToString(),
 
                         //Pdf
                         Pdf = responseCp?.respuesta?.pdf is null ? null : responseCp?.respuesta?.pdf,

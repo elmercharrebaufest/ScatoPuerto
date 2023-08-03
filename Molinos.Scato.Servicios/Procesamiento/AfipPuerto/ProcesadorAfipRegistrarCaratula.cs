@@ -9,14 +9,20 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorAfipRegistrarCaratula : ProcesadorComando<AfipRegistrarCaratula>
     {
-        public ProcesadorAfipRegistrarCaratula(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
+        private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
+        public ProcesadorAfipRegistrarCaratula(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log) 
+        {
+            this.comunicacionEmbarqueServicioHelper = comunicacionEmbarqueServicioHelper;
+        }
 
         public override Resultado Ejecutar(AfipRegistrarCaratula comando)
         {
@@ -24,6 +30,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var caratula = comando.Dto;
+                var response = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
+                //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
                 if (caratula.Id == 0) // Registro
                 {
                     var estado = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Aceptado"));

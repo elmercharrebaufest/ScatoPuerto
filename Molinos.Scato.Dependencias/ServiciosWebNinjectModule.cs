@@ -15,6 +15,7 @@ using Ninject.Modules;
 using System.Data.Entity;
 using System.Net.Http;
 using System.ServiceModel;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 
 namespace Molinos.Scato.Dependencias
 {
@@ -34,6 +35,8 @@ namespace Molinos.Scato.Dependencias
             Bind<ICalculadoraDescuento, CalculadoraDescuento>().To<CalculadoraDescuento>().InScope(ctx => OperationContext.Current);
             Bind<IConfiguracionProvider, ConfiguracionProvider>().To<ConfiguracionProvider>().InSingletonScope();
             Bind<IAccesoWsCtg, AccesoWsCtg>().To<AccesoWsCtg>();
+            Bind<IAccesoComunicacionEmbarque, AccesoComunicacionEmbarque>().To<AccesoComunicacionEmbarque>();
+            Bind<IComunicacionEmbarqueServicioHelper, ComunicacionEmbarqueServicioHelper>().To<ComunicacionEmbarqueServicioHelper>();
             Bind<IFirmaProvider, FirmaProvider>().To<FirmaProvider>().InSingletonScope();
             Bind<IServicioImpresorFactory, ServicioImpresorFactory>().To<ServicioImpresorFactory>().InSingletonScope();
             Bind<IServicioMercadoPago, ServicioMercadoPago>().To<ServicioMercadoPago>().InScope(ctx => OperationContext.Current);
@@ -42,11 +45,12 @@ namespace Molinos.Scato.Dependencias
             Bind<IAdministradorDeCalles, AdministradorDeCalles>().To<AdministradorDeCalles>().InScope(ctx => OperationContext.Current);
             Bind<IServicioProgramaEmbarque, ServicioProgramaEmbarque>().To<ServicioProgramaEmbarque>().InScope(ctx => OperationContext.Current);
             Bind<IServicioVapor, ServicioVapor>().To<ServicioVapor>().InScope(ctx => OperationContext.Current);
-            Bind<IServicioAfip, ServicioAfip>().To<ServicioAfip>().InScope(ctx => OperationContext.Current);
-
+            Bind<IServicioAfip, ServicioAfip>().To<ServicioAfip>().InScope(ctx => OperationContext.Current);           
+            
             this.BindChannelFactory<IServicioNotificarUsuario>("ServicioNotificarUsuario");
             Bind<IServicioEstadoPuesto, ServicioEstadoPuesto>().To<ServicioEstadoPuesto>().InSingletonScope();
 
+            this.BindChannelFactory<wgescomunicacionembarqueSoap>("ComunicacionEmbarque");
             this.BindChannelFactory<LoginCMS>("LoginCms");
             this.BindChannelFactory<CTGServicePortType>("CTGServiceHttpSoap11Endpoint");
             this.BindChannelFactory<ZSDWS_SCATO>("ZSDWS_SCATO", "SapServiceUsername", "SapServicePassword");

@@ -179,6 +179,9 @@
     </Content>
     <Content Include="CertificadosProd\alias.p12" />
     <Content Include="Certificados\alias.p12" />
+    <Content Include="Certificados\CertificadoScatoPuerto.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
