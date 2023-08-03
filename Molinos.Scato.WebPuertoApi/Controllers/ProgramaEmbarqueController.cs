@@ -735,7 +735,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             embarqueDto.Manga = 0;
             embarqueDto.Puntal = 0;
 
-            if (nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
+            if (nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
             {
                 var senasa = nominacion.NominacionDetalleIntervencion.Senasa.ElementAt(0);
                 embarqueDto.Senasa = senasa.TieneSenasa;

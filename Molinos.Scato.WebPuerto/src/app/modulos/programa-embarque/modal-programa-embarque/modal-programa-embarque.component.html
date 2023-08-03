@@ -174,17 +174,17 @@
                         </thead>
                         <tbody *ngFor="let nomi of nominacion?.nominacionRecibo; let i = index" [attr.data-index]="i"
                             style="text-align: center;">
-                            <tr>
+                            <tr [attr.data-reciboid]="nomi.id">
                                 <td class="centradoHorizontal">{{ nomi?.numeroRecibo }}</td>
-                                <td class="centradoHorizontal">{{nomi?.exportador?.nombre }}</td>
+                                <td class="centradoHorizontal nominacionReciboexportador_idAuditoria">{{nomi?.exportador?.nombre }}</td>
                                 <td class="centradoHorizontal nominacionReciboformatoAuditoria">{{nomi?.formato }}</td>
                                 <td class="centradoHorizontal nominacionRecibocantidadAuditoria">{{nomi != null ?
                                     (nomi?.cantidad | number : '1.0-0') :
                                     "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? nomi?.unidad : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? nomi?.ajuste : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? nomi?.puertoDeCarga : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? nomi?.puertoDeDescarga : "-"}}</td>
+                                <td class="centradoHorizontal nominacionRecibounidadAuditoria">{{nomi != null ? nomi?.unidad : "-"}}</td>
+                                <td class="centradoHorizontal nominacionReciboajusteAuditoria">{{nomi != null ? nomi?.ajuste : "-"}}</td>
+                                <td class="centradoHorizontal nominacionRecibopuertoDeCargaAuditoria">{{nomi != null ? nomi?.puertoDeCarga : "-"}}</td>
+                                <td class="centradoHorizontal nominacionRecibopuertoDeDescargaAuditoria">{{nomi != null ? nomi?.puertoDeDescarga : "-"}}</td>
                                 <td class="centradoHorizontal nominacionRecibodescripcionesBienesAuditoria">{{nomi !=
                                     null ? nomi?.descripcionesBienes : "-"}}</td>
                                 <td class="centradoHorizontal nominacionReciborecibosPorDiaAuditoria">{{nomi != null ?
@@ -193,7 +193,7 @@
                                 <td class="centradoHorizontal nominacionRecibomostrarDestinosAuditoria">{{nomi != null ?
                                     (nomi?.mostrarDestinos == true ? 'SI' :
                                     'NO') : "-"}}</td>
-                                <td class="centradoHorizontal">{{nomi != null ? (nomi?.mostrarBodegas == true ? 'SI' :
+                                <td class="centradoHorizontal nominacionRecibomostrarBodegasAuditoria">{{nomi != null ? (nomi?.mostrarBodegas == true ? 'SI' :
                                     'NO') : "-"}}</td>
                             </tr>
                         </tbody>
@@ -287,39 +287,37 @@
                         <tbody
                             *ngFor="let intervencion of nominacion?.nominacionDetalleIntervencion?.senasa; let i = index"
                             [attr.data-index]="i" style="text-align: center;">
-                            <tr>
-                                <td class="centradoHorizontal nominacionDetalleIntervencionnombreAuditoria">
-                                    {{intervencion != null ?
-                                    intervencion?.exportador?.nombre : "-" }}</td>
-                                <td class="centradoHorizontal nominacionDetalleIntervenciontieneSenasaAuditoria">
-                                    {{intervencion != null ?
-                                    (intervencion?.tieneSenasa == true ? 'SI' : 'NO') : "-"}}</td>
-                                <td class="centradoHorizontal consumo--Auditoria">{{intervencion != null ?
-                                    intervencion?.consumo : "-"}}
+                            <tr [attr.data-senasaid]="intervencion.id">
+                                <td class="centradoHorizontal senasanombreAuditoria">
+                                    {{intervencion != null ? intervencion?.exportador?.nombre : "-" }}
                                 </td>
-                                <td class="centradoHorizontal nominacionDetalleIntervencionaCuentaDeAuditoria">
+                                <td class="centradoHorizontal senasatieneSenasaAuditoria">
+                                    {{intervencion != null ? (intervencion?.tieneSenasa == true ? 'SI' : 'NO') : "-"}}
+                                </td>
+                                <td class="centradoHorizontal senasaconsumoAuditoria">
+                                    {{intervencion != null ? intervencion?.consumo : "-"}}
+                                </td>
+                                <td class="centradoHorizontal senasaaCuentaDeAuditoria">
                                     {{intervencion != null ? intervencion?.aCuentaDe : "-"}}
                                 </td>
-                                <td class="centradoHorizontal nominacionDetalleIntervenciondestinoAuditoria">
-                                    {{intervencion?.destino != null ?
-                                    intervencion?.destino?.nombre : "-"}}</td>
-                                <td class="centradoHorizontal nominacionDetalleIntervencionipAuditoria">
+                                <td class="centradoHorizontal senasadestino_IdAuditoria">
+                                    {{intervencion?.destino != null ? intervencion?.destino?.nombre : "-"}}
+                                </td>
+                                <td class="centradoHorizontal senasaiPAuditoria">
                                     {{intervencion?.ip == true ? 'SI' : 'NO'}}</td>
-                                <td class="centradoHorizontal nominacionDetalleIntervenciongmoAuditoria">
+                                <td class="centradoHorizontal senasagMOAuditoria">
                                     {{intervencion?.gmo == true ? 'SI' : 'NO'}}</td>
-                                <td class="centradoHorizontal nominacionDetalleIntervencionfitoAuditoria">
+                                <td class="centradoHorizontal senasafITOAuditoria">
                                     {{intervencion?.fito == true ? 'SI' : 'NO'}}</td>
-                                <td class="centradoHorizontal nominacionDetalleIntervencionmuestraOficialAuditoria">
+                                <td class="centradoHorizontal senasamuestraOficialAuditoria">
                                     {{intervencion?.muestraOficial == true ? 'SI' : 'NO' }}
                                 </td>
-                                <td
-                                    class="centradoHorizontal nominacionDetalleIntervencioncertificadoInocuidadAuditoria">
-                                    {{intervencion?.certificadoInocuidad == true ? 'SI' :
-                                    'NO'}}</td>
-                                <td
-                                    class="centradoHorizontal nominacionDetalleIntervencioncertificadoVeterinarioAuditoria">
-                                    {{intervencion?.certificadoVeterinario == true ? 'SI' :
-                                    'NO'}}</td>
+                                <td class="centradoHorizontal senasacertificadoInocuidadAuditoria">
+                                    {{intervencion?.certificadoInocuidad == true ? 'SI' : 'NO'}}
+                                </td>
+                                <td class="centradoHorizontal senasacertificadoVeterinarioAuditoria">
+                                    {{intervencion?.certificadoVeterinario == true ? 'SI' : 'NO'}}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
