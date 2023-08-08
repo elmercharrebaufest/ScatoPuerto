@@ -503,10 +503,12 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoForm.controls['bandera'].setValue(null);
     }
   }
-  public validarRegistroDatoTecnico(): boolean{
+
+  public validarRegistroDatoTecnico(): boolean {
     this.grabarNominacion = true;
     return this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm);
   }
+
   public validarCreacionNominacion(): Subject<boolean>{
     let subjectValidarDatoTecnico = new Subject<boolean>();
     const nominacionValida: NominacionValida = new NominacionValida();
@@ -675,44 +677,12 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   onSeleccionarTodos(event){
     this.listaNominacionDatoTecnicoCalidad.forEach(data=>{ data.esSeleccionado = event.currentTarget.checked;});
   }
-validarCantidades()
-{
-  let totalExportador=0;
-  let totalCoordinador=0;
-  let totalDestino=0;
-  let cantidadTotal = this.datoTecnicoForm.controls['cantidadTotal'].value;
 
-  this.datoTecnicoExportadorFormArray.controls.forEach(item=>{
-    const exportadoresForm = item['controls'].exportador;
-    totalExportador+=Number(item['controls'].cantidad.value);
-  });
-
-  this.datoTecnicoCoordinadorFormArray.controls.forEach(item=>{
-    const coordinadorForm = item['controls'].coordinador;
-    totalCoordinador+=Number(item['controls'].cantidad.value);
-  });
-
-  this.datoTecnicoDestinoFormArray.controls.forEach(item=>{
-    const destinoForm = item['controls'].destino;
-    totalDestino+=Number(item['controls'].cantidad.value);
-  });
-
-
-  if(totalCoordinador>cantidadTotal || totalExportador>cantidadTotal || totalDestino > cantidadTotal )
-  {
-    this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'No puede superar la Cantidad Total del producto.', 'Cerrar', '', null, null, Tipoalerta.Warning)
-    return false ;
-  }
-  else
-  {return true;}
-
-}
-
-  onGuardarDatoTecnico(){
+  onGuardarDatoTecnico() {
 
     this.grabarNominacion = true;
 
-    if(this.validarCantidades() && this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)){
+    if (this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)) {
       const nominacionValida: NominacionValida = new NominacionValida();
       nominacionValida.id = this._nominacionParametros.nominacion.id;
       nominacionValida.materialPuerto = this.datoTecnicoForm.controls['materialPuerto'].value;
@@ -726,15 +696,18 @@ validarCantidades()
       });
     }
   }
+
   onCancelarDatoTecnico(){
     const nominacionId = this._nominacionParametros.nominacion.id;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
     this.cargarFormulario(nominacionId)
   }
+
   onAltaBajaMantenimiento(opcion) {
     this.tipoAltaBaja = opcion;
     return this.modalService.open(this.modalABM);
   }
+
   onActualizarTipoLista(tipoLista: number) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.listados;
@@ -765,12 +738,12 @@ validarCantidades()
 
 }
 
-  //#region Clases adicionales
-export class ListaNominacionCalidad{
+//#region Clases adicionales
+export class ListaNominacionCalidad {
   calidadValor: CalidadValor;
   esSeleccionado: boolean;
 }
-enum Mensajes{
+enum Mensajes {
   cargando = "Cargando información de dato tecnico. Por favor, espere...",
   grabando = "Guardando información de dato tecnico. Por favor, espere...",
   listados = "Cargando listados de dato tecnico. Por favor, espere...",
