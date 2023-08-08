@@ -84,12 +84,12 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
                 SELECT @idNominacion , d.id, 'Senasa', 'TieneSenasa', d.TieneSenasa, i.TieneSenasa , GETDATE()
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                --IF (@idEmbarque > 0) BEGIN
-                --    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                --    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': SENASA ', @exportadorNuevo,
-                --        CASE d.TieneSenasa WHEN 1 THEN '(SI' ELSE '(NO' END, ' -> ', CASE i.TieneSenasa WHEN 1 THEN 'SI)' ELSE 'NO)' END), GETDATE()
-                --    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                --END
+                IF (@idEmbarque > 0) BEGIN
+                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': SENASA ', @exportadorNuevo,
+                        CASE d.TieneSenasa WHEN 1 THEN '(SI' ELSE '(NO' END, ' -> ', CASE i.TieneSenasa WHEN 1 THEN 'SI)' ELSE 'NO)' END), GETDATE()
+                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                END
             END
 
             -- Consumo
