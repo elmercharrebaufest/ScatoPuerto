@@ -459,19 +459,19 @@ GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Aceite de soja refinado')
 BEGIN 
 insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
-                    values ('Aceite de soja refinado', 'RSBO'         ,''       ,null      ,0        ,'#AB3C05','RSBO')
+                    values ('Aceite de soja refinado', 'RSBO'         ,''       ,null      ,1        ,'#AB3C05','RSBO')
 END
 GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Aceite de girasol refinado')
 BEGIN 
 insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
-                    values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,0        ,'#CDAD0D','RSFO')
+                    values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,1        ,'#CDAD0D','RSFO')
 END
 GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'LECITINA DE SOJA') 
 BEGIN
     insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
-    values ('LECITINA DE SOJA','LEC','99056', 0, '#FFFFFF', 'LEC') 
+    values ('LECITINA DE SOJA','LEC','99056', 1, '#FFFFFF', 'LEC') 
 END
 GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'ACEITE DE SOJA NEUTRALIZADO') 
@@ -480,6 +480,8 @@ BEGIN
     values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF', 'SBO NEU')
 END
 GO
+
+UPDATE MaterialPuerto SET EsLiquido = 1 WHERE Descripcion IN ('Aceite de soja refinado', 'Aceite de girasol refinado', 'LECITINA DE SOJA')
 
 update MaterialPuerto set DescripcionCortaIngles = 'SB'    ,Color = '#D3B177' where descripcion = 'POROTO DE SOJA'
 update MaterialPuerto set DescripcionCortaIngles = 'SBMHP' ,Color = '#FFE0A8' where descripcion = 'HARINA DE SOJA*' -- DUDA DE NOMBRE
