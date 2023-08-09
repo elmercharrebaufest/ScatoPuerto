@@ -1102,34 +1102,32 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   initLinea(line?: any, guardado?: boolean) {
     let bloqueoVicentin = false;
-    if (line != null || line != undefined) {
-      const filtro = this.lineaDeEmbarque.filter(x => x.id == line.linea_Id);
-      if (filtro != null || filtro != undefined) {
-        if (filtro.length > 0) {
-          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin')
-            bloqueoVicentin = true;
-        }
-      }
-    }
     let destino = 0;
     let tipoLineaEmbarque = null;
+
     if (line != null || line != undefined) {
+      const filtro = this.lineaDeEmbarque.filter(x => x.id == line.linea_Id);
+
       destino = line.destino?.id;
-      const linea_Id = line ? line.linea_Id : 0;      
-      const filtro = this.lineaDeEmbarque.filter(x => x.id == linea_Id);
+      //const linea_Id = line ? line.linea_Id : 0;   
+      
       if (filtro != null || filtro != undefined) {
-        if (filtro.length > 0) {
-          tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
+        if (filtro.length > 0) {          
+
+          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin'){
+            bloqueoVicentin = true;
+          }else{
+            tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
+          }            
         }
       }
-    }
+    }      
 
     let medidaInicialCM = line?.medidaInicialCM > 0 ? line.medidaInicialCM : 0;
     let medidaInicialMM = line?.medidaInicialMM > 0 ? line.medidaInicialMM : 0;
 
     let medidaFinalCM = line?.medidaFinalCM > 0 ? line.medidaFinalCM : 0;
     let medidaFinalMM = line?.medidaFinalMM > 0 ? line.medidaFinalMM : 0;
-
 
     const formulario = this._builder.group({
       linea: [{ value: line ? line.linea_Id : '', disabled: guardado },],

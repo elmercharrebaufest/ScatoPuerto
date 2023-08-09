@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Servicios.Conversiones.Impl.Perfiles;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -214,35 +215,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
             //OPERACIONES Y TABLERISTAS
-            if (comando.Dto.ModuloDeCargaLineasDeEmbarque != null)
-            {
-                Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaLineasDeEmbarque.ToList());
-                foreach (var lineas in comando.Dto.ModuloDeCargaLineasDeEmbarque)
-                {
-                    var materialPuerto = lineas.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(lineas.MaterialPuerto.Id) : null;
-                    var tipoLineaEmbarque = lineas.TipoLineaEmbarque != null ?  Repositorio.Obtener<TipoLineaEmbarque>(lineas.TipoLineaEmbarque.Id) : null;
 
-                    moduloDeCarga.ModuloDeCargaLineasDeEmbarque.Add(new ModuloDeCargaLineasDeEmbarque
-                    {
-                        ModuloDeCarga = moduloDeCarga,
-                        Linea = lineas.Linea,
-                        TipoLineaEmbarque = tipoLineaEmbarque,
-                        MaterialPuerto = materialPuerto,
-                        TkInicial = lineas.TkInicial,
-                        TemperaturaInicial = lineas.TemperaturaInicial,
-                        AlturaInicialCM = lineas.AlturaInicialCM,
-                        AlturaInicialMM = lineas.AlturaInicialMM,
-                        DensidadInicial = lineas.DensidadInicial,
-                        TemperaturaFinal = lineas.TemperaturaFinal,
-                        Litros = lineas.Litros,
-                        DensidadFinal = lineas.DensidadFinal,
-                        AlturaFinalCM = lineas.AlturaFinalCM,
-                        AlturaFinalMM = lineas.AlturaFinalMM,
-                        Kilos = lineas.Kilos,
-                        TkFinal = lineas.TkFinal
-                    });
-                }
-            }
+            moduloDeCarga = this.ActualizarModuloDeCarga_LineasDeEmbarque(comando.Dto.ModuloDeCargaLineasDeEmbarque, moduloDeCarga);
+
+            
             //OPERACIONES Y TABLERISTAS
             // LÍQUIDOS
             /////////////////////////
@@ -470,6 +446,99 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
 
           
+        }
+
+        private ModuloDeCarga ActualizarModuloDeCarga_LineasDeEmbarque(IList<ModuloDeCargaLineasDeEmbarqueDto> moduloDeCargaLineasDeEmbarque, ModuloDeCarga moduloDeCargaDB)
+        {
+            if (moduloDeCargaLineasDeEmbarque != null)
+            {
+                //Repositorio.RemoverTodos(moduloDeCarga.ModuloDeCargaLineasDeEmbarque.ToList());
+                //REVISAR QUE REGISTROS SON NUEVOS Y CUALES A MODIFICAR
+
+                #region Armado de listados
+
+                var lineasDeEmbarque = moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque.ToList();
+                var lineasDeEmbarqueInsertar = moduloDeCargaLineasDeEmbarque.Where(x => x.Id == 0);
+                var lineasDeEmbarqueEliminar = lineasDeEmbarque.Where(x => !moduloDeCargaLineasDeEmbarque.Select(y => y.Id).Contains(x.Id));
+                var lineasDeEmbarqueActualizar = lineasDeEmbarque.Where(x => moduloDeCargaLineasDeEmbarque.Select(y => y.Id).Contains(x.Id));
+
+                #endregion
+
+                #region Eliminar
+                foreach (var linea in lineasDeEmbarqueEliminar) { Repositorio.Remover(linea); }
+
+                #endregion
+
+                #region Insertar
+
+                foreach (var linea in lineasDeEmbarqueInsertar) 
+                {
+                    var lineaEmbarque = new ModuloDeCargaLineasDeEmbarque();                                
+
+                    lineaEmbarque.ModuloDeCarga = moduloDeCargaDB;
+                    lineaEmbarque.Linea = linea.Linea;
+                    lineaEmbarque.TipoLineaEmbarque = new TipoLineaEmbarque { Linea = linea.TipoLineaEmbarque.Linea, Id = linea.TipoLineaEmbarque.Id };
+                    lineaEmbarque.MaterialPuerto = new MaterialPuerto
+                    {
+                        Id = linea.MaterialPuerto.Id,
+                        Descripcion = linea.MaterialPuerto.Descripcion,
+                        DescripcionCorta = linea.MaterialPuerto.DescripcionCorta,
+                        DescripcionCortaIngles = linea.MaterialPuerto.DescripcionCortaIngles,
+                        Almacen = linea.MaterialPuerto.Almacen_Id == null ? null : new Almacen { Id = (int)linea.MaterialPuerto.Almacen_Id, Descripcion = linea.MaterialPuerto.AlmacenDesc },
+                        CodigoSAP = linea.MaterialPuerto.CodigoSAP,
+                        Color = linea.MaterialPuerto.Color,
+                        EsLiquido = linea.MaterialPuerto.EsLiquido
+                    };
+                    lineaEmbarque.TkInicial = linea.TkInicial;
+                    lineaEmbarque.TkFinal = linea.TkFinal;
+                    lineaEmbarque.TemperaturaInicial = linea.TemperaturaInicial;
+                    lineaEmbarque.TemperaturaFinal = linea.TemperaturaFinal;
+                    lineaEmbarque.AlturaInicialCM = linea.AlturaInicialCM;
+                    lineaEmbarque.AlturaInicialMM = linea.AlturaInicialMM;
+                    lineaEmbarque.AlturaFinalCM = linea.AlturaFinalCM;
+                    lineaEmbarque.AlturaFinalMM = linea.AlturaFinalMM;
+                    lineaEmbarque.DensidadInicial = linea.DensidadInicial;
+                    lineaEmbarque.DensidadFinal = linea.DensidadFinal;
+                    lineaEmbarque.Litros = linea.Litros;
+                    lineaEmbarque.Kilos = linea.Kilos;
+
+                    moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);                                 
+                     
+                }
+                #endregion
+
+                #region Actualizar
+
+                foreach (ModuloDeCargaLineasDeEmbarque linea in lineasDeEmbarqueActualizar)
+                {
+                    foreach (ModuloDeCargaLineasDeEmbarque lineaDB in moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque)
+                    {
+                        lineaDB.ModuloDeCarga = linea.ModuloDeCarga;
+                        lineaDB.Linea = linea.Linea;
+                        lineaDB.TipoLineaEmbarque = linea.TipoLineaEmbarque;
+                        lineaDB.MaterialPuerto = linea.MaterialPuerto;
+                        lineaDB.TkInicial = linea.TkInicial;
+                        lineaDB.TkFinal = linea.TkFinal;
+                        lineaDB.TemperaturaInicial = linea.TemperaturaInicial;
+                        lineaDB.TemperaturaFinal = linea.TemperaturaFinal;
+                        lineaDB.AlturaInicialCM = linea.AlturaInicialCM;
+                        lineaDB.AlturaInicialMM = linea.AlturaInicialMM;
+                        lineaDB.AlturaFinalCM = linea.AlturaFinalCM;
+                        lineaDB.AlturaFinalMM = linea.AlturaFinalMM;
+                        lineaDB.DensidadInicial = linea.DensidadInicial;
+                        lineaDB.DensidadFinal = linea.DensidadFinal;
+                        lineaDB.Litros = linea.Litros;
+                        lineaDB.Kilos = linea.Kilos;
+                    }                    
+
+                    Repositorio.GuardarCambios();
+                }
+
+                #endregion
+               
+            }
+
+            return moduloDeCargaDB;
         }
 
         private void ProcesarPlanillaDeEmbarque(List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarque, int moduloDeCarga_Id)
