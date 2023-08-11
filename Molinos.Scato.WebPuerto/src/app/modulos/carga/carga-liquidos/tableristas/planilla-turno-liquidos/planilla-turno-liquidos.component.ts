@@ -1295,7 +1295,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const medidaFinalMM = lineaTurno?.medidaFinalMM.value;
       const tkLinea = lineaTurno?.tk.value.toString().padStart(3, "0");;
       const temperatura = lineaTurno?.temperatura.value;
-      const materialPuerto = lineaTurno?.materialPuerto?.value.id
+      const materialPuerto = lineaTurno?.materialPuerto?.value;
       console.log(' input medidaInicialMM ==>')
       console.log(' ', medidaInicialCM, medidaInicialMM, tkLinea)
       console.log(' input medidaFinalMM ==>')
@@ -1324,12 +1324,23 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   async onExportarExcelLiquido(){
     this.exportaPlanilla = true;
-    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
-    this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
-    this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
-    this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
+    
+    if (this.toneladasLineas.length == 0) {
+      this.addToneladasLineas();
+    }else{
+      this.toneladasLineas = [];
+      this.addToneladasLineas();
+    }
+    
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas,false,  false,this.totalABordo, this.toneladasLineas);
     this.exportaPlanilla = false;
+  }
+
+  private addToneladasLineas(){
+    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
+      this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
+      this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
+      this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
   }
 
   calcularRestaEmbarcar(): number {
