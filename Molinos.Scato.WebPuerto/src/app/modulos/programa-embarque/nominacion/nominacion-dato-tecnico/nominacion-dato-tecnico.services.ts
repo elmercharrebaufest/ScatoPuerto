@@ -201,7 +201,7 @@ export class NominacionDatoTecnicoRegistroService {
           return false;
         }
 
-        if (cantidadSumaExportador > cantidad) {
+        if (cantidadSumaExportador > cantidadTotal) {
           mostrarError('La cantidad en cargador excede al total');
           return false;
         }
