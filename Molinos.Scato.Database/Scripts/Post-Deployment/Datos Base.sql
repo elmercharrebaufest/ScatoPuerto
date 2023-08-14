@@ -496,6 +496,7 @@ update MaterialPuerto set DescripcionCortaIngles = 'SBMLP' ,Color = '#FFCF79' wh
 update MaterialPuerto set DescripcionCortaIngles = 'SFPMP' ,Color = '#555554' where descripcion = 'Pellet de girasol'
 UPDATE MaterialPuerto SET DescripcionCortaIngles = 'LEC'   ,Color = '#FFFFFF' WHERE Descripcion = 'LECITINA DE SOJA'
 UPDATE MaterialPuerto SET DescripcionCortaIngles = 'SBO NEU', Color = '#FFFFFF' WHERE Descripcion = 'ACEITE DE SOJA NEUTRALIZADO'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'CORN OIL', Color = '#B76719' WHERE Descripcion = 'ACEITE CRUDO DE MAIZ'
 
 
 declare @SB     int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SB'     )
@@ -508,6 +509,7 @@ declare @SME    int = (select top 1 Id from MaterialPuerto (nolock) where Descri
 declare @WHEAT  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'WHEAT'  )
 declare @SFPMP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPMP'  )
 declare @SFPLP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPLP'  )
+declare @SBONEU int = (select top 1 Id from MaterualPuerto (nolock) where DescripcionCortaIngles = 'SBO NEU')
 
 
 --Scripts TipoDeCalidad
@@ -571,6 +573,12 @@ insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id)
 values ('Gafta 39', @SFPLP)
 END
 
+-- TODO: CALIDAD SBONEU
+--IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = '' AND MaterialPuerto_Id = @SBONEU) BEGIN
+--    INSERT INTO TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+--    VALUES ('', @SBONEU),
+--END
+
 --Scripts CalidadValor
 declare @CVSB     int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SB     )
 declare @CVSBMHP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBMHP  )
@@ -582,6 +590,7 @@ declare @CVSME    int = (select top 1 Id from TipoDeCalidad (nolock) where Mater
 declare @CVWHEAT  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @WHEAT  )
 declare @CVSFPMP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SFPMP  )
 declare @CVSFPLP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SFPLP  )
+declare @CVSBONEU int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBONEU )
 
 IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSB)
 BEGIN 
@@ -682,7 +691,6 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'F
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'GMP+ FSA assured','')
 END
 
-
 IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVCSBO)
 BEGIN 
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Free fatty acids (as oleic acid)','Basis: 1 % - Max: 1.25 %')
@@ -707,9 +715,17 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'CET
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'GREEN HOUSE GAS SAVING ','Min: 60 %')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'C.F.P.P.','Max: -2 d. centigrades')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'WATER ','Max: 350 ppm')
-
 END
 
+-- TODO: CALIDAD SBONEU
+--IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
+--    INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro, Valor) VALUES
+--    (@CVSBONEU, 'MOISTURE', '(%) 0.10 MAX. 0.10 ISO 8534:2017'),
+--    (@CVSBONEU, 'ACID (FFA)', '(%) 0,15 MAX. 0,20 ISO 660:2020'),
+--    (@CVSBONEU, 'FLASH POINT', '(°C) 150 MIN. 150 ISO 15267:1998'),
+--    (@CVSBONEU, 'PHOSPHORUS (PPM)', '5 MAX. 10 ISO 10540-3:2002'),
+--    (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
+--END
 
 --Scripts Surveyor
 
@@ -829,9 +845,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 -- Nuevos Paises
 if not exists (select 1 from Pais where Descripcion = 'GEORGIA') begin insert into Pais (Descripcion) values ('GEORGIA'); end
 if not exists (select 1 from Pais where Descripcion = 'LIBERIA') begin insert into Pais (Descripcion) values ('LIBERIA'); end
+if not exists (select 1 from Destino where Nombre = 'CANADA') begin insert into Destino (Nombre) values ('CANADA'); end
+if not exists (select 1 from Destino where Nombre = 'MEXICO') begin insert into Destino (Nombre) values ('MEXICO'); end
 
 if not exists (select 1 from Destino where Nombre = 'GEORGIA') begin insert into Destino (Nombre) values ('GEORGIA'); end
 if not exists (select 1 from Destino where Nombre = 'LIBERIA') begin insert into Destino (Nombre) values ('LIBERIA'); end
+if not exists (select 1 from Destino where Nombre = 'CANADA') begin insert into Destino (Nombre) values ('CANADA'); end
+if not exists (select 1 from Destino where Nombre = 'MEXICO') begin insert into Destino (Nombre) values ('MEXICO'); end
 
 
 -- Nuevos Coordinadores
