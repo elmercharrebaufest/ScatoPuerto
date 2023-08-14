@@ -17,17 +17,19 @@
         <tr>
           <td><button class="btn btn-muelles color-muelle-sanbenito">San Benito</button></td>
           <td>
-            <button class="btn btn-estados-muelles"
-                    [ngClass]="estadoSanBenitoLp == 'Operando' ?
+            <button class="btn btn-estados-muelles" [ngClass]="estadoSanBenitoLp == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">
               {{estadoSanBenitoLp}}
             </button>
           </td>
           <td style="width: 10px"></td>
-          <td><button class="btn btn-muelles color-muelle-nouryon" (click)='goNouryon()'>Nouryon</button></td>
           <td>
-            <button class="btn btn-estados-muelles"
-                    [ngClass]="estadoNoryonLp == 'Operando' ?
+            <button class="btn btn-muelles color-muelle-nouryon" (click)='goNouryon()'>
+              Nouryon
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-estados-muelles" [ngClass]="estadoNoryonLp == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">
               {{estadoNoryonLp}}
             </button>
@@ -35,19 +37,25 @@
         </tr>
 
         <tr>
-          <td style="padding-top: 10px"><button class="btn btn-muelles color-muelle-vicentin" (click)='goVicentin()'>Vicentin</button></td>
           <td style="padding-top: 10px">
-            <button class="btn btn-estados-muelles"
-                    [ngClass]="estadoVicentinLp == 'Operando' ?
+            <button class="btn btn-muelles color-muelle-vicentin" (click)='goVicentin()'>
+              Vicentin
+            </button>
+          </td>
+          <td style="padding-top: 10px">
+            <button class="btn btn-estados-muelles" [ngClass]="estadoVicentinLp == 'Operando' ?
                   'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">
               {{estadoVicentinLp}}
             </button>
           </td>
           <td style="width: 10px"></td>
-          <td style="padding-top: 10px"><button class="btn btn-muelles color-muelle-otros-muelles" (click)='goOtrosMuelles()'>Otros Muelles</button></td>
           <td style="padding-top: 10px">
-            <button class="btn btn-estados-muelles"
-                    [ngClass]="estadoOtrosLp == 'Operando' ?
+            <button class="btn btn-muelles color-muelle-otros-muelles" (click)='goOtrosMuelles()'>
+              Otros Muelles
+            </button>
+          </td>
+          <td style="padding-top: 10px">
+            <button class="btn btn-estados-muelles" [ngClass]="estadoOtrosLp == 'Operando' ?
                 'btn-estado-muelle-operando' : 'btn-estado-muelle-no-operando'">
               {{estadoOtrosLp}}
             </button>
@@ -91,6 +99,7 @@
     <div *ngIf="!mostrarCalendario">
       <div class="row m-lg-4" *ngFor="let instanciaWorkflow of sanBenito; let i = index;" #puertoSanBenito>
         <app-lineup-embarque *ngIf="!(sanBenitoCargandoMuelle?.embarque.nombreBuque == instanciaWorkflow.embarque.nombreBuque) && instanciaWorkflow.embarque.ubicacion !=1 && mostrarContent"
+                             (showSpinner)='showSpinner($event)'
                              [instanciaWorkflow]="instanciaWorkflow"
                              [observador]="observador"
                              [index]="i"
@@ -135,6 +144,7 @@
         </div>
         <div class="row m-lg-4" *ngFor="let instanciaWorkflow of vicentin; let i = index;">
           <app-lineup-embarque *ngIf="instanciaWorkflow.embarque.ubicacion  != 1"
+                               (showSpinner)='showSpinner($event)'
                                [instanciaWorkflow]="instanciaWorkflow"
                                [observador]="observador"
                                [index]="i"
@@ -180,6 +190,7 @@
         </div>
         <div class="row m-lg-4" *ngFor="let instanciaWorkflow of noryon; let i = index;">
           <app-lineup-embarque *ngIf="instanciaWorkflow.embarque.ubicacion  != 1"
+                               (showSpinner)='showSpinner($event)'
                                [instanciaWorkflow]="instanciaWorkflow"
                                [observador]="observador"
                                [index]="i"

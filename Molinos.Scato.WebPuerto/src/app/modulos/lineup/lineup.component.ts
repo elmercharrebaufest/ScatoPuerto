@@ -95,13 +95,13 @@ export class LineupComponent implements OnInit, Observador {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
       this.ubicacionDeBuquePuerto = res;
       this.estadoVicentinLp = this.estadoVicentin();
-      console.log('estadoVicentinLp '+this.estadoVicentinLp);
+      console.log('estadoVicentinLp ' + this.estadoVicentinLp);
       this.estadoNoryonLp = this.estadoNoryon();
-      console.log('estadoNoryonLp '+this.estadoNoryonLp);
+      console.log('estadoNoryonLp ' + this.estadoNoryonLp);
       this.estadoSanBenitoLp = this.estadoSanBenito();
-      console.log('estadoSanBenitoLp '+this.estadoSanBenitoLp);
+      console.log('estadoSanBenitoLp ' + this.estadoSanBenitoLp);
       this.estadoOtrosLp = this.estadoOtros();
-      console.log('estadoOtrosLp '+this.estadoOtrosLp);
+      console.log('estadoOtrosLp ' + this.estadoOtrosLp);
     });
   }
 
@@ -127,42 +127,34 @@ export class LineupComponent implements OnInit, Observador {
 
   private cargarWorkflows(blockUI: boolean = false) {
     console.log('INICIO LINEUP ', new Date())
-    this.workflowService.obtenerListado()
-      .subscribe(
-        ret => {
-          this.listadoEmbarques = ret;
-
-          this.fechaActualizacion = new Date();
-          if (!blockUI) {
-            setTimeout(x => this.cargarWorkflows(), 120000);
-          }
-        },
-        errmess => this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error)),
-        () => {
-          this.filtrarMuelles();
-          this.mostrarContent = true;
-          this.mostrarSpinner = false;
-          this.cargarErroresGeolocalizacion();
-          console.log('FIN LINEUP ', new Date());
-        }
-      );
+    this.workflowService.obtenerListado().subscribe(ret => {
+      this.listadoEmbarques = ret;
+      this.fechaActualizacion = new Date();
+      if (!blockUI) { setTimeout(x => this.cargarWorkflows(), 120000); }
+    }, errmess => {
+      this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error))
+    }, () => {
+      this.filtrarMuelles();
+      this.mostrarContent = true;
+      this.mostrarSpinner = false;
+      this.cargarErroresGeolocalizacion();
+      console.log('FIN LINEUP ', new Date());
+    });
   }
 
-  private cargarErroresGeolocalizacion(){
-    let listaEmbarques:EmbarqueGeolocalizacion[] = new Array<EmbarqueGeolocalizacion>();
-    this.listadoEmbarques.forEach(item =>{
+  private cargarErroresGeolocalizacion() {
+    let listaEmbarques: EmbarqueGeolocalizacion[] = new Array<EmbarqueGeolocalizacion>();
+    this.listadoEmbarques.forEach(item => {
       listaEmbarques.push(new EmbarqueGeolocalizacion(item.embarque.id));
     });
-    this.geolocalizacionService.ListarErroresGeolocalizacionPorEmbarque(listaEmbarques).subscribe(errores =>{
+    this.geolocalizacionService.ListarErroresGeolocalizacionPorEmbarque(listaEmbarques).subscribe(errores => {
       this.listaErroresEmbarques = errores;
-    }, error => {}
-     , ()=>{
+    }, error => { }, () => {
       this.mostrarErroresGeolocalizacion = true;
-     });
+    });
   }
 
   filtrarMuelles() {
-
     let actualDate = new Date();
     let function_name = 'filtrarMuelles - INICIO';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
@@ -174,12 +166,10 @@ export class LineupComponent implements OnInit, Observador {
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     function_name = 'filtrarMuelles - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" +actualDate.getUTCMinutes()  + ":" + actualDate.getUTCSeconds()  + "." + actualDate.getUTCMilliseconds())
-
+    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
   }
 
   public altaEmbarque() {
-
     let actualDate = new Date();
     let function_name = 'altaEmbarque';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
@@ -200,15 +190,14 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.mostrarSpinner = true;
-    this.lineupService.exportarEmbarques().subscribe(
-      data => {
-        const element = document.createElement('a');
-        element.href = URL.createObjectURL(data);
-        element.download = "Line Up " + formatDate(new Date(), 'yyyy-MM-dd', 'en') + '.xls';
-        document.body.appendChild(element);
-        element.click();
-        this.mostrarSpinner = false;
-      }, error => this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error)));
+    this.lineupService.exportarEmbarques().subscribe(data => {
+      const element = document.createElement('a');
+      element.href = URL.createObjectURL(data);
+      element.download = "Line Up " + formatDate(new Date(), 'yyyy-MM-dd', 'en') + '.xls';
+      document.body.appendChild(element);
+      element.click();
+      this.mostrarSpinner = false;
+    }, error => this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error)));
     function_name = 'exportarEmbarques - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
@@ -225,22 +214,18 @@ export class LineupComponent implements OnInit, Observador {
     this.lineupService.obtenerDestinatariosLineUp().subscribe(x => mail.destinatarios = x);
     var button1 = 'Enviar';
     var button2 = 'Cancelar';
-    this.confirmationDialogService.confirm(titulo, text, button1, button2, 'xl', mail, null, null, true)
-      .then((confirmed) => {
-
-        if (confirmed) {
-          this.mostrarSpinner = true;
-          this.lineupService.enviarPorMail(mail).subscribe(
-            data => {
-              this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el excel de lineup por mail', 'Cerrar', '');
-              this.mostrarSpinner = false;
-            }, error => {
-              this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
-              this.mostrarSpinner = false;
-            })
-        }
-      })
-      .catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
+    this.confirmationDialogService.confirm(titulo, text, button1, button2, 'xl', mail, null, null, true).then((confirmed) => {
+      if (confirmed) {
+        this.mostrarSpinner = true;
+        this.lineupService.enviarPorMail(mail).subscribe(data => {
+          this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el excel de lineup por mail', 'Cerrar', '');
+          this.mostrarSpinner = false;
+        }, error => {
+          this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
+          this.mostrarSpinner = false;
+        });
+      }
+    }).catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
   }
 
   // CARACTERES NO IMPRIMIBLES:
@@ -380,10 +365,10 @@ export class LineupComponent implements OnInit, Observador {
   hasPermisoAltaEmbarque() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_AltaEmbarque);
   }
-  hasPermisoVerCalendario(){
+  hasPermisoVerCalendario() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerCalendario);
   }
-  hasPermisoVerGeo(){
+  hasPermisoVerGeo() {
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerGeo);
   }
   hasPermisoMail() {
