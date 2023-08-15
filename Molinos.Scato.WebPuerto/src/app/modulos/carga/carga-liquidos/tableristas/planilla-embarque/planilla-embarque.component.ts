@@ -48,16 +48,14 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       this.getProductos();
       this.getTanqueAbordo();
     });
-    setTimeout(() => {
-      this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
-        if (data) {
-          this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-            this.lineas = resp.moduloDeCargaLineasDeEmbarque;
-          });
-        }
+      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+        this.lineas = resp.moduloDeCargaLineasDeEmbarque;
       });
-    }, 1200);
-    
+      // this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
+      //   if (data) {
+          
+      //   }
+      // });       
   }
 
   ngAfterViewInit(): void {

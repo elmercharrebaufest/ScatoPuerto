@@ -21,7 +21,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         private readonly List<string> Productos;
 
 
-        public ListarHistorialDeEmbarquesConsulta(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? fechaInicio, DateTime? fechaFin, List<string> productos = null)
+        public ListarHistorialDeEmbarquesConsulta(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? fechaInicio, DateTime? fechaFin, List<string> productos)
         {
             this.VaporId = vaporId;
             this.NombreBuque = nombreBuque;
@@ -33,7 +33,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             this.Productos = productos;
         }
 
-        private static List<HistorialDeBusquesDto> ListarHistorialDeEmbarques(DbContext contexto, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? fechaInicio, DateTime? fechaFin, List<string> productos = null)
+        private static List<HistorialDeBusquesDto> ListarHistorialDeEmbarques(DbContext contexto, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? fechaInicio, DateTime? fechaFin, List<string> productos)
         {
 
 
@@ -96,21 +96,22 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                      }),
                                 NombreMuelle = item.Embarque.SanBenito ? "San Benito" :
                                 item.Embarque.Vicentin ? "Vicentin" : item.Embarque.Noryon ? "Noryon" : item.Embarque.OtrosMuelles ? "Otros Muelles" : ""
-                            };
-         
-            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || String.IsNullOrEmpty(destino) ||
-                                         (x.ProductoExportador != null && x.ProductoExportador
-                                            .Any(y => y.NombreExportador.ToUpper().StartsWith(exportador.ToUpper()) && y.Destino.ToUpper().StartsWith(destino.ToUpper()))) &&
-                                         (productos == null || (x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) &&
-                                         (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado.ToUpper()))
-                                           ))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
+                            };         
+
+
+            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || x.ProductoExportador.Any(y => y.NombreExportador.ToUpper().StartsWith(exportador?.ToUpper()))) && 
+                                           (String.IsNullOrEmpty(destino) || x.ProductoExportador.Any( y => y.Destino.ToUpper().StartsWith(destino?.ToUpper()))) &&
+                                        (productos == null || x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) && 
+                                        (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado?.ToUpper()))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
+
+                                             
         }
 
         public virtual List<HistorialDeBusquesDto> Ejecutar(DbContext contexto)
         {
             using (new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted }))
             {
-                return ListarHistorialDeEmbarques(contexto, VaporId, NombreBuque, Destino, Exportador, ControlPrivado, FechaInicio, FechaFin);
+                return ListarHistorialDeEmbarques(contexto, VaporId, NombreBuque, Destino, Exportador, ControlPrivado, FechaInicio, FechaFin, Productos);
             }
         }
     }
