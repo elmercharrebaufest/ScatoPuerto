@@ -573,11 +573,10 @@ insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id)
 values ('Gafta 39', @SFPLP)
 END
 
--- TODO: CALIDAD SBONEU
---IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = '' AND MaterialPuerto_Id = @SBONEU) BEGIN
---    INSERT INTO TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
---    VALUES ('', @SBONEU),
---END
+IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = 'Fosfa 51' AND MaterialPuerto_Id = @SBONEU) BEGIN
+   INSERT INTO TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+   VALUES ('Fosfa 51', @SBONEU),
+END
 
 --Scripts CalidadValor
 declare @CVSB     int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SB     )
@@ -717,15 +716,14 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'C.F
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'WATER ','Max: 350 ppm')
 END
 
--- TODO: CALIDAD SBONEU
---IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
---    INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro, Valor) VALUES
---    (@CVSBONEU, 'MOISTURE', '(%) 0.10 MAX. 0.10 ISO 8534:2017'),
---    (@CVSBONEU, 'ACID (FFA)', '(%) 0,15 MAX. 0,20 ISO 660:2020'),
---    (@CVSBONEU, 'FLASH POINT', '(°C) 150 MIN. 150 ISO 15267:1998'),
---    (@CVSBONEU, 'PHOSPHORUS (PPM)', '5 MAX. 10 ISO 10540-3:2002'),
---    (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
---END
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
+   INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro, Valor) VALUES
+   (@CVSBONEU, 'MOISTURE', '(%) 0.10 MAX. 0.10 ISO 8534:2017'),
+   (@CVSBONEU, 'ACID (FFA)', '(%) 0,15 MAX. 0,20 ISO 660:2020'),
+   (@CVSBONEU, 'FLASH POINT', '(°C) 150 MIN. 150 ISO 15267:1998'),
+   (@CVSBONEU, 'PHOSPHORUS (PPM)', '5 MAX. 10 ISO 10540-3:2002'),
+   (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
+END
 
 --Scripts Surveyor
 
@@ -845,8 +843,8 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 -- Nuevos Paises
 if not exists (select 1 from Pais where Descripcion = 'GEORGIA') begin insert into Pais (Descripcion) values ('GEORGIA'); end
 if not exists (select 1 from Pais where Descripcion = 'LIBERIA') begin insert into Pais (Descripcion) values ('LIBERIA'); end
-if not exists (select 1 from Destino where Nombre = 'CANADA') begin insert into Destino (Nombre) values ('CANADA'); end
-if not exists (select 1 from Destino where Nombre = 'MEXICO') begin insert into Destino (Nombre) values ('MEXICO'); end
+if not exists (select 1 from Pais where Descripcion = 'CANADA') begin insert into Pais (Descripcion) values ('CANADA'); end
+if not exists (select 1 from Pais where Descripcion = 'MEXICO') begin insert into Pais (Descripcion) values ('MEXICO'); end
 
 if not exists (select 1 from Destino where Nombre = 'GEORGIA') begin insert into Destino (Nombre) values ('GEORGIA'); end
 if not exists (select 1 from Destino where Nombre = 'LIBERIA') begin insert into Destino (Nombre) values ('LIBERIA'); end
@@ -860,3 +858,4 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Invictus') begin 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'The Andersons') begin insert into CoordinadorPuerto (Nombre) values ('The Andersons'); end
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin insert into CoordinadorPuerto (Nombre) values ('Panocean'); end
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end
