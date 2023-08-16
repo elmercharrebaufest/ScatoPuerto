@@ -1282,10 +1282,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
 
     lineaTurno.cantidad.setValue(0);
-    if (lineaTurno?.medidaInicialCM.value &&
-      lineaTurno?.medidaInicialMM.value &&
-      lineaTurno?.medidaFinalCM.value &&
-      lineaTurno?.medidaFinalMM.value &&
+    if ((lineaTurno?.medidaInicialCM.value >= 0) &&
+      (lineaTurno?.medidaInicialMM.value >= 0) &&
+      (lineaTurno?.medidaFinalCM.value >= 0) &&
+      (lineaTurno?.medidaFinalMM.value >= 0) &&
       lineaTurno?.tk.value &&
       lineaTurno?.temperatura &&
       lineaTurno?.materialPuerto) {
@@ -1294,7 +1294,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const medidaFinalCM = lineaTurno?.medidaFinalCM.value;
       const medidaFinalMM = lineaTurno?.medidaFinalMM.value;
       const tkLinea = lineaTurno?.tk.value.toString().padStart(3, "0");;
-      const temperatura = lineaTurno?.temperatura.value;
+      const temperatura =  Math.round(lineaTurno?.temperatura.value);
       const materialPuerto = lineaTurno?.materialPuerto?.value;
       console.log(' input medidaInicialMM ==>')
       console.log(' ', medidaInicialCM, medidaInicialMM, tkLinea)
