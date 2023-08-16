@@ -194,9 +194,10 @@ export class NominacionDatoTecnicoRegistroService {
       let cantidadSumaExportador = 0;
       for (const exportador of exportadores) {
         const cantidad = +exportador.get('cantidad').value;
+        const tolerancia = +exportador.get('tolerancia').value;
         cantidadSumaExportador += cantidad;
 
-        if (!exportador.get('exportador').value || !exportador.get('tolerancia').value || !cantidad) {
+        if (!exportador.get('exportador').value || (!tolerancia && tolerancia !== 0) || !cantidad) {
           mostrarError('Falta completar información en Cargador');
           return false;
         }
