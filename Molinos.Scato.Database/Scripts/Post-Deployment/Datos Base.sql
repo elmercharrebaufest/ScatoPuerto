@@ -575,7 +575,7 @@ END
 
 IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = 'Fosfa 51' AND MaterialPuerto_Id = @SBONEU) BEGIN
    INSERT INTO TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
-   VALUES ('Fosfa 51', @SBONEU),
+   VALUES ('Fosfa 51', @SBONEU)
 END
 
 --Scripts CalidadValor
