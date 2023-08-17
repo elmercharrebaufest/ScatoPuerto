@@ -92,6 +92,7 @@
     <Folder Include="Scripts\20200512 - Credenciales MercadoPago" />
     <Folder Include="Scripts\bkp16052022" />
     <Folder Include="dbo\Tables\AfipPuerto" />
+    <Folder Include="dbo\Tables\AfipTablasReferencia" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -571,9 +572,16 @@
     <Build Include="dbo\Tables\AfipPuerto\AfipCoemContenedorVacio.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipCoemMercaderiaSuelta.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.sql" />
-    <Build Include="dbo\Tables\AfipPuerto\AfipCaratulaEstado.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipCode.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipCodeCoem.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipCondicionContenedor.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipLugarOperativo.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipNaturalezaEmbalaje.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipPais.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipPuerto.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipPuntoAduanero.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipTipoDocumento.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipTipoEmbalaje.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
