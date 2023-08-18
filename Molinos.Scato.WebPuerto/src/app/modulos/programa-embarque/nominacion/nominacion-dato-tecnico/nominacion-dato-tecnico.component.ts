@@ -445,6 +445,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       formExportador[index].controls.exportador.setValue('');
       this.mensajeValidaSeleccion = 'El cargador ingresado no existe.';
     }
+    const controlTolerancia = formExportador[index].controls.tolerancia;
+    if (!controlTolerancia.value) controlTolerancia.setValue(0);
   }
   public validaSeleccionCoordinadorPuerto($event, formulario: FormGroup, index: number) {
     this.mensajeValidaSeleccion = '';
