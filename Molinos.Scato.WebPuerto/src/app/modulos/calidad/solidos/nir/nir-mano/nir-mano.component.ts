@@ -35,7 +35,7 @@ constructor(
     private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
     private planoDeCargaService: PlanoDeCargaService) {
       this.user = this.session.getUser();
-      this.obtenerNir();
+      //this.obtenerNir();
     }
 
   ngOnInit(): void {
@@ -52,18 +52,24 @@ constructor(
   obtenerNir(){
     if(this.queMano != undefined){
       if(this.queMano == 1){
-        this.calidadSharedService.mano1.subscribe((res: Mano) => {
-          res.nirManualPuerto.forEach(nirsito => {
+        var arr = (this.formMano["controls"]["nirManualPuerto"] as FormArray).value;
+
+        this.mano.nirManualPuerto.forEach(nirsito => {
+          if (!arr.some(x => x.id == nirsito.id)) {
             this.agregarObjetoNir(nirsito);
-          })
+          }
         })
+
       } else if(this.queMano == 2) {
-        this.calidadSharedService.mano2.subscribe((res: Mano) => {
-          res.nirManualPuerto.forEach(nirsito => {
+        var arr = (this.formMano["controls"]["nirManualPuerto"] as FormArray).value;
+        
+        this.mano.nirManualPuerto.forEach(nirsito => {
+          if (!arr.some(x => x.id == nirsito.id)) {
             this.agregarObjetoNir(nirsito);
-          })
-        })
+          }
+        })        
       }
+      
       this.loaded = true
     }
   }
