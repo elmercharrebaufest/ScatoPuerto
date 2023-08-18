@@ -71,23 +71,20 @@ export class NominacionDatoTecnicoRegistroService {
     }
 
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
-        if (exportador != null) {
-            return this.formBuilder.group({
-                id: exportador.id,
-                exportador: exportador.exportador,
-                cantidad: exportador.cantidad,
-                tolerancia: exportador.tolerancia,
-                nominacionDatoTecnico_Id: nominacionDatoTecnico
-            })
-        } else {
-            return this.formBuilder.group({
-                id: '',
-                exportador: ['', Validators.required],
-                cantidad: [0, Validators.required],
-                tolerancia: [0, Validators.required],
-                nominacionDatoTecnico_Id: '',
-            })
-        }
+      const group = exportador ? this.formBuilder.group({
+        id: exportador.id,
+        exportador: exportador.exportador,
+        cantidad: exportador.cantidad,
+        tolerancia: exportador.tolerancia || 0,
+        nominacionDatoTecnico_Id: nominacionDatoTecnico
+      }) : this.formBuilder.group({
+        id: '',
+        exportador: ['', Validators.required],
+        cantidad: [0, Validators.required],
+        tolerancia: 0,
+        nominacionDatoTecnico_Id: '',
+      });
+      return group;
     }
 
     public inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null, nominacionDatoTecnico: number = 0): FormGroup {
@@ -194,10 +191,14 @@ export class NominacionDatoTecnicoRegistroService {
       let cantidadSumaExportador = 0;
       for (const exportador of exportadores) {
         const cantidad = +exportador.get('cantidad').value;
-        const tolerancia = +exportador.get('tolerancia').value;
         cantidadSumaExportador += cantidad;
 
-        if (!exportador.get('exportador').value || (!tolerancia && tolerancia !== 0) || !cantidad) {
+        const controlTolerancia = exportador.get('tolerancia');
+        if (controlTolerancia.value === null || controlTolerancia.value === undefined || controlTolerancia.value === '') {
+          controlTolerancia.setValue(0);
+        }
+
+        if (!exportador.get('exportador').value || !cantidad) {
           mostrarError('Falta completar información en Cargador');
           return false;
         }
