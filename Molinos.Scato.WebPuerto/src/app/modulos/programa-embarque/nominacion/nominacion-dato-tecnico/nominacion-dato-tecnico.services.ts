@@ -194,7 +194,9 @@ export class NominacionDatoTecnicoRegistroService {
         cantidadSumaExportador += cantidad;
 
         const controlTolerancia = exportador.get('tolerancia');
-        if (!controlTolerancia.value) controlTolerancia.setValue(0);  // De esta forma si está vacío, se pone 0
+        if (controlTolerancia.value === null || controlTolerancia.value === undefined || controlTolerancia.value === '') {
+          controlTolerancia.setValue(0);
+        }
 
         if (!exportador.get('exportador').value || !cantidad) {
           mostrarError('Falta completar información en Cargador');
