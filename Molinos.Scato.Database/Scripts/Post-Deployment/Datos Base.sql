@@ -509,7 +509,7 @@ declare @SME    int = (select top 1 Id from MaterialPuerto (nolock) where Descri
 declare @WHEAT  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'WHEAT'  )
 declare @SFPMP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPMP'  )
 declare @SFPLP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPLP'  )
-declare @SBONEU int = (select top 1 Id from MaterualPuerto (nolock) where DescripcionCortaIngles = 'SBO NEU')
+declare @SBONEU int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SBO NEU')
 
 
 --Scripts TipoDeCalidad
