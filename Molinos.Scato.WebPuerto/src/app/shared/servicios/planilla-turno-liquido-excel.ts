@@ -281,6 +281,7 @@ export class PlanillaTurnoLiquidoExcelService {
 
         if (!esRecibidores){
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
+            worksheet.getRow(offset).height = 50;
             worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
             worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
@@ -295,6 +296,7 @@ export class PlanillaTurnoLiquidoExcelService {
             worksheet.getRow(offset).getCell(14).value = turno.cantidad;
         }else{
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
+            worksheet.getRow(offset).height = 50;
             worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
             worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
@@ -317,9 +319,9 @@ export class PlanillaTurnoLiquidoExcelService {
             }
         }
     }
-    private setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder){
+    private setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder){      
         planillaDeTurnos = planillaDeTurnos.sort((a, b) => {
-            return (a.fechaMiliseconds - b.fechaMiliseconds) && (a.turnoPuerto.orden - b.turnoPuerto.orden);
+            return (new Date(b.fecha).getDate() - new Date(a.fecha).getDate());
           });
 
 
@@ -337,7 +339,7 @@ export class PlanillaTurnoLiquidoExcelService {
                 turno.indexDia = diaOrder;
               }
             }
-        });
+        });        
         return diaOrder;
     }
     private setDetalleObservacionesCalidad(worksheet, observacion, offset ){
@@ -618,12 +620,17 @@ export class PlanillaTurnoLiquidoExcelService {
         });
 
         //renderizo detalles
-        for (let dia = 0; dia <= diaOrder; dia++) {
+        for (let dia = 0; dia <= diaOrder; dia++) {          
           let CantRows = 0;
           let fechaDia;
-          planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
+          let cantidadToneladasPorFecha = 0;
+          planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {              
+
             //si es el mismo día cuento las filas que voy a necesitar para calcular el merge
             if (turno.indexDia == dia) {
+              turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach(element => {
+                cantidadToneladasPorFecha += element.cantidad;
+              });
               fechaDia = new Date(turno.fecha);
               if (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length > 0) {
                 CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length + 1);
@@ -643,20 +650,11 @@ export class PlanillaTurnoLiquidoExcelService {
           const mesTurno = `${(fechaDia.getMonth() + 1)}`.padStart(2, '0');
           const anioTurno = fechaDia.getFullYear();
           const fechaTurno = `${diaTurno}-${mesTurno}-${anioTurno}`;
-
-          /* Toneladas por fecha */
-          let toneladas: number = 0;
-          planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-            turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach(item =>{
-              console.log('item...', item)
-              toneladas += item.cantidad;
-            })
-          });
-
+        
           /* Contenido Fecha */
-          worksheet.getCell(`A${baseCell + 1}`).value = `${fechaTurno} \r\n ${toneladas} tn`;
-          worksheet.getCell(`A${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center' }
-          worksheet.getCell(`A${baseCell + 1}`).border = borders;
+          worksheet.getCell(`A${baseCell + 1}`).value = `${fechaTurno} \r\n ${cantidadToneladasPorFecha} tn`;
+          worksheet.getCell(`A${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+          worksheet.getCell(`A${baseCell + 1}`).border = borders;     
 
           /* Cabeceras Fecha */
           worksheet.mergeCells(`A${baseCell + 1}:A${baseCell + (CantRows > 0 ? CantRows - 1 : CantRows)}`);
@@ -668,10 +666,11 @@ export class PlanillaTurnoLiquidoExcelService {
 
           /* Cabeceras Turno */
           worksheet.getCell(`B${baseCell}`).value  = "Turno";
+          worksheet.getCell(`B${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };          
           worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
           worksheet.getCell(`B${baseCell}`).border = borders;
-          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
-
+          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}          
+          
           baseCell = baseCell + (CantRows > 0 ? CantRows : CantRows);
 
         }

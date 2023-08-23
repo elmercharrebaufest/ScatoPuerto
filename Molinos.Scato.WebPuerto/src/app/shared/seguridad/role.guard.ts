@@ -92,15 +92,31 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
-            /*
+          
             case 'programa': {
-                if (permisos.find(x => x === 'Recibidores_Ver')){
+                if (permisos.find(x => x === 'Comex_Nominacion_Ver')){
                     return true;
                 }else{
                     this.navigate(permisos, "programa");
                 }
                 break;
-            }*/
+            } 
+            case 'nominacion': {
+                if (permisos.find(x => x === 'Comex_Nominacion_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "nominacion");
+                }
+                break;
+            } 
+            case 'vapor': {
+                if (permisos.find(x => x === 'Vapor_Visualizar')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "vapor");
+                }
+                break;
+            } 
         }
     }
 
@@ -132,6 +148,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'Buque_Ver': {
                 this.router.navigate(['/programa']);
+                break;
+            }
+            case 'Vapor_Visualizar': {
+                this.router.navigate(['/vapor']);
                 break;
             }
         }
@@ -169,11 +189,15 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'buque': {
-                msje = 'No tiene permiso para Buque';
+                msje = 'No tiene permiso para visualizar Historial de Embarques';
                 break;
             }
             case 'programa': {
                 msje = 'No tiene permiso para visualizar Programa de Embarque';
+                break;
+            }
+            case 'vapor': {
+                msje = 'No tiene permiso para visualizar Buques';
                 break;
             }
         }

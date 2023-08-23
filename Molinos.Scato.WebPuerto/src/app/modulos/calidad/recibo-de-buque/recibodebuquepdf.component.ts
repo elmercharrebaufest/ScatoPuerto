@@ -3,6 +3,8 @@ import { ReciboDeBuque, ReciboDeBuqueDetalles } from '@ScatoModels/reciboDeBuque
 import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { ReciboBuqueService } from '@ScatoServicios/reciboBuque.service';
 import jspdf from 'jspdf'; 
+import { iif } from 'rxjs';
+import { ToWords } from 'to-words';
 
 
 @Component({
@@ -77,6 +79,14 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
     doc.output('pdfobjectnewwindow');
   }
 
+  getCantidadEnLetras(cantidad: any): string {
+    if (cantidad != null) {
+      const toWords = new ToWords({ localeCode: 'en-US' });
+      return toWords.convert(cantidad)
+    }
+    return '';
+  }
+
   generarContenido(doc:jspdf, numPag:number, original:boolean){
     if(original){
       doc.text("ORIGINAL", 105, 10, null, 'center');
@@ -106,6 +116,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
     let dia = dateRecibo.getDate();
     dateRecibo.setDate(dia);
     arrFecha = dateRecibo.toDateString().split(' ',4)
+    arrFecha[1] = dateRecibo.toLocaleDateString('EN-US', { 'month': 'long' });    
     
     // FECHA
     doc.text(arrFecha[1].toUpperCase() + "    " + arrFecha[2], 145, 34.5, null, 'center');
@@ -168,18 +179,18 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
     let cantidadAMostrarEnLetras: string;
 
     if(this.recibo.esEuropeo ){
-      let spliteado = this.recibo.cantidadLetrasYClaseCarga.split('POINT');
+      let spliteado = this.getCantidadEnLetras(this.recibo.cantidad).split('POINT');
       if(spliteado[1] != undefined){
         let cantidadLetras = spliteado[0] + 'COMMA' + spliteado[1] 
         cantidadAMostrarEnLetras = cantidadLetras.toUpperCase();
       }else{
-        cantidadAMostrarEnLetras = this.recibo.cantidadLetrasYClaseCarga;
+        cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
       } 
     }else{
-      cantidadAMostrarEnLetras = this.recibo.cantidadLetrasYClaseCarga;
+      cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
     }
     
-    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras, 130);
+    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras +  (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS')+ " OF " + this.recibo.cantidadLetrasYClaseCarga, 130);
     let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5)-5) / 2);
     arrLineasTexto.forEach(linea => {
       

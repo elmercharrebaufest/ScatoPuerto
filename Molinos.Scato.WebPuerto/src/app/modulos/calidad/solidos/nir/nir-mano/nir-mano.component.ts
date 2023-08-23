@@ -4,8 +4,11 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { Mano, NirManualPuerto } from '@ScatoModels/nir';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
@@ -28,9 +31,11 @@ constructor(
     private moduloDeCargaService: ModuloDeCargaService,
     private calidadSharedService: CalidadSharedService,
     private session: SessionService,
-    private fb: FormBuilder) {
+    private fb: FormBuilder,
+    private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
+    private planoDeCargaService: PlanoDeCargaService) {
       this.user = this.session.getUser();
-      this.obtenerNir();
+      //this.obtenerNir();
     }
 
   ngOnInit(): void {
@@ -47,18 +52,24 @@ constructor(
   obtenerNir(){
     if(this.queMano != undefined){
       if(this.queMano == 1){
-        this.calidadSharedService.mano1.subscribe((res: Mano) => {
-          res.nirManualPuerto.forEach(nirsito => {
+        var arr = (this.formMano["controls"]["nirManualPuerto"] as FormArray).value;
+
+        this.mano.nirManualPuerto.forEach(nirsito => {
+          if (!arr.some(x => x.id == nirsito.id)) {
             this.agregarObjetoNir(nirsito);
-          })
+          }
         })
+
       } else if(this.queMano == 2) {
-        this.calidadSharedService.mano2.subscribe((res: Mano) => {
-          res.nirManualPuerto.forEach(nirsito => {
+        var arr = (this.formMano["controls"]["nirManualPuerto"] as FormArray).value;
+        
+        this.mano.nirManualPuerto.forEach(nirsito => {
+          if (!arr.some(x => x.id == nirsito.id)) {
             this.agregarObjetoNir(nirsito);
-          })
-        })
+          }
+        })        
       }
+      
       this.loaded = true
     }
   }
@@ -187,9 +198,13 @@ constructor(
     }
   }
 
-  obtenerBodegas(){
-    this.moduloDeCargaService.obtenerListadoBodegas()
-    .subscribe( bod =>  this.bodegas = bod);
+  obtenerBodegas(){      
+    let planoDeCargaId = this.datosEmbarqueProcesoService.getPlanoDeCargaId();
+    this.planoDeCargaService.obtenerBodegas(planoDeCargaId).subscribe(
+      bodegas => {
+        this.bodegas = bodegas;      
+      }
+    )
   }
 
   getNir(): NirManualPuerto[]{

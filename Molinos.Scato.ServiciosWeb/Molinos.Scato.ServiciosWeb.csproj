@@ -137,6 +137,8 @@
     </Content>
     <Content Include="ServicioEstadoPuesto.svc" />
     <Content Include="FirmaProvider.svc" />
+    <Content Include="ServicioVapor.svc" />
+    <Content Include="ServicioProgramaEmbarque.svc" />
     <Content Include="ServicioSuscriptor.svc" />
     <Content Include="SLOSCATOPROD.DeployParameters.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

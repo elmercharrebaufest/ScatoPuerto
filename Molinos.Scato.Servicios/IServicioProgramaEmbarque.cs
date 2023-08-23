@@ -1,0 +1,144 @@
+﻿using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
+using System;
+using System.Collections.Generic;
+using System.ServiceModel;
+using static Molinos.Scato.Servicios.Impl.ServicioProgramaEmbarque;
+
+namespace Molinos.Scato.Servicios
+{
+    [ServiceContract]
+    public interface IServicioProgramaEmbarque
+    {
+
+        [OperationContract]
+        IList<TipoDeContratoDto> listarTipoDeContrato();
+
+        [OperationContract]
+        IList<SurveyorDto> listarSurveyor();
+
+        [OperationContract]
+        IList<TasaDeCargaDto> listarTasaDeCarga();
+
+        [OperationContract]
+        IList<MuelleDeCargaDto> listarMuelleDeCarga();
+
+        [OperationContract]
+        ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null);
+
+        [OperationContract]
+        ProgramaEmbarqueDto ListarDatosCombo();
+
+        [OperationContract]
+        IList<CalidadValorDto> listarCalidadValor();
+
+        [OperationContract]
+        IList<TipoDeCalidadDto> listarTipoDeCalidad();
+
+        [OperationContract]
+        NominacionDto ObtenerNominacion(int id);
+
+        [OperationContract]
+        IList<NominacionReciboDto> ObtenerNominacionRecibos(int nominacion_id);
+
+        [OperationContract]
+        void GuardarNominacionRecibo(List<NominacionReciboDto> nominacionRecibo, int nominacion_id);
+
+        [OperationContract]
+        IList<VaporInformacionDto> listarVaporInformacion();
+
+        [OperationContract]
+        IList<CompaniaDeFumigacionDto> ListarCompaniaDeFumigacion();
+
+        [OperationContract]
+        IList<TipoDeFumigacionDto> ListarTipoDeFumigacion();
+
+        [OperationContract]
+        IList<MaterialPuertoDto> listarMaterialPuerto();
+
+        [OperationContract]
+        IList<DestinoDto> listarDestino();
+
+        [OperationContract]
+        IList<ExportadorDto> listarExportador();
+
+        [OperationContract]
+        IList<CoordinadorPuertoDto> listarCoordinadorPuerto();
+
+        [OperationContract]
+        IList<BanderaDto> listarBandera();
+
+        [OperationContract]
+        IList<ATAPuertoDto> listarATAPuerto();
+
+        [OperationContract]
+        IList<AgenciaMaritimaPuertoDto> listarAgenciaMaritimaPuerto();
+
+        [OperationContract]
+        bool ValidarCreacionNominacion(NominacionValidaDto nominacion);
+
+        [OperationContract]
+        bool CrearSurveyor(SurveyorDto surveyor);
+
+        [OperationContract]
+        bool CrearTipoDeFumigacion(TipoDeFumigacionDto tipoDeFumigacion);
+
+        [OperationContract]
+        bool CrearCompaniaDeFumigacion(CompaniaDeFumigacionDto companiaDeFumigacion);
+
+        [OperationContract]
+        NominacionDto GuardarNominacion(NominacionDto nominacion);
+
+        [OperationContract]
+        void EliminarNominacion(int nominacion_id);
+
+
+        [OperationContract]
+        void EliminarNotificacion(int notificacion_id, string username);
+
+        [OperationContract]
+        IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario);
+        [OperationContract]
+        MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipo);
+
+        [OperationContract]
+        IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
+        [OperationContract]
+        void ActualizarDatosYEnviarMail(MailDto mail, string usuario);
+
+        [OperationContract]
+        List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);
+
+
+        [OperationContract]
+        IList<VaporInformacionDto> ListarBuquesNominacion();
+
+        [OperationContract]
+        IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id);
+
+        [OperationContract]
+        ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id);
+
+        [OperationContract]
+        IList<EmbarqueDto> ObtenerEmbarquePorVapor(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id);
+
+        [OperationContract]
+        void AsociarEmbarquePorNominacionEnviada(int nominacion_Id, int embarque_Id, string observacion);
+
+        [OperationContract]
+        void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id);
+
+        [OperationContract]
+        void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null, NominacionDto nominacionDto = null);
+
+        [OperationContract]
+        void AgregarNotificacion(NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque);
+
+        [OperationContract]
+        IList<NominacionDto> ListarNominacionesExcel();
+
+        [OperationContract]
+        void EnviarMailNominacionesExcel(byte[] archivo);
+    }
+}

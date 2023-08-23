@@ -1,9 +1,32 @@
-<div class="row">    
-    <div class="col-md-9"><label class="cargando-programa-embarque">Programa de Embarque</label></div>
-    <div class="text-md-right margen-boton col-md-3" style="margin-top: 10px;"> 
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <label class="cargando-programa-embarque">Programa de Embarque</label>
+        </div> 
+        <div class="col-md-2" *ngIf='tienePermisoCrearNuevaNominacion()'>
+            <button class="btn nominacion" (click)="onCrearNuevaNominacion()">NUEVA NOMINACIÓN</button>
+        </div>      
     </div>
-    <div class="col-md-3">
-        <button class="btn buscar" style="width: 100%;" (click)="onCrearNuevaNominacion()" >Buscar</button>      
+    <div class="row" *ngIf='tienePermisoEnviarALineUp()'>
+        <div class="col-md-10"></div>        
+        <div class="col-md-2 alinearAlFinal">
+            <button class="btn enviarLineUp" (click)="onOpenModalEnviarLineUp(addPE)">ENVIAR A LINE UP</button>
+        </div>
     </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <app-filtro-programa-embarque></app-filtro-programa-embarque>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <app-listado-programa-embarque></app-listado-programa-embarque>
+        </div>
+    </div>
+  
 </div>
 
+<ng-template #addPE let-modal>
+    <app-nominacion-enviar-lineup (modalCerrar)="modal.dismiss()"></app-nominacion-enviar-lineup>
+</ng-template>

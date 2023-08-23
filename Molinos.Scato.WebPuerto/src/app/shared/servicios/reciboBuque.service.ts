@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable, Output } from '@angular/core';
+import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { ReciboDeBuque } from '@ScatoModels/reciboDeBuque';
 import { environment } from 'environments/environment';
-import { Observable, Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +32,10 @@ export class ReciboBuqueService {
   }
 
   obtenerRecibos(idEmbarque: number,): Observable<ReciboDeBuque[]>{
-    return this.http.get<ReciboDeBuque[]>(`${this.url}ModuloDeCarga/ListarRecibosDeBuque?idEmbarque=${idEmbarque}`, { 'withCredentials' : true})
-    
+    return this.http.get<ReciboDeBuque[]>(`${this.url}ModuloDeCarga/ListarRecibosDeBuque?idEmbarque=${idEmbarque}`, { 'withCredentials' : true}) 
+  }
+  
+  obtenerNominacionRecibos(idEmbarque: number,): Observable<Nominacion[]>{
+    return this.http.get<Nominacion[]>(`${this.url}ModuloDeCarga/ListarNominacionesRecibos?idEmbarque=${idEmbarque}`, { 'withCredentials' : true}) 
   }
 }

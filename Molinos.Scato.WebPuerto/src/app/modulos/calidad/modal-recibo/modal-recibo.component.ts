@@ -27,15 +27,14 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   //#region variables
   reciboBuqueDetalles: ReciboDeBuqueDetalles;
   reciboBuque: ReciboDeBuque;
-  reciboBuqueOjito:ReciboDeBuque;
+  reciboBuqueOjito: ReciboDeBuque;
   errorMessage: boolean = false;
-  idEmbarque:number;
-  nombreBuque:string;
+  idEmbarque: number;
+  nombreBuque: string;
   reciboDeBuqueForm: FormGroup;
-  desdeTabla:boolean = false;
   // enviado: boolean;
-  @Input() mostrarModal:boolean = false;
-  @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo:TemplateRef<any>;
+  @Input() mostrarModal: boolean = false;
+  @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo: TemplateRef<any>;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
 
@@ -49,11 +48,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     private _embarqueService: EmbarqueService,
     private _reciboSharingService: ReciboSharingService,
     private _formBuilder: FormBuilder,
-    private _confirmationDialogService: ConfirmationDialogService,
-    public session: SessionService    
-  ) 
-  { 
-    this.desdeTabla = false;
+    public session: SessionService
+  ) {
     // session.getUser().username
     this.user = this.session.getUser();
     this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
@@ -61,16 +57,17 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       this.mostrarModalOjito();
     });
     this.initObtenerEmbarque();
+
   }
   //#endregion
   ngOnInit(): void {
     this.initFormReciboDetalles()
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.mostrarModalOjito()
   }
-  
+
   private initFormReciboDetalles() {
     const toWords = new ToWords();
     this.reciboDeBuqueForm = this._formBuilder.group({
@@ -89,12 +86,12 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       incluirImpresionDestino: [true],
       incluirImpresionCalidad: [true],
       incluirImpresionEstibado: [true],
-      esEuropeo:[true],
-      valorEnKG:[true],
+      esEuropeo: [true],
+      valorEnKG: [true],
     })
   }
 
-  initObtenerEmbarque(){
+  initObtenerEmbarque() {
 
     this.idEmbarque = this._datosEmbarqueProcesoService.getEmbarqueId();
 
@@ -103,21 +100,29 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
       this._reciboBuqueService.obtenerRecibos(this.idEmbarque)
     ]).subscribe(([res1]) => {
       this.nombreBuque = res1.nombreBuque;
-      });
+    });
 
   }
 
-  keyUpCantidadEnLetras(cantidad: any, event: any){
-    if(cantidad != null || event.key == 'Backspace'){
-      const toWords = new ToWords({localeCode: 'en-US'});
+  keyUpCantidadEnLetras(cantidad: any, event: any) {
+    if (cantidad != null || event.key == 'Backspace') {
+      const toWords = new ToWords({ localeCode: 'en-US' });
       // this.reciboDeBuqueForm.controls.cantidadLetras.setValue(converter.toWords(cantidad).toUpperCase());
-      if(cantidad !=  null){
+      if (cantidad != null) {
         let convertido = toWords.convert(cantidad)
         this.reciboDeBuqueForm.controls.cantidadLetras.setValue(convertido.toString().toUpperCase());
-      }else{
+      } else {
         this.reciboDeBuqueForm.controls.cantidadLetras.setValue('');
       }
     }
+  }
+
+  getCantidadEnLetras(cantidad: any): string {
+    if (cantidad != null) {
+      const toWords = new ToWords({ localeCode: 'en-US' });
+      return toWords.convert(cantidad)
+    }
+    return '';
   }
 
   public decimalOnly(event): boolean {
@@ -127,61 +132,57 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     return false;
   }
 
-  // onChangeCantidadEnLetras(value:number){
-  // }
+  mostrarModalOjito() {
+    if (this.ojitoRecibo != undefined) {
+      if (this.mostrarModal) {
 
-  mostrarModalOjito(){
-    if(this.ojitoRecibo != undefined){
-      if (this.mostrarModal){
-        this.desdeTabla = true;
-        // this.enviado = true;
-
-        this._modalService.open(this.ojitoRecibo, { size: 'lg'});
+        this._modalService.open(this.ojitoRecibo, { size: 'lg' });
         this.setModalOjito()
       }
     }
   }
 
-  setModalOjito(){
-    let cantidadYClaseCarga = this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga
-    let arrClase = cantidadYClaseCarga.split(' OF ');
+  setModalOjito() {
+
+    this.reciboDeBuqueForm.enable();
 
     this.reciboDeBuqueForm.controls.puertoOrigen.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoOrigen);
-
-
-
-    this.reciboDeBuqueForm.controls.fechaRecibo.setValue(formatDate(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo,'yyyy-MM-dd','en'));
-    // this.reciboDeBuqueForm.controls.fechaRecibo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo);
+    if (this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo != null && this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo != undefined){
+      this.reciboDeBuqueForm.controls.fechaRecibo.setValue(formatDate(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo, 'yyyy-MM-dd', 'en'));
+    }else{
+      this.reciboDeBuqueForm.controls.fechaRecibo.setValue(new Date());
+    }
+    //this.reciboDeBuqueForm.controls.fechaRecibo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo);
     this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].nombreBuque);
     this.reciboDeBuqueForm.controls.exportador.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].exportador);
     this.reciboDeBuqueForm.controls.puertoDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoDestino);
+    this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].valorEnKG);
     this.reciboDeBuqueForm.controls.cantidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad);
-    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(arrClase[0]);
-    this.reciboDeBuqueForm.controls.claseCarga.setValue(arrClase[1]);
+    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(this.getCantidadEnLetras(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad));
+    this.reciboDeBuqueForm.controls.claseCarga.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga);
+
+
     this.reciboDeBuqueForm.controls.estibadoEnBodega.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].estibadoEnBodega);
     this.reciboDeBuqueForm.controls.calidadYCantidadDesconocida.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].calidadYCantidadDesconocida);
     this.reciboDeBuqueForm.controls.incluirImpresionDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionDestino);
     this.reciboDeBuqueForm.controls.incluirImpresionCalidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionCalidad);
     this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionEstibado);
     this.reciboDeBuqueForm.controls.esEuropeo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
-    this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
-    this.reciboDeBuqueForm.disable();
+    if (this.reciboBuqueOjito.desdeTabla) { this.reciboDeBuqueForm.disable(); }
+    else { this.reciboDeBuqueForm.enable(); }
+
   }
 
   openModalEmitirRecibo(modal: any) {
-    // this.enviado = false;
-    // this.errorMessage = false;
     this.initFormReciboDetalles();
-    this._modalService.open(modal, { size: 'lg'});
-    
+    this._modalService.open(modal, { size: 'lg' });
   }
-  
-  guardarRecibo(modifico:boolean){
+
+  guardarRecibo() {
     let reciboActual = this.reciboDeBuqueForm.getRawValue();
     let material = (reciboActual.claseCarga != undefined && reciboActual.claseCarga.length > 0) ? `OF ${reciboActual.claseCarga}` : '';
-    if(reciboActual.valorEnKG == true){
-      this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} KILOS ${material}`);
-    }else this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(`${reciboActual.cantidadLetras} METRIC TONS ${material}`);
+
+    this.reciboDeBuqueForm.controls.cantidadLetrasYClaseCarga.setValue(reciboActual.claseCarga);
 
     this.reciboBuqueDetalles = this.reciboDeBuqueForm.getRawValue();
     this.reciboBuque = new ReciboDeBuque();
@@ -194,15 +195,15 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
     this.reciboBuque.reciboDeBuqueDetalles = [];
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => {
-    console.log('200 Ok')
-    this._reciboSharingService.setRefreshRecibo(true);
-  });
-    
-    
+      console.log('200 Ok')
+      this._reciboSharingService.setRefreshRecibo(true);
+    });
+
+
     // this.enviarMail(this.idEmbarque, this.reciboBuque);
     // this.enviado = true;
   }
-  
+
   // enviarMail(idEmbarque, Recibo) {
   //   var titulo = "Enviar a supervisor";
   //   var text = "Cuerpo del Mail:"
@@ -225,7 +226,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   //        this._confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
   //        .then((confirmed) => {
   //         if (confirmed){
-            
+
   //           return
   //         }
   //         return

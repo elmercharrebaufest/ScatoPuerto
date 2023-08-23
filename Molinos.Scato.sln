@@ -66,6 +66,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Molinos.Scato.AzureAD", "Molinos.Scato.AzureAD\Molinos.Scato.AzureAD.csproj", "{6461D8F2-94BA-4F4D-8312-26890DF036BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Molinos.Scato.ServiciosWindows", "Molinos.Scato.ServiciosWindows\Molinos.Scato.ServiciosWindows\Molinos.Scato.ServiciosWindows.csproj", "{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -427,12 +431,44 @@ Global
 		{A089B73C-69EC-4698-A2E2-DAF208AB5EAC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A089B73C-69EC-4698-A2E2-DAF208AB5EAC}.Release|x86.ActiveCfg = Release|Any CPU
 		{A089B73C-69EC-4698-A2E2-DAF208AB5EAC}.Release|x86.Build.0 = Release|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Debug|x86.Build.0 = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.DebugLocal|x86.ActiveCfg = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.DebugLocal|x86.Build.0 = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Jenkins|Any CPU.ActiveCfg = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Jenkins|Any CPU.Build.0 = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Jenkins|x86.ActiveCfg = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Jenkins|x86.Build.0 = Debug|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Release|x86.ActiveCfg = Release|Any CPU
+		{6461D8F2-94BA-4F4D-8312-26890DF036BC}.Release|x86.Build.0 = Release|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Debug|x86.Build.0 = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.DebugLocal|x86.ActiveCfg = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.DebugLocal|x86.Build.0 = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Jenkins|Any CPU.ActiveCfg = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Jenkins|Any CPU.Build.0 = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Jenkins|x86.ActiveCfg = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Jenkins|x86.Build.0 = Debug|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|x86.ActiveCfg = Release|Any CPU
+		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9DDEFB12-34EF-487C-AD39-BE59400A56B5}
 		RESX_NeutralResourcesLanguage = es-AR
+		SolutionGuid = {9DDEFB12-34EF-487C-AD39-BE59400A56B5}
 	EndGlobalSection
 EndGlobal

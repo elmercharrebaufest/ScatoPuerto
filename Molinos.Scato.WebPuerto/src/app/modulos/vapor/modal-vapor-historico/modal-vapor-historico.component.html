@@ -1,0 +1,39 @@
+<ship-spinner [message]="'Cargando Historial de buques. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<div class="modal-content">
+    <div class="margenes cierre">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cerraModal()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+        <label><strong class="titulo">{{ vapores[0]?.nombreBuque }}</strong></label>
+    </div>
+    <div class="line" style="background-color: gray;"></div>
+    <div class="modal-body tamanioLetraModal">
+        <div style="overflow-x:auto; " class="table-responsive tableFixHead">
+            <div *ngIf="!tieneDatos">
+                <div class="alert alert-dark" role="alert">
+                  No se registraron datos en el historial de buques. Verique que el buque tenga embarques asociados.
+                  </div>
+            </div>
+            <table *ngIf="tieneDatos" class='table table-bordered lista-pe-table'>
+                <thead>
+                    <tr class="header">
+                        <th>Nombre buque</th>
+                        <th>Bandera</th>
+                        <th>Usuario</th>
+                        <th>Fecha Actualización</th>
+                    </tr>
+                </thead>
+                <tbody *ngFor="let vapor of vapores; let i = index" [attr.data-index]="i" style="text-align: center;">
+                    <tr>
+                        <td class="centradoHorizontal">{{ vapor.nombreBuque}}</td>
+                        <td class="centradoHorizontal">{{ vapor.bandera.nombre}}</td>
+                        <td class="centradoHorizontal">{{ vapor.usuario}}</td>
+                        <td class="centradoHorizontal">{{ vapor.fechaModificacion  | date:'dd/MM/yyyy hh:mm:ss a'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="line"></div>
+</div>

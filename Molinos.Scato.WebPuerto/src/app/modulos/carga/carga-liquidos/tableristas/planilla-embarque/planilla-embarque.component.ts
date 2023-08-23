@@ -44,17 +44,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     this.user = this.session.getUser();
     this.turnosService.sendExportadores.subscribe(res => this.exportadores = res);
     this.turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;
+      this.bodegas = res;      
       this.getProductos();
       this.getTanqueAbordo();
     });
-    this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
-      if (data) {
-        this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-          this.lineas = resp.moduloDeCargaLineasDeEmbarque;
-        });
-      }
-    });
+      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+        this.lineas = resp.moduloDeCargaLineasDeEmbarque;
+      });
+      // this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
+      //   if (data) {
+          
+      //   }
+      // });       
   }
 
   ngAfterViewInit(): void {
@@ -84,8 +85,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   newForm() {
     console.log('this.lineas...>>')
     console.log(this.lineas)
-    if (this.lineas == undefined || this.lineas == null)
-      this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
+    
+    if (this.lineas == undefined || this.lineas == null){
+    this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
+    }          
 
     // Evangelino Se considera exportadores unicos no duplicados
     //this.exportadores = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad);
@@ -93,16 +96,16 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     const exportadorFiltro = exportadoresData.map(item => item.exportador);
     this.exportadores = [...new Map(exportadorFiltro.map(item => [item['nombre'], item])).values()];
 
-    this.bodegas = this.turnosService.getBodega();
     //this.partidas = this.bodegas.map(item => ({bodegaParcel: item.bodegaParcel}));
 
 
     //antes de iniciar las lineas vacias me fijo cuantos registros hay de la DB.
-    this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
+    this.planillaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeEmbarque;
 
-
+    this.bodegas = this.turnosService.getBodega();
     this.getProductos();
-    this.getTanqueAbordo();
+    this.getTanqueAbordo();    
+    
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.lineasEmbarque = new FormGroup({
       linea:  this.builder.array([])
@@ -111,15 +114,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     // this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
 
     //Si tengo items en la planilla de embarque los agrego a la tabla.
-    if (this.planillaDeEmbarque){
+    setTimeout(() => {
+      if (this.planillaDeEmbarque){
 
-      if (this.planillaDeEmbarque.length > 0){
-        this.fillPlanillaDeEmbarque();
-      }else{
-        //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
-        this.getPlanillaDeEmbarque().push(this.initLinea());
+        if (this.planillaDeEmbarque.length > 0){
+          this.fillPlanillaDeEmbarque();
+        }else{
+          //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
+          this.getPlanillaDeEmbarque().push(this.initLinea());
+        }
       }
-    }
+    }, 1000);
+    
   }
 
   fillPlanillaDeEmbarque(){
@@ -136,7 +142,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   getProductos() {
     this.productos = new Array();
     this.destinos = new Array();
-    this.bodegas.forEach(b => {
+    
+    this.bodegas?.forEach(b => {
       if (b.destino && !this.destinos.find(d => d == b.destino.nombre))
         this.destinos.push(b.materialPuerto.descripcionCorta);
 
@@ -167,7 +174,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   }
 
   get linea(): FormArray {
-    return this.lineasEmbarque.get('linea') as FormArray;
+    return this.lineasEmbarque?.get('linea') as FormArray;
   }
 
   autoCompleteParcel(parcel, l: FormGroup) {

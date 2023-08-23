@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Servicios;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -68,6 +69,27 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 return Request.CreateResponse(HttpStatusCode.OK,
                servicio.ObtenerUsuarioId( usuario));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        [HttpPost]
+        [Route("api/ObtenerGruposAD")]
+        public HttpResponseMessage ObtenerGruposAD(List<string> grupos, string username )
+        {
+            try
+            {
+                System.Web.HttpContext.Current.Session.Add("usuario", username);
+                var listadoPermisos = servicio.ObtenerGruposAD(grupos);
+
+                return Request.CreateResponse(HttpStatusCode.OK, new
+                {
+                    permisos = listadoPermisos
+                });
             }
             catch (Exception ex)
             {

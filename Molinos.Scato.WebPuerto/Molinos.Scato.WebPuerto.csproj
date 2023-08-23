@@ -337,6 +337,16 @@
     <Content Include="src\assets\fotos\foto_buque005.jpg" />
     <Content Include="src\assets\fotos\foto_buque006.jpg" />
     <Content Include="src\assets\fotos\foto_buque007.jpg" />
+    <Content Include="src\assets\fumigadorProgramaEmbarque.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="src\assets\historial-de-embarque.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="src\assets\iconoEditar.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="src\assets\IconoHomeProgramaEmbarque.svg" />
     <Content Include="src\assets\Menos.svg" />
     <Content Include="src\assets\ojoIcon.svg" />
     <Content Include="src\assets\iconImDeshabilitada.svg" />
@@ -367,6 +377,9 @@
     <Content Include="src\assets\ship.svg" />
     <Content Include="src\assets\shipAzul.svg" />
     <Content Include="src\assets\sidebar-icons\geolocalizacion.svg" />
+    <Content Include="src\assets\surveyorProgramaEmbarque.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="src\assets\trashIcon-no-border.svg" />
     <Content Include="src\assets\trashIcon.svg" />
     <Content Include="src\assets\turno_cerrado.svg" />

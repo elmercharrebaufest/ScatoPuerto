@@ -81,6 +81,8 @@
     <Compile Include="ConsultasEF\ListarCaracteristicaConfiguracionDeTabla.cs" />
     <Compile Include="ConsultasEF\ListarDatosDeWorkflowsPendientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarEstadoDeCalle.cs" />
+    <Compile Include="ConsultasEF\ListarProgramaEmbarqueCombos.cs" />
+    <Compile Include="ConsultasEF\ListarProgramaEmbarqueConsulta.cs" />
     <Compile Include="ConsultasEF\ListarMuestraEnvioACamaraAuditoriaParaImpresionConsulta.cs" />
     <Compile Include="ConsultasEF\ListarMuestraEnvioACamaraAuditoriaParaArchivoConsulta.cs" />
     <Compile Include="ConsultasEF\ListarCampaniaPorCuit.cs" />
@@ -89,6 +91,7 @@
     <Compile Include="ConsultasEF\ListarDetalleMovimientoIngreso.cs" />
     <Compile Include="ConsultasEF\ListarCpeAfipCacheadas.cs" />
     <Compile Include="ConsultasEF\ListarVagonesEnPesada.cs" />
+    <Compile Include="ConsultasEF\ListarVaporInformacionConsulta.cs" />
     <Compile Include="ConsultasEF\MonitorCPEsCacheadasConsulta.cs" />
     <Compile Include="ConsultasEF\ObtenerVehiculo.cs" />
     <Compile Include="ConsultasEF\ObtenerCalleNoGranos.cs" />

@@ -100,7 +100,24 @@ export enum PermisosScato {
 
   // Buques
   Buque_Ver = 'Buque_Ver',
-  Buque_Operatoria_Ver = 'Buque_Operatoria_Ver',
-  
+  Buque_Operatoria_Ver = 'Buque_Operatoria_Ver',  
   Buques_Resumen_De_Operatoria = 'Buques_Resumen_De_Operatoria',
+
+  //Programa de embarque
+
+  Comex_Nominacion_Nominar = "Comex_Nominacion_Nominar",
+  Comex_Nominacion_Eliminar = "Comex_Nominacion_Eliminar",
+  Comex_Nominacion_Modificar = "Comex_Nominacion_Modificar",
+  Comex_Nominacion_Guardar = "Comex_Nominacion_Guardar",
+  Comex_Nominacion_Ver = "Comex_Nominacion_Ver",
+  Comex_Nominacion_Enviar_LineUp = "Comex_Nominacion_Enviar_LineUp",
+
+  //Vapor
+
+  Vapor_Visualizar = "Vapor_Visualizar",
+  Vapor_Editar = "Vapor_Editar",
+  Vapor_Crear = "Vapor_Crear",
+  Vapor_Eliminar = "Vapor_Eliminar"
+
+
 }

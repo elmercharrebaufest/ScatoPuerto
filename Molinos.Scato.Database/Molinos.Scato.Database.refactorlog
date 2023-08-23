@@ -777,4 +777,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Bandera_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="a88279be-844e-47e0-93f5-7aec859987a6" ChangeDateTime="12/06/2022 13:48:25">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnico].[Tolterancia]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnico]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Tolerancia" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="75cf48bf-2e85-4a15-aca2-315a5f41a03f" ChangeDateTime="12/06/2022 15:53:47">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnico].[AgenciaMaritima_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnico]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AgenciaMaritimaPuerto_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="99ecb8a7-3079-4222-ab69-1f0ae7ef721d" ChangeDateTime="12/15/2022 16:50:56">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnico].[TipoContrato_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnico]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TipoDeContrato_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e4e4db58-ad24-4ada-9dbb-24efc0409ff5" ChangeDateTime="12/22/2022 14:28:10">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnico].[Vapor_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnico]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="VaporInformacion_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f29e2fe3-3b35-4b46-9e3b-1bedca9bd9e6" ChangeDateTime="01/13/2023 12:39:54">
+    <Property Name="ElementName" Value="[dbo].[NotificacionProgramaDeEmbarque].[Hora]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NotificacionProgramaDeEmbarque]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Fecha" />
+  </Operation>
 </Operations>

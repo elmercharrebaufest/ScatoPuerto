@@ -26,7 +26,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             else
             {
                 var grupos = comando.Grupos.Split(',');
-                var notificaciones = Repositorio.Listar<Notificacion>(x => grupos.Any(y => y == x.Grupo) && x.TipoAlerta != TipoAlerta.Sobre && !x.Leido);
+                var notificaciones = Repositorio.Listar<Notificacion>(x => grupos.Any(y => y == x.Grupo) && x.TipoAlerta != TipoAlerta.Sobre && x.Leido == false);
                 foreach (var notificacion in notificaciones)
                 {
                     notificacion.Leido = true;

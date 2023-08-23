@@ -1,0 +1,21 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <label class="cargando-buque">Buque</label>
+        </div> 
+        <div class="col-md-2" *ngIf='tienePermisoCrearNuevoBuque()'>          
+        <app-editar-crear-buques></app-editar-crear-buques>
+        </div>      
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <app-filtro-vapor></app-filtro-vapor>
+        </div>       
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <app-listado-vapor ></app-listado-vapor>
+        </div>
+    </div>
+  
+</div>
