@@ -43,7 +43,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e,"LiberarStockSojaEpa");
+                    Log.Error(e, "LiberarStockSojaEpa");
                 }
 
                 var ultimaActividad = Repositorio.ObtenerMayor<ControlRecorrido, int>(x => x.WorkflowInstanceId == recorrido.InstanciaWorkflow, y => y.Id);
@@ -69,7 +69,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var impReciboMunicipales = Repositorio.Listar<ImpReciboMunicipal>(x => x.WorkflowId == recorrido.InstanciaWorkflow && x.TipoImpresion == TipoImpresion.ReciboMunicipal);
                 if (impReciboMunicipales != null && impReciboMunicipales.Any())
                 {
-                    foreach(var impReciboMunicipal in impReciboMunicipales)
+                    foreach (var impReciboMunicipal in impReciboMunicipales)
                     {
                         Repositorio.Agregar(new TicketMunicipalBorrado
                         {
@@ -111,11 +111,29 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     recorrido.Vehiculo = null;
                     Repositorio.Remover(vehiculo);
                 }
+
+                if (recorrido.TipoDocumentoIngreso == TipoDocumentoIngreso.Embarque)
+                {
+                    var idEmbarque = Int32.Parse(recorrido.NumeroDocumentoIngreso);
+                    var embarque = Repositorio.Obtener<Embarque>(idEmbarque);
+                    var nominaciones = Repositorio.Listar<Nominacion>(x => x.Embarque != null && x.Embarque.Id == idEmbarque);
+                    var lineup = Repositorio.Obtener<LineUp>(x => x.Embarque != null && x.Embarque.Id == idEmbarque);
+
+                    foreach (var nominacion in nominaciones)
+                    {
+                        nominacion.Embarque = null;
+                        nominacion.FechaEnvioLineUp = null;
+                        nominacion.ObservacionEnvioLineUp = "";
+                    }
+                    Repositorio.Remover(embarque);
+                    Repositorio.Remover(lineup);
+                }
+
                 Log.Debug("Borrar Recorrido Id: {0}", recorrido.Id);
                 Repositorio.Remover(recorrido);
 
                 try
-                {                  
+                {
                     if (Repositorio.Existe<LogActividad>(x => x.WorkflowInstanceId == recorrido.InstanciaWorkflow && x.ActividadXaml == "AltaCTG"))
                     {
                         Log.Info("La actividad realizo alta de CTG");
@@ -163,8 +181,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             var recorrido = Repositorio.Obtener<Recorrido>(comando.Id);
             if (recorrido != null)
             {
-                var calados = Repositorio.Listar<Calado,int>(x => x.Id, x => x.WorkflowInstanceId == recorrido.InstanciaWorkflow);
-                if ( Repositorio.Existe<MicroMuestrasPorCasillero>(x => calados.Any(y => y == x.Muestra.Calado.Id)) && !resultado.HayErrores)
+                var calados = Repositorio.Listar<Calado, int>(x => x.Id, x => x.WorkflowInstanceId == recorrido.InstanciaWorkflow);
+                if (Repositorio.Existe<MicroMuestrasPorCasillero>(x => calados.Any(y => y == x.Muestra.Calado.Id)) && !resultado.HayErrores)
                 {
                     resultado.Errores.Add("Eliminar Documento", Textos.Error_EliminarMicroMuestra);
                 }

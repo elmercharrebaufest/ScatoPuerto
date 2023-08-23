@@ -144,10 +144,10 @@
                                                     <td>
                                                         <select formControlName='tipoLineaEmbarque'
                                                             (change)="onLineaChange(result,d,t, i)"
-                                                            [compareWith]='compareFieldLineas'>
+                                                            >
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let linea of tipoLineaEmbarque'
-                                                                [ngValue]='linea'>
+                                                                [ngValue]='linea.id'>
                                                                 {{linea.linea}}
                                                             </option>
                                                         </select>
@@ -160,7 +160,7 @@
                                                             <option [value]='0'></option>
                                                             <option
                                                                 *ngFor='let producto of obtenerMaterialxLinea(result)'
-                                                                [ngValue]='producto'>{{producto.descripcionCorta}}
+                                                                [ngValue]='producto.id'>{{producto.descripcionCorta}}
                                                             </option>
                                                         </select>
                                                     </td>

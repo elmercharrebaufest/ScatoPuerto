@@ -10,8 +10,8 @@ namespace Molinos.Scato.Dominio.Dto
     public class VaporInformacionDto
     {
         public int Id { get; set; }
-        public int Vapor_Id { get; set; }
-        public int Bandera_Id { get; set; }
+        public VaporDto Vapor { get; set; }
+        public BanderaDto Bandera { get; set; }
         public string NombreBuque { get; set; }
         public string TipoBuque { get; set; }
         public string CategoriaBuque { get; set; }
@@ -23,6 +23,12 @@ namespace Molinos.Scato.Dominio.Dto
         public decimal Manga { get; set; }
         public decimal Puntual { get; set; }
         public int CantidadBodegasTks { get; set; }
-
+        public string BanderaInformacion { get; set; } = null;
+        public int ItemsTotales { get; set; } = 0;
+        public int Pagina { get; set; } = 0;
+        public int ItemPorPagina { get; set; } = 0;
+        public int VaporId { get; set; } = 0;
+        public string Usuario { get; set; } = null;
+        public DateTime FechaModificacion { get; set; } = DateTime.Now;
     }
 }

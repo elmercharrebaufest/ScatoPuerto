@@ -921,6 +921,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ModuloDeCarga/ListarNominacionesRecibos")]
+        public HttpResponseMessage ListarNominacionesRecibos(int idEmbarque)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarNominaciones(idEmbarque));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }        
+
         public class CapturaImagenLineUp
         {
             public int Embarque_Id { get; set; }

@@ -37,6 +37,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     message.From = new MailAddress(comando.Origen);
                 }
 
+                if(comando.Copia != null && comando.Copia.Count > 0)
+                {
+                    foreach (var email in comando.Copia)
+                    {
+                        message.CC.Add(new MailAddress(email));
+                    }              
+                }
+
                 if (comando.Attachment != null)
                 {
                     message.Attachments.Add(new Attachment(new MemoryStream(comando.Attachment), comando.AttachmentName));

@@ -35,7 +35,12 @@ using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using NPOI.SS.Formula.Functions;
 using System.Drawing.Text;
-
+using System.Threading;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using Microsoft.Identity.Client;
 namespace Molinos.Scato.Servicios.Impl
 {
     public class ServicioRepositorio : IServicioRepositorio
@@ -50,6 +55,7 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly ZSDWS_SCATO servicioSap;
         private readonly IAdministradorDeCalles administradorDeCalles;
 
+
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
             ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
             , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap)
@@ -63,6 +69,8 @@ namespace Molinos.Scato.Servicios.Impl
             this.configuracion = configuracion;
             this.servicioSap = servicioSap;
             this.administradorDeCalles = administradorDeCalles;
+
+
 
         }
 
@@ -296,7 +304,7 @@ namespace Molinos.Scato.Servicios.Impl
             foreach (var puestoid in puestosId)
             {
                 var error = repositorio.ObtenerMayor<Notificacion, int>(x => x.TipoAlerta == TipoAlerta.Automatica && x.PuestoId == puestoid, x => x.Id);
-                if (error != null && !error.Leido)
+                if (error != null && error.Leido == false)
                 {
                     resultado.Add(conversor.Convertir<Notificacion, NotificacionDto>(error));
                 }
@@ -1652,7 +1660,7 @@ namespace Molinos.Scato.Servicios.Impl
                     using (FileStream file = new FileStream(embarqueDto.FilePathImgLineUp, FileMode.Open, FileAccess.Read))
                     {
                         file.CopyTo(ms);
-                        embarqueDto.FilePathImgLineUp = "data:image/png;base64,"+Convert.ToBase64String(ms.ToArray());
+                        embarqueDto.FilePathImgLineUp = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
                     }
                 }
             }
@@ -2287,6 +2295,7 @@ namespace Molinos.Scato.Servicios.Impl
                 conversor.ConvertirList<Permiso, PermisoDto>(
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
+
 
 
 
@@ -3905,7 +3914,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var lista =
                 Listar<Notificacion, NotificacionDto>(
-                    x => grupos.Contains(x.Grupo) && x.TipoAlerta != TipoAlerta.Sobre && !x.Leido, 30);
+                    x => grupos.Contains(x.Grupo) && x.TipoAlerta != TipoAlerta.Sobre && x.Leido == false, 30);
             return lista.OrderBy(x => x.TipoAlerta).ThenBy(x => x.Id).ToList();
         }
 
@@ -8099,6 +8108,29 @@ namespace Molinos.Scato.Servicios.Impl
         public PlanoDeCargaDto ObtenerPlanoDeCarga(int planoDeCargaId)
         {
             var planoDeCargaDto = Obtener<PlanoDeCarga, PlanoDeCargaDto>(x => x.Id == planoDeCargaId);
+
+            if (planoDeCargaDto.FechaDeCreacion == null)
+            {
+                var lineup = repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == planoDeCargaDto.Id);
+                var nominaciones = repositorio.Listar<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
+                var datosTecnicosExportadores = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador);
+                foreach (var datosTecnicosExportador in datosTecnicosExportadores)
+                {
+                    var cargaComercial = new CargaComercialDto();
+                    cargaComercial.Cantidad = datosTecnicosExportador.Cantidad;
+                    cargaComercial.Exportador = new ExportadorDto();
+                    cargaComercial.Exportador.Id = datosTecnicosExportador.Exportador.Id;
+                    cargaComercial.Exportador.Nombre = datosTecnicosExportador.Exportador.Nombre;
+                    if (datosTecnicosExportador.Exportador.Almacen != null)
+                    {
+                        cargaComercial.Exportador.Almacen_Id = datosTecnicosExportador.Exportador.Almacen.Id;
+                        cargaComercial.Exportador.AlmacenDesc = datosTecnicosExportador.Exportador.Almacen.Descripcion;
+                    }
+                    cargaComercial.MaterialPuerto = conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(datosTecnicosExportador.NominacionDatoTecnico.MaterialPuerto);
+                    planoDeCargaDto.CargasComerciales.Add(cargaComercial);
+                }
+            }
+
             if (File.Exists(planoDeCargaDto.FilePathPlano))
             {
                 MemoryStream ms = new MemoryStream();
@@ -9204,6 +9236,14 @@ namespace Molinos.Scato.Servicios.Impl
             return body;
         }
 
+        public IList<BodegaDto> ListarBodegasNir(int planoDeCargaId)
+        {
+            var bodegasId = repositorio.Listar<PlanoDeCargaBodega>(x => x.PlanoDeCarga.Id == planoDeCargaId).Select(b => b.BodegaParcel);
+            var bodegas = Listar<Bodega, BodegaDto>(x => bodegasId.Contains(x.Id));
+
+            return bodegas;
+        }
+
         public IList<ATAPuertoDto> ListarATAPuerto()
         {
             return Listar<ATAPuerto, ATAPuertoDto>();
@@ -9527,9 +9567,9 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                List<CargasPorBodega> cargasAbiertas = new List<CargasPorBodega>();
-                List<CargasPorBodega> cargasCerradas = new List<CargasPorBodega>();
-                List<CargasPorBodega> cargasFinal = new List<CargasPorBodega>();
+                List<CargasPorBodega> cargasAbiertasPorBodega = new List<CargasPorBodega>();
+                List<CargasPorBodega> cargasCerradasPorBodega = new List<CargasPorBodega>();
+                List<CargasPorBodega> cargasFinalPorBodega = new List<CargasPorBodega>();
 
                 Embarque embarqueBase = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque);
 
@@ -9537,90 +9577,78 @@ namespace Molinos.Scato.Servicios.Impl
                     return null;
 
                 int idVapor = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque).Vapor.Id;
-                var cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio == null && x.CargaOpuesta_Id == null);
+                var cargasAbiertas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio == null && x.CargaOpuesta_Id == null);
+                var cargasCerradas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga && x.CargaOpuesta_Id != null);
 
                 //Este caso representa solamente cargas en curso.
-                foreach (Carga carga in cargas)
+                foreach (Carga carga in cargasAbiertas)
                 {
                     int pesoTotalBalanzadas = 0;
                     List<RegistroBalanzaPuerto> rbp = repositorio.Listar<RegistroBalanzaPuerto>(x => x.Id >= carga.Id && x.NumeroBalanza == carga.NumeroBalanza).ToList();
                     foreach (RegistroBalanzaPuerto reg in rbp)
                     {
-                        pesoTotalBalanzadas += repositorio.Obtener<Balanzada>(x => x.Id == reg.Id && x.NumeroBalanza == reg.NumeroBalanza) != null ? repositorio.Obtener<Balanzada>(x => x.Id == reg.Id && x.NumeroBalanza == reg.NumeroBalanza).PesoNeto : 0;
+                        var balanzada = repositorio.Obtener<Balanzada>(x => x.Id == reg.Id && x.NumeroBalanza == reg.NumeroBalanza);
+                        pesoTotalBalanzadas += balanzada == null ? 0 : balanzada.PesoNeto;
                     }
-                    int excedente = pesoTotalBalanzadas - carga.PesoProgramado;
-                    int restaCargar = carga.PesoProgramado - pesoTotalBalanzadas;
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
                         Cargado = pesoTotalBalanzadas,
-                        Excedente = excedente > 0 ? excedente : 0,
-                        RestaCargar = restaCargar > 0 ? restaCargar : 0,
+                        Programado = carga.PesoProgramado,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
                         NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
                     };
-                    cargasAbiertas.Add(cargasPorBodega);
-
+                    cargasAbiertasPorBodega.Add(cargasPorBodega);
                 }
 
-                cargas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga && x.CargaOpuesta_Id != null);
                 //Este caso representa cargas cerradas
-                foreach (Carga carga in cargas)
+                foreach (Carga carga in cargasCerradas)
                 {
-                    int excedente = carga.ToneladasAW - carga.PesoProgramado;
-                    int restaCargar = carga.PesoProgramado - carga.ToneladasAW;
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
                         Cargado = carga.ToneladasAW,
-                        Excedente = excedente > 0 ? excedente : 0,
-                        RestaCargar = restaCargar > 0 ? restaCargar : 0,
+                        Programado = carga.PesoProgramado,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
                         NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
                     };
-                    cargasCerradas.Add(cargasPorBodega);
+                    cargasCerradasPorBodega.Add(cargasPorBodega);
                 }
 
-                foreach (CargasPorBodega carga in cargasAbiertas)
+                var cargasTotales = cargasAbiertasPorBodega.Concat(cargasCerradasPorBodega).ToList();
+
+                foreach (CargasPorBodega carga in cargasTotales)
                 {
-                    if (cargasFinal.Exists(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto))
+                    var cargaBodega = cargasFinalPorBodega.FirstOrDefault(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto);
+                    if (cargaBodega == null)
                     {
-                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Cargado += carga.Cargado;
-                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).RestaCargar += carga.RestaCargar += carga.RestaCargar;
-                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Excedente += carga.Excedente += carga.Excedente;
-                    }
-                    else
-                    {
-                        cargasFinal.Add(new CargasPorBodega()
+                        cargasFinalPorBodega.Add(new CargasPorBodega()
                         {
                             Cargado = carga.Cargado,
-                            RestaCargar = carga.RestaCargar,
-                            Excedente = carga.Excedente,
+                            Programado = carga.Programado,
                             NombreBodega = carga.NombreBodega,
                             NombreProducto = carga.NombreProducto
                         });
                     }
+                    else
+                    {
+                        cargaBodega.Cargado += carga.Cargado;
+                        cargaBodega.Programado += carga.Programado;
+                    }
                 }
 
-                foreach (CargasPorBodega carga in cargasCerradas)
+                foreach (var carga in cargasFinalPorBodega)
                 {
-                    if (cargasFinal.Exists(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto))
+                    var diferencia = carga.Programado - carga.Cargado;
+                    if (diferencia > 0)
                     {
-                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Cargado += carga.Cargado;
-                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).RestaCargar += carga.RestaCargar += carga.RestaCargar;
-                        cargasFinal.First(x => x.NombreBodega == carga.NombreBodega && x.NombreProducto == carga.NombreProducto).Excedente += carga.Excedente += carga.Excedente;
+                        carga.RestaCargar = diferencia;
                     }
                     else
                     {
-                        cargasFinal.Add(new CargasPorBodega()
-                        {
-                            Cargado = carga.Cargado,
-                            RestaCargar = carga.RestaCargar,
-                            Excedente = carga.Excedente,
-                            NombreBodega = carga.NombreBodega,
-                            NombreProducto = carga.NombreProducto
-                        });
+                        carga.Excedente = diferencia * -1;
                     }
                 }
-                return cargasFinal;
+
+                return cargasFinalPorBodega;
             }
             catch (Exception ex)
             {
@@ -11130,6 +11158,7 @@ namespace Molinos.Scato.Servicios.Impl
                     var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
                     InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
                     {
+                        Id = lineupDto.InstanciaWorkflow,
                         Embarque = embarque,
                         LineUp = lineupDto
                     });
@@ -11528,76 +11557,16 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarVaporInformacion(List<VaporInformacionDto> VaporInformacionDto)
-        {
-            Vapor vapor = null;
-
-            foreach (var item in VaporInformacionDto)
-            {
-                if (item.Vapor_Id == null || item.Vapor_Id == 0)
-                {
-                    var NuevoVapor = new Vapor
-                    {
-                        Nombre = item.NombreBuque
-                    };
-                    repositorio.Agregar(NuevoVapor);
-                    repositorio.GuardarCambios();
-
-                    vapor = repositorio.Obtener<Vapor>(x => x.Id == NuevoVapor.Id);
-                }
-                else
-                {
-                    vapor = repositorio.Obtener<Vapor>(x => x.Id == item.Vapor_Id);
-                }
-                Bandera bandera = repositorio.Obtener<Bandera>(x => x.Id == item.Bandera_Id);
-                VaporInformacion vaporInformacion_Db = repositorio.Obtener<VaporInformacion>(x => x.Vapor_Id == item.Vapor_Id);
-
-
-                if (vaporInformacion_Db != null)
-                {
-                    vaporInformacion_Db.Bandera_Id = bandera.Id;
-                    vaporInformacion_Db.NombreBuque = item.NombreBuque;
-                    vaporInformacion_Db.TipoBuque = item.TipoBuque;
-                    vaporInformacion_Db.CategoriaBuque = item.CategoriaBuque;
-                    vaporInformacion_Db.ImoVapor = item.ImoVapor;
-                    vaporInformacion_Db.Freeboard = item.Freeboard;
-                    vaporInformacion_Db.Eslora = item.Eslora;
-                    vaporInformacion_Db.PorteNeto = item.PorteNeto;
-                    vaporInformacion_Db.PorteBruto = item.PorteBruto;
-                    vaporInformacion_Db.Manga = item.Manga;
-                    vaporInformacion_Db.Puntual = item.Puntual;
-                    vaporInformacion_Db.CantidadBodegasTks = item.CantidadBodegasTks;
-                }
-                else
-                {
-                    vaporInformacion_Db = new VaporInformacion()
-                    {
-                        Vapor_Id = vapor.Id,
-                        Bandera_Id = bandera.Id,
-                        NombreBuque = item.NombreBuque,
-                        TipoBuque = item.TipoBuque,
-                        CategoriaBuque = item.CategoriaBuque,
-                        ImoVapor = item.ImoVapor,
-                        Freeboard = item.Freeboard,
-                        Eslora = item.Eslora,
-                        PorteNeto = item.PorteNeto,
-                        PorteBruto = item.PorteBruto,
-                        Manga = item.Manga,
-                        Puntual = item.Puntual,
-                        CantidadBodegasTks = item.CantidadBodegasTks,
-                    };
-                    repositorio.Agregar(vaporInformacion_Db);
-                }
-            }
-            repositorio.GuardarCambios();
-
-        }
-
         public VaporInformacionDto ObtenerVaporInformacion(int vapor_id)
         {
             try
             {
-                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor_Id == vapor_id);
+                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor.Id == vapor_id);
+                if (infoVapor == null)
+                {
+                    var vapor = Obtener<Vapor, VaporDto>(x => x.Id == vapor_id);
+                    infoVapor = new VaporInformacionDto { VaporId = vapor_id, NombreBuque = vapor.Nombre };
+                }
                 return infoVapor;
             }
             catch (Exception ex)
@@ -11612,7 +11581,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
 
-                string filePath = @"c:\Img\Fotos\lineup\"+embarque.Patente+ "_"+ DateTime.Now.ToString("ddmmyyyy") + ".png";
+                string filePath = @"c:\Img\Fotos\lineup\" + embarque.Patente + "_" + DateTime.Now.ToString("ddmmyyyy") + ".png";
                 File.WriteAllBytes(filePath, Convert.FromBase64String(filePathImgLineUp.Replace("data:image/png;base64,", String.Empty)));
 
 
@@ -11621,7 +11590,7 @@ namespace Molinos.Scato.Servicios.Impl
                     embarque.FilePathImgLineUp = filePath;
                     repositorio.GuardarCambios();
                 }
-                     
+
             }
             catch (Exception ex)
             {
@@ -12114,20 +12083,21 @@ namespace Molinos.Scato.Servicios.Impl
                         item.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
 
                     }
-                    if(item.ModuloDeCargaId > 0) { 
-                    if (item != null && item.EsLiquido)
+                    if (item.ModuloDeCargaId > 0)
                     {
-                        Dictionary<string, int> resultado = ObtenerRitmosLiquidos(item.ModuloDeCargaId);
-                        if (resultado != null)
+                        if (item != null && item.EsLiquido)
                         {
-                            if (resultado.Count > 0)
+                            Dictionary<string, int> resultado = ObtenerRitmosLiquidos(item.ModuloDeCargaId);
+                            if (resultado != null)
                             {
-                                int ritmoAcumuladoNeto = 0;
-                                resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
-                                item.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
+                                if (resultado.Count > 0)
+                                {
+                                    int ritmoAcumuladoNeto = 0;
+                                    resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
+                                    item.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
+                                }
                             }
                         }
-                    }
                         if (item != null && !item.EsLiquido)
                         {
                             Dictionary<string, int> resultado = ObtenerRitmos(item.ModuloDeCargaId);
@@ -12160,6 +12130,49 @@ namespace Molinos.Scato.Servicios.Impl
             CompletarDatosHistorialDeEmbarque(historial);
             return historial;
         }
+        public IList<NominacionDto> ListarNominaciones(int idEmbarque)
+        {
+            try
+            {
+                List<NominacionDto> nominacionReciboDtos = Listar<Nominacion, NominacionDto>(x => x.Embarque.Id == idEmbarque).ToList();
+                nominacionReciboDtos = nominacionReciboDtos.Where(x => x.NominacionRecibo != null && x.NominacionRecibo.Count > 0).ToList();
+                return nominacionReciboDtos;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public List<LogABM> ObtenerInformacionLog(int claseId)
+        {
+            return repositorio.Listar<LogABM>(x => x.ClaseId == claseId).OrderByDescending(x => x.Fecha).ToList();
+        }
+
+        public IList<string> ObtenerGruposAD(List<string> grupos)
+        {
+            List<string> gruposPermisos = new List<string>();
+            // iterate over all groups
+            foreach (var permisoAd in grupos)
+            {
+
+                var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
+                                   join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
+                                   join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
+                                   join d in repositorio.Listar<ADPuertoRolesPermisos>() on c.Id equals d.Id_Rol
+                                   join e in repositorio.Listar<ADPuertoPermisos>() on d.Id_Permiso equals e.Id
+                                   where a.NombreGrupoAd == permisoAd
+                                   select (e.NombrePermiso);
+
+                gruposPermisos.AddRange(permisoGrupo);
+
+            }
+
+            return gruposPermisos;
+
+        }
+
 
     }
 }

@@ -418,7 +418,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
     return this.datePipe.transform(this.formTurnos.get('diasTurno')['controls'][index]['controls'].diaTurno.value, 'dd-MM-yyyy');
   }
 
-  getCombos() {
+  getCombos() { 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.lineas = this.procesoService.getModuloDeCarga().moduloDeCargaLineasDeEmbarque;
     this.arrLineas = this.lineas;
@@ -875,11 +875,15 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit {
 
   initLinea(line?: any, guardado?: boolean) {
     let destino = 0;
+    let tipoLineaEmbarqueId = 0;
+
     if (line != null || line != undefined) {
       destino = line.destino?.id;
+      tipoLineaEmbarqueId = this.lineas?.filter(x => x.id == line.linea_Id)[0]?.tipoLineaEmbarque?.id;      
     }
+
     return this._builder.group({
-      linea: [{ value: line ? line.linea_Id : '', disabled: guardado },],
+      linea: [{ value: line ? line.linea_Id : '', disabled: guardado }],
       exportador: [{ value: line ? line.exportador : '', disabled: guardado }],
       bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: guardado }],
       materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: guardado }],

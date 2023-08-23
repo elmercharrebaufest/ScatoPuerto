@@ -93,6 +93,9 @@
       <SourceFilesWebPuerto Include="$(PackageWebPuerto)"/>
       <SourceFilesWebPuertoApi Include="$(PackageWebPuertoApi)"/>
 
+      <SourceFilesAzureAD Include="$(PackageAzureAD)"/>
+
+
       <XamlxWorkflow Include="$(XamlxWorkflow)"/>
     </ItemGroup>
 
@@ -113,6 +116,10 @@
     <Copy SourceFiles="@(SourceFilesWebPuertoApi)"
           DestinationFiles="@(SourceFilesWebPuertoApi->'$(OutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
 
+    <Copy SourceFiles="@(SourceFilesAzureAD)"
+      DestinationFiles="@(SourceFilesAzureAD->'$(OutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    
+
     <Message Text="*** Generando instaladores del Editor WF ***" />
     <Exec Command="..\Molinos.Scato.Build\WfEditor\build.bat" />
     
@@ -128,6 +135,9 @@
     <MakeDir Directories="$(OutputPackModuloImpresorDir)" />
     <MakeDir Directories="$(OutputPackWebPuertoDir)" />
     <MakeDir Directories="$(OutputPackWebPuertoApiDir)" />
+    
+    <MakeDir Directories="$(OutputPackAzureADDir)" />
+    
 
     <ItemGroup>
       <ZipDir Include="$(ZipDir)"/>
@@ -147,6 +157,8 @@
       <DeployParametersWebPuerto Include="$(DeployParametersWebPuerto)"/>
       <DeployParametersWebPuerto Include="$(DeployParametersWebPuertoApi)"/>
 
+      <DeployParametersWebPuerto Include="$(DeployParametersAzureAD)"/>
+      
     </ItemGroup>
     
     <Copy SourceFiles="@(DeployParametersWeb)" DestinationFiles="@(DeployParametersWeb->'$(OutputPackWebDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
@@ -158,6 +170,9 @@
     <Copy SourceFiles="@(DeployParametersWebPuerto)" DestinationFiles="@(DeployParametersWebPuerto->'$(OutputPackWebPuertoDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(DeployParametersWebPuertoApi)" DestinationFiles="@(DeployParametersWebPuertoApi->'$(OutputPackWebPuertoApiDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
 
+    <Copy SourceFiles="@(DeployParametersAzureAD)" DestinationFiles="@(DeployParametersAzureAD->'$(OutputPackAzureADDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    
+    
     <ItemGroup>
       <QaMsiDir Include="$(QaMsiDir)"/>
       <ProdMsiDir Include="$(ProdMsiDir)"/>
@@ -220,8 +235,10 @@
       <SourceFilesModuloImpresor Include="$(PackageModuloImpresor)"/>
       <SourceFilesWebPuerto Include="$(PackageWebPuerto)"/>
       <SourceFilesWebPuertoApi Include="$(PackageWebPuertoApi)"/>
-
       <XamlxWorkflow Include="$(XamlxWorkflow)"/>
+
+      <SourceAzureAD Include="$(PackageAzureAD)"/>
+      
     </ItemGroup>
 
     <Copy SourceFiles="@(SourceFilesWeb)"
@@ -240,6 +257,10 @@
           DestinationFiles="@(SourceFilesWebPuerto->'$(OutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(SourceFilesWebPuertoApi)"
           DestinationFiles="@(SourceFilesWebPuertoApi->'$(OutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+    <Copy SourceFiles="@(SourceFilesAzureAD)"
+          DestinationFiles="@(SourceFilesAzureAD->'$(OutputDir)\%(RecursiveDir)%(Filename)%(Extension)')" />
+    
     <Message Text="*** Generando instaladores del Editor WF ***" />
     <Exec Command="..\Molinos.Scato.Build\WfEditor\build.bat" />
 
@@ -255,7 +276,10 @@
     <MakeDir Directories="$(OutputPackModuloImpresorDir)" />
     <MakeDir Directories="$(OutputPackWebPuertoDir)" />
     <MakeDir Directories="$(OutputPackWebPuertoApiDir)" />
+
+    <MakeDir Directories="$(OutputPackAzureADDir)" />
     
+
     <ItemGroup>
       <DeployParametersWeb Include="$(DeployParametersWeb)"/>
       <DeployParametersServicios Include="$(DeployParametersServicios)"/>
@@ -265,6 +289,9 @@
       <DeployParametersModuloImpresor Include="$(DeployParametersModuloImpresor)"/>
       <DeployParametersWebPuerto Include="$(DeployParametersWebPuerto)"/>
       <DeployParametersWebPuertoApi Include="$(DeployParametersWebPuertoApi)"/>
+
+      <DeployParametersAzureAD Include="$(DeployParametersAzureAD)"/>
+      
     </ItemGroup>
 
     <Copy SourceFiles="@(DeployParametersWeb)" DestinationFiles="@(DeployParametersWeb->'$(OutputPackWebDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
@@ -275,6 +302,10 @@
     <Copy SourceFiles="@(DeployParametersModuloImpresor)" DestinationFiles="@(DeployParametersModuloImpresor->'$(OutputPackModuloImpresorDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(DeployParametersWebPuerto)" DestinationFiles="@(DeployParametersWebPuerto->'$(OutputPackWebPuertoDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
     <Copy SourceFiles="@(DeployParametersWebPuertoApi)" DestinationFiles="@(DeployParametersWebPuertoApi->'$(OutputPackWebPuertoApiDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+
+    <Copy SourceFiles="@(DeployParametersAzureAD)" DestinationFiles="@(DeployParametersAzureAD->'$(OutputPackAzureADDir)\%(RecursiveDir)\%(Filename)%(Extension)')" />
+    
+
 
     <ItemGroup>
       <ReportsDir Include="$(ReportsDir)"/>

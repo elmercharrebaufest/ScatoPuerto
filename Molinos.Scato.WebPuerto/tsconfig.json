@@ -7,7 +7,8 @@
       "@ScatoServicios/*":["app/shared/servicios/*"],
       "@ScatoModels/*":["app/shared/modelos/*"],
       "@ScatoInterfaces/*":["app/shared/interfaces/*"],
-      "@ScatoEnums/*":["app/shared/enums/*"]
+      "@ScatoEnums/*":["app/shared/enums/*"],
+      "@ScatoStores/*":["app/store/*"],
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,

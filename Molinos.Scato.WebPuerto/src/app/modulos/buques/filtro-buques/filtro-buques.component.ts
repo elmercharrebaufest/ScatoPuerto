@@ -27,6 +27,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   anio: string;
   desde: string = this.AnioMesActual();
   hasta: string = this.AnioMesActual();
+
   // #endregion
 
   // #region Observables
@@ -144,8 +145,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
 
   // #region Eventos Controles
  
-  onLimpiarFiltros() {
-   
+  onLimpiarFiltros() {   
     this.filtroBuquedaForm.controls.producto.setValue('');
     this.filtroBuquedaForm.controls.buque.setValue('');
     this.filtroBuquedaForm.controls.destino.setValue('');

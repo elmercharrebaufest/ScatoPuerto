@@ -120,6 +120,12 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaDeT
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaDeTurnosLiquido') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaDeTurnosLiquido','mauro.mir@molinosagro.com.ar; cristian.leonori@molinosagro.com.ar; martin.amado@molinosagro.com.ar;rodolfo.benegas@mocommodities.com; German.Castagnani@molinosagro.com.ar;juan.catala@molinosagro.com.ar; gabriel.conde@mocommodities.com;romina.escudero@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar;guido.gallo@mocommodities.com; GrupoPeritosDeEmbarque@molinosagro.com.ar;Antonela.Labonia@molinosagro.com.ar; Ariel.Lascano@molinosagro.com.ar;macarena.asqueri@molinosagro.com.ar;paulino.martinez@Molinosagro.com.ar;omar.mazany@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar;liz.pereira@molinosagro.com.ar; pablo.piras@mocommodities.com;jimena.rodriguez@molinosagro.com.ar; federico.romano@molinosagro.com.ar;SupervisoresPuertosanLorenzo@molinosagro.com.ar; joaquin.sarachaga@mocommodities.com;Grupo-Turnosyfinalizacindeembarques@molinosagro.onmicrosoft.com;paulino.martinez@Molinosagro.com.ar'); END
 GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaProgramaEmbarque') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaProgramaEmbarque', 'supervisorespuertosanlorenzo@molinosagro.com.ar; macarena.asqueri@molinosagro.com.ar; leandro.bolzan@molinosagro.com.ar; romina.escudero@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar; candela.kremzky@molinosagro.com.ar; antonela.labonia@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar; liz.pereira@molinosagro.com.ar; federico.romano@molinosagro.com.ar'); END
+GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaProgramaEmbarqueCopia') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaProgramaEmbarqueCopia', 'scatoprodMOA@molinosagro.com.ar'); END
+GO
+IF NOT EXISTs (select 1 from ConfiguracionMail where TemplateMail = 'NominacionesExcel') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('NominacionesExcel', 'macarena.asqueri@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar; cintia.maltoni@molinosagro.com.ar; alejandra.sarquis@molinosagro.com.ar; hugo.baratto@molinosagro.com.ar; omar.mazany@molinosagro.com.ar; diego.mazettelle@molinosagro.com.ar; mauricio.mezzavilla@molinosagro.com.ar; nestor.kantt@molinosagro.com.ar; pablo.noceda@molinosagro.com.ar; edgardo.ponce@molinosagro.com.ar; sergio.mossin@molinosagro.com.ar; pablo.kieffer@molinosagro.com.ar; mauro.ortega@molinosagro.com.ar; cristian.frank@molinosagro.com.ar; rodrigo.gonzalez@molinosagro.com.ar; adrian.mauri@molinosagro.com.ar; martin.amado@molinosagro.com.ar; federico.romano@molinosagro.com.ar; damian.calvet@molinosagro.com.ar; daniel.santos@molinosagro.com.ar; sebastian.bertazzo@molinosagro.com.ar; ruben.bisson@molinosagro.com.ar; fabricio.herrera@molinosagro.com.ar; sebastian.muniz@molinosagro.com.ar; marcelo.gustavo.lopez@molinosagro.com.ar; jose.luis.gomez@molinosagro.com.ar; cristian.leonori@molinosagro.com.ar; nestor.sosaguerci@Molinosagro.com.ar; norberto.moriconi@molinosagro.com.ar; sebastian.bolger@molinosagro.com.ar; matias.abramor@molinosagro.com.ar; martin.manoni@molinosagro.com.ar; mauro.mir@molinosagro.com.ar; leandro.armendari@molinosagro.com.ar; lucioano.arario@molinosagro.com.ar; Antonela.Labonia@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar; melina.corio@mocommodities.com; ileana.rodriguez@mocommodities.com; rosario.viana@mocommodities.com; liz.pereira@molinosagro.com.ar; Trading@mocommodities.com; leandro.varela@molinosagro.com.ar; german.turcutto@molinosagro.com.ar; GrupoPeritosDeEmbarque@molinosagro.com.ar; Ariel.Lascano@molinosagro.com.ar; joaquin.sarachaga@mocommodities.com; German.Castagnani@molinosagro.com.ar; jimena.rodriguez@molinosagro.com.ar; emanuel.venica@molinosagro.com.ar; Candela.Kremzky@molinosagro.com.ar; juan.lapissonde@molinosagro.com.ar; hernan.ferreira@mocommodities.com') END
+GO
 
 -- Puntos de Interes para geolocalizacion.
 if not exists(select 1 from PuntosInteresGeolocalizacion where Latitud = '-35.61958  ' and Longitud='-55.88947') BEGIN insert into PuntosInteresGeolocalizacion (Nombre, TipoUbicacion, Imagen,Puerto, Pais, HorasSanBenito, Latitud, Longitud, DistanciaKM, TipoZona, AgrupadorZona, PosicionZona, RadioPunto, Estado, FechaRegistro) values('Recalada','Fondeadero','ancla','','AR','30','-35.61958  ','-55.88947',5,'','','',15000,1,getdate()) END
@@ -430,3 +436,426 @@ update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where 
 
 --cambios zona Vicentin
 update PuntosInteresGeolocalizacion  set Latitud = '-32.77205351237338', Longitud = '-60.72096919438843' where Nombre = 'Vicentín'
+
+--Scripts Material Puerto
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'SoyBean Low Pro')
+BEGIN 
+insert into MaterialPuerto (Descripcion      , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
+                    values ('SoyBean Low Pro', 'SBMLP'         ,'99497'  ,null      ,0        ,'#FFCF79','SBMLP')
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Pellet de girasol')
+BEGIN 
+insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
+                    values ('Pellet de girasol', 'SFPMP'         ,''       ,null      ,0        ,'#555554','SFPMP')
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Pellet de girasol integral')
+BEGIN 
+insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
+                    values ('Pellet de girasol integral', 'SFPLP'         ,''       ,null      ,0        ,'#262626','SFPLP')
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Aceite de soja refinado')
+BEGIN 
+insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
+                    values ('Aceite de soja refinado', 'RSBO'         ,''       ,null      ,1        ,'#AB3C05','RSBO')
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Aceite de girasol refinado')
+BEGIN 
+insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
+                    values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,1        ,'#CDAD0D','RSFO')
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'LECITINA DE SOJA') 
+BEGIN
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
+    values ('LECITINA DE SOJA','LEC','99056', 1, '#FFFFFF', 'LEC') 
+END
+GO
+IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'ACEITE DE SOJA NEUTRALIZADO') 
+BEGIN
+    insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
+    values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF', 'SBO NEU')
+END
+GO
+
+UPDATE MaterialPuerto SET EsLiquido = 1 WHERE Descripcion IN ('Aceite de soja refinado', 'Aceite de girasol refinado', 'LECITINA DE SOJA')
+
+update MaterialPuerto set DescripcionCortaIngles = 'SB'    ,Color = '#D3B177' where descripcion = 'POROTO DE SOJA'
+update MaterialPuerto set DescripcionCortaIngles = 'SBMHP' ,Color = '#FFE0A8' where descripcion = 'HARINA DE SOJA*' -- DUDA DE NOMBRE
+update MaterialPuerto set DescripcionCortaIngles = 'SBH'   ,Color = '#96685D' where descripcion = 'PECASO'
+update MaterialPuerto set DescripcionCortaIngles = 'CSBO'  ,Color = '#D34906' where descripcion = 'ACEITE CRUDO DE SOJA'
+update MaterialPuerto set DescripcionCortaIngles = 'CSFO'  ,Color = '#F0CB10' where descripcion = 'ACEITE CRUDO DE GIRASOL'
+update MaterialPuerto set DescripcionCortaIngles = 'CORN'  ,Color = '#F58920' where descripcion = 'MAIZ'
+update MaterialPuerto set DescripcionCortaIngles = 'SME'   ,Color = '#32938C' where descripcion = 'BIODIESEL'
+update MaterialPuerto set DescripcionCortaIngles = 'CSFOHO',Color = '#FFFFFF' where descripcion = 'ACEITE CRUDO DE GIRASOL ALTO OLEICO'
+update MaterialPuerto set DescripcionCortaIngles = 'WHEAT' ,Color = '#92B234' where descripcion = 'TRIGO'
+update MaterialPuerto set DescripcionCortaIngles = 'SBMLP' ,Color = '#FFCF79' where descripcion = 'SoyBean Low Pro' --ESTÁ MAL EL COLOR SEGÚN LA TABLA
+update MaterialPuerto set DescripcionCortaIngles = 'SFPMP' ,Color = '#555554' where descripcion = 'Pellet de girasol'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'LEC'   ,Color = '#FFFFFF' WHERE Descripcion = 'LECITINA DE SOJA'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'SBO NEU', Color = '#FFFFFF' WHERE Descripcion = 'ACEITE DE SOJA NEUTRALIZADO'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'CORN OIL', Color = '#B76719' WHERE Descripcion = 'ACEITE CRUDO DE MAIZ'
+
+
+declare @SB     int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SB'     )
+declare @SBMHP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SBMHP'  )
+declare @SBH    int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SBH'    )
+declare @CSBO   int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'CSBO'   )
+declare @CSFO   int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'CSFO'   )
+declare @CORN   int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'CORN'   )
+declare @SME    int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SME'    )
+declare @WHEAT  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'WHEAT'  )
+declare @SFPMP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPMP'  )
+declare @SFPLP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPLP'  )
+declare @SBONEU int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SBO NEU')
+
+
+--Scripts TipoDeCalidad
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 38' and MaterialPuerto_Id = @SB)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 38', @SB)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 39' and MaterialPuerto_Id = @SBMHP)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 39', @SBMHP)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 39' and MaterialPuerto_Id = @SBH)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 39', @SBH)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 38' and MaterialPuerto_Id = @CORN)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 38', @CORN)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 38' and MaterialPuerto_Id = @WHEAT)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 38', @WHEAT)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Fosfa 51' and MaterialPuerto_Id = @CSBO)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Fosfa 51', @CSBO)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Fosfa 51' and MaterialPuerto_Id = @CSFO)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Fosfa 51', @CSFO)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Biodiesel' and MaterialPuerto_Id = @SME)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Biodiesel', @SME)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 39' and MaterialPuerto_Id = @SFPMP)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 39', @SFPMP)
+END
+
+IF NOT EXISTS (select 1 from TipoDeCalidad where Descripcion = 'Gafta 39' and MaterialPuerto_Id = @SFPLP)
+BEGIN 
+insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+values ('Gafta 39', @SFPLP)
+END
+
+IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = 'Fosfa 51' AND MaterialPuerto_Id = @SBONEU) BEGIN
+   INSERT INTO TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+   VALUES ('Fosfa 51', @SBONEU)
+END
+
+--Scripts CalidadValor
+declare @CVSB     int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SB     )
+declare @CVSBMHP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBMHP  )
+declare @CVSBH    int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBH    )
+declare @CVCSBO   int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @CSBO   )
+declare @CVCSFO   int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @CSFO   )
+declare @CVCORN   int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @CORN   )
+declare @CVSME    int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SME    )
+declare @CVWHEAT  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @WHEAT  )
+declare @CVSFPMP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SFPMP  )
+declare @CVSFPLP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SFPLP  )
+declare @CVSBONEU int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBONEU )
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSB)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Moisture','Max: 13.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Oil on the seed tale quale','Basis: 18.50 % - Min: 18.00 % with non reciprocal allowance 1.50 % for each 1.00 %, fractions in proportion. ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Protein (Dry Basis)','Protein on the seed tale quale Basis: 33.00 % - Min: 32.00 % with non reciprocal allowance 1.00% for each 1.0%, fractions in proportion. ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Foreigh Matters','Basis: 1.00 % - Max: 2.00 % with non reciprocal allowance 1.0 % for each 1.0 %, fractions in proportion.')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Green beans','Max: 5.00 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Heat/burned damage','Max: 4.00 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Damaged kernels','Basis: 8.00 % - Max: 8.50 % with non reciprocal allowance 1.0 % for each 1.0 %, fractions in proportion. ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSB, 'Split beans','Max: 20 %')
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSBMHP)
+BEGIN 
+
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Protein','Basis: 46.50 % - Min: 45.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Fiber','Max: 3.80 % o Max: 4.00 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Moisture','Max: 12.75 % o Max: 13.00 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Fat','Max: 2.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Sand / Silica','Max: 2.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Urease Activity','Max: 0.20 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Solubility in KOH','Min: 78')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Ash','Max: 7.00 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Aflatoxin','Max: 20 ppb o Max: 50 ppb')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Free from added urea','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Free from live insects and / or mould','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Melamine Free','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'GMP+ FSA assured','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Arsenic (As)','Max: 2.0 mg/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Lead (Pb)','Max: 10.0 mg/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Aflatoxin B1','Max: 30.0 micro gram/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Salmonella','No found in 25 grams')
+
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSBH)
+BEGIN 
+
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBH, 'Moisture','Max: 13 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBH, 'Fiber','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBH, 'GMP + FSA assured','')
+
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVCORN)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Test Weight','Min: 72 Kg/Hl')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Heat Damaged Kernels ','Max: 5 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Broken Kernels','Max: 3 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Foreign Matters','Max: 1.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Grade','2 or better')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Aflatoxin','Menor a 20 ppb')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Moisture','Max: 14.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Arsenic (As)','Max: 2.0 mg/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Lead (Pb)','Max: 10.0 mg/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Aflatoxin B1','Max: 30.0 micro gram/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCORN, 'Salmonella','No found in 25 grams')
+
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVWHEAT)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Moisture','Basis: 11.50 % - Max: 13.50 % or Basis: 12.50 % - Max: 13.50 % Trigo')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Test Weight','Min: 78Kg/Hl Trigo')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Vomitoxin','Max: 2 ppm')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Protein (Dry Basis)','Min: 11.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Falling number','Min: 280 sec')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Grade','2 or better')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Foreigh Matters','Max: 0.80 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Total Damaged','Max: 2 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Broken Kernels','Max: 1.20 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Insect Damaged','Max: 0.50  %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Wet Gluten','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Aflatoxin B1 ','Max: 5.0 ppb')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Arsenic (As)','Max: 2.0mg/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Lead (Pb)','Max: 10.0 mg/kg ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Aflatoxin B1','Max: 30.0 micro gram/kg')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVWHEAT, 'Salmonella','No found in 25 grams')
+
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSFPMP)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPMP, 'Protein','Basis: 32/33 % protein and fat combined - Min: 30% protein')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPMP, 'Fiber','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPMP, 'Moisture','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPMP, 'Fat','')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPMP, 'GMP+ FSA assured','')
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSFPLP)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'Protein','Basis: 27 % - Min: 25.5 %  ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'Fiber','28 % (+/-2 %)')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'Moisture','12 % (+/-1 %), Max: 13 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'Fat','Basis: 2 % - Stow factor: 80/82')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'GMP+ FSA assured','')
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVCSBO)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Free fatty acids (as oleic acid)','Basis: 1 % - Max: 1.25 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Moisture and volatile matter','Max: 0.20 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Insoluble impurities','Max: 0.10 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Lecithin (expressed as phosphorus)','Base: 0.020 % - Max: 0.025 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Unsaponifiable matter','Max: 1.50 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Flash point','Superior a 250° F')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Lovibond color 1” - Yellow','No más de 50 amarillo ')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Lovibond color 1” - Red','No más de 5 rojo')
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVCSFO)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSFO, 'Free fatty acids (as oleic acid)','Basis: 2 % - Max: 3 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSFO, 'Moisture and Impurities','Max: 0.50 %')
+END
+
+IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSME)
+BEGIN 
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'CETANE','Min: 47')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'GREEN HOUSE GAS SAVING ','Min: 60 %')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'C.F.P.P.','Max: -2 d. centigrades')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'WATER ','Max: 350 ppm')
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
+   INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro, Valor) VALUES
+   (@CVSBONEU, 'MOISTURE', '(%) 0.10 MAX. 0.10 ISO 8534:2017'),
+   (@CVSBONEU, 'ACID (FFA)', '(%) 0,15 MAX. 0,20 ISO 660:2020'),
+   (@CVSBONEU, 'FLASH POINT', '(°C) 150 MIN. 150 ISO 15267:1998'),
+   (@CVSBONEU, 'PHOSPHORUS (PPM)', '5 MAX. 10 ISO 10540-3:2002'),
+   (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
+END
+
+--Scripts Surveyor
+
+if not exists(select 1 from Surveyor where Descripcion = 'EUROAMERICA') begin insert into Surveyor (Descripcion,Mail) values ('EUROAMERICA','operations@eagsurveyor.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'FIDES CONTROL') begin insert into Surveyor (Descripcion,Mail) values ('FIDES CONTROL','execution.ar@fidescontrol.com; commercial.ar@fidescontrol.com; rosario.faccone@fidescontrol.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'SGS AGRICULTURAL SERVICES') begin insert into Surveyor (Descripcion,Mail) values ('SGS AGRICULTURAL SERVICES','ar.nr.drycargo@sgs.com; ana.garcia@sgs.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'BUREAU VERITAS') begin insert into Surveyor (Descripcion,Mail) values ('BUREAU VERITAS','agri.bvbna@ar.bureauveritas.com; agriservices@ar.bureauveritas.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'CIS') begin insert into Surveyor (Descripcion,Mail) values ('CIS','execution-arg@cis-inspections.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'COTECNA') begin insert into Surveyor (Descripcion,Mail) values ('COTECNA','dl-buenos-aires-reporting@cotecna.com.ar; dl-buenos-aires-operations@cotecna.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'RRMG SA') begin insert into Surveyor (Descripcion,Mail) values ('RRMG SA','exec.argentina@rrmgltda.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'HL CONTROL SERVICES') begin insert into Surveyor (Descripcion,Mail) values ('HL CONTROL SERVICES','operations@controlservices.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'INTERTEK AGRI SERVICES') begin insert into Surveyor (Descripcion,Mail) values ('INTERTEK AGRI SERVICES','agri.argentina@intertek.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'AMSPEC') begin insert into Surveyor (Descripcion,Mail) values ('AMSPEC','trust.log.ba@amspecgroup.com; dardic.elisa@amspecgroup.com; demarco.leonardo@amspecgroup.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'MARONI GROUP') begin insert into Surveyor (Descripcion,Mail) values ('MARONI GROUP','operaciones@maronigroup.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'OPERAGRO SURV') begin insert into Surveyor (Descripcion,Mail) values ('OPERAGRO SURV','surveyor@operagro.com; stamay@operagro.com; mlvilarino@operagro.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'COMETEC') begin insert into Surveyor (Descripcion,Mail) values ('COMETEC','cometec@cometecargentina.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'ISB') begin insert into Surveyor (Descripcion,Mail) values ('ISB','mariano.rodriguez@isbargentina.com.ar; candelaria.zurro@isbargentina.com.ar; laura.martinez@isbargentina.com.ar; ag@isbargentina.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'VIGLIENZONE') begin insert into Surveyor (Descripcion,Mail) values ('VIGLIENZONE','fballester@viglienzone.com; vgonzalez@viglienzone.com; sebastian.vara@viglienzone.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'CCIC') begin insert into Surveyor (Descripcion,Mail) values ('CCIC','inspections@ccicsa.com; shannon.yu@ccicsa.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'CONTROL INT') begin insert into Surveyor (Descripcion,Mail) values ('CONTROL INT','controlint@controlint.com.ar; Marcela.damia@controlint.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'SAYBOLT ARGENTINA') begin insert into Surveyor (Descripcion,Mail) values ('SAYBOLT ARGENTINA','operaciones.argentina@sayboltargentina.com; Gustavo.sanchez@sayboltargentina.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'SCHUTTER ARGENTINA S.A.') begin insert into Surveyor (Descripcion,Mail) values ('SCHUTTER ARGENTINA S.A.','AHORA ES BUREAU VERITAS') end
+if not exists(select 1 from Surveyor where Descripcion = 'BALTIC CONTROL') begin insert into Surveyor (Descripcion,Mail) values ('BALTIC CONTROL','hernansilveyra@balticargentina.com.ar; tomas.jensen@balticargentina.com.ar; ejecuciones@balticargentina.com.ar; admin@balticargentina.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'ALEX STEWART') begin insert into Surveyor (Descripcion,Mail) values ('ALEX STEWART','cristinabeltrame@alexstewart.com.ar; jcmorandeyra@alexstewart.com.ar; logistic@alexstewart.com.ar') end
+if not exists(select 1 from Surveyor where Descripcion = 'CUBCO') begin insert into Surveyor (Descripcion,Mail) values ('CUBCO','info@cubcosurveyor.com; eblanco@cubcosurveyor.com>; nbarrueco@cubcosurveyor.com; mcuccarese@cubcosurveyor.com; lsvampa@cubcosurveyor.com') end
+if not exists(select 1 from Surveyor where Descripcion = 'RED FLINT') begin insert into Surveyor (Descripcion,Mail) values ('RED FLINT','walter.tolotti@redflint.com.ar; gabriela.ambrosioni@redflint.com.ar') end
+
+--Scripts TasaDeCarga
+if not exists(select 1 from TasaDeCarga where Descripcion = 'WWD SATAFSHEX EIU') begin insert into TasaDeCarga (Descripcion) values ('WWD SATAFSHEX EIU') end
+if not exists(select 1 from TasaDeCarga where Descripcion = 'WWD SHINC') begin insert into TasaDeCarga (Descripcion) values ('WWD SHINC') end
+
+--Scripts CompaniaDeFumigacion
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'AB GROUP') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('AB GROUP','abgroup@group-ab.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN SAN LORENZO') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN SAN LORENZO','rosario@fugran.com; ship@fugran.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN BAHIA BLANCA') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN BAHIA BLANCA','bblanca@fugran.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'PROFUM') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('PROFUM','fumigaciones@profum.com.ar; sanlorenzo@profum.com.ar') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'AGROFUM') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('AGROFUM','agrofum@agrofum.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'PEST CONTROL') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('PEST CONTROL','administracion@pestcontrolarg.com.ar; comercial@pestcontrolarg.com.ar') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'ECOTEC') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('ECOTEC','opsar@ecotecfumigation.com; argentina@ecotecfumigation.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'Tecnophos Services S.A.') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('Tecnophos Services S.A.','info@tecnophos.com.ar') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'ADC S.R.L.') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('ADC S.R.L.','info@adc.com.ar') end
+
+--Scripts TipoContrato
+if not exists(select 1 from TipoDeContrato where Descripcion = 'FOB') begin insert into TipoDeContrato (Descripcion) values ('FOB') end
+if not exists(select 1 from TipoDeContrato where Descripcion = 'CIF') begin insert into TipoDeContrato (Descripcion) values ('CIF') end
+
+--Scripts MuelleDeCarga
+if not exists(select 1 from MuelleDeCarga where Descripcion = 'San Benito') begin insert into MuelleDeCarga (Descripcion) values ('San Benito') end
+if not exists(select 1 from MuelleDeCarga where Descripcion = 'Vicentin') begin insert into MuelleDeCarga (Descripcion) values ('Vicentin') end
+if not exists(select 1 from MuelleDeCarga where Descripcion = 'Nouryon') begin insert into MuelleDeCarga (Descripcion) values ('Nouryon') end
+if not exists(select 1 from MuelleDeCarga where Descripcion = 'Otros Muelles') begin insert into MuelleDeCarga (Descripcion) values ('Otros Muelles') end
+
+--Scripts TipoDeFumigacion
+if not exists(select 1 from TipoDeFumigacion where Descripcion = 'Standard        Aluminium Phosphine    1 tablet/metric ton ') begin insert into TipoDeFumigacion (Descripcion) values ('Standard        Aluminium Phosphine    1 tablet/metric ton ') end
+if not exists(select 1 from TipoDeFumigacion where Descripcion = 'Standard   Aluminium Phosphine    5 tablets/metric ton ') begin insert into TipoDeFumigacion (Descripcion) values ('Standard   Aluminium Phosphine    5 tablets/metric ton ') end
+if not exists(select 1 from TipoDeFumigacion where Descripcion = 'Standard   Phosphine (PH3)   3grs / m3') begin insert into TipoDeFumigacion (Descripcion) values ('Standard   Phosphine (PH3)   3grs / m3') end
+if not exists(select 1 from TipoDeFumigacion where Descripcion = 'Standard   Phosphine gas   2grs / m3') begin insert into TipoDeFumigacion (Descripcion) values ('Standard   Phosphine gas   2grs / m3') end
+if not exists(select 1 from TipoDeFumigacion where Descripcion = 'Recirculation method      ') begin insert into TipoDeFumigacion (Descripcion) values ('Recirculation method      ') end
+if not exists(select 1 from TipoDeFumigacion where Descripcion = 'SLEEVES      1gr / m3') begin insert into TipoDeFumigacion (Descripcion) values ('SLEEVES      1gr / m3') end
+
+
+
+--Scripts Permisos de AD
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Nominar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Nominacion_Nominar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Nominar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Nominar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Nominar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Nominar')); end
+
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Nominacion_Eliminar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Eliminar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Eliminar')); end
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Modificar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Nominacion_Modificar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Modificar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Modificar')); end
+
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Guardar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Nominacion_Guardar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Guardar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Guardar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Guardar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Guardar')); end
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Ver') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Nominacion_Ver'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Ver')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Ver')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Ver')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Ver')); end
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Enviar_LineUp') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Nominacion_Enviar_LineUp'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Enviar_LineUp')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Enviar_LineUp')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Enviar_LineUp')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_Nominacion_Enviar_LineUp')); end
+
+--Visualizar Vapor
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Vapor_Visualizar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')); end
+
+
+
+--Editar vapor
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Vapor_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Vapor_Editar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Editar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Editar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Editar')); end
+
+--Crear vapor
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Vapor_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Vapor_Crear'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Crear')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Crear')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Crear')); end
+
+
+-- Eliminar Vapor
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Vapor_Eliminar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Eliminar')); end
+
+-- Nuevos Paises
+if not exists (select 1 from Pais where Descripcion = 'GEORGIA') begin insert into Pais (Descripcion) values ('GEORGIA'); end
+if not exists (select 1 from Pais where Descripcion = 'LIBERIA') begin insert into Pais (Descripcion) values ('LIBERIA'); end
+if not exists (select 1 from Pais where Descripcion = 'CANADA') begin insert into Pais (Descripcion) values ('CANADA'); end
+if not exists (select 1 from Pais where Descripcion = 'MEXICO') begin insert into Pais (Descripcion) values ('MEXICO'); end
+
+if not exists (select 1 from Destino where Nombre = 'GEORGIA') begin insert into Destino (Nombre) values ('GEORGIA'); end
+if not exists (select 1 from Destino where Nombre = 'LIBERIA') begin insert into Destino (Nombre) values ('LIBERIA'); end
+if not exists (select 1 from Destino where Nombre = 'CANADA') begin insert into Destino (Nombre) values ('CANADA'); end
+if not exists (select 1 from Destino where Nombre = 'MEXICO') begin insert into Destino (Nombre) values ('MEXICO'); end
+
+
+-- Nuevos Coordinadores
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Agrocorp') begin insert into CoordinadorPuerto (Nombre) values ('Agrocorp'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Invictus') begin insert into CoordinadorPuerto (Nombre) values ('Invictus'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'The Andersons') begin insert into CoordinadorPuerto (Nombre) values ('The Andersons'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin insert into CoordinadorPuerto (Nombre) values ('Panocean'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end

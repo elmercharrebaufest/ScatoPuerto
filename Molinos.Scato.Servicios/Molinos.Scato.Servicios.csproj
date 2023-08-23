@@ -76,6 +76,12 @@
       <HintPath>..\packages\NPOI.Excel.2.1.1\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Identity.Client, Version=4.53.0.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.53.0\lib\net45\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=6.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.6.22.0\lib\net45\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -117,10 +123,12 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Management" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Printing" />
@@ -154,7 +162,10 @@
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ArchivosPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\AuditoriaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\CompaniaDeFumigacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
@@ -207,6 +218,17 @@
     <Compile Include="Conversiones\Impl\Perfiles\MotivosFallasBalanzaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\MotivosLimpiezaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BanderaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\MuelleDeCargaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoCalidadMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoCoordinadorPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoDestinoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoExportadorMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDatoTecnicoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionDetalleIntervencionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NominacionReciboMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NotificacionExcluidosMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NotificacionProgramaDeEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ParametrosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaMappingProfile.cs" />
@@ -268,9 +290,15 @@
     <Compile Include="Conversiones\Impl\Perfiles\ReciboDeBuqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RegistroBalanzaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ReglaDeAnalisisObligatorioMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\SenasaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SentidoManoDeEmbarqueMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\SurveyorMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TasaDeCargaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoArchivoPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TipoDeContratoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDeBuquePuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TipoDeCalidadMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\TipoDeFumigacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoLineaEmbarqueMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TurnoPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\UbicacionDeBuquePuertoMappingProfile.cs" />
@@ -334,8 +362,12 @@
     <Compile Include="Impl\AdministradorDeCalles.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
     <Compile Include="Impl\ServicioEstadoPuesto.cs" />
+    <Compile Include="Impl\ServicioProgramaEmbarque.cs" />
+    <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
+    <Compile Include="IServicioProgramaEmbarque.cs" />
+    <Compile Include="IServicioVapor.cs" />
     <Compile Include="MercadoLibreException.cs" />
     <Compile Include="FormattingHtmlHelper.cs" />
     <Compile Include="IFirmaProvider.cs" />
@@ -482,7 +514,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\MotivoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HumedimetroMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\MuestraDeHumedadMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\NotifiacionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\NotificacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\OrdenCargaInternaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RecorridoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RolMappingProfile.cs" />
@@ -510,9 +542,12 @@
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
+    <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloBalanza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />
+    <Compile Include="Procesamiento\ProcesadorGuardarNominacionDetalleIntervencion.cs" />
+    <Compile Include="Procesamiento\ProcesadorGuardarNominacionDatoTecnico.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarAsignacionDeCalle.cs" />
     <Compile Include="Procesamiento\ProcesadorAutomatizacionEtapas.cs" />

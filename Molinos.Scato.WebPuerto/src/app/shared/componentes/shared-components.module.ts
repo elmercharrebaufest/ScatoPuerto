@@ -29,8 +29,13 @@ import { ToastModule } from 'primeng/toast';
 import { IniciarSesionComponent } from './iniciar-sesion/iniciar-sesion.component';
 import { NavtabsCalidadComponent } from "./navtabs-calidad/navtabs-calidad.component";
 import { CardBuqueComponent } from './modulos/geo/card-buque/card-buque.component';
-import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
+import { ModalCrearBuqueComponent } from "./modal-crear-buque/modal-crear-buque.component";
 import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-balanzas.component";
+import { AltaBajaMantenimientoComponent } from './alta-baja-mantenimiento/alta-baja-mantenimiento.component';
+import { NotificacionesComponent } from "./notificaciones/notificaciones.component";
+import { EnvioMailDialogComponent } from "./envio-mail-dialog/envio-mail-dialog.component";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
+import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
 
 const components = [
     AlertComponent,
@@ -51,7 +56,11 @@ const components = [
     AmarreComponent,
     NavtabsCalidadComponent,
     CardBuqueComponent,
-    EditarCrearBuquesComponent
+    EditarCrearBuquesComponent,
+    AltaBajaMantenimientoComponent,
+    NotificacionesComponent,
+    EnvioMailDialogComponent,    
+    ModalCrearBuqueComponent
 ]
 const libs = [
     CommonModule,
@@ -66,7 +75,8 @@ const libs = [
     CalendarModule,
     RouterModule,
     KnobModule,
-    ToastModule
+    ToastModule,
+    CKEditorModule,
 ]
 
 @NgModule({
@@ -75,7 +85,7 @@ const libs = [
     ],
     declarations: [
         components,
-        IniciarSesionComponent,
+        IniciarSesionComponent
     ],
     exports: [
         components,

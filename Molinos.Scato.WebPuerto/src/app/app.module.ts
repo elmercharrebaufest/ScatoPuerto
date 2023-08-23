@@ -23,10 +23,14 @@ import { NgxPermissionsModule, NgxPermissionsService } from 'ngx-permissions';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 import { ToastrModule } from 'ngx-toastr';
+import { LoginComponent } from './modulos/login/login.component';
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
+    LoginComponent,
   ],
   imports: [
     CommonModule,
@@ -45,7 +49,8 @@ import { ToastrModule } from 'ngx-toastr';
     NgxsModule.forRoot([
       ProductoState, 
       BuquesState
-    ])
+    ]),
+   
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },

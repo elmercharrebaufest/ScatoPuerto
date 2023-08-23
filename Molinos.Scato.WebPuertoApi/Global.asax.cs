@@ -1,8 +1,10 @@
 using System.Net;
+using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using System.Web.SessionState;
 using log4net;
 using Newtonsoft.Json.Serialization;
 
@@ -22,6 +24,9 @@ namespace Molinos.Scato.WebPuertoApi
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             config.Formatters.JsonFormatter.UseDataContractJsonSerializer = false;
         }
-
+        protected void Application_PostAuthorizeRequest()
+        {
+            HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
+        }
     }
 }
