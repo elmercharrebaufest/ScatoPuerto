@@ -4,6 +4,7 @@ using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -30,11 +31,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("No existe la caratula a cual asociar la COEM");
                     }
-                    var estadoCaratula = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Enviado"));
-                    if (estadoCaratula == null)
-                    {
-                        throw new Exception("No se encuentra el estado de caratula \"Enviado\" en la Base de datos");
-                    }
+                    caratula.Estado = EstadosCaratulaAFIP.Enviado;
                     var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "PRE");
                     var guid = Guid.NewGuid().ToString("N");
                     var contenedoresConCarga = coem.ContenedoresConCarga.Select(x => Conversor.Convertir<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(x)).ToList();

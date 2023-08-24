@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Molinos.Scato.Dominio.Dto
+namespace Molinos.Scato.Dominio.Comandos
 {
-    public class AfipCaratulaEstadoDto
+    public class AfipAnularCaratula : Comando
     {
         public int Id { get; set; }
-        public string Estado { get; set; }
     }
 }

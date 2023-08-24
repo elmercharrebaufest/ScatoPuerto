@@ -8,6 +8,34 @@ namespace Molinos.Scato.Servicios
     [ServiceContract]
     public interface IServicioAfip
     {
+
+        #region Tablas de referencia
+
+        [OperationContract]
+        IList<AfipTipoEmbalajeDto> ListarTiposEmbalaje();
+
+        [OperationContract]
+        IList<AfipPuntoAduaneroDto> ListarPuntosAduaneros();
+
+        [OperationContract]
+        IList<AfipPuertoDto> ListarPuertos();
+
+        [OperationContract]
+        IList<AfipPaisDto> ListarPaises();
+
+        [OperationContract]
+        IList<AfipTipoDocumentoDto> ListarTiposDocumento();
+
+        [OperationContract]
+        IList<AfipNaturalezaEmbalajeDto> ListarNaturalezasEmbalaje();
+
+        [OperationContract]
+        IList<AfipLugarOperativoDto> ListarLugaresOperativos();
+
+        [OperationContract]
+        IList<AfipCondicionContenedorDto> ListarCondicionesContenedor();
+        #endregion
+
         #region Caratulas
 
         [OperationContract]
@@ -20,10 +48,16 @@ namespace Molinos.Scato.Servicios
         bool RegistrarCaratula(AfipCaratulaDto caratula);
 
         [OperationContract]
-        IList<AfipCaratulaEstadoDto> ListarEstadosCaratula();
+        bool RectificarCaratula(AfipCaratulaDto caratula);
 
         [OperationContract]
-        bool CambiarEstadoCaratula(int id, int idEstado);
+        bool AnularCaratula(int id);
+
+        [OperationContract]
+        IList<string> ListarEstadosCaratula();
+
+        [OperationContract]
+        bool CambiarEstadoCaratula(int id, string estado);
 
         [OperationContract]
         IList<AfipCaratulaDto> ComboCaratulas();

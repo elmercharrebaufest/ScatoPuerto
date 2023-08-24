@@ -21,6 +21,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string NumeroViaje { get; set; }
         public DateTime FechaRegistro { get; set; }
         public IList<AfipCaratulaItinerarioDto> Itinerario { get; set; }
-        public AfipCaratulaEstadoDto AfipCaratulaEstado { get; set; }
+        public string Estado { get; set; }
     }
 }

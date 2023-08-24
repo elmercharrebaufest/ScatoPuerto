@@ -840,5 +840,4 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
 
 /* SCRIPTS DATOS AFIP */
-IF NOT EXISTS(SELECT 1 FROM AfipCaratulaEstado) BEGIN INSERT INTO AfipCaratulaEstado (Estado) VALUES ('Aceptado'), ('Rectificado'), ('Enviado (Ya asociado COEM)'), ('Eliminado') END
 IF NOT EXISTS(SELECT 1 FROM AfipCoemEstado) BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'), ('PRE', 'Presentada'), ('AUTO', 'Autorizada'), ('CAN', 'Cancelada'), ('ANU', 'Anulada') END

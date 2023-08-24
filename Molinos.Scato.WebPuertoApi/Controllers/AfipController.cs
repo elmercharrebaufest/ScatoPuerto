@@ -2,6 +2,7 @@
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,123 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
 
         }
+
+        #region Tablas de referencia
+
+        [HttpGet]
+        [Route("api/afip/ListarTiposEmbalaje")]
+        public HttpResponseMessage ListarTiposEmbalaje()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarTiposEmbalaje());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarPuntosAduaneros")]
+        public HttpResponseMessage ListarPuntosAduaneros()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarPuntosAduaneros());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarPuertos")]
+        public HttpResponseMessage ListarPuertos()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarPuertos());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarPaises")]
+        public HttpResponseMessage ListarPaises()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarPaises());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarTiposDocumento")]
+        public HttpResponseMessage ListarTiposDocumento()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarTiposDocumento());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarNaturalezasEmbalaje")]
+        public HttpResponseMessage ListarNaturalezasEmbalaje()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarNaturalezasEmbalaje());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarLugaresOperativos")]
+        public HttpResponseMessage ListarLugaresOperativos()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarLugaresOperativos());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarCondicionesContenedor")]
+        public HttpResponseMessage ListarCondicionesContenedor()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCondicionesContenedor());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+
+        #endregion
 
         #region Caratula
 
@@ -63,14 +181,45 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("api/afip/RectificarCaratula")]
+        public HttpResponseMessage RectificarCaratula(AfipCaratulaDto caratula)
+        {
+            try
+            {
+                var resultado = servicioAfip.RectificarCaratula(caratula);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/afip/AnularCaratula")]
+        public HttpResponseMessage AnularCaratula(int id)
+        {
+            try
+            {
+                var resultado = servicioAfip.AnularCaratula(id);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         [HttpGet]
         [Route("api/afip/ListarEstadosCaratula")]
         public HttpResponseMessage ListarEstadosCaratula()
         {
             try
             {
-                var resultado = servicioAfip.ListarEstadosCaratula();
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                Type estadosType = typeof(EstadosCaratulaAFIP);
+                var estados = estadosType.GetFields().Select(f => (string)f.GetValue(null)).ToList();
+                return Request.CreateResponse(HttpStatusCode.OK, estados);
             }
             catch (Exception e)
             {
@@ -80,11 +229,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/CambiarEstadoCaratula")]
-        public HttpResponseMessage CambiarEstadoCaratula(int id, int idEstado)
+        public HttpResponseMessage CambiarEstadoCaratula(int id, string estado)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.CambiarEstadoCaratula(id, idEstado));
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.CambiarEstadoCaratula(id, estado));
             }
             catch (Exception e)
             {

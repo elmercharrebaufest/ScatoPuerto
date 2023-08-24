@@ -38,12 +38,12 @@ namespace Molinos.Scato.Servicios.Impl
         public RegistrarCaratulaResponse RegistrarCaratula(AfipCaratulaDto afipCaratulaDto)
         {
             try
-            {               
+            {
                 this.cuitRepresentada = 20040410024;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
-                
+
                 RegistrarCaratulaRequest1 registrarCaratulaRequest =
                     new RegistrarCaratulaRequest1(
                         new RegistrarCaratulaRequest1Body
@@ -57,6 +57,58 @@ namespace Molinos.Scato.Servicios.Impl
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar registrar la Caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+
+        public RectificarCaratulaResponse RectificarCaratula(AfipCaratulaDto afipCaratulaDto)
+        {
+            try
+            {
+                this.cuitRepresentada = 20040410024;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                RectificarCaratulaRequest1 rectificarCaratulaRequest = new RectificarCaratulaRequest1(
+                    new RectificarCaratulaRequest1Body
+                    {
+                        argRectificarCaratula = new RectificarCaratulaRequest { Caratula = this.conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto) },
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
+                    }
+                );
+
+                return this.wgescomunicacionembarque.RectificarCaratula(rectificarCaratulaRequest);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar rectificar la caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+
+        public AnularCaratulaResponse AnularCaratula(string identificadorCaratula)
+        {
+            try
+            {
+                this.cuitRepresentada = 20040410024;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                AnularCaratulaRequest1 anularCaratulaRequest = new AnularCaratulaRequest1(
+                    new AnularCaratulaRequest1Body
+                    {
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                        argAnularCaratula = new AnularCaratulaRequest { IdentificadorCaratula = identificadorCaratula }
+                    }
+                );
+
+                return this.wgescomunicacionembarque.AnularCaratula(anularCaratulaRequest);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar anular la caratula. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
