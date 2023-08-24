@@ -5,6 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Angular App",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200",
+            "webRoot": "${workspaceFolder}",
+            "sourceMapPathOverrides": {
+            "webpack:///src/*": "${webRoot}/src/*"
+            },
+            "sourceMaps": true,
+            "runtimeExecutable": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",  // Ruta a Chrome en Windows
+            // "runtimeExecutable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",  // Ruta a Chrome en macOS
+            // "runtimeExecutable": "/usr/bin/google-chrome",  // Ruta a Chrome en Linux (ejemplo)
+            "userDataDir": "${workspaceFolder}/.vscode/chrome",
+            "smartStep": true,
+            "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"],
+            "breakOnLoad": true
+        },
+        {
             "type": "chrome",
             "request": "launch",
             "reAttach": false,
