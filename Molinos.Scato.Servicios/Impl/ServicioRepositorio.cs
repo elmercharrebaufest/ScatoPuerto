@@ -11137,17 +11137,24 @@ namespace Molinos.Scato.Servicios.Impl
                 try
                 {
                     embar = (from e in repositorio.Listar<Embarque>()
-                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
+                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
                              // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
-                             join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
-                             where e.Ubicacion != 1 && l.ModuloDeCarga.Id > 0
+                             join v in repositorio.Listar<Vapor>() on e.Vapor?.Id equals v.Id
+                             where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
                              orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
                              select (e.Id)).ToList();
 
                 }
                 catch (Exception ex)
-                {
-                    log.Error(ex, "Error en joins: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
+                {                   
+                    if (ex.InnerException != null)
+                    {
+                        log.Error(ex, "Error en joins con inner: Excepcion: {0} Trace: {1} inner: {2}", ex.Message, ex.StackTrace, ex.InnerException.Message + ex.InnerException.StackTrace);
+                    }
+                    else
+                    {
+                        log.Error(ex, "Error en joins: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
+                    }
                     throw (new Exception("Error en joins: Excepcion "+ ex.Message + ex.StackTrace, ex));
                 }
                 var embarques = new List<EmbarqueDto>();
@@ -11193,6 +11200,7 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Error(ex, "Error en servicioListarEmbarque: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                 throw ex;
             }
+
         }
 
         public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
