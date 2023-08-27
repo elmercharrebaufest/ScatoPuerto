@@ -513,22 +513,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     foreach (ModuloDeCargaLineasDeEmbarque lineaDB in moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque)
                     {
-                        lineaDB.ModuloDeCarga = linea.ModuloDeCarga;
-                        lineaDB.Linea = linea.Linea;
-                        lineaDB.TipoLineaEmbarque = linea.TipoLineaEmbarque;
-                        lineaDB.MaterialPuerto = linea.MaterialPuerto;
-                        lineaDB.TkInicial = linea.TkInicial;
-                        lineaDB.TkFinal = linea.TkFinal;
-                        lineaDB.TemperaturaInicial = linea.TemperaturaInicial;
-                        lineaDB.TemperaturaFinal = linea.TemperaturaFinal;
-                        lineaDB.AlturaInicialCM = linea.AlturaInicialCM;
-                        lineaDB.AlturaInicialMM = linea.AlturaInicialMM;
-                        lineaDB.AlturaFinalCM = linea.AlturaFinalCM;
-                        lineaDB.AlturaFinalMM = linea.AlturaFinalMM;
-                        lineaDB.DensidadInicial = linea.DensidadInicial;
-                        lineaDB.DensidadFinal = linea.DensidadFinal;
-                        lineaDB.Litros = linea.Litros;
-                        lineaDB.Kilos = linea.Kilos;
+                        if (linea.Id == lineaDB.Id)
+                        {
+                            lineaDB.ModuloDeCarga = linea.ModuloDeCarga;
+                            lineaDB.Linea = linea.Linea;
+                            lineaDB.TipoLineaEmbarque = linea.TipoLineaEmbarque;
+                            lineaDB.MaterialPuerto = linea.MaterialPuerto;
+                            lineaDB.TkInicial = linea.TkInicial;
+                            lineaDB.TkFinal = linea.TkFinal;
+                            lineaDB.TemperaturaInicial = linea.TemperaturaInicial;
+                            lineaDB.TemperaturaFinal = linea.TemperaturaFinal;
+                            lineaDB.AlturaInicialCM = linea.AlturaInicialCM;
+                            lineaDB.AlturaInicialMM = linea.AlturaInicialMM;
+                            lineaDB.AlturaFinalCM = linea.AlturaFinalCM;
+                            lineaDB.AlturaFinalMM = linea.AlturaFinalMM;
+                            lineaDB.DensidadInicial = linea.DensidadInicial;
+                            lineaDB.DensidadFinal = linea.DensidadFinal;
+                            lineaDB.Litros = linea.Litros;
+                            lineaDB.Kilos = linea.Kilos;
+                        }                        
                     }                    
 
                     Repositorio.GuardarCambios();
