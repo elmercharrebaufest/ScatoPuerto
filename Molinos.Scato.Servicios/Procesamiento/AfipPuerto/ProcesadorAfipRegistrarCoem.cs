@@ -53,37 +53,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     };
                     Repositorio.Agregar(coemDb);
                 }
-                else // Rectificación
-                {
-                    var contenedoresConCarga = Repositorio.Listar<AfipCoemContenedorConCarga>(x => x.AfipCoem.Id == coem.Id);
-                    foreach (var contenedor in contenedoresConCarga) Repositorio.Remover(contenedor);
-                    var contenedoresVacios = Repositorio.Listar<AfipCoemContenedorVacio>(x => x.AfipCoem.Id == coem.Id);
-                    foreach (var contenedor in contenedoresVacios) Repositorio.Remover(contenedor);
-                    var mercaderiasSueltas = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);
-                    foreach (var mercaderia in mercaderiasSueltas) Repositorio.Remover(mercaderia);
-
-                    var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id);
-                    if (coemDb == null)
-                    {
-                        throw new Exception("No existe la COEM con el id especificado");
-                    }
-
-                    foreach (var contenedorConCarga in coem.ContenedoresConCarga)
-                    {
-                        var contenedorConCargaDb = this.Conversor.Convertir<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(contenedorConCarga);
-                        coemDb.ContenedoresConCarga.Add(contenedorConCargaDb);
-                    }
-                    foreach (var contenedorVacio in coem.ContenedoresVacios)
-                    {
-                        var contenedorVacioDb = this.Conversor.Convertir<AfipCoemContenedorVacioDto, AfipCoemContenedorVacio>(contenedorVacio);
-                        coemDb.ContenedoresVacios.Add(contenedorVacioDb);
-                    }
-                    foreach (var mercaderiaSuelta in coem.MercaderiasSueltas)
-                    {
-                        var mercaderiaSueltaDb = this.Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(mercaderiaSuelta);
-                        coemDb.MercaderiasSueltas.Add(mercaderiaSueltaDb);
-                    }
-                }
+             
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

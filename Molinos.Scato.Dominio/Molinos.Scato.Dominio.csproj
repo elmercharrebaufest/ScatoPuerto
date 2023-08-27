@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRectificarCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCode.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCoem.cs" />

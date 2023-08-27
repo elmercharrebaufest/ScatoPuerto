@@ -45,7 +45,7 @@ export class CaratulaAfipComponent implements OnInit {
     this.caratulaService.listarCaratulas().subscribe((datos)=>{
       this.listaHistorialCaratulas=datos;
       this.listaHistorialCaratulas.length == 0 ? this.esNoExisteRegistros : this.esNoExisteRegistros = false;
-      this.cargarCaratulas=false
+      this.cargarCaratulas=false;
       // Calcular el total de elementos y las páginas
       this.totalItems = this.listaHistorialCaratulas.length;
       this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);

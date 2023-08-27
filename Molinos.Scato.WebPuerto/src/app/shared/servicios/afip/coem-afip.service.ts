@@ -17,7 +17,7 @@ export class CoemAfipService {
   }
 
   public editarCoem(coem:COEM): Observable<any[]> {
-    return this.http.post<any[]>(`${this.url}Afip/RegistrarCoem`, coem ,{ 'withCredentials': true });
+    return this.http.put<any[]>(`${this.url}Afip/RectificarCoem`, coem ,{ 'withCredentials': true });
   }
 
   public listarCoems(): Observable<any[]> {
@@ -29,7 +29,7 @@ export class CoemAfipService {
   }
 
   public cambiarEstadosCoem(id,idCoem): Observable<any[]> {
-    return this.http.post<any[]>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${idCoem}&idEstado=${id}`, { 'withCredentials': true });
+    return this.http.put<any[]>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${idCoem}&idEstado=${id}`, { 'withCredentials': true });
   }
 
   public obtenerCoemId(id:number): Observable<any> {

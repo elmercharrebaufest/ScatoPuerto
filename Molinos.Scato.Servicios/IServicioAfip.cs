@@ -43,6 +43,9 @@ namespace Molinos.Scato.Servicios
         void RegistrarCoem(AfipCoemDto coem);
 
         [OperationContract]
+        void RectificarCoem(AfipCoemDto coem);
+
+        [OperationContract]
         IList<AfipCoemEstadoDto> ListarEstadosCoem();
 
         [OperationContract]

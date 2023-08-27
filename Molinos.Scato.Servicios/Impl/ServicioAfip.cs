@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using System.Web;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
+using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -130,6 +131,11 @@ namespace Molinos.Scato.Servicios.Impl
         public void RegistrarCoem(AfipCoemDto coem)
         {
             this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coem });
+        }
+
+        public void RectificarCoem(AfipCoemDto coem)
+        {
+            this.servicioComandos.Ejecutar(new AfipRectificarCoem { Dto = coem });
         }
 
         public IList<AfipCoemEstadoDto> ListarEstadosCoem()

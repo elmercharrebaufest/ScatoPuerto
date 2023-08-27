@@ -167,6 +167,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("api/afip/RectificarCoem")]
+        public HttpResponseMessage RectificarCoem(AfipCoemDto coem)
+        {
+            try
+            {
+                servicioAfip.RectificarCoem(coem);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
+            }
+        }
+
+
         [HttpGet]
         [Route("api/afip/ListarEstadosCoem")]
         public HttpResponseMessage ListarEstadosCoem()
@@ -181,7 +197,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("api/afip/CambiarEstadoCoem")]
         public HttpResponseMessage CambiarEstadoCoem(int idCoem, int idEstado)
         {
@@ -195,6 +211,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+        //[HttpPut]
+        //[Route("api/afip/AnularCoem")]
         #endregion
 
         #region CODE
