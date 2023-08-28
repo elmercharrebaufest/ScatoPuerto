@@ -144,9 +144,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   ngAfterViewChecked()
-  {
-    console.log( "! changement de la date du composant !" );
-   
+  {       
     this.cdRef.detectChanges();
   }
 
