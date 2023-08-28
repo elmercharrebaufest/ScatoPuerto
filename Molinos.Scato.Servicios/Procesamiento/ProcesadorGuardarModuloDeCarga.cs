@@ -460,7 +460,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var lineasDeEmbarque = moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque.ToList();
                 var lineasDeEmbarqueInsertar = moduloDeCargaLineasDeEmbarque.Where(x => x.Id == 0);
                 var lineasDeEmbarqueEliminar = lineasDeEmbarque.Where(x => !moduloDeCargaLineasDeEmbarque.Select(y => y.Id).Contains(x.Id));
-                var lineasDeEmbarqueActualizar = lineasDeEmbarque.Where(x => moduloDeCargaLineasDeEmbarque.Select(y => y.Id).Contains(x.Id));
+                var lineasDeEmbarqueActualizar = lineasDeEmbarque.Where(la => moduloDeCargaLineasDeEmbarque.Select(l => l.Id).Contains(la.Id));
 
                 #endregion
 
@@ -507,39 +507,46 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
                 #endregion
 
-                #region Actualizar
+                #region Actualizar               
 
-                foreach (ModuloDeCargaLineasDeEmbarque linea in lineasDeEmbarqueActualizar)
-                {
-                    foreach (ModuloDeCargaLineasDeEmbarque lineaDB in moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque)
+                foreach (var linea in lineasDeEmbarqueActualizar)
+                {                    
+                                       
+                    moduloDeCargaDB.FechaDeModificacion = DateTime.Now;
+
+                    var lineaDto = moduloDeCargaLineasDeEmbarque.FirstOrDefault(l => l.Id == linea.Id);
+                    if (lineaDto != null)
                     {
-                        if (linea.Id == lineaDB.Id)
-                        {
-                            lineaDB.ModuloDeCarga = linea.ModuloDeCarga;
-                            lineaDB.Linea = linea.Linea;
-                            lineaDB.TipoLineaEmbarque = linea.TipoLineaEmbarque;
-                            lineaDB.MaterialPuerto = linea.MaterialPuerto;
-                            lineaDB.TkInicial = linea.TkInicial;
-                            lineaDB.TkFinal = linea.TkFinal;
-                            lineaDB.TemperaturaInicial = linea.TemperaturaInicial;
-                            lineaDB.TemperaturaFinal = linea.TemperaturaFinal;
-                            lineaDB.AlturaInicialCM = linea.AlturaInicialCM;
-                            lineaDB.AlturaInicialMM = linea.AlturaInicialMM;
-                            lineaDB.AlturaFinalCM = linea.AlturaFinalCM;
-                            lineaDB.AlturaFinalMM = linea.AlturaFinalMM;
-                            lineaDB.DensidadInicial = linea.DensidadInicial;
-                            lineaDB.DensidadFinal = linea.DensidadFinal;
-                            lineaDB.Litros = linea.Litros;
-                            lineaDB.Kilos = linea.Kilos;
-                        }                        
-                    }                    
+                        var lineaDeEmbarque = Repositorio.Obtener<ModuloDeCargaLineasDeEmbarque>(x => x.Id == linea.Id);
+                        var material = Repositorio.Obtener<MaterialPuerto>(x => x.Id == linea.MaterialPuerto.Id);
+                        var tipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(x => x.Id == linea.TipoLineaEmbarque.Id);
 
-                    Repositorio.GuardarCambios();
+                        linea.ModuloDeCarga = moduloDeCargaDB;
+                        linea.Linea = tipoLineaEmbarque.Linea;
+                        linea.TipoLineaEmbarque = tipoLineaEmbarque;
+                        linea.MaterialPuerto = material;
+                        linea.TkInicial = lineaDto.TkInicial;
+                        linea.TemperaturaInicial = lineaDto.TemperaturaInicial;
+                        linea.AlturaInicialCM = lineaDto.AlturaInicialCM;
+                        linea.AlturaInicialMM = lineaDto.AlturaInicialMM;
+                        linea.DensidadInicial = lineaDto.DensidadInicial;
+                        linea.TemperaturaFinal = lineaDto.TemperaturaFinal;
+                        linea.Litros = lineaDto.Litros;
+                        linea.DensidadFinal = lineaDto.DensidadFinal;
+                        linea.AlturaFinalCM = lineaDto.AlturaFinalCM;
+                        linea.AlturaFinalMM = lineaDto.AlturaFinalMM;
+                        linea.Kilos = lineaDto.Kilos;
+                        linea.TkFinal = lineaDto.TkFinal;
+                        linea.KilosFinales = lineaDto.KilosFinales;
+                        linea.LitrosFinales = lineaDto.LitrosFinales;
+                    }                   
                 }
 
                 #endregion
-               
+                Repositorio.GuardarCambios();
             }
+
+            
 
             return moduloDeCargaDB;
         }
