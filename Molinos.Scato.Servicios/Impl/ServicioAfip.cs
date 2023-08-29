@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using System.Web;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
+using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 
 namespace Molinos.Scato.Servicios.Impl
@@ -55,6 +56,50 @@ namespace Molinos.Scato.Servicios.Impl
         }
         #endregion
 
+        #region Tablas de referencia
+
+        public IList<AfipTipoEmbalajeDto> ListarTiposEmbalaje()
+        {
+            return Listar<AfipTipoEmbalaje, AfipTipoEmbalajeDto>();
+        }
+
+        public IList<AfipPuntoAduaneroDto> ListarPuntosAduaneros()
+        {
+            return Listar<AfipPuntoAduanero, AfipPuntoAduaneroDto>();
+        }
+
+        public IList<AfipPuertoDto> ListarPuertos()
+        {
+            return Listar<AfipPuerto, AfipPuertoDto>();
+        }
+
+        public IList<AfipPaisDto> ListarPaises()
+        {
+            return Listar<AfipPais, AfipPaisDto>();
+        }
+
+        public IList<AfipTipoDocumentoDto> ListarTiposDocumento()
+        {
+            return Listar<AfipTipoDocumento, AfipTipoDocumentoDto>();
+        }
+
+        public IList<AfipNaturalezaEmbalajeDto> ListarNaturalezasEmbalaje()
+        {
+            return Listar<AfipNaturalezaEmbalaje, AfipNaturalezaEmbalajeDto>();
+        }
+
+        public IList<AfipLugarOperativoDto> ListarLugaresOperativos()
+        {
+            return Listar<AfipLugarOperativo, AfipLugarOperativoDto>();
+        }
+
+        public IList<AfipCondicionContenedorDto> ListarCondicionesContenedor()
+        {
+            return Listar<AfipCondicionContenedor, AfipCondicionContenedorDto>();
+        }
+
+        #endregion
+
         #region Caratulas
 
         public IList<AfipCaratulaDto> ListarCaratulas()
@@ -75,18 +120,39 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
-        public IList<AfipCaratulaEstadoDto> ListarEstadosCaratula()
+        public bool RectificarCaratula(AfipCaratulaDto caratula)
         {
-            return Listar<AfipCaratulaEstado, AfipCaratulaEstadoDto>();
+            var res = this.servicioComandos.Ejecutar(new AfipRectificarCaratula { Dto = caratula });
+            return !res.HayErrores;
         }
 
-        public bool CambiarEstadoCaratula(int id, int idEstado)
+        public bool AnularCaratula(int id)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipAnularCaratula { Id = id });
+            return !res.HayErrores;
+        }
+
+        public IList<string> ListarEstadosCaratula()
+        {
+            Type estadosType = typeof(EstadosCaratulaAFIP);
+            return estadosType.GetFields().Select(f => (string)f.GetValue(null)).ToList();
+        }
+
+        public bool CambiarEstadoCaratula(int id, string estado)
         {
             try
             {
                 var caratula = this.repositorio.Obtener<AfipCaratula>(id);
-                var estadoDb = this.repositorio.Obtener<AfipCaratulaEstado>(idEstado);
-                caratula.AfipCaratulaEstado = estadoDb;
+                var estados = ListarEstadosCaratula();
+                if (caratula == null)
+                {
+                    throw new Exception("No existe la carátula con el id indicado");
+                }
+                if (!estados.Contains(estado))
+                {
+                    throw new Exception("El estado indicado no es válido");
+                }
+                caratula.Estado = estado;
                 var res = this.repositorio.GuardarCambios();
                 return true;
             }

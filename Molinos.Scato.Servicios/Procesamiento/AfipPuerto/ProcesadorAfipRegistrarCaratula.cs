@@ -19,7 +19,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
     public class ProcesadorAfipRegistrarCaratula : ProcesadorComando<AfipRegistrarCaratula>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
-        public ProcesadorAfipRegistrarCaratula(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log) 
+        public ProcesadorAfipRegistrarCaratula(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log)
         {
             this.comunicacionEmbarqueServicioHelper = comunicacionEmbarqueServicioHelper;
         }
@@ -30,60 +30,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var caratula = comando.Dto;
-                var response = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
+                if (caratula == null) { throw new Exception("La caratula recibida es nula"); }
+
+                var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
+                var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
                 //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
-                if (caratula.Id == 0) // Registro
+                if (cuerpoRespuesta.Codigo != 0)
                 {
-                    var estado = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Aceptado"));
-                    if (estado == null)
-                    {
-                        throw new Exception("No se encuentra el estado de caratula \"Aceptado\" en la Base de datos");
-                    }
-                    var guid = Guid.NewGuid().ToString("N");
-                    var caratulaDb = new AfipCaratula
-                    {
-                        IdentificadorCaratula = guid.Substring(guid.Length - 16),
-                        IdentificadorBuque = caratula.IdentificadorBuque,
-                        CodigoAduana = caratula.CodigoAduana,
-                        CodigoLugarOperativo = caratula.CodigoLugarOperativo,
-                        FechaArribo = caratula.FechaArribo,
-                        FechaZarpada = caratula.FechaZarpada,
-                        NombreMedioTransporte = caratula.NombreMedioTransporte,
-                        NumeroViaje = caratula.NumeroViaje,
-                        PuertoDestino = caratula.PuertoDestino,
-                        Via = caratula.Via,
-                        FechaRegistro = DateTime.Now,
-                        AfipCaratulaEstado = estado,
-                        Itinerario = caratula.Itinerario.Select(x => new AfipCaratulaItinerario { Puerto = x.Puerto }).ToList()
-                    };
-                    Repositorio.Agregar(caratulaDb);
+                    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                 }
-                else // Rectificación
-                {
-                    var itinerariosDb = Repositorio.Listar<AfipCaratulaItinerario>(x => x.AfipCaratula.Id == caratula.Id);
-                    foreach (var itinerario in itinerariosDb) Repositorio.Remover(itinerario);
-                    var caratulaDb = Repositorio.Obtener<AfipCaratula>(caratula.Id);
-                    if (caratula == null)
-                    {
-                        throw new Exception("No existe una carátula con el id especificado");
-                    }
-                    var estado = Repositorio.Obtener<AfipCaratulaEstado>(x => x.Estado.Contains("Rectificado"));
-                    caratulaDb.IdentificadorBuque = caratula.IdentificadorBuque;
-                    caratulaDb.CodigoAduana = caratula.CodigoAduana;
-                    caratulaDb.CodigoLugarOperativo = caratula.CodigoLugarOperativo;
-                    caratulaDb.FechaArribo = caratula.FechaArribo;
-                    caratulaDb.FechaZarpada = caratula.FechaZarpada;
-                    caratulaDb.NombreMedioTransporte = caratula.NombreMedioTransporte;
-                    caratulaDb.NumeroViaje = caratula.NumeroViaje;
-                    caratulaDb.PuertoDestino = caratula.PuertoDestino;
-                    caratulaDb.Via = caratula.Via;
-                    caratulaDb.AfipCaratulaEstado = estado;
-                    foreach (var itinerario in caratula.Itinerario)
-                    {
-                        var itinerarioDb = new AfipCaratulaItinerario { AfipCaratula = caratulaDb, Puerto = itinerario.Puerto };
-                        caratulaDb.Itinerario.Add(itinerarioDb);
-                    }
-                }
+                string caratulaId = cuerpoRespuesta.DescripcionAdicional;
+
+                var caratulaDb = this.Conversor.Convertir<AfipCaratulaDto, AfipCaratula>(caratula);
+                caratulaDb.IdentificadorCaratula = Guid.NewGuid().ToString().Substring(0, 16); // TODO: utilizar caratulaId
+                caratulaDb.FechaRegistro = DateTime.Now;
+                caratulaDb.Estado = EstadosCaratulaAFIP.Aceptado;
+                Repositorio.Agregar(caratulaDb);
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

@@ -11,5 +11,7 @@ namespace Molinos.Scato.Servicios
     public interface IComunicacionEmbarqueServicioHelper
     {
         RegistrarCaratulaResponse RegistrarCaratula(AfipCaratulaDto afipCaratulaDto);
+        RectificarCaratulaResponse RectificarCaratula(AfipCaratulaDto afipCaratulaDto);
+        AnularCaratulaResponse AnularCaratula(string identificadorCaratula);
     }
 }

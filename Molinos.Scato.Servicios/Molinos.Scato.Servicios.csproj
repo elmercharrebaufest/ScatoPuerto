@@ -158,7 +158,6 @@
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeCoemMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemContenedorConCargaDeclaracionMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaEstadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaItinerarioMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoGruposAdMappingProfile.cs" />
@@ -171,6 +170,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMercaderiaSueltaEmbalajeMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMercaderiaSueltaMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipTablasReferenciaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ArchivosPuertoMappingProfile.cs" />
@@ -369,6 +369,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ImpIdentificacionMuestraAuditoriaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VinedoTercerosMappingProfile.cs" />
     <Compile Include="CrearException.cs" />
+    <Compile Include="Enumeradores\EstadosCaratulaAFIP.cs" />
     <Compile Include="Enumeradores\ServiciosAFIP.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
@@ -563,6 +564,8 @@
     <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCaratula.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRectificarCaratula.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRectificarCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCaratula.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCode.cs" />

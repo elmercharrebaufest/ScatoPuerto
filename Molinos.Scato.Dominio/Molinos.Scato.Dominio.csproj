@@ -81,6 +81,8 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRectificarCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRectificarCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCode.cs" />
@@ -692,7 +694,6 @@
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaDto.cs" />
-    <Compile Include="Dto\AfipPuerto\AfipCaratulaEstadoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCaratulaItinerarioDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCodeCoemDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCodeDto.cs" />
@@ -704,6 +705,14 @@
     <Compile Include="Dto\AfipPuerto\AfipCoemEstadoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaEmbalajeDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipCondicionContenedorDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipLugarOperativoDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipNaturalezaEmbalajeDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipPaisDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipPuertoDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipPuntoAduaneroDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipTipoDocumentoDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipTipoEmbalajeDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
@@ -1000,7 +1009,6 @@
     <Compile Include="Entidades\ADPuertoRoles.cs" />
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratula.cs" />
-    <Compile Include="Entidades\AfipPuerto\AfipCaratulaEstado.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCaratulaItinerario.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCode.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCodeCoem.cs" />
@@ -1012,6 +1020,14 @@
     <Compile Include="Entidades\AfipPuerto\AfipCoemEstado.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSuelta.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipCondicionContenedor.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipLugarOperativo.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipNaturalezaEmbalaje.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipPais.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipPuerto.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipPuntoAduanero.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipTipoDocumento.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipTipoEmbalaje.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
     <Compile Include="Entidades\Auditoria.cs" />
