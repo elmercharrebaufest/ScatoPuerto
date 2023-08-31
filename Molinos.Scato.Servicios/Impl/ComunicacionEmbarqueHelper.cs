@@ -113,6 +113,113 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto)
+        {
+            try
+            {
+                this.cuitRepresentada = 20040410024;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                RegistrarCOEMRequest1 registrarCOEMRequest1 =
+                    new RegistrarCOEMRequest1(
+                        new RegistrarCOEMRequest1Body
+                        {
+                            argRegistrarCOEM = new RegistrarCOEMRequest {IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
+                            argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
+                        });
+                return this.wgescomunicacionembarque.RegistrarCOEM(registrarCOEMRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar registrar la Coem, Error {0} trace {1}", ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+
+        public RectificarCOEMResponse RectificarCOEM(AfipCoemDto afipCoemDto)
+        {
+            try
+            {
+                this.cuitRepresentada = 20040410024;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                RectificarCOEMRequest1 rectificarCOEMRequest1 = new RectificarCOEMRequest1(
+                    new RectificarCOEMRequest1Body
+                    {
+                        argRectificarCOEM = new RectificarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) }
+                    });
+                return this.wgescomunicacionembarque.RectificarCOEM(rectificarCOEMRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar rectificar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+
+        public AnularCOEMResponse AnularCOEM(string identificadorCaratula, string identificadorCOEM)
+        {
+            try
+            {
+                this.cuitRepresentada = 20040410024;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                AnularCOEMRequest1 anularCOEMRequest1 = new AnularCOEMRequest1(
+                    new AnularCOEMRequest1Body
+                    {
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                        argAnularCOEM = new AnularCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                    });
+
+                return this.wgescomunicacionembarque.AnularCOEM(anularCOEMRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar anular la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw;                
+            }
+        }
+
+        public CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM)
+        {
+            this.cuitRepresentada = 20040410024;
+            this.rol = "DEPO";
+            this.tipoAgente = "DEPO";
+            this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+            CerrarCOEMRequest1 cerrarCOEMRequest1 = new CerrarCOEMRequest1(
+                new CerrarCOEMRequest1Body
+                {
+                    argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                    argCerrarCOEM = new CerrarCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                });
+
+            return this.wgescomunicacionembarque.CerrarCOEM(cerrarCOEMRequest1);
+        }
+
+        public SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM)
+        {
+            this.cuitRepresentada = 20040410024;
+            this.rol = "DEPO";
+            this.tipoAgente = "DEPO";
+            this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+            SolicitarAnulacionCOEMRequest1 solicitarAnulacionCOEMRequest1 = new SolicitarAnulacionCOEMRequest1(
+                new SolicitarAnulacionCOEMRequest1Body
+                {
+                    argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                    argSolicitarAnulacionCOEM = new SolicitarAnulacionCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                });
+
+            return this.wgescomunicacionembarque.SolicitarAnulacionCOEM(solicitarAnulacionCOEMRequest1);
+        }
+
         private void ObtenerAutenticacionEmpresa(long cuitRepresentada, string rol, string tipoAgente)
         {
             if (this.wSAutenticacionEmpresa == null || this.ticketAccesoAfip.ExpirationTime < DateTime.Now)
