@@ -370,6 +370,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\VinedoTercerosMappingProfile.cs" />
     <Compile Include="CrearException.cs" />
     <Compile Include="Enumeradores\EstadosCaratulaAFIP.cs" />
+    <Compile Include="Enumeradores\EstadosCoemAFIP.cs" />
     <Compile Include="Enumeradores\ServiciosAFIP.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
@@ -565,11 +566,14 @@
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCaratula.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCoem.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipCerrarCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRectificarCaratula.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRectificarCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCaratula.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCode.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCoem.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarAnulacionCOEM.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />

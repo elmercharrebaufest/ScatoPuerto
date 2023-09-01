@@ -211,10 +211,29 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void CambiarEstadoCoem(int idCoem, int idEstado)
         {
-            var coem = this.repositorio.Obtener<AfipCoem>(idCoem);
-            var estado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
-            coem.AfipCoemEstado = estado;
-            this.repositorio.GuardarCambios();
+            try
+            {
+                var coem = this.repositorio.Obtener<AfipCoem>(idCoem);
+                var estado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
+
+                if (coem == null)
+                {
+                    throw new Exception("No existe la COEM con el id indicado");
+                }
+                if (estado == null)
+                {
+                    throw new Exception("No existe el estado con el ID indicado");
+                }
+
+                coem.AfipCoemEstado = estado;
+                this.repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                this.log.Error("Error al cambiar estado de la COEM {0}", ex.StackTrace);              
+                throw new Exception("Error al cambiar estado de la COEM");
+            }
+           
         }
         #endregion
 

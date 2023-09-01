@@ -3,6 +3,7 @@ using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
@@ -16,7 +17,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 {
     public class ProcesadorAfipRectificarCoem : ProcesadorComando<AfipRectificarCoem>
     {
-        public ProcesadorAfipRectificarCoem(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
+        private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
+        public ProcesadorAfipRectificarCoem(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log)
+        {
+            this.comunicacionEmbarqueServicioHelper = comunicacionEmbarqueServicioHelper;
+        }
         public override Resultado Ejecutar(AfipRectificarCoem comando)
         {
             var resultado = new ResultadoCrear();
@@ -25,16 +30,20 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 var coem = comando.Dto;
                
                 var contenedoresConCargaDB = Repositorio.Listar<AfipCoemContenedorConCarga>(x => x.AfipCoem.Id == coem.Id);
-                //foreach (var contenedor in contenedoresConCarga) Repositorio.Remover(contenedor);
                 var contenedoresVaciosDB = Repositorio.Listar<AfipCoemContenedorVacio>(x => x.AfipCoem.Id == coem.Id);
-                //foreach (var contenedor in contenedoresVacios) Repositorio.Remover(contenedor);
-                var mercaderiasSueltasDB = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);
-                //foreach (var mercaderia in mercaderiasSueltas) Repositorio.Remover(mercaderia);
+                var mercaderiasSueltasDB = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);                
 
                 var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id);
                 if (coemDb == null)
                 {
                     throw new Exception("No existe la COEM con el id especificado");
+                }
+
+                var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
+                var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al rectificar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                 }
 
                 var contenedoresConCarga = this.Conversor.ConvertirList<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(coem.ContenedoresConCarga);
@@ -50,8 +59,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             }
             catch (Exception ex)
             {
-                Log.Error("Error al rectificar Coem {0}", ex.StackTrace);
-                throw ex;
+                resultado.Error("", Textos.Error_ActualizarGenerico);
+                Log.Error("Error al rectificar Coem {0}", ex.StackTrace);                
             }
             return resultado;
         }
