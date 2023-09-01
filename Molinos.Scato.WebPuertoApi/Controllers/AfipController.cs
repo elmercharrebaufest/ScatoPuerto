@@ -307,8 +307,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.RegistrarCoem(coem);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var resultado = servicioAfip.RegistrarCoem(coem);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
             {
@@ -322,8 +322,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.RectificarCoem(coem);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                var resultado = servicioAfip.RectificarCoem(coem);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
             {
@@ -331,6 +331,50 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("api/afip/AnularCoem")]
+        public HttpResponseMessage AnularCoem(int id)
+        {
+            try
+            {
+                var resultado = servicioAfip.AnularCaratula(id);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);               
+            }            
+        }
+
+        [HttpPut]
+        [Route("api/afip/CerrarCoem")]
+        public HttpResponseMessage CerrarCoem(int id)
+        {
+            try
+            {
+                var resultado = servicioAfip.CerrarCoem(id);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/SolicitarAnulacionCoem")]
+        public HttpResponseMessage SolicitarAnulacionCoem(int id)
+        {
+            try
+            {
+                var resultado = servicioAfip.SolicitarAnulacionCoem(id);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
+            }
+        }
 
         [HttpGet]
         [Route("api/afip/ListarEstadosCoem")]

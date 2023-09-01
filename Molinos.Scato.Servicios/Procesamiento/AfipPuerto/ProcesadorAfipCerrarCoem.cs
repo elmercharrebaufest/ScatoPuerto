@@ -28,7 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             var resultado = new ResultadoCrear();
             try
             {
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Dto.IdentificadorCOEM);
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id);
                 if (coemDB == null)
                 {
                     throw new Exception("No existe la COEM con el id especificado");

@@ -9,6 +9,6 @@ namespace Molinos.Scato.Dominio.Comandos.AfipPuerto
 {
     public class AfipSolicitarAnulacionCoem: Comando
     {
-        public AfipCoemDto Dto { get; set; }
+        public int Id { get; set; }
     }
 }

@@ -194,14 +194,34 @@ namespace Molinos.Scato.Servicios.Impl
             return Obtener<AfipCoem, AfipCoemDto>(id);
         }
 
-        public void RegistrarCoem(AfipCoemDto coem)
+        public bool RegistrarCoem(AfipCoemDto coem)
         {
-            this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coem });
+            var res = this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coem });
+            return !res.HayErrores;
         }
 
-        public void RectificarCoem(AfipCoemDto coem)
+        public bool RectificarCoem(AfipCoemDto coem)
         {
-            this.servicioComandos.Ejecutar(new AfipRectificarCoem { Dto = coem });
+            var res = this.servicioComandos.Ejecutar(new AfipRectificarCoem { Dto = coem });
+            return !res.HayErrores;
+        }
+
+        public bool AnularCoem(int id)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipAnularCoem { Id = id });
+            return !res.HayErrores;
+        } 
+
+        public bool CerrarCoem(int id)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipCerrarCoem { Id = id });
+            return !res.HayErrores;
+        }
+
+        public bool SolicitarAnulacionCoem(int id)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipSolicitarAnulacionCoem { Id = id });
+            return !res.HayErrores;
         }
 
         public IList<AfipCoemEstadoDto> ListarEstadosCoem()
