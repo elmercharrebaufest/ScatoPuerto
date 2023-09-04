@@ -1,5 +1,5 @@
 
-    
+
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">{{titleCaratula}}</h5>
@@ -30,18 +30,34 @@
                     </div>
                     <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Puerto</label>
-                        <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="puertoDestino" maxLength="5"/>
+                        <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="puertoDestino" [matAutocomplete]="listaPuertos" [ngClass]="{'input-error': submitted && f.puertoDestino.invalid}" required />
+                        <mat-autocomplete autoActiveFirstOption #listaPuertos="matAutocomplete" class="test-class" [classList]="'test-class'" [displayWith]="getNombre">
+                          <mat-option *ngFor="let puerto of puertos$ | async" [value]="puerto">
+                            ({{puerto.codigo}}) {{puerto.descripcion}}
+                          </mat-option>
+                        </mat-autocomplete>
+                        <!-- <input type="text" class="form-control" placeholder="Ingrese nombre del puerto" formControlName="puertoDestino" maxLength="5"/> -->
                     </div>
-                    
+
                 </div>
                 <div class="row margen">
                     <div class="col-md-4 col-sm-12 pt-4">
-                        <label class="">Código de Aduana</label>
-                        <input type="text" class="form-control" placeholder="Ingrese el código de aduana" formControlName="codigoAduana" [ngClass]="{'input-error': submitted && f.codigoAduana.invalid}" required/>
+                        <label class="">Aduana</label>
+                        <input type="text" class="form-control" placeholder="Ingrese el código de aduana" formControlName="codigoAduana" [matAutocomplete]="listaAduanas" [ngClass]="{'input-error': submitted && f.codigoAduana.invalid}" required/>
+                        <mat-autocomplete autoActiveFirstOption #listaAduanas="matAutocomplete" class="test-class" [classList]="'test-class'" [displayWith]="getNombre">
+                          <mat-option *ngFor="let aduana of aduanas$ | async" [value]="aduana">
+                            ({{aduana.codigo}}) {{aduana.descripcion}}
+                          </mat-option>
+                        </mat-autocomplete>
                     </div>
                     <div class="col-md-4 col-sm-12 pt-4">
-                        <label class="">Código de Lugar Operativo</label>
-                        <input type="text" class="form-control" placeholder="Ingrese el código de lugar operativo" formControlName="codigoLugarOperativo" [ngClass]="{'input-error': submitted && f.codigoLugarOperativo.invalid}" required/>
+                        <label class="">Lugar Operativo</label>
+                        <input type="text" class="form-control" placeholder="Ingrese el código de lugar operativo" formControlName="codigoLugarOperativo" [matAutocomplete]="listaLugaresOperativos" [ngClass]="{'input-error': submitted && f.codigoLugarOperativo.invalid}" required/>
+                        <mat-autocomplete autoActiveFirstOption #listaLugaresOperativos="matAutocomplete" class="test-class" [classList]="'test-class'" [displayWith]="getNombre">
+                          <mat-option *ngFor="let lugarOperativo of lugaresOperativos$ | async" [value]="lugarOperativo">
+                            ({{lugarOperativo.codigo}}) {{lugarOperativo.descripcion}}
+                          </mat-option>
+                        </mat-autocomplete>
                     </div>
                     <!-- <div class="col-md-4 col-sm-12 pt-4">
                         <label class="">Nombre del Medio de Transporte</label>
@@ -62,7 +78,7 @@
                         <input type="datetime-local" [value]="crearEditarCaratulaForm.get('fechaZarpada').value | date:'yyyy-MM-ddTHH:mm:ss'" class="form-control" placeholder="Ingrese la fecha de zarpado" formControlName="fechaZarpada"  [ngClass]="{'input-error': submitted && f.fechaZarpada.invalid}" [min]="crearEditarCaratulaForm.get('fechaArribo').value" required/>
                     </div>
                 </div>
-        
+
             </div>
         </form>
         <div class="modal-footer justify-content-center">

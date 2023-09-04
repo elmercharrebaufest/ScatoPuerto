@@ -14,7 +14,7 @@
             <th>Fecha Registro</th>
             <th>Rectificar</th>
             <th>Anular</th>
-            <th>Estados</th>
+            <th>Estado</th>
         </thead>
         <tbody *ngFor="let historial of displayedItems">
             <tr class="lista-caratula-row" >
@@ -26,19 +26,19 @@
                 <td class="lista-caratula-row-item">{{ historial.fechaZarpada | date:'dd/MM/yyyy'}}</td>
                 <td class="lista-caratula-row-item">{{ historial.fechaRegistro | date:'dd/MM/yyyy'}}</td>
                 <td class="lista-caratula-row-item" >
-                    <div *ngIf="historial.afipCaratulaEstado.id!=4" (click)="editarCaratula(historial,editCaratula)" class='icon-editar cursor'></div>
+                    <div *ngIf="historial.afipCaratulaEstado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" class='icon-editar cursor'></div>
                 </td>
                 <td class="lista-caratula-row-item">
-                    <img *ngIf="historial.afipCaratulaEstado.id!=4" (click)="eliminarCaratula(historial.id,historial.identificadorCaratula)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                    <img *ngIf="historial.afipCaratulaEstado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
-                <td class="lista-caratula-row-item font-weight-bold" >{{historial.afipCaratulaEstado.estado}}</td>
+                <td class="lista-caratula-row-item font-weight-bold" >{{historial.afipCaratulaEstado}}</td>
             </tr>
         </tbody>
     </table>
 </div>
 <div *ngIf="esNoExisteRegistros">
     No se encontraron registros para los filtros ingresados.
-</div> 
+</div>
 <!--Paginado -->
 <nav aria-label="Page navigation example" class="centrado" *ngIf="!esNoExisteRegistros">
     <ul class="pagination justify-content-center paginado-buque-fondo">
@@ -57,8 +57,8 @@
             </a>
         </li>
     </ul>
-</nav> 
-    
+</nav>
+
 
 <ng-template #editCaratula let-modal>
     <app-modal-crear-caratula (editFinish)="editFinish($event)" [id]="caratulaId" [title]="'Rectificar Caratula Nro '+ caratulaImo"></app-modal-crear-caratula>

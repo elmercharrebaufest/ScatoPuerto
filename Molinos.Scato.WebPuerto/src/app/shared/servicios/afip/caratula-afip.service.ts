@@ -4,11 +4,23 @@ import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
 
+export interface EstadosCaratulaAFIP {
+  Aceptado: string;
+  Rectificado: string;
+  Enviado: string;
+  Eliminado: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CaratulaAfipService {
-
+  public estados: EstadosCaratulaAFIP = {
+    Aceptado: "Aceptado",
+    Rectificado: "Rectificado",
+    Enviado: "Enviado (Ya asociado a COEM)",
+    Eliminado: "Eliminado"
+  };
   private url: string = environment.apiUrl;
   constructor(private http: HttpClient) { }
 

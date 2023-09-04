@@ -2,7 +2,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Caratula } from '@ScatoModels/afip/caratula';
-import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
+import { CaratulaAfipService, EstadosCaratulaAFIP } from '@ScatoServicios/afip/caratula-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -23,6 +23,7 @@ export class CaratulaAfipComponent implements OnInit {
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+  public estados: EstadosCaratulaAFIP;
 
   // Paginado
   currentPage: number = 1; // Página actual
@@ -34,8 +35,13 @@ export class CaratulaAfipComponent implements OnInit {
   showEllipsisEnd: boolean = false; // Mostrar puntos suspensivos al final
   displayedItems: any[] = []; // Elementos mostrados en la tabla
 
-  constructor(private modalService: NgbModal, private confirmationDialogService: ConfirmationDialogService, private caratulaService: CaratulaAfipService) 
-  {   }
+  constructor(
+    private modalService: NgbModal,
+    private confirmationDialogService: ConfirmationDialogService,
+    private caratulaService: CaratulaAfipService
+  ) {
+    this.estados = caratulaService.estados;
+  }
 
   ngOnInit(): void {
     this.listarCaratulas();
@@ -62,10 +68,10 @@ export class CaratulaAfipComponent implements OnInit {
       this.caratulaId = historial.id;
       this.caratulaImo = historial.identificadorBuque
       this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
-      .then(() => {     
+      .then(() => {
         console.log('_modalService.open');
       })
-      .catch((res) => { console.log(res) }); 
+      .catch((res) => { console.log(res) });
   }
 
   eliminarCaratula(id:number,idCaratula:string){

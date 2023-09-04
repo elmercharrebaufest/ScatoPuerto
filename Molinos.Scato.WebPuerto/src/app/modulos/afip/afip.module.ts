@@ -15,7 +15,9 @@ import { CoemComponent } from './coem/coem.component';
 import { CodeComponent } from './code/code.component';
 import { ModalCrearCoemComponent } from './coem/modal-crear-coem/modal-crear-coem.component';
 import { ModalCrearCodeComponent } from './code/modal-crear-code/modal-crear-code.component';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
 
 
 @NgModule({
@@ -33,11 +35,14 @@ import { ModalCrearCodeComponent } from './code/modal-crear-code/modal-crear-cod
   ],
   imports: [
     CommonModule,
-    SharedModule, 
+    SharedModule,
     AfipRoutingModule,
     SharedComponentModule,
     NgMultiSelectDropDownModule.forRoot(),
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatAutocompleteModule,
+    MatInputModule
   ]
 })
 export class AfipModule { }
