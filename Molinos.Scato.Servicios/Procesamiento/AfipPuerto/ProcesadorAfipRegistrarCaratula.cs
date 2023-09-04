@@ -32,17 +32,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var caratula = comando.Dto;
                 if (caratula == null) { throw new Exception("La caratula recibida es nula"); }
 
-                var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
-                var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
-                //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
-                if (cuerpoRespuesta.Codigo != 0)
-                {
-                    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                }
-                string caratulaId = cuerpoRespuesta.DescripcionAdicional;
+                // TODO: Implementar comunicación c/ AFIP
+                //var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
+                //var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
+                ////TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
+                //if (cuerpoRespuesta.Codigo != 0)
+                //{
+                //    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                //}
+                //string caratulaId = cuerpoRespuesta.DescripcionAdicional;
+                string caratulaId = Guid.NewGuid().ToString().Substring(0, 16);
 
                 var caratulaDb = this.Conversor.Convertir<AfipCaratulaDto, AfipCaratula>(caratula);
-                caratulaDb.IdentificadorCaratula = Guid.NewGuid().ToString().Substring(0, 16); // TODO: utilizar caratulaId
+                caratulaDb.IdentificadorCaratula = caratulaId;
                 caratulaDb.FechaRegistro = DateTime.Now;
                 caratulaDb.Estado = EstadosCaratulaAFIP.Aceptado;
                 Repositorio.Agregar(caratulaDb);

@@ -1,6 +1,4 @@
-import { EstadoCaratula } from "./estadoCaratula";
-
-export class Caratula { 
+export class Caratula {
     id?:number;
     identificadorCaratula?: string;
     identificadorBuque: string;
@@ -9,7 +7,7 @@ export class Caratula {
     puertoDestino: string;
     nombreMedioTransporte: string;
     fechaRegistro: string;
-    afipCaratulaEstado: EstadoCaratula;
+    estado: string;
 
     numeroPaginado:any=false;
     itinerario:string[]=[];
