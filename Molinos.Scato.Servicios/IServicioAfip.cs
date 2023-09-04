@@ -80,10 +80,10 @@ namespace Molinos.Scato.Servicios
         bool RectificarCoem(AfipCoemDto coem);
 
         [OperationContract]
-        bool AnularCoem(int id);
+        bool AnularCoem(int id, int idEstado);
 
         [OperationContract]
-        bool CerrarCoem(int id);
+        bool CerrarCoem(int id, int idEstado);
 
         [OperationContract]
         bool SolicitarAnulacionCoem(int id);

@@ -206,15 +206,15 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
-        public bool AnularCoem(int id)
+        public bool AnularCoem(int id, int idEstado)
         {
-            var res = this.servicioComandos.Ejecutar(new AfipAnularCoem { Id = id });
+            var res = this.servicioComandos.Ejecutar(new AfipAnularCoem { Id = id, IdEstado = idEstado });
             return !res.HayErrores;
         } 
 
-        public bool CerrarCoem(int id)
+        public bool CerrarCoem(int id, int idEstado)
         {
-            var res = this.servicioComandos.Ejecutar(new AfipCerrarCoem { Id = id });
+            var res = this.servicioComandos.Ejecutar(new AfipCerrarCoem { Id = id, IdEstado = idEstado });
             return !res.HayErrores;
         }
 

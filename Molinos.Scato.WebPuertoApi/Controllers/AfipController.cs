@@ -333,11 +333,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpDelete]
         [Route("api/afip/AnularCoem")]
-        public HttpResponseMessage AnularCoem(int id)
+        public HttpResponseMessage AnularCoem(int id, int idEstado)
         {
             try
             {
-                var resultado = servicioAfip.AnularCaratula(id);
+                var resultado = servicioAfip.AnularCoem(id, idEstado);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -348,11 +348,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPut]
         [Route("api/afip/CerrarCoem")]
-        public HttpResponseMessage CerrarCoem(int id)
+        public HttpResponseMessage CerrarCoem(int id, int idEstado)
         {
             try
             {
-                var resultado = servicioAfip.CerrarCoem(id);
+                var resultado = servicioAfip.CerrarCoem(id, idEstado);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)

@@ -10,5 +10,6 @@ namespace Molinos.Scato.Dominio.Comandos.AfipPuerto
     public class AfipAnularCoem : Comando
     {
         public int Id { get; set; }
+        public int IdEstado { get; set; }
     }
 }

@@ -29,6 +29,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             try
             {
                 var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id);
+                var estado = Repositorio.Obtener<AfipCoemEstado>(comando.IdEstado);
                 if (coemDB == null)
                 {
                     throw new Exception("No existe la COEM con el id especificado");
@@ -43,7 +44,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     {
                         throw new Exception(String.Format("Ocurrió un error al ANULAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                     }
-                    coemDB.AfipCoemEstado.Estado = EstadosCoemAFIP.Anulada;
+
+                    coemDB.AfipCoemEstado = estado;
                     Repositorio.GuardarCambios();
                 }
                 

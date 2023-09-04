@@ -40,7 +40,11 @@ export class CoemAfipService {
     return this.http.get<any>(`${this.url}Afip/ComboCaratulas`, { 'withCredentials': true });
   }
 
-  public eliminarCoem(id:number): Observable<any> {
-    return this.http.post<any>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${id}&idEstado=5`, { 'withCredentials': true });
+  public anularCoem(id:number): Observable<any> {
+    return this.http.post<any>(`${this.url}Afip/AnularCoem?id=${id}&idEstado=5`, { 'withCredentials': true });
+  }
+
+  public cerrarCoem(id:number): Observable<any> {
+    return this.http.post<any>(`${this.url}Afip/CerrarCoem?id=${id}&idEstado=4`, { 'withCredentials': true });
   }
 }

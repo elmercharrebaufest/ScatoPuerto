@@ -70,16 +70,16 @@ export class CoemAfipComponent implements OnInit {
   }
 
   eliminarCoem(id,identificadorCOEM){
-    this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de eliminar la nueva Caratula con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+    this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de eliminar la nueva COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
     .then((confirmed)=>{
       if(confirmed){
         this.load=true;
-        this.coemAfipService.eliminarCoem(id).subscribe((datos)=>{
-          this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Caratula con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar','', null, null, Tipoalerta.Success)
+        this.coemAfipService.anularCoem(id).subscribe((datos)=>{
+          this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La COEM con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar','', null, null, Tipoalerta.Success)
           this.listarCoems();
           this.load = false;
         },(error) => {
-          this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido crear una nueva Caratula, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+          this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido crear una nueva COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
         })
       }
     })
