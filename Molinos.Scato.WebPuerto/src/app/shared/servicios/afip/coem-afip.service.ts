@@ -41,10 +41,14 @@ export class CoemAfipService {
   }
 
   public anularCoem(id:number): Observable<any> {
-    return this.http.post<any>(`${this.url}Afip/AnularCoem?id=${id}&idEstado=5`, { 'withCredentials': true });
+    return this.http.delete<any>(`${this.url}Afip/AnularCoem?id=${id}&idEstado=5`, { 'withCredentials': true });
   }
 
   public cerrarCoem(id:number): Observable<any> {
-    return this.http.post<any>(`${this.url}Afip/CerrarCoem?id=${id}&idEstado=4`, { 'withCredentials': true });
+    return this.http.put<any>(`${this.url}Afip/CerrarCoem?id=${id}&idEstado=4`, { 'withCredentials': true });
+  }
+
+  public solicitarAnulacionCoem(id:number): Observable<any> {
+    return this.http.put<any>(`${this.url}Afip/SolicitarAnulacionCoem?id=${id}`, { 'withCredentials': true });
   }
 }

@@ -25,10 +25,10 @@
                     </div>
                 </td>
                 <td class="lista-coem-row-item">
-                    <div class='icon-editar cursor' *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="editarCoem(historial,editCoem)"></div>
+                    <i class="fa fa-pencil fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="editarCoem(historial,editCoem)"></i>                   
                 </td>
                 <td class="lista-coem-row-item" >
-                    <img src="assets/trashIcon-no-border.svg" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="eliminarCoem(historial.id, historial.identificadorCOEM)" class="eliminar cursor">
+                    <i class="fa fa-trash-o fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="eliminarCoem(historial.id, historial.identificadorCOEM)"></i>                                        
                 </td>
             </tr>
         </tbody>
@@ -43,7 +43,7 @@
         <ul class="pagination justify-content-center paginado-buque-fondo">
             <li [ngClass]="{'page-item disabled': currentPage === 1}">
                 <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
-                 << </a>
+                << </a>
             </li>
             <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
             <li *ngFor="let page of visiblePages"

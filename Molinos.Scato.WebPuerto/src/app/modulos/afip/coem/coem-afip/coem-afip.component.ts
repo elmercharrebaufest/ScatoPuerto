@@ -75,11 +75,16 @@ export class CoemAfipComponent implements OnInit {
       if(confirmed){
         this.load=true;
         this.coemAfipService.anularCoem(id).subscribe((datos)=>{
-          this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La COEM con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar','', null, null, Tipoalerta.Success)
-          this.listarCoems();
+          if (!datos) {
+            this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);  
+          }else{
+            this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La COEM con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar','', null, null, Tipoalerta.Success)
+            this.listarCoems();
+          }
+          
           this.load = false;
         },(error) => {
-          this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido crear una nueva COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+          this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
         })
       }
     })

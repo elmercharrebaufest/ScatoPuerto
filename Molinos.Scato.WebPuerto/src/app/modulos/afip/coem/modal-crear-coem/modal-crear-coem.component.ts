@@ -149,7 +149,7 @@ export class ModalCrearCoemComponent implements OnInit {
       .registrarCoem(coem)
       .subscribe(
         (data) => {
-          console.log('cre')
+         
           this.editOCrearFinish.emit();
             this.confirmationDialogService.confirm(
               '¡Felicitaciones!',
@@ -160,7 +160,7 @@ export class ModalCrearCoemComponent implements OnInit {
               null,
               null,
               Tipoalerta.Success
-            );
+            )
         },
         (error) => {
           this.confirmationDialogService.confirm(
