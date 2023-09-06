@@ -28,9 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             try
             {
                 var coem = comando.Dto;
-               
-                var contenedoresConCargaDB = Repositorio.Listar<AfipCoemContenedorConCarga>(x => x.AfipCoem.Id == coem.Id);
-                var contenedoresVaciosDB = Repositorio.Listar<AfipCoemContenedorVacio>(x => x.AfipCoem.Id == coem.Id);
+                               
                 var mercaderiasSueltasDB = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);                
 
                 var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id);
@@ -39,18 +37,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception("No existe la COEM con el id especificado");
                 }
 
-                var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
-                var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
-                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                {
-                    throw new Exception(String.Format("Ocurrió un error al rectificar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                }
-
-                var contenedoresConCarga = this.Conversor.ConvertirList<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(coem.ContenedoresConCarga);
-                contenedoresConCargaDB = contenedoresConCarga;
-
-                var contenedoresVacios = this.Conversor.ConvertirList<AfipCoemContenedorVacioDto, AfipCoemContenedorVacio>(coem.ContenedoresVacios);
-                contenedoresVaciosDB = contenedoresVacios;
+                //var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
+                //var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
+                //if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                //{
+                //    throw new Exception(String.Format("Ocurrió un error al rectificar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                //}
 
                 var mercaderiasSueltas = this.Conversor.ConvertirList<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(coem.MercaderiasSueltas);
                 mercaderiasSueltasDB = mercaderiasSueltas;
@@ -59,8 +51,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             }
             catch (Exception ex)
             {
-                resultado.Error("", Textos.Error_ActualizarGenerico);
-                Log.Error("Error al rectificar Coem {0}", ex.StackTrace);                
+                resultado.Error("", ex.Message);
+                Log.Error("Error al rectificar Coem {0}", ex.Message);                
             }
             return resultado;
         }
