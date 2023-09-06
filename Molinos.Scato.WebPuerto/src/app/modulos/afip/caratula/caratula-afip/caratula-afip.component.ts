@@ -15,11 +15,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class CaratulaAfipComponent implements OnInit {
 
   // #region Variables
-  private listaHistorialCaratulas: Caratula[]=[];
+  private listaHistorialCaratulas: Caratula[] = [];
   public cargarCaratulas: boolean = true;
-  caratulaId:number;
-  caratulaImo:string;
-  esNoExisteRegistros:boolean= true;
+  caratulaId: number;
+  caratulaImo: string;
+  esNoExisteRegistros: boolean = true;
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -47,11 +47,13 @@ export class CaratulaAfipComponent implements OnInit {
     this.listarCaratulas();
   }
 
-  listarCaratulas(){
-    this.caratulaService.listarCaratulas().subscribe((datos)=>{
-      this.listaHistorialCaratulas=datos;
-      this.listaHistorialCaratulas.length == 0 ? this.esNoExisteRegistros : this.esNoExisteRegistros = false;
-      this.cargarCaratulas=false;
+
+  listarCaratulas() {
+    this.cargarCaratulas = true;
+    this.caratulaService.listarCaratulas().subscribe((datos) => {
+      this.listaHistorialCaratulas = datos;
+      this.esNoExisteRegistros = !Boolean(datos.length);
+
       // Calcular el total de elementos y las páginas
       this.totalItems = this.listaHistorialCaratulas.length;
       this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
@@ -59,33 +61,38 @@ export class CaratulaAfipComponent implements OnInit {
       // Mostrar los elementos de la página actual
       this.displayedItems = this.getItemsForPage(this.currentPage);
 
-        // Calcular las páginas visibles
+      // Calcular las páginas visibles
       this.calculateVisiblePages();
-    })
+    }, (error) => {
+      console.error(error);
+      this.confirmationDialogService.confirm(`¡Error!`, 'No se han podido cargar correctamente las Caratulas', 'Cerrar', '', null, null, Tipoalerta.Error);
+    }, () => {
+      this.cargarCaratulas = false;
+    });
   }
 
-  public editarCaratula(historial,modal){
-      this.caratulaId = historial.id;
-      this.caratulaImo = historial.identificadorBuque
-      this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
+  public editarCaratula(historial, modal) {
+    this.caratulaId = historial.id;
+    this.caratulaImo = historial.identificadorBuque
+    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
       .then(() => {
         console.log('_modalService.open');
       })
       .catch((res) => { console.log(res) });
   }
 
-  eliminarCaratula(id:number,idCaratula:string){
-    this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de eliminar la nueva Caratula con id: ${idCaratula}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
-    .then((confirmed)=>{
-      if(confirmed){
-        this.caratulaService.eliminarCaratula(id).subscribe((datos)=>{
-          this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Caratula con id: ${idCaratula} fue eliminada con éxito!`, 'Cerrar','', null, null, Tipoalerta.Success)
-          this.listarCaratulas();
-        },(error) => {
-          this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido crear una nueva Caratula, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
-        })
-      }
-    })
+  public async eliminarCaratula(id: number, idCaratula: string) {
+    const confirm = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de anular la Caratula con id: ${idCaratula}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+    if (!confirm) {
+      return;
+    }
+    this.caratulaService.eliminarCaratula(id).subscribe((datos) => {
+      this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Caratula con id: ${idCaratula} fue anulada con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
+      this.listarCaratulas();
+    }, (error) => {
+      console.error(error);
+      this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la Caratula, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+    });
   }
 
   editFinish(event) {
@@ -98,6 +105,27 @@ export class CaratulaAfipComponent implements OnInit {
 
   tienePermisoEliminarCaratula() {
     return this.user.permisos.find(p => p === this.permisosScato.Caratula_Eliminar);
+  }
+
+  public async onCambiarEstado(event: Event, caratula: Caratula) {
+    const input = event.target as HTMLInputElement;
+    const confirm = await this.confirmationDialogService.confirm(
+      'Advertencia',
+      `¿Está seguro de cambiar el estado de la Caratula con id: ${caratula.id} de "${caratula.estado}" a "${input.value}"?`,
+      'Sí', 'Cancelar', null, null, Tipoalerta.Warning
+    );
+    if (!confirm) {
+      input.value = caratula.estado;
+      return;
+    }
+    this.cargarCaratulas = true;
+    this.caratulaService.cambiarEstadoCaratula(caratula.id, input.value).subscribe(
+      () => this.listarCaratulas(),
+      (error) => {
+        console.error(error);
+        this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado de la Caratula', 'Cerrar', '', null, null, Tipoalerta.Error);
+      }, () => this.cargarCaratulas = false
+    );
   }
 
   // Paginado

@@ -21,22 +21,34 @@ export class CaratulaAfipService {
     Enviado: "Enviado (Ya asociado a COEM)",
     Eliminado: "Eliminado"
   };
-  private url: string = environment.apiUrl;
+  private url: string = environment.apiUrl + 'afip/';
   constructor(private http: HttpClient) { }
 
-  public registrarOEditarCaratula(caratula:Caratula): Observable<any[]> {
-    return this.http.post<any[]>(`${this.url}Afip/RegistrarCaratula`, caratula ,{ 'withCredentials': true });
+  public registrarCaratula(caratula: Caratula): Observable<any[]> {
+    return this.http.post<any[]>(this.url + 'RegistrarCaratula', caratula, { 'withCredentials': true });
   }
 
-  public listarCaratulas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url}Afip/ListarCaratulas`, { 'withCredentials': true });
+  public rectificarCaratula(caratula: Caratula): Observable<any> {
+    return this.http.put<any>(this.url + 'RectificarCaratula', caratula, { withCredentials: true });
   }
 
-  public obtenerCaratulaId(id:number): Observable<Caratula> {
-    return this.http.get<Caratula>(`${this.url}Afip/ObtenerCaratula?id=${id}`, { 'withCredentials': true });
+  public listarCaratulas(): Observable<Caratula[]> {
+    return this.http.get<Caratula[]>(this.url + 'ListarCaratulas', { withCredentials: true });
   }
 
-  public eliminarCaratula(id:number): Observable<any> {
-    return this.http.post<any>(`${this.url}Afip/CambiarEstadoCaratula?id=${id}&idEstado=4`, { 'withCredentials': true });
+  public listarEstadosCaratula(): Observable<string[]> {
+    return this.http.get<string[]>(this.url + 'ListarEstadosCaratula', { withCredentials: true });
+  }
+
+  public obtenerCaratulaId(id: number): Observable<Caratula> {
+    return this.http.get<Caratula>(`${this.url}ObtenerCaratula?id=${id}`, { withCredentials: true });
+  }
+
+  public cambiarEstadoCaratula(id: number, estado: string): Observable<any> {
+    return this.http.put<any>(`${this.url}CambiarEstadoCaratula?id=${id}&estado=${estado}`, null);
+  }
+
+  public eliminarCaratula(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.url}AnularCaratula?id=${id}`, { withCredentials: true });
   }
 }

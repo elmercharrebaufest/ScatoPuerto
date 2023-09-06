@@ -26,12 +26,20 @@
                 <td class="lista-caratula-row-item">{{ historial.fechaZarpada | date:'dd/MM/yyyy'}}</td>
                 <td class="lista-caratula-row-item">{{ historial.fechaRegistro | date:'dd/MM/yyyy'}}</td>
                 <td class="lista-caratula-row-item" >
-                    <div *ngIf="historial.afipCaratulaEstado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" class='icon-editar cursor'></div>
+                    <div *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" class='icon-editar cursor'></div>
                 </td>
                 <td class="lista-caratula-row-item">
-                    <img *ngIf="historial.afipCaratulaEstado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
+                    <img *ngIf="historial.estado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
-                <td class="lista-caratula-row-item font-weight-bold" >{{historial.afipCaratulaEstado}}</td>
+                <!-- <td class="lista-caratula-row-item font-weight-bold" >{{historial.afipCaratulaEstado}}</td> -->
+                <td class="lista-caratula-row-item font-weight-bold" >
+                  <select class="custom-select" (change)="onCambiarEstado($event, historial)">
+                    <option style="display:none"></option>
+                    <option *ngFor="let estado of estados | keyvalue" [ngValue]="estado.value" [selected]="estado.value == historial.estado">
+                      {{estado.value}}
+                    </option>
+                  </select>
+                </td>
             </tr>
         </tbody>
     </table>

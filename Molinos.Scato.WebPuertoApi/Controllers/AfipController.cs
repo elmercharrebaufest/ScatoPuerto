@@ -227,7 +227,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("api/afip/CambiarEstadoCaratula")]
         public HttpResponseMessage CambiarEstadoCaratula(int id, string estado)
         {

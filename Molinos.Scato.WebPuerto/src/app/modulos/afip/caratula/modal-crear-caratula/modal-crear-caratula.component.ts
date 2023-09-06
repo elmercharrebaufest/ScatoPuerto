@@ -174,7 +174,9 @@ export class ModalCrearCaratulaComponent implements OnInit {
     caratula.codigoLugarOperativo = form.get('codigoLugarOperativo').value.codigo;
     caratula.puertoDestino = form.get('puertoDestino').value.codigo;
 
-    this.caratulaAfipService.registrarOEditarCaratula(caratula).subscribe(async (data) => {
+    const observable = nueva ? this.caratulaAfipService.registrarCaratula(caratula) : this.caratulaAfipService.rectificarCaratula(caratula);
+
+    observable.subscribe(async (data) => {
       if (!data) {
         mostrarError();
         return;
