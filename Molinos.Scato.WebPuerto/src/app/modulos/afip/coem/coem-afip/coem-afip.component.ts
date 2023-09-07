@@ -70,7 +70,7 @@ export class CoemAfipComponent implements OnInit {
   }
 
   eliminarCoem(id,identificadorCOEM){
-    this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de eliminar la nueva COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+    this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de eliminar la COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
     .then((confirmed)=>{
       if(confirmed){
         this.load=true;
@@ -85,6 +85,27 @@ export class CoemAfipComponent implements OnInit {
           this.load = false;
         },(error) => {
           this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+        })
+      }
+    })
+  }
+
+  cerrarCoem(id, identificadorCOEM){
+    this.confirmationDialogService.confirm('Advertencia',`¿Está seguro de <b>CERRAR</b> la COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+    .then((confirmed) => {
+      if (confirmed) {
+        this.load = true;
+        this.coemAfipService.cerrarCoem(id).subscribe((datos) => {
+          if (!datos) {
+            this.confirmationDialogService.confirm('¡Error!', `No se ha podido cerrar la COEM, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
+          } else {
+            this.confirmationDialogService.confirm('¡Felicitaciones', `¡La COEM con id ${identificadorCOEM} se ha podido cerrar con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success);
+            this.listarCoems();
+          }
+
+          this.load = false;
+        }, (error) => {
+          this.confirmationDialogService.confirm('¡Error!', `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
         })
       }
     })

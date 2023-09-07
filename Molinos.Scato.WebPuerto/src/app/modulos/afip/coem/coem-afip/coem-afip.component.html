@@ -8,8 +8,8 @@
             <th>Caratula</th>
             <th>Mercaderías Sueltas</th>
             <th>Estados</th>
-            <th>Rectificar COEM</th>
-            <th>Anular COEM</th>
+            <th>Acciones</th>
+         
         </thead>
         <tbody *ngFor="let historial of getListaHistorialCoem()">
             <tr class="lista-coem-row" >
@@ -25,11 +25,10 @@
                     </div>
                 </td>
                 <td class="lista-coem-row-item">
-                    <i class="fa fa-pencil fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="editarCoem(historial,editCoem)"></i>                   
-                </td>
-                <td class="lista-coem-row-item" >
-                    <i class="fa fa-trash-o fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="eliminarCoem(historial.id, historial.identificadorCOEM)"></i>                                        
-                </td>
+                    <button class="btn btn-light"><i class="fa fa-pencil fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="editarCoem(historial,editCoem)" title="RECTIFICAR"></i></button>
+                    <button class="btn btn-light"><i class="fa fa-trash-o fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="eliminarCoem(historial.id, historial.identificadorCOEM)" title="ANULAR"></i></button>
+                    <button class="btn btn-light"><i class="fa fa-check-circle-o fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="cerrarCoem(historial.id, historial.identificadorCOEM)" title="CERRAR"></i></button>                    
+                </td>              
             </tr>
         </tbody>
     </table>
