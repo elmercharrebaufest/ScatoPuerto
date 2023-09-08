@@ -111,7 +111,7 @@ export class CaratulaAfipComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const confirm = await this.confirmationDialogService.confirm(
       'Advertencia',
-      `¿Está seguro de cambiar el estado de la Caratula con id: ${caratula.id} de "${caratula.estado}" a "${input.value}"?`,
+      `¿Está seguro de cambiar el estado de la Caratula con id: ${caratula.identificadorCaratula} de "${caratula.estado}" a "${input.value}"?`,
       'Sí', 'Cancelar', null, null, Tipoalerta.Warning
     );
     if (!confirm) {

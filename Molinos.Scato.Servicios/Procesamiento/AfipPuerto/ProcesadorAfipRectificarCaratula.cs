@@ -40,7 +40,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception("No existe la carátula con el id especificado");
                 }
 
-                caratula.IdentificadorCaratula = caratulaDb.IdentificadorCaratula; // Este identificado no viene en el DTO ya que no debería variar
+                // Campos que no vienen en el dto pero que igual no deben variar
+                caratula.IdentificadorCaratula = caratulaDb.IdentificadorCaratula;
+                caratula.FechaRegistro = caratulaDb.FechaRegistro;
 
                 //TODO: Implementar comunicación con AFIP
                 //var response = this.comunicacionEmbarqueServicioHelper.RectificarCaratula(caratula);
