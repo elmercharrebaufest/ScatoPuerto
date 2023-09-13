@@ -37,6 +37,12 @@ export class ModalCrearCoemComponent implements OnInit {
   idCaratula: string;
   operacionNuevo: boolean = true;
 
+  cuitATA : string = '';
+  codigoEmbalaje : string = '';
+  cantidadBultos : number = 0;
+  peso : number = 0;
+  identificadorDeclaracion : string = '';
+
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
