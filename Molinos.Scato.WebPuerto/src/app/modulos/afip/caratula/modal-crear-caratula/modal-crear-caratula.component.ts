@@ -6,7 +6,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { AfipLugarOperativo, AfipPuerto, AfipPuntoAduanero } from '@ScatoModels/afip/tablas-afip';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
-import { EMPTY, Observable, Subject, forkJoin } from 'rxjs';
+import { of, Observable, forkJoin } from 'rxjs';
 import { map, startWith, debounceTime } from 'rxjs/operators';
 import { AbstractControl } from '@angular/forms';
 import { Caratula } from '@ScatoModels/afip/caratula';
@@ -26,9 +26,8 @@ export class ModalCrearCaratulaComponent implements OnInit {
   submitted = false;
   titleCaratula: string
   crearEditarCaratulaForm: FormGroup;
-  load: boolean = true;
-
-  private errorSubject = new Subject<any>();
+  public cargando: boolean;
+  public mensajeCarga: string;
 
   private aduanas: AfipPuntoAduanero[] = [];
   private lugaresOperativos: AfipLugarOperativo[] = [];
@@ -50,42 +49,41 @@ export class ModalCrearCaratulaComponent implements OnInit {
 
   ngOnInit(): void {
 
-    const onCatchError = (error: any) => {
-      this.errorSubject.next(error);
-      return EMPTY;
-    };
-
-    this.errorSubject.pipe().subscribe(error => {
-      console.error(error);
-      this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al cargar los datos', 'Cerrar', '', null, null, Tipoalerta.Error);
-      this.errorSubject.unsubscribe();
-    });
-
+    this.titleCaratula = this.title;
+    const obtenerCaratula = this.title.includes('Nueva') ? of(null) : this.caratulaAfipService.obtenerCaratulaId(this.id);
+    this.cargando = true;
+    this.mensajeCarga = 'Cargando datos';
     forkJoin([
       this.tablasAfipService.listarPuntosAduaneros(),
       this.tablasAfipService.listarLugaresOperativos(),
-      this.tablasAfipService.listarPuertos()
-    ]).subscribe(([aduanas, lugaresOperativos, puertos]) => {
+      this.tablasAfipService.listarPuertos(),
+      obtenerCaratula
+    ]).subscribe(([aduanas, lugaresOperativos, puertos, caratula]) => {
       this.aduanas = aduanas.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
-      this.lugaresOperativos = lugaresOperativos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1);;
-      this.puertos = puertos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1);
-    }, onCatchError);
-
-    this.titleCaratula = this.title;
-    if (this.title.includes('Nueva')) {
-      return;
-    }
-    this.caratulaAfipService.obtenerCaratulaId(this.id).subscribe((datos) => {
-      this.crearEditarCaratulaForm.controls['id'].setValue(datos.id);
-      this.crearEditarCaratulaForm.controls['fechaArribo'].setValue(datos.fechaArribo);
-      this.crearEditarCaratulaForm.controls['fechaZarpada'].setValue(datos.fechaZarpada);
-      // this.crearEditarCaratulaForm.controls['puertoDestino'].setValue(datos.puertoDestino);
-      this.crearEditarCaratulaForm.controls['codigoAduana'].setValue(datos.codigoAduana);
-      this.crearEditarCaratulaForm.controls['codigoLugarOperativo'].setValue(datos.codigoLugarOperativo);
-      this.crearEditarCaratulaForm.controls['via'].setValue(datos.via);
-      this.crearEditarCaratulaForm.controls['identificadorBuque'].setValue(datos.identificadorBuque);
-      this.crearEditarCaratulaForm.controls['nombreMedioTransporte'].setValue(datos.nombreMedioTransporte);
-    }, onCatchError);
+      this.lugaresOperativos = lugaresOperativos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
+      this.puertos = puertos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
+      if (!caratula) {
+        return;
+      }
+      for (let [prop, val] of Object.entries(caratula)) {
+        switch (prop) {
+          case 'codigoAduana':
+            val = aduanas.find(aduana => aduana.codigo == val);
+            break;
+          case 'codigoLugarOperativo':
+            val = lugaresOperativos.find(lugarOp => lugarOp.codigo == val);
+            break;
+          case 'puertoDestino':
+            val = puertos.find(puerto => puerto.codigo == val);
+        }
+        this.crearEditarCaratulaForm.get(prop)?.setValue(val);
+      }
+    }, (error) => {
+      console.error(error);
+      this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al cargar los datos', 'Cerrar', '', null, null, Tipoalerta.Error);
+    }, () => {
+      this.cargando = false;
+    });
   }
 
   public getNombre(option: AfipPuntoAduanero | AfipLugarOperativo | AfipPuerto) {
@@ -156,7 +154,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
       return;
     }
     const nueva = this.title.includes('Nueva');
-    if ((!nueva && form.get('id').value) || (nueva && this.crearEditarCaratulaForm.get('id').value)) {
+    if ((!nueva && !form.get('id').value) || (nueva && form.get('id').value)) {
       this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
       return;
     }
@@ -175,7 +173,8 @@ export class ModalCrearCaratulaComponent implements OnInit {
     caratula.puertoDestino = form.get('puertoDestino').value.codigo;
 
     const observable = nueva ? this.caratulaAfipService.registrarCaratula(caratula) : this.caratulaAfipService.rectificarCaratula(caratula);
-
+    this.cargando = true;
+    this.mensajeCarga = 'Guardando caratula';
     observable.subscribe(async (data) => {
       if (!data) {
         mostrarError();
@@ -187,6 +186,8 @@ export class ModalCrearCaratulaComponent implements OnInit {
     }, error => {
       console.error(error);
       mostrarError();
+    }, () => {
+      this.cargando = false
     });
   }
 
