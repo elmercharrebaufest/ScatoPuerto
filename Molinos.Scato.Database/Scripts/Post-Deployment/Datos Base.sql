@@ -769,6 +769,7 @@ if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'ADC S.R.L.
 --Scripts TipoContrato
 if not exists(select 1 from TipoDeContrato where Descripcion = 'FOB') begin insert into TipoDeContrato (Descripcion) values ('FOB') end
 if not exists(select 1 from TipoDeContrato where Descripcion = 'CIF') begin insert into TipoDeContrato (Descripcion) values ('CIF') end
+if not exists(select 1 from TipoDeContrato where Descripcion = 'FAS') begin insert into TipoDeContrato (Descripcion) values ('FAS') end
 
 --Scripts MuelleDeCarga
 if not exists(select 1 from MuelleDeCarga where Descripcion = 'San Benito') begin insert into MuelleDeCarga (Descripcion) values ('San Benito') end
