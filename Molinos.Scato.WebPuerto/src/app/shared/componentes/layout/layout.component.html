@@ -70,8 +70,20 @@
           <span *ngIf='opened'>Historial Embarques</span>
         </div>
       </a>
-    
-
+      <hr *ngIf='tienePermiso("Caratula_Visualizar")'>
+      <a routerLink="/afip/caratula" *ngIf='tienePermiso("Caratula_Visualizar")'>
+        <div (click)="closeSubmenus(menuSide)" class="item-container" [class.active-item]='rutaActual == "caratulas"'>
+          <div class="icon-buques"></div>
+          <span *ngIf="opened">Caratulas</span>
+        </div>
+      </a>
+      <hr *ngIf='tienePermiso("Coem_Visualizar")'>
+      <a routerLink="/afip/coem" *ngIf='tienePermiso("Coem_Visualizar")'>
+        <div (click)="closeSubmenus(menuSide)" class="item-container" [class.active-item]='rutaActual == "coems"'>
+          <div class="icon-buques"></div>
+          <span *ngIf="opened">Coems</span>
+        </div>
+      </a>
       <!-- <hr *ngIf='tienePermiso(650)'>
       <a routerLink='/administracion' *ngIf='tienePermiso(650)'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "administracion"'>

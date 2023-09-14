@@ -804,6 +804,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Vapor_Visualizar')); end
 
 
+--Visualizar Caratula AFIP
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Caratula_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Caratula_Visualizar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Caratula_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Caratula_Visualizar')); end
+
+--Visualizar COEM AFIP
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Coem_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Coem_Visualizar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Coem_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Coem_Visualizar')); end
 
 --Editar vapor
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Vapor_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Vapor_Editar'); end
