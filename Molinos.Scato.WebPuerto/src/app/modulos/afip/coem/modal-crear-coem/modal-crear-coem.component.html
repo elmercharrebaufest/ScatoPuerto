@@ -1,6 +1,6 @@
 
 
-    
+
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{titleCoem}}</h5>
@@ -38,13 +38,13 @@
                         <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="cantidadBultos" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cantidadBultos').invalid}" required></td>
                         <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="peso" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('peso').invalid}" required></td>
                         <td class="lista-coem-row-item">
-                          <input type="text" class="form-control" formControlName="identificadorDeclaracion" placeholder="" 
+                          <input type="text" class="form-control" formControlName="identificadorDeclaracion" placeholder=""
                           [ngClass]="{'input-error': submitted && mercaderia.get('identificadorDeclaracion').invalid}"
-                           maxlength="16" required 
+                           maxlength="17" required
                            [(ngModel)]="identificadorDeclaracion"
-                           mask="00000SSSA00000S"
+                           mask="00000SSAA000000S"
                            [showMaskTyped]="true"
-                           [dropSpecialCharacters]="false"                                                 
+                           [dropSpecialCharacters]="false"
                           ></td>
                         <td class="lista-coem-row-item">
                           <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer"
@@ -55,8 +55,8 @@
                   </tbody>
                   </table>
                 </div>
-              </form> 
-            
+              </form>
+
             </div>
         <div class="modal-footer justify-content-center">
           <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onCrearCoem()">Guardar</button>

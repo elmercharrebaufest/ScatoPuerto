@@ -117,6 +117,10 @@ namespace Molinos.Scato.Servicios.Impl
         public bool RegistrarCaratula(AfipCaratulaDto caratula)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRegistrarCaratula { Dto = caratula });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 

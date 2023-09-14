@@ -165,7 +165,10 @@ export class ModalCrearCaratulaComponent implements OnInit {
     }
 
     form.get('puertoDestino').enable();
-    const mostrarError = () => this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
+    const mostrarError = () => {
+      this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
+      this.cargando = false;
+    };
 
     const caratula: Caratula = form.value;
     caratula.codigoAduana = form.get('codigoAduana').value.codigo;
@@ -177,17 +180,17 @@ export class ModalCrearCaratulaComponent implements OnInit {
     this.mensajeCarga = 'Guardando caratula';
     observable.subscribe(async (data) => {
       if (!data) {
+        console.error(data);
         mostrarError();
         return;
       }
       this.editOCrearFinish.emit();
       await this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${nueva ? 'creado una nueva' : 'editado la'} Caratula con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      this.cargando = false;
       this.modalService.dismissAll();
     }, error => {
       console.error(error);
       mostrarError();
-    }, () => {
-      this.cargando = false
     });
   }
 

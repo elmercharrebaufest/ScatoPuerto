@@ -35,12 +35,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception("No existe la COEM con el id especificado");
                 }
 
-                //var res = comunicacionEmbarqueServicioHelper.CerrarCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
-                //var cuerpoRespuesta = res.Body.CerrarCOEMResult.ListaErrores[0];
-                //if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                //{
-                //    throw new Exception(String.Format("Ocurrió un error al CERRAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                //}
+                var res = comunicacionEmbarqueServicioHelper.CerrarCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
+                var cuerpoRespuesta = res.Body.CerrarCOEMResult.ListaErrores[0];
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al CERRAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
                 coemDB.AfipCoemEstado = estado;
                 Repositorio.GuardarCambios();
             }

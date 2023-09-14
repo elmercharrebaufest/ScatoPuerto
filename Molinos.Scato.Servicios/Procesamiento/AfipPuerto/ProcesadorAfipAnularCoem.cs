@@ -38,12 +38,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 //Se anula la COEM, siempre que esta se encuentre en el estado en CURSO/REGISTRADA, identificada por un identificador de Caratula
                 if (coemDB.AfipCoemEstado.Estado == EstadosCoemAFIP.Registrada)
                 {
-                    //var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
-                    //var cuerpoRespuesta = res.Body.AnularCOEMResult.ListaErrores[0];
-                    //if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                    //{
-                    //    throw new Exception(String.Format("Ocurrió un error al ANULAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                    //}
+                    var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
+                    var cuerpoRespuesta = res.Body.AnularCOEMResult.ListaErrores[0];
+                    if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                    {
+                        throw new Exception(String.Format("Ocurrió un error al ANULAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    }
 
                     coemDB.AfipCoemEstado = estado;
                     Repositorio.GuardarCambios();

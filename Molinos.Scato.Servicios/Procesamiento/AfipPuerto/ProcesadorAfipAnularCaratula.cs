@@ -31,16 +31,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     throw new Exception("No existe la carátula con el id especificado");
                 }
-                
+
                 // TODO: Revisar que todas sus COEM se encuentren anuladas, caso contrario impedir anulación
-                
+
                 // TODO: Implementar comunicación con AFIPig
-                //var res = comunicacionEmbarqueServicioHelper.AnularCaratula(caratulaDb.IdentificadorCaratula);
-                //var cuerpoRespuesta = res.Body.AnularCaratulaResult.ListaErrores[0];
-                //if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                //{
-                //    throw new Exception(String.Format("Ocurrió un error al anular la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                //}
+                var res = comunicacionEmbarqueServicioHelper.AnularCaratula(caratulaDb.IdentificadorCaratula);
+                var cuerpoRespuesta = res.Body.AnularCaratulaResult.ListaErrores[0];
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al anular la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
                 caratulaDb.Estado = EstadosCaratulaAFIP.Eliminado;
                 Repositorio.GuardarCambios();
             }
