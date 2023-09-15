@@ -36,7 +36,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
                 var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
                 //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
-                if (cuerpoRespuesta.Codigo != 0 || !cuerpoRespuesta.DescripcionAdicional.StartsWith("Identificador:"))
+                if (cuerpoRespuesta.Codigo != 0)
                 {
                     throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                 }

@@ -34,16 +34,17 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception("No existe la COEM con el id expecificado");
                 }
 
-                if (coemDB.AfipCoemEstado.Estado == EstadosCoemAFIP.Registrada || coemDB.AfipCoemEstado.Estado == EstadosCoemAFIP.Presentada)
+                if (coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Registrada && coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Presentada)
                 {
-                    var res = comunicacionEmbarqueServicioHelper.SolicitarAnulacionCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
-                    var cuerpoRespuesta = res.Body.SolicitarAnulacionCOEMResult.ListaErrores[0];
-                    if(cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                    {
-                        throw new Exception(String.Format("Ocurrió un error al SOLICITAT_ANULACION de la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                    }
-                    Repositorio.GuardarCambios();                    
-                }                
+                    throw new Exception("La COEM debe estar en estado Registrada (REG) o Presentada (PRE) para poder solicitar anulación");
+                }
+                var res = comunicacionEmbarqueServicioHelper.SolicitarAnulacionCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
+                var cuerpoRespuesta = res.Body.SolicitarAnulacionCOEMResult.ListaErrores[0];
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al SOLICITAT_ANULACION de la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
+                Repositorio.GuardarCambios();
             }
             catch (Exception e)
             {
