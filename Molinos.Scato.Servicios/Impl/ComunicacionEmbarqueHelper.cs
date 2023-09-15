@@ -39,7 +39,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                this.cuitRepresentada = 20040410024;
+                this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -65,7 +65,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                this.cuitRepresentada = 20040410024;
+                this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -73,7 +73,10 @@ namespace Molinos.Scato.Servicios.Impl
                 RectificarCaratulaRequest1 rectificarCaratulaRequest = new RectificarCaratulaRequest1(
                     new RectificarCaratulaRequest1Body
                     {
-                        argRectificarCaratula = new RectificarCaratulaRequest { Caratula = this.conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto) },
+                        argRectificarCaratula = new RectificarCaratulaRequest { 
+                            Caratula = this.conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto),
+                            IdentificadorCaratula = afipCaratulaDto.IdentificadorCaratula
+                        },
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                     }
                 );
@@ -91,7 +94,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                this.cuitRepresentada = 20040410024;
+                this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -117,7 +120,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                this.cuitRepresentada = 20040410024;
+                this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -142,7 +145,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                this.cuitRepresentada = 20040410024;
+                this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -165,7 +168,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                this.cuitRepresentada = 20040410024;
+                this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -188,7 +191,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            this.cuitRepresentada = 20040410024;
+            this.cuitRepresentada = 30715118773;
             this.rol = "DEPO";
             this.tipoAgente = "DEPO";
             this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -205,7 +208,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            this.cuitRepresentada = 20040410024;
+            this.cuitRepresentada = 30715118773;
             this.rol = "DEPO";
             this.tipoAgente = "DEPO";
             this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);

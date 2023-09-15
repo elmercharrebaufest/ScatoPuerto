@@ -37,12 +37,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception("No existe la COEM con el id especificado");
                 }
 
-                //var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
-                //var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
-                //if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                //{
-                //    throw new Exception(String.Format("Ocurrió un error al rectificar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                //}
+                var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
+                var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al rectificar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
 
                 var mercaderiasSueltas = this.Conversor.ConvertirList<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(coem.MercaderiasSueltas);
                 mercaderiasSueltasDB = mercaderiasSueltas;

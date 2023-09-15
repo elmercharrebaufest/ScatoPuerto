@@ -45,12 +45,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 caratula.FechaRegistro = caratulaDb.FechaRegistro;
 
                 //TODO: Implementar comunicación con AFIP
-                //var response = this.comunicacionEmbarqueServicioHelper.RectificarCaratula(caratula);
-                //var cuerpoRespuesta = response.Body.RectificarCaratulaResult.ListaErrores[0]; // Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa”.
-                //if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                //{
-                //    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                //}
+                var response = this.comunicacionEmbarqueServicioHelper.RectificarCaratula(caratula);
+                var cuerpoRespuesta = response.Body.RectificarCaratulaResult.ListaErrores[0]; // Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa”.
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
 
                 var itinerariosDb = Repositorio.Listar<AfipCaratulaItinerario>(x => x.AfipCaratula.Id == caratula.Id);
                 foreach (var itinerario in itinerariosDb) Repositorio.Remover(itinerario);

@@ -33,15 +33,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (caratula == null) { throw new Exception("La caratula recibida es nula"); }
 
                 // TODO: Implementar comunicación c/ AFIP
-                //var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
-                //var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
-                ////TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
-                //if (cuerpoRespuesta.Codigo != 0)
-                //{
-                //    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                //}
-                //string caratulaId = cuerpoRespuesta.DescripcionAdicional;
-                string caratulaId = Guid.NewGuid().ToString().Substring(0, 16);
+                var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
+                var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
+                //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
+                if (cuerpoRespuesta.Codigo != 0 || !cuerpoRespuesta.DescripcionAdicional.StartsWith("Identificador:"))
+                {
+                    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
+                string caratulaId = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                //string caratulaId = Guid.NewGuid().ToString().Substring(0, 16);
 
                 var caratulaDb = this.Conversor.Convertir<AfipCaratulaDto, AfipCaratula>(caratula);
                 caratulaDb.IdentificadorCaratula = caratulaId;
@@ -52,7 +52,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             catch (Exception e)
             {
-                resultado.Error("", Textos.Error_ActualizarGenerico);
+                resultado.Error("", e.Message);
                 Log.Error("Error al registrar caratula {0}", e.StackTrace);
             }
             return resultado;

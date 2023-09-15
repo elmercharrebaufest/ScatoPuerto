@@ -37,15 +37,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("No existe la caratula a cual asociar la COEM");
                     }
 
-                    //var res = this.comunicacionEmbarqueServicioHelper.RegistrarCOEM(coem);
-                    //var cuerpoRespuesta = res.Body.RegistrarCOEMResult.ListaErrores[0];
+                    var res = this.comunicacionEmbarqueServicioHelper.RegistrarCOEM(coem);
+                    var cuerpoRespuesta = res.Body.RegistrarCOEMResult.ListaErrores[0];
 
-                    //if (cuerpoRespuesta.Codigo != 0)
-                    //{
-                    //    throw new Exception(String.Format("Ocurrió un error al registrar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                    //}
-                    var coemId = Guid.NewGuid().ToString().Substring(0, 10);
-                                             
+                    if (cuerpoRespuesta.Codigo != 0)
+                    {
+                        throw new Exception(String.Format("Ocurrió un error al registrar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    }
+                    var coemId = cuerpoRespuesta.DescripcionAdicional;
+                    //var coemId = Guid.NewGuid().ToString().Substring(0, 10);
+
                     var contenedoresConCarga = coem.ContenedoresConCarga.Select(x => Conversor.Convertir<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(x)).ToList();
                     var contenedoresVacios = coem.ContenedoresVacios.Select(x => Conversor.Convertir<AfipCoemContenedorVacioDto, AfipCoemContenedorVacio>(x)).ToList();
                     var mercaderiasSueltas = coem.MercaderiasSueltas.Select(x => Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(x)).ToList();

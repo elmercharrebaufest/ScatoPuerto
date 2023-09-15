@@ -96,7 +96,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             try
             {
-                var vencimiento = DateTime.ParseExact(certFirmante.GetExpirationDateString(), "d/M/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                var vencimiento = DateTime.Parse(certFirmante.GetExpirationDateString());
 
                 var hoy = DateTime.Today.AddDays(10);
 
