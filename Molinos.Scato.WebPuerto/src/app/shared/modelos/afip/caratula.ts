@@ -7,6 +7,7 @@ export class Caratula {
     puertoDestino: string;
     nombreMedioTransporte: string;
     fechaRegistro: string;
+    numeroViaje: string;
     estado: string;
 
     numeroPaginado:any=false;
