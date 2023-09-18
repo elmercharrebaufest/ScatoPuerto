@@ -108,6 +108,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
       codigoAduana: [null, [Validators.required, this.ValidadorEsObjeto]],
       codigoLugarOperativo: [null, [Validators.required, this.ValidadorEsObjeto]],
       via: ['8'],
+      numeroViaje: [''],
       fechaArribo: ['', Validators.required],
       fechaZarpada: ['', Validators.required]
     })

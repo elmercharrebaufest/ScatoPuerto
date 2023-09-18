@@ -127,12 +127,20 @@ namespace Molinos.Scato.Servicios.Impl
         public bool RectificarCaratula(AfipCaratulaDto caratula)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRectificarCaratula { Dto = caratula });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 
         public bool AnularCaratula(int id)
         {
             var res = this.servicioComandos.Ejecutar(new AfipAnularCaratula { Id = id });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 

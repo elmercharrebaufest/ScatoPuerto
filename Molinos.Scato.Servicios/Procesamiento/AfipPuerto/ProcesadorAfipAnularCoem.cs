@@ -36,28 +36,26 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 }
 
                 //Se anula la COEM, siempre que esta se encuentre en el estado en CURSO/REGISTRADA, identificada por un identificador de Caratula
-                if (coemDB.AfipCoemEstado.Estado == EstadosCoemAFIP.Registrada)
-                {
-                    var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
-                    var cuerpoRespuesta = res.Body.AnularCOEMResult.ListaErrores[0];
-                    if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
-                    {
-                        throw new Exception(String.Format("Ocurrió un error al ANULAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
-                    }
-
-                    coemDB.AfipCoemEstado = estado;
-                    Repositorio.GuardarCambios();
-                }
-                else
+                if (coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Registrada)
                 {
                     throw new Exception("La COEM debe estar en estado Registrada (REG) para poder anularlse");
                 }
-                
+
+                var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
+                var cuerpoRespuesta = res.Body.AnularCOEMResult.ListaErrores[0];
+                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                {
+                    throw new Exception(String.Format("Ocurrió un error al ANULAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                }
+
+                coemDB.AfipCoemEstado = estado;
+                Repositorio.GuardarCambios();
+
             }
             catch (Exception e)
             {
                 resultado.Error("", e.Message);
-                Log.Error("Error al anular COEM {0}", e.Message);               
+                Log.Error("Error al anular COEM {0}", e.Message);
             }
             return resultado;
         }

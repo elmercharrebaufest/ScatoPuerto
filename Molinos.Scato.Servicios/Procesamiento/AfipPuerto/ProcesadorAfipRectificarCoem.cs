@@ -37,6 +37,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception("No existe la COEM con el id especificado");
                 }
 
+                // Campos que no vienen en el dto pero que igual no deben variar
+                coem.FechaRegistro = coemDb.FechaRegistro;
+                coem.IdentificadorCaratula = coemDb.IdentificadorCaratula;
+                coem.IdentificadorCOEM = coemDb.IdentificadorCOEM;
+
                 var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
                 var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
                 if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)

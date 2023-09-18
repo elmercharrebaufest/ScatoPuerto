@@ -153,6 +153,12 @@ namespace Molinos.Scato.Servicios.Impl
                 RectificarCOEMRequest1 rectificarCOEMRequest1 = new RectificarCOEMRequest1(
                     new RectificarCOEMRequest1Body
                     {
+                        argRectificarCOEM = new RectificarCOEMRequest { 
+                            IdentificadorCaratula = afipCoemDto.IdentificadorCaratula,
+                            IdentificadorCOEM = afipCoemDto.IdentificadorCOEM,
+                            Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) 
+                        },
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         argRectificarCOEM = new RectificarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, IdentificadorCOEM = afipCoemDto.IdentificadorCOEM, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                     });
