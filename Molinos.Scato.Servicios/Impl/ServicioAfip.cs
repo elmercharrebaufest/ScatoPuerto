@@ -201,30 +201,50 @@ namespace Molinos.Scato.Servicios.Impl
         public bool RegistrarCoem(AfipCoemDto coem)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coem });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 
         public bool RectificarCoem(AfipCoemDto coem)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRectificarCoem { Dto = coem });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 
         public bool AnularCoem(int id, int idEstado)
         {
             var res = this.servicioComandos.Ejecutar(new AfipAnularCoem { Id = id, IdEstado = idEstado });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         } 
 
         public bool CerrarCoem(int id, int idEstado)
         {
             var res = this.servicioComandos.Ejecutar(new AfipCerrarCoem { Id = id, IdEstado = idEstado });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 
         public bool SolicitarAnulacionCoem(int id)
         {
             var res = this.servicioComandos.Ejecutar(new AfipSolicitarAnulacionCoem { Id = id });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
             return !res.HayErrores;
         }
 

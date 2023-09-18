@@ -153,7 +153,8 @@ namespace Molinos.Scato.Servicios.Impl
                 RectificarCOEMRequest1 rectificarCOEMRequest1 = new RectificarCOEMRequest1(
                     new RectificarCOEMRequest1Body
                     {
-                        argRectificarCOEM = new RectificarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) }
+                        argRectificarCOEM = new RectificarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, IdentificadorCOEM = afipCoemDto.IdentificadorCOEM, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                     });
                 return this.wgescomunicacionembarque.RectificarCOEM(rectificarCOEMRequest1);
             }
@@ -191,36 +192,53 @@ namespace Molinos.Scato.Servicios.Impl
 
         public CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            this.cuitRepresentada = 30715118773;
-            this.rol = "DEPO";
-            this.tipoAgente = "DEPO";
-            this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+            try
+            {
+                this.cuitRepresentada = 30715118773;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-            CerrarCOEMRequest1 cerrarCOEMRequest1 = new CerrarCOEMRequest1(
-                new CerrarCOEMRequest1Body
-                {
-                    argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                    argCerrarCOEM = new CerrarCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
-                });
+                CerrarCOEMRequest1 cerrarCOEMRequest1 = new CerrarCOEMRequest1(
+                    new CerrarCOEMRequest1Body
+                    {
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                        argCerrarCOEM = new CerrarCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                    });
 
-            return this.wgescomunicacionembarque.CerrarCOEM(cerrarCOEMRequest1);
+                return this.wgescomunicacionembarque.CerrarCOEM(cerrarCOEMRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace):
+                throw;
+            }
+           
         }
 
         public SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            this.cuitRepresentada = 30715118773;
-            this.rol = "DEPO";
-            this.tipoAgente = "DEPO";
-            this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+            try
+            {
+                this.cuitRepresentada = 30715118773;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-            SolicitarAnulacionCOEMRequest1 solicitarAnulacionCOEMRequest1 = new SolicitarAnulacionCOEMRequest1(
-                new SolicitarAnulacionCOEMRequest1Body
-                {
-                    argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                    argSolicitarAnulacionCOEM = new SolicitarAnulacionCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
-                });
+                SolicitarAnulacionCOEMRequest1 solicitarAnulacionCOEMRequest1 = new SolicitarAnulacionCOEMRequest1(
+                    new SolicitarAnulacionCOEMRequest1Body
+                    {
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                        argSolicitarAnulacionCOEM = new SolicitarAnulacionCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                    });
 
-            return this.wgescomunicacionembarque.SolicitarAnulacionCOEM(solicitarAnulacionCOEMRequest1);
+                return this.wgescomunicacionembarque.SolicitarAnulacionCOEM(solicitarAnulacionCOEMRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace):
+                throw;
+            }            
         }
 
         private void ObtenerAutenticacionEmpresa(long cuitRepresentada, string rol, string tipoAgente)
