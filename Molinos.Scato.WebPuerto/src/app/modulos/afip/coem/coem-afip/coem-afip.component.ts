@@ -76,6 +76,7 @@ export class CoemAfipComponent implements OnInit {
         this.load=true;
         this.coemAfipService.anularCoem(id).subscribe((datos)=>{
           if (!datos) {
+            console.log(datos);
             this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);  
           }else{
             this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La COEM con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar','', null, null, Tipoalerta.Success)
@@ -84,6 +85,7 @@ export class CoemAfipComponent implements OnInit {
           
           this.load = false;
         },(error) => {
+          console.log(error);
           this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
         })
       }
@@ -97,6 +99,7 @@ export class CoemAfipComponent implements OnInit {
         this.load = true;
         this.coemAfipService.cerrarCoem(id).subscribe((datos) => {
           if (!datos) {
+            console.log(datos);
             this.confirmationDialogService.confirm('¡Error!', `No se ha podido cerrar la COEM, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
           } else {
             this.confirmationDialogService.confirm('¡Felicitaciones', `¡La COEM con id ${identificadorCOEM} se ha podido cerrar con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success);
@@ -105,6 +108,7 @@ export class CoemAfipComponent implements OnInit {
 
           this.load = false;
         }, (error) => {
+          console.log(error);
           this.confirmationDialogService.confirm('¡Error!', `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
         })
       }

@@ -45,7 +45,7 @@ export class CoemAfipService {
   }
 
   public cerrarCoem(id:number): Observable<any> {
-    return this.http.put<any>(`${this.url}Afip/CerrarCoem?id=${id}&idEstado=4`, { 'withCredentials': true });
+    return this.http.put<any>(`${this.url}Afip/CerrarCoem?id=${id}&idEstado=1`, { 'withCredentials': true });
   }
 
   public solicitarAnulacionCoem(id:number): Observable<any> {

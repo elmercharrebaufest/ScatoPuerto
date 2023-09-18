@@ -147,38 +147,34 @@ export class ModalCrearCoemComponent implements OnInit {
           this.modalService.dismissAll();
         });
     }
-  }
+  } 
 
-  crearCoem(coem) {
+  crearCoem(coem) {    
     //Si llegamos hasta aca es porque tenemos que crear un nuevo Coem.
     this.coemAfipService
       .registrarCoem(coem)
       .subscribe(
         (data) => {
-         
+         if (!data) {
+            console.log(data);
+            this.mostrarError();
+         }else{
           this.editOCrearFinish.emit();
-            this.confirmationDialogService.confirm(
-              '¡Felicitaciones!',
-              `Ha ${this.operacionNuevo ? 'creado un nuevo' : 'editado el'
-              } Coem con éxito`,
-              'Cerrar',
-              '',
-              null,
-              null,
-              Tipoalerta.Success
-            )
-        },
-        (error) => {
           this.confirmationDialogService.confirm(
-            '¡Error!',
-            `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'
-            } Coem, comunicarse con soporte técnico`,
+            '¡Felicitaciones!',
+            `Ha ${this.operacionNuevo ? 'creado un nuevo' : 'editado el'
+            } Coem con éxito`,
             'Cerrar',
             '',
             null,
             null,
-            Tipoalerta.Error
-          );
+            Tipoalerta.Success
+          )
+         }          
+        },
+        (error) => {
+          console.log(error);
+          this.mostrarError();
         }
       );
   }
@@ -188,7 +184,11 @@ export class ModalCrearCoemComponent implements OnInit {
       .editarCoem(coem)
       .subscribe(
         (data) => {
-          this.editOCrearFinish.emit();
+          if (!data) {         
+            console.log(data);
+            this.mostrarError();
+          }else{
+            this.editOCrearFinish.emit();
             this.confirmationDialogService.confirm(
               '¡Felicitaciones!',
               `Ha ${this.operacionNuevo ? 'creado un nuevo' : 'editado el'
@@ -198,21 +198,27 @@ export class ModalCrearCoemComponent implements OnInit {
               null,
               null,
               Tipoalerta.Success
-            );
+            ); 
+          }
         },
         (error) => {
-          this.confirmationDialogService.confirm(
-            '¡Error!',
-            `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'
-            } Coem, comunicarse con soporte técnico`,
-            'Cerrar',
-            '',
-            null,
-            null,
-            Tipoalerta.Error
-          );
+          console.log(error);
+          this.mostrarError();
         }
       );
+  }
+
+  mostrarError = () => {
+    this.confirmationDialogService.confirm(
+      '¡Error!',
+      `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'
+      } Coem, comunicarse con soporte técnico`,
+      'Cerrar',
+      '',
+      null,
+      null,
+      Tipoalerta.Error
+    );
   }
 
   agregarNuevoCoem() {
