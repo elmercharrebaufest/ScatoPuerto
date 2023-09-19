@@ -73,7 +73,8 @@ namespace Molinos.Scato.Servicios.Impl
                 RectificarCaratulaRequest1 rectificarCaratulaRequest = new RectificarCaratulaRequest1(
                     new RectificarCaratulaRequest1Body
                     {
-                        argRectificarCaratula = new RectificarCaratulaRequest { 
+                        argRectificarCaratula = new RectificarCaratulaRequest
+                        {
                             Caratula = this.conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto),
                             IdentificadorCaratula = afipCaratulaDto.IdentificadorCaratula
                         },
@@ -129,7 +130,7 @@ namespace Molinos.Scato.Servicios.Impl
                     new RegistrarCOEMRequest1(
                         new RegistrarCOEMRequest1Body
                         {
-                            argRegistrarCOEM = new RegistrarCOEMRequest {IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
+                            argRegistrarCOEM = new RegistrarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
                             argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         });
                 return this.wgescomunicacionembarque.RegistrarCOEM(registrarCOEMRequest1);
@@ -153,10 +154,11 @@ namespace Molinos.Scato.Servicios.Impl
                 RectificarCOEMRequest1 rectificarCOEMRequest1 = new RectificarCOEMRequest1(
                     new RectificarCOEMRequest1Body
                     {
-                        argRectificarCOEM = new RectificarCOEMRequest { 
+                        argRectificarCOEM = new RectificarCOEMRequest
+                        {
                             IdentificadorCaratula = afipCoemDto.IdentificadorCaratula,
                             IdentificadorCOEM = afipCoemDto.IdentificadorCOEM,
-                            Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) 
+                            Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto)
                         },
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,                        
                     });
@@ -190,7 +192,7 @@ namespace Molinos.Scato.Servicios.Impl
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar anular la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
-                throw;                
+                throw;
             }
         }
 
@@ -208,7 +210,8 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                         argCerrarCOEM = new CerrarCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
-                    });
+                    }
+                );
 
                 return this.wgescomunicacionembarque.CerrarCOEM(cerrarCOEMRequest1);
             }
@@ -217,7 +220,7 @@ namespace Molinos.Scato.Servicios.Impl
                 this.log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
-           
+
         }
 
         public SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM)
@@ -242,7 +245,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 this.log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
-            }            
+            }
         }
 
         private void ObtenerAutenticacionEmpresa(long cuitRepresentada, string rol, string tipoAgente)
