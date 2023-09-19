@@ -41,7 +41,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 {
                     throw new Exception(String.Format("Ocurrió un error al CERRAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                 }
-                coemDB.AfipCoemEstado = EstadosCoemAFIP.Registrada;
+                coemDB.AfipCoemEstado = estado;
                 Repositorio.GuardarCambios();
             }
             catch (Exception ex)

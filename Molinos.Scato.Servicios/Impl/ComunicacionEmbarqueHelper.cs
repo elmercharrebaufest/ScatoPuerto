@@ -158,9 +158,7 @@ namespace Molinos.Scato.Servicios.Impl
                             IdentificadorCOEM = afipCoemDto.IdentificadorCOEM,
                             Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) 
                         },
-                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
-                        argRectificarCOEM = new RectificarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, IdentificadorCOEM = afipCoemDto.IdentificadorCOEM, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
-                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,                        
                     });
                 return this.wgescomunicacionembarque.RectificarCOEM(rectificarCOEMRequest1);
             }
@@ -216,7 +214,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace):
+                this.log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
            
@@ -242,7 +240,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace):
+                this.log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }            
         }
