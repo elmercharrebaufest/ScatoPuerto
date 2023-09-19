@@ -7,7 +7,6 @@ import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service'
 import { AfipLugarOperativo, AfipPuerto, AfipPuntoAduanero } from '@ScatoModels/afip/tablas-afip';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { of, Observable, forkJoin } from 'rxjs';
-import { map, startWith, debounceTime } from 'rxjs/operators';
 import { AbstractControl } from '@angular/forms';
 import { Caratula } from '@ScatoModels/afip/caratula';
 
@@ -48,9 +47,12 @@ export class ModalCrearCaratulaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.titleCaratula = this.title;
-    const obtenerCaratula = this.title.includes('Nueva') ? of(null) : this.caratulaAfipService.obtenerCaratulaId(this.id);
+    this.cargarDatos();
+  }
+
+  private cargarDatos() {
+    const obtenerCaratula: Observable<Caratula> = !this.id ? of(null) : this.caratulaAfipService.obtenerCaratulaId(this.id);
     this.cargando = true;
     this.mensajeCarga = 'Cargando datos';
     forkJoin([
@@ -62,21 +64,10 @@ export class ModalCrearCaratulaComponent implements OnInit {
       this.aduanas = aduanas.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.lugaresOperativos = lugaresOperativos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.puertos = puertos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
-      if (!caratula) {
-        return;
-      }
-      for (let [prop, val] of Object.entries(caratula)) {
-        switch (prop) {
-          case 'codigoAduana':
-            val = aduanas.find(aduana => aduana.codigo == val);
-            break;
-          case 'codigoLugarOperativo':
-            val = lugaresOperativos.find(lugarOp => lugarOp.codigo == val);
-            break;
-          case 'puertoDestino':
-            val = puertos.find(puerto => puerto.codigo == val);
-        }
-        this.crearEditarCaratulaForm.get(prop)?.setValue(val);
+
+      this.asignarFuncionesAutocompletado();
+      if (caratula) {
+        this.asignarValoresCaratula(caratula)
       }
     }, (error) => {
       console.error(error);
@@ -84,6 +75,22 @@ export class ModalCrearCaratulaComponent implements OnInit {
     }, () => {
       this.cargando = false;
     });
+  }
+
+  private asignarFuncionesAutocompletado() {
+    this.puertos$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'puertoDestino', this.puertos);
+    this.aduanas$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'codigoAduana', this.aduanas);
+    this.lugaresOperativos$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'codigoLugarOperativo', this.lugaresOperativos);
+  }
+
+  private asignarValoresCaratula(caratula: Caratula) {
+    // Las propiedades de Caratula tienen el mismo nombre que los controles del form
+    for (let [prop, val] of Object.entries(caratula)) {
+      this.crearEditarCaratulaForm.get(prop)?.setValue(val);
+    }
+    this.crearEditarCaratulaForm.get('puertoDestino').setValue(this.puertos.find(puerto => puerto.codigo == caratula.puertoDestino));
+    this.crearEditarCaratulaForm.get('codigoAduana').setValue(this.aduanas.find(aduana => aduana.codigo == caratula.codigoAduana));
+    this.crearEditarCaratulaForm.get('codigoLugarOperativo').setValue(this.lugaresOperativos.find(lugarOp => lugarOp.codigo == caratula.codigoLugarOperativo));
   }
 
   public getNombre(option: AfipPuntoAduanero | AfipLugarOperativo | AfipPuerto) {
@@ -98,7 +105,6 @@ export class ModalCrearCaratulaComponent implements OnInit {
   }
 
   private initFormCrearEditarCaratula() {
-    this.crearEditarCaratulaForm = null;
     this.crearEditarCaratulaForm = this.formBuilder.group({
       id: [''],
       itinerario: [[]],
@@ -112,35 +118,6 @@ export class ModalCrearCaratulaComponent implements OnInit {
       fechaArribo: ['', Validators.required],
       fechaZarpada: ['', Validators.required]
     })
-
-    // Funciones para autocompletado
-    this.puertos$ = this.crearEditarCaratulaForm.get('puertoDestino').valueChanges.pipe(
-      debounceTime(500), // Tiempo de espera en ms antes de filtrar
-      startWith(''),
-      map(val => this._filtrar(this.puertos, val))
-    );
-    this.aduanas$ = this.crearEditarCaratulaForm.get('codigoAduana').valueChanges.pipe(
-      debounceTime(500),
-      startWith(''),
-      map(val => this._filtrar(this.aduanas, val))
-    );
-    this.lugaresOperativos$ = this.crearEditarCaratulaForm.get('codigoLugarOperativo').valueChanges.pipe(
-      debounceTime(500),
-      startWith(''),
-      map(val => this._filtrar(this.lugaresOperativos, val))
-    );
-    // this.crearEditarCaratulaForm.get('puertoDestino').disable();
-  }
-
-  // Función que permite filtrar los arrays para los desplegables
-  private _filtrar<T>(arr: T[], val: string): T[] {
-    console.log(val);
-    if (typeof (val) != 'string') { // Cuando se selecciona una opción, el
-      return;
-    }
-    const lowerVal = val.toLocaleLowerCase().trim();
-    const res = arr.filter(item => item['descripcion'].toLocaleLowerCase().indexOf(lowerVal) > -1);
-    return res.slice(0, 10);
   }
 
   closeModalEditarCrearCaratula() {
@@ -176,15 +153,11 @@ export class ModalCrearCaratulaComponent implements OnInit {
     caratula.codigoLugarOperativo = form.get('codigoLugarOperativo').value.codigo;
     caratula.puertoDestino = form.get('puertoDestino').value.codigo;
 
-    const observable = nueva ? this.caratulaAfipService.registrarCaratula(caratula) : this.caratulaAfipService.rectificarCaratula(caratula);
     this.cargando = true;
     this.mensajeCarga = 'Guardando caratula';
-    observable.subscribe(async (data) => {
-      if (!data) {
-        console.error(data);
-        mostrarError();
-        return;
-      }
+    const observable = nueva ? this.caratulaAfipService.registrarCaratula(caratula) : this.caratulaAfipService.rectificarCaratula(caratula);
+
+    observable.subscribe(async () => {
       this.editOCrearFinish.emit();
       await this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${nueva ? 'creado una nueva' : 'editado la'} Caratula con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
       this.cargando = false;

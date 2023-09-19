@@ -1,8 +1,10 @@
 import { AfipCondicionContenedor, AfipLugarOperativo, AfipNaturalezaEmbalaje, AfipPais, AfipPuerto, AfipPuntoAduanero, AfipTipoDocumento, AfipTipoEmbalaje } from '@ScatoModels/afip/tablas-afip';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
+import { debounceTime, startWith, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -52,4 +54,26 @@ export class TablasAfipService {
     return this.http.get<AfipCondicionContenedor[]>(this.url + 'ListarCondicionesContenedor', { withCredentials: true });
   }
 
+  // Función que setea el comportamiento de un form control autocompletable
+  public crearObservableAutocompletar<T>(form: FormGroup, controlName: string, data: T[]): Observable<T[]> {
+    return form.get(controlName)?.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      map(val => this._filtrar(data, val))
+    );
+  }
+
+  // Función que permite filtrar los arrays para los desplegables
+  private _filtrar<T>(arr: T[], val: string): T[] {
+    console.log({ arr, val });
+    if (typeof (val) != 'string') { // Cuando se selecciona una opción se produce un valueChanges con el valor como objeto. Ya no sería necesario filtrar
+      return;
+    }
+    const lowerVal = val.toLocaleLowerCase().trim();
+    const res = arr.filter(item =>
+      item['descripcion'].toLocaleLowerCase().indexOf(lowerVal) > -1 ||
+      item['codigo'].toLocaleLowerCase().indexOf(lowerVal) > -1
+    );
+    return res.slice(0, 10);
+  }
 }

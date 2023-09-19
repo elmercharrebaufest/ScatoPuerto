@@ -24,12 +24,12 @@ export class CaratulaAfipService {
   private url: string = environment.apiUrl + 'afip/';
   constructor(private http: HttpClient) { }
 
-  public registrarCaratula(caratula: Caratula): Observable<any[]> {
-    return this.http.post<any[]>(this.url + 'RegistrarCaratula', caratula, { 'withCredentials': true });
+  public registrarCaratula(caratula: Caratula) {
+    return this.http.post<boolean>(this.url + 'RegistrarCaratula', caratula, { 'withCredentials': true });
   }
 
-  public rectificarCaratula(caratula: Caratula): Observable<any> {
-    return this.http.put<any>(this.url + 'RectificarCaratula', caratula, { withCredentials: true });
+  public rectificarCaratula(caratula: Caratula) {
+    return this.http.put<boolean>(this.url + 'RectificarCaratula', caratula, { withCredentials: true });
   }
 
   public listarCaratulas(): Observable<Caratula[]> {
