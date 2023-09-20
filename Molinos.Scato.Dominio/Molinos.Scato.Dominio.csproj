@@ -1760,7 +1760,12 @@
     <None Include="Resources\DescuentosDeCalidadMailEsp.txt" />
     <None Include="Resources\DiferenciaPesoOrigenMailEsp.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Molinos.Scato.Validadores\Molinos.Scato.Validadores.csproj">
+      <Project>{a92b0022-1a22-4b71-b17a-4a04982671b1}</Project>
+      <Name>Molinos.Scato.Validadores</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
