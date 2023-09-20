@@ -16,7 +16,7 @@ export class NominacionDatoTecnicoRegistroService {
     }
 
     public listarFormatos():string[]{
-        const formatos: string[] = ["Asiático", "Europeo"];
+        const formatos: string[] = ["Asiático", "Normal"];
         return formatos;
     }
     public listarUnidades(): string[]{

@@ -38,7 +38,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     private _reciboBuqueService: ReciboBuqueService,
     private _reciboSharingService: ReciboSharingService,
     private session: SessionService,
-  ) 
+  )
   {
     this.user = this.session.getUser();
     this.refreshRecibos();
@@ -48,19 +48,19 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     this._reciboSharingService.getReciboImpresionSubject().subscribe((data:ReciboDeBuque) => {
       this.recibo = data;
     });
-    
+
    }
 
   ngOnInit(): void {
     this.initGrillaRecibos();
-    
+
   }
 
   ngOnDestroy(): void {
   }
-  
+
   refreshRecibos(){
-    this._reciboSharingService.getRefreshRecibo().subscribe(refresh => { 
+    this._reciboSharingService.getRefreshRecibo().subscribe(refresh => {
       if(refresh == true){
         this._reciboBuqueService.obtenerRecibos(this.idEmbarque).subscribe(data => {
           this.recibosDeBuque = data;
@@ -68,7 +68,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
       }
     })
     this._reciboSharingService.setRefreshRecibo(false);
-    
+
     // this.subscriptionRecibo = this._reciboBuqueService.refresh.subscribe(() =>{
     //   this._reciboBuqueService.obtenerRecibos(this.idEmbarque).subscribe(data => this.recibosDeBuque = data);
     // })
@@ -92,12 +92,12 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     recibo.desdeTabla = true;
     this._reciboSharingService.setFiltroRecibos(recibo);
     this.mostrarModal = true;
-  
+
   }
   generarPDF(recibo){
     if(!this.hasPermisoRecibidores_Recibo_Imprimir())
       return;
-      
+
     recibo.fechaHoraImpresion = new Date();
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, recibo).subscribe(res => {
       this.refreshRecibos();
@@ -109,7 +109,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     let reciboAGenerar: ReciboDeBuque = new ReciboDeBuque();
     reciboAGenerar.embarque_Id = this.idEmbarque;
     let reciboDetalle: ReciboDeBuqueDetalles = new ReciboDeBuqueDetalles();
-    reciboDetalle.esEuropeo = nominacionRecibo.formato == 'Europeo' || nominacionRecibo.formato == '' ? true: false;
+    reciboDetalle.esEuropeo = ['Europeo', 'Normal', ''].includes(nominacionRecibo.formato);
     reciboDetalle.cantidad = nominacionRecibo.cantidad;
     reciboDetalle.exportador = nominacionRecibo.exportador.nombre;
     reciboDetalle.valorEnKG = nominacionRecibo.unidad == 'Kg'? true: false;
