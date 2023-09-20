@@ -32,8 +32,8 @@ export class CoemAfipService {
     return this.http.put<any[]>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${idCoem}&idEstado=${id}`, { 'withCredentials': true });
   }
 
-  public obtenerCoemId(id:number): Observable<any> {
-    return this.http.get<any>(`${this.url}Afip/ObtenerCoem?id=${id}`, { 'withCredentials': true });
+  public obtenerCoemId(id:number): Observable<COEM> {
+    return this.http.get<COEM>(`${this.url}Afip/ObtenerCoem?id=${id}`, { 'withCredentials': true });
   }
 
   public comboCaratulas(): Observable<any> {
