@@ -248,6 +248,30 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(string identificadorCaratula, DateTime fechaZarpada, string numeroViaje, List<Coem> coems)
+        {
+            try
+            {
+                this.cuitRepresentada = 30715118773;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                SolicitarCierreCargaGranelRequest1 solicitarCierreCargaGranelRequest1 = new SolicitarCierreCargaGranelRequest1(
+                    new SolicitarCierreCargaGranelRequest1Body
+                    {
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                        argSolicitarCierreCargaGranel = new SolicitarCierreCargaGranelRequest { IdentificadorCaratula = identificadorCaratula, FechaZarpada = fechaZarpada, numeroViaje = numeroViaje, Coems = coems }
+                    });
+                return this.wgescomunicacionembarque.SolicitarCierreCargaGranel(solicitarCierreCargaGranelRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar Solicitar cierre de carga granel. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+
         private void ObtenerAutenticacionEmpresa(long cuitRepresentada, string rol, string tipoAgente)
         {
             if (this.wSAutenticacionEmpresa == null || this.ticketAccesoAfip.ExpirationTime < DateTime.Now)
