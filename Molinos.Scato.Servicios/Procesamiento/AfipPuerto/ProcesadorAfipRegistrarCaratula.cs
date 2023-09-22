@@ -40,15 +40,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                 }
-                string caratulaId = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                string identificadorSolicitudCierreCarga = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
                 //string caratulaId = Guid.NewGuid().ToString().Substring(0, 16);
 
                 var caratulaDb = this.Conversor.Convertir<AfipCaratulaDto, AfipCaratula>(caratula);
-                caratulaDb.IdentificadorCaratula = caratulaId;
-                caratulaDb.FechaRegistro = DateTime.Now;
-                caratulaDb.Estado = EstadosCaratulaAFIP.Aceptado;
-                Repositorio.Agregar(caratulaDb);
-                Repositorio.GuardarCambios();
+               
+                //Repositorio.Agregar(caratulaDb);
+                //Repositorio.GuardarCambios();
             }
             catch (Exception e)
             {
