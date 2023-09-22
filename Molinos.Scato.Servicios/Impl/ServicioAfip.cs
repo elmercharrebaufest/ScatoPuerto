@@ -305,5 +305,19 @@ namespace Molinos.Scato.Servicios.Impl
             this.servicioComandos.Ejecutar(new AfipRegistrarCode { Dto = code });
         }
         #endregion
+
+        #region Solicitudes
+        
+        public bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipSolicitarCierreCargaGranel { Dto = solicitarCierreCargaGranelDto });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+            return !res.HayErrores;
+        }
+
+        #endregion
     }
 }

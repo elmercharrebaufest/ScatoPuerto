@@ -103,5 +103,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void RegistrarCode(AfipCodeDto code);
         #endregion
+
+        #region Solicitudes
+        [OperationContract]
+        bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto);
+        #endregion
     }
 }

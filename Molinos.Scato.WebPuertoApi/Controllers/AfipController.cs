@@ -1,6 +1,7 @@
 ﻿using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.Servicios.Enumeradores;
 using System;
@@ -407,6 +408,25 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         //[HttpPut]
         //[Route("api/afip/AnularCoem")]
+        #endregion
+
+        #region Solicitudes
+
+        [HttpPost]
+        [Route("api/afip/SolicitarCierreCargaGranel")]
+        public HttpResponseMessage SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCargaGranelDto)
+        {
+            try
+            {
+                var resultado = servicioAfip.SolicitarCierreCargaGranel(solicitarCargaGranelDto);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
+            }
+        }
+
         #endregion
 
         #region CODE
