@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 namespace Molinos.Scato.Dominio.Dto.AfipPuerto
 {
     public class AfipSolicitarCierreCargaGranelDto
-    {
-        public int IdCoem { get; set; }
-        public string IdentificadorCaratula { get; set; }
-        public string IdentificadorCoem { get; set; }
-        public IList<AfipCoemDto> Coems { get; set; }
+    {        
+        public string IdentificadorCaratula { get; set; } 
+        public IList<int> Coems { get; set; }
     }
 }
