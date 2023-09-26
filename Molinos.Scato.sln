@@ -70,6 +70,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Molinos.Scato.AzureAD", "Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Molinos.Scato.ServiciosWindows", "Molinos.Scato.ServiciosWindows\Molinos.Scato.ServiciosWindows\Molinos.Scato.ServiciosWindows.csproj", "{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Molinos.Scato.Validadores", "Molinos.Scato.Validadores\Molinos.Scato.Validadores.csproj", "{A92B0022-1A22-4B71-B17A-4A04982671B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -463,12 +465,28 @@ Global
 		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|x86.ActiveCfg = Release|Any CPU
 		{F26B931A-C91B-45E3-ADFD-3C33A38DFA32}.Release|x86.Build.0 = Release|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Debug|x86.Build.0 = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.DebugLocal|x86.ActiveCfg = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.DebugLocal|x86.Build.0 = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Jenkins|Any CPU.ActiveCfg = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Jenkins|Any CPU.Build.0 = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Jenkins|x86.ActiveCfg = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Jenkins|x86.Build.0 = Debug|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Release|x86.ActiveCfg = Release|Any CPU
+		{A92B0022-1A22-4B71-B17A-4A04982671B1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_NeutralResourcesLanguage = es-AR
 		SolutionGuid = {9DDEFB12-34EF-487C-AD39-BE59400A56B5}
+		RESX_NeutralResourcesLanguage = es-AR
 	EndGlobalSection
 EndGlobal

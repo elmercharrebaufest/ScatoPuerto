@@ -186,15 +186,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/afip/RectificarCaratula")]
         public HttpResponseMessage RectificarCaratula(AfipCaratulaDto caratula)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var resultado = servicioAfip.RectificarCaratula(caratula);
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                try
+                {
+                    var resultado = servicioAfip.RectificarCaratula(caratula);
+                    return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                }
+                catch (Exception e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                }               
             }
-            catch (Exception e)
+            else
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                // El modelo no es válido, devuelve los errores de validación
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
+            
         }
 
         [HttpDelete]
