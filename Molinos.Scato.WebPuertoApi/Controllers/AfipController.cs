@@ -427,6 +427,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/afip/SolicitarNoAbordo")]
+        public HttpResponseMessage SolicitarCierreCargaGranel(AfipSolicitarNoAbordoDto solicitarCargaGranelDto)
+        {
+            try
+            {
+                var resultado = servicioAfip.SolicitarNoAbordo(solicitarCargaGranelDto);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion
 
         #region CODE
