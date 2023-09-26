@@ -30,7 +30,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
             try
             {
-                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdentificadorCaratula);
+                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula);
                 IList<CoemGranel> coems = new List<CoemGranel>();
 
                 if (caratulaDB == null)
