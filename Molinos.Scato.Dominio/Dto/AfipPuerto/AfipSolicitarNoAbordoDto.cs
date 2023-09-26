@@ -8,7 +8,7 @@ namespace Molinos.Scato.Dominio.Dto.AfipPuerto
 {
     public class AfipSolicitarNoAbordoDto
     {
-        public string IdCaratula { get; set; }
-        public string IdCoem { get; set; }        
+        public int IdCaratula { get; set; }
+        public int IdCoem { get; set; }        
     }
 }
