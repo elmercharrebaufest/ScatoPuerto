@@ -318,6 +318,16 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
+        public bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipSolicitarNoAbordo { Dto = solicitarNoAbordoDto });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+            return !res.HayErrores;
+        }
+
         #endregion
     }
 }

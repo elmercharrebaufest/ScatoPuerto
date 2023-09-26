@@ -248,7 +248,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(string identificadorCaratula, DateTime fechaZarpada, string numeroViaje, List<Coem> coems)
+        public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(string identificadorCaratula, DateTime fechaZarpada, string numeroViaje, CoemGranel[] coems)
         {
             try
             {
@@ -268,6 +268,34 @@ namespace Molinos.Scato.Servicios.Impl
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar Solicitar cierre de carga granel. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw;
+            }
+        }
+
+        public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta)
+        {
+            try
+            {
+                this.cuitRepresentada = 30715118773;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                SolicitarNoABordoRequest1 solicitarNoABordoRequest1 = new SolicitarNoABordoRequest1(
+                    new SolicitarNoABordoRequest1Body
+                    {
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                        argSolicitarNoABordo = new SolicitarNoABordoRequest { 
+                            IdentificadorCaratula = identificadorCaratula, 
+                            IdentificadorCOEM = identificadorCoem,                                                   
+                            IdentificadoresDeclaracionesMercaderiaSuelta = identificadoresDeclaracionesMercaderiaSuelta                            
+                        }
+                    });
+                return this.wgescomunicacionembarque.SolicitarNoABordo(solicitarNoABordoRequest1);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar Solicitar No Abordo. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
