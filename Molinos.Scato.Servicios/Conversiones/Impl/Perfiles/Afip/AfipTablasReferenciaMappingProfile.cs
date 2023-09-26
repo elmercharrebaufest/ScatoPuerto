@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,10 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<AfipTipoEmbalaje, AfipTipoEmbalajeDto>();
             Mapper.CreateMap<AfipTipoEmbalajeDto, AfipTipoEmbalaje>();
+
+            Mapper.CreateMap<AfipCoemMercaderiaSuelta, Declaracion>()
+                .ForMember(x => x.ExtensionData, y => y.Ignore());
+
         }
     }
 }

@@ -91,6 +91,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipSolicitarAnulacionCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipSolicitarCierreCargaGranel.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarNoAbordo.cs" />
     <Compile Include="Comandos\AutomatizacionEtapas.cs" />
     <Compile Include="Comandos\CambiarNotificacionAplicacionComando.cs" />
     <Compile Include="Comandos\CambiarPinchazosComando.cs" />
@@ -710,6 +711,7 @@
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaEmbalajeDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitarCierreCargaGranelDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitarNoAbordoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipCondicionContenedorDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipLugarOperativoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipNaturalezaEmbalajeDto.cs" />

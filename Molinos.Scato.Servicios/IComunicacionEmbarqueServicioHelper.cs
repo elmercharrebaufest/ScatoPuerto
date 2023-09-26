@@ -18,6 +18,7 @@ namespace Molinos.Scato.Servicios
         AnularCOEMResponse AnularCOEM(string identificadorCaratula, string identificadorCOEM);
         CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM);
         SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM);
-        SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(string identificadorCaratula, DateTime fechaZarpada, string numeroViaje, IList<CoemGranel> coems);
+        SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(string identificadorCaratula, DateTime fechaZarpada, string numeroViaje, CoemGranel[] coems);
+        SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta);
     }
 }
