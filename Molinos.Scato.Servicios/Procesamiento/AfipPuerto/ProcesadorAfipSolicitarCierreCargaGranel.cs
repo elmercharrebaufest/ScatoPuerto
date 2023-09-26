@@ -58,7 +58,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     };
                 }).ToList();                             
 
-                var res = comunicacionEmbarqueServicioHelper.SolicitarCierreCargaGranel(caratulaDB.IdentificadorCaratula, caratulaDB.FechaZarpada, caratulaDB.NumeroViaje, coemGranelList);
+                var res = comunicacionEmbarqueServicioHelper.SolicitarCierreCargaGranel(caratulaDB.IdentificadorCaratula, caratulaDB.FechaZarpada, caratulaDB.NumeroViaje, coemGranelList.ToArray());
                 var cuerpoRespuesta = res.Body.SolicitarCierreCargaGranelResult.ListaErrores[0];
                 if (cuerpoRespuesta.Codigo != 0)
                 {
@@ -71,7 +71,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             catch (Exception ex)
             {
                 resultado.Error("", ex.Message);
-                Log.Error("Error al solicitar anulación de COEM {0}", ex.Message);
+                Log.Error("Error al solicitar Cierre Carga Granel de COEM {0}", ex.Message);
             }
             return resultado;
         }
