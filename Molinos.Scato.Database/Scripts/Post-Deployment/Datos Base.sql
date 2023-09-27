@@ -578,6 +578,12 @@ IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = 'Fosfa 51' AND Ma
    VALUES ('Fosfa 51', @SBONEU)
 END
 
+--Scripts densidades (copia valores de CSBO para SBO NEU)
+IF NOT EXISTS (SELECT 1 FROM DensidadPorTemperaturaDeMaterial WHERE MaterialPuerto_Id = @SBONEU) BEGIN
+    INSERT INTO DensidadPorTemperaturaDeMaterial
+    SELECT @SBONEU, Grado, Densidad FROM DensidadPorTemperaturaDeMaterial WHERE MaterialPuerto_Id = @CSBO
+END
+
 --Scripts CalidadValor
 declare @CVSB     int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SB     )
 declare @CVSBMHP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBMHP  )
