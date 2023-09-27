@@ -9,6 +9,7 @@ import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { of, Observable, forkJoin } from 'rxjs';
 import { AbstractControl } from '@angular/forms';
 import { Caratula } from '@ScatoModels/afip/caratula';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-modal-crear-caratula',
@@ -36,14 +37,25 @@ export class ModalCrearCaratulaComponent implements OnInit {
   public lugaresOperativos$: Observable<AfipLugarOperativo[]>;
   public puertos$: Observable<AfipPuerto[]>;
 
+  public ver: boolean;
+  public identificadorCaratula: string;
+
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
     private formBuilder: FormBuilder,
     private caratulaAfipService: CaratulaAfipService,
-    private tablasAfipService: TablasAfipService
+    private tablasAfipService: TablasAfipService,
+    private route: ActivatedRoute
   ) {
     this.initFormCrearEditarCaratula();
+    this.route.params.subscribe(params => {
+      const id = Number(params['id']);
+      this.ver = Boolean(id);
+      if (this.ver) {
+        this.id = id;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -64,10 +76,14 @@ export class ModalCrearCaratulaComponent implements OnInit {
       this.aduanas = aduanas.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.lugaresOperativos = lugaresOperativos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.puertos = puertos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
-
       this.asignarFuncionesAutocompletado();
+
       if (caratula) {
-        this.asignarValoresCaratula(caratula)
+        this.asignarValoresCaratula(caratula);
+      }
+
+      if (this.ver) {
+        this.crearEditarCaratulaForm.disable()
       }
     }, (error) => {
       console.error(error);
@@ -91,6 +107,8 @@ export class ModalCrearCaratulaComponent implements OnInit {
     this.crearEditarCaratulaForm.get('puertoDestino').setValue(this.puertos.find(puerto => puerto.codigo == caratula.puertoDestino));
     this.crearEditarCaratulaForm.get('codigoAduana').setValue(this.aduanas.find(aduana => aduana.codigo == caratula.codigoAduana));
     this.crearEditarCaratulaForm.get('codigoLugarOperativo').setValue(this.lugaresOperativos.find(lugarOp => lugarOp.codigo == caratula.codigoLugarOperativo));
+
+    this.identificadorCaratula = caratula.identificadorCaratula;
   }
 
   public getNombre(option: AfipPuntoAduanero | AfipLugarOperativo | AfipPuerto) {

@@ -65,7 +65,6 @@ export class TablasAfipService {
 
   // Función que permite filtrar los arrays para los desplegables
   private _filtrar<T>(arr: T[], val: string): T[] {
-    console.log({ arr, val });
     if (typeof (val) != 'string') { // Cuando se selecciona una opción se produce un valueChanges con el valor como objeto. Ya no sería necesario filtrar
       return;
     }

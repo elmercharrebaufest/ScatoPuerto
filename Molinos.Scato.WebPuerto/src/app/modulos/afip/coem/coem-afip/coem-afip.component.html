@@ -1,69 +1,128 @@
-<ship-spinner [message]="'Cargando Historial de COEM. Por favor, espere...'"
-    *ngIf='load'></ship-spinner>
-
+<ship-spinner [message]="'Cargando listado de COEMs. Por favor, espere...'" *ngIf='load'></ship-spinner>
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-coem-table'>
-        <thead class="lista-coem-header">
-            <th>Id COEM</th>
-            <th>Caratula</th>
+        <thead>
+            <th class="centrado" *ngIf="caratulaId">
+                <input type="checkbox" (change)="seleccionarTodas($event.target, tbody)">
+            </th>
+            <th>Identificador</th>
+            <th *ngIf="!caratulaId">Caratula</th>
             <th>Mercaderías Sueltas</th>
             <th>Estados</th>
-            <th>Acciones</th>
-         
+            <th class="centrado">Acciones</th>
         </thead>
-        <tbody *ngFor="let historial of getListaHistorialCoem()">
-            <tr class="lista-coem-row" >
-                <td class="lista-coem-row-item">{{historial.identificadorCOEM}}</td>
-                <td class="lista-coem-row-item">{{historial.identificadorCaratula}}</td>
-                <td class="lista-coem-row-item">{{historial.mercaderiasSueltas[0].cuitATA}}</td>
-                <td class="lista-coem-row-item">
-                    <div class="btn-group">
-                        <select class="custom-select" id="inputGroupSelect01" (change)="cambiarEstado($event,historial.id,historial.identificadorCOEM)" [disabled]="historial.afipCoemEstado.codigo=='ANU'">
-                            <option selected value="" disabled>Estado</option>
-                            <option *ngFor="let p of listaEstados" [value]="p.id" [selected]="historial.afipCoemEstado.id===p.id">{{p.codigo}}</option>
-                          </select>
-                    </div>
+        <tbody #tbody>
+            <ng-container *ngFor="let coem of listadoCoems">
+                <tr #tr>
+                    <td class="centrado" *ngIf="caratulaId">
+                        <input type="checkbox" [checked]="esCoemSeleccionada(coem, tr)"
+                            (change)="seleccionarCoem($event, coem)">
+                    </td>
+                    <td>{{coem.identificadorCOEM}}</td>
+                    <td *ngIf="!caratulaId">{{coem.identificadorCaratula}}</td>
+                    <td>
+                        <div class="flex-between">
+                            <span>
+                                {{coem.mercaderiasSueltas.length}}
+                            </span>
+                            <label role="button">
+                                <input type="checkbox" class="d-none"
+                                    (click)="mostrarMercaderias($event, trMercaderia)">
+                                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <select class="custom-select" id="inputGroupSelect01"
+                                (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM)"
+                                [disabled]="coem.afipCoemEstado.codigo=='ANU'">
+                                <option selected value="" disabled>Estado</option>
+                                <option *ngFor="let p of listaEstados" [value]="p.id"
+                                    [selected]="coem.afipCoemEstado.id == p.id">
+                                    ({{p.codigo}}) {{p.estado}}
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="centrado">
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                            (click)="editarCoem(coem,editCoem)">
+                            <i class="fa fa-pencil fs-icon" aria-hidden="true" title="RECTIFICAR"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                            (click)="eliminarCoem(coem.id, coem.identificadorCOEM)">
+                            <i class="fa fa-trash-o fs-icon" aria-hidden="true" title="ANULAR"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                            (click)="cerrarCoem(coem.id, coem.identificadorCOEM)">
+                            <i class="fa fa-check-circle-o fs-icon" aria-hidden="true" title="CERRAR"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                            (click)="solicitarNoABordo(coem)">
+                            <i class="fa fa-exclamation-circle fs-icon" aria-hidden="true" title="SOLICITAR NO A BORDO"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr #trMercaderia class="d-none desplegable">
+                    <td *ngIf="caratulaId"></td>
+                    <td colspan="100%" class="contenedor-tabla-mercaderias">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cuit ATA</th>
+                                    <th>Declaración</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let mercaderia of coem.mercaderiasSueltas">
+                                    <td>{{mercaderia.cuitATA}}</td>
+                                    <td>{{mercaderia.identificadorDeclaracion}}</td>
+                                    <td>{{mercaderia.embalajes[0].peso}} kg</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </ng-container>
+            <tr *ngIf="!listadoCoems?.length">
+                <td colspan="100%" class="centrado">
+                    No se encontraron Comunicaciones de Embarque.
                 </td>
-                <td class="lista-coem-row-item">
-                    <button class="btn btn-light"><i class="fa fa-pencil fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="editarCoem(historial,editCoem)" title="RECTIFICAR"></i></button>
-                    <button class="btn btn-light"><i class="fa fa-trash-o fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="eliminarCoem(historial.id, historial.identificadorCOEM)" title="ANULAR"></i></button>
-                    <button class="btn btn-light"><i class="fa fa-check-circle-o fs-icon" aria-hidden="true" *ngIf="historial.afipCoemEstado.codigo!='ANU'" (click)="cerrarCoem(historial.id, historial.identificadorCOEM)" title="CERRAR"></i></button>                    
-                </td>              
             </tr>
         </tbody>
     </table>
 </div>
-<!-- <div *ngIf="esNoExisteRegistros">
-    No se encontraron registros para los filtros ingresados.
-</div>  -->
+
+<div class="flex-center mb-3" *ngIf="caratulaId && coemsSeleccionadas.length">
+    <button class="btn btn-primary" (click)="solicitarCierreCarga()">
+        Solicitar cierre
+    </button>
+</div>
 
 <!--Paginado -->
-  <nav aria-label="Page navigation example" class="centrado">
-        <ul class="pagination justify-content-center paginado-buque-fondo">
-            <li [ngClass]="{'page-item disabled': currentPage === 1}">
-                <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
-                << </a>
-            </li>
-            <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
-            <li *ngFor="let page of visiblePages"
-                [ngClass]="{'page-item disabled': page == currentPage}">
-                <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
-            </li>
-            <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
-            <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
-                <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)"> >>
-                </a>
-            </li>
-        </ul>
-    </nav> 
-    <!-- <div *ngIf="esNoExisteRegistros && ">
-        No se encontraron registros para los filtros ingresados.
-    </div>  -->
-
-
-
-
+<nav aria-label="Page navigation example" class="centrado">
+    <ul class="pagination justify-content-center paginado-buque-fondo">
+        <li [ngClass]="{'page-item disabled': currentPage === 1}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
+                &lt;&lt;
+            </a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
+        <li *ngFor="let page of visiblePages" [ngClass]="{'page-item disabled': page == currentPage}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
+        <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)">
+                &gt;&gt;
+            </a>
+        </li>
+    </ul>
+</nav>
 
 <ng-template #editCoem let-modal>
-    <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId" [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
+    <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId"
+        [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
 </ng-template>
