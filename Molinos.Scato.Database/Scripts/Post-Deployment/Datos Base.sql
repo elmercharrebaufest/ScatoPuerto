@@ -578,6 +578,12 @@ IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = 'Fosfa 51' AND Ma
    VALUES ('Fosfa 51', @SBONEU)
 END
 
+--Scripts densidades (copia valores de CSBO para SBO NEU)
+IF NOT EXISTS (SELECT 1 FROM DensidadPorTemperaturaDeMaterial WHERE MaterialPuerto_Id = @SBONEU) BEGIN
+    INSERT INTO DensidadPorTemperaturaDeMaterial
+    SELECT @SBONEU, Grado, Densidad FROM DensidadPorTemperaturaDeMaterial WHERE MaterialPuerto_Id = @CSBO
+END
+
 --Scripts CalidadValor
 declare @CVSB     int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SB     )
 declare @CVSBMHP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBMHP  )
@@ -769,6 +775,7 @@ if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'ADC S.R.L.
 --Scripts TipoContrato
 if not exists(select 1 from TipoDeContrato where Descripcion = 'FOB') begin insert into TipoDeContrato (Descripcion) values ('FOB') end
 if not exists(select 1 from TipoDeContrato where Descripcion = 'CIF') begin insert into TipoDeContrato (Descripcion) values ('CIF') end
+if not exists(select 1 from TipoDeContrato where Descripcion = 'FAS') begin insert into TipoDeContrato (Descripcion) values ('FAS') end
 
 --Scripts MuelleDeCarga
 if not exists(select 1 from MuelleDeCarga where Descripcion = 'San Benito') begin insert into MuelleDeCarga (Descripcion) values ('San Benito') end
