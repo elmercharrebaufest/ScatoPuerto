@@ -116,15 +116,15 @@ stroke: none;
 }
 /*Estilos del grafico*/
 .text-datos-buque{
-    font-size: 19px; 
+    font-size: 19px;
     fill: #3376A1;
 }
 .text-buque-bold{
     stroke-width: 1px; stroke: #3376A1;
 }
 .nombre-buque{
-    stroke: #3376A1; 
-    stroke-width: 1px; 
+    stroke: #3376A1;
+    stroke-width: 1px;
     font-size: 29px;
 }
 
@@ -168,104 +168,70 @@ svg{
     outline: none;
 }
 
-#selectMateriales{
-    position: absolute;
-    width: 11rem;
-    right: 4%;
-    margin-top: 36.5%;
-}
-
-#toggleColorContainer{
-    position: absolute;
-    width: 6rem;
-    right: 6.5%;
-    margin-top: 44%;
-}
-#colorLabel{
-    position: absolute;
-    width: 6rem;
-    right: 0%;
-    margin-top: 44.5%;
-    font-weight: bold;
-}
-#prodLabel{
-    position: absolute;
-    width: 6rem;
-    right: 10%;
-    margin-top: 44.5%;
-    font-weight: bold;
-}
-
-#toggleFormaContainer{
-    position: absolute;
-    width: 6rem;
-    right: 6.5%;
-    margin-top: 40%;
-}
-#toggleRotarContainer{
-    position: absolute;
-    width: 6rem;
-    right: 6.5%;
-    margin-top: 48%;
-}
-#circuloLabel{
-    position: absolute;
-    width: 6rem;
-    right: 0%;
-    margin-top: 40.5%;
-    font-weight: bold;
-}
-#rectLabel{
-    position: absolute;
-    width: 6rem;
-    right: 13%;
-    margin-top: 40.5%;
-    font-weight: bold;
-}
-
-#rotarLabel{
-    position: absolute;
-    width: 6rem;
-    right: 12%;
-    margin-top: 48.5%;
-    font-weight: bold;
-}
-
-.siloResaltado{
+.siloResaltado {
     stroke: #3cd73c;
     stroke-width: 4;
 }
 
-.tank-control {
-    margin-left: 6px;
-    margin-top: 5px;
+#collapseGrafico {
+    position: relative;
+}
+
+/* #region Controles Grafico */
+.controles-grafico {
+    position: absolute;
+    bottom: 5rem;
+    right: 2%;
+    display: grid;
+    justify-items: end;
+    grid-template-columns: auto auto auto;
+    column-gap: .5rem;
+    row-gap: 1.5rem;
+}
+
+.controles-grafico .select-material-container {
+    grid-column: 1/-1;
+    padding-right: 1rem;
+}
+
+.controles-grafico #selectMateriales {
+    padding: 0.1rem;
+}
+
+.controles-grafico div:not([class]) {
+    font-weight: bold;
+}
+
+.controles-grafico div:nth-last-child(3) {
+    justify-self: start;
+}
+
+.custom-switch {
+    padding: 0;
+}
+
+.custom-control-label {
+    width: 5rem;
+    height: 1.7rem;
 }
 
 .custom-switch.tank-control .custom-control-label::before {
-    width: 5rem !important;
-    height: 1.7rem;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
     border-radius: 4rem;
     background-color: #4D60A8;
-    border:none;
-    text-align: end;
-    padding-right: 14px;
+    border: none;
     font-size: 1.12rem;
     font-weight: 500;
     color: white;
-    padding-top: 1px;
     cursor: pointer;
 }
 
-.tank-control .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #4D60A8;
-    border: none;
-    text-align: start;
-    padding-left: 16px;
-}
-
 .custom-switch.tank-control .custom-control-label::after {
-    top: calc(0.25rem + 3px);
-    left: calc(-2.25rem + 3px);
+    top: 3px;
+    left: 3px;
     width: 1.3rem;
     height: 1.3rem;
     border-radius: 50%;
@@ -273,9 +239,11 @@ svg{
     cursor: pointer;
 }
 
-.tank-control .custom-control-input:checked ~ .custom-control-label::after {
+.tank-control .custom-control-input:checked~.custom-control-label::after {
     transform: translateX(3.35rem);
 }
+
+/* #endregion Controles Grafico */
 
 #colorMateriales{
     display: flex;
