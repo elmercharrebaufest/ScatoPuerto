@@ -23,7 +23,7 @@ export class CaratulaComponent implements OnInit {
 
   openModalEditarCrearCaratula(modal: any) {
     // this.errorMessage = false;
-    
+
     this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
   }
 
@@ -34,10 +34,10 @@ export class CaratulaComponent implements OnInit {
   tienePermisoVisualizarCaratula() {
     return this.user.permisos.find(p => p === this.permisosScato.Caratula_Visualizar);
   }
-  
+
   tienePermisoCrearCaratula() {
     return this.user.permisos.find(p => p === this.permisosScato.Caratula_Crear);
   }
 
-  
+
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CoemAfipComponent } from './coem-afip/coem-afip.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-coem',
@@ -11,20 +12,23 @@ export class CoemComponent implements OnInit {
 
   @ViewChild(CoemAfipComponent) coemAfipComponent: CoemAfipComponent;
 
-  constructor(private modalService: NgbModal) { }
+  public caratulaId: number;
+
+  constructor(
+    private modalService: NgbModal,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
+    this.route.params.subscribe(params => this.caratulaId = Number(params['id']));
   }
 
   openModalCrearCaratula(modal: any) {
-    // this.errorMessage = false;
-    
     this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
   }
 
   crearFinish(event) {
-    this.coemAfipComponent.listarEstados();
-    this.coemAfipComponent.listarCoems();
+    this.coemAfipComponent.cargarDatos();
   }
 
 }

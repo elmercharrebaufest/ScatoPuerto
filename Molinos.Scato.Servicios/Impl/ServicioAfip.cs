@@ -192,12 +192,6 @@ namespace Molinos.Scato.Servicios.Impl
         public IList<AfipCoemDto> ListarCoemsPorCaratula(int idCaratula)
         {
             var caratulas = Listar<AfipCoem, AfipCoemDto>(x => x.AfipCaratula.Id == idCaratula);
-            foreach (var caratula in caratulas)
-            {
-                caratula.MercaderiasSueltas = null;
-                caratula.ContenedoresConCarga = null;
-                caratula.ContenedoresVacios = null;
-            }
             return caratulas;
         }
 
