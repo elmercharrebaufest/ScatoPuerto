@@ -74,7 +74,7 @@ namespace Molinos.Scato.Servicios
         AfipCoemDto ObtenerCoem(int id);
 
         [OperationContract]
-        bool RegistrarCoem(AfipCoemDto coem);
+        bool RegistrarCoem(AfipCoemRegistrarRequest coem);
 
         [OperationContract]
         bool RectificarCoem(AfipCoemDto coem);

@@ -9,8 +9,10 @@ namespace Molinos.Scato.Dominio.Dto.AfipPuerto
 {
     public class AfipSolicitarCierreCargaGranelDto
     {        
-        [Required(ErrorMessage = "El identificador ")]
+        [Required(ErrorMessage = "El IdCaratula es obligatorio.")]
         public int IdCaratula { get; set; } 
+
+        [Required(ErrorMessage = "La/s Coem/s son obligatorias ")]
         public IList<int> Coems { get; set; }
     }
 }

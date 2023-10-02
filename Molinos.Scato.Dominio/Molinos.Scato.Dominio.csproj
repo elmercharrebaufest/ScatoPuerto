@@ -710,6 +710,8 @@
     <Compile Include="Dto\AfipPuerto\AfipCoemEstadoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaEmbalajeDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemRectificarRequest.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemRegistrarRequest.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitarCierreCargaGranelDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitarNoAbordoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipCondicionContenedorDto.cs" />

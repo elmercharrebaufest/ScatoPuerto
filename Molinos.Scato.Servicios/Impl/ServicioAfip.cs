@@ -206,9 +206,10 @@ namespace Molinos.Scato.Servicios.Impl
             return Obtener<AfipCoem, AfipCoemDto>(id);
         }
 
-        public bool RegistrarCoem(AfipCoemDto coem)
+        public bool RegistrarCoem(AfipCoemRegistrarRequest coem)
         {
-            var res = this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coem });
+            var coemDto = this.conversor.Convertir<AfipCoemRegistrarRequest, AfipCoemDto>(coem);
+            var res = this.servicioComandos.Ejecutar(new AfipRegistrarCoem { Dto = coemDto });
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);

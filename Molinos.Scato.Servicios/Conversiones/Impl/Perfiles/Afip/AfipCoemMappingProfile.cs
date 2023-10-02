@@ -56,6 +56,10 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<AfipCoemDto, Coem>()
                 .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
+            Mapper.CreateMap<AfipCoemRegistrarRequest, AfipCoemDto>()
+                .ForMember(x => x.FechaRegistro, y => y.Ignore())
+                .ForMember(x => x.IdentificadorCOEM, y => y.Ignore())
+                .ForMember(x => x.Id, y => y.Ignore());
         }
     }
 }

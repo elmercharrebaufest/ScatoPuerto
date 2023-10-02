@@ -3,6 +3,7 @@ using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,9 @@ using System.Web.Http;
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class AfipController : BaseController
-    {
-        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip)
-        {
-
+    {        
+        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip ) : base(servicio, null, null, servicioAfip)
+        {     
         }
 
         #region Tablas de referencia
@@ -313,32 +313,48 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/RegistrarCoem")]
-        public HttpResponseMessage RegistrarCoem(AfipCoemDto coem)
+        public HttpResponseMessage RegistrarCoem(AfipCoemRegistrarRequest coem)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var resultado = servicioAfip.RegistrarCoem(coem);
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                try
+                {                    
+                    var resultado = servicioAfip.RegistrarCoem(coem);
+                    return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                }
+                catch (Exception e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                }
             }
-            catch (Exception e)
+            else
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
+                // El modelo no es válido, devuelve los errores de validación
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            }        
         }
 
         [HttpPut]
         [Route("api/afip/RectificarCoem")]
         public HttpResponseMessage RectificarCoem(AfipCoemDto coem)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var resultado = servicioAfip.RectificarCoem(coem);
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                try
+                {
+                    var resultado = servicioAfip.RectificarCoem(coem);
+                    return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                }
+                catch (Exception e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                }
             }
-            catch (Exception e)
+            else
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
-            }
+                // El modelo no es válido, devuelve los errores de validación
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            }            
         }
 
         [HttpDelete]
@@ -425,30 +441,46 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/afip/SolicitarCierreCargaGranel")]
         public HttpResponseMessage SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCargaGranelDto)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var resultado = servicioAfip.SolicitarCierreCargaGranel(solicitarCargaGranelDto);
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                try
+                {
+                    var resultado = servicioAfip.SolicitarCierreCargaGranel(solicitarCargaGranelDto);
+                    return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                }
+                catch (Exception e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                }
             }
-            catch (Exception e)
+            else
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
-            }
+                // El modelo no es válido, devuelve los errores de validación
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            }            
         }
 
         [HttpPost]
         [Route("api/afip/SolicitarNoAbordo")]
-        public HttpResponseMessage SolicitarCierreCargaGranel(AfipSolicitarNoAbordoDto solicitarCargaGranelDto)
+        public HttpResponseMessage SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var resultado = servicioAfip.SolicitarNoAbordo(solicitarCargaGranelDto);
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                try
+                {
+                    var resultado = servicioAfip.SolicitarNoAbordo(solicitarNoAbordoDto);
+                    return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                }
+                catch (Exception e)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                }
             }
-            catch (Exception e)
+            else
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
+                // El modelo no es válido, devuelve los errores de validación
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            }        
         }
 
         #endregion

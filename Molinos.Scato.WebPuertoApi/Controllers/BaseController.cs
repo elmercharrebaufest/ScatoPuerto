@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Conversiones;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
@@ -10,6 +11,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         protected string nombreUsuario;
         protected readonly IServicioVapor servicioVapor;
         protected readonly IServicioAfip servicioAfip;
+
         public BaseController(IServicioRepositorio servicio, IServicioProgramaEmbarque servicioProgramaEmbarque = null, IServicioVapor servicioVapor = null, IServicioAfip servicioAfip = null)
         {
             if(System.Web.HttpContext.Current.Session !=null)
@@ -18,7 +20,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicio = servicio;
             this.servicioProgramaEmbarque = servicioProgramaEmbarque;
             this.servicioVapor = servicioVapor;
-            this.servicioAfip = servicioAfip;
+            this.servicioAfip = servicioAfip;            
         }
     }
 }
