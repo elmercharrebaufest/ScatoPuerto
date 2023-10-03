@@ -143,34 +143,19 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   }
 
   setModalOjito() {
-
+    const detalles = this.reciboBuqueOjito.reciboDeBuqueDetalles[0];
     this.reciboDeBuqueForm.enable();
 
-    this.reciboDeBuqueForm.controls.puertoOrigen.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoOrigen);
-    if (this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo != null && this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo != undefined){
-      this.reciboDeBuqueForm.controls.fechaRecibo.setValue(formatDate(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo, 'yyyy-MM-dd', 'en'));
-    }else{
-      this.reciboDeBuqueForm.controls.fechaRecibo.setValue(new Date());
+    // asignación automática de controles con mismos nombres de propiedades
+    for (let [prop, val] of Object.entries(detalles)) {
+      this.reciboDeBuqueForm.controls[prop]?.setValue(val);
     }
-    //this.reciboDeBuqueForm.controls.fechaRecibo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].fechaRecibo);
-    this.reciboDeBuqueForm.controls.nombreBuque.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].nombreBuque);
-    this.reciboDeBuqueForm.controls.exportador.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].exportador);
-    this.reciboDeBuqueForm.controls.puertoDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].puertoDestino);
-    this.reciboDeBuqueForm.controls.valorEnKG.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].valorEnKG);
-    this.reciboDeBuqueForm.controls.cantidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad);
-    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(this.getCantidadEnLetras(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidad));
-    this.reciboDeBuqueForm.controls.claseCarga.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga);
+    const fechaRecibo = detalles.fechaRecibo ? formatDate(detalles.fechaRecibo, 'yyyy-MM-dd', 'en') : new Date();
+    this.reciboDeBuqueForm.controls.fechaRecibo.setValue(fechaRecibo);
+    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(this.getCantidadEnLetras(detalles.cantidad));
+    this.reciboDeBuqueForm.controls.claseCarga.setValue(detalles.cantidadLetrasYClaseCarga);
 
-
-    this.reciboDeBuqueForm.controls.estibadoEnBodega.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].estibadoEnBodega);
-    this.reciboDeBuqueForm.controls.calidadYCantidadDesconocida.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].calidadYCantidadDesconocida);
-    this.reciboDeBuqueForm.controls.incluirImpresionDestino.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionDestino);
-    this.reciboDeBuqueForm.controls.incluirImpresionCalidad.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionCalidad);
-    this.reciboDeBuqueForm.controls.incluirImpresionEstibado.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].incluirImpresionEstibado);
-    this.reciboDeBuqueForm.controls.esEuropeo.setValue(this.reciboBuqueOjito.reciboDeBuqueDetalles[0].esEuropeo);
     if (this.reciboBuqueOjito.desdeTabla) { this.reciboDeBuqueForm.disable(); }
-    else { this.reciboDeBuqueForm.enable(); }
-
   }
 
   openModalEmitirRecibo(modal: any) {
