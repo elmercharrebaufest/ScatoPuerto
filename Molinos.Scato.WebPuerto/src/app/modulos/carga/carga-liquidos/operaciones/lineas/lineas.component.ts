@@ -228,7 +228,7 @@ export class LineasComponent implements OnInit, OnChanges {
       linea.controls['alturaFinalMM'].setValue(mm);
       linea.controls['alturaFinalCMyMM'].setValue(cm + ',' + mm);
     }
-    //linea.controls['alturaFinalMM'].setValue(mm);
+    linea.controls['alturaFinalMM'].setValue(mm);
     return this._lineasService.obtenerLlenadoMilimetroPorTanque(cm, mm, '0' + tk)
   }
 
@@ -484,8 +484,7 @@ export class LineasComponent implements OnInit, OnChanges {
       bValidarDuplicadas = true;
     return bValidarDuplicadas;
   }
-  onGuardar() {
-    this.lineasDeEmbarqueForm.controls;
+  onGuardar() {    
     if (this.esCalidad) return;
     const bValidarDuplicadas = this.validarLineasDuplicadas();
     if (bValidarDuplicadas){
@@ -495,8 +494,6 @@ export class LineasComponent implements OnInit, OnChanges {
     }
 
     this.esGuardadoActivo = false;
-
-    
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
     lineasEmabarque.forEach(item => {
