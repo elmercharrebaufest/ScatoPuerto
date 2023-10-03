@@ -484,7 +484,7 @@ export class LineasComponent implements OnInit, OnChanges {
       bValidarDuplicadas = true;
     return bValidarDuplicadas;
   }
-  onGuardar() {
+  onGuardar() {    
     if (this.esCalidad) return;
     const bValidarDuplicadas = this.validarLineasDuplicadas();
     if (bValidarDuplicadas){

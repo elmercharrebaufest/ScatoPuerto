@@ -42,6 +42,7 @@ export class NominacionDatoTecnicoRegistroService {
     }
 
     public inicializarFormNuevo(): FormGroup {
+        const validadorImo = this.crearFnValidarImo();
         return this.formBuilder.group({
             id: [0, Validators.required],
             materialPuerto: ['', Validators.required],
@@ -50,8 +51,8 @@ export class NominacionDatoTecnicoRegistroService {
             cantidadTotal: ['', Validators.required],
             tolerancia: [''],
             observaciones: [''],
-            vaporInformacion: [[], Validators.required],
-            bandera: [{value: '', disabled: true }],
+            vaporInformacion: [null, [Validators.required, validadorImo]],
+            bandera: [{ value: '', disabled: true }],
             etaRecalada: ['', Validators.required],
             obligacionDeCarga: ['', Validators.required],
             muelleDeCarga: ['', Validators.required],
@@ -68,6 +69,21 @@ export class NominacionDatoTecnicoRegistroService {
             nominacionDatoTecnicoDestino: this.formBuilder.array([]),
             nominacionDatoTecnicoCoordinadorPuerto: this.formBuilder.array([]),
         });
+    }
+
+    private crearFnValidarImo(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors => {
+            const vapor = control.value as VaporInformacion;
+            if (!vapor || typeof vapor != 'object') { // Esta validación ya se prevee en la función validaSeleccionVapor() del componente
+                return null;
+            }
+            if (!vapor.imoVapor) {
+                const mensaje = 'El buque seleccionado no tiene establecido su IMO lo cuál no permitirá continuar con el guardado';
+                this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar.', '', null, null, Tipoalerta.Warning);
+                return { buqueSinImo: true };
+            }
+            return null;
+        }
     }
 
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
