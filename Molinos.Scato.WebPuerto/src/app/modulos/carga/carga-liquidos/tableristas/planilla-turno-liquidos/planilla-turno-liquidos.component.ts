@@ -1113,6 +1113,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         if (filtro.length > 0) {          
 
           if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin'){
+            tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
             bloqueoVicentin = true;
           }else{
             tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
@@ -1141,7 +1142,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` :`${line.medidaFinalCM},0`:"", disabled: bloqueoVicentin }],
       medidaFinalCM: [{ value: medidaFinalCM , disabled: bloqueoVicentin }],
       medidaFinalMM: [{ value: medidaFinalMM , disabled: bloqueoVicentin }],
-      destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
+      destino: [{ value: destino, disabled: guardado }],
       cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
     });
@@ -1464,11 +1465,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         let tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
         let tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
         tipoLineaEmbarqueNombre = (tipoLineaEmbarqueNombre != undefined || tipoLineaEmbarqueNombre !=null) ? tipoLineaEmbarqueNombre : '';
-        let lineaSeleccionada = null
-        if (tipoLineaEmbarqueVal == LineaDeEmbarque.VICENTIN)
-            lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
-            else
-            lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
+        let lineaSeleccionada = null;
+
+        if (tipoLineaEmbarqueVal == LineaDeEmbarque.VICENTIN){
+          lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
+        }            
+        else{
+          lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
+        }            
 
         if (turnoDetalle['controls'].linea.value == undefined || turnoDetalle['controls'].linea.value == null){
           turnoDetalle['controls'].linea.setValue(0)
