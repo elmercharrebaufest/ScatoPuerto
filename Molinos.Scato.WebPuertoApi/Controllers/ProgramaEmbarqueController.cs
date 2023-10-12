@@ -123,6 +123,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [Route("api/ProgramaEmbarque/ValidarPuedeCambiarBuque")]
+        public HttpResponseMessage ValidarPuedeCambiarBuque(int nominacionId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ValidarPuedeCambiarBuque(nominacionId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
 
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp_Ver)]
@@ -355,7 +367,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
                 {
                     Dto = nominacion,
-                    EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
+                    EsCreacion = nominacion.NominacionDatoTecnico.Id == 0
                 });
                 bGraboOK = resultado.HayErrores ? false : true;
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);

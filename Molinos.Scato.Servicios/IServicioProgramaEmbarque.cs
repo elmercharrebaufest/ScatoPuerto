@@ -79,6 +79,9 @@ namespace Molinos.Scato.Servicios
         bool ValidarCreacionNominacion(NominacionValidaDto nominacion);
 
         [OperationContract]
+        bool ValidarPuedeCambiarBuque(int embarqueId);
+
+        [OperationContract]
         bool CrearSurveyor(SurveyorDto surveyor);
 
         [OperationContract]
