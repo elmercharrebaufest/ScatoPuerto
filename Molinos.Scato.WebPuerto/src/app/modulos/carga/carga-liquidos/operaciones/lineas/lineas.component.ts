@@ -276,7 +276,7 @@ export class LineasComponent implements OnInit, OnChanges {
       alturaFinalMM: x?.alturaFinalMM >= 0 ? x.alturaFinalMM : 0,
       alturaFinalCMyMM: [{ value: x?.alturaFinalCM >= 0 ? x.alturaFinalMM >= 0 ? `${x.alturaFinalCM},${x.alturaFinalMM}` :`${x.alturaFinalCM},0`:"", disabled: deshabilitar || esVicentin }],
       kilos: [{ value: x && x.kilos ? x.kilos > 0 ? x.kilos : "" : "", disabled: true || esVicentin }],
-      tkFinal: [{ value: x?.tkFinal ?? "", disabled: false || esVicentin }],
+      tkFinal: [{ value: x?.tkFinal ?? "", disabled: false }],
       litrosFinales:[{ value: x && x.litrosFinales ? x.litrosFinales > 0 ? x.litrosFinales : "" : "", disabled: deshabilitar || esVicentin }],
       kilosFinales:[{ value: x && x.kilosFinales ? x.kilosFinales > 0 ? x.kilosFinales : "" : "", disabled: deshabilitar || esVicentin }],
     });
