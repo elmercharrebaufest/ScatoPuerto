@@ -41,7 +41,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-container formArrayName='diasTurno'>
+                        <ng-container formArrayName='diasTurno' >
                             <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
                                 <div class="html2pdf__page-break" *ngIf="d >0">
                                 </div>
