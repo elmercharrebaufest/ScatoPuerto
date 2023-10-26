@@ -30,11 +30,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             if (comando.Dto.Agencias != null)
                 Embarque.Agencias = Repositorio.Obtener<AgenciaMaritimaPuerto>(comando.Dto.Agencias.Id);
             else
-                Embarque.Agencias = null;
-            if (comando.Dto.Coordinadores != null)
-                Embarque.Coordinadores = Repositorio.Obtener<CoordinadorPuerto>(comando.Dto.Coordinadores.Id);
-            else
-                Embarque.Coordinadores = null;
+                Embarque.Agencias = null;            
 
             if (comando.Dto.MotivosLimpieza != null)
                 Embarque.MotivosLimpieza = Repositorio.Obtener<MotivosLimpieza>(comando.Dto.MotivosLimpieza.Id);
@@ -91,6 +87,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Color = mat.Color
                 });
             }
+
+            Embarque.Coordinadores = comando.Dto.Coordinadores
+                .Select(coo => new EmbarqueCoordinador
+                {
+                    CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id),
+                    Embarque = Embarque
+                })
+                .ToList();            
 
             LimpiarCarpetaDeArchivosDeEmbarques(comando.Dto.Id);
             if (comando.Dto.filePathShipParticular != null)
