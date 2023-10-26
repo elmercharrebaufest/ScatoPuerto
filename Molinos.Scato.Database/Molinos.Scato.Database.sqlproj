@@ -561,6 +561,7 @@
     <Build Include="dbo\Tables\Auditoria.sql" />
     <Build Include="dbo\Tables\NotificacionesExcluidos.sql" />
     <Build Include="dbo\Tables\NotificacionProgramaDeEmbarque.sql" />
+    <Build Include="dbo\Tables\EmbarqueCoordinador.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
