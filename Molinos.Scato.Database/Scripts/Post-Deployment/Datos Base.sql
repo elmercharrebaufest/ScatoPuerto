@@ -72,6 +72,7 @@ IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Pala/Paleo') B
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Terceros', '3ro'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Otros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Otros', 'T'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Espera Determinante') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Espera Determinante', 'ED'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros' AND Liquido = 1) BEGIN insert into MotivosFallasBalanza(Nombre, Siglas, Liquido) values ('Terceros', '3ro', 1); END
 GO
 
 --Motivos De Corte
