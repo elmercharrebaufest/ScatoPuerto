@@ -38,6 +38,7 @@ BEGIN
 	DECLARE @idEmbarque INT;
 	DECLARE @muelle NVARCHAR(60);
 	DECLARE @nombreEmbarque NVARCHAR(60);
+	DECLARE @nuevoBuque NVARCHAR(60);
 
 	SELECT @idNominacion = n.id, @idEmbarque = n.Embarque_Id
 	FROM NominacionDatoTecnico dt INNER JOIN Nominacion n ON dt.Id = n.NominacionDatoTecnico_Id
@@ -102,9 +103,13 @@ BEGIN
 		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'VaporInformacion_Id', d.VaporInformacion_Id, i.VaporInformacion_Id, GETDATE()
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
+		SELECT @nuevoBuque = NombreBuque
+		FROM VaporInformacion v INNER JOIN inserted i ON V.Id = i.VaporInformacion_Id
+
+
 		IF (@idEmbarque > 0) BEGIN
 			INSERT INTO NotificacionProgramaDeEmbarque ([TipoAlerta], [Mensaje], [Fecha])
-			VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Propiedad -> Buque.', GETDATE())
+			VALUES (9, 'Se ha editado el embarque ' + @nombreEmbarque + ' - ' + @muelle + ': Cambio de Buque (' + @nombreEmbarque + ' -> ' + @nuevoBuque + ')', GETDATE())
 		END
 	END
 

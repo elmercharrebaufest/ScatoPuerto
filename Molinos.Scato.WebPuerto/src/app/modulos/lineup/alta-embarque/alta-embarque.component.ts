@@ -223,7 +223,7 @@ export class AltaEmbarqueComponent implements OnInit {
             },
             res.materialesPuertoCantidad.map(x => x.materialId)
           );
-          
+
           if (this.embarqueSeleccionado.sanBenito &&  this.embarqueSeleccionado.fechaHoraInicioCarga != null)
               this.ubicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.filter(ubicacion => ubicacion.orden != 1);
 
@@ -646,31 +646,32 @@ export class AltaEmbarqueComponent implements OnInit {
     this.submitted = true;
     if (this.embarqueId == 0) {
 
-      if (this.id_buque == 0){
+      if (this.id_buque == 0) {
         let mensaje = "Debe seleccionar un buque para realizar el alta de embarque.";
         this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
         return false;
       }
       this.guardarAltaEmbarque();
     }
-    else{
+    else {
       // Sino se cambiado el embarque
-      if (this.vaporSeleccionado === undefined || this.vaporSeleccionado == null){
+      if (this.vaporSeleccionado === undefined || this.vaporSeleccionado == null) {
         this.modificarAltaEmbarque();
-      }else{
+      } else {
         // Si se cambiado el embarque y selecciono el mismo embarque
-        if (this.embarqueSeleccionado.vapor.id == this.vaporSeleccionado.id){
+        if (this.embarqueSeleccionado.vapor.id == this.vaporSeleccionado.id) {
           this.modificarAltaEmbarque();
         }
-        if (this.embarqueSeleccionado.vapor.id != this.vaporSeleccionado.id){
+        if (this.embarqueSeleccionado.vapor.id != this.vaporSeleccionado.id) {
           this.mostrarSpinner = true;
-          this.validaAltaEmbarque().subscribe(esValido =>{
+          this.validaAltaEmbarque().subscribe(esValido => {
             this.mostrarSpinner = false;
-            let mensaje = "No se pude modificar el embarque porque ya tiene cargas asociadas.";
-            if (esValido)
-              this.modificarAltaEmbarque();
-            else
+            if (!esValido) {
+              const mensaje = "No se pude modificar el embarque porque ya tiene cargas asociadas.";
               this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+              return;
+            }
+            this.modificarAltaEmbarque();
           });
         }
       }
@@ -979,6 +980,11 @@ export class AltaEmbarqueComponent implements OnInit {
     return this.modalService.open(this.modalABM);
   }
 
+  // TODO: Refactorizar para mejor legibilidad.
+  // Las validaciones podrían hacerse en otras funciones.
+  // Tener una sola función para los diferentes guardados complica la legibilidad.
+  // Las condiciones negativas podrían evaluarse en un if y hacer un return prematuro en vez de estar en un else.
+  // Los mensajes y variables podrían definirse dentro de la condición en la que van a ser utilizadas y no antes.
   //**CONTROL DE BOTONES DE LOS ABM***//
   submitABM(accion) {
     var condicion: string = this.pantallaSeleccionada
@@ -1218,6 +1224,7 @@ export class AltaEmbarqueComponent implements OnInit {
   setinfoSelected(){
     let bandera;
       if(this.vaporInfo.bandera !== undefined || this.vaporInfo.bandera !== null){
+        // TODO: Podría ser "bandera = this.vaporInfo.bandera" ?
         bandera = this.banderasBuque.filter(p => p.id == this.vaporInfo.bandera.id)
       }
 
@@ -1230,6 +1237,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.vaporInfo.manga !== null && this.embarqueForm.controls.manga.setValue(this.vaporInfo.manga);
       this.vaporInfo.puntual !== null && this.embarqueForm.controls.puntal.setValue(this.vaporInfo.puntual);
       this.vaporInfo.cantidadBodegasTks !== null && this.embarqueForm.controls.cantidadBodegasTanques.setValue(this.vaporInfo.cantidadBodegasTks);
+      // TODO: para que hacer la diferencia con null si después asigna null?
       bandera !== null && this.embarqueForm.controls.bandera.setValue(bandera[0] != null ? bandera[0] : null);
       tipoBuqueBD !== null && this.embarqueForm.controls.tipoDeBuque.setValue(tipoBuqueBD[0]);
       this.vaporInfo.imoVapor !== null && this.embarqueForm.controls.imo.setValue(this.vaporInfo.imoVapor);
