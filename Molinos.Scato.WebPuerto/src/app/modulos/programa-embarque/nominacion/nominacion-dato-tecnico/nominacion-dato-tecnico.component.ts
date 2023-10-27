@@ -52,8 +52,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
   public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
   public nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
-  public esEnvioLineUp: boolean = false;
-  public esMuelleDeCarga: boolean = false;
 
   public formatoDestino;
   public formatoVapor;
@@ -183,8 +181,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null){
-            this.esEnvioLineUp = nominacionParametos.nominacion.fechaEnvioLineUp!= null? true : false;
-            this.esMuelleDeCarga = nominacionParametos.nominacion.enMuelleDeCarga? true : false;
             this.inicializarForm();
             this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
             const etaRecalada = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.etaRecalada);
@@ -201,16 +197,23 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.datoTecnicoForm = null;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
   }
+
   private deshabilitarEnvioLineUp(){
-    if (this.esEnvioLineUp){
-      const vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value;
-      if (vaporInformacion!=null){
-        const esLiquido = vaporInformacion.tipoBuque == 'Bulk Carrier'? false: true;
+    const nominacion = this.nominacionParametros.nominacion;
+    if (nominacion.fechaEnvioLineUp) {
+      const vaporInformacion = this.datoTecnicoForm.get('vaporInformacion').value as VaporInformacion;
+      if (vaporInformacion) {
+        const esLiquido = vaporInformacion.tipoBuque != 'Bulk Carrier';
         this.filtrarMaterialEnvioLineUp(esLiquido);
       }
-      this.datoTecnicoForm.controls['vaporInformacion'].disable();
+      this.nominacionService.validarPuedeCambiarBuque(nominacion.id).subscribe(puedeCambiar => {
+        if (!puedeCambiar) {
+          this.datoTecnicoForm.controls['vaporInformacion'].disable();
+        }
+      });
     }
-    if (this.esMuelleDeCarga){
+    if (nominacion.enMuelleDeCarga) {
+      this.datoTecnicoForm.controls['vaporInformacion'].disable();
       this.datoTecnicoForm.controls['materialPuerto'].disable();
       this.datoTecnicoForm.controls['tipoDeCalidad'].disable();
       this.datoTecnicoForm.controls['cantidadTotal'].disable();
@@ -218,6 +221,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoForm.controls['muelleDeCarga'].disable();
     }
   }
+
   private inicializarFormEdicion(datoTecnicoForm: FormGroup, dataTecnico: NominacionDatoTecnico) {
     let material: MaterialPuerto = null;
     let datoTecnicoCalidadSel = null;
@@ -563,7 +567,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     let agenciaMaritimaPuerto = this.datoTecnicoForm.value.agenciaMaritimaPuerto;
     let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
     let surveyor = this.datoTecnicoForm.value.surveyor;
-
+    // TODO: Refactorizar. Podría usarse datoTecnicoForm.getRawValue() para obtener todos los valores del form
+    // No hay necesidad de usar JSON. La asignación de datos es innecesarias del objeto jsonDatoTecnico es innecesaria
     let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.value));
     jsonDatoTecnico.id                                    =this.datoTecnicoForm.controls["id"].value;
     jsonDatoTecnico.materialPuerto                        =this.datoTecnicoForm.controls["materialPuerto"].value;
@@ -690,10 +695,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       nominacionValida.materialPuerto = this.datoTecnicoForm.controls['materialPuerto'].value;
       nominacionValida.muelleDeCarga = this.datoTecnicoForm.controls['muelleDeCarga'].value;
       nominacionValida.vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value;
-      let validacion: boolean = false;
-      forkJoin([
-        this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida)
-      ]).pipe(takeUntil(this.destroy$)).subscribe(([validacion]) => {
+      this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida).pipe(takeUntil(this.destroy$)).subscribe(validacion => {
         this.guardarDatoTecnico(validacion);
       });
     }

@@ -443,9 +443,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       else {
         this.setTurnoODia();
       }
-    } else {
-      this.setTurnoODia(false, 0, true);
-    }
+    } 
+    //NO CREAR TURNO POR DEFAULT
+    // else {
+    //   this.setTurnoODia(false, 0, true);
+    // }
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number, noExisteTurno:boolean = false) {
@@ -537,8 +539,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean) {
     if (!esNuevoTurno)
       (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno, esNuevoTurno));
-    else
-      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
+    // SE QUITA ASIGNACION DE TURNO POR DEFAULT A PEDIDO DEL CLIENTE
+    // else
+    //   (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
   }
 
   setDia(dia: any, turno?: PlanillaDeTurnos, date?: Date) {
