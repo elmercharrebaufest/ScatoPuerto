@@ -131,8 +131,8 @@ export class ModalCrearBuqueComponent implements OnInit {
 
   public onInputNombreBuque(e: Event) {
     const input = e.target as HTMLInputElement;
-    this.crearEditarBuqueForm['controls'].nombreBuque.setValue(input.value.toUpperCase());
-  }
+    this.crearEditarBuqueForm['controls'].nombreBuque.setValue(input.value.toUpperCase());    
+  }  
 
   public onBlurBandera() {
     this.listadoBanderasModificadas = !this.crearEditarBuqueForm.value.bandera;
@@ -275,7 +275,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       vaporId: this.id > 0 ? this.id  : null,
       // nombrebuque: typeof buque.nombreBuque.nombre !== 'object'  ? buque.nombreBuque : buque.nombreBuque.nombre,
       bandera: buque.bandera,
-      nombrebuque: buque.nombreBuque,
+      nombrebuque: buque.nombreBuque.trim(),
       tipoBuque: buque.tipoBuque.nombre,
       categoriaBuque: '',
       imoVapor: buque.imoVapor,

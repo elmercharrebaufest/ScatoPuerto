@@ -38,8 +38,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     nominacion.NominacionDatoTecnico = nominacionDatoTecnico;
                     Repositorio.GuardarCambios();
                 }
-
-                if (!comando.EsCreacion)
+                else
                 {
                     var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
                     var datoTecnico = comando.Dto.NominacionDatoTecnico;
@@ -59,6 +58,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             var datoTecnico = comando.Dto.NominacionDatoTecnico;
             var nominacionDatoTecnico = comando.EsCreacion ? new NominacionDatoTecnico() : Repositorio.Obtener<NominacionDatoTecnico>(datoTecnico.Id);
+            bool cambioVapor;
 
             MuelleDeCarga muelleDeCarga = null;
             TasaDeCarga tasaDeCarga = null;
@@ -77,6 +77,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             surveyor = datoTecnico.Surveyor != null ? Repositorio.Obtener<Surveyor>(x => x.Id == datoTecnico.Surveyor.Id) : surveyor;
             vaporInformacion = datoTecnico.VaporInformacion != null ? Repositorio.Obtener<VaporInformacion>(x => x.Id == datoTecnico.VaporInformacion.Id) : vaporInformacion;
             materialPuerto = datoTecnico.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(x => x.Id == datoTecnico.MaterialPuerto.Id) : materialPuerto;
+
+            cambioVapor = nominacionDatoTecnico.VaporInformacion?.Id != vaporInformacion.Id;
 
             nominacionDatoTecnico.MaterialPuerto = materialPuerto;
             nominacionDatoTecnico.CantidadTotal = datoTecnico.CantidadTotal;
@@ -98,7 +100,43 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             if (!comando.EsCreacion)
             {
+                // TODO: Modificar notificaciones para que no se hagan por trigger en base de datos.
+                // Es necesario primero hacer el guardado de la edición de la nominación para poder notificar correctamente,
+                // ya que el nombre del buque anterior se obtiene del embarque y si guardo ambos a la vez ya va a estar efectuado
+                // el cambio en el embarque se hace antes y no puedo obtener el nombre del buque previo en el trigger.
                 Repositorio.GuardarCambios();
+                if (cambioVapor)
+                {
+                    var embarque = Repositorio.Obtener<Nominacion>(n => n.NominacionDatoTecnico.Id == nominacionDatoTecnico.Id).Embarque;
+                    if (embarque != null)
+                    {
+                        var lineup = Repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarque.Id);
+                        var planillasDeTurnos = lineup?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos;
+                        var puedeCambiarBuque = !(planillasDeTurnos != null && planillasDeTurnos.Count > 0);
+                        if (puedeCambiarBuque)
+                        {
+                            var embarqueInformacion = embarque.EmbarqueInformacion.FirstOrDefault();
+                            if (embarqueInformacion != null)
+                            {
+                                embarqueInformacion.Bandera = vaporInformacion.Bandera;
+                                embarqueInformacion.IMO = vaporInformacion.ImoVapor;
+                                embarqueInformacion.FechaRegistro = DateTime.Now;
+                            }
+
+                            embarque.Freeboard = vaporInformacion.Freeboard;
+                            embarque.PorteNeto = vaporInformacion.PorteNeto;
+                            embarque.PorteBruto = vaporInformacion.PorteBruto;
+                            embarque.Eslora = vaporInformacion.Eslora;
+                            embarque.Manga = vaporInformacion.Manga;
+                            embarque.Puntal = vaporInformacion.Puntual;
+                            embarque.CantidadBodegasTanques = vaporInformacion.CantidadBodegasTks;
+                            embarque.TipoBuque = vaporInformacion.TipoBuque;
+                            embarque.Vapor = vaporInformacion.Vapor;
+                            embarque.Patente = vaporInformacion.NombreBuque;
+                        }
+                        Repositorio.GuardarCambios();
+                    }
+                }
             }
 
             return nominacionDatoTecnico;
