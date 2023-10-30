@@ -11836,7 +11836,7 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 #region variables
-                string coordinador = "-";
+                string[] coordinadores;
                 string ata = "-";
                 string agenciaMaritima = "-";
                 string estiba = "-";
@@ -11845,7 +11845,7 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
 
                 #region obtener datos
-                Dictionary<string, string> actoresEmbarque = new Dictionary<string, string>();
+                Dictionary<string, string> actoresEmbarque = new Dictionary<string, object>();
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
                 Embarque embarque = lineUp.Embarque;
                 PlanoDeCarga plano = lineUp.PlanoDeCarga;
@@ -11853,7 +11853,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 #region comprobaciones
                 if (embarque.Coordinadores != null)
-                    coordinador = embarque.Coordinadores.Nombre != null ? embarque.Coordinadores.Nombre : "";
+                    coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
 
                 if (embarque.ATA != null)
                     ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
@@ -11874,7 +11874,7 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
 
                 #region llenarLista
-                actoresEmbarque.Add("coordinador", coordinador);
+                actoresEmbarque.Add("coordinador", coordinadores);
                 actoresEmbarque.Add("ata", ata);
                 actoresEmbarque.Add("agenciaMaritima", agenciaMaritima);
                 actoresEmbarque.Add("estiba", estiba);
