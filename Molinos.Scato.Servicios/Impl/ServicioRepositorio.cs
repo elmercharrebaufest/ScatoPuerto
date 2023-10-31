@@ -11845,7 +11845,7 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
 
                 #region obtener datos
-                Dictionary<string, string> actoresEmbarque = new Dictionary<string, object>();
+                Dictionary<string, object> actoresEmbarque = new Dictionary<string, object>();
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
                 Embarque embarque = lineUp.Embarque;
                 PlanoDeCarga plano = lineUp.PlanoDeCarga;
