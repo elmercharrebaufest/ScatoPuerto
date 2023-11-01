@@ -1,47 +1,70 @@
-.columa-ancho-total{ 
+.columa-ancho-total {
     width: 100%;
 }
-.alinear-controles{
+
+.alinear-controles {
     width: 100% !important;
 }
-.color-linea-division{ 
+
+.color-linea-division {
     background-color: #ebe8e8;
 }
-.quitar-margen-detalles{ 
+
+.quitar-margen-detalles {
     margin-left: -15px;
 }
-.margen-superior-detalle{ 
+
+.margen-superior-detalle {
     margin-top: 10px;
 }
-.header-calida-valor{
+
+.header-calida-valor {
     font-weight: bold;
     font-size: 16px;
     background-color: #E8E8E8;
 }
+
 input.largerCheckbox {
-    transform : scale(1.2);
+    transform: scale(1.2);
     margin-right: 5px;
 }
-.botones-registro-centrado{
+
+.botones-registro-centrado {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.botones-registro-custom{ 
+
+.botones-registro-custom {
     padding-left: 20px;
     padding-right: 20px;
     font-weight: 500;
     margin-left: 10px;
     margin-right: 10px;
 }
+
 .botones-alineado-abajo {
     display: flex;
     align-items: flex-end;
 }
-.cursorPointer{
+
+.cursorPointer {
     cursor: pointer;
 
 }
+
 .input-error {
     border: 1px solid red !important;
+}
+
+.exportadores>div {
+    padding-inline: 0.5%;
+}
+
+.exportadores>div.tolerancia-max {
+    padding-inline-end: 0.25%;
+}
+
+.exportadores>div.tolerancia-min {
+    padding-inline-start: 0.25%;
 }

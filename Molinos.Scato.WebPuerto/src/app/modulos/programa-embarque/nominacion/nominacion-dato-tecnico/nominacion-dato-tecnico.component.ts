@@ -270,6 +270,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
     if (dataTecnico.obligacionDeCarga !=null)
       obligacionDeCarga = new Date(dataTecnico.obligacionDeCarga).toISOString().slice(0, 10);
+
     datoTecnicoForm.controls['id'].setValue(dataTecnico.id);
     datoTecnicoForm.controls['materialPuerto'].setValue(material);
     datoTecnicoForm.controls['tipoDeCalidad'].setValue(tipoDeCalidad);
@@ -553,47 +554,17 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   public crearObjectoDatoTecnico(): Nominacion{
     let nominacion: Nominacion = new Nominacion();
-    const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
-    let listaCalidadSeleccionada = [];
-    listaNominacionCalidad.forEach(calidad=>{
-      listaCalidadSeleccionada.push({
-        nominacionDatoTecnicoCalidad_Id: 0,
-        calidadValor: calidad.calidadValor,
-        nominacionDatoTecnico: null
-      });
-    });
+    const listaCalidadSeleccionada = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true).map(calidad => ({
+      nominacionDatoTecnicoCalidad_Id: 0,
+      calidadValor: calidad.calidadValor,
+      nominacionDatoTecnico: null
+    }));
     this.datoTecnicoForm.controls['nominacionDatoTecnicoCalidad'].setValue(listaCalidadSeleccionada);
     this.datoTecnicoForm.value.nominacionDatoTecnicoCalidad = listaCalidadSeleccionada;
     let agenciaMaritimaPuerto = this.datoTecnicoForm.value.agenciaMaritimaPuerto;
     let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
     let surveyor = this.datoTecnicoForm.value.surveyor;
-    // TODO: Refactorizar. Podría usarse datoTecnicoForm.getRawValue() para obtener todos los valores del form
-    // No hay necesidad de usar JSON. La asignación de datos es innecesarias del objeto jsonDatoTecnico es innecesaria
     let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.value));
-    jsonDatoTecnico.id                                    =this.datoTecnicoForm.controls["id"].value;
-    jsonDatoTecnico.materialPuerto                        =this.datoTecnicoForm.controls["materialPuerto"].value;
-    jsonDatoTecnico.tipoDeCalidad                         =this.datoTecnicoForm.controls["tipoDeCalidad"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoCalidad          =this.datoTecnicoForm.controls["nominacionDatoTecnicoCalidad"].value;
-    jsonDatoTecnico.cantidadTotal                         =this.datoTecnicoForm.controls["cantidadTotal"].value;
-    jsonDatoTecnico.tolerancia                            =this.datoTecnicoForm.controls["tolerancia"].value;
-    jsonDatoTecnico.observaciones                         =this.datoTecnicoForm.controls["observaciones"].value;
-    jsonDatoTecnico.vaporInformacion                      =this.datoTecnicoForm.controls["vaporInformacion"].value;
-    jsonDatoTecnico.bandera                               =this.datoTecnicoForm.controls["bandera"].value;
-    jsonDatoTecnico.etaRecalada                           =this.datoTecnicoForm.controls["etaRecalada"].value;
-    jsonDatoTecnico.obligacionDeCarga                     =this.datoTecnicoForm.controls["obligacionDeCarga"].value;
-    jsonDatoTecnico.muelleDeCarga                         =this.datoTecnicoForm.controls["muelleDeCarga"].value;
-    jsonDatoTecnico.tasaDeCarga                           =this.datoTecnicoForm.controls["tasaDeCarga"].value;
-    jsonDatoTecnico.tasaDeCargaValor                      =this.datoTecnicoForm.controls["tasaDeCargaValor"].value;
-    jsonDatoTecnico.dem                                   =this.datoTecnicoForm.controls["dem"].value;
-    jsonDatoTecnico.des                                   =this.datoTecnicoForm.controls["des"].value;
-    jsonDatoTecnico.tipoDeContrato                        =this.datoTecnicoForm.controls["tipoDeContrato"].value;
-    jsonDatoTecnico.ataPuerto                             =this.datoTecnicoForm.controls["ataPuerto"].value;
-    jsonDatoTecnico.agenciaMaritimaPuerto                 =this.datoTecnicoForm.controls["agenciaMaritimaPuerto"].value;
-    jsonDatoTecnico.surveyor                              =this.datoTecnicoForm.controls["surveyor"].value;
-    jsonDatoTecnico.observacionesSurveyor                 =this.datoTecnicoForm.controls["observacionesSurveyor"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoExportador       =this.datoTecnicoForm.controls["nominacionDatoTecnicoExportador"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoDestino          =this.datoTecnicoForm.controls["nominacionDatoTecnicoDestino"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoCoordinadorPuerto=this.datoTecnicoForm.controls["nominacionDatoTecnicoCoordinadorPuerto"].value;
     jsonDatoTecnico.agenciaMaritimaPuerto = (agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
     this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);
     jsonDatoTecnico.ataPuerto = (ataPuerto != null && ataPuerto.length > 0 ? this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
