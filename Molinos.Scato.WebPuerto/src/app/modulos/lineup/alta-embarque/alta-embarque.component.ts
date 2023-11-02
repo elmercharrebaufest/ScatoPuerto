@@ -311,15 +311,23 @@ export class AltaEmbarqueComponent implements OnInit {
             });
           }
 
+          // this.embarqueService.obtenerListadoCoordinadores().subscribe(res1 => {
+          //   res.coordinadores = res1.map(x => new CoordinadorPuerto(x.id, x.nombre));
+          // });
+          // if (this.embarqueForm.value['coordinadores'] != null) {
+          //   this.embarqueService.obtenerListadoCoordinadores().subscribe(res1 => {
+              
+          //   });
+          // }
+
+
           this.embarqueService.obtenerListadoCoordinadores().subscribe(res1 => {
             res.coordinadores = res1.map(x => new CoordinadorPuerto(x.id, x.nombre));
-          });
-          if (this.embarqueForm.value['coordinadores'] != null) {
-            this.embarqueService.obtenerListadoCoordinadores().subscribe(res1 => {
+            if (this.embarqueForm.value['coordinadores'] != null) {
               this.embarqueForm.get('coordinadoresList').setValue(
                 res1.filter(x => x.id == this.embarqueForm.value['coordinadores'].id).map(x => new CoordinadorPuerto(x.id, x.nombre)));
-            });
-          }
+            }
+          })
 
           this.embarqueService.obtenerListadoATAPuerto().subscribe(res1 => {
             res.ata = res1.map(x => new ATAPuerto(x.id, x.nombre));
