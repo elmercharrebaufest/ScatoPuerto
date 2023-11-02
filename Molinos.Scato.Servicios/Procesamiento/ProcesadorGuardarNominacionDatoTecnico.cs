@@ -330,6 +330,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     exportador.Exportador = Repositorio.Obtener<Exportador>(x => x.Id == dto.Exportador.Id);
                     exportador.Cantidad = dto.Cantidad;
                     exportador.Tolerancia = dto.Tolerancia;
+                    exportador.ToleranciasDiferenciadas = dto.ToleranciasDiferenciadas;
+                    exportador.ToleranciaPositiva = dto.ToleranciaPositiva;
+                    exportador.ToleranciaNegativa = dto.ToleranciaNegativa;
                     Repositorio.GuardarCambios();
                 }
 

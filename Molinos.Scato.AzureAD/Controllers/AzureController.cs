@@ -9,11 +9,13 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Configuration;
 using Microsoft.Identity;
+using log4net;
 
 namespace Molinos.Scato.AzureAD.Controllers
 {
     public class AzureController : ApiController
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(AzureController));
         [HttpGet]
         //[Route ("consultarPermisos/{id}")]
         [Route("azure/{mail}/{password}")]
@@ -144,11 +146,16 @@ namespace Molinos.Scato.AzureAD.Controllers
                 var App = new login.PublicAppUsingUsernamePassword(ap);
                 var result = App.AcquireATokenFromCacheOrUsernamePasswordAsync(Scopes, mail, password).GetAwaiter().GetResult();
 
+                if(result == null)
+                {
+                    throw (new Exception("No se ha podido validar el inicio de sesión. Verificar credenciales. Si el problema persiste contactar al equipo de soporte."));
+                }
+
                 var gruposAD = new login.GroupsAD();
                 var grupos = gruposAD.obtenerGrupos(result);
 
                 #endregion
-
+                log.Info("Inicio de sesion: " + mail + "Grupos: " + grupos.ToString());
                 return Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     username = mail,
@@ -160,11 +167,11 @@ namespace Molinos.Scato.AzureAD.Controllers
             }
             catch (Exception ex)
             {
+                log.Error("Error al iniciar sesion.Usuario: "+ mail, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, new
                 {
                     message = ex.Message
                 });
-
             }
 
         }

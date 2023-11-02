@@ -12,5 +12,8 @@ namespace Molinos.Scato.Dominio.Dto
         public ExportadorDto Exportador { get; set; }
         public int Cantidad { get; set; }
         public int Tolerancia { get; set; }
+        public bool? ToleranciasDiferenciadas { get; set; }
+        public int? ToleranciaPositiva { get; set; }
+        public int? ToleranciaNegativa { get; set; }
     }
 }

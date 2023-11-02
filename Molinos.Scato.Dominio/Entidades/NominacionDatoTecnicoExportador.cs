@@ -15,5 +15,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Exportador Exportador { get; set; }
         public virtual int Cantidad { get; set; }
         public virtual int Tolerancia { get; set; }
+        public virtual bool? ToleranciasDiferenciadas { get; set; }
+        public virtual int? ToleranciaPositiva { get; set; }
+        public virtual int? ToleranciaNegativa { get; set; }
     }
 }
