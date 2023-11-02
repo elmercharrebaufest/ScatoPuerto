@@ -98,7 +98,12 @@
                           [class]="'NominacionDatoTecnicoExportador' + cargador.id">
                             {{ cargador.exportador.nombre }}:
                             {{ cargador.cantidad | number : '1.0-0'}} tn
-                            +/- {{ cargador.tolerancia }}%
+                            <ng-container *ngIf="cargador.toleranciasDiferenciadas">
+                              + {{ cargador.toleranciaPositiva }}% / - {{cargador.toleranciaNegativa}}%
+                            </ng-container>
+                            <ng-container *ngIf="!cargador.toleranciasDiferenciadas">
+                              +/- {{ cargador.tolerancia }}%
+                            </ng-container>
                         </div>
                         <br>
                         <label><strong>Cantidad x cliente: </strong></label>
