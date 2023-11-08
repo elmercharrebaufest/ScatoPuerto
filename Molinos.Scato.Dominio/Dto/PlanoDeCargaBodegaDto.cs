@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int BodegaParcel { get; set; }
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public string Condicion { get; set; }
         public string SfFull { get; set; }

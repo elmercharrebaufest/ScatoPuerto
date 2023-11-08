@@ -9173,14 +9173,14 @@ namespace Molinos.Scato.Servicios.Impl
             }).ToList();
             foreach (var destino in destinos)
             {
-                body += $"\t {destino.Destino.Trim().PadRight(10, '.')} {destino.Cantidad} tn. \n";
+                body += $"\t {destino.Destino.Trim().PadRight(10, '.')} {destino.Cantidad.ToString().Replace('.', ',')} tn. \n";
             }
 
             body += "\n\f-------------------------------------------------------------------------------------------------\f\f\n";
             body += " \fPlano de carga: \f\f\n";
             foreach (var bodega in planoDeCargaBodegas)
             {
-                body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad} tn. ";
+                body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
                 if (bodega.Destino != null)
                     body += $"{bodega.Destino.Nombre.Trim()}. \n";
                 else
@@ -9189,7 +9189,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             var planoDeCarga = repositorio.Obtener<PlanoDeCarga>(planoDeCargaId);
 
-            body += $"\n\f Total a cargar: \f\f....... {planoDeCargaBodegas.Sum(x => x.Cantidad)} tn. (A un calado {planoDeCarga.CaladoSalida.ToString()} mts.).\n";
+            body += $"\n\f Total a cargar: \f\f....... {planoDeCargaBodegas.Sum(x => x.Cantidad).ToString().Replace('.', ',')} tn. (A un calado {planoDeCarga.CaladoSalida.ToString()} mts.).\n";
             body += "\f-------------------------------------------------------------------------------------------------\f\f\n\n";
 
             body += $"\fEncargado de agencia: \f\f";
