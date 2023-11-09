@@ -8113,6 +8113,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var lineup = repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == planoDeCargaDto.Id);
                 var nominaciones = repositorio.Listar<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
+
                 var datosTecnicosExportadores = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador);
                 foreach (var datosTecnicosExportador in datosTecnicosExportadores)
                 {
@@ -8128,6 +8129,12 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     cargaComercial.MaterialPuerto = conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(datosTecnicosExportador.NominacionDatoTecnico.MaterialPuerto);
                     planoDeCargaDto.CargasComerciales.Add(cargaComercial);
+                }
+
+                var intervencion = nominaciones.FirstOrDefault(n => n.NominacionDetalleIntervencion != null && n.NominacionDetalleIntervencion.Fumigacion == "Si")?.NominacionDetalleIntervencion;
+                if (intervencion != null) {
+                    planoDeCargaDto.Fumigacion = true;
+                    planoDeCargaDto.EmpresaFumigadora = intervencion.CompaniaDeFumigacion.Descripcion;
                 }
             }
 

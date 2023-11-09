@@ -52,8 +52,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public datoTecnicoDestino: NominacionDatoTecnicoDestino[];
   public datoTecnicoCoordinador: NominacionDatoTecnicoCoordinador[];
   public nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[];
-  public esEnvioLineUp: boolean = false;
-  public esMuelleDeCarga: boolean = false;
 
   public formatoDestino;
   public formatoVapor;
@@ -183,8 +181,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null){
-            this.esEnvioLineUp = nominacionParametos.nominacion.fechaEnvioLineUp!= null? true : false;
-            this.esMuelleDeCarga = nominacionParametos.nominacion.enMuelleDeCarga? true : false;
             this.inicializarForm();
             this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
             const etaRecalada = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.etaRecalada);
@@ -201,16 +197,23 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.datoTecnicoForm = null;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
   }
+
   private deshabilitarEnvioLineUp(){
-    if (this.esEnvioLineUp){
-      const vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value;
-      if (vaporInformacion!=null){
-        const esLiquido = vaporInformacion.tipoBuque == 'Bulk Carrier'? false: true;
+    const nominacion = this.nominacionParametros.nominacion;
+    if (nominacion.fechaEnvioLineUp) {
+      const vaporInformacion = this.datoTecnicoForm.get('vaporInformacion').value as VaporInformacion;
+      if (vaporInformacion) {
+        const esLiquido = vaporInformacion.tipoBuque != 'Bulk Carrier';
         this.filtrarMaterialEnvioLineUp(esLiquido);
       }
-      this.datoTecnicoForm.controls['vaporInformacion'].disable();
+      this.nominacionService.validarPuedeCambiarBuque(nominacion.id).subscribe(puedeCambiar => {
+        if (!puedeCambiar) {
+          this.datoTecnicoForm.controls['vaporInformacion'].disable();
+        }
+      });
     }
-    if (this.esMuelleDeCarga){
+    if (nominacion.enMuelleDeCarga) {
+      this.datoTecnicoForm.controls['vaporInformacion'].disable();
       this.datoTecnicoForm.controls['materialPuerto'].disable();
       this.datoTecnicoForm.controls['tipoDeCalidad'].disable();
       this.datoTecnicoForm.controls['cantidadTotal'].disable();
@@ -218,6 +221,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoForm.controls['muelleDeCarga'].disable();
     }
   }
+
   private inicializarFormEdicion(datoTecnicoForm: FormGroup, dataTecnico: NominacionDatoTecnico) {
     let material: MaterialPuerto = null;
     let datoTecnicoCalidadSel = null;
@@ -266,6 +270,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
     if (dataTecnico.obligacionDeCarga !=null)
       obligacionDeCarga = new Date(dataTecnico.obligacionDeCarga).toISOString().slice(0, 10);
+
     datoTecnicoForm.controls['id'].setValue(dataTecnico.id);
     datoTecnicoForm.controls['materialPuerto'].setValue(material);
     datoTecnicoForm.controls['tipoDeCalidad'].setValue(tipoDeCalidad);
@@ -549,46 +554,17 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
   public crearObjectoDatoTecnico(): Nominacion{
     let nominacion: Nominacion = new Nominacion();
-    const listaNominacionCalidad = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true);
-    let listaCalidadSeleccionada = [];
-    listaNominacionCalidad.forEach(calidad=>{
-      listaCalidadSeleccionada.push({
-        nominacionDatoTecnicoCalidad_Id: 0,
-        calidadValor: calidad.calidadValor,
-        nominacionDatoTecnico: null
-      });
-    });
+    const listaCalidadSeleccionada = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true).map(calidad => ({
+      nominacionDatoTecnicoCalidad_Id: 0,
+      calidadValor: calidad.calidadValor,
+      nominacionDatoTecnico: null
+    }));
     this.datoTecnicoForm.controls['nominacionDatoTecnicoCalidad'].setValue(listaCalidadSeleccionada);
     this.datoTecnicoForm.value.nominacionDatoTecnicoCalidad = listaCalidadSeleccionada;
     let agenciaMaritimaPuerto = this.datoTecnicoForm.value.agenciaMaritimaPuerto;
     let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
     let surveyor = this.datoTecnicoForm.value.surveyor;
-
     let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.value));
-    jsonDatoTecnico.id                                    =this.datoTecnicoForm.controls["id"].value;
-    jsonDatoTecnico.materialPuerto                        =this.datoTecnicoForm.controls["materialPuerto"].value;
-    jsonDatoTecnico.tipoDeCalidad                         =this.datoTecnicoForm.controls["tipoDeCalidad"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoCalidad          =this.datoTecnicoForm.controls["nominacionDatoTecnicoCalidad"].value;
-    jsonDatoTecnico.cantidadTotal                         =this.datoTecnicoForm.controls["cantidadTotal"].value;
-    jsonDatoTecnico.tolerancia                            =this.datoTecnicoForm.controls["tolerancia"].value;
-    jsonDatoTecnico.observaciones                         =this.datoTecnicoForm.controls["observaciones"].value;
-    jsonDatoTecnico.vaporInformacion                      =this.datoTecnicoForm.controls["vaporInformacion"].value;
-    jsonDatoTecnico.bandera                               =this.datoTecnicoForm.controls["bandera"].value;
-    jsonDatoTecnico.etaRecalada                           =this.datoTecnicoForm.controls["etaRecalada"].value;
-    jsonDatoTecnico.obligacionDeCarga                     =this.datoTecnicoForm.controls["obligacionDeCarga"].value;
-    jsonDatoTecnico.muelleDeCarga                         =this.datoTecnicoForm.controls["muelleDeCarga"].value;
-    jsonDatoTecnico.tasaDeCarga                           =this.datoTecnicoForm.controls["tasaDeCarga"].value;
-    jsonDatoTecnico.tasaDeCargaValor                      =this.datoTecnicoForm.controls["tasaDeCargaValor"].value;
-    jsonDatoTecnico.dem                                   =this.datoTecnicoForm.controls["dem"].value;
-    jsonDatoTecnico.des                                   =this.datoTecnicoForm.controls["des"].value;
-    jsonDatoTecnico.tipoDeContrato                        =this.datoTecnicoForm.controls["tipoDeContrato"].value;
-    jsonDatoTecnico.ataPuerto                             =this.datoTecnicoForm.controls["ataPuerto"].value;
-    jsonDatoTecnico.agenciaMaritimaPuerto                 =this.datoTecnicoForm.controls["agenciaMaritimaPuerto"].value;
-    jsonDatoTecnico.surveyor                              =this.datoTecnicoForm.controls["surveyor"].value;
-    jsonDatoTecnico.observacionesSurveyor                 =this.datoTecnicoForm.controls["observacionesSurveyor"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoExportador       =this.datoTecnicoForm.controls["nominacionDatoTecnicoExportador"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoDestino          =this.datoTecnicoForm.controls["nominacionDatoTecnicoDestino"].value;
-    jsonDatoTecnico.nominacionDatoTecnicoCoordinadorPuerto=this.datoTecnicoForm.controls["nominacionDatoTecnicoCoordinadorPuerto"].value;
     jsonDatoTecnico.agenciaMaritimaPuerto = (agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
     this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);
     jsonDatoTecnico.ataPuerto = (ataPuerto != null && ataPuerto.length > 0 ? this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
@@ -690,10 +666,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       nominacionValida.materialPuerto = this.datoTecnicoForm.controls['materialPuerto'].value;
       nominacionValida.muelleDeCarga = this.datoTecnicoForm.controls['muelleDeCarga'].value;
       nominacionValida.vaporInformacion = this.datoTecnicoForm.controls['vaporInformacion'].value;
-      let validacion: boolean = false;
-      forkJoin([
-        this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida)
-      ]).pipe(takeUntil(this.destroy$)).subscribe(([validacion]) => {
+      this.datoTecnicoRegistroService.validarCreacionNominacion(nominacionValida).pipe(takeUntil(this.destroy$)).subscribe(validacion => {
         this.guardarDatoTecnico(validacion);
       });
     }
