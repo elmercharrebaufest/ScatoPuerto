@@ -149,7 +149,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             InsertarFilaConValores(new string[] { "Cantidad por cargadores" }, true, true); // Negrita y borde sup
             foreach (var item in datoTecnico.NominacionDatoTecnicoExportador)
             {
-                valoresCeldas = new string[] { item.Exportador.Nombre, String.Format("{0} tn +/- {1}%", item.Cantidad, item.Tolerancia) };
+                string tolerancia = item.ToleranciasDiferenciadas == true ? String.Format("+ {0}% / - {1}%", item.ToleranciaPositiva, item.ToleranciaNegativa) : String.Format("+/- {0}%", item.Tolerancia);
+                valoresCeldas = new string[] { item.Exportador.Nombre, String.Format("{0} tn {1}", item.Cantidad, tolerancia) };
                 InsertarFilaConValores(valoresCeldas); // Normal
             }
             _flagColor = !_flagColor;
@@ -242,23 +243,26 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 "FITO", "Muestras oficiales", "Certificado de inocuidad", "Certificado Veterinario"
             };
             InsertarFilaConValores(valoresCeldas, true); // Negrita
-            foreach (var intervencion in detalleIntervencion.Senasa)
+            if (detalleIntervencion != null)
             {
-                valoresCeldas = new string[] {
-                    intervencion.Exportador.Nombre ?? "-",
-                    intervencion.TieneSenasa ? "SI" : "NO",
-                    intervencion.Consumo ?? "-",
-                    intervencion.ACuentaDe ?? "-",
-                    intervencion.Destino?.Nombre ?? "-",
-                    intervencion.IP ? "SI" : "NO",
-                    intervencion.GMO ? "SI" : "NO",
-                    intervencion.FITO ? "SI" : "NO",
-                    intervencion.MuestraOficial ? "SI" : "NO",
-                    intervencion.CertificadoInocuidad ? "SI" : "NO",
-                    intervencion.CertificadoVeterinario ? "SI" : "NO"
-                };
-                var ultimo = intervencion == detalleIntervencion.Senasa.Last();
-                InsertarFilaConValores(valoresCeldas, bordeInfGrueso: ultimo); //  inf
+                foreach (var intervencion in detalleIntervencion.Senasa)
+                {
+                    valoresCeldas = new string[] {
+                        intervencion.Exportador.Nombre ?? "-",
+                        intervencion.TieneSenasa ? "SI" : "NO",
+                        intervencion.Consumo ?? "-",
+                        intervencion.ACuentaDe ?? "-",
+                        intervencion.Destino?.Nombre ?? "-",
+                        intervencion.IP ? "SI" : "NO",
+                        intervencion.GMO ? "SI" : "NO",
+                        intervencion.FITO ? "SI" : "NO",
+                        intervencion.MuestraOficial ? "SI" : "NO",
+                        intervencion.CertificadoInocuidad ? "SI" : "NO",
+                        intervencion.CertificadoVeterinario ? "SI" : "NO"
+                    };
+                    var ultimo = intervencion == detalleIntervencion.Senasa.Last();
+                    InsertarFilaConValores(valoresCeldas, bordeInfGrueso: ultimo); //  inf
+                }
             }
             #endregion
         }

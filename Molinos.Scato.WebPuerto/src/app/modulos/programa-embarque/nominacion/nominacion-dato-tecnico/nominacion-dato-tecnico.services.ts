@@ -87,19 +87,28 @@ export class NominacionDatoTecnicoRegistroService {
     }
 
     public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
-      const group = exportador ? this.formBuilder.group({
-        id: exportador.id,
-        exportador: exportador.exportador,
-        cantidad: exportador.cantidad,
-        tolerancia: exportador.tolerancia || 0,
-        nominacionDatoTecnico_Id: nominacionDatoTecnico
-      }) : this.formBuilder.group({
+      const group = this.formBuilder.group({
         id: '',
         exportador: ['', Validators.required],
         cantidad: [0, Validators.required],
         tolerancia: 0,
         nominacionDatoTecnico_Id: '',
+        toleranciasDiferenciadas: false,
+        toleranciaPositiva: 0,
+        toleranciaNegativa: 0
       });
+      if (exportador) {
+        group.patchValue({
+          id: exportador.id,
+          exportador: exportador.exportador,
+          cantidad: exportador.cantidad,
+          tolerancia: exportador.tolerancia || 0,
+          nominacionDatoTecnico_Id: nominacionDatoTecnico,
+          toleranciasDiferenciadas: exportador.toleranciasDiferenciadas || false,
+          toleranciaPositiva: exportador.toleranciaPositiva || 0,
+          toleranciaNegativa: exportador.toleranciaNegativa || 0
+        });
+      }
       return group;
     }
 
