@@ -392,7 +392,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   extraeNombre(objeto): string {
-    return objeto != null ? objeto?.nombre?.toString() : '';
+    return objeto != null ? objeto?.nombre?.toString(): '';
   }
 
   get filteredMaterialList(): MaterialPuertoCantidad[] { return this.instanciaWorkflow.embarque.materialesPuertoCantidad.filter(x => x.cantidad > 0); }
