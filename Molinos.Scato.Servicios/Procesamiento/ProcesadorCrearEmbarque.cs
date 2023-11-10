@@ -104,15 +104,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         });
                     }
 
+                    
+
                     var embarqueCoordinadores = comando.Embarque.Coordinadores.Select(coo => new EmbarqueCoordinador
                     {
                         CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id),
                         Embarque = embarque
                     }).ToList();
 
-                    Repositorio.Agregar(embarqueCoordinadores);
-
-
+                    foreach (var item in embarqueCoordinadores)
+                    {
+                        Repositorio.Agregar(item);
+                    }
+                   
                     Repositorio.Agregar(embarque);
                     Repositorio.GuardarCambios();
                     resultado.Id = (int)embarque.GetType().GetProperty("Id").GetValue(embarque, null);

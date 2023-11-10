@@ -8,6 +8,7 @@ namespace Molinos.Scato.Dominio.Dto
 {
     public sealed class EmbarqueCoordinadorDto
     {
-        public CoordinadorPuertoDto CoordinadorPuerto { get; set; }
+        public int Id { get; set; }
+        public CoordinadorPuertoDto CoordinadorPuerto { get; set; }        
     }
 }

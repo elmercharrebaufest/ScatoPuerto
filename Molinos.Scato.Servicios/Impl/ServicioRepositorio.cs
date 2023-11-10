@@ -11831,12 +11831,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        public Dictionary<string, string> ObtenerActores(int idEmbarque)
+        public Dictionary<string, object> ObtenerActores(int idEmbarque)
         {
             try
             {
                 #region variables
-                string[] coordinadores;
+                string[] coordinadores = new string[] { };
                 string ata = "-";
                 string agenciaMaritima = "-";
                 string estiba = "-";
@@ -11872,9 +11872,8 @@ namespace Molinos.Scato.Servicios.Impl
                     encargado = plano.AgentesControlPrivado.First().name;
                 }
                 #endregion
-
                 #region llenarLista
-                actoresEmbarque.Add("coordinador", coordinadores);
+                actoresEmbarque.Add("coordinadores", coordinadores);
                 actoresEmbarque.Add("ata", ata);
                 actoresEmbarque.Add("agenciaMaritima", agenciaMaritima);
                 actoresEmbarque.Add("estiba", estiba);

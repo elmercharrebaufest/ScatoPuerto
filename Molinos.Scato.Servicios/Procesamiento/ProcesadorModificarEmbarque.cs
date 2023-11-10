@@ -40,7 +40,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             if (comando.Dto.Destino != null)
                 Embarque.Destino = Repositorio.Obtener<Destino>(comando.Dto.Destino.Id);
             else
-                Embarque.Destino = null;
+                Embarque.Destino = null;           
 
             Embarque.FechaDesdeLimpieza = comando.Dto.FechaDesdeLimpieza != null ? comando.Dto.FechaDesdeLimpieza : null;
             Embarque.FechaHastaLimpieza = comando.Dto.FechaHastaLimpieza != null ? comando.Dto.FechaHastaLimpieza : null;
@@ -88,13 +88,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 });
             }
 
-            Embarque.Coordinadores = comando.Dto.Coordinadores
-                .Select(coo => new EmbarqueCoordinador
+            if (comando.Dto.Coordinadores != null)
+            {
+                foreach (var coo in comando.Dto.Coordinadores)
                 {
-                    CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id),
-                    Embarque = Embarque
-                })
-                .ToList();            
+                    var coordinador = Repositorio.Obtener<EmbarqueCoordinador>(x => coo.CoordinadorPuerto.Id == x.CoordinadorPuerto.Id && comando.Dto.Id == x.Embarque.Id);
+                    if (coordinador != null)
+                    {
+                        coordinador.CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id);
+                    }
+                    else
+                    {
+                        coordinador = new EmbarqueCoordinador()
+                        {
+                            CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id),
+                            Embarque = Repositorio.Obtener<Embarque>(comando.Dto.Id)
+                        };
+                        Embarque.Coordinadores.Add(coordinador);
+                    }
+                    
+                    coordinador.Embarque = Repositorio.Obtener<Embarque>(comando.Dto.Id);
+                }
+            }                                 
 
             LimpiarCarpetaDeArchivosDeEmbarques(comando.Dto.Id);
             if (comando.Dto.filePathShipParticular != null)
