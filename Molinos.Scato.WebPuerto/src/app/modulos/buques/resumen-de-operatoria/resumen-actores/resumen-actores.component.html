@@ -3,7 +3,7 @@
         <div class="bg-white shadow m-4 px-4 pt-4">
             <h2 class="colorTitle">Actores</h2>
             <hr class="mt-0">
-            <p class="subTItulos mb-1">Coordinador: <span class="data">{{actores.coordinador}}</span></p>
+            <p class="subTItulos mb-1">Coordinador: <span class="data" *ngFor="let coordinador of actores.coordinadores">{{coordinador}}</span></p>
             <p class="subTItulos mb-1">A.T.A: <span class="data">{{actores.ata}}</span></p>
             <p class="subTItulos mb-1">Agencia Marítima: <span class="data">{{actores.agenciaMaritima}}</span></p>
             <br>

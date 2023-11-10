@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[EmbarqueCoordinador]
 (
-	
+	[Id]				INT IDENTITY (1, 1) NOT NULL, 
 	[CoordinadorPuerto_Id]	INT		NOT NULL,
 	[Embarque_Id]			INT		NOT NULL,
 	
