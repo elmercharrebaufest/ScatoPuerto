@@ -10,7 +10,7 @@ namespace Molinos.Scato.Dominio.Entidades
         [Key]
         public virtual int Id { get; set; }
         public virtual ICollection<MaterialPuertoCantidad> MaterialPuertoCantidad { get; set; }
-        public virtual CoordinadorPuerto Coordinadores { get; set; }
+        public virtual ICollection<CoordinadorPuerto> Coordinadores { get; set; }
         public virtual AgenciaMaritimaPuerto Agencias { get; set; }
         public virtual Vapor Vapor { get; set; }
         public virtual DateTime? FechaRecalada { get; set; }

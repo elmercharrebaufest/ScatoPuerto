@@ -12,7 +12,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Id { get; set; }
         public string NombreBuque { get; set; }
         public AgenciaMaritimaPuertoDto Agencias { get; set; }
-        public CoordinadorPuertoDto Coordinadores { get; set; }
+        public IList<EmbarqueCoordinadorDto> Coordinadores { get; set; }
         public DateTime? FechaRecalada { get; set; }
         public string HoraRecalada { get; set; }
         public DateTime? ObligacionCarga { get; set; }
