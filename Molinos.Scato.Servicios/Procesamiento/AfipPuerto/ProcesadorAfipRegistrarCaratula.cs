@@ -29,10 +29,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             var resultado = new ResultadoCrear();
             try
             {
-                var caratula = comando.Dto;
-                if (caratula == null) { throw new Exception("La caratula recibida es nula"); }
-
-                // TODO: Implementar comunicación c/ AFIP
+                var caratula = comando.Dto ?? throw new Exception("La caratula recibida es nula");
                 var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
                 var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
                 //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
@@ -40,13 +37,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
                 }
-                string identificadorSolicitudCierreCarga = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
-                //string caratulaId = Guid.NewGuid().ToString().Substring(0, 16);
+                string caratulaId = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
 
                 var caratulaDb = this.Conversor.Convertir<AfipCaratulaDto, AfipCaratula>(caratula);
-               
-                //Repositorio.Agregar(caratulaDb);
-                //Repositorio.GuardarCambios();
+                caratulaDb.IdentificadorCaratula = caratulaId;
+                caratulaDb.FechaRegistro = DateTime.Now;
+                caratulaDb.Estado = EstadosCaratulaAFIP.Aceptado;
+                Repositorio.Agregar(caratulaDb);
+                Repositorio.GuardarCambios();
             }
             catch (Exception e)
             {
