@@ -351,6 +351,7 @@ namespace Molinos.Scato.Servicios.Impl
             caratula.IdentificadorBuque = solicitud.IdentificadorBuque;
             caratula.NombreMedioTransporte = solicitud.NombreMedioTransporte;
             solicitud.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            solicitud.FechaActualizacion = DateTime.Now;
             repositorio.GuardarCambios();
         }
 
@@ -359,6 +360,48 @@ namespace Molinos.Scato.Servicios.Impl
             var solicitud = repositorio.Obtener<AfipSolicitudCambioBuque>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
             if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
             solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+        #endregion
+
+        #region Solicitar Cambio de Fechas
+        public void SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipSolicitarCambioFechas { Dto = solicitarCambioFechasDto });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public IList<AfipSolicitudCambioFechasDto> ListarSolicitudesCambioFechas(int id = 0)
+        {
+            if (id != 0)
+            {
+                return Listar<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>(x => x.AfipCaratula.Id == id);
+            }
+            return Listar<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>();
+        }
+
+        public void EfectuarSolicitudCambioFechas(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudCambioFechas>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            var caratula = solicitud.AfipCaratula;
+            caratula.FechaArribo = solicitud.FechaArribo;
+            caratula.FechaZarpada = solicitud.FechaZarpada;
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+
+        public void RechazarSolicitudCambioFechas(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudCambioFechas>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            solicitud.FechaActualizacion = DateTime.Now;
             repositorio.GuardarCambios();
         }
         #endregion

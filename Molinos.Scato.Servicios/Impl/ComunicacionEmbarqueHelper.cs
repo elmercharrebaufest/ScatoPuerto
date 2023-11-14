@@ -148,6 +148,37 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public SolicitarCambioFechasResponse SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto, string identificadorCaratula)
+        {
+            try
+            {
+                this.cuitRepresentada = 30715118773;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                var solicitarCambioFechasRequest = new SolicitarCambioFechasRequest1(
+                        new SolicitarCambioFechasRequest1Body
+                        {
+                            argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                            argSolicitarCambioFechas = new SolicitarCambioFechasRequest
+                            {
+                                FechaArribo = solicitarCambioFechasDto.FechaArribo,
+                                FechaZarpada = solicitarCambioFechasDto.FechaZarpada,
+                                IdentificadorCaratula = identificadorCaratula
+                            }
+                        }
+                );
+
+                return this.wgescomunicacionembarque.SolicitarCambioFechas(solicitarCambioFechasRequest);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar solicitar cambio de buque. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw ex;
+            }
+        }
+
         public RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto)
         {
             try

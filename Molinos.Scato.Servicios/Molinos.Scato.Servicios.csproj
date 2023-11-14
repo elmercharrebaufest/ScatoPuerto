@@ -568,6 +568,7 @@
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCode.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarAnulacionCOEM.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCambioFechas.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCambioBuque.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCierreCargaGranel.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarNoAbordo.cs" />

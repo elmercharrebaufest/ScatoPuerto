@@ -37,5 +37,6 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<AfipCaratulaItinerarioDto> Itinerario { get; set; }
         public string Estado { get; set; }
         public IList<AfipSolicitudCambioBuqueDto> SolicitudesCambioBuque { get; set; }
+        public IList<AfipSolicitudCambioFechasDto> SolicitudesCambioFechas { get; set; }
     }
 }

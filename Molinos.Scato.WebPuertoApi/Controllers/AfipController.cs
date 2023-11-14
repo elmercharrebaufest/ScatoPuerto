@@ -559,6 +559,81 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
         #endregion
 
+        #region Solicitar Cambio de Fechas
+        [HttpPut]
+        [Route("api/afip/SolicitarCambioFechas")]
+        public HttpResponseMessage SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto)
+        {
+            try
+            {
+                servicioAfip.SolicitarCambioFechas(solicitarCambioFechasDto);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCambioFechas")]
+        public HttpResponseMessage ListarSolicitudesCambioFechas()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCambioFechas());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCambioFechas/{id}")]
+        public HttpResponseMessage ListarSolicitudesCambioFechas(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCambioFechas(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/EfectuarSolicitudCambioFechas/{id}")]
+        public HttpResponseMessage EfectuarSolicitudCambioFechas(int id)
+        {
+            try
+            {
+                servicioAfip.EfectuarSolicitudCambioFechas(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/RechazarSolicitudCambioFechas/{id}")]
+        public HttpResponseMessage RechazarSolicitudCambioFechas(int id)
+        {
+            try
+            {
+                servicioAfip.RechazarSolicitudCambioFechas(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
+
         #endregion
 
         #region CODE

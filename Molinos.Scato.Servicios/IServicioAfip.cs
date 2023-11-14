@@ -111,6 +111,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto);
 
+        #region Solicitar Cambio de Buque
         [OperationContract]
         void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto);
 
@@ -122,6 +123,22 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void RechazarSolicitudCambioBuque(int id);
+        #endregion
+
+        #region Solicitar Cambio de Fechas
+        [OperationContract]
+        void SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto);
+
+        [OperationContract]
+        IList<AfipSolicitudCambioFechasDto> ListarSolicitudesCambioFechas(int id = 0);
+
+        [OperationContract]
+        void EfectuarSolicitudCambioFechas(int id);
+
+        [OperationContract]
+        void RechazarSolicitudCambioFechas(int id);
+        #endregion
+
         #endregion
     }
 }

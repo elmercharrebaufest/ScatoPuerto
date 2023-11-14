@@ -90,6 +90,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCode.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRegistrarCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipSolicitarAnulacionCoem.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarCambioFechas.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipSolicitarCambioBuque.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipSolicitarCierreCargaGranel.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipSolicitarNoAbordo.cs" />
@@ -713,9 +714,11 @@
     <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaEmbalajeDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemRectificarRequest.cs" />
     <Compile Include="Dto\AfipPuerto\AfipCoemRegistrarRequest.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitarCambioFechasDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitarCambioBuqueDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitarCierreCargaGranelDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitarNoAbordoDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitudCambioFechasDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCambioBuqueDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipCondicionContenedorDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipLugarOperativoDto.cs" />
@@ -1032,6 +1035,7 @@
     <Compile Include="Entidades\AfipPuerto\AfipCoemEstado.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSuelta.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipSolicitudCambioFechas.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCambioBuque.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipCondicionContenedor.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipLugarOperativo.cs" />

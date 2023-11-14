@@ -15,13 +15,17 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>()
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => ((EstadosSolicitudesAFIP)src.Estado).ToString()));
+            Mapper.CreateMap<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>()
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => ((EstadosSolicitudesAFIP)src.Estado).ToString()));
 
             Mapper.CreateMap<AfipCaratula, AfipCaratulaDto>()
                 .ForMember(dest => dest.Itinerario, opt => opt.MapFrom(src => src.Itinerario))
-                .ForMember(dest => dest.SolicitudesCambioBuque, opt => opt.MapFrom(src => src.SolicitudesCambioBuque));
+                .ForMember(dest => dest.SolicitudesCambioBuque, opt => opt.MapFrom(src => src.SolicitudesCambioBuque))
+                .ForMember(dest => dest.SolicitudesCambioFechas, opt => opt.MapFrom(src => src.SolicitudesCambioFechas));
             Mapper.CreateMap<AfipCaratulaDto, AfipCaratula>()
                 .ForMember(dest => dest.Itinerario, opt => opt.MapFrom(src => src.Itinerario))
-                .ForMember(dest => dest.SolicitudesCambioBuque, opt => opt.Ignore());
+                .ForMember(dest => dest.SolicitudesCambioBuque, opt => opt.Ignore())
+                .ForMember(dest => dest.SolicitudesCambioFechas, opt => opt.Ignore());
 
             Mapper.CreateMap<AfipCaratulaDto, Caratula>().ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
 
