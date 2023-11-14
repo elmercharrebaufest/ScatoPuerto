@@ -107,7 +107,21 @@ namespace Molinos.Scato.Servicios
         #region Solicitudes
         [OperationContract]
         bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto);
+
+        [OperationContract]
         bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto);
+
+        [OperationContract]
+        void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto);
+
+        [OperationContract]
+        IList<AfipSolicitudCambioBuqueDto> ListarSolicitudesCambioBuque(int id = 0);
+
+        [OperationContract]
+        void EfectuarSolicitudCambioBuque(int id);
+
+        [OperationContract]
+        void RechazarSolicitudCambioBuque(int id);
         #endregion
     }
 }

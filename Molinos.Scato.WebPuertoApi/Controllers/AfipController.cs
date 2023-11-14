@@ -15,9 +15,9 @@ using System.Web.Http;
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class AfipController : BaseController
-    {        
-        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip ) : base(servicio, null, null, servicioAfip)
-        {     
+    {
+        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip)
+        {
         }
 
         #region Tablas de referencia
@@ -196,14 +196,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 catch (Exception e)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-                }               
+                }
             }
             else
             {
                 // El modelo no es válido, devuelve los errores de validación
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
-            
+
         }
 
         [HttpDelete]
@@ -318,7 +318,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {                    
+                {
                     var resultado = servicioAfip.RegistrarCoem(coem);
                     return Request.CreateResponse(HttpStatusCode.OK, resultado);
                 }
@@ -331,7 +331,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 // El modelo no es válido, devuelve los errores de validación
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
-            }        
+            }
         }
 
         [HttpPut]
@@ -354,7 +354,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 // El modelo no es válido, devuelve los errores de validación
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
-            }            
+            }
         }
 
         [HttpDelete]
@@ -368,8 +368,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);               
-            }            
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
         [HttpPut]
@@ -383,7 +383,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
@@ -398,7 +398,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);                
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
@@ -457,7 +457,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 // El modelo no es válido, devuelve los errores de validación
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
-            }            
+            }
         }
 
         [HttpPost]
@@ -480,8 +480,84 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 // El modelo no es válido, devuelve los errores de validación
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
-            }        
+            }
         }
+
+
+        #region Solicitar Cambio de Buque
+        [HttpPut]
+        [Route("api/afip/SolicitarCambioBuque")]
+        public HttpResponseMessage SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto)
+        {
+            try
+            {
+                servicioAfip.SolicitarCambioBuque(solicitarCambioBuqueDto);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCambioBuque")]
+        public HttpResponseMessage ListarSolicitudesCambioBuque()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCambioBuque());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCambioBuque/{id}")]
+        public HttpResponseMessage ListarSolicitudesCambioBuque(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCambioBuque(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/EfectuarSolicitudCambioBuque/{id}")]
+        public HttpResponseMessage EfectuarSolicitudCambioBuque(int id)
+        {
+            try
+            {
+                servicioAfip.EfectuarSolicitudCambioBuque(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/RechazarSolicitudCambioBuque/{id}")]
+        public HttpResponseMessage RechazarSolicitudCambioBuque(int id)
+        {
+            try
+            {
+                servicioAfip.RechazarSolicitudCambioBuque(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
 
         #endregion
 

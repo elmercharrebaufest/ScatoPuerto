@@ -13,6 +13,7 @@ namespace Molinos.Scato.Servicios
         RegistrarCaratulaResponse RegistrarCaratula(AfipCaratulaDto afipCaratulaDto);
         RectificarCaratulaResponse RectificarCaratula(AfipCaratulaDto afipCaratulaDto);
         AnularCaratulaResponse AnularCaratula(string identificadorCaratula);
+        SolicitarCambioBuqueResponse SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto, string identificadorCaratula);
         RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto);
         RectificarCOEMResponse RectificarCOEM(AfipCoemDto afipCoemDto);
         AnularCOEMResponse AnularCOEM(string identificadorCaratula, string identificadorCOEM);

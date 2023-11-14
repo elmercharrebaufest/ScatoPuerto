@@ -364,6 +364,7 @@
     <Compile Include="CrearException.cs" />
     <Compile Include="Enumeradores\EstadosCaratulaAFIP.cs" />
     <Compile Include="Enumeradores\EstadosCoemAFIP.cs" />
+    <Compile Include="Enumeradores\EstadosSolicitudesAFIP.cs" />
     <Compile Include="Enumeradores\ServiciosAFIP.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
@@ -567,6 +568,7 @@
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCode.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipRegistrarCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarAnulacionCOEM.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCambioBuque.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCierreCargaGranel.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarNoAbordo.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />

@@ -117,6 +117,37 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public SolicitarCambioBuqueResponse SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto, string identificadorCaratula)
+        {
+            try
+            {
+                this.cuitRepresentada = 30715118773;
+                this.rol = "DEPO";
+                this.tipoAgente = "DEPO";
+                this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
+
+                SolicitarCambioBuqueRequest1 solicitarCambioBuqueRequest = new SolicitarCambioBuqueRequest1(
+                        new SolicitarCambioBuqueRequest1Body
+                        {
+                            argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
+                            argSolicitarCambioBuque = new SolicitarCambioBuqueRequest
+                            {
+                                IdentificadorBuque = solicitarCambioBuqueDto.IdentificadorBuque,
+                                NombreMedioTransporte = solicitarCambioBuqueDto.NombreMedioTransporte,
+                                IdentificadorCaratula = identificadorCaratula
+                            }
+                        }
+                );
+
+                return this.wgescomunicacionembarque.SolicitarCambioBuque(solicitarCambioBuqueRequest);
+            }
+            catch (Exception ex)
+            {
+                this.log.Error(ex, "Error al intentar solicitar cambio de buque. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                throw ex;
+            }
+        }
+
         public RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto)
         {
             try
@@ -160,7 +191,7 @@ namespace Molinos.Scato.Servicios.Impl
                             IdentificadorCOEM = afipCoemDto.IdentificadorCOEM,
                             Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto)
                         },
-                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,                        
+                        argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                     });
                 return this.wgescomunicacionembarque.RectificarCOEM(rectificarCOEMRequest1);
             }
@@ -285,10 +316,11 @@ namespace Molinos.Scato.Servicios.Impl
                     new SolicitarNoABordoRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                        argSolicitarNoABordo = new SolicitarNoABordoRequest { 
-                            IdentificadorCaratula = identificadorCaratula, 
-                            IdentificadorCOEM = identificadorCoem,                                                   
-                            IdentificadoresDeclaracionesMercaderiaSuelta = identificadoresDeclaracionesMercaderiaSuelta                            
+                        argSolicitarNoABordo = new SolicitarNoABordoRequest
+                        {
+                            IdentificadorCaratula = identificadorCaratula,
+                            IdentificadorCOEM = identificadorCoem,
+                            IdentificadoresDeclaracionesMercaderiaSuelta = identificadoresDeclaracionesMercaderiaSuelta
                         }
                     });
                 return this.wgescomunicacionembarque.SolicitarNoABordo(solicitarNoABordoRequest1);

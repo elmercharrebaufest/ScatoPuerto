@@ -17,6 +17,7 @@ using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
+using Molinos.Scato.Servicios.Orquestador;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -229,7 +230,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
             return !res.HayErrores;
-        } 
+        }
 
         public bool CerrarCoem(int id, int idEstado)
         {
@@ -277,10 +278,10 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                this.log.Error("Error al cambiar estado de la COEM {0}", ex.StackTrace);              
+                this.log.Error("Error al cambiar estado de la COEM {0}", ex.StackTrace);
                 throw new Exception("Error al cambiar estado de la COEM");
             }
-           
+
         }
         #endregion
 
@@ -302,7 +303,7 @@ namespace Molinos.Scato.Servicios.Impl
         #endregion
 
         #region Solicitudes
-        
+
         public bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto)
         {
             var res = this.servicioComandos.Ejecutar(new AfipSolicitarCierreCargaGranel { Dto = solicitarCierreCargaGranelDto });
@@ -322,6 +323,45 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return !res.HayErrores;
         }
+
+        #region Solicitar Cambio de Buque
+        public void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto)
+        {
+            var res = this.servicioComandos.Ejecutar(new AfipSolicitarCambioBuque { Dto = solicitarCambioBuqueDto });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public IList<AfipSolicitudCambioBuqueDto> ListarSolicitudesCambioBuque(int id = 0)
+        {
+            if (id != 0)
+            {
+                return Listar<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>(x => x.AfipCaratula.Id == id);
+            }
+            return Listar<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>();
+        }
+
+        public void EfectuarSolicitudCambioBuque(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudCambioBuque>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            var caratula = solicitud.AfipCaratula;
+            caratula.IdentificadorBuque = solicitud.IdentificadorBuque;
+            caratula.NombreMedioTransporte = solicitud.NombreMedioTransporte;
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            repositorio.GuardarCambios();
+        }
+
+        public void RechazarSolicitudCambioBuque(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudCambioBuque>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            repositorio.GuardarCambios();
+        }
+        #endregion
 
         #endregion
     }
