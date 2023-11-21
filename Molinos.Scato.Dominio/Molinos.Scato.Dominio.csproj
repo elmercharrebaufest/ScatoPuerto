@@ -720,6 +720,7 @@
     <Compile Include="Dto\AfipPuerto\AfipSolicitarNoAbordoDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCambioFechasDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCambioBuqueDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipMotivoSolicitudCambioDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipCondicionContenedorDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipLugarOperativoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipNaturalezaEmbalajeDto.cs" />
@@ -1044,6 +1045,7 @@
     <Compile Include="Entidades\AfipTablasReferencia\AfipPuerto.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipPuntoAduanero.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipTipoDocumento.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipMotivoSolicitudCambio.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipTipoEmbalaje.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />

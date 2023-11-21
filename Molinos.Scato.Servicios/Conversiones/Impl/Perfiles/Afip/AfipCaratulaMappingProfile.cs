@@ -16,7 +16,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>()
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => ((EstadosSolicitudesAFIP)src.Estado).ToString()));
             Mapper.CreateMap<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>()
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => ((EstadosSolicitudesAFIP)src.Estado).ToString()));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => ((EstadosSolicitudesAFIP)src.Estado).ToString()))
+                .ForMember(dest => dest.MotivoSolicitud, opt => opt.MapFrom(src => src.AfipMotivoSolicitudCambio.Descripcion));
 
             Mapper.CreateMap<AfipCaratula, AfipCaratulaDto>()
                 .ForMember(dest => dest.Itinerario, opt => opt.MapFrom(src => src.Itinerario))

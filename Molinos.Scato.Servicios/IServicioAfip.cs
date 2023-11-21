@@ -34,6 +34,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<AfipCondicionContenedorDto> ListarCondicionesContenedor();
+
+        [OperationContract]
+        IList<AfipMotivoSolicitudCambioDto> ListarMotivosSolicitudCambio();
         #endregion
 
         #region Caratulas

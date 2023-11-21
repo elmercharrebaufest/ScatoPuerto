@@ -19,5 +19,9 @@ namespace Molinos.Scato.Dominio.Dto
         [FechaFinMayorQueFechaInicio("FechaArribo")]
         [FechaValida(ErrorMessage = "La fehca de zarpada debe ser en el futuro")]
         public DateTime FechaZarpada { get; set; }
+
+        [Required(ErrorMessage = "El motivo es obligatorio")]
+        public string CodigoMotivo { get; set; }
+        public string DescripcionMotivo { get; set; }
     }
 }

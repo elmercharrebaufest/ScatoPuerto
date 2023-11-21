@@ -165,6 +165,8 @@ namespace Molinos.Scato.Servicios.Impl
                             {
                                 FechaArribo = solicitarCambioFechasDto.FechaArribo,
                                 FechaZarpada = solicitarCambioFechasDto.FechaZarpada,
+                                CodigoMotivo = solicitarCambioFechasDto.CodigoMotivo,
+                                DescripcionMotivo = solicitarCambioFechasDto.DescripcionMotivo,
                                 IdentificadorCaratula = identificadorCaratula
                             }
                         }

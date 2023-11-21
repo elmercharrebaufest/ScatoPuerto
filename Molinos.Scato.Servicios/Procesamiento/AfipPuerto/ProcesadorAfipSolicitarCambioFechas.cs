@@ -28,6 +28,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 if (comando.Dto == null) { throw new Exception("Los datos recibidos son nulos"); }
                 var caratulaDb = Repositorio.Obtener<AfipCaratula>(comando.Dto.CaratulaId) ?? throw new Exception("No se ha podido encontrar la carátula indicada");
+                var motivoDb = Repositorio.Obtener<AfipMotivoSolicitudCambio>(x => x.Codigo == comando.Dto.CodigoMotivo) ?? throw new Exception("No se ha encontrado el motivo seleccionado");
+
                 if (caratulaDb.SolicitudesCambioFechas.Any(x => x.Estado == ((int)EstadosSolicitudesAFIP.Pendiente)))
                 {
                     throw new Exception("Ya existe una solicitud pendiente de cambio de fechas para esta carátula");
@@ -45,6 +47,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     AfipCaratula = caratulaDb,
                     FechaArribo = comando.Dto.FechaArribo,
                     FechaZarpada = comando.Dto.FechaZarpada,
+                    AfipMotivoSolicitudCambio = motivoDb,
+                    MotivoSolicitudDetalle = comando.Dto.DescripcionMotivo,
                     Estado = (int)EstadosSolicitudesAFIP.Pendiente,
                     FechaCreacion = DateTime.Now,
                     FechaActualizacion = DateTime.Now

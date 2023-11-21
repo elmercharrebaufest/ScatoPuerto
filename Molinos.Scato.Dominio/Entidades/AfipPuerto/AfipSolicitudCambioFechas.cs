@@ -16,6 +16,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual DateTime FechaZarpada { get; set; }
         public virtual DateTime FechaCreacion { get; set; }
         public virtual DateTime FechaActualizacion { get; set; }
+        public virtual AfipMotivoSolicitudCambio AfipMotivoSolicitudCambio { get; set; }
+        public virtual string MotivoSolicitudDetalle { get; set; }
         /// <summary>
         /// 0: Pendiente, 1: Aceptado, 2: Rechazado
         /// </summary>

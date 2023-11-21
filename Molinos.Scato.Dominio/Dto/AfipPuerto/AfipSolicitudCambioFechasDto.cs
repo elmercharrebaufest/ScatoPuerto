@@ -13,6 +13,8 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime FechaZarpada { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaActualizacion { get; set; }
+        public string MotivoSolicitud { get; set; }
+        public string MotivoSolicitudDetalle { get; set; }
         public string Estado { get; set; }
     }
 }

@@ -99,6 +99,11 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<AfipCondicionContenedor, AfipCondicionContenedorDto>();
         }
 
+        public IList<AfipMotivoSolicitudCambioDto> ListarMotivosSolicitudCambio()
+        {
+            return Listar<AfipMotivoSolicitudCambio, AfipMotivoSolicitudCambioDto>();
+        }
+
         #endregion
 
         #region Caratulas
@@ -112,7 +117,16 @@ namespace Molinos.Scato.Servicios.Impl
 
         public AfipCaratulaDto ObtenerCaratula(int id)
         {
-            return Obtener<AfipCaratula, AfipCaratulaDto>(id);
+            var caratula = Obtener<AfipCaratula, AfipCaratulaDto>(id);
+            if (caratula.SolicitudesCambioBuque?.Count > 0)
+            {
+                caratula.SolicitudesCambioBuque = caratula.SolicitudesCambioBuque.OrderByDescending(s => s.FechaCreacion).ToList();
+            }
+            if (caratula.SolicitudesCambioFechas?.Count > 0)
+            {
+                caratula.SolicitudesCambioFechas = caratula.SolicitudesCambioFechas.OrderByDescending(s => s.FechaCreacion).ToList();
+            }
+            return caratula;
         }
 
         public bool RegistrarCaratula(AfipCaratulaDto caratula)
@@ -336,11 +350,16 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AfipSolicitudCambioBuqueDto> ListarSolicitudesCambioBuque(int id = 0)
         {
+            IList<AfipSolicitudCambioBuqueDto> resultado;
             if (id != 0)
             {
-                return Listar<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>(x => x.AfipCaratula.Id == id);
+                resultado = Listar<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>(x => x.AfipCaratula.Id == id);
             }
-            return Listar<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>();
+            else
+            {
+                resultado = Listar<AfipSolicitudCambioBuque, AfipSolicitudCambioBuqueDto>();
+            }
+            return resultado.OrderByDescending(x => x.FechaCreacion).ToList();
         }
 
         public void EfectuarSolicitudCambioBuque(int id)
@@ -377,11 +396,16 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AfipSolicitudCambioFechasDto> ListarSolicitudesCambioFechas(int id = 0)
         {
+            IList<AfipSolicitudCambioFechasDto> resultado;
             if (id != 0)
             {
-                return Listar<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>(x => x.AfipCaratula.Id == id);
+                resultado = Listar<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>(x => x.AfipCaratula.Id == id);
             }
-            return Listar<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>();
+            else
+            {
+                resultado = Listar<AfipSolicitudCambioFechas, AfipSolicitudCambioFechasDto>();
+            }
+            return resultado.OrderByDescending(x => x.FechaCreacion).ToList();
         }
 
         public void EfectuarSolicitudCambioFechas(int id)

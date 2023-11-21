@@ -134,6 +134,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/afip/ListarMotivosSolicitudCambio")]
+        public HttpResponseMessage ListarMotivosSolicitudCambio()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarMotivosSolicitudCambio());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
 
         #endregion
 

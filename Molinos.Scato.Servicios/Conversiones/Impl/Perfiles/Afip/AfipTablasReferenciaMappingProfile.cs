@@ -42,6 +42,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<AfipCoemMercaderiaSuelta, Declaracion>()
                 .ForMember(x => x.ExtensionData, y => y.Ignore());
 
+            Mapper.CreateMap<AfipMotivoSolicitudCambio, AfipMotivoSolicitudCambioDto>();
+            Mapper.CreateMap<AfipMotivoSolicitudCambioDto, AfipMotivoSolicitudCambio>();
         }
     }
 }
