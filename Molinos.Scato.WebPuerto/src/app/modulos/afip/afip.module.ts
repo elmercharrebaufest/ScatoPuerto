@@ -18,6 +18,7 @@ import { ModalCrearCodeComponent } from './code/modal-crear-code/modal-crear-cod
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
+import { SolicitudCaratulaComponent } from './caratula/solicitud-caratula/solicitud-caratula.component';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { MatInputModule } from '@angular/material/input';
     CodeAfipComponent,
     CaratulaComponent,
     CaratulaAfipComponent,
-    ModalCrearCaratulaComponent
+    ModalCrearCaratulaComponent,
+    SolicitudCaratulaComponent
   ],
   imports: [
     CommonModule,

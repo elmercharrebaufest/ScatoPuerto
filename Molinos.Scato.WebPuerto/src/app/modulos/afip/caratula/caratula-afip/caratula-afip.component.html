@@ -11,10 +11,8 @@
             <th>Fecha Arribo</th>
             <th>Fecha Zarpada</th>
             <th>Fecha Registro</th>
-            <th>Rectificar</th>
-            <th>Anular</th>
             <th>Estado</th>
-            <th>Ver COEMs<br>Asociadas</th>
+            <th>Acciones</th>
         </thead>
         <tbody *ngFor="let historial of displayedItems">
             <tr class="lista-caratula-row" >
@@ -25,12 +23,6 @@
                 <td>{{ historial.fechaArribo | date:'dd/MM/yyyy'}}</td>
                 <td>{{ historial.fechaZarpada | date:'dd/MM/yyyy'}}</td>
                 <td>{{ historial.fechaRegistro | date:'dd/MM/yyyy'}}</td>
-                <td class="celda-icono" >
-                    <div *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" class='icon-editar cursor'></div>
-                </td>
-                <td class="celda-icono">
-                    <img *ngIf="historial.estado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" src="assets/trashIcon-no-border.svg" class="eliminar cursor">
-                </td>
                 <td class="font-weight-bold" >
                   <select class="custom-select" (change)="onCambiarEstado($event, historial)">
                     <option style="display:none"></option>
@@ -40,9 +32,15 @@
                   </select>
                 </td>
                 <td class="celda-icono">
-                  <a [routerLink]="[historial.id, 'coems']">
-                    <img src="assets/ojoIcon.svg" alt="Ver COEMs">
-                  </a>
+                  <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" title="RECTIFICAR">
+                    <i class="fa fa-pencil fs-icon text-warning"></i>
+                  </button>
+                  <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" title="ANULAR">
+                    <i class="fa fa-trash-o fs-icon text-danger"></i>
+                  </button>
+                  <button class="btn btn-light text-primary" [routerLink]="[historial.id, 'coems']" title="VER COEMS">
+                    <i class="fa fa-eye fs-icon"></i>
+                  </button>
                 </td>
             </tr>
         </tbody>

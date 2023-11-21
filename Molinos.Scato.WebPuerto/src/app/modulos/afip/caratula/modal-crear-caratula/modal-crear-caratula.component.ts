@@ -7,6 +7,7 @@ import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service'
 import { AfipLugarOperativo, AfipPuerto, AfipPuntoAduanero } from '@ScatoModels/afip/tablas-afip';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { of, Observable, forkJoin } from 'rxjs';
+import { concatMap, tap } from 'rxjs/operators';
 import { AbstractControl } from '@angular/forms';
 import { Caratula } from '@ScatoModels/afip/caratula';
 import { ActivatedRoute } from '@angular/router';
@@ -61,6 +62,20 @@ export class ModalCrearCaratulaComponent implements OnInit {
   ngOnInit(): void {
     this.titleCaratula = this.title;
     this.cargarDatos();
+    this.caratulaAfipService.$recargarCaratula.pipe(
+      tap(() => {
+        this.cargando = true;
+        this.mensajeCarga = 'Cargando datos';
+      }),
+      concatMap(() => this.caratulaAfipService.obtenerCaratulaId(this.id))
+    ).subscribe(caratula => {
+      this.asignarValoresCaratula(caratula);
+      this.cargando = false;
+    }, err => {
+      console.error(err);
+      this.cargando = false;
+      this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al cargar los datos', 'Cerrar', '', null, null, Tipoalerta.Error);
+    });
   }
 
   private cargarDatos() {
@@ -100,6 +115,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
   }
 
   private asignarValoresCaratula(caratula: Caratula) {
+    this.caratulaAfipService.$caratula.next(caratula);
     // Las propiedades de Caratula tienen el mismo nombre que los controles del form
     for (let [prop, val] of Object.entries(caratula)) {
       this.crearEditarCaratulaForm.get(prop)?.setValue(val);
@@ -134,7 +150,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
       via: ['8'],
       numeroViaje: [''],
       fechaArribo: ['', Validators.required],
-      fechaZarpada: ['', Validators.required]
+      fechaZarpada: ['', Validators.required] // TODO: Validacion con fecha arribo
     })
   }
 
@@ -187,7 +203,5 @@ export class ModalCrearCaratulaComponent implements OnInit {
   }
 
   get f() { return this.crearEditarCaratulaForm.controls; }
-
-
 
 }

@@ -1,8 +1,8 @@
 <div class="container-fluid">
     <ng-container *ngIf="caratulaId">
-        <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;" *ngIf="caratulaId">
+        <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
             <div class="col-md-10 col-sm-11">
-                <label class="cargando-caratula">Datos de la carátula</label>
+                <label class="cargando-caratula">Carátula</label>
             </div>
         </div>
         <div class="row m-lg-4">
@@ -10,6 +10,16 @@
                 <app-modal-crear-caratula></app-modal-crear-caratula>
             </div>
         </div>
+        <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
+          <div class="col-md-10 col-sm-11">
+              <label class="cargando-caratula">Solicitudes</label>
+          </div>
+      </div>
+      <div class="row m-lg-4">
+          <div class="col-md-12">
+            <app-solicitud-caratula></app-solicitud-caratula>
+          </div>
+      </div>
     </ng-container>
     <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
         <div class="col-md-10 col-sm-11">

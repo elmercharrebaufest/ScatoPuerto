@@ -1,8 +1,8 @@
-import { Caratula } from '@ScatoModels/afip/caratula';
+import { Caratula, SolicitudCambioBuque, SolicitudCambioFechas } from '@ScatoModels/afip/caratula';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface EstadosCaratulaAFIP {
   Aceptado: string;
@@ -22,6 +22,9 @@ export class CaratulaAfipService {
     Eliminado: "Eliminado"
   };
   private url: string = environment.apiUrl + 'afip/';
+  public $caratula = new BehaviorSubject<Caratula>(null);
+  public $recargarCaratula = new BehaviorSubject<void>(undefined);
+
   constructor(private http: HttpClient) { }
 
   public registrarCaratula(caratula: Caratula) {
@@ -51,4 +54,44 @@ export class CaratulaAfipService {
   public eliminarCaratula(id: number): Observable<any> {
     return this.http.delete<any>(`${this.url}AnularCaratula?id=${id}`, { withCredentials: true });
   }
+
+  //#region Solicitudes
+
+  //#region Solicitud de cambio de buque
+  public listarSolicitudesCambioBuque(id: number) {
+    return this.http.get<SolicitudCambioBuque[]>(`${this.url}ListarSolicitudesCambioBuque/${id}`, { withCredentials: true });
+  }
+
+  public solicitarCambioBuque(solicitud: any) {
+    return this.http.put<any>(`${this.url}SolicitarCambioBuque`, solicitud, { withCredentials: true });
+  }
+
+  public efectuarSolicitudCambioBuque(id: number) {
+    return this.http.put<any>(`${this.url}EfectuarSolicitudCambioBuque/${id}`, null, { withCredentials: true });
+  }
+
+  public rechazarSolicitudCambioBuque(id: number) {
+    return this.http.put<any>(`${this.url}RechazarSolicitudCambioBuque/${id}`, null, { withCredentials: true });
+  }
+  //#endregion
+
+  //#region Solicitud de cambio de fechas
+  public listarSolicitudesCambioFechas(id: number) {
+    return this.http.get<SolicitudCambioFechas[]>(`${this.url}ListarSolicitudesCambioFechas/${id}`, { withCredentials: true });
+  }
+
+  public solicitarCambioFechas(solicitud: any) {
+    return this.http.put<any>(`${this.url}SolicitarCambioFechas`, solicitud, { withCredentials: true });
+  }
+
+  public efectuarSolicitudCambioFechas(id: number) {
+    return this.http.put<any>(`${this.url}EfectuarSolicitudCambioFechas/${id}`, null, { withCredentials: true });
+  }
+
+  public rechazarSolicitudCambioFechas(id: number) {
+    return this.http.put<any>(`${this.url}RechazarSolicitudCambioFechas/${id}`, null, { withCredentials: true });
+  }
+  //#endregion
+
+  //#endregion
 }

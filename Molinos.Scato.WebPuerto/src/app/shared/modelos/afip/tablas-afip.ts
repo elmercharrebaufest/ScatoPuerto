@@ -19,4 +19,5 @@ export interface AfipTipoDocumento extends AfipTabla { }        // DOCIDE_DESC
 export interface AfipNaturalezaEmbalaje extends AfipTabla { }   // NEB_DESC
 export interface AfipLugarOperativo extends AfipTablaExtra { }  // LOT_ADUA
 export interface AfipCondicionContenedor extends AfipTabla { }  // CONCTD_DESC
+export interface AfipMotivoSolicitudCambio extends AfipTabla { }  // MOTIVO_SOL
 

@@ -2,6 +2,7 @@
   border: 0;
   border-radius: 4px 4px 0px 0px;
 }
+
 .lista-caratula-header {
   /* position: sticky; */
   top: 0;
@@ -17,7 +18,7 @@
   border: 0px;
 }
 
-.lista-caratula-header > th {
+.lista-caratula-header>th {
   vertical-align: middle;
 }
 
@@ -33,7 +34,7 @@
   opacity: 1;
 }
 
-.lista-caratula-row > td {
+.lista-caratula-row>td {
   border-bottom: 0px;
   border-top: 0px;
   vertical-align: middle;
@@ -45,10 +46,12 @@
   color: #1a1a1a;
   opacity: 1;
 }
+
 .celda-nombre-caratula-detalle {
   color: #1a1a1a;
   opacity: 1;
 }
+
 .lista-caratula-espacio {
   margin-bottom: 15px;
   width: 100%;
@@ -85,14 +88,20 @@
   display: inline-block;
   margin-right: 10px;
 }
+
 .pagination li.disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .pagination li.active {
   font-weight: bold;
 }
 
 .celda-icono {
   text-align: center;
+}
+
+.fs-icon {
+  font-size: x-large;
 }

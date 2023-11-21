@@ -1,4 +1,4 @@
-import { AfipCondicionContenedor, AfipLugarOperativo, AfipNaturalezaEmbalaje, AfipPais, AfipPuerto, AfipPuntoAduanero, AfipTipoDocumento, AfipTipoEmbalaje } from '@ScatoModels/afip/tablas-afip';
+import { AfipCondicionContenedor, AfipLugarOperativo, AfipMotivoSolicitudCambio, AfipNaturalezaEmbalaje, AfipPais, AfipPuerto, AfipPuntoAduanero, AfipTipoDocumento, AfipTipoEmbalaje } from '@ScatoModels/afip/tablas-afip';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -52,6 +52,11 @@ export class TablasAfipService {
   // CONCTD_DESC
   public listarCondicionesContenedor(): Observable<AfipCondicionContenedor[]> {
     return this.http.get<AfipCondicionContenedor[]>(this.url + 'ListarCondicionesContenedor', { withCredentials: true });
+  }
+
+  // MOTIVO_SOL
+  public listarMotivosSolicitudCambio(): Observable<AfipMotivoSolicitudCambio[]> {
+    return this.http.get<AfipMotivoSolicitudCambio[]>(this.url + 'ListarMotivosSolicitudCambio', { withCredentials: true });
   }
 
   // Función que setea el comportamiento de un form control autocompletable
