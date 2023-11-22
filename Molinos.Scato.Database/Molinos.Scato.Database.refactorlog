@@ -867,5 +867,11 @@
     <Property Name="ParentElementName" Value="[dbo].[AfipCoemEstado]" />
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Codigo" />
+  <Operation Name="Rename Refactor" Key="31299f5e-05bf-4022-abf6-cb0734a881f1" ChangeDateTime="10/25/2023 14:50:52">
+    <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnicoExportador].[ToleranciasDiferentes]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[NominacionDatoTecnicoExportador]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[ToleranciasDiferenciadas]" />
   </Operation>
 </Operations>

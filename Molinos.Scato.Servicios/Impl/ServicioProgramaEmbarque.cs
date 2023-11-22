@@ -365,6 +365,19 @@ namespace Molinos.Scato.Servicios.Impl
             if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;
         }
+
+        // No se puede cambiar el buque si se tienen cargas asociadas
+        public bool ValidarPuedeCambiarBuque(int nominacionId)
+        {
+            var embarque = repositorio.Obtener<Nominacion>(nominacionId).Embarque;
+            if (embarque == null)
+            {
+                return true;
+            }
+            var lineup = repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarque.Id);
+            return !(lineup.ModuloDeCarga != null && lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos != null && lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count > 0);
+        }
+
         public bool CrearSurveyor(SurveyorDto surveyor)
         {
             bool bCreado = false;
@@ -1127,10 +1140,10 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var nominaciones = (from n in repositorio.Listar<Nominacion>()
                                 join e in repositorio.Listar<Embarque>() on n.Embarque?.Id equals e.Id
-                                join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
+                                join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
                                 // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
                                 join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
-                                where e.Ubicacion != 1 && l.ModuloDeCarga.Id > 0 && n.FechaEnvioLineUp != null && n.FechaEliminacion == null
+                                where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0 && n.FechaEnvioLineUp != null && n.FechaEliminacion == null
                                 orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
                                 select (n)).ToList();
             return conversor.ConvertirList<Nominacion, NominacionDto>(nominaciones);

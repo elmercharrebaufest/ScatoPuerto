@@ -72,6 +72,7 @@ IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Pala/Paleo') B
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Terceros', '3ro'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Otros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Otros', 'T'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Espera Determinante') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Espera Determinante', 'ED'); END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros' AND Liquido = 1) BEGIN insert into MotivosFallasBalanza(Nombre, Siglas, Liquido) values ('Terceros', '3ro', 1); END
 GO
 
 --Motivos De Corte
@@ -459,19 +460,19 @@ GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Aceite de soja refinado')
 BEGIN 
 insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
-                    values ('Aceite de soja refinado', 'RSBO'         ,''       ,null      ,0        ,'#AB3C05','RSBO')
+                    values ('Aceite de soja refinado', 'RSBO'         ,''       ,null      ,1        ,'#AB3C05','RSBO')
 END
 GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'Aceite de girasol refinado')
 BEGIN 
 insert into MaterialPuerto (Descripcion        , DescripcionCorta,CodigoSap,Almacen_Id,EsLiquido,Color    ,DescripcionCortaIngles) 
-                    values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,0        ,'#CDAD0D','RSFO')
+                    values ('Aceite de girasol refinado', 'RSFO'         ,''       ,null      ,1        ,'#CDAD0D','RSFO')
 END
 GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'LECITINA DE SOJA') 
 BEGIN
     insert into MaterialPuerto(Descripcion, DescripcionCorta, CodigoSap, EsLiquido, Color, DescripcionCortaIngles) 
-    values ('LECITINA DE SOJA','LEC','99056', 0, '#FFFFFF', 'LEC') 
+    values ('LECITINA DE SOJA','LEC','99056', 1, '#FFFFFF', 'LEC') 
 END
 GO
 IF NOT EXISTS (select 1 from MaterialPuerto where Descripcion = 'ACEITE DE SOJA NEUTRALIZADO') 
@@ -480,6 +481,8 @@ BEGIN
     values ('ACEITE DE SOJA NEUTRALIZADO','SBO NEU','98855', 1, '#FFFFFF', 'SBO NEU')
 END
 GO
+
+UPDATE MaterialPuerto SET EsLiquido = 1 WHERE Descripcion IN ('Aceite de soja refinado', 'Aceite de girasol refinado', 'LECITINA DE SOJA')
 
 update MaterialPuerto set DescripcionCortaIngles = 'SB'    ,Color = '#D3B177' where descripcion = 'POROTO DE SOJA'
 update MaterialPuerto set DescripcionCortaIngles = 'SBMHP' ,Color = '#FFE0A8' where descripcion = 'HARINA DE SOJA*' -- DUDA DE NOMBRE
@@ -494,6 +497,7 @@ update MaterialPuerto set DescripcionCortaIngles = 'SBMLP' ,Color = '#FFCF79' wh
 update MaterialPuerto set DescripcionCortaIngles = 'SFPMP' ,Color = '#555554' where descripcion = 'Pellet de girasol'
 UPDATE MaterialPuerto SET DescripcionCortaIngles = 'LEC'   ,Color = '#FFFFFF' WHERE Descripcion = 'LECITINA DE SOJA'
 UPDATE MaterialPuerto SET DescripcionCortaIngles = 'SBO NEU', Color = '#FFFFFF' WHERE Descripcion = 'ACEITE DE SOJA NEUTRALIZADO'
+UPDATE MaterialPuerto SET DescripcionCortaIngles = 'CORN OIL', Color = '#B76719' WHERE Descripcion = 'ACEITE CRUDO DE MAIZ'
 
 
 declare @SB     int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SB'     )
@@ -506,6 +510,7 @@ declare @SME    int = (select top 1 Id from MaterialPuerto (nolock) where Descri
 declare @WHEAT  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'WHEAT'  )
 declare @SFPMP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPMP'  )
 declare @SFPLP  int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SFPLP'  )
+declare @SBONEU int = (select top 1 Id from MaterialPuerto (nolock) where DescripcionCortaIngles = 'SBO NEU')
 
 
 --Scripts TipoDeCalidad
@@ -569,6 +574,17 @@ insert into TipoDeCalidad (Descripcion, MaterialPuerto_Id)
 values ('Gafta 39', @SFPLP)
 END
 
+IF NOT EXISTS (SELECT 1 FROM TipoDeCalidad WHERE Descripcion = 'Fosfa 51' AND MaterialPuerto_Id = @SBONEU) BEGIN
+   INSERT INTO TipoDeCalidad (Descripcion, MaterialPuerto_Id) 
+   VALUES ('Fosfa 51', @SBONEU)
+END
+
+--Scripts densidades (copia valores de CSBO para SBO NEU)
+IF NOT EXISTS (SELECT 1 FROM DensidadPorTemperaturaDeMaterial WHERE MaterialPuerto_Id = @SBONEU) BEGIN
+    INSERT INTO DensidadPorTemperaturaDeMaterial
+    SELECT @SBONEU, Grado, Densidad FROM DensidadPorTemperaturaDeMaterial WHERE MaterialPuerto_Id = @CSBO
+END
+
 --Scripts CalidadValor
 declare @CVSB     int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SB     )
 declare @CVSBMHP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBMHP  )
@@ -580,6 +596,7 @@ declare @CVSME    int = (select top 1 Id from TipoDeCalidad (nolock) where Mater
 declare @CVWHEAT  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @WHEAT  )
 declare @CVSFPMP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SFPMP  )
 declare @CVSFPLP  int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SFPLP  )
+declare @CVSBONEU int = (select top 1 Id from TipoDeCalidad (nolock) where MaterialPuerto_Id = @SBONEU )
 
 IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVSB)
 BEGIN 
@@ -680,7 +697,6 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'F
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSFPLP, 'GMP+ FSA assured','')
 END
 
-
 IF NOT EXISTS (select 1 from CalidadValor where  TipoDeCalidad_Id = @CVCSBO)
 BEGIN 
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVCSBO, 'Free fatty acids (as oleic acid)','Basis: 1 % - Max: 1.25 %')
@@ -705,9 +721,16 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'CET
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'GREEN HOUSE GAS SAVING ','Min: 60 %')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'C.F.P.P.','Max: -2 d. centigrades')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'WATER ','Max: 350 ppm')
-
 END
 
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
+   INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro, Valor) VALUES
+   (@CVSBONEU, 'MOISTURE', '(%) 0.10 MAX. 0.10 ISO 8534:2017'),
+   (@CVSBONEU, 'ACID (FFA)', '(%) 0,15 MAX. 0,20 ISO 660:2020'),
+   (@CVSBONEU, 'FLASH POINT', '(°C) 150 MIN. 150 ISO 15267:1998'),
+   (@CVSBONEU, 'PHOSPHORUS (PPM)', '5 MAX. 10 ISO 10540-3:2002'),
+   (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
+END
 
 --Scripts Surveyor
 
@@ -753,6 +776,7 @@ if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'ADC S.R.L.
 --Scripts TipoContrato
 if not exists(select 1 from TipoDeContrato where Descripcion = 'FOB') begin insert into TipoDeContrato (Descripcion) values ('FOB') end
 if not exists(select 1 from TipoDeContrato where Descripcion = 'CIF') begin insert into TipoDeContrato (Descripcion) values ('CIF') end
+if not exists(select 1 from TipoDeContrato where Descripcion = 'FAS') begin insert into TipoDeContrato (Descripcion) values ('FAS') end
 
 --Scripts MuelleDeCarga
 if not exists(select 1 from MuelleDeCarga where Descripcion = 'San Benito') begin insert into MuelleDeCarga (Descripcion) values ('San Benito') end
@@ -834,9 +858,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 -- Nuevos Paises
 if not exists (select 1 from Pais where Descripcion = 'GEORGIA') begin insert into Pais (Descripcion) values ('GEORGIA'); end
 if not exists (select 1 from Pais where Descripcion = 'LIBERIA') begin insert into Pais (Descripcion) values ('LIBERIA'); end
+if not exists (select 1 from Pais where Descripcion = 'CANADA') begin insert into Pais (Descripcion) values ('CANADA'); end
+if not exists (select 1 from Pais where Descripcion = 'MEXICO') begin insert into Pais (Descripcion) values ('MEXICO'); end
 
 if not exists (select 1 from Destino where Nombre = 'GEORGIA') begin insert into Destino (Nombre) values ('GEORGIA'); end
 if not exists (select 1 from Destino where Nombre = 'LIBERIA') begin insert into Destino (Nombre) values ('LIBERIA'); end
+if not exists (select 1 from Destino where Nombre = 'CANADA') begin insert into Destino (Nombre) values ('CANADA'); end
+if not exists (select 1 from Destino where Nombre = 'MEXICO') begin insert into Destino (Nombre) values ('MEXICO'); end
 
 
 -- Nuevos Coordinadores
@@ -848,3 +876,4 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin 
 
 /* SCRIPTS DATOS AFIP */
 IF NOT EXISTS(SELECT 1 FROM AfipCoemEstado) BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'), ('PRE', 'Presentada'), ('AUTO', 'Autorizada'), ('CAN', 'Cancelada'), ('ANU', 'Anulada') END
+if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end

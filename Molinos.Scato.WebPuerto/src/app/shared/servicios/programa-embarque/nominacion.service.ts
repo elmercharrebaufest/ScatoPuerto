@@ -16,9 +16,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Injectable({
     providedIn: 'root'
 })
-export class NominacionService { 
+export class NominacionService {
 
-    // #region Variables  
+    // #region Variables
     private url: string = environment.apiUrl;
     private _nominacionParametros: BehaviorSubject<NominacionParametros> = new BehaviorSubject<NominacionParametros>(null);
     private _nominacionExportadores: BehaviorSubject<NominacionExportadores> = new BehaviorSubject<NominacionExportadores>(null);
@@ -78,7 +78,9 @@ export class NominacionService {
     public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp):Observable<ProgramaEmbarqueResultadoResultado> {
         return this.http.post<ProgramaEmbarqueResultadoResultado>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`,nominacionesEnvioLineUp, { 'withCredentials': true });
     }
-    
+    public validarPuedeCambiarBuque(nominacionId: number) {
+      return this.http.get<boolean>(`${this.url}ProgramaEmbarque/ValidarPuedeCambiarBuque?id=${nominacionId}`, { withCredentials: true });
+    }
     // #endregion
-    
+
 }

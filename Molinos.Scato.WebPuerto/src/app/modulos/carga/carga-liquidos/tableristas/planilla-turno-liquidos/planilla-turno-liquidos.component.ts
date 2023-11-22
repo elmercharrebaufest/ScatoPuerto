@@ -144,9 +144,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   ngAfterViewChecked()
-  {
-    console.log( "! changement de la date du composant !" );
-   
+  {       
     this.cdRef.detectChanges();
   }
 
@@ -445,9 +443,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       else {
         this.setTurnoODia();
       }
-    } else {
-      this.setTurnoODia(false, 0, true);
-    }
+    } 
+    //NO CREAR TURNO POR DEFAULT
+    // else {
+    //   this.setTurnoODia(false, 0, true);
+    // }
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number, noExisteTurno:boolean = false) {
@@ -539,8 +539,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean) {
     if (!esNuevoTurno)
       (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno, esNuevoTurno));
-    else
-      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
+    // SE QUITA ASIGNACION DE TURNO POR DEFAULT A PEDIDO DEL CLIENTE
+    // else
+    //   (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
   }
 
   setDia(dia: any, turno?: PlanillaDeTurnos, date?: Date) {
@@ -1102,34 +1103,33 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   initLinea(line?: any, guardado?: boolean) {
     let bloqueoVicentin = false;
-    if (line != null || line != undefined) {
-      const filtro = this.lineaDeEmbarque.filter(x => x.id == line.linea_Id);
-      if (filtro != null || filtro != undefined) {
-        if (filtro.length > 0) {
-          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin')
-            bloqueoVicentin = true;
-        }
-      }
-    }
     let destino = 0;
     let tipoLineaEmbarque = null;
+
     if (line != null || line != undefined) {
+      const filtro = this.lineaDeEmbarque.filter(x => x.id == line.linea_Id);
+
       destino = line.destino?.id;
-      const linea_Id = line ? line.linea_Id : 0;      
-      const filtro = this.lineaDeEmbarque.filter(x => x.id == linea_Id);
+      //const linea_Id = line ? line.linea_Id : 0;   
+      
       if (filtro != null || filtro != undefined) {
-        if (filtro.length > 0) {
-          tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
+        if (filtro.length > 0) {          
+
+          if (filtro[0].tipoLineaEmbarque.linea == 'Vicentin'){
+            tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
+            bloqueoVicentin = true;
+          }else{
+            tipoLineaEmbarque = filtro[0].tipoLineaEmbarque;
+          }            
         }
       }
-    }
+    }      
 
     let medidaInicialCM = line?.medidaInicialCM > 0 ? line.medidaInicialCM : 0;
     let medidaInicialMM = line?.medidaInicialMM > 0 ? line.medidaInicialMM : 0;
 
     let medidaFinalCM = line?.medidaFinalCM > 0 ? line.medidaFinalCM : 0;
     let medidaFinalMM = line?.medidaFinalMM > 0 ? line.medidaFinalMM : 0;
-
 
     const formulario = this._builder.group({
       linea: [{ value: line ? line.linea_Id : '', disabled: guardado },],
@@ -1145,7 +1145,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` :`${line.medidaFinalCM},0`:"", disabled: bloqueoVicentin }],
       medidaFinalCM: [{ value: medidaFinalCM , disabled: bloqueoVicentin }],
       medidaFinalMM: [{ value: medidaFinalMM , disabled: bloqueoVicentin }],
-      destino: [{ value: destino, disabled: !guardado? bloqueoVicentin: guardado }],
+      destino: [{ value: destino, disabled: guardado }],
       cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
     });
@@ -1284,10 +1284,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
 
     lineaTurno.cantidad.setValue(0);
-    if (lineaTurno?.medidaInicialCM.value &&
-      lineaTurno?.medidaInicialMM.value &&
-      lineaTurno?.medidaFinalCM.value &&
-      lineaTurno?.medidaFinalMM.value &&
+    if ((lineaTurno?.medidaInicialCM.value >= 0) &&
+      (lineaTurno?.medidaInicialMM.value >= 0) &&
+      (lineaTurno?.medidaFinalCM.value >= 0) &&
+      (lineaTurno?.medidaFinalMM.value >= 0) &&
       lineaTurno?.tk.value &&
       lineaTurno?.temperatura &&
       lineaTurno?.materialPuerto) {
@@ -1296,8 +1296,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       const medidaFinalCM = lineaTurno?.medidaFinalCM.value;
       const medidaFinalMM = lineaTurno?.medidaFinalMM.value;
       const tkLinea = lineaTurno?.tk.value.toString().padStart(3, "0");;
-      const temperatura = lineaTurno?.temperatura.value;
-      const materialPuerto = lineaTurno?.materialPuerto?.value.id
+      const temperatura =  Math.round(lineaTurno?.temperatura.value);
+      const materialPuerto = lineaTurno?.materialPuerto?.value;
       console.log(' input medidaInicialMM ==>')
       console.log(' ', medidaInicialCM, medidaInicialMM, tkLinea)
       console.log(' input medidaFinalMM ==>')
@@ -1326,12 +1326,23 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   async onExportarExcelLiquido(){
     this.exportaPlanilla = true;
-    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
-    this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
-    this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
-    this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
+    
+    if (this.toneladasLineas.length == 0) {
+      this.addToneladasLineas();
+    }else{
+      this.toneladasLineas = [];
+      this.addToneladasLineas();
+    }
+    
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas,false,  false,this.totalABordo, this.toneladasLineas);
     this.exportaPlanilla = false;
+  }
+
+  private addToneladasLineas(){
+    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
+      this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
+      this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
+      this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
   }
 
   calcularRestaEmbarcar(): number {
@@ -1457,11 +1468,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         let tipoLineaEmbarqueVal = turnoDetalle['controls'].tipoLineaEmbarque.value;
         let tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
         tipoLineaEmbarqueNombre = (tipoLineaEmbarqueNombre != undefined || tipoLineaEmbarqueNombre !=null) ? tipoLineaEmbarqueNombre : '';
-        let lineaSeleccionada = null
-        if (tipoLineaEmbarqueVal == LineaDeEmbarque.VICENTIN)
-            lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
-            else
-            lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
+        let lineaSeleccionada = null;
+
+        if (tipoLineaEmbarqueVal == LineaDeEmbarque.VICENTIN){
+          lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
+        }            
+        else{
+          lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tkInicial == tkInicial && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
+        }            
 
         if (turnoDetalle['controls'].linea.value == undefined || turnoDetalle['controls'].linea.value == null){
           turnoDetalle['controls'].linea.setValue(0)

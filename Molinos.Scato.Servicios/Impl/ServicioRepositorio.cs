@@ -8113,6 +8113,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var lineup = repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == planoDeCargaDto.Id);
                 var nominaciones = repositorio.Listar<Nominacion>(x => x.Embarque.Id == lineup.Embarque.Id);
+
                 var datosTecnicosExportadores = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador);
                 foreach (var datosTecnicosExportador in datosTecnicosExportadores)
                 {
@@ -8128,6 +8129,12 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     cargaComercial.MaterialPuerto = conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(datosTecnicosExportador.NominacionDatoTecnico.MaterialPuerto);
                     planoDeCargaDto.CargasComerciales.Add(cargaComercial);
+                }
+
+                var intervencion = nominaciones.FirstOrDefault(n => n.NominacionDetalleIntervencion != null && n.NominacionDetalleIntervencion.Fumigacion == "Si")?.NominacionDetalleIntervencion;
+                if (intervencion != null) {
+                    planoDeCargaDto.Fumigacion = true;
+                    planoDeCargaDto.EmpresaFumigadora = intervencion.CompaniaDeFumigacion.Descripcion;
                 }
             }
 
@@ -11132,42 +11139,72 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 //var embarques = Listar<Embarque, EmbarqueDto>();
-
-                var embar = (from e in repositorio.Listar<Embarque>()
-                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque.Id
+                //
+                var embar = new List<int>();
+                try
+                {
+                    embar = (from e in repositorio.Listar<Embarque>()
+                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
                              // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
-                             join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
-                             where e.Ubicacion != 1 && l.ModuloDeCarga.Id > 0
+                             join v in repositorio.Listar<Vapor>() on e.Vapor?.Id equals v.Id
+                             where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
                              orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
                              select (e.Id)).ToList();
 
-
-                var embarques = new List<EmbarqueDto>();
-                foreach (var em in embar)
-                {
-                    var embarque = repositorio.Obtener<Embarque>(x => x.Id == em);
-
-                    embarques.Add(conversor.Convertir<Embarque, EmbarqueDto>(embarque));
-
                 }
+                catch (Exception ex)
+                {                   
+                    if (ex.InnerException != null)
+                    {
+                        log.Error(ex, "Error en joins con inner: Excepcion: {0} Trace: {1} inner: {2}", ex.Message, ex.StackTrace, ex.InnerException.Message + ex.InnerException.StackTrace);
+                    }
+                    else
+                    {
+                        log.Error(ex, "Error en joins: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
+                    }
+                    throw (new Exception("Error en joins: Excepcion "+ ex.Message + ex.StackTrace, ex));
+                }
+                var embarques = new List<EmbarqueDto>();
+                try
+                {
+                    foreach (var em in embar)
+                    {
+                        var embarque = repositorio.Obtener<Embarque>(x => x.Id == em);
 
+                        embarques.Add(conversor.Convertir<Embarque, EmbarqueDto>(embarque));
+
+                    }
+                }
+                catch(Exception ex)
+                {
+                    log.Error(ex, "Error en Conversion EbarqueDto: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
+                    throw (new Exception("Error en Conversion EbarqueDto Excepcion: " + ex.Message + ex.StackTrace, ex));
+                }
                 List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
 
-                foreach (var embarque in embarques)
+                try
                 {
-                    var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
-                    InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                    foreach (var embarque in embarques)
                     {
-                        Id = lineupDto.InstanciaWorkflow,
-                        Embarque = embarque,
-                        LineUp = lineupDto
-                    });
+                        var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
+                        InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                        {
+                            Id = lineupDto.InstanciaWorkflow,
+                            Embarque = embarque,
+                            LineUp = lineupDto
+                        });
+                    }
+                }
+                catch(Exception ex)
+                {
+                    log.Error(ex, "Error en Conversion InstanciaWorkflowPuertoDtos: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
+                    throw (new Exception("Error en Conversion InstanciaWorkflowPuertoDtos Excepcion: " + ex.Message + ex.StackTrace, ex));
                 }
                 return InstanciaWorkflowPuertoDtos;
             }
             catch (Exception ex)
             {
-                log.Error(ex.InnerException.ToString());
+                log.Error(ex, "Error en servicioListarEmbarque: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                 throw ex;
             }
 

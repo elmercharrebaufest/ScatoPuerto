@@ -228,7 +228,7 @@ export class LineasComponent implements OnInit, OnChanges {
       linea.controls['alturaFinalMM'].setValue(mm);
       linea.controls['alturaFinalCMyMM'].setValue(cm + ',' + mm);
     }
-    linea.controls['alturaFinalMM'].setValue(mm);
+
     return this._lineasService.obtenerLlenadoMilimetroPorTanque(cm, mm, '0' + tk)
   }
 
@@ -276,7 +276,7 @@ export class LineasComponent implements OnInit, OnChanges {
       alturaFinalMM: x?.alturaFinalMM >= 0 ? x.alturaFinalMM : 0,
       alturaFinalCMyMM: [{ value: x?.alturaFinalCM >= 0 ? x.alturaFinalMM >= 0 ? `${x.alturaFinalCM},${x.alturaFinalMM}` :`${x.alturaFinalCM},0`:"", disabled: deshabilitar || esVicentin }],
       kilos: [{ value: x && x.kilos ? x.kilos > 0 ? x.kilos : "" : "", disabled: true || esVicentin }],
-      tkFinal: [{ value: x?.tkFinal ?? "", disabled: true || esVicentin }],
+      tkFinal: [{ value: x?.tkFinal ?? "", disabled: false }],
       litrosFinales:[{ value: x && x.litrosFinales ? x.litrosFinales > 0 ? x.litrosFinales : "" : "", disabled: deshabilitar || esVicentin }],
       kilosFinales:[{ value: x && x.kilosFinales ? x.kilosFinales > 0 ? x.kilosFinales : "" : "", disabled: deshabilitar || esVicentin }],
     });
@@ -485,6 +485,7 @@ export class LineasComponent implements OnInit, OnChanges {
     return bValidarDuplicadas;
   }
   onGuardar() {
+
     if (this.esCalidad) return;
     const bValidarDuplicadas = this.validarLineasDuplicadas();
     if (bValidarDuplicadas){
@@ -494,6 +495,8 @@ export class LineasComponent implements OnInit, OnChanges {
     }
 
     this.esGuardadoActivo = false;
+
+    
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
     lineasEmabarque.forEach(item => {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
 import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-coordinador';
 import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
@@ -42,6 +42,7 @@ export class NominacionDatoTecnicoRegistroService {
     }
 
     public inicializarFormNuevo(): FormGroup {
+        const validadorImo = this.crearFnValidarImo();
         return this.formBuilder.group({
             id: [0, Validators.required],
             materialPuerto: ['', Validators.required],
@@ -50,8 +51,8 @@ export class NominacionDatoTecnicoRegistroService {
             cantidadTotal: ['', Validators.required],
             tolerancia: [''],
             observaciones: [''],
-            vaporInformacion: [[], Validators.required],
-            bandera: [{value: '', disabled: true }],
+            vaporInformacion: [null, [Validators.required, validadorImo]],
+            bandera: [{ value: '', disabled: true }],
             etaRecalada: ['', Validators.required],
             obligacionDeCarga: ['', Validators.required],
             muelleDeCarga: ['', Validators.required],
@@ -70,24 +71,45 @@ export class NominacionDatoTecnicoRegistroService {
         });
     }
 
-    public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
-        if (exportador != null) {
-            return this.formBuilder.group({
-                id: exportador.id,
-                exportador: exportador.exportador,
-                cantidad: exportador.cantidad,
-                tolerancia: exportador.tolerancia,
-                nominacionDatoTecnico_Id: nominacionDatoTecnico
-            })
-        } else {
-            return this.formBuilder.group({
-                id: '',
-                exportador: ['', Validators.required],
-                cantidad: [0, Validators.required],
-                tolerancia: [0, Validators.required],
-                nominacionDatoTecnico_Id: '',
-            })
+    private crearFnValidarImo(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors => {
+            const vapor = control.value as VaporInformacion;
+            if (!vapor || typeof vapor != 'object') { // Esta validación ya se prevee en la función validaSeleccionVapor() del componente
+                return null;
+            }
+            if (!vapor.imoVapor) {
+                const mensaje = 'El buque seleccionado no tiene establecido su IMO lo cuál no permitirá continuar con el guardado';
+                this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar.', '', null, null, Tipoalerta.Warning);
+                return { buqueSinImo: true };
+            }
+            return null;
         }
+    }
+
+    public inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0): FormGroup {
+      const group = this.formBuilder.group({
+        id: '',
+        exportador: ['', Validators.required],
+        cantidad: [0, Validators.required],
+        tolerancia: 0,
+        nominacionDatoTecnico_Id: '',
+        toleranciasDiferenciadas: false,
+        toleranciaPositiva: 0,
+        toleranciaNegativa: 0
+      });
+      if (exportador) {
+        group.patchValue({
+          id: exportador.id,
+          exportador: exportador.exportador,
+          cantidad: exportador.cantidad,
+          tolerancia: exportador.tolerancia || 0,
+          nominacionDatoTecnico_Id: nominacionDatoTecnico,
+          toleranciasDiferenciadas: exportador.toleranciasDiferenciadas || false,
+          toleranciaPositiva: exportador.toleranciaPositiva || 0,
+          toleranciaNegativa: exportador.toleranciaNegativa || 0
+        });
+      }
+      return group;
     }
 
     public inicializarFormDestino(destino: NominacionDatoTecnicoDestino = null, nominacionDatoTecnico: number = 0): FormGroup {
@@ -127,77 +149,92 @@ export class NominacionDatoTecnicoRegistroService {
     }
 
     public validacionGrabar(datoTecnicoForm: FormGroup): boolean {
-        let bValidacion: boolean = true;
-        const tituloMensaje = 'Registro Nominación - Dato Tecnico';
-        if (datoTecnicoForm.invalid == true){
-            this.confirmationDialogService.confirm(tituloMensaje, 'Revise que este completado los campos marcados en rojo, asi como la información en Destino, Cliente y Cargador.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-            bValidacion = false;
-            return bValidacion;
+      const mostrarError = (mensaje: string) => this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar.', '', null, null, Tipoalerta.Warning);
+
+      if (datoTecnicoForm.invalid == true) {
+        mostrarError('Revise que este completado los campos marcados en rojo, asi como la información en Destino, Cliente y Cargador.');
+        return false;
+      }
+
+      const datoTecnicoCoordinadorForm = datoTecnicoForm.get('nominacionDatoTecnicoCoordinadorPuerto') as FormArray;
+      const datoTecnicoDestinoForm = datoTecnicoForm.get('nominacionDatoTecnicoDestino') as FormArray;
+      const datoTecnicoExportadorForm = datoTecnicoForm.get('nominacionDatoTecnicoExportador') as FormArray;
+
+      const coordinadores = datoTecnicoCoordinadorForm?.controls ?? null;
+      const destinos = datoTecnicoDestinoForm?.controls ?? null;
+      const exportadores = datoTecnicoExportadorForm?.controls ?? null;
+
+      if (!coordinadores || !destinos || !exportadores) {
+        mostrarError('Debe agregar destino, cargador y cliente para la nominación')
+        return false;
+      }
+
+      if (datoTecnicoCoordinadorForm.status != 'VALID' || datoTecnicoCoordinadorForm.status != 'VALID' || datoTecnicoCoordinadorForm.status != 'VALID') {
+        mostrarError('Debe completar todos los datos en destino, cargador y cliente');
+        return false;
+      }
+
+      if (exportadores.length == 0 || destinos.length == 0 || exportadores.length == 0) {
+        mostrarError('Debe agregar destino, cargador y cliente a la nominación');
+        return false;
+      }
+
+      const cantidadTotal = +datoTecnicoForm.get('cantidadTotal').value;
+
+      let cantidadSumaDestino = 0;
+      for (const destino of destinos) {
+        const cantidad = +destino.get('cantidad').value;
+        cantidadSumaDestino += cantidad;
+
+        if (!destino.get('destino').value || !cantidad) {
+          mostrarError('Falta completar información en destino');
+          return false;
         }
 
-        const datoTecnicoCoordinadorForm = datoTecnicoForm.controls['nominacionDatoTecnicoCoordinadorPuerto'];
-        const datoTecnicoDestinoForm = datoTecnicoForm.controls['nominacionDatoTecnicoDestino'];
-        const datoTecnicoExportadorForm = datoTecnicoForm.controls['nominacionDatoTecnicoExportador'];
+        if (cantidadSumaDestino > cantidadTotal) {
+          mostrarError('La cantidad en destino excede al total')
+          return false;
+        }
+      }
 
-        const datoTecnicoCoordinador = datoTecnicoCoordinadorForm != null || datoTecnicoCoordinadorForm != undefined ? datoTecnicoCoordinadorForm['controls']: null;
-        const datoTecnicoDestino = datoTecnicoDestinoForm !=null || datoTecnicoDestinoForm !=undefined ? datoTecnicoDestinoForm['controls'] : null;
-        const datoTecnicoExportador = datoTecnicoExportadorForm !=null || datoTecnicoExportadorForm != undefined ? datoTecnicoExportadorForm['controls'] : null;
-        const material =datoTecnicoForm.controls['materialPuerto'];
-        if (datoTecnicoCoordinador == null || datoTecnicoDestino == null || datoTecnicoExportador == null){
-            this.confirmationDialogService.confirm(tituloMensaje, 'Debe agregar destino, cargador y cliente para la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
-            bValidacion = false;
-            return bValidacion;
+      let cantidadSumaCoordinador = 0;
+      for (const coordinador of coordinadores) {
+        const cantidad = +coordinador.get('cantidad').value;
+        cantidadSumaCoordinador += cantidad;
+
+        if (!coordinador.get('coordinadorPuerto').value || !cantidad) {
+          mostrarError('Falta completar información en cliente');
+          return false;
         }
 
-        if (datoTecnicoCoordinadorForm.status !='VALID' || datoTecnicoCoordinadorForm.status !='VALID' || datoTecnicoCoordinadorForm.status !='VALID'){
-            this.confirmationDialogService.confirm(tituloMensaje, 'Debe completar todos los datos en destino, cargador y cliente', 'Cerrar', '', null, null, Tipoalerta.Warning);
-            bValidacion = false;
-            return bValidacion;
+        if (cantidadSumaCoordinador > cantidadTotal) {
+          mostrarError('La cantidad en cliente excede al total');
+          return false;
+        }
+      }
+
+      let cantidadSumaExportador = 0;
+      for (const exportador of exportadores) {
+        const cantidad = +exportador.get('cantidad').value;
+        cantidadSumaExportador += cantidad;
+
+        const controlTolerancia = exportador.get('tolerancia');
+        if (controlTolerancia.value === null || controlTolerancia.value === undefined || controlTolerancia.value === '') {
+          controlTolerancia.setValue(0);
         }
 
-            let erroresDestinos: boolean = false;
-            let erroresCoordinador: boolean = false;
-            let erroresExportador: boolean = false;
+        if (!exportador.get('exportador').value || !cantidad) {
+          mostrarError('Falta completar información en Cargador');
+          return false;
+        }
 
-            if (datoTecnicoExportador.length == 0 || datoTecnicoDestino.length == 0 || datoTecnicoExportador.length == 0) {
-                this.confirmationDialogService.confirm(tituloMensaje, 'Debe agregar destino, cargador y cliente a la nominación', 'Cerrar', '', null, null, Tipoalerta.Warning);
-                bValidacion = false;
-                return bValidacion;
-            }
-            datoTecnicoDestino.forEach(detalle => {
-                const datos = detalle['controls'];
-                if (datos.destino.value == '' || datos.cantidad.value == '' || datos.cantidad.value == '0') {
-                    erroresDestinos = true;
-                    return;
-                }
-            });
-            datoTecnicoCoordinador.forEach(detalle => {
-                const datos = detalle['controls'];
-                if (datos.coordinadorPuerto.value == '' || (datos.cantidad.value == '' || datos.cantidad.value == '0')) {
-                    erroresCoordinador = true;
-                    return;
-                }
-            });
-            datoTecnicoExportador.forEach(detalle => {
-                const datos = detalle['controls'];
-                if (!datos.exportador.value || !datos.cantidad.value || datos.tolerancia == '') {
-                    erroresExportador = true;
-                    return;
-                }
-            });
+        if (cantidadSumaExportador > cantidadTotal) {
+          mostrarError('La cantidad en cargador excede al total');
+          return false;
+        }
+      }
 
-            if (erroresDestinos || erroresCoordinador || erroresExportador) {
-                this.confirmationDialogService.confirm(tituloMensaje, 'Falta completar información en destino, cargador o cliente.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-                bValidacion = false;
-                return bValidacion;
-            } else {
-                if (!bValidacion) {
-                    this.confirmationDialogService.confirm(tituloMensaje, 'Falta completar información para el registro de nominación.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-                    return bValidacion;
-                }
-            }
-
-        return bValidacion;
+      return true;
     }
 
     public grabarNominacion(nominacion: Nominacion): Observable<boolean>{
