@@ -17,10 +17,6 @@ export const routeConfig: Routes = [
     //   redirectTo: '/login',
         pathMatch: 'full'
       },
-     /*   {
-         path: 'login',
-         component: IniciarSesionComponent,
-       }, */
       {
         path: "lineup",
         canActivateChild: [RoleGuard],
@@ -58,10 +54,6 @@ export const routeConfig: Routes = [
       }
     ]
   },
-/*   {
-    path: 'login',
-    component: IniciarSesionComponent,
-  } */
   {
     path: 'login',
     component: LoginComponent,
