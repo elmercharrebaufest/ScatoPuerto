@@ -396,9 +396,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             this.diasTurno['controls'][dayIndex]['controls'].turnos,
             this.diasTurno['controls'][dayIndex]['controls'].turnos.length - 1);
         } else {
-          this.initTurnoDetalle(null,
-            this.diasTurno['controls'][dayIndex]['controls'].turnos,
-            this.diasTurno['controls'][dayIndex]['controls'].turnos.length - 1);
+          // this.initTurnoDetalle(null,
+          //   this.diasTurno['controls'][dayIndex]['controls'].turnos,
+          //   this.diasTurno['controls'][dayIndex]['controls'].turnos.length - 1);
         }
 
         //Agrego cortes
@@ -411,10 +411,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       });
 
     }
+    //this.setTurnoDiaXHoraDefault();
+  }
 
-    //Me obtengo la fecha del último día
-    //let diaUltimoTurno;
-    //let ultimoDiaIndex;
+  setTurnoDiaXHoraDefault(){
+   // Me obtengo la fecha del último día    
     if (this.diasTurno != undefined && this.diasTurno['controls'].length > 0) {
 
       const diasTurno = this.diasTurno['controls'];
@@ -445,9 +446,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
     } 
     //NO CREAR TURNO POR DEFAULT
-    // else {
-    //   this.setTurnoODia(false, 0, true);
-    // }
+    else {
+      this.setTurnoODia(false, 0, true);
+    }
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number, noExisteTurno:boolean = false) {
@@ -538,10 +539,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   setTurno(dia: number, Turno: PlanillaDeTurnos, esNuevoTurno?: boolean) {
     if (!esNuevoTurno)
-      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno, esNuevoTurno));
-    // SE QUITA ASIGNACION DE TURNO POR DEFAULT A PEDIDO DEL CLIENTE
-    // else
-    //   (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
+      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).push(this.initTurno(Turno, esNuevoTurno));    
+    else
+      (this.diasTurno['controls'][dia]['controls'].turnos as FormArray).insert(0, this.initTurno(Turno, esNuevoTurno));
   }
 
   setDia(dia: any, turno?: PlanillaDeTurnos, date?: Date) {
@@ -1055,9 +1055,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       }
       //Si no hay detalles completo con 4 lineas vacías.
     } else {
-      for (let i = 1; i <= 1; i++) {
-        (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea());
-      }
+      // for (let i = 1; i <= 1; i++) {
+      //   (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea());
+      // }
     }
   }
 
