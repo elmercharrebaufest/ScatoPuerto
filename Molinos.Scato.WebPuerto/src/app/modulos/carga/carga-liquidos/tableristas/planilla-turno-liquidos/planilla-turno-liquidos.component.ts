@@ -395,10 +395,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           this.initTurnoDetalle(dia.moduloDeCargaPlanillaDeTurnosDetallesLiquido,
             this.diasTurno['controls'][dayIndex]['controls'].turnos,
             this.diasTurno['controls'][dayIndex]['controls'].turnos.length - 1);
-        } else {
-          // this.initTurnoDetalle(null,
-          //   this.diasTurno['controls'][dayIndex]['controls'].turnos,
-          //   this.diasTurno['controls'][dayIndex]['controls'].turnos.length - 1);
         }
 
         //Agrego cortes
@@ -410,45 +406,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
       });
 
-    }
-    //this.setTurnoDiaXHoraDefault();
-  }
-
-  setTurnoDiaXHoraDefault(){
-   // Me obtengo la fecha del último día    
-    if (this.diasTurno != undefined && this.diasTurno['controls'].length > 0) {
-
-      const diasTurno = this.diasTurno['controls'];
-      const ultimoDiaIndex = 0; //this.diasTurno['controls'].length - 1;
-      const diaUltimoTurno = diasTurno[ultimoDiaIndex]['controls']['diaTurno']['value'];
-
-      //Me fijo si ese día es hoy
-      if (new Date().getDate() == new Date(diaUltimoTurno).getDate()) {
-        //Si es hoy reviso el id del último turno
-        const ultimoDiaRevIndex = [diasTurno[ultimoDiaIndex]['controls']['turnos']['controls'].length - 1];
-        const idTurnoPuerto = diasTurno[ultimoDiaIndex]['controls']['turnos']['controls'][ultimoDiaRevIndex].value.turnoPuerto.turnoPuerto.id
-
-        //Me traigo la hora actual (solo la hora, no me interesan los minutos.)
-        let horaActual = new Date().getHours();
-
-        //Me traigo el rango de horario del último turno y lo guardo en un array de 2 posiciones
-        let rangoHorarios: string[] = this.turnos[idTurnoPuerto - 1].split('-');
-
-        //Me fijo si la hora actual está dentro de ese rango.
-        if (horaActual >= parseInt(rangoHorarios[0]) && horaActual < parseInt(rangoHorarios[1])) {
-          //Si está dentro del rango quiere decir que ya existe el turno.
-        } else {
-          this.setTurnoODia(true, ultimoDiaIndex);
-        }
-      }
-      else {
-        this.setTurnoODia();
-      }
-    } 
-    //NO CREAR TURNO POR DEFAULT
-    else {
-      this.setTurnoODia(false, 0, true);
-    }
+    }   
   }
 
   setTurnoODia(soloTurno: boolean = false, diaIndex?: number, noExisteTurno:boolean = false) {
@@ -1046,18 +1004,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       if (detalle.length > 0) {
         detalle.forEach(element => {
           (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][turnoIndex]['controls'].guardadoPorTablerista.value));
-        });
-
-        //HAGO ESTO PARA COMPLETAR CON LINEAS VACÝAS HASTA LLEGAR A 4.
-        /*for (let i = 0; i <= detalle.length - 1; i++) {
-          (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, turno['controls'][turnoIndex]['controls'].guardadoPorTablerista.value));
-        }*/
-      }
-      //Si no hay detalles completo con 4 lineas vacías.
-    } else {
-      // for (let i = 1; i <= 1; i++) {
-      //   (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea());
-      // }
+        });       
+      }      
     }
   }
 
