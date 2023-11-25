@@ -11,6 +11,6 @@ namespace Molinos.Scato.Dominio.Dto
         public int Id { get; set; }
         public ExportadorDto Exportador { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
     }
 }

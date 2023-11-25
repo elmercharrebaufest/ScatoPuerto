@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, TemplateRef, ViewChild, OnDestroy } from '@angular/core';
 import { ReciboDeBuqueDetalles, ReciboDeBuque } from '@ScatoModels/reciboDeBuque';
 import { ReciboBuqueService } from '@ScatoServicios/reciboBuque.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,7 +6,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Mail } from '@ScatoModels/mail';
@@ -23,7 +23,7 @@ import { formatDate } from '@angular/common';
   templateUrl: './modal-recibo.component.html',
   styleUrls: ['./modal-recibo.component.css']
 })
-export class ModalReciboComponent implements OnInit, AfterViewInit {
+export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
   //#region variables
   reciboBuqueDetalles: ReciboDeBuqueDetalles;
   reciboBuque: ReciboDeBuque;
@@ -37,6 +37,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   @ViewChild('emitirRecibo', { read: TemplateRef }) ojitoRecibo: TemplateRef<any>;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+
+  private suscripcionRecibo: Subscription;
 
   //#endregion
 
@@ -52,7 +54,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
   ) {
     // session.getUser().username
     this.user = this.session.getUser();
-    this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
+    this.suscripcionRecibo = this._reciboSharingService.getFiltroRecibos().subscribe((data) => {
       this.reciboBuqueOjito = data;
       this.mostrarModalOjito();
     });
@@ -66,6 +68,10 @@ export class ModalReciboComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.mostrarModalOjito()
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcionRecibo.unsubscribe();
   }
 
   private initFormReciboDetalles() {

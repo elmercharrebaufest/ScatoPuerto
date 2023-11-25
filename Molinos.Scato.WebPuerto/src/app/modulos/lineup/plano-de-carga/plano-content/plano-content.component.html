@@ -25,7 +25,7 @@
               <ng-container [formGroupName]="i">
                 <td>{{bodega.bodegaParcel}}</td>
                 <td>
-                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event)">
+                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)">
                 </td>
                 <td>
                   <select class="custom-select" formControlName="materialPuerto">
@@ -76,7 +76,7 @@
               <ng-container [formGroupName]="i">
                 <td>{{bodega.bodegaParcel}}</td>
                 <td>
-                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event)" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'>
+                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'>
                 </td>
                 <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'></td>
                 <td>
