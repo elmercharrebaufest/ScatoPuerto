@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -28,6 +28,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { CargaComercial } from '@ScatoModels/carga-comercial';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 
 @Component({
   selector: 'app-plano-content',
@@ -152,16 +153,24 @@ export class PlanoContentComponent implements OnInit {
         for (let index = 0; index < 9; index++) {
           var bodega = res.planoDeCargaBodegas.find(x => x.bodegaParcel == index + 1);
           if (bodega != null) {
-            this.planoDeCargaBodegasFormArray.at(index).setValue(bodega);
+            const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+            bodegaForm.setValue(bodega);
             this.onChangeCondicion(bodega.condicion, index);
-            if (bodega.materialPuerto != null)
-              this.planoDeCargaBodegasFormArray.at(index).get('materialPuerto').setValue(
-                this.materialesPuerto.find(x => x.id == bodega.materialPuerto.id)
-              );
-            if (bodega.destino != null)
-              this.planoDeCargaBodegasFormArray.at(index).get('destino').setValue(
-                this.destinos.find(x => x.id == bodega.destino.id)
-              );
+            if (bodega.materialPuerto != null) {
+              const material = this.materialesPuerto.find(x => x.id == bodega.materialPuerto.id);
+              bodegaForm.get('materialPuerto').setValue(material);
+            }
+            if (bodega.destino != null) {
+              const destino = this.destinos.find(x => x.id == bodega.destino.id);
+              bodegaForm.get('destino').setValue(destino);
+            }
+            if (bodega.cantidad && bodega.cantidad % 1) { // necesario para mostrar los valores iniciales con "," en los decimales
+              const cantidadStr = bodega.cantidad.toString().replace('.', ',');
+              bodegaForm.get('cantidad').setValue(cantidadStr, { emitEvent: false });
+              setTimeout(() => {
+                bodegaForm.get('cantidad').setValue(Number(cantidadStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
+              }, 200);
+            }
             let bodegas = this.planoDeCargaForm.controls.planoDeCargaBodegas.value.filter(b => b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo);
             this._turnoService.setBodega(bodegas);
           }
@@ -335,10 +344,17 @@ export class PlanoContentComponent implements OnInit {
   cargarPlanoDeCargaBodegas() {
     this.planoDeCargaBodegasFormArray.clear();
     for (let index = 0; index < 9; index++) {
+      const control = new FormControl(null, { updateOn: 'blur' });
+      control.valueChanges.subscribe((val: string) => {
+        if (typeof val == 'string') {
+          const valorNumerico = val ? Number(val.replace(',', '.')) : val;
+          control.setValue(valorNumerico, { emitModelToViewChange: false, emitEvent: false });
+        }
+      });
       this.planoDeCargaBodegasFormArray.push(this.formBuilder.group({
         id: [],
         bodegaParcel: [index + 1],
-        cantidad: [],
+        cantidad: control,
         materialPuerto: [],
         condicion: [""],
         sfFull: [],
@@ -361,11 +377,15 @@ export class PlanoContentComponent implements OnInit {
     return index;
   }
 
-  public numberOnly(event): boolean {
+  public numberOnly(event: KeyboardEvent, decimales?: boolean): boolean {
     var charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57))
-      return false;
-    return true;
+    let esNumero = charCode >= 48 && charCode <= 57;
+    if (!esNumero && decimales){
+      const input = event.target as HTMLInputElement;
+      const char = String.fromCharCode(charCode);
+      return char == ',' && !input.value.includes(',');
+    }
+    return esNumero;
   }
 
   calcularRecomendacionDefensas(estadoPuerto?: any) {
@@ -665,11 +685,13 @@ export class PlanoContentComponent implements OnInit {
   }
 
   calcularTotal() {
-    if (this.esLiquido)
-      this._turnoService.setTnTotales(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
-
-    this._procesoService.sendTotalPlanoDeEmbarque.emit(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
-    return this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0);
+    const bodegas = this.planoDeCargaBodegasFormArray.value as PlanoDeCargaBodega[];
+    const total = bodegas.reduce((prev, next) => prev + +next.cantidad, 0);
+    if (this.esLiquido) {
+      this._turnoService.setTnTotales(total)
+    }
+    this._procesoService.sendTotalPlanoDeEmbarque.emit(total)
+    return total.toString().replace('.', ',');
   }
 
   //**CONTROL DE BOTONES DE LOS ABM***//

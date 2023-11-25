@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[PlanoDeCargaBodega] (
     [Id]                              INT             IDENTITY (1, 1) NOT NULL,
-    [Cantidad]					 INT                      NOT NULL,
+    [Cantidad]					 DECIMAL(18, 3)                      NOT NULL,
     [Condicion]					 NVARCHAR(50)             NULL,
     [SfFull]					 NVARCHAR(50)             NULL,
     [MaterialPuerto_Id]          INT                      NULL,

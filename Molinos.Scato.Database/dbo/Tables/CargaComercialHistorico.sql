@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[CargaComercialHistorico] (
     [Id]                              INT             IDENTITY (1, 1) NOT NULL,
-    [Cantidad]					 INT             NOT NULL,
+    [Cantidad]					 DECIMAL(18, 3)             NOT NULL,
     [Exportador_Id]                       INT             NOT NULL,
     [MaterialPuerto_Id]                       INT             NOT NULL,
     [PlanoDeCargaHistorico_Id]            INT                      NOT NULL,
