@@ -99,126 +99,34 @@ export class ModalCrearCoemComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
-  public onCrearCoem() {
+  public async onCrearCoem() {
     this.submitted = true;
-    if (
-      this.crearEditarCoemForm.controls['identificadorCaratula'].invalid ||
-      this.mercaderiasSueltasFormArray.invalid
-    ) {
-      this.confirmationDialogService.confirm(
-        'Advertencia',
-        'Los campos que estan en rojo son requeridos',
-        'Cerrar',
-        '',
-        null,
-        null,
-        Tipoalerta.Warning
-      );
-    } else {
-      this.confirmationDialogService
-        .confirm(
-          'Advertencia',
-          `¿Está seguro de ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'
-          } Coem?`,
-          'Sí',
-          'Cancelar',
-          null,
-          null,
-          Tipoalerta.Warning
-        )
-        .then((confirmed) => {
-          if (confirmed) {
-            
-            this.operacionNuevo ? this.crearCoem(this.setValoresNuevoOEditarCoem()) : this.editarCoem(this.setValoresNuevoOEditarCoem());
-          }
-            this.modalService.dismissAll();
-        })
-        .catch(() => {
-          this.confirmationDialogService.confirm(
-            '¡Error!',
-            `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'
-            } Coem`,
-            'Cerrar',
-            '',
-            null,
-            null,
-            Tipoalerta.Error
-          );
-          this.modalService.dismissAll();
-        });
+    if (this.crearEditarCoemForm.controls['identificadorCaratula'].invalid || this.mercaderiasSueltasFormArray.invalid) {
+      this.confirmationDialogService.confirm('Advertencia','Los campos que estan en rojo son requeridos','Cerrar','',null,null,Tipoalerta.Warning);
+      return;
     }
-  } 
-
-  crearCoem(coem) {    
-    //Si llegamos hasta aca es porque tenemos que crear un nuevo Coem.
-    this.coemAfipService
-      .registrarCoem(coem)
-      .subscribe(
-        (data) => {
-         if (!data) {
-            console.log(data);
-            this.mostrarError();
-         }else{
-          this.editOCrearFinish.emit();
-          this.confirmationDialogService.confirm(
-            '¡Felicitaciones!',
-            `Ha ${this.operacionNuevo ? 'creado un nuevo' : 'editado el'
-            } Coem con éxito`,
-            'Cerrar',
-            '',
-            null,
-            null,
-            Tipoalerta.Success
-          )
-         }          
-        },
-        (error) => {
-          console.log(error);
-          this.mostrarError();
-        }
-      );
-  }
-  editarCoem(coem) {
-    this.crearEditarCoemForm.get('identificadorCaratula').enable();
-    this.coemAfipService
-      .editarCoem(coem)
-      .subscribe(
-        (data) => {
-          if (!data) {         
-            console.log(data);
-            this.mostrarError();
-          }else{
-            this.editOCrearFinish.emit();
-            this.confirmationDialogService.confirm(
-              '¡Felicitaciones!',
-              `Ha ${this.operacionNuevo ? 'creado un nuevo' : 'editado el'
-              } Coem con éxito`,
-              'Cerrar',
-              '',
-              null,
-              null,
-              Tipoalerta.Success
-            ); 
-          }
-        },
-        (error) => {
-          console.log(error);
-          this.mostrarError();
-        }
-      );
+    const confirmed = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'} Coem?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+    if(!confirmed){
+      return;
+    }
+    this.crearEditarCoem(this.setValoresNuevoOEditarCoem());
+    this.modalService.dismissAll();
   }
 
-  mostrarError = () => {
-    this.confirmationDialogService.confirm(
-      '¡Error!',
-      `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'
-      } Coem, comunicarse con soporte técnico`,
-      'Cerrar',
-      '',
-      null,
-      null,
-      Tipoalerta.Error
-    );
+  private crearEditarCoem(coem){
+    const request = this.operacionNuevo ? this.coemAfipService.registrarCoem(coem):this.coemAfipService.editarCoem(coem);
+    request.subscribe(() => {
+      this.editOCrearFinish.emit();
+      this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${this.operacionNuevo ? 'creado una nueva' : 'editado la'} Coem con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+    }, (err) => {
+      console.error(err);
+      this.mostrarError(err.error);
+    });
+  }
+
+  mostrarError = (err?: string) => {
+    const msj = err || `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'} Coem, comunicarse con soporte técnico`;
+    this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
   }
 
   agregarNuevoCoem() {
@@ -245,7 +153,7 @@ export class ModalCrearCoemComponent implements OnInit {
       !this.operacionNuevo ? coem.id = this.id : null ;
       coem.identificadorCaratula = this.crearEditarCoemForm.controls['identificadorCaratula'].value;
       coem.mercaderiasSueltas=new Array<NuevasMercaderiasSueltasCoem>();
-      
+
       for(let mercaderia of this.mercaderiasSueltasFormArray.value){
       coem.mercaderiasSueltas.push(new NuevasMercaderiasSueltasCoem());
       coem.mercaderiasSueltas[i].cuitATA = mercaderia.cuitATA;
