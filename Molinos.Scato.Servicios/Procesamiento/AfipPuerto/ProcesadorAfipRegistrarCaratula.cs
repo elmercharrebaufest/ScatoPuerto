@@ -30,12 +30,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var caratula = comando.Dto ?? throw new Exception("La caratula recibida es nula");
-                var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula);
-                var cuerpoRespuesta = res.Body.RegistrarCaratulaResult.ListaErrores[0];
-                //TODO Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa” y se devolverá el IdentificadorCaratula en el tag <DescripcionAdicional>
-                if (cuerpoRespuesta.Codigo != 0)
+                var res = this.comunicacionEmbarqueServicioHelper.RegistrarCaratula(caratula).Body.RegistrarCaratulaResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e=> sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
                 string caratulaId = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
 
@@ -49,7 +51,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             catch (Exception e)
             {
                 resultado.Error("", e.Message);
-                Log.Error("Error al registrar caratula {0}", e.StackTrace);
+                Log.Error("Error al registrar caratula {0}", e);
             }
             return resultado;
         }

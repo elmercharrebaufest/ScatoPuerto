@@ -28,12 +28,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             var resultado = new ResultadoCrear();
             try
             {
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id);
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");
                 var estado = Repositorio.Obtener<AfipCoemEstado>(comando.IdEstado);
-                if (coemDB == null)
-                {
-                    throw new Exception("No existe la COEM con el id especificado");
-                }
 
                 //Se anula la COEM, siempre que esta se encuentre en el estado en CURSO/REGISTRADA, identificada por un identificador de Caratula
                 if (coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Registrada)
@@ -41,11 +37,14 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception("La COEM debe estar en estado Registrada (REG) para poder anularlse");
                 }
 
-                var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
-                var cuerpoRespuesta = res.Body.AnularCOEMResult.ListaErrores[0];
-                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM).Body.AnularCOEMResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al ANULAR la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
 
                 coemDB.AfipCoemEstado = estado;
@@ -55,7 +54,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             catch (Exception e)
             {
                 resultado.Error("", e.Message);
-                Log.Error("Error al anular COEM {0}", e.Message);
+                Log.Error("Error al anular COEM {0}", e);
             }
             return resultado;
         }

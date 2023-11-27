@@ -35,11 +35,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception("Ya existe una solicitud pendiente de cambio de fechas para esta carátula");
                 }
 
-                var res = this.comunicacionEmbarqueServicioHelper.SolicitarCambioFechas(comando.Dto, caratulaDb.IdentificadorCaratula);
-                var cuerpoRespuesta = res.Body.SolicitarCambioFechasResult.ListaErrores[0];
-                if (cuerpoRespuesta.Codigo != 0)
+                var res = this.comunicacionEmbarqueServicioHelper.SolicitarCambioFechas(comando.Dto, caratulaDb.IdentificadorCaratula).Body.SolicitarCambioFechasResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al solicitar el cambio de fechas: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
 
                 var solicitudDb = new AfipSolicitudCambioFechas
@@ -59,7 +62,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             catch (Exception e)
             {
                 resultado.Error("", e.Message);
-                Log.Error("Error al solicitar cambio de fechas {0}", e.StackTrace);
+                Log.Error("Error al solicitar cambio de fechas {0}", e);
             }
             return resultado;
         }

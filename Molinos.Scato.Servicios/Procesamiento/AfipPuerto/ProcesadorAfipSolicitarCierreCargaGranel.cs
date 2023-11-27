@@ -30,13 +30,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
             try
             {
-                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula);
-                IList<CoemGranel> coems = new List<CoemGranel>();
-
-                if (caratulaDB == null)
-                {
-                    throw new Exception("No existe la Caratula con el id especificado");
-                }
+                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula) ?? throw new Exception("No existe la Caratula con el id especificado");
 
                 var coemGranelList = comando.Dto.Coems.Select(idCoem =>
                 {
@@ -58,11 +52,14 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     };
                 }).ToList();                             
 
-                var res = comunicacionEmbarqueServicioHelper.SolicitarCierreCargaGranel(caratulaDB.IdentificadorCaratula, caratulaDB.FechaZarpada, caratulaDB.NumeroViaje, coemGranelList.ToArray());
-                var cuerpoRespuesta = res.Body.SolicitarCierreCargaGranelResult.ListaErrores[0];
-                if (cuerpoRespuesta.Codigo != 0)
+                var res = comunicacionEmbarqueServicioHelper.SolicitarCierreCargaGranel(caratulaDB.IdentificadorCaratula, caratulaDB.FechaZarpada, caratulaDB.NumeroViaje, coemGranelList.ToArray()).Body.SolicitarCierreCargaGranelResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al Solicitar Cierre carga granel: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
 
                 //QUE SE HACE CON EL IDENTIFICADOR ??
@@ -71,7 +68,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             catch (Exception ex)
             {
                 resultado.Error("", ex.Message);
-                Log.Error("Error al solicitar Cierre Carga Granel de COEM {0}", ex.Message);
+                Log.Error("Error al solicitar Cierre Carga Granel de COEM {0}", ex);
             }
             return resultado;
         }

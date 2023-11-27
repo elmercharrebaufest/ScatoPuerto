@@ -33,23 +33,20 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception("La caratula recibida es nula");
                 }
 
-                var caratulaDb = Repositorio.Obtener<AfipCaratula>(caratula.Id);
-
-                if (caratulaDb == null)
-                {
-                    throw new Exception("No existe la carátula con el id especificado");
-                }
+                var caratulaDb = Repositorio.Obtener<AfipCaratula>(caratula.Id) ?? throw new Exception("No existe la carátula con el id especificado");
 
                 // Campos que no vienen en el dto pero que igual no deben variar
                 caratula.IdentificadorCaratula = caratulaDb.IdentificadorCaratula;
                 caratula.FechaRegistro = caratulaDb.FechaRegistro;
 
-                //TODO: Implementar comunicación con AFIP
-                var response = this.comunicacionEmbarqueServicioHelper.RectificarCaratula(caratula);
-                var cuerpoRespuesta = response.Body.RectificarCaratulaResult.ListaErrores[0]; // Si la ejecución es exitosa, el código de error devuelto es 0 (cero), la descripción “Ejecución Exitosa”.
-                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                var res = this.comunicacionEmbarqueServicioHelper.RectificarCaratula(caratula).Body.RectificarCaratulaResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al registrar la caratula: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
 
                 var itinerariosDb = Repositorio.Listar<AfipCaratulaItinerario>(x => x.AfipCaratula.Id == caratula.Id);
@@ -62,8 +59,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             catch (Exception e)
             {
-                resultado.Error("", Textos.Error_ActualizarGenerico);
-                Log.Error("Error al rectificar caratula {0}", e.StackTrace);
+                resultado.Error("", e.Message);
+                Log.Error("Error al rectificar caratula {0}", e);
             }
             return resultado;
         }
