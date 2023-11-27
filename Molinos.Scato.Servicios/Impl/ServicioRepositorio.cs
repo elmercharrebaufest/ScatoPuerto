@@ -9241,12 +9241,12 @@ namespace Molinos.Scato.Servicios.Impl
             body += "\n\fObservacion(es):\f\f\n";
             body += $"\t {planoDeCarga.Observaciones}";
             return body;
-        }
+        }        
 
         public IList<BodegaDto> ListarBodegasNir(int planoDeCargaId)
         {
-            var bodegasId = repositorio.Listar<PlanoDeCargaBodega>(x => x.PlanoDeCarga.Id == planoDeCargaId).Select(b => b.BodegaParcel);
-            var bodegas = Listar<Bodega, BodegaDto>(x => bodegasId.Contains(x.Id));
+            var nombresBodegas = repositorio.Listar<PlanoDeCargaBodega>(x => x.PlanoDeCarga.Id == planoDeCargaId).Select(b => "BODEGA " + b.BodegaParcel).ToList();
+            var bodegas = Listar<Bodega, BodegaDto>(x => nombresBodegas.Contains(x.Nombre));
 
             return bodegas;
         }
@@ -10325,7 +10325,7 @@ namespace Molinos.Scato.Servicios.Impl
                     double tiempoCorteOp = 0;
                     foreach (var corte in paradasOperativasPuerto)
                     {
-                        tiempoCorteOp += (corte.Fecha_Corte - corte.Fecha_Inicio).GetValueOrDefault().TotalMinutes;
+                        tiempoCorteOp += (corte?.Fecha_Corte - corte?.Fecha_Inicio).GetValueOrDefault().TotalMinutes;
                     }
                     if (operacion == "BCB_BCP_F")
                         minutoBc = tiempoCorteOp;
