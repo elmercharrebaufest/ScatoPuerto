@@ -28,28 +28,26 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             var resultado = new ResultadoCrear();
             try
             {
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id);
-                if (coemDB == null)
-                {
-                    throw new Exception("No existe la COEM con el id expecificado");
-                }
-
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id expecificado");
                 if (coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Registrada && coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Presentada)
                 {
                     throw new Exception("La COEM debe estar en estado Registrada (REG) o Presentada (PRE) para poder solicitar anulación");
                 }
-                var res = comunicacionEmbarqueServicioHelper.SolicitarAnulacionCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM);
-                var cuerpoRespuesta = res.Body.SolicitarAnulacionCOEMResult.ListaErrores[0];
-                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                var res = comunicacionEmbarqueServicioHelper.SolicitarAnulacionCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM).Body.SolicitarAnulacionCOEMResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al SOLICITAT_ANULACION de la coem: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)
             {
-                resultado.Error("", Textos.Error_ActualizarGenerico);
-                Log.Error("Error al Solicitar Anulacion de COEM {0}", e.StackTrace);                
+                resultado.Error("", e.Message);
+                Log.Error("Error al Solicitar Anulacion de COEM {0}", e);                
             }
             return resultado;
         }

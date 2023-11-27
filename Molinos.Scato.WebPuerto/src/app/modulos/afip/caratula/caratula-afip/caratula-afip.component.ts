@@ -86,12 +86,13 @@ export class CaratulaAfipComponent implements OnInit {
     if (!confirm) {
       return;
     }
-    this.caratulaService.eliminarCaratula(id).subscribe((datos) => {
+    this.caratulaService.eliminarCaratula(id).subscribe(() => {
       this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Caratula con id: ${idCaratula} fue anulada con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
       this.listarCaratulas();
-    }, (error) => {
-      console.error(error);
-      this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la Caratula, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+    }, (err) => {
+      console.error(err);
+      const msj = err.error || 'No se ha podido anular la Caratula, comunicarse con soporte técnico';
+      this.confirmationDialogService.confirm(`¡Error!`, msj, 'Cerrar', '', null, null, Tipoalerta.Error);
     });
   }
 

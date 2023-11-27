@@ -85,9 +85,10 @@ export class CoemAfipComponent implements OnInit {
     this.coemAfipService.anularCoem(id).subscribe(() => {
       this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La COEM con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
       this.cargarDatos();
-    }, (error) => {
-      console.error(error);
-      this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido anular la COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+    }, (err) => {
+      console.error(err);
+      const msj = err.error || 'No se ha podido anular la COEM, comunicarse con soporte técnico';
+      this.confirmationDialogService.confirm(`¡Error!`, msj, 'Cerrar', '', null, null, Tipoalerta.Error);
     }, () => this.load = false)
   }
 
@@ -101,9 +102,10 @@ export class CoemAfipComponent implements OnInit {
     this.coemAfipService.cerrarCoem(id).subscribe(() => {
       this.confirmationDialogService.confirm('¡Felicitaciones', `¡La COEM con id ${identificadorCOEM} se ha podido cerrar con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success);
       this.cargarDatos();
-    }, (error) => {
-      console.error(error);
-      this.confirmationDialogService.confirm('¡Error!', `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
+    }, (err) => {
+      console.error(err);
+      const msj = err.error || `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`;
+      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
     }, () => this.load = false);
   }
 
@@ -179,9 +181,10 @@ export class CoemAfipComponent implements OnInit {
     this.load = true;
     this.coemAfipService.solicitarNoABordo(coem.id, this.caratulaId).subscribe(() => {
       alertar('Resultado exitoso', 'Se ha solicitado no a bordo correctamente para la COEM ' + coem.identificadorCOEM, Tipoalerta.Success);
-    }, (error) => {
-      console.error(error);
-      alertar('¡Error!', 'Ha ocurrido un error al solicitar no a bordo', Tipoalerta.Error);
+    }, (err) => {
+      console.error(err);
+      const msj = err.error || 'Ha ocurrido un error al solicitar no a bordo';
+      alertar('¡Error!', msj, Tipoalerta.Error);
     }, () => {
       this.load = false;
     });
@@ -212,9 +215,10 @@ export class CoemAfipComponent implements OnInit {
     this.load = true;
     this.coemAfipService.solicitarCierreDeCarga(this.coemsSeleccionadas, this.caratulaId).subscribe(() => {
       alertar('Resultado exitoso', 'Se ha solicitado correctamente el cierre de carga para las COEMs ' + identificadores.join(', '), Tipoalerta.Success);
-    }, (error) => {
-      console.error(error);
-      alertar('¡Error!', 'Ha ocurrido un error al solicitar cierre de carga', Tipoalerta.Error);
+    }, (err) => {
+      console.error(err);
+      const msj = err.error || 'Ha ocurrido un error al solicitar cierre de carga';
+      alertar('¡Error!', msj, Tipoalerta.Error);
     }, () => {
       this.load = false;
     });

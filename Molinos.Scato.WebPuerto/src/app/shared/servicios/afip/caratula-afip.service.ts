@@ -2,7 +2,7 @@ import { Caratula, SolicitudCambioBuque, SolicitudCambioFechas } from '@ScatoMod
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 export interface EstadosCaratulaAFIP {
   Aceptado: string;
@@ -23,7 +23,7 @@ export class CaratulaAfipService {
   };
   private url: string = environment.apiUrl + 'afip/';
   public $caratula = new BehaviorSubject<Caratula>(null);
-  public $recargarCaratula = new BehaviorSubject<void>(undefined);
+  public $recargarCaratula = new Subject<void>();
 
   constructor(private http: HttpClient) { }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -6,7 +6,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { AfipLugarOperativo, AfipPuerto, AfipPuntoAduanero } from '@ScatoModels/afip/tablas-afip';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
-import { of, Observable, forkJoin } from 'rxjs';
+import { of, Observable, forkJoin, Subscription } from 'rxjs';
 import { concatMap, tap } from 'rxjs/operators';
 import { AbstractControl } from '@angular/forms';
 import { Caratula } from '@ScatoModels/afip/caratula';
@@ -17,7 +17,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './modal-crear-caratula.component.html',
   styleUrls: ['./modal-crear-caratula.component.css']
 })
-export class ModalCrearCaratulaComponent implements OnInit {
+export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
 
   @Input() id: number = 0;
   @Input() title: string = "Nueva Caratula";
@@ -40,6 +40,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
 
   public ver: boolean;
   public identificadorCaratula: string;
+  private suscripcion: Subscription;
 
   constructor(
     private modalService: NgbModal,
@@ -62,7 +63,7 @@ export class ModalCrearCaratulaComponent implements OnInit {
   ngOnInit(): void {
     this.titleCaratula = this.title;
     this.cargarDatos();
-    this.caratulaAfipService.$recargarCaratula.pipe(
+    this.suscripcion = this.caratulaAfipService.$recargarCaratula.pipe(
       tap(() => {
         this.cargando = true;
         this.mensajeCarga = 'Cargando datos';
@@ -76,6 +77,10 @@ export class ModalCrearCaratulaComponent implements OnInit {
       this.cargando = false;
       this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al cargar los datos', 'Cerrar', '', null, null, Tipoalerta.Error);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcion.unsubscribe();
   }
 
   private cargarDatos() {
@@ -177,8 +182,9 @@ export class ModalCrearCaratulaComponent implements OnInit {
     }
 
     form.get('puertoDestino').enable();
-    const mostrarError = () => {
-      this.confirmationDialogService.confirm('¡Error!', `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
+    const mostrarError = (err?: string) => {
+      const msj = err || `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`;
+      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error)
       this.cargando = false;
     };
 
@@ -196,9 +202,9 @@ export class ModalCrearCaratulaComponent implements OnInit {
       await this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${nueva ? 'creado una nueva' : 'editado la'} Caratula con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
       this.cargando = false;
       this.modalService.dismissAll();
-    }, error => {
-      console.error(error);
-      mostrarError();
+    }, err => {
+      console.error(err);
+      mostrarError(err.error);
     });
   }
 

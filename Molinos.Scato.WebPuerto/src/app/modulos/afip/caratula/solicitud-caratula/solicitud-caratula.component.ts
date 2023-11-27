@@ -4,10 +4,10 @@ import { AfipMotivoSolicitudCambio } from '@ScatoModels/afip/tablas-afip';
 import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { concatMap, tap } from 'rxjs/operators';
 
 @Component({
@@ -15,7 +15,7 @@ import { concatMap, tap } from 'rxjs/operators';
   templateUrl: './solicitud-caratula.component.html',
   styleUrls: ['./solicitud-caratula.component.css']
 })
-export class SolicitudCaratulaComponent implements OnInit {
+export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
 
   public caratula: Caratula
   public solicitarCambioFechasForm: FormGroup;
@@ -27,6 +27,7 @@ export class SolicitudCaratulaComponent implements OnInit {
   public mensajeCarga: string;
 
   private modal: NgbModalRef;
+  private suscripcion: Subscription;
 
   constructor(
     private modalService: NgbModal,
@@ -40,7 +41,7 @@ export class SolicitudCaratulaComponent implements OnInit {
 
   ngOnInit(): void {
     // El request se hace en modal-crear-caratula.ts, este es un BehaviorSubject
-    this.caratulaAfipService.$caratula.subscribe(caratula => {
+    this.suscripcion = this.caratulaAfipService.$caratula.subscribe(caratula => {
       if (!caratula) {
         return;
       }
@@ -52,6 +53,10 @@ export class SolicitudCaratulaComponent implements OnInit {
       this.listaMotivos = motivos,
       err => console.error(err)
     );
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcion.unsubscribe();
   }
 
   private initForms() {
@@ -125,10 +130,10 @@ export class SolicitudCaratulaComponent implements OnInit {
       this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha solicitado el cambio de ${solicitud} con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
       form.reset();
     }, (err) => {
-      // TODO: Mostrar errores devueltos por el back
       console.error(err);
       this.cargando = false;
-      this.confirmationDialogService.confirm('¡Error!', `No se ha podido enviar la solicitud, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error)
+      const msj = err.error || `No se ha podido enviar la solicitud, comunicarse con soporte técnico`;
+      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error)
     });
   }
 

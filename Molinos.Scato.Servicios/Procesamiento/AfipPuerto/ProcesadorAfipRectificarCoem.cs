@@ -31,22 +31,21 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                                
                 var mercaderiasSueltasDB = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);                
 
-                var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id);
-                if (coemDb == null)
-                {
-                    throw new Exception("No existe la COEM con el id especificado");
-                }
+                var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id) ?? throw new Exception("No existe la COEM con el id especificado");
 
                 // Campos que no vienen en el dto pero que igual no deben variar
                 coem.FechaRegistro = coemDb.FechaRegistro;
                 coem.IdentificadorCaratula = coemDb.IdentificadorCaratula;
                 coem.IdentificadorCOEM = coemDb.IdentificadorCOEM;
 
-                var response = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem);
-                var cuerpoRespuesta = response.Body.RectificarCOEMResult.ListaErrores[0];
-                if (cuerpoRespuesta != null && cuerpoRespuesta.Codigo != 0)
+                var res = this.comunicacionEmbarqueServicioHelper.RectificarCOEM(coem).Body.RectificarCOEMResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al rectificar la COEM: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
 
                 var mercaderiasSueltas = this.Conversor.ConvertirList<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(coem.MercaderiasSueltas);
@@ -57,7 +56,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             catch (Exception ex)
             {
                 resultado.Error("", ex.Message);
-                Log.Error("Error al rectificar Coem {0}", ex.Message);                
+                Log.Error("Error al rectificar Coem {0}", ex);                
             }
             return resultado;
         }

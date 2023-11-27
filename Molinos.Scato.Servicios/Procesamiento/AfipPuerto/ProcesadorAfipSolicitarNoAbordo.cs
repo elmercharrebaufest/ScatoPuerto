@@ -28,27 +28,20 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
             try
             {
-                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula);
+                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula) ?? throw new Exception("No existe la Caratula con el id especificado");
                 var coemDB = Repositorio.Obtener<AfipCoem>(comando.Dto.IdCoem);
 
-                if (caratulaDB == null)
-                {
-                    throw new Exception("No existe la Caratula con el id especificado");
-                }
-
-                //var contenedoresVacios = Repositorio.Listar<AfipCoemContenedorVacio>(x => x.AfipCoem.Id == coemDB.Id);
-                //var contenedoresCarga = Repositorio.Listar<AfipCoemContenedorConCarga>(x => x.AfipCoem.Id == coemDB.Id);                
-                
                 var contenedoresDeclaracionesMercaderiaSuelta = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coemDB.Id);
                 var declaraciones = this.Conversor.Convertir<IList<AfipCoemMercaderiaSuelta>, IList<Declaracion>>(contenedoresDeclaracionesMercaderiaSuelta).ToArray();
 
-
-                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(caratulaDB.IdentificadorCaratula, coemDB.IdentificadorCOEM, declaraciones);
-                var cuerpoRespuesta = res.Body.SolicitarNoABordoResult.ListaErrores[0];
-
-                if (cuerpoRespuesta.Codigo != 0)
+                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(caratulaDB.IdentificadorCaratula, coemDB.IdentificadorCOEM, declaraciones).Body.SolicitarNoABordoResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
                 {
-                    throw new Exception(String.Format("Ocurrió un error al Solicitar No Abordo: {0} {1}", cuerpoRespuesta.Descripcion, cuerpoRespuesta.DescripcionAdicional));
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
                 }
 
                 var identificadorSolicitud = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
@@ -56,7 +49,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             catch (Exception ex)
             {
                 resultado.Error("", ex.Message);
-                Log.Error("Error al solicitar no abordo {0}", ex.Message);                
+                Log.Error("Error al solicitar no abordo {0}", ex);                
             }
             return resultado;
         }
