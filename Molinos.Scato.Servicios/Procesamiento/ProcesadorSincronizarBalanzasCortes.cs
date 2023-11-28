@@ -14,7 +14,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
     {
         public List<registrosPuerto> listaBalanza7 = new List<registrosPuerto>();
         public List<registrosPuerto> listaBalanza8 = new List<registrosPuerto>();
-        private const int TIEMPO_MINIMO_CORTE = 5;
+        private const int TIEMPO_MINIMO_CORTE = 30;
         public ProcesadorSincronizarBalanzasCortes(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
             : base(repositorio, conversor, log, servicioRepositorio)
         {
