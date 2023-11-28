@@ -1,0 +1,45 @@
+<div class="container-fluid">
+    <ng-container *ngIf="caratulaId">
+        <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
+            <div class="col-md-10 col-sm-11">
+                <label class="cargando-caratula">Carátula</label>
+            </div>
+        </div>
+        <div class="row m-lg-4">
+            <div class="col-md-12">
+                <app-modal-crear-caratula></app-modal-crear-caratula>
+            </div>
+        </div>
+        <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
+          <div class="col-md-10 col-sm-11">
+              <label class="cargando-caratula">Solicitudes</label>
+          </div>
+      </div>
+      <div class="row m-lg-4">
+          <div class="col-md-12">
+            <app-solicitud-caratula></app-solicitud-caratula>
+          </div>
+      </div>
+    </ng-container>
+    <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
+        <div class="col-md-10 col-sm-11">
+            <label class="cargando-caratula">
+                <ng-container *ngIf="caratulaId; then deCaratula else todas"></ng-container>
+                <ng-template #todas>Comunicación de Embarque Previa (COEM)</ng-template>
+                <ng-template #deCaratula>Comunicaciones de Embarque Previa (COEMs) Asociadas</ng-template>
+            </label>
+        </div>
+        <div class="col-md-2 col-sm-1 align-self-center" style="display: flex; flex-direction: row-reverse;">
+            <button class="btn btn-success" (click)="openModalCrearCaratula(crearCoem)">Nuevo COEM</button>
+        </div>
+    </div>
+    <div class="row m-lg-4">
+        <div class="col-md-12">
+            <app-coem-afip></app-coem-afip>
+        </div>
+    </div>
+</div>
+
+<ng-template #crearCoem let-modal>
+    <app-modal-crear-coem (editOCrearFinish)="crearFinish($event)"></app-modal-crear-coem>
+</ng-template>

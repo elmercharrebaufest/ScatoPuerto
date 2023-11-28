@@ -19,6 +19,7 @@ namespace Molinos.Scato.Dependencias
             this.BindChannelFactory<IFirmaProvider>("FirmaProvider");
             this.BindChannelFactory<IServicioProgramaEmbarque>("ServicioProgramaEmbarque");
             this.BindChannelFactory<IServicioVapor>("ServicioVapor");
+            this.BindChannelFactory<IServicioAfip>("ServicioAfip");
 
             BindServiciosActividad();
 
