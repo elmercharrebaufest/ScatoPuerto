@@ -812,6 +812,62 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Fecha" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2619c636-3e25-4a8b-9348-2980714e3d83" ChangeDateTime="05/09/2023 18:52:22">
+    <Property Name="ElementName" Value="[dbo].[Afip_Caratulas].[BuqueId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Afip_Caratulas]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CodigoAduana" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="43b641ca-c117-42c8-a5fa-041745e6cac0" ChangeDateTime="05/10/2023 19:17:51">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdentificadorCaratula" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d1adf032-ad7d-4865-9ae3-2de59226a207" ChangeDateTime="05/10/2023 19:20:48">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[ Puerto]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Puerto" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7987cd8d-0b6e-41a7-af5f-a26d997aaddf" ChangeDateTime="05/15/2023 17:31:32">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[IdentificadorCaratula]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdCaratula" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="69c36b1f-304f-47d3-a0b2-50a76339106a" ChangeDateTime="05/15/2023 18:41:07">
+    <Property Name="ElementName" Value="[dbo].[AfipCaratulaItinerario].[IdAfipCaratula]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCaratulaItinerario]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AfipCaratula_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="572ed7b5-fcc1-42f8-876b-57a32cfc5994" ChangeDateTime="05/17/2023 13:14:10">
+    <Property Name="ElementName" Value="[dbo].[AfipCoem].[IdentificadorCaratula]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdentificadorCOEM" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="deb40f9d-efdb-4728-8dfb-8db2834414cc" ChangeDateTime="05/17/2023 13:36:17">
+    <Property Name="ElementName" Value="[dbo].[AfipCoemContenedorConCarga].[IdentificadorCoem]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoemContenedorConCarga]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdentificadorContenedor" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="129f5082-2e6d-4391-bc64-edd434995dec" ChangeDateTime="05/23/2023 19:27:00">
+    <Property Name="ElementName" Value="[dbo].[AfipCoemEstado].[Siglas]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoemEstado]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Codigo" />
+  </Operation>
   <Operation Name="Rename Refactor" Key="31299f5e-05bf-4022-abf6-cb0734a881f1" ChangeDateTime="10/25/2023 14:50:52">
     <Property Name="ElementName" Value="[dbo].[NominacionDatoTecnicoExportador].[ToleranciasDiferentes]" />
     <Property Name="ElementType" Value="SqlSimpleColumn" />
