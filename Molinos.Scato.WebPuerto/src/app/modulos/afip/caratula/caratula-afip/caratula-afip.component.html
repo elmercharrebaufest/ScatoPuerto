@@ -1,0 +1,73 @@
+<ship-spinner [message]="'Cargando Historial de carátulas. Por favor, espere...'"
+    *ngIf='cargarCaratulas'></ship-spinner>
+
+<div style="overflow-x:auto;" class="table-responsive">
+    <table class='table table-bordered lista-caratula-table'>
+        <thead class="lista-caratula-header">
+            <th>Identificador</th>
+            <th>Buque</th>
+            <th>IMO</th>
+            <th>Puerto Destino</th>
+            <th>Fecha Arribo</th>
+            <th>Fecha Zarpada</th>
+            <th>Fecha Registro</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </thead>
+        <tbody *ngFor="let historial of displayedItems">
+            <tr class="lista-caratula-row" >
+                <td>{{historial.identificadorCaratula}}</td>
+                <td>{{historial.nombreMedioTransporte}}</td>
+                <td>{{historial.identificadorBuque}}</td>
+                <td>{{ historial.puertoDestino }}</td>
+                <td>{{ historial.fechaArribo | date:'dd/MM/yyyy'}}</td>
+                <td>{{ historial.fechaZarpada | date:'dd/MM/yyyy'}}</td>
+                <td>{{ historial.fechaRegistro | date:'dd/MM/yyyy'}}</td>
+                <td class="font-weight-bold" >
+                  <select class="custom-select" (change)="onCambiarEstado($event, historial)">
+                    <option style="display:none"></option>
+                    <option *ngFor="let estado of estados | keyvalue" [ngValue]="estado.value" [selected]="estado.value == historial.estado">
+                      {{estado.value}}
+                    </option>
+                  </select>
+                </td>
+                <td class="celda-icono">
+                  <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" title="RECTIFICAR">
+                    <i class="fa fa-pencil fs-icon text-warning"></i>
+                  </button>
+                  <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" title="ANULAR">
+                    <i class="fa fa-trash-o fs-icon text-danger"></i>
+                  </button>
+                  <button class="btn btn-light text-primary" [routerLink]="[historial.id, 'coems']" title="VER COEMS">
+                    <i class="fa fa-eye fs-icon"></i>
+                  </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div *ngIf="esNoExisteRegistros">
+    No se encontraron registros para los filtros ingresados.
+</div>
+<!--Paginado -->
+<nav aria-label="Page navigation example" class="centrado" *ngIf="!esNoExisteRegistros">
+    <ul class="pagination justify-content-center paginado-buque-fondo">
+        <li [ngClass]="{'page-item disabled': currentPage === 1}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">&lt;&lt;</a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
+        <li *ngFor="let page of visiblePages"
+            [ngClass]="{'page-item disabled': page == currentPage}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
+        <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)">&gt;&gt;</a>
+        </li>
+    </ul>
+</nav>
+
+
+<ng-template #editCaratula let-modal>
+    <app-modal-crear-caratula (editOCrearFinish)="editFinish($event)" [id]="caratulaId" [title]="'Rectificar Caratula Nro '+ caratulaImo"></app-modal-crear-caratula>
+</ng-template>
