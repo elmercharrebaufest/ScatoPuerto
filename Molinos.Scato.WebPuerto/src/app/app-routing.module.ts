@@ -17,10 +17,6 @@ export const routeConfig: Routes = [
     //   redirectTo: '/login',
         pathMatch: 'full'
       },
-     /*   {
-         path: 'login',
-         component: IniciarSesionComponent,
-       }, */
       {
         path: "lineup",
         canActivateChild: [RoleGuard],
@@ -55,13 +51,13 @@ export const routeConfig: Routes = [
         path: 'vapor',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/vapor/vapor.module').then(m => m.VaporModule)
+      },
+      {
+        path: 'afip',
+        loadChildren: () => import('./modulos/afip/afip.module').then(m => m.AfipModule)
       }
     ]
   },
-/*   {
-    path: 'login',
-    component: IniciarSesionComponent,
-  } */
   {
     path: 'login',
     component: LoginComponent,

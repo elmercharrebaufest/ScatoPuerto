@@ -47,6 +47,7 @@
     "ng-multiselect-dropdown": "^0.3.8",
     "ng-sidebar": "^9.4.2",
     "ngx-chips": "^2.2.2",
+    "ngx-mask": "^11.0.0",
     "ngx-material-timepicker": "^5.5.3",
     "ngx-perfect-scrollbar": "^10.1.1",
     "ngx-permissions": "^8.1.1",

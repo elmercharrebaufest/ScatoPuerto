@@ -81,6 +81,19 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRectificarCaratula.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRectificarCoem.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRegistrarCaratula.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRegistrarCode.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipRegistrarCoem.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarAnulacionCoem.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarCambioFechas.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarCambioBuque.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarCierreCargaGranel.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipSolicitarNoAbordo.cs" />
     <Compile Include="Comandos\AutomatizacionEtapas.cs" />
     <Compile Include="Comandos\CambiarNotificacionAplicacionComando.cs" />
     <Compile Include="Comandos\CambiarPinchazosComando.cs" />
@@ -687,6 +700,35 @@
     <Compile Include="Dto\ADPuertoPermisosDto.cs" />
     <Compile Include="Dto\ADPuertoRolesDto.cs" />
     <Compile Include="Dto\ADPuertoRolesPermisosDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCaratulaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCaratulaItinerarioDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCodeCoemDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCodeDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaDeclaracionDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorConCargaPrecintoDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemContenedorVacioDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemEstadoDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemMercaderiaSueltaEmbalajeDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemRectificarRequest.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipCoemRegistrarRequest.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitarCambioFechasDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitarCambioBuqueDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitarCierreCargaGranelDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitarNoAbordoDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitudCambioFechasDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AfipSolicitudCambioBuqueDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipMotivoSolicitudCambioDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipCondicionContenedorDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipLugarOperativoDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipNaturalezaEmbalajeDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipPaisDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipPuertoDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipPuntoAduaneroDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipTipoDocumentoDto.cs" />
+    <Compile Include="Dto\AfipTablasReferencia\AfipTipoEmbalajeDto.cs" />
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
@@ -983,6 +1025,29 @@
     <Compile Include="Entidades\ADPuertoPermisos.cs" />
     <Compile Include="Entidades\ADPuertoRoles.cs" />
     <Compile Include="Entidades\ADPuertoRolesPermisos.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCaratula.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCaratulaItinerario.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCode.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCodeCoem.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoem.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCargaPrecinto.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCargaDeclaracion.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorConCarga.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemContenedorVacio.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemEstado.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSuelta.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipSolicitudCambioFechas.cs" />
+    <Compile Include="Entidades\AfipPuerto\AfipSolicitudCambioBuque.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipCondicionContenedor.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipLugarOperativo.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipNaturalezaEmbalaje.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipPais.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipPuerto.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipPuntoAduanero.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipTipoDocumento.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipMotivoSolicitudCambio.cs" />
+    <Compile Include="Entidades\AfipTablasReferencia\AfipTipoEmbalaje.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\ATAPuerto.cs" />
     <Compile Include="Entidades\Auditoria.cs" />
@@ -1712,6 +1777,12 @@
     <None Include="Resources\RechazosMailMesaEntradaEsp.txt" />
     <None Include="Resources\DescuentosDeCalidadMailEsp.txt" />
     <None Include="Resources\DiferenciaPesoOrigenMailEsp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Molinos.Scato.Validadores\Molinos.Scato.Validadores.csproj">
+      <Project>{a92b0022-1a22-4b71-b17a-4a04982671b1}</Project>
+      <Name>Molinos.Scato.Validadores</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

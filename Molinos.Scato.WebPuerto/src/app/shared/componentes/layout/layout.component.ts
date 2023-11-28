@@ -65,10 +65,14 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/geolocalizacion'])
     if (this.user.permisos.find(x => x === 'Buque_Ver'))
       this.router.navigate(['/buques'])
-      if (this.user.permisos.find(x => x === 'Comex_Nominacion_Ver'))
+    if (this.user.permisos.find(x => x === 'Comex_Nominacion_Ver'))
       this.router.navigate(['/programa'])
-      if (this.user.permisos.find(x => x === 'Vapor_Visualizar'))
+    if (this.user.permisos.find(x => x === 'Vapor_Visualizar'))
       this.router.navigate(['/vapor'])
+    if (this.user.permisos.find(x => x === 'Caratula_Visualizar'))
+      this.router.navigate(['/afip/caratula'])
+    if (this.user.permisos.find(x => x === 'Coem_Visualizar'))
+      this.router.navigate(['/afip/coem'])
     this.opened = false;
   }
 

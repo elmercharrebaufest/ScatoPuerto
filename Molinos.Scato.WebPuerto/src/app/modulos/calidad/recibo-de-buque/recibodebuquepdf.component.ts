@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { ReciboDeBuque, ReciboDeBuqueDetalles } from '@ScatoModels/reciboDeBuque';
 import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
 import { ReciboBuqueService } from '@ScatoServicios/reciboBuque.service';
 import jspdf from 'jspdf';
-import { iif } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { skip } from 'rxjs/operators';
 import { ToWords } from 'to-words';
 
 
@@ -12,28 +13,29 @@ import { ToWords } from 'to-words';
   templateUrl: './recibodebuquepdf.component.html',
   styleUrls: ['./recibodebuquepdf.component.css']
 })
-export class RecibodebuquepdfComponent implements OnInit, AfterViewInit {
+export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestroy {
   reciboBuque:ReciboDeBuque;
   recibo : ReciboDeBuqueDetalles;
   cantidadFormatoEntera : string;
   cantidadAMostrar : string;
 
-  constructor
-  (
-    private _reciboSharingService: ReciboSharingService,
-  )
-  {
-    this._reciboSharingService.getReciboImpresionSubject().subscribe((data:ReciboDeBuque) => {this.reciboBuque = data
-      this.recibirDataImpresion()
+  private suscripcion: Subscription;
+
+  constructor(private _reciboSharingService: ReciboSharingService) {
+    this.suscripcion = this._reciboSharingService.getReciboImpresionSubject().pipe(skip(1)).subscribe((data: ReciboDeBuque) => {
+      this.reciboBuque = data;
+      this.recibirDataImpresion();
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void { }
 
+  ngAfterViewInit() {
+    // this.recibirDataImpresion();
   }
-  ngAfterViewInit(){
-    this.recibirDataImpresion()
 
+  ngOnDestroy(): void {
+    this.suscripcion.unsubscribe();
   }
 
   recibirDataImpresion(){

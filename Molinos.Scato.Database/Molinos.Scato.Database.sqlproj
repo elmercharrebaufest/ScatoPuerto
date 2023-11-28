@@ -91,6 +91,8 @@
     <Folder Include="Scripts\20160524 - Configuracion de Workflows" />
     <Folder Include="Scripts\20200512 - Credenciales MercadoPago" />
     <Folder Include="Scripts\bkp16052022" />
+    <Folder Include="dbo\Tables\AfipPuerto" />
+    <Folder Include="dbo\Tables\AfipTablasReferencia" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -514,7 +516,6 @@
     <Build Include="dbo\Tables\MotivoInactividad.sql" />
     <Build Include="dbo\Tables\RegistroInactividad.sql" />
     <Build Include="dbo\Tables\RegistroStockOtrosPuertos.sql" />
-    <!-- <Build Include="dbo\Tables\ConfiguracionGeneral.sql" /> -->
     <Build Include="dbo\Tables\NotificacionAplicacion.sql" />
     <Build Include="dbo\Tables\PinchazosPorCalada.sql" />
     <Build Include="dbo\Tables\RamalFerroviario.sql" />
@@ -561,6 +562,29 @@
     <Build Include="dbo\Tables\Auditoria.sql" />
     <Build Include="dbo\Tables\NotificacionesExcluidos.sql" />
     <Build Include="dbo\Tables\NotificacionProgramaDeEmbarque.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCaratula.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCaratulaItinerario.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoem.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemEstado.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemContenedorConCarga.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemContenedorConCargaPrecinto.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemContenedorConCargaDeclaracion.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemContenedorVacio.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemMercaderiaSuelta.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCoemMercaderiaSueltaEmbalaje.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCode.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipCodeCoem.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipCondicionContenedor.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipLugarOperativo.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipNaturalezaEmbalaje.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipPais.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipPuerto.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipPuntoAduanero.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipTipoDocumento.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipTipoEmbalaje.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudCambioBuque.sql" />
+    <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudCambioFechas.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipMotivoSolicitudCambio.sql" />
     <Build Include="dbo\Tables\EmbarqueCoordinador.sql" />
   </ItemGroup>
   <ItemGroup>
