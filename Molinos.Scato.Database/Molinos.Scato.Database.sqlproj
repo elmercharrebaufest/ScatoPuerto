@@ -585,6 +585,7 @@
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudCambioBuque.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudCambioFechas.sql" />
     <Build Include="dbo\Tables\AfipTablasReferencia\AfipMotivoSolicitudCambio.sql" />
+    <Build Include="dbo\Tables\AfipTablasReferencia\AfipMotivoNoABordo.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

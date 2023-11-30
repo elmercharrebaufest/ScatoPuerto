@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using System;
@@ -44,6 +45,9 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<AfipMotivoSolicitudCambio, AfipMotivoSolicitudCambioDto>();
             Mapper.CreateMap<AfipMotivoSolicitudCambioDto, AfipMotivoSolicitudCambio>();
+
+            Mapper.CreateMap<AfipMotivoNoABordo, AfipMotivoNoAbordoDto>();
+            Mapper.CreateMap<AfipMotivoNoAbordoDto, AfipMotivoNoABordo>();
         }
     }
 }

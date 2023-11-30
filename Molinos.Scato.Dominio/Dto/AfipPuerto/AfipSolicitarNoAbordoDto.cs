@@ -13,5 +13,7 @@ namespace Molinos.Scato.Dominio.Dto.AfipPuerto
         public int IdCaratula { get; set; }
         [Required(ErrorMessage = "El IdCoem es obligatorio")]
         public int IdCoem { get; set; }        
+        [Required(ErrorMessage = "El Codigo de motivo es obligatorio")]
+        public string CodigoMotivo { get; set; }
     }
 }

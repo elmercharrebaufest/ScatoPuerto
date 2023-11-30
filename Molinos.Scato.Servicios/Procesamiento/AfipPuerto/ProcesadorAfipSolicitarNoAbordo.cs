@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
@@ -33,8 +34,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
                 var contenedoresDeclaracionesMercaderiaSuelta = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coemDB.Id);
                 var declaraciones = this.Conversor.Convertir<IList<AfipCoemMercaderiaSuelta>, IList<Declaracion>>(contenedoresDeclaracionesMercaderiaSuelta).ToArray();
+                var motivo = Repositorio.Listar<AfipMotivoNoABordo>(x => x.Codigo == comando.Dto.CodigoMotivo).FirstOrDefault();
 
-                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(caratulaDB.IdentificadorCaratula, coemDB.IdentificadorCOEM, declaraciones).Body.SolicitarNoABordoResult;
+                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(caratulaDB.IdentificadorCaratula, coemDB.IdentificadorCOEM, declaraciones, motivo).Body.SolicitarNoABordoResult;
                 var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
                 if (cuerpoRespuesta == null)
                 {

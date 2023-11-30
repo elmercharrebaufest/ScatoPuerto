@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
+using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -37,6 +38,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<AfipMotivoSolicitudCambioDto> ListarMotivosSolicitudCambio();
+        [OperationContract]
+        IList<AfipMotivoNoAbordoDto> ListarMotivosNoAbordo();
         #endregion
 
         #region Caratulas

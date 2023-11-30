@@ -63,8 +63,8 @@ export class CoemAfipService {
     return this.http.post<boolean>(`${this.url}Afip/SolicitarCierreCargaGranel`, body, { withCredentials: true });
   }
 
-  public solicitarNoABordo(idCoem: number, idCaratula: number) {
-    const body = { idCaratula, idCoem };
+  public solicitarNoABordo(idCoem: number, idCaratula: number, codigoMotivo: string) {
+    const body = { idCaratula, idCoem, codigoMotivo };
     return this.http.post<boolean>(`${this.url}Afip/SolicitarNoAbordo`, body, { withCredentials: true });
   }
 }
