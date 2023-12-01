@@ -28,6 +28,7 @@ import { Vapor } from '@ScatoModels/embarque';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { Pais } from '@ScatoModels/Buques/Pais';
+import { EmbarqueCoordinador } from '@ScatoModels/embarque-coordinador';
 @Component({
   selector: 'app-alta-embarque',
   templateUrl: './alta-embarque.component.html',
@@ -310,17 +311,13 @@ export class AltaEmbarqueComponent implements OnInit {
                 res1.filter(x => x.id == this.embarqueForm.value['agencias'].id).map(x => new AgenciaMaritimaPuerto(x.id, x.nombre)));
             });
           }
-
-          this.embarqueService.obtenerListadoCoordinadores().subscribe(res1 => {
-            res.coordinadores = res1.map(x => new CoordinadorPuerto(x.id, x.nombre));
-          });
-          if (this.embarqueForm.value['coordinadores'] != null) {
-            this.embarqueService.obtenerListadoCoordinadores().subscribe(res1 => {
-              this.embarqueForm.get('coordinadoresList').setValue(
-                res1.filter(x => x.id == this.embarqueForm.value['coordinadores'].id).map(x => new CoordinadorPuerto(x.id, x.nombre)));
-            });
+           
+          if (this.embarqueForm.value['coordinadores'] != null) {                           
+            this.embarqueForm.get('coordinadoresList').setValue(
+            res.coordinadores.map(x => new CoordinadorPuerto(x.coordinadorPuerto.id, x.coordinadorPuerto.nombre)));          
+        
           }
-
+        
           this.embarqueService.obtenerListadoATAPuerto().subscribe(res1 => {
             res.ata = res1.map(x => new ATAPuerto(x.id, x.nombre));
           });
@@ -472,11 +469,23 @@ export class AltaEmbarqueComponent implements OnInit {
     this.embarqueForm.get('agencias').setValue(
       this.embarqueForm.value.agenciasList != null && this.embarqueForm.value.agenciasList.length > 0 ?
         this.agenciasList.find(x => x.id == this.embarqueForm.value.agenciasList[0].id) : '');
+    
+    /** Coordinadores */
+    var coordinadoresEncontrados = [];
+    this.embarqueForm.value.coordinadoresList.forEach(element => {
+      coordinadoresEncontrados.push(this.coordinadoresList.find(x => x.id == element.id));     
+    });
+    var coordinadores = [];
+    coordinadoresEncontrados.forEach(coordinador => {
+      if (this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ) {
+        coordinadores.push(new EmbarqueCoordinador(0, coordinador))
+      }
+      
+    })  
+    this.embarqueForm.get('coordinadores').setValue(coordinadores);
 
-    this.embarqueForm.get('coordinadores').setValue(
-      this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
-        this.coordinadoresList.find(x => x.id == this.embarqueForm.value.coordinadoresList[0].id) : '');
-
+    /**Fin Coordinadores */
+  
     this.embarqueForm.get('ata').setValue(
       this.embarqueForm.value.ataList != null && this.embarqueForm.value.ataList.length > 0 ?
         this.ataList.find(x => x.id == this.embarqueForm.value.ataList[0].id) : '');
@@ -499,7 +508,8 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
     }
     let altaEmbarque = this.embarqueForm.value
-    altaEmbarque.nombreBuque = this.nombre_buque;
+    altaEmbarque.nombreBuque = this.nombre_buque;    
+    
     const tipoBuqueSel = this.tipoDeBuquePuerto.filter(x => x.nombre == altaEmbarque.tipoBuque);
     if (tipoBuqueSel.length > 0)
       altaEmbarque.tipoDeBuque= tipoBuqueSel[0];
@@ -801,10 +811,23 @@ export class AltaEmbarqueComponent implements OnInit {
     this.embarqueForm.value.agencias =
       this.embarqueForm.value.agenciasList != null && this.embarqueForm.value.agenciasList.length > 0 ?
         this.agenciasList.find(x => x.id == this.embarqueForm.value.agenciasList[0].id) : '';
+    /**Coordinadores */
+    var coordinadoresEncontrados = [];
+    this.embarqueForm.value.coordinadoresList.forEach(element => {
+      coordinadoresEncontrados.push(this.coordinadoresList.find(x => x.id == element.id));     
+    });
 
-    this.embarqueForm.value.coordinadores =
-      this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
-        this.coordinadoresList.find(x => x.id == this.embarqueForm.value.coordinadoresList[0].id) : '';
+    coordinadoresEncontrados.forEach(coordinador => {
+      this.embarqueForm.get('coordinadores').setValue(
+        this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ? new EmbarqueCoordinador(0, coordinador) : ''
+      )
+    })    
+
+    // this.embarqueForm.get('coordinadores').setValue(        
+    //   this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
+    //   coordinadoresEncontrados : '')
+
+    /****Fin Coordinadores */
 
     this.embarqueForm.value.ata =
       this.embarqueForm.value.ataList != null && this.embarqueForm.value.ataList.length > 0 ?

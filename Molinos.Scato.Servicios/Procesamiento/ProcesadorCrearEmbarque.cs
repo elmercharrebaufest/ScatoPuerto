@@ -56,7 +56,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     embarque.Vapor = vapor;
                     embarque.FechaRecalada = comando.Embarque.FechaRecalada;
                     embarque.HoraRecalada = comando.Embarque.HoraRecalada;
-                    embarque.Coordinadores = (comando.Embarque.Coordinadores != null) ? Repositorio.Obtener<CoordinadorPuerto>(comando.Embarque.Coordinadores.Id) : null;
+ 
                     embarque.Agencias = (comando.Embarque.Agencias != null) ? Repositorio.Obtener<AgenciaMaritimaPuerto>(comando.Embarque.Agencias.Id) : null;
                     embarque.ObligacionCarga = comando.Embarque.ObligacionCarga;
                     embarque.Senasa = comando.Embarque.Senasa;
@@ -104,6 +104,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         });
                     }
 
+                    
+
+                    var embarqueCoordinadores = comando.Embarque.Coordinadores.Select(coo => new EmbarqueCoordinador
+                    {
+                        CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id),
+                        Embarque = embarque
+                    }).ToList();
+
+                    foreach (var item in embarqueCoordinadores)
+                    {
+                        Repositorio.Agregar(item);
+                    }
+                   
                     Repositorio.Agregar(embarque);
                     Repositorio.GuardarCambios();
                     resultado.Id = (int)embarque.GetType().GetProperty("Id").GetValue(embarque, null);

@@ -227,7 +227,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 celda.SetCellValue(muestra.Embarque.NombreBuque);
                 celda.CellStyle = fontBold;
                 celda = row.CreateCell(1);
-                celda.SetCellValue(muestra.Embarque.Coordinadores != null ? muestra.Embarque.Coordinadores.Nombre : "");
+                celda.SetCellValue(muestra.Embarque.Coordinadores != null ? string.Join(", ", muestra.Embarque.Coordinadores.Select(x => x.CoordinadorPuerto.Nombre))  : "");
                 celda.CellStyle = font;
                 celda = row.CreateCell(2);
                 celda.SetCellValue(muestra.Embarque.Agencias != null ? muestra.Embarque.Agencias.Nombre : "");

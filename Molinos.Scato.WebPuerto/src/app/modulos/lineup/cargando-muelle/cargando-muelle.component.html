@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-3 mt-3 mb-3 align-self-center">
                     <div><strong>Agencia:</strong>{{extraeNombre(instanciaWorkflow.embarque.agencias)}}</div>
-                    <div><strong>Coordinador:</strong>{{extraeNombre(instanciaWorkflow.embarque.coordinadores)}}</div>
+                    <div><strong>Coordinador/es:</strong><span *ngFor="let item of instanciaWorkflow.embarque.coordinadores">{{extraeNombre(item.coordinadorPuerto)}},</span></div>
                 </div>
                 <div class="col-6 mt-3 mb-3">
                     <div><strong>Observaciones:</strong>{{instanciaWorkflow.embarque.observaciones}}</div>
