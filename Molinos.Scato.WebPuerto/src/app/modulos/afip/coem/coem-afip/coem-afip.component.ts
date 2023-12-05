@@ -109,23 +109,29 @@ export class CoemAfipComponent implements OnInit {
     }, () => this.load = false);
   }
 
-  public async cambiarEstado(event: Event, idCoem: number, identificadorCOEM: string) {
+  public async cambiarEstado(event: Event, idCoem: number, identificadorCOEM: string, codigoEstado: string) {
     const selectElement = event.target as HTMLSelectElement;
-    const selectedOption = selectElement.value;
-    const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de cambiar el estado del COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
-    if (!confirmacion) {
-      this.cargarDatos();
-      return;
+
+    let codigoSelect = this.listaEstados.find(e => e.id == selectElement.selectedIndex).codigo;
+
+    if (codigoSelect == "AUTO" && codigoEstado != "PRE") { //VALIDACION PARA PASAR DE ESTADO PRE A AUTO
+      return "Debe estar en estado PRESENTADA para poder AUTORIZAR una coem";
     }
-    this.load = true;
-    this.coemAfipService.cambiarEstadosCoem(selectedOption, idCoem).subscribe((datos) => {
-      this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Estado del COEM con id: ${identificadorCOEM} fue cambiado con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
-      this.cargarDatos();
-    }, (error) => {
-      console.error(error);
-      this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
-    })
-  }
+          const selectedOption = selectElement.value;
+      const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de cambiar el estado del COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+      if (!confirmacion) {
+        this.cargarDatos();
+        return;
+      }
+      this.load = true;
+      this.coemAfipService.cambiarEstadosCoem(selectedOption, idCoem).subscribe((datos) => {
+        this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Estado del COEM con id: ${identificadorCOEM} fue cambiado con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
+        this.cargarDatos();
+      }, (error) => {
+        console.error(error);
+        this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+      })
+    }
 
   public mostrarMercaderias(event: Event, trMercaderias: HTMLTableRowElement) {
     const checkbox = event.target as HTMLInputElement;
@@ -289,4 +295,10 @@ export class CoemAfipComponent implements OnInit {
   }
   //#endregion
 
+  mostrarRectificarAnular(codigoEstado : string) : boolean {
+    if (codigoEstado == "CUR" || codigoEstado == "REG") {
+      return true;
+    }
+    return false;
+  }
 }

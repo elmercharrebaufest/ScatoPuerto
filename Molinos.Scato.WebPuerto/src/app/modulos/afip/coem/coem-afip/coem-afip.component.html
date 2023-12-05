@@ -35,7 +35,7 @@
                     <td>
                         <div class="btn-group">
                             <select class="custom-select" id="inputGroupSelect01"
-                                (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM)"
+                                (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM, coem.afipCoemEstado.codigo)"
                                 [disabled]="coem.afipCoemEstado.codigo=='ANU'">
                                 <option selected value="" disabled>Estado</option>
                                 <option *ngFor="let p of listaEstados" [value]="p.id"
@@ -46,11 +46,11 @@
                         </div>
                     </td>
                     <td class="centrado">
-                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                        <button class="btn btn-light" *ngIf="mostrarRectificarAnular(coem.afipCoemEstado.codigo)"
                             (click)="editarCoem(coem,editCoem)">
                             <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="RECTIFICAR"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                        <button class="btn btn-light" *ngIf="mostrarRectificarAnular(coem.afipCoemEstado.codigo)"
                             (click)="eliminarCoem(coem.id, coem.identificadorCOEM)">
                             <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ANULAR"></i>
                         </button>
