@@ -5,5 +5,6 @@
     [CodigoEmbalaje] NVARCHAR(2) NOT NULL, 
     [Peso] INT NOT NULL, 
     [CantidadBultos] INT NOT NULL, 
+    [CantidadReal] INT NOT NULL DEFAULT 0, 
     CONSTRAINT [FK_dbo.AfipCoemMercaderiaSueltaEmbalaje_dbo.AfipCoemMercaderiaSuelta_Id] FOREIGN KEY ([AfipCoemMercaderiaSuelta_Id]) REFERENCES [AfipCoemMercaderiaSuelta]([Id]) ON DELETE CASCADE
 )

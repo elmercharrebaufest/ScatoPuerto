@@ -1,0 +1,73 @@
+<ship-spinner [message]="'Enviando solicitud'" *ngIf='cargando'></ship-spinner>
+
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">Solicitar Cierres de Carga</h5>
+    <button (click)="closeModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label>Fecha de Zarpado</label>
+          <input type="datetime-local" class="form-control" formControlName="fechaZarpada">
+        </div>
+        <div class="form-group col-md-6">
+          <label>Numero de Viaje</label>
+          <input type="text" class="form-control" formControlName="numeroViaje">
+        </div>
+      </div>
+      <div class="row" formArrayName="coems" *ngFor="let coem of coems; let i = index">
+        <div class="col">
+          <table class="table" [formGroup]="coem">
+            <thead class="thead-dark">
+              <tr>
+                <th>COEM: {{coem.get('identificadorCoem').value}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="p-0">
+                  <table class="table table-bordered">
+                    <thead class="thead-light">
+                      <tr>
+                        <th>Id Declaracion</th>
+                        <th>Cantidad Original (Kg)</th>
+                        <th>Cantidad Real Embarcada (Kg)</th>
+                        <th>Fecha de Embarque</th>
+                      </tr>
+                    </thead>
+                    <tbody formArrayName="declaraciones">
+                      <tr *ngFor="let declaracion of getDeclaraciones(coem)" [formGroup]="declaracion">
+                        <td class="align-middle">
+                          {{declaracion.get('identificadorDeclaracion').value}}
+                        </td>
+                        <td class="align-middle">
+                          {{declaracion.get('cantidadOriginal').value}}
+                        </td>
+                        <td>
+                          <input type="number" class="form-control" formControlName="cantidadReal">
+                        </td>
+                        <td>
+                          <input type="datetime-local" class="form-control" formControlName="fechaEmbarque">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- <ng-container formArrayName="coems" *ngFor="let coem of coems; let i = index">
+      </ng-container> -->
+    </form>
+  </div>
+  <div class="modal-footer justify-content-center">
+    <button type="button" class="btn btn-success" (click)="cerrarCargasCoem()">Guardar</button>
+    <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="closeModal()">Cancelar</button>
+  </div>
+</div>

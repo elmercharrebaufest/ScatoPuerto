@@ -3,6 +3,7 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
+using System.Linq;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
@@ -60,6 +61,21 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 .ForMember(x => x.FechaRegistro, y => y.Ignore())
                 .ForMember(x => x.IdentificadorCOEM, y => y.Ignore())
                 .ForMember(x => x.Id, y => y.Ignore());
+
+            // Solicitud Cierre Carga Granel
+            Mapper.CreateMap<AfipSolicitarCierreCargaGranelCoemDeclaracionDto, DeclaracionGranel>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => new[] { new Item { numeroItem = 1, cantidadReal = src.CantidadReal, ExtensionData = null } }))
+                .ForMember(dest => dest.IdentificadorCierreCumplido, opt => opt.MapFrom(src => "N"))
+                .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
+
+            Mapper.CreateMap<AfipSolicitarCierreCargaGranelCoemDto, CoemGranel>()
+                .ForMember(dest => dest.Declaraciones, opt => opt.MapFrom(src => src.Declaraciones))
+                .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
+
+            Mapper.CreateMap<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>()
+               .ForMember(dest => dest.Coems, opt => opt.MapFrom(src => src.Coems))
+               .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
+            // ----------------------------
         }
     }
 }

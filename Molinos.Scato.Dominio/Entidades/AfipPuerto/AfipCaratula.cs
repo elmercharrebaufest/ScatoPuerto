@@ -24,5 +24,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<AfipCoem> Coems { get; set; }
         public virtual ICollection<AfipSolicitudCambioBuque> SolicitudesCambioBuque { get; set; }
         public virtual ICollection<AfipSolicitudCambioFechas> SolicitudesCambioFechas { get; set; }
+        public virtual string IdentificadorCierre { get; set; }
     }
 }

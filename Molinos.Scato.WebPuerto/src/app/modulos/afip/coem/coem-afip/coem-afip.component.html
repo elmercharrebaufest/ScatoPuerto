@@ -2,9 +2,6 @@
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-coem-table'>
         <thead>
-            <th class="centrado" *ngIf="caratulaId">
-                <input type="checkbox" (change)="seleccionarTodas($event.target, tbody)">
-            </th>
             <th>Identificador</th>
             <th *ngIf="!caratulaId">Caratula</th>
             <th>Mercaderías Sueltas</th>
@@ -14,10 +11,6 @@
         <tbody #tbody>
             <ng-container *ngFor="let coem of listadoCoems">
                 <tr #tr>
-                    <td class="centrado" *ngIf="caratulaId">
-                        <input type="checkbox" [checked]="esCoemSeleccionada(coem, tr)"
-                            (change)="seleccionarCoem($event, coem)">
-                    </td>
                     <td>{{coem.identificadorCOEM}}</td>
                     <td *ngIf="!caratulaId">{{coem.identificadorCaratula}}</td>
                     <td>
@@ -95,9 +88,9 @@
     </table>
 </div>
 
-<div class="flex-center mb-3" *ngIf="caratulaId && coemsSeleccionadas.length">
-    <button class="btn btn-primary" (click)="solicitarCierreCarga()">
-        Solicitar cierre
+<div class="flex-center mb-3" *ngIf="caratulaId">
+    <button class="btn btn-primary" (click)="solicitarCierreCarga(cerrarCoems)">
+        Solicitar cierre de carga
     </button>
 </div>
 
@@ -125,4 +118,8 @@
 <ng-template #editCoem let-modal>
     <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId"
         [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
+</ng-template>
+
+<ng-template #cerrarCoems let-modal>
+    <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas" [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
 </ng-template>
