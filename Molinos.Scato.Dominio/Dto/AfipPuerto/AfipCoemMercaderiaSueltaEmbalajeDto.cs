@@ -12,5 +12,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string CodigoEmbalaje { get; set; }
         public int Peso { get; set; }
         public int CantidadBultos { get; set; }
+        public int CantidadReal { get; set; }
     }
 }

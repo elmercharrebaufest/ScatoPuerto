@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { SolicitudCaratulaComponent } from './caratula/solicitud-caratula/solicitud-caratula.component';
+import { ModalCerrarCargaCoemsComponent } from './coem/modal-cerrar-carga-coems/modal-cerrar-carga-coems.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { SolicitudCaratulaComponent } from './caratula/solicitud-caratula/solici
     CaratulaComponent,
     CaratulaAfipComponent,
     ModalCrearCaratulaComponent,
-    SolicitudCaratulaComponent
+    SolicitudCaratulaComponent,
+    ModalCerrarCargaCoemsComponent
   ],
   imports: [
     CommonModule,

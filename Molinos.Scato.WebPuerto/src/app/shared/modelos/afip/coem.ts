@@ -10,3 +10,21 @@ export class COEM {
   mercaderiasSueltas: Array<NuevasMercaderiasSueltasCoem>;
   afipCoemEstado: EstadoCOEM;
 }
+
+export interface SolicitudCierreCargaDto {
+  idCaratula: number;
+  fechaZarpada: string;
+  coems: SolicitudCierreCargaCoemDto[];
+}
+
+export interface SolicitudCierreCargaCoemDto {
+  idCoem: number;
+  identificadorCoem: string;
+  declaraciones: SolicitudCierreCargaCoemDeclaracionDto[];
+}
+
+export interface SolicitudCierreCargaCoemDeclaracionDto {
+  identificadorDeclaracion: string;
+  fechaEmbarque: string;
+  cantidadReal: string;
+}

@@ -4,7 +4,6 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
-using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
@@ -30,29 +29,25 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
             try
             {
-                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula) ?? throw new Exception("No existe la Caratula con el id especificado");
+                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula) ?? throw new Exception("No existe la caratula con el id " + comando.Dto.IdCaratula);
+                comando.Dto.IdentificadorCaratula = caratulaDB.IdentificadorCaratula;
 
-                var coemGranelList = comando.Dto.Coems.Select(idCoem =>
+                foreach (var coem in comando.Dto.Coems)
                 {
-                    var mercaderias = Repositorio
-                        .Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == idCoem)
-                        .Select(mercaderia => new DeclaracionGranel
-                        {
-                            IdentificadorDeclaracion = mercaderia.IdentificadorDeclaracion,
-                            FechaEmbarque = mercaderia.AfipCoem.AfipCaratula.FechaArribo,
-                        })
-                        .ToList();
-
-                    var coem = Repositorio.Obtener<AfipCoem>(idCoem);
-
-                    return new CoemGranel
+                    var coemDb = caratulaDB.Coems.FirstOrDefault(c => c.Id == coem.IdCoem) ?? throw new Exception("No existe la coem con el id " + coem.IdCoem);
+                    if (coemDb.AfipCoemEstado.Codigo != "AUTO")
                     {
-                        IdentificadorCoem = coem.IdentificadorCOEM,
-                        Declaraciones = mercaderias.ToArray(),                        
-                    };
-                }).ToList();                             
+                        throw new Exception("La COEM " + coemDb.IdentificadorCOEM + " no se encuentra en estado 'AUTO'");
+                    }
+                    coem.IdentificadorCoem = coemDb.IdentificadorCOEM;
+                    foreach (var declaracion in coem.Declaraciones)
+                    {
+                        var declaracionDb = coemDb.MercaderiasSueltas.FirstOrDefault(m => m.IdentificadorDeclaracion == declaracion.IdentificadorDeclaracion) ?? throw new Exception("No existe la declaracion con el identificador " + declaracion.IdentificadorDeclaracion);
+                        declaracionDb.Embalajes.First().CantidadReal = declaracion.CantidadReal; // Se guardan las cantidades reales embarcadas
+                    }
+                }
 
-                var res = comunicacionEmbarqueServicioHelper.SolicitarCierreCargaGranel(caratulaDB.IdentificadorCaratula, caratulaDB.FechaZarpada, caratulaDB.NumeroViaje, coemGranelList.ToArray()).Body.SolicitarCierreCargaGranelResult;
+                var res = comunicacionEmbarqueServicioHelper.SolicitarCierreCargaGranel(comando.Dto).Body.SolicitarCierreCargaGranelResult;
                 var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
                 if (cuerpoRespuesta == null)
                 {
@@ -62,8 +57,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception(sb.ToString());
                 }
 
-                //QUE SE HACE CON EL IDENTIFICADOR ??
-                var identificadorSolCierreCarga = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                caratulaDB.IdentificadorCierre = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                this.Repositorio.GuardarCambios();
             }
             catch (Exception ex)
             {
