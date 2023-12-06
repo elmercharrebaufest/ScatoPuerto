@@ -17,7 +17,7 @@
                     <div class="form-group col-md-4">
                     <select class="custom-select" id="inputGroupSelect01" formControlName="identificadorCaratula" [ngClass]="{ 'input-error': submitted && crearEditarCoemForm.get('identificadorCaratula').invalid }" required>
                       <option selected value="" disabled>Selecciona</option>
-                      <option *ngFor="let p of idsCaratula" [value]="p.identificadorCaratula" [selected]="p.identificadorCaratula==idCaratula">{{p.identificadorCaratula}}</option>
+                      <option *ngFor="let p of caratulas" [value]="p.identificadorCaratula" [selected]="p.identificadorCaratula==idCaratula">{{p.identificadorCaratula}}</option>
                     </select>
                   </div>
                 </div>

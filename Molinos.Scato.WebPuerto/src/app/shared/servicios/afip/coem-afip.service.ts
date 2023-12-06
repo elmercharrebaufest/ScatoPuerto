@@ -1,3 +1,4 @@
+import { Caratula } from '@ScatoModels/afip/caratula';
 import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
 import { HttpClient } from '@angular/common/http';
@@ -41,7 +42,7 @@ export class CoemAfipService {
     return this.http.get<COEM>(`${this.url}Afip/ObtenerCoem?id=${id}`, { 'withCredentials': true });
   }
 
-  public comboCaratulas(): Observable<any> {
+  public comboCaratulas(): Observable<Caratula[]> {
     return this.http.get<any>(`${this.url}Afip/ComboCaratulas`, { 'withCredentials': true });
   }
 

@@ -24,6 +24,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class ModalCrearCoemComponent implements OnInit {
   @Input() id: number = null;
   @Input() title: string = 'Nueva Comunicación de Embarque Previa';
+  @Input() caratulaId: number = 0;
   @Output() editOCrearFinish = new EventEmitter<void>();
 
   errorMessage: boolean = false;
@@ -33,15 +34,15 @@ export class ModalCrearCoemComponent implements OnInit {
   listaNuevoCoem: NuevoCoem[] = [];
   nuevoCoem: NuevoCoem = new NuevoCoem();
   crearEditarCoemForm: FormGroup;
-  idsCaratula: Caratula[] = [];
+  caratulas: Caratula[] = [];
   idCaratula: string;
   operacionNuevo: boolean = true;
 
-  cuitATA : string = '';
-  codigoEmbalaje : string = '';
-  cantidadBultos : number = 0;
-  peso : number = 0;
-  identificadorDeclaracion : string = '';
+  cuitATA: string = '';
+  codigoEmbalaje: string = '';
+  cantidadBultos: number = 0;
+  peso: number = 0;
+  identificadorDeclaracion: string = '';
 
   constructor(
     private modalService: NgbModal,
@@ -102,19 +103,19 @@ export class ModalCrearCoemComponent implements OnInit {
   public async onCrearCoem() {
     this.submitted = true;
     if (this.crearEditarCoemForm.controls['identificadorCaratula'].invalid || this.mercaderiasSueltasFormArray.invalid) {
-      this.confirmationDialogService.confirm('Advertencia','Los campos que estan en rojo son requeridos','Cerrar','',null,null,Tipoalerta.Warning);
+      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
     const confirmed = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'} Coem?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
-    if(!confirmed){
+    if (!confirmed) {
       return;
     }
     this.crearEditarCoem(this.setValoresNuevoOEditarCoem());
     this.modalService.dismissAll();
   }
 
-  private crearEditarCoem(coem){
-    const request = this.operacionNuevo ? this.coemAfipService.registrarCoem(coem):this.coemAfipService.editarCoem(coem);
+  private crearEditarCoem(coem) {
+    const request = this.operacionNuevo ? this.coemAfipService.registrarCoem(coem) : this.coemAfipService.editarCoem(coem);
     request.subscribe(() => {
       this.editOCrearFinish.emit();
       this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${this.operacionNuevo ? 'creado una nueva' : 'editado la'} Coem con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
@@ -143,29 +144,36 @@ export class ModalCrearCoemComponent implements OnInit {
 
   loadIdsCaratula() {
     this.coemAfipService.comboCaratulas().subscribe((datos) => {
-      this.idsCaratula = datos;
+      this.caratulas = datos;
+      this.idCaratula = datos.find(c => c.id == this.caratulaId)?.identificadorCaratula;
+      if (this.idCaratula) {
+        const control = this.crearEditarCoemForm.get('identificadorCaratula');
+        control.setValue(this.idCaratula);
+        control.disable();
+        console.log('valor', this.crearEditarCoemForm.controls['identificadorCaratula'].value)
+      }
     });
   }
 
-  setValoresNuevoOEditarCoem(){
+  setValoresNuevoOEditarCoem() {
     let coem = new COEM();
-    let i=0;
-      !this.operacionNuevo ? coem.id = this.id : null ;
-      coem.identificadorCaratula = this.crearEditarCoemForm.controls['identificadorCaratula'].value;
-      coem.mercaderiasSueltas=new Array<NuevasMercaderiasSueltasCoem>();
+    let i = 0;
+    !this.operacionNuevo ? coem.id = this.id : null;
+    coem.identificadorCaratula = this.crearEditarCoemForm.controls['identificadorCaratula'].value;
+    coem.mercaderiasSueltas = new Array<NuevasMercaderiasSueltasCoem>();
 
-      for(let mercaderia of this.mercaderiasSueltasFormArray.value){
+    for (let mercaderia of this.mercaderiasSueltasFormArray.value) {
       coem.mercaderiasSueltas.push(new NuevasMercaderiasSueltasCoem());
       coem.mercaderiasSueltas[i].cuitATA = mercaderia.cuitATA;
       coem.mercaderiasSueltas[i].identificadorDeclaracion = mercaderia.identificadorDeclaracion;
-      coem.mercaderiasSueltas[i].embalajes=new Array<Embalajes>();
+      coem.mercaderiasSueltas[i].embalajes = new Array<Embalajes>();
       coem.mercaderiasSueltas[i].embalajes.push(new Embalajes());
       coem.mercaderiasSueltas[i].embalajes[0].cantidadBultos = mercaderia.cantidadBultos;
       coem.mercaderiasSueltas[i].embalajes[0].codigoEmbalaje = mercaderia.codigoEmbalaje;
       coem.mercaderiasSueltas[i].embalajes[0].peso = mercaderia.peso;
       i++;
-      }
-      return coem;
+    }
+    return coem;
   }
 
   setValoresFormEditar() {
