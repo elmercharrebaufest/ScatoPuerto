@@ -169,7 +169,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     if (planoDeCargaBodega != null)
                     {
                         planoDeCargaBodega.BodegaParcel = pla.BodegaParcel;
-                        planoDeCargaBodega.Cantidad = pla.Cantidad;
+                        planoDeCargaBodega.Cantidad = (decimal)pla.Cantidad;
                         planoDeCargaBodega.Condicion = pla.Condicion;
                         planoDeCargaBodega.Destino = destino;
                         planoDeCargaBodega.PlanoDeCarga = planoDeCarga;
@@ -182,7 +182,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         planoDeCarga.PlanoDeCargaBodega.Add(new PlanoDeCargaBodega
                         {
                             BodegaParcel = pla.BodegaParcel,
-                            Cantidad = pla.Cantidad,
+                            Cantidad = (decimal)pla.Cantidad,
                             Condicion = pla.Condicion,
                             Destino = destino,
                             PlanoDeCarga = planoDeCarga,
