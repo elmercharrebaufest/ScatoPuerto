@@ -312,7 +312,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(string identificadorCaratula, DateTime fechaZarpada, string numeroViaje, CoemGranel[] coems)
+        public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto dto)
         {
             try
             {
@@ -325,7 +325,7 @@ namespace Molinos.Scato.Servicios.Impl
                     new SolicitarCierreCargaGranelRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                        argSolicitarCierreCargaGranel = new SolicitarCierreCargaGranelRequest { IdentificadorCaratula = identificadorCaratula, FechaZarpada = fechaZarpada, numeroViaje = numeroViaje, Coems = coems }
+                        argSolicitarCierreCargaGranel = this.conversor.Convertir<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>(dto)
                     });
                 return this.wgescomunicacionembarque.SolicitarCierreCargaGranel(solicitarCierreCargaGranelRequest1);
             }

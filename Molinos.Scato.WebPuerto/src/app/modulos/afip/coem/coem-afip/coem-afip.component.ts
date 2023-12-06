@@ -72,7 +72,7 @@ export class CoemAfipComponent implements OnInit {
   public editarCoem(historial, modal) {
     this.coemId = historial.id;
     this.coemIdentificador = historial.identificadorCOEM
-    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
+    this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
   public async eliminarCoem(id: number, identificadorCOEM: string) {
@@ -138,36 +138,6 @@ export class CoemAfipComponent implements OnInit {
     }
   }
 
-  public esCoemSeleccionada(coem: COEM, tr: HTMLTableRowElement) {
-    if (this.coemsSeleccionadas.indexOf(coem) != -1) {
-      tr.classList.add('checked');
-      return true;
-    }
-    tr.classList.remove('checked');
-    return false;
-  }
-
-  public seleccionarCoem(event: Event, coem: COEM) {
-    const checkbox = event.target as HTMLInputElement;
-    if (checkbox.checked) {
-      this.coemsSeleccionadas.push(coem);
-    } else {
-      this.coemsSeleccionadas.splice(this.coemsSeleccionadas.indexOf(coem), 1);
-    }
-    setTimeout(() => {
-      const checkboxTodos = document.querySelector('thead input') as HTMLInputElement;
-      checkboxTodos.checked = this.coemsSeleccionadas.length == this.listaHistorialCoem.length;
-    }, 30);
-  }
-
-  public seleccionarTodas(checkbox: HTMLInputElement) {
-    if (checkbox.checked) {
-      this.coemsSeleccionadas = [...this.listaHistorialCoem];
-    } else {
-      this.coemsSeleccionadas = [];
-    }
-  }
-
   public async solicitarNoABordo(coem: COEM) {
     const alertar = (titulo: string, mensaje: string, tipo: Tipoalerta, confirmar?: boolean) => this.confirmationDialogService.confirm(
       titulo, mensaje, confirmar ? 'Sí' : 'Cerrar', confirmar ? 'Cancelar' : '', null, null, tipo
@@ -190,38 +160,20 @@ export class CoemAfipComponent implements OnInit {
     });
   }
 
-  public async solicitarCierreCarga() {
-    const alertar = (titulo: string, mensaje: string, tipo: Tipoalerta, confirmar?: boolean) => this.confirmationDialogService.confirm(
-      titulo, mensaje, confirmar ? 'Sí' : 'Cerrar', confirmar ? 'Cancelar' : '', null, null, tipo
-    );
+  public async solicitarCierreCarga(modalCierreCarga: any) {
+    this.coemsSeleccionadas = this.listadoCoems.filter(coem => coem.afipCoemEstado.codigo != 'ANU');
+    const estadosValidos = ['AUTO', 'ANU'];
+    const coemsEstadoinvalido = this.coemsSeleccionadas
+      .filter(coem => !estadosValidos.includes(coem.afipCoemEstado.codigo))
+      .map(coem => coem.identificadorCOEM).join('\n');
 
-    if (!this.coemsSeleccionadas.length) {
-      alertar('¡Error!', 'No se han seleccionado COEMs', Tipoalerta.Error);
+    if (coemsEstadoinvalido) {
+      const msj = 'Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido;
+      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
       return;
     }
 
-    const coemsEstadoinvalido = this.coemsSeleccionadas.filter(coem => coem.afipCoemEstado.codigo != 'AUTO').map(coem => coem.identificadorCOEM);
-    if (this.coemsSeleccionadas.some(coem => coem.afipCoemEstado.codigo != 'AUTO')) {
-      alertar('¡Error!', `Las COEMs ${coemsEstadoinvalido.join(', ')} no se encuentran en el estado 'AUTO'`, Tipoalerta.Error);
-      return;
-    }
-
-    const identificadores = this.coemsSeleccionadas.map(coem => coem.identificadorCOEM);
-    const confirmacion = await alertar('Advertencia', `¿Está seguro de solicitar cierre de carga para las siguientes COEMs: ${identificadores.join(', ')}?`, Tipoalerta.Warning, true);
-    if (!confirmacion) {
-      return;
-    }
-
-    this.load = true;
-    this.coemAfipService.solicitarCierreDeCarga(this.coemsSeleccionadas, this.caratulaId).subscribe(() => {
-      alertar('Resultado exitoso', 'Se ha solicitado correctamente el cierre de carga para las COEMs ' + identificadores.join(', '), Tipoalerta.Success);
-    }, (err) => {
-      console.error(err);
-      const msj = err.error || 'Ha ocurrido un error al solicitar cierre de carga';
-      alertar('¡Error!', msj, Tipoalerta.Error);
-    }, () => {
-      this.load = false;
-    });
+    this.modalService.open(modalCierreCarga, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
   //#region Funciones de paginado
@@ -288,5 +240,6 @@ export class CoemAfipComponent implements OnInit {
     }
   }
   //#endregion
+
 
 }

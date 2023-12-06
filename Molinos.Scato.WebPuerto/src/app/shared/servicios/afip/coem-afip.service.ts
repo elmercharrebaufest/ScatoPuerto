@@ -1,4 +1,5 @@
-import { COEM } from '@ScatoModels/afip/coem';
+import { Caratula } from '@ScatoModels/afip/caratula';
+import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -41,7 +42,7 @@ export class CoemAfipService {
     return this.http.get<COEM>(`${this.url}Afip/ObtenerCoem?id=${id}`, { 'withCredentials': true });
   }
 
-  public comboCaratulas(): Observable<any> {
+  public comboCaratulas(): Observable<Caratula[]> {
     return this.http.get<any>(`${this.url}Afip/ComboCaratulas`, { 'withCredentials': true });
   }
 
@@ -57,10 +58,8 @@ export class CoemAfipService {
     return this.http.put<any>(`${this.url}Afip/SolicitarAnulacionCoem?id=${id}`, { 'withCredentials': true });
   }
 
-  public solicitarCierreDeCarga(coems: COEM[], idCaratula: number) {
-    const coemIds = coems.map(coem => coem.id);
-    const body = { idCaratula, coems: coemIds };
-    return this.http.post<boolean>(`${this.url}Afip/SolicitarCierreCargaGranel`, body, { withCredentials: true });
+  public solicitarCierreDeCarga(dto: SolicitudCierreCargaDto) {
+    return this.http.post<boolean>(`${this.url}Afip/SolicitarCierreCargaGranel`, dto, { withCredentials: true });
   }
 
   public solicitarNoABordo(idCoem: number, idCaratula: number) {

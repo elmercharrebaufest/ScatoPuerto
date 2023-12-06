@@ -12,6 +12,8 @@
     [PuertoDestino] NVARCHAR(5) NOT NULL, 
     [NumeroViaje] NVARCHAR(16) NULL, 
     [FechaRegistro] DATETIME NOT NULL,
-    [Estado] NVARCHAR(50) NULL
-    CONSTRAINT [PK_AfipCaratula] PRIMARY KEY ([Id]), 
+    [Estado] NVARCHAR(50) NULL,
+    [IdentificadorCierre] NVARCHAR(50) NULL
+
+    CONSTRAINT [PK_AfipCaratula] PRIMARY KEY ([Id])
 )

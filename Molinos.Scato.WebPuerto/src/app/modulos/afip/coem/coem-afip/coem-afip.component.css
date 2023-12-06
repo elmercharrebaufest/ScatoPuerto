@@ -18,10 +18,6 @@
   text-align: left;
 }
 
-.lista-coem-table>tbody>tr.checked {
-  background: #dadada 0% 0% no-repeat padding-box;
-}
-
 .lista-coem-table>tbody>tr>td {
   border-bottom: 0px;
   border-top: 0px;

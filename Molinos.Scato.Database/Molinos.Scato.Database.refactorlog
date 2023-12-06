@@ -875,4 +875,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[ToleranciasDiferenciadas]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="017805c7-faf6-48fd-9618-01ee0092dd57" ChangeDateTime="11/29/2023 19:31:25">
+    <Property Name="ElementName" Value="[dbo].[AfipCoemMercaderiaSueltaEmbalaje].[CantidadTotalEmbarcada]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipCoemMercaderiaSueltaEmbalaje]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CantidadReal" />
+  </Operation>
 </Operations>

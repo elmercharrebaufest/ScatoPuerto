@@ -1,4 +1,5 @@
 <div class="container-fluid">
+    <!-- #region Exclusivo vista desde caratula -->
     <ng-container *ngIf="caratulaId">
         <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
             <div class="col-md-10 col-sm-11">
@@ -21,6 +22,7 @@
           </div>
       </div>
     </ng-container>
+    <!-- #endregion -->
     <div class="row m-lg-4 m-sm-2" style="flex-wrap: nowrap;">
         <div class="col-md-10 col-sm-11">
             <label class="cargando-caratula">
@@ -41,5 +43,5 @@
 </div>
 
 <ng-template #crearCoem let-modal>
-    <app-modal-crear-coem (editOCrearFinish)="crearFinish($event)"></app-modal-crear-coem>
+    <app-modal-crear-coem (editOCrearFinish)="crearFinish($event)" [caratulaId]="caratulaId"></app-modal-crear-coem>
 </ng-template>
