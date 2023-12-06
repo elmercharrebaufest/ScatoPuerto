@@ -5,6 +5,7 @@ import { Embalajes } from '@ScatoModels/afip/embalajes';
 import { NuevasMercaderiasSueltasCoem } from '@ScatoModels/afip/nuevasMercaderiasSueltasCoem';
 import { NuevoCoem } from '@ScatoModels/afip/nuevoCoem';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
+import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import {
@@ -15,6 +16,7 @@ import {
   FormArray,
 } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-modal-crear-coem',
@@ -39,16 +41,18 @@ export class ModalCrearCoemComponent implements OnInit {
   operacionNuevo: boolean = true;
 
   cuitATA: string = '';
-  codigoEmbalaje: string = '';
   cantidadBultos: number = 0;
   peso: number = 0;
   identificadorDeclaracion: string = '';
+
+  private codigoEmbalajeGranel: string;
 
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
     private formBuilder: FormBuilder,
-    private coemAfipService: CoemAfipService
+    private coemAfipService: CoemAfipService,
+    private tablasAfipService: TablasAfipService
   ) {
     this.initFormCrearEditarCode();
   }
@@ -57,7 +61,7 @@ export class ModalCrearCoemComponent implements OnInit {
     this.id == null ? this.operacionNuevo : (this.operacionNuevo = false);
     this.titleCoem = this.title;
     this.agregarNuevoCoem();
-    this.loadIdsCaratula();
+    this.cargarCombos();
     this.setValoresFormEditar();
   }
 
@@ -81,7 +85,7 @@ export class ModalCrearCoemComponent implements OnInit {
       return this.formBuilder.group({
         cuitATA: mercaderias.cuitATA,
         codigoEmbalaje: mercaderias.codigoEmbalaje,
-        cantidadBultos: mercaderias.cantidadBultos,
+        cantidadBultos: mercaderias.peso,
         peso: mercaderias.peso,
         identificadorDeclaracion: mercaderias.identificadorDeclaracion,
       });
@@ -142,16 +146,23 @@ export class ModalCrearCoemComponent implements OnInit {
     return this.listaNuevoCoem;
   }
 
-  loadIdsCaratula() {
-    this.coemAfipService.comboCaratulas().subscribe((datos) => {
-      this.caratulas = datos;
-      this.idCaratula = datos.find(c => c.id == this.caratulaId)?.identificadorCaratula;
+  private cargarCombos() {
+    forkJoin([
+      this.coemAfipService.comboCaratulas(),
+      this.tablasAfipService.listarNaturalezasEmbalaje()
+    ]).subscribe(([caratulas, embalajes]) => {
+      this.caratulas = caratulas;
+      this.idCaratula = caratulas.find(c => c.id == this.caratulaId)?.identificadorCaratula;
       if (this.idCaratula) {
         const control = this.crearEditarCoemForm.get('identificadorCaratula');
         control.setValue(this.idCaratula);
         control.disable();
         console.log('valor', this.crearEditarCoemForm.controls['identificadorCaratula'].value)
       }
+      this.codigoEmbalajeGranel = embalajes.find(e => e.descripcion == 'A GRANEL').codigo;
+    });
+    this.coemAfipService.comboCaratulas().subscribe((datos) => {
+
     });
   }
 
@@ -168,8 +179,8 @@ export class ModalCrearCoemComponent implements OnInit {
       coem.mercaderiasSueltas[i].identificadorDeclaracion = mercaderia.identificadorDeclaracion;
       coem.mercaderiasSueltas[i].embalajes = new Array<Embalajes>();
       coem.mercaderiasSueltas[i].embalajes.push(new Embalajes());
-      coem.mercaderiasSueltas[i].embalajes[0].cantidadBultos = mercaderia.cantidadBultos;
-      coem.mercaderiasSueltas[i].embalajes[0].codigoEmbalaje = mercaderia.codigoEmbalaje;
+      coem.mercaderiasSueltas[i].embalajes[0].cantidadBultos = mercaderia.peso;
+      coem.mercaderiasSueltas[i].embalajes[0].codigoEmbalaje = this.codigoEmbalajeGranel;
       coem.mercaderiasSueltas[i].embalajes[0].peso = mercaderia.peso;
       i++;
     }
@@ -185,7 +196,7 @@ export class ModalCrearCoemComponent implements OnInit {
         this.crearEditarCoemForm.controls['identificadorCaratula'].disable();
         this.embalajeForm.get('cuitATA').setValue(datos.mercaderiasSueltas[0].cuitATA);
         this.embalajeForm.get('codigoEmbalaje').setValue(datos.mercaderiasSueltas[0].embalajes[0].codigoEmbalaje);
-        this.embalajeForm.get('cantidadBultos').setValue(datos.mercaderiasSueltas[0].embalajes[0].cantidadBultos);
+        this.embalajeForm.get('cantidadBultos').setValue(datos.mercaderiasSueltas[0].embalajes[0].peso);
         this.embalajeForm.get('peso').setValue(datos.mercaderiasSueltas[0].embalajes[0].peso);
         this.embalajeForm.get('identificadorDeclaracion').setValue(datos.mercaderiasSueltas[0].identificadorDeclaracion);
       });

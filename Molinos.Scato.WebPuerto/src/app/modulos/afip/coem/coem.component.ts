@@ -24,7 +24,7 @@ export class CoemComponent implements OnInit {
   }
 
   openModalCrearCaratula(modal: any) {
-    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
+    this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
   crearFinish(event) {

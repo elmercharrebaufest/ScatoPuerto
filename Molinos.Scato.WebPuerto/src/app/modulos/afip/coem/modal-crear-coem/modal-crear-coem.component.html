@@ -12,7 +12,7 @@
               <form [formGroup]="crearEditarCoemForm">
                 <div class="row margen ">
                     <div class="form-group col-md-12">
-                      <label class="font-weight-bold">Id Carátula Afip</label>
+                      <label class="font-weight-bold">Carátula</label>
                     </div>
                     <div class="form-group col-md-4">
                     <select class="custom-select" id="inputGroupSelect01" formControlName="identificadorCaratula" [ngClass]="{ 'input-error': submitted && crearEditarCoemForm.get('identificadorCaratula').invalid }" required>
@@ -25,17 +25,13 @@
                   <table class='table table-bordered lista-coem-table'>
                     <thead class="lista-coem-header">
                         <th>CUIT ATA</th>
-                        <th>Código de Embalaje</th>
-                        <th>Cant. de Bultos</th>
-                        <th>Peso en kilos de la mercadería</th>
+                        <th>Peso (kg)</th>
                         <th>Identificador de la declaración</th>
                         <th></th>
                     </thead>
                     <tbody formArrayName="mercaderiasSueltas">
                       <tr class="lista-coem-row" *ngFor="let mercaderia of mercaderiasSueltasFormArray.controls; let i = index;last as isLast" [formGroupName]="i">
                         <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="cuitATA" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cuitATA').invalid}" maxlength="11" ></td>
-                        <td class="lista-coem-row-item"><input type="text" class="form-control" formControlName="codigoEmbalaje" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('codigoEmbalaje').invalid}" maxlength="2" required></td>
-                        <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="cantidadBultos" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('cantidadBultos').invalid}" required></td>
                         <td class="lista-coem-row-item"><input type="number" class="form-control" formControlName="peso" placeholder="" [ngClass]="{'input-error': submitted && mercaderia.get('peso').invalid}" required></td>
                         <td class="lista-coem-row-item">
                           <input type="text" class="form-control" formControlName="identificadorDeclaracion" placeholder=""

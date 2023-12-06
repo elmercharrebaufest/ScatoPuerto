@@ -72,7 +72,7 @@ export class CoemAfipComponent implements OnInit {
   public editarCoem(historial, modal) {
     this.coemId = historial.id;
     this.coemIdentificador = historial.identificadorCOEM
-    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
+    this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
   public async eliminarCoem(id: number, identificadorCOEM: string) {
