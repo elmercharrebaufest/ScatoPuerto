@@ -29,6 +29,7 @@ export class ModalCrearCoemComponent implements OnInit {
   @Input() caratulaId: number = 0;
   @Output() editOCrearFinish = new EventEmitter<void>();
 
+  public cargando: boolean;
   errorMessage: boolean = false;
   submitted = false;
   titleCoem: string;
@@ -92,8 +93,8 @@ export class ModalCrearCoemComponent implements OnInit {
     } else {
       return this.formBuilder.group({
         cuitATA: ['', Validators.required],
-        codigoEmbalaje: ['', Validators.required],
-        cantidadBultos: ['', Validators.required],
+        codigoEmbalaje: [''],
+        cantidadBultos: [''],
         peso: ['', Validators.required],
         identificadorDeclaracion: [''],
       });
@@ -105,8 +106,8 @@ export class ModalCrearCoemComponent implements OnInit {
   }
 
   public async onCrearCoem() {
-    this.submitted = true;
-    if (this.crearEditarCoemForm.controls['identificadorCaratula'].invalid || this.mercaderiasSueltasFormArray.invalid) {
+    this.crearEditarCoemForm.markAllAsTouched();
+    if (this.crearEditarCoemForm.invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
@@ -115,15 +116,18 @@ export class ModalCrearCoemComponent implements OnInit {
       return;
     }
     this.crearEditarCoem(this.setValoresNuevoOEditarCoem());
-    this.modalService.dismissAll();
   }
 
   private crearEditarCoem(coem) {
     const request = this.operacionNuevo ? this.coemAfipService.registrarCoem(coem) : this.coemAfipService.editarCoem(coem);
+    this.cargando = true;
     request.subscribe(() => {
+      this.cargando = false;
+      this.modalService.dismissAll();
       this.editOCrearFinish.emit();
       this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${this.operacionNuevo ? 'creado una nueva' : 'editado la'} Coem con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
+      this.cargando = false;
       console.error(err);
       this.mostrarError(err.error);
     });
@@ -157,7 +161,6 @@ export class ModalCrearCoemComponent implements OnInit {
         const control = this.crearEditarCoemForm.get('identificadorCaratula');
         control.setValue(this.idCaratula);
         control.disable();
-        console.log('valor', this.crearEditarCoemForm.controls['identificadorCaratula'].value)
       }
       this.codigoEmbalajeGranel = embalajes.find(e => e.descripcion == 'A GRANEL').codigo;
     });
