@@ -18,6 +18,7 @@ using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Servicios.Orquestador;
+using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -103,7 +104,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<AfipMotivoSolicitudCambio, AfipMotivoSolicitudCambioDto>();
         }
-
+         
         #endregion
 
         #region Caratulas
@@ -336,6 +337,11 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
             return !res.HayErrores;
+        }
+
+        public IList<AfipMotivoNoAbordoDto> ListarMotivosNoAbordo()
+        {
+            return Listar<AfipMotivoNoABordo, AfipMotivoNoAbordoDto>();
         }
 
         #region Solicitar Cambio de Buque

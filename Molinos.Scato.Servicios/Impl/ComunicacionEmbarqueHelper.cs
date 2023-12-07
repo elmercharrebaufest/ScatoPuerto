@@ -336,7 +336,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta)
+        public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, AfipMotivoNoABordo afipMotivoNoAbordo)
         {
             try
             {
@@ -353,7 +353,9 @@ namespace Molinos.Scato.Servicios.Impl
                         {
                             IdentificadorCaratula = identificadorCaratula,
                             IdentificadorCOEM = identificadorCoem,
-                            IdentificadoresDeclaracionesMercaderiaSuelta = identificadoresDeclaracionesMercaderiaSuelta
+                            IdentificadoresDeclaracionesMercaderiaSuelta = identificadoresDeclaracionesMercaderiaSuelta,
+                            CodigoMotivo = afipMotivoNoAbordo.Codigo,
+                            DescripcionMotivo = afipMotivoNoAbordo.Descripcion
                         }
                     });
                 return this.wgescomunicacionembarque.SolicitarNoABordo(solicitarNoABordoRequest1);

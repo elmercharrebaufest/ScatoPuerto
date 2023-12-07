@@ -1,11 +1,14 @@
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { COEM } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
+import { AfipMotivoSolicitudCambio } from '@ScatoModels/afip/tablas-afip';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
+import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, forkJoin, of } from 'rxjs';
 
 @Component({
@@ -23,9 +26,13 @@ export class CoemAfipComponent implements OnInit {
   coemIdentificador: string;
   coemImo: string;
   listaEstados: EstadoCOEM[] = [];
+  solicitarNoABordoForm : FormGroup;
 
   public caratulaId: number;
   public coemsSeleccionadas: COEM[] = [];
+  public listaMotivos: AfipMotivoSolicitudCambio[] = [];
+
+  private modal: NgbModalRef;
 
   // Paginado
   currentPage: number = 1; // Página actual
@@ -41,14 +48,23 @@ export class CoemAfipComponent implements OnInit {
     private modalService: NgbModal,
     private coemAfipService: CoemAfipService,
     private confirmationDialogService: ConfirmationDialogService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private tablasAfipService: TablasAfipService,
+    private formBuilder: FormBuilder,
   ) { }
 
   ngOnInit(): void {
+    this.initForms();
+
     this.route.params.subscribe(params => {
       this.caratulaId = Number(params['id']);
       this.cargarDatos();
     });
+
+    this.tablasAfipService.listarMotivosNoABordo().subscribe(motivos =>
+      this.listaMotivos = motivos,
+      err => console.error(err)
+    );
   }
 
   public cargarDatos() {
@@ -149,14 +165,14 @@ export class CoemAfipComponent implements OnInit {
       titulo, mensaje, confirmar ? 'Sí' : 'Cerrar', confirmar ? 'Cancelar' : '', null, null, tipo
     );
 
-    const confirmacion = await alertar('Advertencia', `¿Está seguro de solicitar no a bordo a para la COEM ${coem.identificadorCOEM}?`, Tipoalerta.Warning, true);
+    const confirmacion = await alertar('Advertencia', `¿Está seguro de solicitar no a bordo a para la COEM ${this.coemIdentificador}?`, Tipoalerta.Warning, true);
     if (!confirmacion) {
       return;
     }
-
+    var codigoMotivo = this.solicitarNoABordoForm.get('codigoMotivo').value;
     this.load = true;
-    this.coemAfipService.solicitarNoABordo(coem.id, this.caratulaId).subscribe(() => {
-      alertar('Resultado exitoso', 'Se ha solicitado no a bordo correctamente para la COEM ' + coem.identificadorCOEM, Tipoalerta.Success);
+    this.coemAfipService.solicitarNoABordo(this.coemId, this.caratulaId, codigoMotivo).subscribe(() => {
+      alertar('Resultado exitoso', 'Se ha solicitado no a bordo correctamente para la COEM ' + this.coemIdentificador, Tipoalerta.Success);
     }, (err) => {
       console.error(err);
       const msj = err.error || 'Ha ocurrido un error al solicitar no a bordo';
@@ -171,15 +187,31 @@ export class CoemAfipComponent implements OnInit {
     const estadosValidos = ['AUTO', 'ANU'];
     const coemsEstadoinvalido = this.coemsSeleccionadas
       .filter(coem => !estadosValidos.includes(coem.afipCoemEstado.codigo))
-      .map(coem => coem.identificadorCOEM).join('\n');
+            .map(coem => coem.identificadorCOEM).join('\n');
+        if (coemsEstadoinvalido) {
+            const msj = 'Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido;
+            this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
+            return;
+        }
+      this.modalService.open(modalCierreCarga, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
+  }
 
-    if (coemsEstadoinvalido) {
-      const msj = 'Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido;
-      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
-      return;
-    }
+  public abrirModal(modal: any, coem : COEM) {
+    this.coemId = coem.id;
+    this.coemIdentificador = coem.identificadorCOEM;
+    
+    this.modal = this.modalService.open(modal, { size: 'md', centered: true, backdrop: 'static', keyboard: false });
+  }
 
-    this.modalService.open(modalCierreCarga, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
+  public cerrarModal() {
+    this.modal.close();
+    this.load = false;
+  }    
+
+  private initForms() {
+       this.solicitarNoABordoForm = this.formBuilder.group({      
+        codigoMotivo: ['', Validators.required]      
+    });    
   }
 
   //#region Funciones de paginado
@@ -246,6 +278,5 @@ export class CoemAfipComponent implements OnInit {
     }
   }
   //#endregion
-
 
 }
