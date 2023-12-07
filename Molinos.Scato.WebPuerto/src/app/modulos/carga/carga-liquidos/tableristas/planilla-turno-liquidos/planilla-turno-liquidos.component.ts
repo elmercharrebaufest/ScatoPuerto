@@ -1176,7 +1176,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.destinos = new Array();
     if (this.bodegas != null || this.bodegas != undefined) {
       this.bodegas.forEach(b => {
-        if (!this.destinos?.find(d => d.nombre == b.destino.nombre)) {
+        if (!this.destinos?.find(d => d.nombre == b?.destino?.nombre)) {
           this.destinos.push(b.destino);
         }
       });
