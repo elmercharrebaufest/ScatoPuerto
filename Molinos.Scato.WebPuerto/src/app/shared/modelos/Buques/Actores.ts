@@ -1,5 +1,5 @@
 export class Actores {
-    coordinador: string;
+    coordinadores: string[];
     ata: string;
     agenciaMaritima: string;
     estiba: string;

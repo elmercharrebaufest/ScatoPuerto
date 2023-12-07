@@ -17,8 +17,16 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 .ForMember(x => x.NombreBuque,
                 x => x.MapFrom(y => y.Vapor.Nombre))
                 .ForMember(x => x.MaterialesPuertoCantidad,
-                x => x.MapFrom(y => y.MaterialPuertoCantidad));
+                x => x.MapFrom(y => y.MaterialPuertoCantidad))
+                .ForMember(x => x.Coordinadores,
+                x => x.MapFrom(y => y.Coordinadores));
+
             Mapper.CreateMap<EmbarqueDto, Embarque>();
+
+            Mapper.CreateMap<EmbarqueCoordinador, EmbarqueCoordinadorDto>()
+                .ForMember(x => x.CoordinadorPuerto, x => x.MapFrom(y => y.CoordinadorPuerto))
+                .ForMember(x => x.Id, x => x.MapFrom(y => y.Id));
+            Mapper.CreateMap<EmbarqueCoordinadorDto, EmbarqueCoordinador>();
         }
     }
 }

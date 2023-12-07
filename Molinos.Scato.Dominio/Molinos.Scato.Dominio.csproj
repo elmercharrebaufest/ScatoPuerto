@@ -732,6 +732,7 @@
     <Compile Include="Dto\ArchivosPuertoDto.cs" />
     <Compile Include="Dto\AuditoriaDto.cs" />
     <Compile Include="Dto\CalidadValorDto.cs" />
+    <Compile Include="Dto\EmbarqueCoordinadorDto.cs" />
     <Compile Include="Dto\CompaniaDeFumigacionDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ErroresGeolocalizacionDto.cs" />
@@ -1063,6 +1064,7 @@
     <Compile Include="Entidades\ConfiguracionMail.cs" />
     <Compile Include="Entidades\CubitacionDeTanques.cs" />
     <Compile Include="Entidades\DensidadPorTemperaturaDeMaterial.cs" />
+    <Compile Include="Entidades\EmbarqueCoordinador.cs" />
     <Compile Include="Entidades\Entidad.cs" />
     <Compile Include="Entidades\EntidadTipoDeActividad.cs" />
     <Compile Include="Entidades\EquivalenciasCaracteristicasCpOtrosPuertos.cs" />
