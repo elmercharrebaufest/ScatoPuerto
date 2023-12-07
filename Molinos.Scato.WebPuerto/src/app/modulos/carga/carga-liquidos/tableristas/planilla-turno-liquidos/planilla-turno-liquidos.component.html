@@ -126,7 +126,7 @@
                                                         <select formControlName='destino'>
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let destino of destinos'
-                                                                [ngValue]='destino.id'>{{destino.nombre}}</option>
+                                                                [ngValue]='destino?.id'>{{destino?.nombre}}</option>
                                                         </select>
                                                     </td>
                                                     <!-- PARTIDA -->

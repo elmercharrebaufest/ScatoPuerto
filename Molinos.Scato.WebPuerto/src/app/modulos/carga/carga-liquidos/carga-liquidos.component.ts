@@ -27,6 +27,8 @@ import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liq
 import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { take } from 'rxjs/operators';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -385,7 +387,7 @@ export class CargaLiquidosComponent implements OnInit {
       });
   }
 
-  guardarContinuacion(finalizar: boolean) {
+  async guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
       this.enviado = finalizar;
 
@@ -397,8 +399,19 @@ export class CargaLiquidosComponent implements OnInit {
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
-    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+           
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
+      
+      let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
+      if (ok) {
+        this.guardarModuloDeCarga(finalizar, moduloCarga) ;
+      }      
+                   
+  }
+
+  guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga){
+    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+    
       if (finalizar) {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {
@@ -419,8 +432,9 @@ export class CargaLiquidosComponent implements OnInit {
         this.cargaPdf = false;
       }
 
-    });
+    });    
   }
+  
 
   modificarEstadoBuque(estado: string) {
     let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes(estado));

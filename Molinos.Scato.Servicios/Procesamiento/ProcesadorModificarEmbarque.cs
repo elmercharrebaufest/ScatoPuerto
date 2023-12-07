@@ -90,8 +90,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             if (comando.Dto.Coordinadores != null)
             {
+                //EliminarCoordinador                
+                var coordinadorEliminar = Embarque.Coordinadores.ToList().Where(x => !comando.Dto.Coordinadores.Select(y => y.CoordinadorPuerto.Id).Contains(x.CoordinadorPuerto.Id));
+                foreach (var linea in coordinadorEliminar) { Repositorio.Remover(linea); }
+
                 foreach (var coo in comando.Dto.Coordinadores)
-                {
+                {                    
                     var coordinador = Repositorio.Obtener<EmbarqueCoordinador>(x => coo.CoordinadorPuerto.Id == x.CoordinadorPuerto.Id && comando.Dto.Id == x.Embarque.Id);
                     if (coordinador != null)
                     {

@@ -52,6 +52,7 @@ export class CoemAfipComponent implements OnInit {
   }
 
   public cargarDatos() {
+    this.load = true;
     const obsCoems = this.caratulaId ? this.coemAfipService.listarCoemsDeCaratula(this.caratulaId) : this.coemAfipService.listarCoems();
     const obsEstados: Observable<EstadoCOEM[]> = this.listaEstados.length ? of(null) : this.coemAfipService.estadosCoem(); // no es necesario cargar los estados si ya estan
     forkJoin([obsEstados, obsCoems]).subscribe(([estados, coems]) => {
@@ -60,9 +61,11 @@ export class CoemAfipComponent implements OnInit {
       }
       this.listaHistorialCoem = coems;
       this.crearPaginado();
+      this.load = false;
     }, error => {
       console.error(error);
-    }, () => this.load = false);
+      this.load = false;
+    });
   }
 
   editFinish(event) {
@@ -87,9 +90,10 @@ export class CoemAfipComponent implements OnInit {
       this.cargarDatos();
     }, (err) => {
       console.error(err);
+      this.load = false;
       const msj = err.error || 'No se ha podido anular la COEM, comunicarse con soporte técnico';
       this.confirmationDialogService.confirm(`¡Error!`, msj, 'Cerrar', '', null, null, Tipoalerta.Error);
-    }, () => this.load = false)
+    })
   }
 
   public async cerrarCoem(id: number, identificadorCOEM: string) {
@@ -104,9 +108,10 @@ export class CoemAfipComponent implements OnInit {
       this.cargarDatos();
     }, (err) => {
       console.error(err);
+      this.load = false;
       const msj = err.error || `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`;
       this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
-    }, () => this.load = false);
+    });
   }
 
   public async cambiarEstado(event: Event, idCoem: number, identificadorCOEM: string) {
@@ -124,6 +129,7 @@ export class CoemAfipComponent implements OnInit {
     }, (error) => {
       console.error(error);
       this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+      this.load = false;
     })
   }
 
