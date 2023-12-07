@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
-import { AfipLugarOperativo, AfipPuerto, AfipPuntoAduanero } from '@ScatoModels/afip/tablas-afip';
+import { AfipLugarOperativo, AfipPuntoAduanero } from '@ScatoModels/afip/tablas-afip';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { of, Observable, forkJoin, Subscription } from 'rxjs';
 import { concatMap, tap } from 'rxjs/operators';
@@ -32,11 +32,9 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
 
   private aduanas: AfipPuntoAduanero[] = [];
   private lugaresOperativos: AfipLugarOperativo[] = [];
-  private puertos: AfipPuerto[] = [];
 
   public aduanas$: Observable<AfipPuntoAduanero[]>;
   public lugaresOperativos$: Observable<AfipLugarOperativo[]>;
-  public puertos$: Observable<AfipPuerto[]>;
 
   public ver: boolean;
   public identificadorCaratula: string;
@@ -90,12 +88,10 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     forkJoin([
       this.tablasAfipService.listarPuntosAduaneros(),
       this.tablasAfipService.listarLugaresOperativos(),
-      this.tablasAfipService.listarPuertos(),
       obtenerCaratula
-    ]).subscribe(([aduanas, lugaresOperativos, puertos, caratula]) => {
+    ]).subscribe(([aduanas, lugaresOperativos, caratula]) => {
       this.aduanas = aduanas.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.lugaresOperativos = lugaresOperativos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
-      this.puertos = puertos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.asignarFuncionesAutocompletado();
 
       if (caratula) {
@@ -114,7 +110,6 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
   }
 
   private asignarFuncionesAutocompletado() {
-    this.puertos$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'puertoDestino', this.puertos);
     this.aduanas$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'codigoAduana', this.aduanas);
     this.lugaresOperativos$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'codigoLugarOperativo', this.lugaresOperativos);
   }
@@ -125,14 +120,13 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     for (let [prop, val] of Object.entries(caratula)) {
       this.crearEditarCaratulaForm.get(prop)?.setValue(val);
     }
-    this.crearEditarCaratulaForm.get('puertoDestino').setValue(this.puertos.find(puerto => puerto.codigo == caratula.puertoDestino));
     this.crearEditarCaratulaForm.get('codigoAduana').setValue(this.aduanas.find(aduana => aduana.codigo == caratula.codigoAduana));
     this.crearEditarCaratulaForm.get('codigoLugarOperativo').setValue(this.lugaresOperativos.find(lugarOp => lugarOp.codigo == caratula.codigoLugarOperativo));
 
     this.identificadorCaratula = caratula.identificadorCaratula;
   }
 
-  public getNombre(option: AfipPuntoAduanero | AfipLugarOperativo | AfipPuerto) {
+  public getNombre(option: AfipPuntoAduanero | AfipLugarOperativo) {
     return option ? `(${option.codigo}) ${option.descripcion}` : '';
   }
 
@@ -149,7 +143,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       itinerario: [[]],
       identificadorBuque: ['', Validators.required],
       nombreMedioTransporte: ['', Validators.required],
-      puertoDestino: [null, [Validators.required, this.ValidadorEsObjeto]],
+      puertoDestino: [null],
       codigoAduana: [null, [Validators.required, this.ValidadorEsObjeto]],
       codigoLugarOperativo: [null, [Validators.required, this.ValidadorEsObjeto]],
       via: ['8'],
@@ -181,7 +175,6 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    form.get('puertoDestino').enable();
     const mostrarError = (err?: string) => {
       const msj = err || `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`;
       this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error)
@@ -191,7 +184,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     const caratula: Caratula = form.value;
     caratula.codigoAduana = form.get('codigoAduana').value.codigo;
     caratula.codigoLugarOperativo = form.get('codigoLugarOperativo').value.codigo;
-    caratula.puertoDestino = form.get('puertoDestino').value.codigo;
+    caratula.puertoDestino = '';
 
     this.cargando = true;
     this.mensajeCarga = 'Guardando caratula';
