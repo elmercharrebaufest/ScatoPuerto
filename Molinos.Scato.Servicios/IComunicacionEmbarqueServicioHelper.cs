@@ -1,10 +1,7 @@
 ﻿using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios
 {
@@ -21,6 +18,6 @@ namespace Molinos.Scato.Servicios
         CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM);
         SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM);
         SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto dto);
-        SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta);
+        SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, AfipMotivoNoABordo afipMotivoSolicitudCambio);
     }
 }

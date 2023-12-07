@@ -496,6 +496,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/afip/ListarMotivosNoABordo")]
+        public HttpResponseMessage ListarMotivosNoABordo()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarMotivosNoAbordo());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
 
         #region Solicitar Cambio de Buque
         [HttpPut]

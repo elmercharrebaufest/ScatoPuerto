@@ -877,3 +877,7 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin 
 /* SCRIPTS DATOS AFIP */
 IF NOT EXISTS(SELECT 1 FROM AfipCoemEstado) BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'), ('PRE', 'Presentada'), ('AUTO', 'Autorizada'), ('CAN', 'Cancelada'), ('ANU', 'Anulada') END
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end
+
+
+/* AFIP MOTIVOS DE NO ABORDO */
+IF NOT EXISTS (SELECT * FROM AfipMotivoNoABordo) BEGIN INSERT INTO AfipMotivoNoABordo (Codigo, Descripcion) VALUES ('1', 'OTROS'),('2', 'PEDIDO AGENCIA-ROLEO'),('3', 'CAMBIO BUQUE/BANDERA'),('4', 'IMG SCAN SOSPECHOSA'),('5', 'ALERTA / ADO'),('6', 'RAZONES CLIMATICAS'),('7', 'CONTENEDOR ABIERTO'),('8', 'DIFERENCIA PESO'); END
