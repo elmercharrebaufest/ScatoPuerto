@@ -20,4 +20,5 @@ export interface AfipNaturalezaEmbalaje extends AfipTabla { }   // NEB_DESC
 export interface AfipLugarOperativo extends AfipTablaExtra { }  // LOT_ADUA
 export interface AfipCondicionContenedor extends AfipTabla { }  // CONCTD_DESC
 export interface AfipMotivoSolicitudCambio extends AfipTabla { }  // MOTIVO_SOL
+export interface AfipMotivoNoABordo extends AfipTabla { } // MOTIVO_NAB
 

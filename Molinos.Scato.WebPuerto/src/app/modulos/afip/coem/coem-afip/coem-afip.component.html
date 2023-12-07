@@ -51,8 +51,8 @@
                             (click)="cerrarCoem(coem.id, coem.identificadorCOEM)">
                             <i class="fa fa-check-circle-o fs-icon text-success" aria-hidden="true" title="CERRAR"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
-                            (click)="solicitarNoABordo(coem)">
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU' && (coem.afipCoemEstado.codigo=='PRE' || coem.afipCoemEstado.codigo=='AUTO')"
+                            (click)="abrirModal(modalSolicitudNoABordo, coem)">
                             <i class="fa fa-exclamation-circle fs-icon text-info" aria-hidden="true" title="SOLICITAR NO A BORDO"></i>
                         </button>
                     </td>
@@ -122,4 +122,31 @@
 
 <ng-template #cerrarCoems let-modal>
     <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas" [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
+</ng-template>
+
+<ng-template #modalSolicitudNoABordo let-modal>   
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h5 class="modal-title">Solicitar No A Bordo</h5>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="solicitarNoABordoForm">
+                <div class="row justify-content-center">
+                    <div class="pt-4">
+                        <label>Motivo*</label>
+                        <select formControlName="codigoMotivo" class="form-control custom-select" maxlength="200">
+                            <option selected="true">Seleccione un motivo...</option>
+                            <option *ngFor="let motivo of listaMotivos" [ngValue]="motivo.codigo">
+                              {{motivo.descripcion}}
+                            </option>
+                          </select>
+                    </div>
+                </div>                
+            </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-success" (click)="solicitarNoABordo()">Enviar solicitud</button>
+            <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
 </ng-template>
