@@ -48,7 +48,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var mercaderiasSueltas = coem.MercaderiasSueltas.Select(x => Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(x)).ToList();
                     
                     caratula.Estado = EstadosCaratulaAFIP.Enviado;
-                    var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "PRE");
+                    var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "CUR");
                     var coemDb = new AfipCoem
                     {
                         AfipCaratula = caratula,
