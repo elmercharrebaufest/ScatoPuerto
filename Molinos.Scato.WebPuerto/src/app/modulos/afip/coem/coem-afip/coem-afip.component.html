@@ -54,11 +54,11 @@
                             (click)="eliminarCoem(coem.id, coem.identificadorCOEM)">
                             <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ANULAR"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo == 'CUR'"
                             (click)="cerrarCoem(coem.id, coem.identificadorCOEM)">
                             <i class="fa fa-check-circle-o fs-icon text-success" aria-hidden="true" title="CERRAR"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo!='ANU'"
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarNoABordo(coem.afipCoemEstado.codigo)"
                             (click)="solicitarNoABordo(coem)">
                             <i class="fa fa-exclamation-circle fs-icon text-info" aria-hidden="true" title="SOLICITAR NO A BORDO"></i>
                         </button>

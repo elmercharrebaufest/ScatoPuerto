@@ -112,12 +112,8 @@ export class CoemAfipComponent implements OnInit {
   public async cambiarEstado(event: Event, idCoem: number, identificadorCOEM: string, codigoEstado: string) {
     const selectElement = event.target as HTMLSelectElement;
 
-    let codigoSelect = this.listaEstados.find(e => e.id == selectElement.selectedIndex).codigo;
-
-    if (codigoSelect == "AUTO" && codigoEstado != "PRE") { //VALIDACION PARA PASAR DE ESTADO PRE A AUTO
-      return "Debe estar en estado PRESENTADA para poder AUTORIZAR una coem";
-    }
-          const selectedOption = selectElement.value;
+    if (await this.validarEstadoCoem(selectElement, codigoEstado)) {
+      const selectedOption = selectElement.value;
       const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de cambiar el estado del COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
       if (!confirmacion) {
         this.cargarDatos();
@@ -130,8 +126,65 @@ export class CoemAfipComponent implements OnInit {
       }, (error) => {
         console.error(error);
         this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
-      })
+      }) 
+    }else{
+      this.cargarDatos();
+    }          
+  }
+
+  openModal(titulo: string, texto: string, tipoAlerta: Tipoalerta){
+    return this.confirmationDialogService.confirm(titulo, texto, 'Cerrar', '', null, null, tipoAlerta);
+  }
+
+  async validarEstadoCoem(selectElement, codigoEstado) : Promise<boolean> {
+    let valido : boolean = true;
+    let codigoSeleccionado = this.listaEstados.find(e => e.id == selectElement.selectedIndex).codigo;
+    let titulo = "¡Alerta!";
+    if (codigoEstado != "CUR" && codigoSeleccionado == "CUR") {
+      let texto = "La COEM no puede volver a estar en el estado EN CURSO";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
+    }else if (codigoSeleccionado == "ANU" && codigoEstado != "CUR" && codigoEstado != "REG" && codigoEstado != "PRE") {
+      let texto = "Para poder cambiar la COEM al estado ANULADA (ANU), debe estar en alguno de los estados <b>EN CURSO (CUR)</b>, <b>REGISTRADA (REG)</b>, ó <b>PRESENTADA (PRE)</b>";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
+    }else if (codigoSeleccionado == "REG" && codigoEstado != "CUR") {
+      let texto = "Para poder cambiar la COEM al estado REGISTRADA (REG), debe estar en estado EN CURSO (CUR)";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
+    }else if (codigoSeleccionado == "PRE" && codigoEstado != "REG") {
+      let texto = "Para poder pasar la COEM al estado PRESENTADA (PRE), debe estar en estado REGISTRADA (REG)";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
+    }else if(codigoSeleccionado == "REC" && codigoEstado != "PRE"){
+      let texto = "Para poder pasar la COEM al estado RECHAZADA (REC), debe estar en estado PRESENTADA (PRE)";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
+    }else if (codigoSeleccionado == "AUT" && codigoEstado != "PRE") {
+      let texto = "Para poder pasar la COEM al estado AUTORIZADA (AUT), debe estar en estado PRESENTADA (PRE)";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
+    }else if(codigoSeleccionado == "CAN" && codigoEstado != "AUTO"){ // y la coem ha sido convertida en una CODE
+      let texto = "Para poder pasar la COEM al estado CANCELADA (CAN), debe estar en estado AUTORIZADA (PRE)";
+      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
+      if (confirmacion) {
+        valido = false;
+      }
     }
+    return valido;
+  }
 
   public mostrarMercaderias(event: Event, trMercaderias: HTMLTableRowElement) {
     const checkbox = event.target as HTMLInputElement;
@@ -297,6 +350,13 @@ export class CoemAfipComponent implements OnInit {
 
   mostrarRectificarAnular(codigoEstado : string) : boolean {
     if (codigoEstado == "CUR" || codigoEstado == "REG") {
+      return true;
+    }
+    return false;
+  }
+
+  mostrarSolicitarNoABordo(codigoEstado: string) : boolean {
+    if (codigoEstado == "PRE" || codigoEstado == "AUT") {
       return true;
     }
     return false;
