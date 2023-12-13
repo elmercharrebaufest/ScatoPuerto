@@ -5,11 +5,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ReciboSharingService } from '@ScatoServicios/recibo.shared.service';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { forkJoin, Subscription } from 'rxjs';
-import { finalize } from 'rxjs/operators';
-import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Mail } from '@ScatoModels/mail';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
@@ -63,11 +60,11 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   //#endregion
   ngOnInit(): void {
-    this.initFormReciboDetalles()
+    this.initFormReciboDetalles();
   }
 
   ngAfterViewInit() {
-    this.mostrarModalOjito()
+    this.mostrarModalOjito();
   }
 
   ngOnDestroy(): void {
@@ -93,8 +90,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
       incluirImpresionCalidad: [true],
       incluirImpresionEstibado: [true],
       esEuropeo: [true],
-      valorEnKG: [true],
-    })
+      valorEnKG: [true]
+    });
   }
 
   initObtenerEmbarque() {
@@ -126,15 +123,17 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
   getCantidadEnLetras(cantidad: any): string {
     if (cantidad != null) {
       const toWords = new ToWords({ localeCode: 'en-US' });
-      return toWords.convert(cantidad)
+      return toWords.convert(cantidad).toUpperCase();
     }
     return '';
   }
 
   public decimalOnly(event): boolean {
     var charCode = (event.which) ? event.which : event.keyCode;
-    if ((charCode > 47 && charCode < 58) || charCode == 46 || charCode == 8)
+    if ((charCode > 47 && charCode < 58) || charCode == 46 || charCode == 8){
       return true;
+    }
+      
     return false;
   }
 
@@ -143,7 +142,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.mostrarModal) {
 
         this._modalService.open(this.ojitoRecibo, { size: 'lg' });
-        this.setModalOjito()
+        this.setModalOjito();
       }
     }
   }
@@ -158,8 +157,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const fechaRecibo = detalles.fechaRecibo ? formatDate(detalles.fechaRecibo, 'yyyy-MM-dd', 'en') : new Date();
     this.reciboDeBuqueForm.controls.fechaRecibo.setValue(fechaRecibo);
-    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(this.getCantidadEnLetras(detalles.cantidad));
-    this.reciboDeBuqueForm.controls.claseCarga.setValue(detalles.cantidadLetrasYClaseCarga);
+    this.reciboDeBuqueForm.controls.cantidadLetras.setValue(this.getCantidadEnLetras(detalles.cantidad).toUpperCase());
+    this.reciboDeBuqueForm.controls.claseCarga.setValue(detalles.cantidadLetrasYClaseCarga.toUpperCase());
 
     if (this.reciboBuqueOjito.desdeTabla) { this.reciboDeBuqueForm.disable(); }
   }
@@ -177,55 +176,17 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.reciboBuqueDetalles = this.reciboDeBuqueForm.getRawValue();
     this.reciboBuque = new ReciboDeBuque();
-    this.reciboBuque.emitio = this.session.getUser().username
-    // this.reciboBuque.reciboDeBuqueDetalles[0].cantidadLetrasYClaseCarga = this.reciboBuqueDetalles
-    // this.reciboBuque.emitio = 'pepito recibidor';
+    this.reciboBuque.emitio = this.session.getUser().username;
     this.reciboBuque.superviso = 'pepito sipervisor';
     this.reciboBuque.estado = "Aprobado";
     this.reciboBuque.fechaHoraImpresion = null;
     this.reciboBuque.reciboDeBuqueDetalles = [];
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
     this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => {
-      console.log('200 Ok')
+      console.log('200 Ok');
       this._reciboSharingService.setRefreshRecibo(true);
     });
-
-
-    // this.enviarMail(this.idEmbarque, this.reciboBuque);
-    // this.enviado = true;
   }
-
-  // enviarMail(idEmbarque, Recibo) {
-  //   var titulo = "Enviar a supervisor";
-  //   var text = "Cuerpo del Mail:"
-  //   var textoCuerpoMail = 'Cuerpo del mail';
-  //   var inputTitle = "Destinatarios";
-  //   var mailSupervisor = new Mail(`Recibo.`,`${textoCuerpoMail}`);
-  //   this._reciboBuqueService.obtenerDestinatariosRecibo('SupervisoresRecibo').subscribe(destinatarios => { mailSupervisor.destinatarios = destinatarios; });
-  //   var button1 = 'Enviar';
-  //   var button2 = 'Cancelar';
-
-  //   this._confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailSupervisor, null, inputTitle, true)
-  //     .then((confirmed) => {
-  //       if (confirmed) {
-  //         this._reciboBuqueService.guardarReciboDeBuque(idEmbarque, Recibo).subscribe(() => console.log('200 Ok'));
-  //         this._reciboSharingService.setRefreshRecibo(true);
-
-  //         }
-  //     })
-  //     .catch((e) => {
-  //        this._confirmationDialogService.confirm(e, 'Cerrar', button1, button2, null, )
-  //        .then((confirmed) => {
-  //         if (confirmed){
-
-  //           return
-  //         }
-  //         return
-  //      }).catch(() => window.location.reload());
-
-  //       console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-  //     });
-  // }
 
   hasPermisoRecibidores_EmitirRecibo() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_EmitirRecibo);
