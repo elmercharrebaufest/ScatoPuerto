@@ -29,7 +29,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             {
                 var coem = comando.Dto;
                                
-                var mercaderiasSueltasDB = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);                
+                var mercaderiasSueltasDB = Repositorio.Obtener<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);
+                int embalajeId = mercaderiasSueltasDB.Embalajes.Select(x => x.Id).FirstOrDefault();
+                var embalajeDB = Repositorio.Obtener<AfipCoemMercaderiaSueltaEmbalaje>(x => x.Id == embalajeId);
 
                 var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id) ?? throw new Exception("No existe la COEM con el id especificado");
 
@@ -48,9 +50,14 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception(sb.ToString());
                 }
 
-                var mercaderiasSueltas = this.Conversor.ConvertirList<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(coem.MercaderiasSueltas);
-                mercaderiasSueltasDB = mercaderiasSueltas;
+                var mercaderiasSueltas = this.Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(coem.MercaderiasSueltas.FirstOrDefault());
+                
+                mercaderiasSueltasDB.CuitATA = mercaderiasSueltas.CuitATA;
+                mercaderiasSueltasDB.IdentificadorDeclaracion = mercaderiasSueltas.IdentificadorDeclaracion;
 
+                embalajeDB.Peso = mercaderiasSueltas.Embalajes.FirstOrDefault().Peso;
+                embalajeDB.CantidadBultos = mercaderiasSueltas.Embalajes.FirstOrDefault().CantidadBultos;
+             
                 Repositorio.GuardarCambios();
             }
             catch (Exception ex)
