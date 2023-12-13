@@ -9,28 +9,15 @@ namespace Molinos.Scato.Dominio.Dto
 {
     public class AfipCaratulaDto
     {
-        public int Id { get; set; }
-
-        //[Required(ErrorMessage = "El Identificador Caratula es obligatorio.")]
-        public string IdentificadorCaratula { get; set; }
-        
-        [Required(ErrorMessage = "El Identificador Buque es obligatorio.")]
-        public string IdentificadorBuque { get; set; }
-        //[Required(ErrorMessage = "El codigo aduana es obligatorio.")]
-        public string CodigoAduana { get; set; }
-        
-        //[Required(ErrorMessage = "El lugar operativo es obligatorio.")]
-        public string CodigoLugarOperativo { get; set; }
-        
-        [Required(ErrorMessage = "La Fecha Arribo es obligatorio.")]
-        public DateTime FechaArribo { get; set; }
-
-        [Required(ErrorMessage = "La fecha de Zarpada es obligatorio.")]
-        [FechaFinMayorQueFechaInicio("FechaArribo")]
-        [FechaValida(ErrorMessage = "La fecha de zarpada debe ser en el futuro.")]
-        public DateTime FechaZarpada { get; set; }
+        public virtual int Id { get; set; }
+        public virtual string IdentificadorCaratula { get; set; }
+        public virtual string IdentificadorBuque { get; set; }
+        public virtual string CodigoAduana { get; set; }
+        public virtual string CodigoLugarOperativo { get; set; }
+        public virtual DateTime FechaArribo { get; set; }
+        public virtual DateTime FechaZarpada { get; set; }
         public string Via { get; set; }
-        public string NombreMedioTransporte { get; set; }
+        public virtual string NombreMedioTransporte { get; set; }
         public string PuertoDestino { get; set; }
         public string NumeroViaje { get; set; }
         public DateTime FechaRegistro { get; set; }

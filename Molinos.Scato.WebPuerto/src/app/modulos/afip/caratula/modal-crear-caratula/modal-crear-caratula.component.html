@@ -19,15 +19,15 @@
             <div class="row margen ">
                 <div class="col-md-4 pt-4 col-sm-12">
                     <label class="">IMO</label>
-                    <input type="text" class="form-control" placeholder="Ingrese IMO" formControlName="identificadorBuque" [ngClass]="{'input-error': submitted && f.identificadorBuque.invalid}" maxLength="7" minlength="7" required />
+                    <input type="text" class="form-control" placeholder="Ingrese IMO" formControlName="identificadorBuque" maxLength="7" minlength="7" required />
                 </div>
                 <div class="col-md-4 col-sm-12 pt-4">
                     <label class="">Buque</label>
-                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreMedioTransporte" [ngClass]="{'input-error': submitted && f.nombreMedioTransporte.invalid}" required />
+                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreMedioTransporte" required />
                 </div>
                 <div class="col-md-4 col-sm-12 pt-4">
                     <label class="">Aduana</label>
-                    <input type="text" class="form-control" placeholder="Ingrese el código de aduana" formControlName="codigoAduana" [matAutocomplete]="listaAduanas" [ngClass]="{'input-error': submitted && f.codigoAduana.invalid}" required />
+                    <input type="text" class="form-control" placeholder="Ingrese el código de aduana" formControlName="codigoAduana" [matAutocomplete]="listaAduanas" required />
                     <mat-autocomplete autoActiveFirstOption #listaAduanas="matAutocomplete" class="test-class" [classList]="'test-class'" [displayWith]="getNombre">
                         <mat-option *ngFor="let aduana of aduanas$ | async" [value]="aduana">
                             ({{aduana.codigo}}) {{aduana.descripcion}}
@@ -38,7 +38,7 @@
             <div class="row margen">
                 <div class="col-md-4 col-sm-12 pt-4">
                     <label class="">Lugar Operativo</label>
-                    <input type="text" class="form-control" placeholder="Ingrese el código de lugar operativo" formControlName="codigoLugarOperativo" [matAutocomplete]="listaLugaresOperativos" [ngClass]="{'input-error': submitted && f.codigoLugarOperativo.invalid}" required />
+                    <input type="text" class="form-control" placeholder="Ingrese el código de lugar operativo" formControlName="codigoLugarOperativo" [matAutocomplete]="listaLugaresOperativos" required />
                     <mat-autocomplete autoActiveFirstOption #listaLugaresOperativos="matAutocomplete" class="test-class" [classList]="'test-class'" [displayWith]="getNombre">
                         <mat-option *ngFor="let lugarOperativo of lugaresOperativos$ | async" [value]="lugarOperativo">
                             ({{lugarOperativo.codigo}}) {{lugarOperativo.descripcion}}
@@ -46,12 +46,18 @@
                     </mat-autocomplete>
                 </div>
                 <div class="col-md-4 col-sm-12 pt-4">
-                    <label class="">Fecha de Arribo</label>
-                    <input type="datetime-local" [value]="crearEditarCaratulaForm.get('fechaArribo').value | date:'yyyy-MM-ddTHH:mm:ss'" class="form-control" placeholder="Ingrese la fecha de arribo" formControlName="fechaArribo" [ngClass]="{'input-error': submitted && f.fechaArribo.invalid}" required />
+                    <label class="">Fecha estimada de Arribo</label>
+                    <input type="datetime-local" class="form-control" placeholder="Ingrese la fecha de arribo" formControlName="fechaArribo" [min]="fechaMin" [max]="fechaMax" required />
+                    <small class="text-danger" *ngIf="crearEditarCaratulaForm.get('fechaArribo').errors?.fechaInvalida">
+                      La fecha de arribo debe ser entre 5 y 96hs posteriores
+                    </small>
                 </div>
                 <div class="col-md-4 col-sm-12 pt-4">
-                    <label class="">Fecha de Zarpado</label>
-                    <input type="datetime-local" [value]="crearEditarCaratulaForm.get('fechaZarpada').value | date:'yyyy-MM-ddTHH:mm:ss'" class="form-control" placeholder="Ingrese la fecha de zarpado" formControlName="fechaZarpada" [ngClass]="{'input-error': submitted && f.fechaZarpada.invalid}" [min]="crearEditarCaratulaForm.get('fechaArribo').value" required />
+                    <label class="">Fecha estimada de Zarpado</label>
+                    <input type="datetime-local" class="form-control" placeholder="Ingrese la fecha de zarpado" formControlName="fechaZarpada" [min]="crearEditarCaratulaForm.get('fechaArribo').value" required />
+                    <small class="text-danger" *ngIf="crearEditarCaratulaForm.get('fechaZarpada').errors?.fechaInvalida">
+                      La fecha de zarpada no puede ser menor a la de arribo
+                    </small>
                 </div>
             </div>
         </div>

@@ -84,6 +84,8 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
+    <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRectificarCaratulaDto.cs" />
+    <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRegistrarCaratulaDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipMotivoNoAbordoDto.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipMotivoNoABordo.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipRectificarCaratula.cs" />
