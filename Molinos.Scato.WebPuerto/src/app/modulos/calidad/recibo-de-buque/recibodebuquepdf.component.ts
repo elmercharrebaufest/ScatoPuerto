@@ -47,22 +47,22 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   darFormato(cantidad: number, formatoEuropeo: boolean = false) {
-    let numeroEntero = cantidad.toString().split(".")[0]
-    let numeroDecimal = cantidad.toString().split(".")[1]
+    let numeroEntero = cantidad.toString().split(".")[0];
+    let numeroDecimal = cantidad.toString().split(".")[1];
     let numeroEnteroConPuntos: any = "";
 
     if(numeroEntero.length > 0){
       for(let i = 0; i <= numeroEntero.length -1 ; i++){
         numeroEnteroConPuntos += numeroEntero[i];
         if((numeroEntero.length - (i+1))%3 == 0){
-          numeroEnteroConPuntos += "."
+          numeroEnteroConPuntos += ".";
         }
       }
     }
 
     if(numeroEnteroConPuntos.length > 0){
       if(numeroEnteroConPuntos.endsWith(".")){
-        numeroEnteroConPuntos = numeroEnteroConPuntos.substring(0, numeroEnteroConPuntos.length - 1)
+        numeroEnteroConPuntos = numeroEnteroConPuntos.substring(0, numeroEnteroConPuntos.length - 1);
       }
     }
 
@@ -70,7 +70,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       numeroEnteroConPuntos = numeroEnteroConPuntos.replaceAll(".",",");
     }
 
-    return (numeroEnteroConPuntos + ((numeroDecimal != undefined && numeroDecimal.length > 0) ? ((formatoEuropeo ? ",": ".") + numeroDecimal) : (!formatoEuropeo ? ".000": "")))
+    return (numeroEnteroConPuntos + ((numeroDecimal != undefined && numeroDecimal.length > 0) ? ((formatoEuropeo ? ",": ".") + numeroDecimal) : (!formatoEuropeo ? ".000": "")));
   }
 
   crearPDF(){
@@ -84,7 +84,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
   getCantidadEnLetras(cantidad: any): string {
     if (cantidad != null) {
       const toWords = new ToWords({ localeCode: 'en-US' });
-      return toWords.convert(cantidad)
+      return toWords.convert(cantidad);
     }
     return '';
   }
@@ -117,7 +117,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     let dateRecibo = new Date(this.recibo.fechaRecibo);
     let dia = dateRecibo.getDate();
     dateRecibo.setDate(dia);
-    arrFecha = dateRecibo.toDateString().split(' ',4)
+    arrFecha = dateRecibo.toDateString().split(' ',4);
     arrFecha[1] = dateRecibo.toLocaleDateString('EN-US', { 'month': 'long' });
 
     // FECHA
@@ -127,12 +127,12 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
 
     //NOMBRE VAPOR
     doc.setFontSize(12);
-    doc.text("Received, on board the M/V _____________________________", 79, 50)
+    doc.text("Received, on board the M/V _____________________________", 79, 50);
     doc.setFontSize(11);
-    doc.text(this.recibo.nombreBuque || '', 165, 49.5, null, 'center')
+    doc.text(this.recibo.nombreBuque || '', 165, 49.5, null, 'center');
     doc.setFontSize(9);
-    doc.text("Recibido a bordo del vapor",79, 54 )
-    doc.setFontSize(12)
+    doc.text("Recibido a bordo del vapor",79, 54 );
+    doc.setFontSize(12);
 
     //EXPORTADOR
     doc.text("the under noted goods in apparent good order and condition from", 10, 62);
@@ -183,7 +183,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     if(this.recibo.esEuropeo ){
       let spliteado = this.getCantidadEnLetras(this.recibo.cantidad).split('POINT');
       if(spliteado[1] != undefined){
-        let cantidadLetras = spliteado[0] + 'COMMA' + spliteado[1]
+        let cantidadLetras = spliteado[0] + 'COMMA' + spliteado[1];
         cantidadAMostrarEnLetras = cantidadLetras.toUpperCase();
       }else{
         cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
@@ -192,14 +192,14 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
     }
 
-    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras +  (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS')+ " OF " + this.recibo.cantidadLetrasYClaseCarga, 130);
+    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras.toUpperCase() +  (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS')+ " OF " + this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 130);
     let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5)-5) / 2);
     arrLineasTexto.forEach(linea => {
 
-      doc.text(linea, 129.5, 131.2 + offSet, null, 'center')
+      doc.text(linea, 129.5, 131.2 + offSet, null, 'center');
       offSet += 5;
 
-    })
+    });
     // doc.text(cantidadAMostrarEnLetras.toUpperCase(), 129.5, 131.2, null, 'center');
     doc.setFontSize(12);
 
@@ -211,7 +211,6 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       doc.text("Estibado en bodega", 10, 173);
       doc.setFontSize(11);
       doc.text(this.recibo.estibadoEnBodega || '', 47, 169.5);
-
 
       doc.setFontSize(12);
       doc.text("Quality And Quantity unknown Said to Weigh:", 10, 185);
@@ -264,6 +263,8 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       doc.text("Firma del capitán - Primer Oficial", 10, 173);
 
     }
-    if (numPag <= 2) doc.addPage('a4', 'p');
+    if (numPag <= 2){
+      doc.addPage('a4', 'p');
+    }
   }
 }
