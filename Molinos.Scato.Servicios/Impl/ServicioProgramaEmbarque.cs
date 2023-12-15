@@ -642,8 +642,18 @@ namespace Molinos.Scato.Servicios.Impl
             // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
             var copia = new List<string>();
             copia = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones.Split(';').ToList();
-            copia.Add(tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null ? nominacion.NominacionDatoTecnico.Surveyor.Mail : tipoDeMail == "Fumigador" &&
-            nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ? nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail : "");
+
+            string campoMail = "";
+            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null)
+            {
+                campoMail = nominacion.NominacionDatoTecnico.Surveyor.Mail;
+            }
+            else if (tipoDeMail == "Fumigador" && nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null)
+            {
+                campoMail = nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail;
+            }
+            var direccionesExtra = campoMail.Split(';').Select(x => x.Trim());
+            copia.AddRange(direccionesExtra);
 
             copia.RemoveAll(item => item == null || item == "");
 
