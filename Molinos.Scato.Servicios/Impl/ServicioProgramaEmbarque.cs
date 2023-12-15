@@ -747,7 +747,7 @@ namespace Molinos.Scato.Servicios.Impl
                     body += $"<strong>FORMATO/UNIDAD</strong>:  {item.Formato}/{item.Unidad} </br>";
                     body += $"<strong>AJUSTE</strong>:  {item.Ajuste} </br>";
                     body += $"<strong>LOADING PORT</strong>:  {item.PuertoDeCarga} </br>";
-                    body += $"<strong>DISCHARGE PORT</strong>:  {item.PuertoDeCarga} </br>";
+                    body += $"<strong>DISCHARGE PORT</strong>:  {item.PuertoDeDescarga} </br>";
                     body += $"<strong>DESCRIPTION OF GOODS</strong>:  {item.DescripcionesBienes} </td>";
                     body += $"</tr>";
                 }
