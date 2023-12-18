@@ -120,7 +120,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
     this.cargarTurnosBodegasDestinos();
     this.cargarEmbarqueShipParticular();
-    this.obtenerTipoLineaEmbarque();
+
     this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
       if (data) {
         this.obtenerTipoLineaEmbarque();
