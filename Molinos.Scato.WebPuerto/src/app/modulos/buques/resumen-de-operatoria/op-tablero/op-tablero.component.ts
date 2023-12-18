@@ -1072,11 +1072,9 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
   }
 
   public guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
-
-    var bodegasCargadas;
     
     //Bodegas cargadas sin destino
-    bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && x.destino == null);
+    var bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && x.destino == null);
     
     if (bodegasCargadas.length > 0) {
       this.confirmationDialogService.confirm("Alerta", "No se ha ingresado el DESTINO para una o mas bodegas cargadas.", 'Cerrar', '', null, null, Tipoalerta.Warning)

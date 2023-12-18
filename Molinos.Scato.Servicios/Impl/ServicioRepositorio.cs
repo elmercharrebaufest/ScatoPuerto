@@ -9166,11 +9166,14 @@ namespace Molinos.Scato.Servicios.Impl
 
             body += "\n\0\f DESTINO(S): \0\0\f\f\n";
             var planoDeCargaBodegas = Listar<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(x => x.PlanoDeCarga.Id == planoDeCargaId);
-            var destinos = planoDeCargaBodegas.GroupBy(x => x.Destino == null ? "No Definido" : x.Destino.Nombre).Select(group => new
-            {
-                Destino = group.Key,
-                Cantidad = group.Sum(y => y.Cantidad)
-            }).ToList();
+            var destinos = planoDeCargaBodegas
+                .SelectMany(p => p.Destinos.Select(b => new { Destino = b.Destino.Nombre, Cantidad = p.Cantidad}))
+                .GroupBy(bodegaDestino => bodegaDestino.Destino)
+                .Select(group => new
+                {
+                    Destino = group.Key,
+                    Cantidad = group.Sum(y => y.Cantidad)
+                }).ToList();
             foreach (var destino in destinos)
             {
                 body += $"\t {destino.Destino.Trim().PadRight(10, '.')} {destino.Cantidad.ToString().Replace('.', ',')} tn. \n";
@@ -9181,10 +9184,17 @@ namespace Molinos.Scato.Servicios.Impl
             foreach (var bodega in planoDeCargaBodegas)
             {
                 body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
-                if (bodega.Destino != null)
-                    body += $"{bodega.Destino.Nombre.Trim()}. \n";
+                if (bodega.Destinos != null || bodega.Destinos.Count > 0)
+                {
+                    foreach (var d in bodega.Destinos)
+                    {
+                        body += $"{d.Destino.Nombre.Trim()}. \n";
+                    }
+                }
                 else
+                {
                     body += "No Definido.\n";
+                }                                                                          
             }
 
             var planoDeCarga = repositorio.Obtener<PlanoDeCarga>(planoDeCargaId);

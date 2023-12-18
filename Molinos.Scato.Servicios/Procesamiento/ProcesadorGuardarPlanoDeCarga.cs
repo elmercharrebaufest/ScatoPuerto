@@ -161,21 +161,33 @@ namespace Molinos.Scato.Servicios.Procesamiento
             if (comando.Dto.PlanoDeCargaBodegas != null)
             {
                 foreach (var pla in comando.Dto.PlanoDeCargaBodegas.Where(x => x.Cantidad > 0))
-                {
-                    var destino = pla.Destino != null ? Repositorio.Obtener<Destino>(pla.Destino.Id) : null;
+                {                    
                     var materialPuerto = pla.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(pla.MaterialPuerto.Id) : null;
-                    PlanoDeCargaBodega planoDeCargaBodega = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == pla.Id);
-
+                    PlanoDeCargaBodega planoDeCargaBodega = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == pla.Id);                                                    
+                    
                     if (planoDeCargaBodega != null)
                     {
                         planoDeCargaBodega.BodegaParcel = pla.BodegaParcel;
                         planoDeCargaBodega.Cantidad = (decimal)pla.Cantidad;
-                        planoDeCargaBodega.Condicion = pla.Condicion;
-                        planoDeCargaBodega.Destino = destino;
+                        planoDeCargaBodega.Condicion = pla.Condicion;                        
                         planoDeCargaBodega.PlanoDeCarga = planoDeCarga;
                         planoDeCargaBodega.MaterialPuerto = materialPuerto;
                         planoDeCargaBodega.SfFull = pla.SfFull;
                         planoDeCargaBodega.TanqueDeAbordo = pla.TanqueDeAbordo;
+
+                        if (planoDeCargaBodega.Destino != null)
+                        {
+                            planoDeCargaBodega.Destino = Repositorio.Obtener<Destino>(pla.Destino.Id);
+                        }
+
+                        var destinosAgregar = new List<PlanoDeCargaBodegaDestino>();
+                        foreach (var bodegaDestino in planoDeCargaBodega.BodegaDestinos)
+                        {
+                            PlanoDeCargaBodegaDestino planoDeCargaBodegaDestino = Repositorio.Obtener<PlanoDeCargaBodegaDestino>(bodegaDestino);
+                            destinosAgregar.Add(planoDeCargaBodegaDestino);
+                        }
+
+                        planoDeCargaBodega.BodegaDestinos = destinosAgregar;
                     }
                     else
                     {
@@ -183,13 +195,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         {
                             BodegaParcel = pla.BodegaParcel,
                             Cantidad = (decimal)pla.Cantidad,
-                            Condicion = pla.Condicion,
-                            Destino = destino,
+                            Condicion = pla.Condicion,                            
                             PlanoDeCarga = planoDeCarga,
                             MaterialPuerto = materialPuerto,
                             SfFull = pla.SfFull,
-                            TanqueDeAbordo = pla.TanqueDeAbordo
+                            TanqueDeAbordo = pla.TanqueDeAbordo                             
                         });
+
+                        var planoDeCargaBodegaDestinos = pla.Destinos.Select(d => new PlanoDeCargaBodegaDestino
+                        {
+                            Destino = Repositorio.Obtener<Destino>(d.Destino.Id),
+                            PlanoDeCargaBodega = planoDeCargaBodega
+                        });
+
+                        Repositorio.Agregar(planoDeCargaBodegaDestinos);
+
+                        //foreach (var item in planoDeCargaBodegaDestinos)
+                        //{
+                        //    Repositorio.Agregar(item);
+                        //}
                     }
                 }
                 Repositorio.GuardarCambios();

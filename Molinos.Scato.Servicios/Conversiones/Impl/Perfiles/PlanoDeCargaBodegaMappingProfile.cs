@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.PlanoDeCarga;
 using Molinos.Scato.Dominio.Entidades;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
@@ -14,6 +15,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         {
             Mapper.CreateMap<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>();
             Mapper.CreateMap<PlanoDeCargaBodegaDto, PlanoDeCargaBodega>();
+            Mapper.CreateMap<PlanoDeCargaBodegaDestino, PlanoDeCargaBodegaDestinoDto>();
+            Mapper.CreateMap<PlanoDeCargaBodegaDestinoDto, PlanoDeCargaBodegaDestino>();
         }
     }
 }
