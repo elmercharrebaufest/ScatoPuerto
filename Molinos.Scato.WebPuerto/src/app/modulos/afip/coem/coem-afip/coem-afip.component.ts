@@ -158,52 +158,67 @@ export class CoemAfipComponent implements OnInit {
   }
 
   async validarEstadoCoem(selectElement, codigoEstado) : Promise<boolean> {
+
+    const codigoSeleccionado = this.listaEstados.find(e => e.id === selectElement.selectedIndex).codigo;
     let valido : boolean = true;
-    let codigoSeleccionado = this.listaEstados.find(e => e.id == selectElement.selectedIndex).codigo;
-    let titulo = "¡Alerta!";
-    if (codigoEstado != "CUR" && codigoSeleccionado == "CUR") {
-      let texto = "La COEM no puede volver a estar en el estado EN CURSO";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
+
+    const showModalAndCheckConfirmation = async (texto : string) : Promise<void> => {
+       const confirmation = await this.openModal("¡Alerta!", texto, Tipoalerta.Warning);
+       if (confirmation) {
         valido = false;
-      }
-    }else if (codigoSeleccionado == "ANU" && codigoEstado != "CUR" && codigoEstado != "REG" && codigoEstado != "PRE") {
-      let texto = "Para poder cambiar la COEM al estado ANULADA (ANU), debe estar en alguno de los estados <b>EN CURSO (CUR)</b>, <b>REGISTRADA (REG)</b>, ó <b>PRESENTADA (PRE)</b>";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
-        valido = false;
-      }
-    }else if (codigoSeleccionado == "REG" && codigoEstado != "CUR") {
-      let texto = "Para poder cambiar la COEM al estado REGISTRADA (REG), debe estar en estado EN CURSO (CUR)";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
-        valido = false;
-      }
-    }else if (codigoSeleccionado == "PRE" && codigoEstado != "REG") {
-      let texto = "Para poder pasar la COEM al estado PRESENTADA (PRE), debe estar en estado REGISTRADA (REG)";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
-        valido = false;
-      }
-    }else if(codigoSeleccionado == "REC" && codigoEstado != "PRE"){
-      let texto = "Para poder pasar la COEM al estado RECHAZADA (REC), debe estar en estado PRESENTADA (PRE)";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
-        valido = false;
-      }
-    }else if (codigoSeleccionado == "AUT" && codigoEstado != "PRE") {
-      let texto = "Para poder pasar la COEM al estado AUTORIZADA (AUT), debe estar en estado PRESENTADA (PRE)";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
-        valido = false;
-      }
-    }else if(codigoSeleccionado == "CAN" && codigoEstado != "AUTO"){ // y la coem ha sido convertida en una CODE
-      let texto = "Para poder pasar la COEM al estado CANCELADA (CAN), debe estar en estado AUTORIZADA (PRE)";
-      let confirmacion = await this.openModal(titulo, texto, Tipoalerta.Warning);
-      if (confirmacion) {
-        valido = false;
-      }
+       } 
+    };
+
+    switch (codigoSeleccionado) {
+      case "CUR":
+        if (codigoEstado !== "CUR") {
+          await showModalAndCheckConfirmation("La COEM no puede volver a estar en el estado EN CURSO");
+        }
+        break;
+  
+      case "ANU":
+        if (codigoEstado !== "CUR" && codigoEstado !== "REG" && codigoEstado !== "PRE") {
+          await showModalAndCheckConfirmation("Para ANULAR la COEM, debe estar en CURSO, REGISTRADA o PRESENTADA");
+        }
+        break;
+  
+      case "REG":
+        if (codigoEstado !== "CUR") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a REGISTRADA, debe estar en estado EN CURSO");
+        }
+        break;
+  
+      case "PRE":
+        if (codigoEstado !== "REG") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a PRESENTADA, debe estar en estado REGISTRADA");
+        }
+        break;
+  
+      case "REC":
+        if (codigoEstado !== "PRE") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a RECHAZADA, debe estar en estado PRESENTADA");
+        }
+        break;
+  
+      case "AUT":
+        if (codigoEstado !== "PRE") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a AUTORIZADA, debe estar en estado PRESENTADA");
+        }
+        break;
+  
+      case "CAN":
+        if (codigoEstado !== "AUTO") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a CANCELADA, debe estar en estado AUTORIZADA");
+        }
+        break;
+  
+      case "CODE":
+        if (codigoEstado !== "AUT") {
+          await showModalAndCheckConfirmation("Para transformar la COEM en una CODE, debe estar en estado AUTORIZADA");
+        }
+        break;
     }
+
     return valido;
   }
 
