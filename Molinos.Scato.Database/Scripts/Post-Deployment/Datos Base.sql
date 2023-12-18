@@ -875,5 +875,13 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
 
 /* SCRIPTS DATOS AFIP */
-IF NOT EXISTS(SELECT 1 FROM AfipCoemEstado) BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'), ('PRE', 'Presentada'), ('AUTO', 'Autorizada'), ('CAN', 'Cancelada'), ('ANU', 'Anulada') END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REG') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'PRE') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('PRE', 'Presentada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'AUT') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('AUT', 'Autorizada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CAN') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CAN', 'Cancelada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'ANU') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('ANU', 'Anulada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CUR') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CUR', 'En Curso'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REC') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REC', 'Rechazada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CODE') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CODE', 'CODE'); END
+
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end
