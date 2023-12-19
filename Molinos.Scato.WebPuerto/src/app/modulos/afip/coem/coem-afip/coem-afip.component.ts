@@ -130,23 +130,96 @@ export class CoemAfipComponent implements OnInit {
     });
   }
 
-  public async cambiarEstado(event: Event, idCoem: number, identificadorCOEM: string) {
+  public async cambiarEstado(event: Event, idCoem: number, identificadorCOEM: string, codigoEstado: string) {
     const selectElement = event.target as HTMLSelectElement;
-    const selectedOption = selectElement.value;
-    const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de cambiar el estado del COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
-    if (!confirmacion) {
+
+    if (await this.validarEstadoCoem(selectElement, codigoEstado)) {
+      const selectedOption = selectElement.value;
+      const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de cambiar el estado del COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+      if (!confirmacion) {
+        this.cargarDatos();
+        return;
+      }
+      this.load = true;
+      this.coemAfipService.cambiarEstadosCoem(selectedOption, idCoem).subscribe((datos) => {
+        this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Estado del COEM con id: ${identificadorCOEM} fue cambiado con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
+        this.cargarDatos();
+      }, (error) => {
+        console.error(error);
+        this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
+      }) 
+    }else{
       this.cargarDatos();
-      return;
+    }          
+  }
+
+  openModal(titulo: string, texto: string, tipoAlerta: Tipoalerta){
+    return this.confirmationDialogService.confirm(titulo, texto, 'Cerrar', '', null, null, tipoAlerta);
+  }
+
+  async validarEstadoCoem(selectElement, codigoEstado) : Promise<boolean> {
+
+    const codigoSeleccionado = this.listaEstados.find(e => e.id === selectElement.selectedIndex).codigo;
+    let valido : boolean = true;
+
+    const showModalAndCheckConfirmation = async (texto : string) : Promise<void> => {
+       const confirmation = await this.openModal("¡Alerta!", texto, Tipoalerta.Warning);
+       if (confirmation) {
+        valido = false;
+       } 
+    };
+
+    switch (codigoSeleccionado) {
+      case "CUR":
+        if (codigoEstado !== "CUR") {
+          await showModalAndCheckConfirmation("La COEM no puede volver a estar en el estado EN CURSO");
+        }
+        break;
+  
+      case "ANU":
+        if (codigoEstado !== "CUR" && codigoEstado !== "REG" && codigoEstado !== "PRE") {
+          await showModalAndCheckConfirmation("Para ANULAR la COEM, debe estar en CURSO, REGISTRADA o PRESENTADA");
+        }
+        break;
+  
+      case "REG":
+        if (codigoEstado !== "CUR") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a REGISTRADA, debe estar en estado EN CURSO");
+        }
+        break;
+  
+      case "PRE":
+        if (codigoEstado !== "REG") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a PRESENTADA, debe estar en estado REGISTRADA");
+        }
+        break;
+  
+      case "REC":
+        if (codigoEstado !== "PRE") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a RECHAZADA, debe estar en estado PRESENTADA");
+        }
+        break;
+  
+      case "AUT":
+        if (codigoEstado !== "PRE") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a AUTORIZADA, debe estar en estado PRESENTADA");
+        }
+        break;
+  
+      case "CAN":
+        if (codigoEstado !== "AUTO") {
+          await showModalAndCheckConfirmation("Para cambiar la COEM a CANCELADA, debe estar en estado AUTORIZADA");
+        }
+        break;
+  
+      case "CODE":
+        if (codigoEstado !== "AUT") {
+          await showModalAndCheckConfirmation("Para transformar la COEM en una CODE, debe estar en estado AUTORIZADA");
+        }
+        break;
     }
-    this.load = true;
-    this.coemAfipService.cambiarEstadosCoem(selectedOption, idCoem).subscribe((datos) => {
-      this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Estado del COEM con id: ${identificadorCOEM} fue cambiado con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
-      this.cargarDatos();
-    }, (error) => {
-      console.error(error);
-      this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
-      this.load = false;
-    })
+
+    return valido;
   }
 
   public mostrarMercaderias(event: Event, trMercaderias: HTMLTableRowElement) {
@@ -279,4 +352,17 @@ export class CoemAfipComponent implements OnInit {
   }
   //#endregion
 
+  mostrarRectificarAnular(codigoEstado : string) : boolean {
+    if (codigoEstado == "CUR" || codigoEstado == "REG") {
+      return true;
+    }
+    return false;
+  }
+
+  mostrarSolicitarNoABordo(codigoEstado: string) : boolean {
+    if (codigoEstado == "PRE" || codigoEstado == "AUT") {
+      return true;
+    }
+    return false;
+  }
 }

@@ -28,8 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             var resultado = new ResultadoCrear();
             try
             {
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");
-                var estado = Repositorio.Obtener<AfipCoemEstado>(comando.IdEstado);
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");                
 
                 //Se anula la COEM, siempre que esta se encuentre en el estado en CURSO/REGISTRADA, identificada por un identificador de Caratula
                 if (coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Registrada)
@@ -46,7 +45,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
                     throw new Exception(sb.ToString());
                 }
-
+                var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "ANU");
                 coemDB.AfipCoemEstado = estado;
                 Repositorio.GuardarCambios();
 

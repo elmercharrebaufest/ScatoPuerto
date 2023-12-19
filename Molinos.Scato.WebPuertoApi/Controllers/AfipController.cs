@@ -182,8 +182,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/afip/RegistrarCaratula")]
-        public HttpResponseMessage RegistrarCaratula(AfipCaratulaDto caratula)
+        public HttpResponseMessage RegistrarCaratula(AfipRegistrarCaratulaDto caratula)
         {
+            if (!ModelState.IsValid)
+            {
+                var errores = string.Join("\n", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct());
+                return Request.CreateResponse(HttpStatusCode.BadRequest, errores);
+            }
             try
             {
                 var resultado = servicioAfip.RegistrarCaratula(caratula);
@@ -197,26 +202,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPut]
         [Route("api/afip/RectificarCaratula")]
-        public HttpResponseMessage RectificarCaratula(AfipCaratulaDto caratula)
+        public HttpResponseMessage RectificarCaratula(AfipRectificarCaratulaDto caratula)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var resultado = servicioAfip.RectificarCaratula(caratula);
-                    return Request.CreateResponse(HttpStatusCode.OK, resultado);
-                }
-                catch (Exception e)
-                {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-                }
+                var errores = string.Join("\n", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct());
+                return Request.CreateResponse(HttpStatusCode.BadRequest, errores);
             }
-            else
+            try
             {
-                // El modelo no es válido, devuelve los errores de validación
-                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+                var resultado = servicioAfip.RectificarCaratula(caratula);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
-
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
         [HttpDelete]

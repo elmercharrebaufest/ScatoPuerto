@@ -48,14 +48,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
       this.getProductos();
       this.getTanqueAbordo();
     });
+    this.idModuloDeCarga = this.procesoService.getModuloDeCarga().id;
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         this.lineas = resp.moduloDeCargaLineasDeEmbarque;
-      });
-      // this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
-      //   if (data) {
-          
-      //   }
-      // });       
+      });         
   }
 
   ngAfterViewInit(): void {

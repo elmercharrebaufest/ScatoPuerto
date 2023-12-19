@@ -28,8 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             var resultado = new ResultadoCrear();
             try
             {
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");
-                var estado = Repositorio.Obtener<AfipCoemEstado>(comando.IdEstado);
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");              
 
                 var res = comunicacionEmbarqueServicioHelper.CerrarCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM).Body.CerrarCOEMResult;
                 var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
@@ -40,6 +39,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
                     throw new Exception(sb.ToString());
                 }
+                var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "REG");
                 coemDB.AfipCoemEstado = estado;
                 Repositorio.GuardarCambios();
             }

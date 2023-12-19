@@ -130,7 +130,7 @@ namespace Molinos.Scato.Servicios.Impl
             return caratula;
         }
 
-        public bool RegistrarCaratula(AfipCaratulaDto caratula)
+        public bool RegistrarCaratula(AfipRegistrarCaratulaDto caratula)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRegistrarCaratula { Dto = caratula });
             if (res.HayErrores)
@@ -140,7 +140,7 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
-        public bool RectificarCaratula(AfipCaratulaDto caratula)
+        public bool RectificarCaratula(AfipRectificarCaratulaDto caratula)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRectificarCaratula { Dto = caratula });
             if (res.HayErrores)
@@ -276,20 +276,23 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var coem = this.repositorio.Obtener<AfipCoem>(idCoem);
-                var estado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
-
-                if (coem == null)
+                if(ValidarEstados(idCoem, idEstado))
                 {
-                    throw new Exception("No existe la COEM con el id indicado");
-                }
-                if (estado == null)
-                {
-                    throw new Exception("No existe el estado con el ID indicado");
-                }
+                    var coem = this.repositorio.Obtener<AfipCoem>(idCoem);
+                    var estado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
 
-                coem.AfipCoemEstado = estado;
-                this.repositorio.GuardarCambios();
+                    if (coem == null)
+                    {
+                        throw new Exception("No existe la COEM con el id indicado");
+                    }
+                    if (estado == null)
+                    {
+                        throw new Exception("No existe el estado con el ID indicado");
+                    }
+
+                    coem.AfipCoemEstado = estado;
+                    this.repositorio.GuardarCambios();
+                }                
             }
             catch (Exception ex)
             {
@@ -297,6 +300,51 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception("Error al cambiar estado de la COEM");
             }
 
+        }
+
+        private bool ValidarEstados(int idCoem, int idEstado)
+        {
+            var retorno = true;
+            var estadoActual = this.repositorio.Obtener<AfipCoem>(idCoem).AfipCoemEstado;
+            var estadoSeleccionado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
+
+            if (estadoActual.Codigo != "CUR" && estadoSeleccionado.Codigo == "CUR")
+            {
+                var texto = "La COEM no puede volver a estar en el estado EN CURSO";
+                throw new Exception(texto);
+            }
+            else if (estadoSeleccionado.Codigo == "ANU" && estadoActual.Codigo != "CUR" && estadoActual.Codigo != "REG" && estadoActual.Codigo != "PRE")
+            {
+                var texto = "Para poder cambiar la COEM al estado ANULADA (ANU), debe estar en alguno de los estados <b>EN CURSO (CUR)</b>, <b>REGISTRADA (REG)</b>, ó <b>PRESENTADA (PRE)</b>";
+                throw new Exception(texto);
+            }
+            else if (estadoSeleccionado.Codigo == "REG" && estadoActual.Codigo != "CUR")
+            {
+                var texto = "Para poder cambiar la COEM al estado REGISTRADA (REG), debe estar en estado EN CURSO (CUR)";
+                throw new Exception(texto);
+            }
+            else if (estadoSeleccionado.Codigo == "PRE" && estadoActual.Codigo != "REG")
+            {
+                var texto = "Para poder pasar la COEM al estado PRESENTADA (PRE), debe estar en estado REGISTRADA (REG)";
+                throw new Exception(texto);
+            }
+            else if (estadoSeleccionado.Codigo == "REC" && estadoActual.Codigo != "PRE")
+            {
+                var texto = "Para poder pasar la COEM al estado RECHAZADA (REC), debe estar en estado PRESENTADA (PRE)";
+                throw new Exception(texto);
+            }
+            else if (estadoSeleccionado.Codigo == "AUT" && estadoActual.Codigo != "PRE")
+            {
+                var texto = "Para poder pasar la COEM al estado AUTORIZADA (AUT), debe estar en estado PRESENTADA (PRE)";
+                throw new Exception(texto);
+            }
+            else if (estadoSeleccionado.Codigo == "CAN" && estadoActual.Codigo != "AUTO")
+            { // y la coem ha sido convertida en una CODE
+                var texto = "Para poder pasar la COEM al estado CANCELADA (CAN), debe estar en estado AUTORIZADA (PRE)";
+                throw new Exception(texto);
+            }
+
+            return retorno;
         }
         #endregion
 

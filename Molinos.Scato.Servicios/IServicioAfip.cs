@@ -51,10 +51,10 @@ namespace Molinos.Scato.Servicios
         AfipCaratulaDto ObtenerCaratula(int id);
 
         [OperationContract]
-        bool RegistrarCaratula(AfipCaratulaDto caratula);
+        bool RegistrarCaratula(AfipRegistrarCaratulaDto caratula);
 
         [OperationContract]
-        bool RectificarCaratula(AfipCaratulaDto caratula);
+        bool RectificarCaratula(AfipRectificarCaratulaDto caratula);
 
         [OperationContract]
         bool AnularCaratula(int id);
