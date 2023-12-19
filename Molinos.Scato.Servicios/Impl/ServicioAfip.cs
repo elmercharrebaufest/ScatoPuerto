@@ -130,7 +130,7 @@ namespace Molinos.Scato.Servicios.Impl
             return caratula;
         }
 
-        public bool RegistrarCaratula(AfipCaratulaDto caratula)
+        public bool RegistrarCaratula(AfipRegistrarCaratulaDto caratula)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRegistrarCaratula { Dto = caratula });
             if (res.HayErrores)
@@ -140,7 +140,7 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
-        public bool RectificarCaratula(AfipCaratulaDto caratula)
+        public bool RectificarCaratula(AfipRectificarCaratulaDto caratula)
         {
             var res = this.servicioComandos.Ejecutar(new AfipRectificarCaratula { Dto = caratula });
             if (res.HayErrores)

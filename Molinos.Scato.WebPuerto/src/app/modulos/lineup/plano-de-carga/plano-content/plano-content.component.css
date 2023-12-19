@@ -49,3 +49,19 @@ img:hover {
 #nombreExportador {
   text-transform: uppercase;
 }
+
+.header-destino {
+  position: relative;
+}
+
+.header-destino div {
+  position: absolute;
+  top: -100%;
+}
+
+td .disabled-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(235, 235, 228, 0.3);
+}

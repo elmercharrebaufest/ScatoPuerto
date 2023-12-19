@@ -27,7 +27,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
   public mensajeCarga: string;
 
   private modal: NgbModalRef;
-  private suscripcion: Subscription;
+  private suscripciones: Subscription[] = [];
 
   constructor(
     private modalService: NgbModal,
@@ -41,7 +41,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // El request se hace en modal-crear-caratula.ts, este es un BehaviorSubject
-    this.suscripcion = this.caratulaAfipService.$caratula.subscribe(caratula => {
+    const suscripcion = this.caratulaAfipService.$caratula.subscribe(caratula => {
       if (!caratula) {
         return;
       }
@@ -49,6 +49,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
       this.solicitarCambioFechasForm.get('caratulaId').setValue(caratula.id);
       this.solicitarCambioBuqueForm.get('caratulaId').setValue(caratula.id);
     });
+    this.suscripciones.push(suscripcion);
     this.tablasAfipService.listarMotivosSolicitudCambio().subscribe(motivos =>
       this.listaMotivos = motivos,
       err => console.error(err)
@@ -56,7 +57,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.suscripcion.unsubscribe();
+    this.suscripciones.forEach(s => s.unsubscribe());
   }
 
   private initForms() {
@@ -74,7 +75,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
       descripcionMotivo: ['', Validators.maxLength(200)]
     });
     // Borra la fecha de zarpada si la de arribo es menor
-    this.solicitarCambioFechasForm.get('fechaArribo').valueChanges.subscribe((val) => {
+    const suscripcion = this.solicitarCambioFechasForm.get('fechaArribo').valueChanges.subscribe((val) => {
       const controlFechaZarpada = this.solicitarCambioFechasForm.get('fechaZarpada');
       const fechaArribo = new Date(val);
       const fechaZarpada = new Date(controlFechaZarpada.value);
@@ -82,6 +83,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
         controlFechaZarpada.setValue('');
       }
     });
+    this.suscripciones.push(suscripcion);
   }
 
   public abrirModal(modal: any) {
