@@ -38,7 +38,9 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
 
   public ver: boolean;
   public identificadorCaratula: string;
-  private suscripcion: Subscription;
+  private suscripciones: Subscription[] = [];
+  public fechaMin: string;
+  public fechaMax: string;
 
   constructor(
     private modalService: NgbModal,
@@ -48,6 +50,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     private tablasAfipService: TablasAfipService,
     private route: ActivatedRoute
   ) {
+    this.setearRangoFechaArribo();
     this.initFormCrearEditarCaratula();
     this.route.params.subscribe(params => {
       const id = Number(params['id']);
@@ -61,7 +64,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.titleCaratula = this.title;
     this.cargarDatos();
-    this.suscripcion = this.caratulaAfipService.$recargarCaratula.pipe(
+    const suscripcion = this.caratulaAfipService.$recargarCaratula.pipe(
       tap(() => {
         this.cargando = true;
         this.mensajeCarga = 'Cargando datos';
@@ -75,10 +78,11 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       this.cargando = false;
       this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al cargar los datos', 'Cerrar', '', null, null, Tipoalerta.Error);
     });
+    this.suscripciones.push(suscripcion)
   }
 
   ngOnDestroy(): void {
-    this.suscripcion.unsubscribe();
+    this.suscripciones.forEach(s => s.unsubscribe());
   }
 
   private cargarDatos() {
@@ -137,9 +141,55 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  /**
+   * Valida que la fecha de arribo esté entre 5 y 96 horas en el futuro
+   */
+  private ValidadorFechaArribo(control: AbstractControl) {
+    const msFecha = new Date(control.value).getTime();
+    if (msFecha) {
+      const minimo = new Date().setHours(new Date().getHours() + 5);
+      const maximo = new Date().setHours(new Date().getHours() + 96);
+      if (msFecha < minimo || msFecha > maximo) {
+        return { fechaInvalida: true };
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Valida que la fecha de zarpada sea posterior a la de arribo
+   */
+  private ValidadorFechaZarpada(control: AbstractControl) {
+    const msFecha = new Date(control.value).getTime();
+    if (msFecha) {
+      const msFechaArribo = new Date(control.parent.get('fechaArribo').value).getTime();
+      if (msFecha < msFechaArribo) {
+        return { fechaInvalida: true };
+      }
+    }
+    return null;
+  }
+
+  private setearRangoFechaArribo() {
+    const convertirFecha = (date: Date) => {
+      const dia = ('0' + date.getDate().toString()).slice(-2);
+      const mes = ('0' + (date.getMonth() + 1).toString()).slice(-2);
+      const anio = date.getFullYear().toString();
+      const horas = ('0' + date.getHours().toString()).slice(-2);
+      const minutos = ('0' + date.getMinutes().toString()).slice(-2);
+      return `${anio}-${mes}-${dia}T${horas}:${minutos}`;
+    }
+    const minimo = new Date(new Date().setHours(new Date().getHours() + 5));
+    const maximo = new Date(new Date().setHours(new Date().getHours() + 96));
+
+    this.fechaMin = convertirFecha(minimo);
+    this.fechaMax = convertirFecha(maximo);
+  }
+
   private initFormCrearEditarCaratula() {
+
     this.crearEditarCaratulaForm = this.formBuilder.group({
-      id: [''],
+      id: [0],
       itinerario: [[]],
       identificadorBuque: ['', Validators.required],
       nombreMedioTransporte: ['', Validators.required],
@@ -148,9 +198,19 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       codigoLugarOperativo: [null, [Validators.required, this.ValidadorEsObjeto]],
       via: ['8'],
       numeroViaje: [''],
-      fechaArribo: ['', Validators.required],
-      fechaZarpada: ['', Validators.required] // TODO: Validacion con fecha arribo
-    })
+      fechaArribo: ['', [Validators.required, this.ValidadorFechaArribo]],
+      fechaZarpada: ['', [Validators.required, this.ValidadorFechaZarpada]]
+    });
+
+    const controlFechaZarpada = this.crearEditarCaratulaForm.get('fechaZarpada');
+    const suscripcion = this.crearEditarCaratulaForm.get('fechaArribo').valueChanges.subscribe(val => {
+      const fechaArribo = new Date(val);
+      const fechaZarpada = new Date(controlFechaZarpada.value);
+      if (fechaArribo >= fechaZarpada) {
+        controlFechaZarpada.setValue('');
+      }
+    });
+    this.suscripciones.push(suscripcion);
   }
 
   closeModalEditarCrearCaratula() {
@@ -161,6 +221,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     this.submitted = true;
     const form = this.crearEditarCaratulaForm;
     if (form.invalid) {
+      form.markAllAsTouched();
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
