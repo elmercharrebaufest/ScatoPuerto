@@ -173,21 +173,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         planoDeCargaBodega.PlanoDeCarga = planoDeCarga;
                         planoDeCargaBodega.MaterialPuerto = materialPuerto;
                         planoDeCargaBodega.SfFull = pla.SfFull;
-                        planoDeCargaBodega.TanqueDeAbordo = pla.TanqueDeAbordo;
+                        planoDeCargaBodega.TanqueDeAbordo = pla.TanqueDeAbordo;                        
 
-                        if (planoDeCargaBodega.Destino != null)
+                        if (planoDeCargaBodega.BodegaDestinos != null)
                         {
-                            planoDeCargaBodega.Destino = Repositorio.Obtener<Destino>(pla.Destino.Id);
-                        }
-
-                        var destinosAgregar = new List<PlanoDeCargaBodegaDestino>();
-                        foreach (var bodegaDestino in planoDeCargaBodega.BodegaDestinos)
-                        {
-                            PlanoDeCargaBodegaDestino planoDeCargaBodegaDestino = Repositorio.Obtener<PlanoDeCargaBodegaDestino>(bodegaDestino);
-                            destinosAgregar.Add(planoDeCargaBodegaDestino);
-                        }
-
-                        planoDeCargaBodega.BodegaDestinos = destinosAgregar;
+                            foreach (var destino in pla.Destinos)
+                            {
+                                planoDeCargaBodega.BodegaDestinos = pla.Destinos.Select(d => new PlanoDeCargaBodegaDestino
+                                {
+                                    Destino = Repositorio.Obtener<Destino>(destino.Destino.Id),
+                                    PlanoDeCargaBodega = planoDeCargaBodega
+                                }).ToList();                                 
+                            }                            
+                        }                        
                     }
                     else
                     {

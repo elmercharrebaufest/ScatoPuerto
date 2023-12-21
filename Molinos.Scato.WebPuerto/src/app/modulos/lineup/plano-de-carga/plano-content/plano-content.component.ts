@@ -29,7 +29,9 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { CargaComercial } from '@ScatoModels/carga-comercial';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
-import { resolve } from '@angular/compiler-cli/src/ngtsc/file_system';
+import { PlanoDeCargaBodegaDestino } from '@ScatoModels/plano-de-carga-bodega-destino';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
 
 @Component({
   selector: 'app-plano-content',
@@ -50,7 +52,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   recomendacionDefensas: string = '';
   planoDeCargaForm: FormGroup;
   materialesPuerto: MaterialPuerto[];
-  destinos: Destino[];
+  destinosBodega: Destino[];
   exportadores: Exportador[];
   estibasList: Estiba[];
   agenciasControlPrivadoList: AgenciaControlPrivado[];
@@ -72,7 +74,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   private suscripciones: Subscription[] = [];
-  public checkDestinoUnico: boolean = false;
+  public checkDestinoUnico: boolean = false; 
+  soloUnDestino: boolean;
+  private dropdownSettings;
 
   constructor(
     private lineupService: LineupService,
@@ -89,6 +93,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     private session: SessionService
   ) {
     this.user = this.session.getUser();
+    this.setConfigListaMultiple();
     const subs1 = this._guardarService.sendGuardar.subscribe(
       (([finalizar, moduloCarga]) => {
         this.guardarPlanoDeCargaContinuacion(finalizar, moduloCarga);
@@ -106,6 +111,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+   
+
     this.getEmbarqueData();
   }
 
@@ -165,7 +173,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         for (let index = 0; index < 9; index++) {
           var bodega = res.planoDeCargaBodegas.find(x => x.bodegaParcel == index + 1);
           if (bodega != null) {
-            const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+            const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);           
+
             bodegaForm.setValue(bodega);
             this.onChangeCondicion(bodega.condicion, index);
             if (bodega.materialPuerto != null) {
@@ -173,8 +182,11 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
               bodegaForm.get('materialPuerto').setValue(material);
             }
             if (bodega.destino != null) {
-              const destino = this.destinos.find(x => x.id == bodega.destino.id);
-              bodegaForm.get('destino').setValue(destino);
+              this.soloUnDestino = true;
+              const destino = this.destinosBodega?.find(x => x.id == bodega.destino.id);
+              bodega.destinos = [];
+              bodega.destinos.push(new PlanoDeCargaBodegaDestino( 0, destino ));
+              //bodegaForm.get('destino').setValue(destino);
             }
             if (bodega.cantidad && bodega.cantidad % 1) { // necesario para mostrar los valores iniciales con "," en los decimales
               const cantidadStr = bodega.cantidad.toString().replace('.', ',');
@@ -182,6 +194,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
               setTimeout(() => {
                 bodegaForm.get('cantidad').setValue(Number(cantidadStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
               }, 200);
+            }
+            if (bodega.destinos != null && bodega.destinos.length > 0) {
+              const destinos = bodega.destinos.filter(x => x.destino.id == bodega.destino.id).map(x => x.destino);              
+              bodegaForm.get('destinos').setValue(destinos);
             }
             let bodegas = this.planoDeCargaForm.controls.planoDeCargaBodegas.value.filter(b => b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo);
             this._turnoService.setBodega(bodegas);
@@ -306,18 +322,22 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
           listaMateriales: res.materialesPuertoCantidad.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color })),
         }
         this._procesoService.setDatosGrafico(this.datosGrafico);
-        this.getDestinos();
+        this.cargarDestinos();
+        this.getExportadores();
       }, () => {
         this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${this.embarqueSelected.id}`, 'Cerrar', '', null, null, Tipoalerta.Error);
       });
   }
 
-  getDestinos() {
+  cargarDestinos() {
     this.planoDeCargaService.obtenerDestinos().subscribe(
       res => {
-        this.destinos = res;
-        this.getExportadores();
+        this.destinosBodega = res;      
       });
+  }
+
+  public getDestinos() {
+    return this.destinosBodega;
   }
 
   getExportadores() {
@@ -357,6 +377,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
   cargarPlanoDeCargaBodegas() {
     this.planoDeCargaBodegasFormArray.clear();
+   
     for (let index = 0; index < 9; index++) {
       const cantidad = new FormControl(null, { updateOn: 'blur' });
       const suscCantidad = cantidad.valueChanges.subscribe((val: string) => {
@@ -375,7 +396,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         condicion: [""],
         sfFull: [],
         destino: [],
-        tanqueDeAbordo: [],
+        tanqueDeAbordo: [],  
+        destinos: ''     
       });
       this.planoDeCargaBodegasFormArray.push(bodegaGroup);
     }
@@ -399,7 +421,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     this.planoDeCargaBodegasFormArray.controls.filter(bf => {
       const b = bf.value as PlanoDeCargaBodega;
       return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo || b.destino);
-    }).forEach(bf => bf.get('destino').setValue(destino, { emitEvent: false }));
+    }).forEach(bf => bf.get('destinos').setValue(destino, { emitEvent: false }));
   }
 
   public onChangeCheckDestinos() {
@@ -478,7 +500,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     var bodegasCargadas;
 
     //Bodegas cargadas sin destino
-    bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && (x.destino == null || x.destino == ''));
+    bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && (x.destinos == null ||x.destinos.length == 0));
 
     if (bodegasCargadas.length > 0) {
       let texto = "No se ha ingresado el DESTINO para una o mas bodegas cargadas.";
@@ -514,8 +536,19 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this.planoDeCargaForm.value.filePathSecuencia = this.fileSecuencia;
       this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
       this.planoDeCargaForm.value.usuario = this.user.username;
-      this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
-      console.log(this.planoDeCargaForm.value)
+      this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;    
+      
+      var planoDeCarga = new PlanoDeCarga();
+      var planoDeCargaBodegas : PlanoDeCargaBodega[];
+      
+      planoDeCarga.planoDeCargaBodegas = 
+
+      this.planoDeCargaForm.get('planoDeCargaBodegas').value.forEach((bodega : PlanoDeCargaBodega) => {
+        var destinos : Destino[] = bodega.destinos;
+        var destinosBodegas = new PlanoDeCargaBodegaDestino(0, des)
+      })
+
+      
 
       try {
         this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value)
@@ -1186,6 +1219,20 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     if (!this.hasPermisoPlanoDeCarga_CaladoSalida_Modificar()) {
       this.planoDeCargaForm.get('caladoSalida').disable();
     }
+  }   
+  
+  public setConfigListaMultiple(){
+    this.dropdownSettings = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'nombre',
+      enableSearchFilter: true,      
+      showSelectedItemsAtTop: false
+    };
+  }
+
+  public getConfigListaMultiple(){
+    return this.dropdownSettings;
   }
 
 }

@@ -19,7 +19,7 @@ namespace Molinos.Scato.Dominio.Dto
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (Cantidad > 0 && (Destino == null || Destinos.Count == 0)
+            if (Cantidad > 0 && (Destino == null || Destinos.Count == 0))
             {
                 yield return new ValidationResult("El campo Destino es obligatorio cuando la cantidad es mayor a cero.");
             }           

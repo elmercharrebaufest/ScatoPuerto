@@ -53,10 +53,11 @@
                          maxlength="2"></td>
                 <td>
                   <div class="disabled-overlay" *ngIf="checkDestinoUnico && i != 0"></div>
-                  <select class="custom-select" formControlName="destino">
-                    <option value="" selected></option>
-                    <option *ngFor="let d of destinos" [ngValue]="d">{{ d.nombre }}</option>
-                  </select>
+                
+                    <ng-multiselect-dropdown                                
+                      formControlName="destinos" [settings]="getConfigListaMultiple()" [data]="getDestinos()">  
+                    </ng-multiselect-dropdown>
+                                                            
                 </td>
               </ng-container>
             </tr>
@@ -114,7 +115,7 @@
                   <div class="disabled-overlay" *ngIf="checkDestinoUnico && i != 0"></div>
                   <select class="custom-select" formControlName="destino" (focusout)='sendDataParcel()'>
                     <option value="" selected></option>
-                    <option *ngFor="let d of destinos" [ngValue]="d">{{ d.nombre }}</option>
+                    <option *ngFor="let d of destinosBodega" [ngValue]="d">{{ d.nombre }}</option>
                   </select>
                 </td>
               </ng-container>
