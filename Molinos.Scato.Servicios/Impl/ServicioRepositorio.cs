@@ -9181,7 +9181,7 @@ namespace Molinos.Scato.Servicios.Impl
             string inicialParcel = embarque.EsLiquido ? "P" : "H";
             foreach (var bodega in planoDeCargaBodegas)
             {
-                string inicialFullSlack = embarque.EsLiquido ? "" : bodega.Condicion.Substring(0, 1);
+                char inicialFullSlack = embarque.EsLiquido ? default(char) : bodega.Condicion.FirstOrDefault();
                 body += $"\t {inicialParcel}{bodega.BodegaParcel}{inicialFullSlack} - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
                 if (bodega.Destino != null)
                     body += $"{bodega.Destino.Nombre.Trim()}. \n";
