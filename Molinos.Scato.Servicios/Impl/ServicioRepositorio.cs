@@ -9178,9 +9178,11 @@ namespace Molinos.Scato.Servicios.Impl
 
             body += "\n\f-------------------------------------------------------------------------------------------------\f\f\n";
             body += " \fPlano de carga: \f\f\n";
+            string inicialParcel = embarque.EsLiquido ? "P" : "H";
             foreach (var bodega in planoDeCargaBodegas)
             {
-                body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
+                string inicialFullSlack = embarque.EsLiquido ? "" : bodega.Condicion.Substring(0, 1);
+                body += $"\t {inicialParcel}{bodega.BodegaParcel}{inicialFullSlack} - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
                 if (bodega.Destino != null)
                     body += $"{bodega.Destino.Nombre.Trim()}. \n";
                 else
