@@ -9182,11 +9182,18 @@ namespace Molinos.Scato.Servicios.Impl
             foreach (var bodega in planoDeCargaBodegas)
             {
                 char inicialFullSlack = embarque.EsLiquido ? default(char) : bodega.Condicion.FirstOrDefault();
-                body += $"\t {inicialParcel}{bodega.BodegaParcel}{inicialFullSlack} - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
+                string tanqueDeAbordo = embarque.EsLiquido ? $"TANQUE ({bodega.TanqueDeAbordo}) " : "";
+                string material = bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.');
+                string cantidad = bodega.Cantidad.ToString().Replace('.', ',');
+                body += $"\t {inicialParcel}{bodega.BodegaParcel}{inicialFullSlack} - {tanqueDeAbordo}{material} {cantidad} tn. ";
                 if (bodega.Destino != null)
+                {
                     body += $"{bodega.Destino.Nombre.Trim()}. \n";
+                }
                 else
+                {
                     body += "No Definido.\n";
+                }
             }
 
             var planoDeCarga = repositorio.Obtener<PlanoDeCarga>(planoDeCargaId);
