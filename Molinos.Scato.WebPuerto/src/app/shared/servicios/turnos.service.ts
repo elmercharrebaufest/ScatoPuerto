@@ -1,3 +1,4 @@
+import { PlanoDeCargaBodega } from "@ScatoModels/plano-de-carga-bodega";
 import { EventEmitter, Injectable, Output } from "@angular/core";
 
 @Injectable({
@@ -7,12 +8,12 @@ export class TurnosService {
     @Output() sendTurnos = new EventEmitter<any>();
     @Output() sendTnTotal = new EventEmitter<number>();
     @Output() sendExportadores = new EventEmitter<any>();
-    @Output() sendBodega = new EventEmitter<any>();
+    @Output() sendBodega = new EventEmitter<PlanoDeCargaBodega[]>();
     private turnos: any;
     private mails: any;
     private tnTotales: number = 0;
     private formExportadores: any;
-    private bodega: any;
+    private bodega: PlanoDeCargaBodega[];
 
     setTurnos(turno: any){
         this.turnos = turno;
@@ -46,7 +47,7 @@ export class TurnosService {
         return this.formExportadores;
     }
 
-    setBodega(bodega){
+    setBodega(bodega: PlanoDeCargaBodega[]) {
         this.bodega = bodega;
         this.sendBodega.emit(bodega);
     }
