@@ -319,7 +319,7 @@ export class PlanillaTurnoLiquidoExcelService {
             }
         }
     }
-    private setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder){      
+    private setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder){
         planillaDeTurnos = planillaDeTurnos.sort((a, b) => {
             return (new Date(b.fecha).getDate() - new Date(a.fecha).getDate());
           });
@@ -339,7 +339,7 @@ export class PlanillaTurnoLiquidoExcelService {
                 turno.indexDia = diaOrder;
               }
             }
-        });        
+        });
         return diaOrder;
     }
     private setDetalleObservacionesCalidad(worksheet, observacion, offset ){
@@ -466,41 +466,37 @@ export class PlanillaTurnoLiquidoExcelService {
             }
         }
     }
-    private enviarPlanillaLiquido(blob, nombreBuque,idModuloDeCarga) {
+    private async enviarPlanillaLiquido(blob: Blob, nombreBuque: string, idModuloDeCarga: number) {
 
         const titulo = "Enviar Planilla de Turno Líquido";
         const text = "Cuerpo del Mail:"
         const textoCuerpoMail = `Se enviara la planilla de turnos. \n
           Buque: ${nombreBuque}`;
         const inputTitle = "Destinatarios";
-        const mail = new Mail(`Planilla de turnos.`, `${textoCuerpoMail}`);
+        const mail = new Mail(`Planilla de turnos Liquido Modulo de carga ${idModuloDeCarga}`, `${textoCuerpoMail}`);
         this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosLiquido').subscribe(x => mail.destinatarios = x);
-        const button1 = 'Enviar';
-        const button2 = 'Cancelar';
 
-        this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mail, null, inputTitle, true)
-          .then(async (confirmed) => {
-            if (confirmed) {
+        const confirm = await this.confirmationDialogService.confirm(titulo, 'Cuerpo del Mail:', 'Enviar', 'Cancelar', 'lg', mail, null, inputTitle, true);
+        if (!confirm) {
+            return;
+        }
 
-              const convertBlobToBase64 = (blob) => new Promise((resolve, reject) => {
-                const reader = new FileReader;
-                reader.onerror = reject;
-                reader.onload = () => {
-                  resolve(reader.result);
-                };
-                reader.readAsDataURL(blob);
-              });
+        const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
+            const reader = new FileReader;
+            reader.onerror = reject;
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.readAsDataURL(blob);
+        });
 
-              const base64String = await convertBlobToBase64(blob);
-              this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
-                this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success)
-              });
-            }
-          })
-          .catch((e) => {
-            return
-          });
-
+        const base64String = await convertBlobToBase64(blob);
+        this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
+            this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
+        }, (err) => {
+            console.error(err);
+            this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error a enviar el email', 'Cerrar', '', null, null, Tipoalerta.Error);
+        });
     }
     async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
 
@@ -620,11 +616,11 @@ export class PlanillaTurnoLiquidoExcelService {
         });
 
         //renderizo detalles
-        for (let dia = 0; dia <= diaOrder; dia++) {          
+        for (let dia = 0; dia <= diaOrder; dia++) {
           let CantRows = 0;
           let fechaDia;
           let cantidadToneladasPorFecha = 0;
-          planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {              
+          planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
 
             //si es el mismo día cuento las filas que voy a necesitar para calcular el merge
             if (turno.indexDia == dia) {
@@ -650,11 +646,11 @@ export class PlanillaTurnoLiquidoExcelService {
           const mesTurno = `${(fechaDia.getMonth() + 1)}`.padStart(2, '0');
           const anioTurno = fechaDia.getFullYear();
           const fechaTurno = `${diaTurno}-${mesTurno}-${anioTurno}`;
-        
+
           /* Contenido Fecha */
           worksheet.getCell(`A${baseCell + 1}`).value = `${fechaTurno} \r\n ${cantidadToneladasPorFecha} tn`;
           worksheet.getCell(`A${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
-          worksheet.getCell(`A${baseCell + 1}`).border = borders;     
+          worksheet.getCell(`A${baseCell + 1}`).border = borders;
 
           /* Cabeceras Fecha */
           worksheet.mergeCells(`A${baseCell + 1}:A${baseCell + (CantRows > 0 ? CantRows - 1 : CantRows)}`);
@@ -666,11 +662,11 @@ export class PlanillaTurnoLiquidoExcelService {
 
           /* Cabeceras Turno */
           worksheet.getCell(`B${baseCell}`).value  = "Turno";
-          worksheet.getCell(`B${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };          
+          worksheet.getCell(`B${baseCell + 1}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
           worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
           worksheet.getCell(`B${baseCell}`).border = borders;
-          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}          
-          
+          worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
+
           baseCell = baseCell + (CantRows > 0 ? CantRows : CantRows);
 
         }
