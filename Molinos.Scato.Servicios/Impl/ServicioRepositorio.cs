@@ -9178,13 +9178,21 @@ namespace Molinos.Scato.Servicios.Impl
 
             body += "\n\f-------------------------------------------------------------------------------------------------\f\f\n";
             body += " \fPlano de carga: \f\f\n";
+            string inicialParcel = embarque.EsLiquido ? "P" : "H";
             foreach (var bodega in planoDeCargaBodegas)
             {
-                body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
+                string tanqueDeAbordo = embarque.EsLiquido ? $"TANQUE ({bodega.TanqueDeAbordo}) " : "";
+                string material = bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.');
+                string cantidad = bodega.Cantidad.ToString().Replace('.', ',');
+                body += $"\t {inicialParcel}{bodega.BodegaParcel} {bodega.Condicion} - {tanqueDeAbordo}{material} {cantidad} tn. ";
                 if (bodega.Destino != null)
+                {
                     body += $"{bodega.Destino.Nombre.Trim()}. \n";
+                }
                 else
+                {
                     body += "No Definido.\n";
+                }
             }
 
             var planoDeCarga = repositorio.Obtener<PlanoDeCarga>(planoDeCargaId);
