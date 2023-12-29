@@ -160,6 +160,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             if (comando.Dto.PlanoDeCargaBodegas != null)
             {
+                var moduloDeCargaId = Repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == comando.Dto.Id).ModuloDeCarga.Id;
                 foreach (var pla in comando.Dto.PlanoDeCargaBodegas.Where(x => x.Cantidad > 0))
                 {
                     var destino = pla.Destino != null ? Repositorio.Obtener<Destino>(pla.Destino.Id) : null;
@@ -168,6 +169,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     if (planoDeCargaBodega != null)
                     {
+                        // Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
+                        var planillaDeEmbarque = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == planoDeCargaBodega.BodegaParcel);
+                        if (planillaDeEmbarque != null)
+                        {
+                            planillaDeEmbarque.TanqueDeAbordo = pla.TanqueDeAbordo;
+                            planillaDeEmbarque.Destino = destino;
+                            planillaDeEmbarque.MaterialPuerto = materialPuerto;
+                        }
+
                         planoDeCargaBodega.BodegaParcel = pla.BodegaParcel;
                         planoDeCargaBodega.Cantidad = (decimal)pla.Cantidad;
                         planoDeCargaBodega.Condicion = pla.Condicion;
@@ -195,7 +205,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Repositorio.GuardarCambios();
             }
 
-            ProcesarCargaComercial( comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
+            ProcesarCargaComercial(comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
 
             LimpiarCarpetaDeArchivos(comando.Dto.Id);
             if (comando.Dto.FilePathPlano != null)

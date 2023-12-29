@@ -480,14 +480,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                comandos.Ejecutar(new EnvioMail
+                var res = comandos.Ejecutar(new EnvioMail
                 {
                     Cuerpo = objetoEnvioPlanillaTurno.mail.Body,// "Planilla del dia " + planillaDeTurnosDto.Fecha,
                     Destinatarios = Emails,
-                    Titulo = $"Planilla de turnos Liquido Modulo de carga " + IdModuloDeCarga,
+                    Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
                     Attachment = archivoPlanilla,
                     AttachmentName = docFile
                 });
+
+                if (res.HayErrores)
+                {
+                    throw new Exception("Error al enviar mail: " + res.Errores[""]);
+                }
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
