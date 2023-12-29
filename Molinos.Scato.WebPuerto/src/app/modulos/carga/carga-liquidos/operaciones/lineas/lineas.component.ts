@@ -287,7 +287,7 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   obtenerModuloDeCarga() {
-    this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
+    this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
 
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
 
@@ -496,7 +496,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
     this.esGuardadoActivo = false;
 
-    
+
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
     lineasEmabarque.forEach(item => {
