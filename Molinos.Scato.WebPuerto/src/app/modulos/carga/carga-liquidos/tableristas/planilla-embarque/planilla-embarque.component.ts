@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PlanillaDeEmbarque } from '@ScatoModels/planilla-de-embarque';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
@@ -11,6 +11,8 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descriptors/border-radius';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -18,7 +20,7 @@ import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descri
   templateUrl: './planilla-embarque.component.html',
   styleUrls: ['./planilla-embarque.component.css']
 })
-export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
+export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestroy {
   lineasEmbarque: FormGroup;
   exportadores: any[];
   bodegas: any[];
@@ -32,6 +34,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   guardando: boolean;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+  private suscripciones: Subscription[] = [];
 
   constructor(
     private builder: FormBuilder,
@@ -42,16 +45,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     private session: SessionService,
   ) {
     this.user = this.session.getUser();
-    this.turnosService.sendExportadores.subscribe(res => this.exportadores = res);
-    this.turnosService.sendBodega.subscribe(res => {
-      this.bodegas = res;      
+    const sus1 = this.turnosService.sendExportadores.subscribe(res => this.exportadores = res);
+    const sus2 = this.turnosService.sendBodega.subscribe((res: PlanoDeCargaBodega[]) => {
+      this.bodegas = res;
       this.getProductos();
       this.getTanqueAbordo();
+      this.refrescarParceles();
     });
-    this.idModuloDeCarga = this.procesoService.getModuloDeCarga().id;
+    this.suscripciones.push(sus1, sus2); // necesario para desuscripcion
+    this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         this.lineas = resp.moduloDeCargaLineasDeEmbarque;
-      });         
+      });
   }
 
   ngAfterViewInit(): void {
@@ -61,6 +66,20 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
     this.newForm();
 
     if(!this.hasPermisoLiquido_PlanillaEmbarque_Editar()) this.lineasEmbarque.disable();
+  }
+
+  /**
+   * IMPORTANTE: Las suscripciones de rxjs deben desuscribirse manualmente.
+   * De no hacerlo, la suscripción con su funcionamiento quedarán activas aún cuando ya no se esté usando el componente.
+   * Además se creará una nueva suscripción al ingresar nuevamente al componente, lo cual hará que se ejecute varias veces el codigo de la suscripción.
+   * No solo es peligroso que un fragmento de codigo se ejecute más veces de las esperadas, sino que también provoca un memory leak haciendo cada vez más pesada la app.
+   *
+   * La única excepción son las suscripciones que se completan. Los http request se completan automaticamente.
+   */
+  ngOnDestroy(): void {
+    for (const suscripcion of this.suscripciones) {
+      suscripcion.unsubscribe();
+    }
   }
 
   expandir()
@@ -81,10 +100,10 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   newForm() {
     console.log('this.lineas...>>')
     console.log(this.lineas)
-    
+
     if (this.lineas == undefined || this.lineas == null){
     this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
-    }          
+    }
 
     // Evangelino Se considera exportadores unicos no duplicados
     //this.exportadores = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad);
@@ -100,8 +119,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
     this.bodegas = this.turnosService.getBodega();
     this.getProductos();
-    this.getTanqueAbordo();    
-    
+    this.getTanqueAbordo();
+
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.lineasEmbarque = new FormGroup({
       linea:  this.builder.array([])
@@ -121,13 +140,14 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
         }
       }
     }, 1000);
-    
+
   }
 
   fillPlanillaDeEmbarque(){
     this.planillaDeEmbarque.forEach((item: PlanillaDeEmbarque) => {
       this.getPlanillaDeEmbarque().push(this.initLinea(item));
     })
+    this.refrescarParceles();
   }
 
   getPlanillaDeEmbarque() : FormArray {
@@ -138,7 +158,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
   getProductos() {
     this.productos = new Array();
     this.destinos = new Array();
-    
+
     this.bodegas?.forEach(b => {
       if (b.destino && !this.destinos.find(d => d == b.destino.nombre))
         this.destinos.push(b.materialPuerto.descripcionCorta);
@@ -171,6 +191,22 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit {
 
   get linea(): FormArray {
     return this.lineasEmbarque?.get('linea') as FormArray;
+  }
+
+  // Funcion necesaria para que no se borre la selección de bodega al pisar la variable "this.bodegas"
+  public trackBodegas(index: number, item: PlanoDeCargaBodega) {
+    return item.bodegaParcel;
+  }
+
+  private refrescarParceles() {
+    const planillaEmbarque = this.getPlanillaDeEmbarque();
+    for (const linea of planillaEmbarque.controls) {
+      const bodega = this.bodegas.find(b => b.bodegaParcel == linea.get('bodegaParcel').value);
+      const materialPuerto = this.productos.find(p => p.id == bodega?.materialPuerto.id);
+      linea.get('tanqueDeAbordo').setValue(bodega?.tanqueDeAbordo || '');
+      linea.get('destino').setValue(bodega.destino || null);
+      linea.get('materialPuerto').setValue(materialPuerto || null);
+    }
   }
 
   autoCompleteParcel(parcel, l: FormGroup) {

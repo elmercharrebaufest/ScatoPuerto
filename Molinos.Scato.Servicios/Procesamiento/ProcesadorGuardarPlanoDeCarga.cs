@@ -132,6 +132,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
+            var moduloDeCargaId = Repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == comando.Dto.Id).ModuloDeCarga.Id;
+
             #region BODEGAS
             //Remuevo los objetos eliminados o los que la cantidad sea <= 0
             var bodegasVacias = comando.Dto.PlanoDeCargaBodegas.Where(bodega => bodega.Id > 0 && bodega.Cantidad <= 0);
@@ -167,6 +169,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     if (bodegaDb.PlanoDeCargaBodegaDestino == null)
                     {
                         bodegaDb.PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>();
+                    }
+                    
+                    // Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
+                    var planillaDeEmbarque = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == bodegaDb.BodegaParcel);
+                    if (planillaDeEmbarque != null)
+                    {
+                        planillaDeEmbarque.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
+                        planillaDeEmbarque.Destino = destino;
+                        planillaDeEmbarque.MaterialPuerto = materialPuerto;
                     }
 
                     // Elimino los destino que están en DB pero no en el DTO
@@ -215,7 +226,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
             #endregion
 
             Repositorio.GuardarCambios();
-
 
             ProcesarCargaComercial(comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
 
