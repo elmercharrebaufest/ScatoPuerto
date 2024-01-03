@@ -24,9 +24,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             var planoDeCarga = Repositorio.Obtener<PlanoDeCarga>(comando.Dto.Id);
 
-            //PROCESO PARA EL HISTORICO
+            #region HISTORICO
             if (planoDeCarga.FechaDeCreacion == null)
+            {
                 planoDeCarga.FechaDeCreacion = DateTime.Now;
+            }
             else
             {
                 planoDeCarga.FechaDeModificacion = DateTime.Now;
@@ -54,12 +56,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     UsuarioFinalizacion = planoDeCarga.UsuarioFinalizacion
                 });
 
-
-
                 if (planoDeCarga.PlanoDeCargaBodega != null)
                 {
                     foreach (var planoBodega in planoDeCarga.PlanoDeCargaBodega.Where(x => x.Cantidad > 0))
                     {
+                        var destinos = planoBodega.PlanoDeCargaBodegaDestino.Select(d => new PlanoDeCargaBodegaDestinoHistorico { Destino = d.Destino }).ToList();
                         Repositorio.Agregar(new PlanoDeCargaBodegaHistorico
                         {
                             BodegaParcel = planoBodega.BodegaParcel,
@@ -69,12 +70,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             SfFull = planoBodega.SfFull,
                             Destino = planoBodega.Destino,
                             PlanoDeCargaHistorico = planodecargahistorico,
-                            TanqueDeAbordo = planoBodega.TanqueDeAbordo
+                            TanqueDeAbordo = planoBodega.TanqueDeAbordo,
+                            PlanoDeCargaBodegaDestinoHistorico = destinos
                         });
                     }
                 }
-                //Repositorio.GuardarCambios();
-
 
                 if (planoDeCarga.CargaComercial != null)
                 {
@@ -101,20 +101,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         });
                     }
                 }
-
-                //Repositorio.GuardarCambios();
             }
-            //PROCESO PARA EL HISTORICO
+            #endregion
 
-            if (comando.Dto.Estiba != null)
-                planoDeCarga.Estiba = Repositorio.Obtener<Estiba>(comando.Dto.Estiba.Id);
-            else
-                planoDeCarga.Estiba = null;
-
-            if (comando.Dto.AgenciaControlPrivado != null)
-                planoDeCarga.AgenciaControlPrivado = Repositorio.Obtener<AgenciaControlPrivado>(comando.Dto.AgenciaControlPrivado.Id);
-            else
-                planoDeCarga.AgenciaControlPrivado = null;
+            planoDeCarga.Estiba = comando.Dto.Estiba != null ? Repositorio.Obtener<Estiba>(comando.Dto.Estiba.Id) : null;
+            planoDeCarga.AgenciaControlPrivado = comando.Dto.AgenciaControlPrivado != null ? Repositorio.Obtener<AgenciaControlPrivado>(comando.Dto.AgenciaControlPrivado.Id) : null;
 
             planoDeCarga.Observaciones = comando.Dto.Observaciones;
             planoDeCarga.DefensasMoviles = comando.Dto.DefensasMoviles;
@@ -136,88 +127,97 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 foreach (var agente in comando.Dto.AgentesControlPrivado)
                 {
-                    planoDeCarga.AgentesControlPrivado.Add(Repositorio.Obtener<AgenteControlPrivado>(agente.Id));
+                    var agenteDb = Repositorio.Obtener<AgenteControlPrivado>(agente.Id);
+                    planoDeCarga.AgentesControlPrivado.Add(agenteDb);
                 }
             }
 
+            #region BODEGAS
             //Remuevo los objetos eliminados o los que la cantidad sea <= 0
-            foreach (var bodega in planoDeCarga.PlanoDeCargaBodega)
+            var bodegasVacias = comando.Dto.PlanoDeCargaBodegas.Where(bodega => bodega.Id > 0 && bodega.Cantidad <= 0);
+            var bodegasEliminar = planoDeCarga.PlanoDeCargaBodega.Where(bodega => bodegasVacias.Any(b => b.Id == bodega.Id));
+            foreach (var bodegaEliminar in bodegasEliminar)
             {
-                bool exist = false;
-                foreach (var bodegaFront in comando.Dto.PlanoDeCargaBodegas)
-                {
-                    if (bodegaFront.Id <= 0) continue;
-                    if (bodegaFront.Id == bodega.Id && bodegaFront.Cantidad > 0)
-                    {
-                        exist = true;
-                    }
-                }
-                if (!exist)
-                {
-                    Repositorio.Remover(bodega);
-                }
+                Repositorio.Remover(bodegaEliminar);
             }
 
-            if (comando.Dto.PlanoDeCargaBodegas != null)
+            var bodegas = comando.Dto.PlanoDeCargaBodegas?.Where(bodega => bodega.Cantidad > 0) ?? new List<PlanoDeCargaBodegaDto>();
+            foreach (var bodegaDto in bodegas)
             {
-                foreach (var pla in comando.Dto.PlanoDeCargaBodegas.Where(x => x.Cantidad > 0))
-                {                    
-                    var materialPuerto = pla.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(pla.MaterialPuerto.Id) : null;
-                    PlanoDeCargaBodega planoDeCargaBodega = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == pla.Id);                                                    
-                    
-                    if (planoDeCargaBodega != null)
-                    {
-                        planoDeCargaBodega.BodegaParcel = pla.BodegaParcel;
-                        planoDeCargaBodega.Cantidad = (decimal)pla.Cantidad;
-                        planoDeCargaBodega.Condicion = pla.Condicion;                        
-                        planoDeCargaBodega.PlanoDeCarga = planoDeCarga;
-                        planoDeCargaBodega.MaterialPuerto = materialPuerto;
-                        planoDeCargaBodega.SfFull = pla.SfFull;
-                        planoDeCargaBodega.TanqueDeAbordo = pla.TanqueDeAbordo;                        
+                var materialPuerto = bodegaDto.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(bodegaDto.MaterialPuerto.Id) : null;
+                PlanoDeCargaBodega bodegaDb = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == bodegaDto.Id);
 
-                        if (planoDeCargaBodega.BodegaDestinos != null)
-                        {
-                            foreach (var destino in pla.Destinos)
-                            {
-                                planoDeCargaBodega.BodegaDestinos = pla.Destinos.Select(d => new PlanoDeCargaBodegaDestino
-                                {
-                                    Destino = Repositorio.Obtener<Destino>(destino.Destino.Id),
-                                    PlanoDeCargaBodega = planoDeCargaBodega
-                                }).ToList();                                 
-                            }                            
-                        }                        
+                Destino destino = null;
+                if ((bodegaDto.Destinos == null || bodegaDto.Destinos.Count == 0) && bodegaDto.Destino != null)
+                {
+                    destino = Repositorio.Obtener<Destino>(bodegaDto.Destino.Id);
+                }
+
+                if (bodegaDb != null) // EDIT
+                {
+                    bodegaDb.BodegaParcel = bodegaDto.BodegaParcel;
+                    bodegaDb.Cantidad = (decimal)bodegaDto.Cantidad;
+                    bodegaDb.Condicion = bodegaDto.Condicion;
+                    bodegaDb.Destino = destino;
+                    bodegaDb.PlanoDeCarga = planoDeCarga;
+                    bodegaDb.MaterialPuerto = materialPuerto;
+                    bodegaDb.SfFull = bodegaDto.SfFull;
+                    bodegaDb.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
+
+                    if (bodegaDb.PlanoDeCargaBodegaDestino == null)
+                    {
+                        bodegaDb.PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>();
                     }
-                    else
+
+                    // Elimino los destino que están en DB pero no en el DTO
+                    var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => !bodegaDto.Destinos.Any(x => x.Destino.Id == d.Destino.Id));
+                    foreach (var destinoEliminar in destinosEliminar)
                     {
-                        planoDeCarga.PlanoDeCargaBodega.Add(new PlanoDeCargaBodega
-                        {
-                            BodegaParcel = pla.BodegaParcel,
-                            Cantidad = (decimal)pla.Cantidad,
-                            Condicion = pla.Condicion,                            
-                            PlanoDeCarga = planoDeCarga,
-                            MaterialPuerto = materialPuerto,
-                            SfFull = pla.SfFull,
-                            TanqueDeAbordo = pla.TanqueDeAbordo                             
-                        });
+                        Repositorio.Remover(destinoEliminar);
+                    }
 
-                        var planoDeCargaBodegaDestinos = pla.Destinos.Select(d => new PlanoDeCargaBodegaDestino
-                        {
-                            Destino = Repositorio.Obtener<Destino>(d.Destino.Id),
-                            PlanoDeCargaBodega = planoDeCargaBodega
-                        });
-
-                        Repositorio.Agregar(planoDeCargaBodegaDestinos);
-
-                        //foreach (var item in planoDeCargaBodegaDestinos)
-                        //{
-                        //    Repositorio.Agregar(item);
-                        //}
+                    // Agrego los destino que están en el DTO pero no en DB
+                    var destinosAgregar = bodegaDto.Destinos.Where(d => !bodegaDb.PlanoDeCargaBodegaDestino.Any(x => x.Destino.Id == d.Destino.Id));
+                    foreach (var destinoAgregar in destinosAgregar)
+                    {
+                        var destinoDb = Repositorio.Obtener<Destino>(destinoAgregar.Destino.Id);
+                        var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
+                        bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
                     }
                 }
-                Repositorio.GuardarCambios();
-            }
+                else // NEW
+                {
+                    bodegaDb = new PlanoDeCargaBodega
+                    {
+                        BodegaParcel = bodegaDto.BodegaParcel,
+                        Cantidad = (decimal)bodegaDto.Cantidad,
+                        Condicion = bodegaDto.Condicion,
+                        Destino = destino,
+                        PlanoDeCarga = planoDeCarga,
+                        MaterialPuerto = materialPuerto,
+                        SfFull = bodegaDto.SfFull,
+                        TanqueDeAbordo = bodegaDto.TanqueDeAbordo,
+                        PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>()
+                    };
 
-            ProcesarCargaComercial( comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
+                    if (bodegaDto.Destinos != null)
+                    {
+                        foreach (var destinoDto in bodegaDto.Destinos)
+                        {
+                            var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
+                            var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
+                            bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
+                        }
+                    }
+                    Repositorio.Agregar(bodegaDb);
+                }
+            }
+            #endregion
+
+            Repositorio.GuardarCambios();
+
+
+            ProcesarCargaComercial(comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
 
             LimpiarCarpetaDeArchivos(comando.Dto.Id);
             if (comando.Dto.FilePathPlano != null)

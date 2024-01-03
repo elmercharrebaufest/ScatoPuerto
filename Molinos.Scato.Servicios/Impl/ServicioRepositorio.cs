@@ -9166,17 +9166,20 @@ namespace Molinos.Scato.Servicios.Impl
 
             body += "\n\0\f DESTINO(S): \0\0\f\f\n";
             var planoDeCargaBodegas = Listar<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(x => x.PlanoDeCarga.Id == planoDeCargaId);
-            var destinos = planoDeCargaBodegas
+            var destinosAgrupados = planoDeCargaBodegas
                 .SelectMany(p => p.Destinos.Select(b => new { Destino = b.Destino.Nombre, Cantidad = p.Cantidad}))
                 .GroupBy(bodegaDestino => bodegaDestino.Destino)
                 .Select(group => new
                 {
                     Destino = group.Key,
                     Cantidad = group.Sum(y => y.Cantidad)
-                }).ToList();
-            foreach (var destino in destinos)
+                });
+            foreach (var grupoDestino in destinosAgrupados)
             {
-                body += $"\t {destino.Destino.Trim().PadRight(10, '.')} {destino.Cantidad.ToString().Replace('.', ',')} tn. \n";
+                // Sumo las cantidades de aquellas bodegas que aun tienen el destino con el formato viejo (solo si no tienen valores nuevos de destinos multiples)
+                var cantidadDestinoSimple = planoDeCargaBodegas.Where(d => (d.Destinos == null || d.Destinos.Count == 0) && (d.Destino.Nombre == grupoDestino.Destino)).Sum(d => d.Cantidad) ?? 0;
+                var cantidad = (grupoDestino.Cantidad + cantidadDestinoSimple);
+                body += $"\t {grupoDestino.Destino.Trim().PadRight(10, '.')} {cantidad.ToString().Replace('.', ',')} tn. \n";
             }
 
             body += "\n\f-------------------------------------------------------------------------------------------------\f\f\n";
@@ -9186,14 +9189,11 @@ namespace Molinos.Scato.Servicios.Impl
                 body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
                 if (bodega.Destinos != null || bodega.Destinos.Count > 0)
                 {
-                    foreach (var d in bodega.Destinos)
-                    {
-                        body += $"{d.Destino.Nombre.Trim()}. \n";
-                    }
+                    body += string.Join(" | ", bodega.Destinos.Select(d => d.Destino.Nombre)) + $".\n";
                 }
                 else
                 {
-                    body += "No Definido.\n";
+                    body += (bodega.Destino?.Nombre ?? "No Definido") + ".\n";
                 }                                                                          
             }
 

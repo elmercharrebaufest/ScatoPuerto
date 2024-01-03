@@ -1124,6 +1124,7 @@
     <Compile Include="Entidades\NominacionRecibo.cs" />
     <Compile Include="Entidades\NotificacionProgramaDeEmbarque.cs" />
     <Compile Include="Entidades\NotificacionExcluidos.cs" />
+    <Compile Include="Entidades\PlanoDeCargaBodegaDestinoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodegaDestino.cs" />
     <Compile Include="Entidades\ReciboDeBuque.cs" />
     <Compile Include="Entidades\ReciboDeBuqueDetalles.cs" />
