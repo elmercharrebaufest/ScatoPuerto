@@ -176,7 +176,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     if (planillaDeEmbarque != null)
                     {
                         planillaDeEmbarque.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
-                        planillaDeEmbarque.Destino = destino;
+                        //planillaDeEmbarque.Destino = destino;
                         planillaDeEmbarque.MaterialPuerto = materialPuerto;
                     }
 

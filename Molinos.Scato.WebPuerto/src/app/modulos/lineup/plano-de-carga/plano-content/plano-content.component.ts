@@ -414,6 +414,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         }
         const destinos: PlanoDeCargaBodegaDestino[] = val.map(destino => ({ id: 0, destino }));
         bodegaGroup.get('destinos').setValue(destinos, { emitEvent: false });
+        if (this.esLiquido) {
+          this.sendDataParcel();
+        }
       });
       this.suscripciones.push(susConvertirDestino);
       this.planoDeCargaBodegasFormArray.push(bodegaGroup);
