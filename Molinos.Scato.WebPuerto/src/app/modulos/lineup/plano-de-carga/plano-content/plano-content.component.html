@@ -21,7 +21,7 @@
                 Destino
                 <div class="custom-switch">
                   <input type="checkbox" id="chkDestino" class="custom-control-input"
-                    [(ngModel)]="checkDestinoUnico" (change)="onChangeCheckDestinos()"
+                    [(ngModel)]="checkMismosDestinos" (change)="onChangeCheckDestinos()"
                     [ngModelOptions]="{standalone: true}">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
@@ -49,15 +49,12 @@
                     <option>Slack</option>
                   </select>
                 </td>
-                <td><input type="text" formControlName="sfFull" (keypress)="numberOnly($event)"
-                         maxlength="2"></td>
                 <td>
-                  <div class="disabled-overlay" *ngIf="checkDestinoUnico && i != 0"></div>
-                
-                    <ng-multiselect-dropdown                                
-                      formControlName="destinos" [settings]="getConfigListaMultiple()" [data]="getDestinos()">  
-                    </ng-multiselect-dropdown>
-                                                            
+                  <input type="text" formControlName="sfFull" (keypress)="numberOnly($event)" maxlength="2">
+                </td>
+                <td class="multiselect-container">
+                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                  <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()" [data]="getDestinos()"></ng-multiselect-dropdown>
                 </td>
               </ng-container>
             </tr>
@@ -82,7 +79,7 @@
                 Destino
                 <div class="custom-switch">
                   <input type="checkbox" id="chkDestino" class="custom-control-input"
-                    [(ngModel)]="checkDestinoUnico" (change)="onChangeCheckDestinos()"
+                    [(ngModel)]="checkMismosDestinos" (change)="onChangeCheckDestinos()"
                     [ngModelOptions]="{standalone: true}">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
@@ -111,12 +108,14 @@
                     <option>Slack</option>
                   </select>
                 </td>
-                <td>
-                  <div class="disabled-overlay" *ngIf="checkDestinoUnico && i != 0"></div>
-                  <select class="custom-select" formControlName="destino" (focusout)='sendDataParcel()'>
+                <td class="multiselect-container">
+                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                  <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
+                    [data]="getDestinos()" ></ng-multiselect-dropdown>
+                  <!-- <select class="custom-select" formControlName="destino" (focusout)='sendDataParcel()'>
                     <option value="" selected></option>
                     <option *ngFor="let d of destinosBodega" [ngValue]="d">{{ d.nombre }}</option>
-                  </select>
+                  </select> -->
                 </td>
               </ng-container>
             </tr>

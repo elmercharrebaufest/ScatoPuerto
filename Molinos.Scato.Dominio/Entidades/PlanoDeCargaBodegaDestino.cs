@@ -9,7 +9,7 @@ namespace Molinos.Scato.Dominio.Entidades
     public class PlanoDeCargaBodegaDestino : IIdentificable
     {
         public virtual int Id { get; set; }
-        public PlanoDeCargaBodega PlanoDeCargaBodega { get; set; }
-        public Destino Destino { get; set; }
+        public virtual PlanoDeCargaBodega PlanoDeCargaBodega { get; set; }
+        public virtual Destino Destino { get; set; }
     }
 }

@@ -143,7 +143,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Repositorio.Remover(bodegaEliminar);
             }
 
-            var bodegas = comando.Dto.PlanoDeCargaBodegas?.Where(bodega => bodega.Cantidad > 0) ?? new List<PlanoDeCargaBodegaDto>();
+            var bodegas = comando.Dto.PlanoDeCargaBodegas?.Where(bodega => bodega.Cantidad > 0).ToList() ?? new List<PlanoDeCargaBodegaDto>();
             foreach (var bodegaDto in bodegas)
             {
                 var materialPuerto = bodegaDto.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(bodegaDto.MaterialPuerto.Id) : null;
@@ -170,7 +170,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         bodegaDb.PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>();
                     }
-                    
+
                     // Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
                     var planillaDeEmbarque = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == bodegaDb.BodegaParcel);
                     if (planillaDeEmbarque != null)
@@ -181,14 +181,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     // Elimino los destino que están en DB pero no en el DTO
-                    var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => !bodegaDto.Destinos.Any(x => x.Destino.Id == d.Destino.Id));
+                    var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => !bodegaDto.Destinos.Any(x => x.Destino.Id == d.Destino.Id)).ToList();
                     foreach (var destinoEliminar in destinosEliminar)
                     {
                         Repositorio.Remover(destinoEliminar);
                     }
 
                     // Agrego los destino que están en el DTO pero no en DB
-                    var destinosAgregar = bodegaDto.Destinos.Where(d => !bodegaDb.PlanoDeCargaBodegaDestino.Any(x => x.Destino.Id == d.Destino.Id));
+                    var destinosAgregar = bodegaDto.Destinos.Where(d => !bodegaDb.PlanoDeCargaBodegaDestino.Any(x => x.Destino.Id == d.Destino.Id)).ToList();
                     foreach (var destinoAgregar in destinosAgregar)
                     {
                         var destinoDb = Repositorio.Obtener<Destino>(destinoAgregar.Destino.Id);
