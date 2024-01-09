@@ -14,10 +14,10 @@ import { ToWords } from 'to-words';
   styleUrls: ['./recibodebuquepdf.component.css']
 })
 export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestroy {
-  reciboBuque:ReciboDeBuque;
-  recibo : ReciboDeBuqueDetalles;
-  cantidadFormatoEntera : string;
-  cantidadAMostrar : string;
+  reciboBuque: ReciboDeBuque;
+  recibo: ReciboDeBuqueDetalles;
+  cantidadFormatoEntera: string;
+  cantidadAMostrar: string;
 
   private suscripcion: Subscription;
 
@@ -38,9 +38,9 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     this.suscripcion.unsubscribe();
   }
 
-  recibirDataImpresion(){
+  recibirDataImpresion() {
     console.log("RECIBIENDO DATA DESDE PDF", this.reciboBuque);
-    if(this.reciboBuque !== null){
+    if (this.reciboBuque !== null) {
       this.recibo = this.reciboBuque.reciboDeBuqueDetalles[0];
       this.crearPDF();
     }
@@ -51,32 +51,32 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     let numeroDecimal = cantidad.toString().split(".")[1];
     let numeroEnteroConPuntos: any = "";
 
-    if(numeroEntero.length > 0){
-      for(let i = 0; i <= numeroEntero.length -1 ; i++){
+    if (numeroEntero.length > 0) {
+      for (let i = 0; i <= numeroEntero.length - 1; i++) {
         numeroEnteroConPuntos += numeroEntero[i];
-        if((numeroEntero.length - (i+1))%3 == 0){
+        if ((numeroEntero.length - (i + 1)) % 3 == 0) {
           numeroEnteroConPuntos += ".";
         }
       }
     }
 
-    if(numeroEnteroConPuntos.length > 0){
-      if(numeroEnteroConPuntos.endsWith(".")){
+    if (numeroEnteroConPuntos.length > 0) {
+      if (numeroEnteroConPuntos.endsWith(".")) {
         numeroEnteroConPuntos = numeroEnteroConPuntos.substring(0, numeroEnteroConPuntos.length - 1);
       }
     }
 
-    if(!formatoEuropeo){
-      numeroEnteroConPuntos = numeroEnteroConPuntos.replaceAll(".",",");
+    if (!formatoEuropeo) {
+      numeroEnteroConPuntos = numeroEnteroConPuntos.replaceAll(".", ",");
     }
 
-    return (numeroEnteroConPuntos + ((numeroDecimal != undefined && numeroDecimal.length > 0) ? ((formatoEuropeo ? ",": ".") + numeroDecimal) : (!formatoEuropeo ? ".000": "")));
+    return (numeroEnteroConPuntos + ((numeroDecimal != undefined && numeroDecimal.length > 0) ? ((formatoEuropeo ? "," : ".") + numeroDecimal) : (!formatoEuropeo ? ".000" : "")));
   }
 
-  crearPDF(){
+  crearPDF() {
     let doc = new jspdf();
-    for (let i = 1; i <= 3 ; i++) {
-      i == 1 ? this.generarContenido(doc, i, true): this.generarContenido(doc, i, false);
+    for (let i = 1; i <= 3; i++) {
+      i == 1 ? this.generarContenido(doc, i, true) : this.generarContenido(doc, i, false);
     }
     doc.output('pdfobjectnewwindow');
   }
@@ -89,12 +89,12 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     return '';
   }
 
-  generarContenido(doc:jspdf, numPag:number, original:boolean){
-    if(original){
+  generarContenido(doc: jspdf, numPag: number, original: boolean) {
+    if (original) {
       doc.text("ORIGINAL", 105, 10, null, 'center');
       doc.setFontSize(11);
       doc.text("ORIGINAL", 105, 15, null, 'center');
-    }else{
+    } else {
       doc.setFontSize(18);
       doc.text("COPY", 105, 10, null, 'center');
       doc.setFontSize(11);
@@ -117,7 +117,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     let dateRecibo = new Date(this.recibo.fechaRecibo);
     let dia = dateRecibo.getDate();
     dateRecibo.setDate(dia);
-    arrFecha = dateRecibo.toDateString().split(' ',4);
+    arrFecha = dateRecibo.toDateString().split(' ', 4);
     arrFecha[1] = dateRecibo.toLocaleDateString('EN-US', { 'month': 'long' });
 
     // FECHA
@@ -131,7 +131,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     doc.setFontSize(11);
     doc.text(this.recibo.nombreBuque || '', 165, 49.5, null, 'center');
     doc.setFontSize(9);
-    doc.text("Recibido a bordo del vapor",79, 54 );
+    doc.text("Recibido a bordo del vapor", 79, 54);
     doc.setFontSize(12);
 
     //EXPORTADOR
@@ -144,7 +144,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     doc.text("________________________________________________________________________________", 10, 77);
 
     //PUERTO DESTINO
-    if(this.recibo.incluirImpresionDestino){
+    if (this.recibo.incluirImpresionDestino) {
       doc.text("for the Port of", 10, 87);
       doc.setFontSize(9);
       doc.text("para el puerto de", 10, 91);
@@ -169,31 +169,32 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     doc.setFontSize(9);
     doc.text("CANTIDAD", 35, 111, null, 'center');
     doc.setFontSize(11);
-    doc.text(this.darFormato(this.recibo.cantidad, this.recibo.esEuropeo) , 35, 131.5, null, 'center');
+    const siglasUnidad = this.recibo.valorEnKG ? 'KG' : 'MT';
+    doc.text(this.darFormato(this.recibo.cantidad, this.recibo.esEuropeo) + ' ' + siglasUnidad, 35, 131.5, null, 'center');
 
     //CALIDAD EN LETRAS
     doc.setFontSize(12);
     doc.text("QUANTITY IN WORDS AND CLASS OF CARGO", 82, 107);
     doc.setFontSize(9);
-    doc.text("CANTIDAD EN LETRAS Y CLASE DE CARGA",96, 111);
-    doc.setFontSize(7.5);
+    doc.text("CANTIDAD EN LETRAS Y CLASE DE CARGA", 96, 111);
+    doc.setFontSize(11);
 
     let cantidadAMostrarEnLetras: string;
 
-    if(this.recibo.esEuropeo ){
+    if (this.recibo.esEuropeo) {
       let spliteado = this.getCantidadEnLetras(this.recibo.cantidad).split('POINT');
-      if(spliteado[1] != undefined){
+      if (spliteado[1] != undefined) {
         let cantidadLetras = spliteado[0] + 'COMMA' + spliteado[1];
         cantidadAMostrarEnLetras = cantidadLetras.toUpperCase();
-      }else{
+      } else {
         cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
       }
-    }else{
+    } else {
       cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
     }
 
-    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras.toUpperCase() +  (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS')+ " OF " + this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 130);
-    let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5)-5) / 2);
+    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras.toUpperCase() + (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS') + " OF " + this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 130);
+    let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5) - 5) / 2);
     arrLineasTexto.forEach(linea => {
 
       doc.text(linea, 129.5, 131.2 + offSet, null, 'center');
@@ -204,7 +205,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     doc.setFontSize(12);
 
     //ESTIBADO DE BODEGA
-    if(this.recibo.incluirImpresionEstibado && this.recibo.incluirImpresionCalidad) {
+    if (this.recibo.incluirImpresionEstibado && this.recibo.incluirImpresionCalidad) {
       doc.text("Stowed:", 10, 170);
       doc.text("_________________________________________________________________", 46, 170);
       doc.setFontSize(9);
@@ -226,7 +227,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       doc.text("__________________________________________________", 81, 200);
       doc.setFontSize(9);
       doc.text("Firma del capitán - Primer Oficial", 10, 203);
-    } else if (this.recibo.incluirImpresionEstibado && !this.recibo.incluirImpresionCalidad){
+    } else if (this.recibo.incluirImpresionEstibado && !this.recibo.incluirImpresionCalidad) {
 
       doc.text("Stowed:", 10, 170);
       doc.text("_________________________________________________________________", 46, 170);
@@ -240,7 +241,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       doc.text("__________________________________________________", 81, 185);
       doc.setFontSize(9);
       doc.text("Firma del capitán - Primer Oficial", 10, 188);
-    } else if (!this.recibo.incluirImpresionEstibado && this.recibo.incluirImpresionCalidad){
+    } else if (!this.recibo.incluirImpresionEstibado && this.recibo.incluirImpresionCalidad) {
       doc.setFontSize(12);
       doc.text("Quality And Quantity unknown Said to Weigh:", 10, 170);
       doc.text("_________________________________________", 102, 170);
@@ -263,7 +264,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       doc.text("Firma del capitán - Primer Oficial", 10, 173);
 
     }
-    if (numPag <= 2){
+    if (numPag <= 2) {
       doc.addPage('a4', 'p');
     }
   }
