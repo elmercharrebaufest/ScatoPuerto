@@ -23,10 +23,10 @@ import { Subscription } from 'rxjs';
 export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestroy {
   lineasEmbarque: FormGroup;
   exportadores: any[];
-  bodegas: any[];
+  bodegas: PlanoDeCargaBodega[];
   lineas: any[];
   productos: any[];
-  destinos: any[];
+  // destinos: any[];
   partidas: any[];
   tanquesAbordo: any[];
   idModuloDeCarga: number;
@@ -54,9 +54,9 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     });
     this.suscripciones.push(sus1, sus2); // necesario para desuscripcion
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
-      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-        this.lineas = resp.moduloDeCargaLineasDeEmbarque;
-      });
+    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      this.lineas = resp.moduloDeCargaLineasDeEmbarque;
+    });
   }
 
   ngAfterViewInit(): void {
@@ -65,7 +65,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
   ngOnInit(): void {
     this.newForm();
 
-    if(!this.hasPermisoLiquido_PlanillaEmbarque_Editar()) this.lineasEmbarque.disable();
+    if (!this.hasPermisoLiquido_PlanillaEmbarque_Editar()) this.lineasEmbarque.disable();
   }
 
   /**
@@ -82,17 +82,16 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     }
   }
 
-  expandir()
-  {
+  expandir() {
     document.getElementById('planillaEmbarque').className = "pb-5 collapse show";
   }
 
 
-  eliminarObjPlanilla(i: number){
+  eliminarObjPlanilla(i: number) {
     this.getPlanillaDeEmbarque().removeAt(i);
   }
 
-  agregarObjPlanilla(){
+  agregarObjPlanilla() {
     this.getPlanillaDeEmbarque().push(this.initLinea())
   }
 
@@ -101,8 +100,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     console.log('this.lineas...>>')
     console.log(this.lineas)
 
-    if (this.lineas == undefined || this.lineas == null){
-    this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
+    if (this.lineas == undefined || this.lineas == null) {
+      this.lineas = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
     }
 
     // Evangelino Se considera exportadores unicos no duplicados
@@ -123,18 +122,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
 
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.lineasEmbarque = new FormGroup({
-      linea:  this.builder.array([])
+      linea: this.builder.array([])
     });
 
     // this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
 
     //Si tengo items en la planilla de embarque los agrego a la tabla.
     setTimeout(() => {
-      if (this.planillaDeEmbarque){
+      if (this.planillaDeEmbarque) {
 
-        if (this.planillaDeEmbarque.length > 0){
+        if (this.planillaDeEmbarque.length > 0) {
           this.fillPlanillaDeEmbarque();
-        }else{
+        } else {
           //Si no tengo ningún item en la planilla de embarque, agrego 1 vacío.
           this.getPlanillaDeEmbarque().push(this.initLinea());
         }
@@ -143,50 +142,49 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
 
   }
 
-  fillPlanillaDeEmbarque(){
+  fillPlanillaDeEmbarque() {
     this.planillaDeEmbarque.forEach((item: PlanillaDeEmbarque) => {
       this.getPlanillaDeEmbarque().push(this.initLinea(item));
     })
     this.refrescarParceles();
   }
 
-  getPlanillaDeEmbarque() : FormArray {
+  getPlanillaDeEmbarque(): FormArray {
     return this.lineasEmbarque.controls.linea as FormArray;
   }
 
 
   getProductos() {
-    this.productos = new Array();
-    this.destinos = new Array();
+    this.productos = [];
+    // this.destinos = [];
 
-    this.bodegas?.forEach(b => {
-      if (b.destino && !this.destinos.find(d => d == b.destino.nombre))
-        this.destinos.push(b.materialPuerto.descripcionCorta);
-
-      if (b.materialPuerto && !this.productos.find(p => p == b.materialPuerto.descripcionCorta))
-        this.productos.push(b.materialPuerto)
-    })
+    for (const bodega of this.bodegas) {
+      if (bodega.materialPuerto && !this.productos.find(p => p == bodega.materialPuerto.descripcionCorta)) {
+        this.productos.push(bodega.materialPuerto);
+      }
+    }
   }
 
   initLinea(planilla?: PlanillaDeEmbarque) {
-    var result= localStorage.getItem('desabilitar');
+    var result = localStorage.getItem('desabilitar');
     return this.builder.group({
 
-      id: {value: planilla?.id ? planilla.id :'0',  disabled: true},
-      exportador: {value:planilla?.exportador ? planilla.exportador :'',  disabled:result=='true'?true:false},
-      bodegaParcel: {value:planilla?.bodegaParcel ? planilla.bodegaParcel : '',  disabled:result=='true'?true:false},
+      id: { value: planilla?.id ? planilla.id : '0', disabled: true },
+      exportador: { value: planilla?.exportador ? planilla.exportador : '', disabled: result == 'true' ? true : false },
+      bodegaParcel: { value: planilla?.bodegaParcel ? planilla.bodegaParcel : '', disabled: result == 'true' ? true : false },
       tanqueDeAbordo: { value: planilla?.tanqueDeAbordo ? planilla.tanqueDeAbordo : '', disabled: true },
       destino: { value: planilla?.destino ? planilla.destino : null, disabled: true },
-      tk: { value:planilla?.tk ? planilla.tk : '',  disabled:result=='true'?false:false},
+      destinoTexto: '',
+      tk: { value: planilla?.tk ? planilla.tk : '', disabled: result == 'true' ? false : false },
       tn: { value: planilla?.tn ? planilla.tn : null, disabled: false },
       materialPuerto: { value: planilla?.materialPuerto ? planilla.materialPuerto : null, disabled: true },
-      fechaComienzoCarga: { value:planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga: '',disabled:result=='true'?true:false},
-      fechaFinalizacionCarga: { value:planilla?.fechaFinalizacionCarga ?  planilla.fechaFinalizacionCarga: '',disabled:result=='true'?true:false}
+      fechaComienzoCarga: { value: planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga : '', disabled: result == 'true' ? true : false },
+      fechaFinalizacionCarga: { value: planilla?.fechaFinalizacionCarga ? planilla.fechaFinalizacionCarga : '', disabled: result == 'true' ? true : false }
     })
   }
 
-  compareLineaItem(c1: any, c2: any){
-      return c1 && c2 ? c1.id === c2.id : c1 === c2;
+  compareLineaItem(c1: any, c2: any) {
+    return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
   get linea(): FormArray {
@@ -203,9 +201,11 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     for (const linea of planillaEmbarque.controls) {
       const bodega = this.bodegas.find(b => b.bodegaParcel == linea.get('bodegaParcel').value);
       const materialPuerto = this.productos.find(p => p.id == bodega?.materialPuerto.id);
+      const destinoTexto = bodega.destinosPaises.map(dp => dp.nombre).join(', ');
       linea.get('tanqueDeAbordo').setValue(bodega?.tanqueDeAbordo || '');
       linea.get('destino').setValue(bodega.destino || null);
       linea.get('materialPuerto').setValue(materialPuerto || null);
+      linea.get('destinoTexto').setValue(destinoTexto || null);
     }
   }
 
@@ -218,85 +218,86 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     */
     let bodega = this.bodegas.find(b => b.bodegaParcel == parcel);
 
-    l.controls?.tanqueDeAbordo.setValue(bodega != null ? bodega.tanqueDeAbordo: '' );
+    l.controls?.tanqueDeAbordo.setValue(bodega != null ? bodega.tanqueDeAbordo : '');
     l.controls?.destino.setValue(bodega != null ? bodega.destino : null);
-   // l.controls?.tn.setValue(bodega != null ? bodega.cantidad : 0);
+    // l.controls?.tn.setValue(bodega != null ? bodega.cantidad : 0);
     l.controls?.materialPuerto.setValue(bodega != null ? bodega.materialPuerto : null);
-
+    const destinoTexto = bodega.destinosPaises.map(dp => dp.nombre).join(', ');
+    l.controls?.destinoTexto.setValue(destinoTexto);
   }
 
-  obtenerDatosPlanillaDeEmbarque(){
+  obtenerDatosPlanillaDeEmbarque() {
     return this.lineasEmbarque.getRawValue()['linea'].filter(x => x.materialPuerto != null && x.exportador != null && x.destino != null);;
   }
 
-  getTanqueAbordo(){
+  getTanqueAbordo() {
     this.tanquesAbordo = new Array();
     this.bodegas.forEach(b => {
       if (this.tanquesAbordo.find(t => t == b.tanqueDeAbordo)) this.tanquesAbordo.push(b.tanqueDeAbordo);
     })
   }
-  cargarPlanilla(){
+  cargarPlanilla() {
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
       this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque = resp.moduloDeCargaPlanillaDeEmbarque;
       this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
       console.log('this.planillaDeEmbarque ini-->>>');
       console.log(this.planillaDeEmbarque);
-        if (this.planillaDeEmbarque){
-          this.lineasEmbarque = null;
-          this.lineasEmbarque = new FormGroup({
-            linea:  this.builder.array([])
-          });
+      if (this.planillaDeEmbarque) {
+        this.lineasEmbarque = null;
+        this.lineasEmbarque = new FormGroup({
+          linea: this.builder.array([])
+        });
 
-          if (this.planillaDeEmbarque.length > 0){
-            this.fillPlanillaDeEmbarque();
-          }else{
-            //Si no tengo ningún registro, agrego 1 por default.
-            this.getPlanillaDeEmbarque().push(this.initLinea());
-          }
+        if (this.planillaDeEmbarque.length > 0) {
+          this.fillPlanillaDeEmbarque();
+        } else {
+          //Si no tengo ningún registro, agrego 1 por default.
+          this.getPlanillaDeEmbarque().push(this.initLinea());
         }
+      }
       console.log(resp);
     });
   }
   guardar() {
-      const planillaEmbarque = this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto > '' && x.exportador > '' && x.destino != null);
-      console.log('this.planillaDeEmbarque fin-->>>');
-      console.log(planillaEmbarque);
-      this.guardando = true;
+    const planillaEmbarque = this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto > '' && x.exportador > '');
+    console.log('this.planillaDeEmbarque fin-->>>');
+    console.log(planillaEmbarque);
+    this.guardando = true;
 
-      // if(this.validarExportadorYPartida(planillaEmbarque) == false){
-      //   this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
-      //   this.guardando = false;
-      //   return;
-      // }
+    // if(this.validarExportadorYPartida(planillaEmbarque) == false){
+    //   this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+    //   this.guardando = false;
+    //   return;
+    // }
 
-      this.moduloCargaService.guardarPlanillaDeEmbarque( planillaEmbarque, this.idModuloDeCarga).subscribe(
-        res => {
-          this.guardando = false;
-          console.log(res);
-          const texto = "Se guardo la planilla de embarque correctamente";
-          this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
+    this.moduloCargaService.guardarPlanillaDeEmbarque(planillaEmbarque, this.idModuloDeCarga).subscribe(
+      res => {
+        this.guardando = false;
+        console.log(res);
+        const texto = "Se guardo la planilla de embarque correctamente";
+        this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
 
 
-          console.log('termino');
-        },
-        err => {
-          this.guardando = false;
-          console.log(err);
-        },
-        () => {
+        console.log('termino');
+      },
+      err => {
+        this.guardando = false;
+        console.log(err);
+      },
+      () => {
 
-          this.guardando = false;
-          this.cargarPlanilla();
-        });
+        this.guardando = false;
+        this.cargarPlanilla();
+      });
   }
 
-  validarExportadorYPartida(planilla: any[]): boolean{
-    for(let i = 0; i <= planilla.length - 1; i++){
-      if(i < planilla.length - 1)
-        for(let j = i + 1; j <= planilla.length -1; j++ ){
-          if(planilla[i].exportador != null && planilla[i].bodegaParcel != null && planilla[j].exportador != null && planilla[j].bodegaParcel != null){
-            if(planilla[i].exportador.nombre == planilla[j].exportador.nombre && planilla[i].bodegaParcel == planilla[j].bodegaParcel){
-              return false ;
+  validarExportadorYPartida(planilla: any[]): boolean {
+    for (let i = 0; i <= planilla.length - 1; i++) {
+      if (i < planilla.length - 1)
+        for (let j = i + 1; j <= planilla.length - 1; j++) {
+          if (planilla[i].exportador != null && planilla[i].bodegaParcel != null && planilla[j].exportador != null && planilla[j].bodegaParcel != null) {
+            if (planilla[i].exportador.nombre == planilla[j].exportador.nombre && planilla[i].bodegaParcel == planilla[j].bodegaParcel) {
+              return false;
             }
           }
         }

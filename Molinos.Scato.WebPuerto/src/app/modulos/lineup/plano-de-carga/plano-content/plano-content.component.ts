@@ -29,7 +29,9 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { CargaComercial } from '@ScatoModels/carga-comercial';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
-import { resolve } from '@angular/compiler-cli/src/ngtsc/file_system';
+import { PlanoDeCargaBodegaDestino } from '@ScatoModels/plano-de-carga-bodega-destino';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
 
 @Component({
   selector: 'app-plano-content',
@@ -72,7 +74,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   private suscripciones: Subscription[] = [];
-  public checkDestinoUnico: boolean = false;
+  public checkMismosDestinos: boolean = false;
+  private dropdownSettings;
 
   constructor(
     private lineupService: LineupService,
@@ -89,6 +92,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     private session: SessionService
   ) {
     this.user = this.session.getUser();
+    this.setConfigListaMultiple();
     const subs1 = this._guardarService.sendGuardar.subscribe(
       (([finalizar, moduloCarga]) => {
         this.guardarPlanoDeCargaContinuacion(finalizar, moduloCarga);
@@ -106,6 +110,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+
+
     this.getEmbarqueData();
   }
 
@@ -156,26 +163,40 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
   obtenerPlanoDeCarga() {
     this.planoDeCargaService.obtenerPlanoDeCarga(this.embarqueSelected.planoDeCargaId).subscribe(res => {
-      this.planoDeCargaForm.patchValue({
-        ...res, planoDeCargaBodegas: this.planoDeCargaForm.get('planoDeCargaBodegas').value
-      });
+      this.planoDeCargaForm.patchValue({ ...res, planoDeCargaBodegas: this.planoDeCargaForm.get('planoDeCargaBodegas').value });
       this._turnoService.setExportadores(res.cargasComerciales);
-      if (res.planoDeCargaBodegas.length > 0) {
-        this.checkDestinoUnico = res.planoDeCargaBodegas.map(b => b.destino.id).filter(d => d).every((d, i, arr) => d == arr[0]);
+      this.checkMismosDestinos = false;
+      const bodegas = res.planoDeCargaBodegas;
+      if (bodegas?.length) {
         for (let index = 0; index < 9; index++) {
-          var bodega = res.planoDeCargaBodegas.find(x => x.bodegaParcel == index + 1);
+          var bodega = bodegas.find(x => x.bodegaParcel == index + 1);
           if (bodega != null) {
+
+            if (!bodega.destinos) {
+              bodega.destinos = []
+            }
+
+            // Se convierte el formato anterior de destino al nuevo que puede contener multiples destinos
+            if (bodega.destino != null) {
+              const destinoPais = this.destinos?.find(x => x.id == bodega.destino.id);
+              const destinoBodega = new PlanoDeCargaBodegaDestino(0, destinoPais);
+              bodega.destinos.push(destinoBodega);
+              bodega.destino = null; // Ya que fue convertido, es necesario quitarlo de su lugar anterior
+            }
+            // Obtención de los destinos como Destino[] en vez de PlanoDeCargaBodegaDestino[] ya que así lo usa el form.
+            const destinosIds = bodega.destinos.map(d => d.destino.id);
+            const destinosPaises = this.destinos.filter(d => destinosIds.includes(d.id));
+            bodega.destinosPaises = destinosPaises;
+
             const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
             bodegaForm.setValue(bodega);
             this.onChangeCondicion(bodega.condicion, index);
+
             if (bodega.materialPuerto != null) {
               const material = this.materialesPuerto.find(x => x.id == bodega.materialPuerto.id);
               bodegaForm.get('materialPuerto').setValue(material);
             }
-            if (bodega.destino != null) {
-              const destino = this.destinos.find(x => x.id == bodega.destino.id);
-              bodegaForm.get('destino').setValue(destino);
-            }
+
             if (bodega.cantidad && bodega.cantidad % 1) { // necesario para mostrar los valores iniciales con "," en los decimales
               const cantidadStr = bodega.cantidad.toString().replace('.', ',');
               bodegaForm.get('cantidad').setValue(cantidadStr, { emitEvent: false });
@@ -183,12 +204,17 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
                 bodegaForm.get('cantidad').setValue(Number(cantidadStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
               }, 200);
             }
-            let bodegas = this.planoDeCargaForm.controls.planoDeCargaBodegas.value.filter(b => b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo);
-            this._turnoService.setBodega(bodegas);
+
+            const bodegasConValores = this.planoDeCargaForm.controls.planoDeCargaBodegas.value
+              .filter((b: PlanoDeCargaBodega) => b.cantidad > 0 || b.condicion || b.materialPuerto || b.tanqueDeAbordo);
+            this._turnoService.setBodega(bodegasConValores);
           }
         }
-      } else{
-        this.checkDestinoUnico = false;
+        // Reviso si todos tienen los mismos destinos. Con una sola bodega no sería necesario
+        if (bodegas.length > 1) {
+          const primerosDestinos = JSON.stringify(bodegas.find(b => b.destinos?.length)?.destinosPaises);
+          this.checkMismosDestinos = !bodegas.some(b => JSON.stringify(b.destinosPaises) != primerosDestinos)
+        }
       }
 
       this.planoDeCargaService.obtenerListadoEstibas().subscribe(res1 => {
@@ -306,18 +332,19 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
           listaMateriales: res.materialesPuertoCantidad.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color })),
         }
         this._procesoService.setDatosGrafico(this.datosGrafico);
-        this.getDestinos();
+        this.cargarDestinos();
+        this.getExportadores();
       }, () => {
         this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${this.embarqueSelected.id}`, 'Cerrar', '', null, null, Tipoalerta.Error);
       });
   }
 
-  getDestinos() {
-    this.planoDeCargaService.obtenerDestinos().subscribe(
-      res => {
-        this.destinos = res;
-        this.getExportadores();
-      });
+  cargarDestinos() {
+    this.planoDeCargaService.obtenerDestinos().subscribe(res => this.destinos = res);
+  }
+
+  public getDestinos() {
+    return this.destinos;
   }
 
   getExportadores() {
@@ -357,6 +384,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
   cargarPlanoDeCargaBodegas() {
     this.planoDeCargaBodegasFormArray.clear();
+
     for (let index = 0; index < 9; index++) {
       const cantidad = new FormControl(null, { updateOn: 'blur' });
       const suscCantidad = cantidad.valueChanges.subscribe((val: string) => {
@@ -376,12 +404,26 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         sfFull: [],
         destino: [],
         tanqueDeAbordo: [],
+        destinos: [],
+        destinosPaises: []
       });
+      // Convierte los destinos seleccionados en la clase de relación
+      const susConvertirDestino = bodegaGroup.get('destinosPaises').valueChanges.subscribe((val: Destino[]) => {
+        if (!val) {
+          return;
+        }
+        const destinos: PlanoDeCargaBodegaDestino[] = val.map(destino => ({ id: 0, destino }));
+        bodegaGroup.get('destinos').setValue(destinos, { emitEvent: false });
+        if (this.esLiquido) {
+          this.sendDataParcel();
+        }
+      });
+      this.suscripciones.push(susConvertirDestino);
       this.planoDeCargaBodegasFormArray.push(bodegaGroup);
     }
 
-    const suscDestino = this.planoDeCargaBodegasFormArray.valueChanges.subscribe(() => {
-      if (this.checkDestinoUnico) {
+    const suscDestino = this.planoDeCargaBodegasFormArray.valueChanges.pipe().subscribe(() => {
+      if (this.checkMismosDestinos) {
         this.setearMismoDestino();
       }
     });
@@ -392,18 +434,31 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
   private setearMismoDestino() {
     const bodegas = this.planoDeCargaBodegasFormArray.value as PlanoDeCargaBodega[];
-    const destino = bodegas.find(b => b.destino)?.destino;
-    if (!destino) {
+    const primerBodegaConDestinos = bodegas.find(b => b.destinosPaises?.length);
+    if (!primerBodegaConDestinos) {
       return;
     }
-    this.planoDeCargaBodegasFormArray.controls.filter(bf => {
-      const b = bf.value as PlanoDeCargaBodega;
-      return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo || b.destino);
-    }).forEach(bf => bf.get('destino').setValue(destino, { emitEvent: false }));
+
+    const bodegasNoVaciasForm = this.planoDeCargaBodegasFormArray.controls.filter(bodegaForm => {
+      const b = bodegaForm.value as PlanoDeCargaBodega;
+      return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo); // solo las bodegas con datos
+    });
+
+    // Descarto las que ya poseen el mismo destino, para evitar un ciclo infinito
+    const bodegasActualizarDestino = bodegasNoVaciasForm.filter(bodegaForm => {
+      const destinosViejos = bodegaForm.get('destinosPaises').value as Destino[];
+      const destinosNuevos = primerBodegaConDestinos.destinosPaises;
+      return JSON.stringify(destinosViejos) != JSON.stringify(destinosNuevos);
+    });
+
+    for (const bodegaForm of bodegasActualizarDestino) {
+      bodegaForm.get('destinosPaises').setValue(primerBodegaConDestinos.destinosPaises, { emitEvent: false });
+      bodegaForm.get('destinos').setValue(primerBodegaConDestinos.destinos, { emitEvent: false });
+    }
   }
 
   public onChangeCheckDestinos() {
-    if (this.checkDestinoUnico) {
+    if (this.checkMismosDestinos) {
       this.setearMismoDestino();
     }
   }
@@ -454,9 +509,11 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Tambien invocado desde plano-de-carga.component.ts
   public guardarPlanoDeCarga(finalizar: boolean) {
-    if (this.planoDeCargaForm.invalid)
+    if (this.planoDeCargaForm.invalid) {
       return;
+    }
 
     //SI EL PLANO DE CARGA YA ESTABA FINALIZADO, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     //CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
@@ -478,7 +535,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     var bodegasCargadas;
 
     //Bodegas cargadas sin destino
-    bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && (x.destino == null || x.destino == ''));
+    bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && (x.destinos == null || x.destinos.length == 0));
 
     if (bodegasCargadas.length > 0) {
       let texto = "No se ha ingresado el DESTINO para una o mas bodegas cargadas.";
@@ -515,44 +572,39 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
       this.planoDeCargaForm.value.usuario = this.user.username;
       this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
-      console.log(this.planoDeCargaForm.value)
 
       try {
-        this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value)
-          .subscribe((res: any) => {
-            if (!moduloCarga) {
-              if (finalizar)
-                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-                  .then(() => { this.enviarMail(); },
-                    error => {
-                      this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-                    }
-                  ).catch(() => window.location.reload())
-              else {
-                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Volver Line up', '', null, null, Tipoalerta.Success)
-                  .then((confirmed) => {
-                    if (confirmed) {
-                      this.router.navigate(['/lineup']);
-                    }
-                  }).catch(() => window.location.reload())
-              }
+        this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value).subscribe((res: any) => {
+          if (!moduloCarga) {
+            if (finalizar)
+              this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+                .then(() => { this.enviarMail(); },
+                  error => {
+                    this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+                  }
+                ).catch(() => window.location.reload())
+            else {
+              this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Volver Line up', '', null, null, Tipoalerta.Success)
+                .then((confirmed) => {
+                  if (confirmed) {
+                    this.router.navigate(['/lineup']);
+                  }
+                }).catch(() => window.location.reload())
             }
-            this._guardarService.planoCargaOk.next(true);
+          }
+          this._guardarService.planoCargaOk.next(true);
 
-            this.hideSpinner.emit(false);
-          },
-            (err) => {
-              console.log(err.error)
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + err.error, 'Cerrar', '', null, null, Tipoalerta.Error)
-                .then(() => {
-                  this._guardarService.planoCargaOk.next(false);
-                })
-                .catch(() => window.location.reload());
-
-            });
-      } catch (e) {
-        console.log(e);
+          this.hideSpinner.emit(false);
+        }, async (err) => {
+          console.error(err.error)
+          await this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + err.error, 'Cerrar', '', null, null, Tipoalerta.Error)
+          this._guardarService.planoCargaOk.next(false);
+          this.hideSpinner.emit(false);
+        });
+      } catch (err) {
+        console.error(err);
         this._guardarService.planoCargaOk.next(false);
+        this.hideSpinner.emit(false);
       }
     }
   }
@@ -1186,6 +1238,20 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     if (!this.hasPermisoPlanoDeCarga_CaladoSalida_Modificar()) {
       this.planoDeCargaForm.get('caladoSalida').disable();
     }
+  }
+
+  public setConfigListaMultiple() {
+    this.dropdownSettings = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'nombre',
+      enableSearchFilter: true,
+      showSelectedItemsAtTop: false
+    };
+  }
+
+  public getConfigListaMultiple() {
+    return this.dropdownSettings;
   }
 
 }

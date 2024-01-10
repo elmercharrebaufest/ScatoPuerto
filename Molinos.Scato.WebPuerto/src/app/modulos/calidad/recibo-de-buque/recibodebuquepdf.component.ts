@@ -47,8 +47,7 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   darFormato(cantidad: number, formatoEuropeo: boolean = false) {
-    let numeroEntero = cantidad.toString().split(".")[0];
-    let numeroDecimal = cantidad.toString().split(".")[1];
+    let [numeroEntero, numeroDecimal] = cantidad.toString().split(".");
     let numeroEnteroConPuntos: any = "";
 
     if (numeroEntero.length > 0) {
@@ -81,12 +80,18 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     doc.output('pdfobjectnewwindow');
   }
 
-  getCantidadEnLetras(cantidad: any): string {
+  getCantidadEnLetras(cantidad: number): string {
+    let texto = '';
     if (cantidad != null) {
+      let [enteros, decimales] = cantidad.toString().split('.');
       const toWords = new ToWords({ localeCode: 'en-US' });
-      return toWords.convert(cantidad);
+      texto = toWords.convert(+enteros);
+      if (decimales) {
+        decimales = (decimales + '000').substring(0, 3);
+        texto += ` AND ${decimales}/1000`;
+      }
     }
-    return '';
+    return texto.toUpperCase();
   }
 
   generarContenido(doc: jspdf, numPag: number, original: boolean) {
@@ -179,22 +184,10 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     doc.text("CANTIDAD EN LETRAS Y CLASE DE CARGA", 96, 111);
     doc.setFontSize(11);
 
-    let cantidadAMostrarEnLetras: string;
+    const cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
 
-    if (this.recibo.esEuropeo) {
-      let spliteado = this.getCantidadEnLetras(this.recibo.cantidad).split('POINT');
-      if (spliteado[1] != undefined) {
-        let cantidadLetras = spliteado[0] + 'COMMA' + spliteado[1];
-        cantidadAMostrarEnLetras = cantidadLetras.toUpperCase();
-      } else {
-        cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
-      }
-    } else {
-      cantidadAMostrarEnLetras = this.getCantidadEnLetras(this.recibo.cantidad);
-    }
-
-    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras.toUpperCase() + (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS') + " OF " + this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 130);
-    let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5) - 5) / 2);
+    let arrLineasTexto = doc.splitTextToSize(cantidadAMostrarEnLetras + (this.recibo.valorEnKG == true ? ' KILOS' : ' METRIC TONS') + " OF " + this.recibo.cantidadLetrasYClaseCarga.toUpperCase(), 130);
+    let offSet = arrLineasTexto.length == 1 ? 0 : -(((arrLineasTexto.length * 5)-5) / 2);
     arrLineasTexto.forEach(linea => {
 
       doc.text(linea, 129.5, 131.2 + offSet, null, 'center');
