@@ -343,10 +343,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 foreach (var planilla in comando.Dto.ModuloDeCargaPlanillaDeEmbarque)
                 {
                     var exportador = planilla.Exportador != null ? Repositorio.Obtener<Exportador>(planilla.Exportador.Id) : null;
-                    var destino = planilla.Destino != null ? Repositorio.Obtener<Destino>(planilla.Destino.Id) : null;
+                    //var destino = planilla.Destino != null ? Repositorio.Obtener<Destino>(planilla.Destino.Id) : null;
                     var materialPuerto = planilla.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id) : null;
 
-                    if (exportador != null && destino != null && materialPuerto != null)
+                    if (exportador != null && materialPuerto != null)
                     {
                         moduloDeCarga.ModuloDeCargaPlanillaDeEmbarque.Add(new ModuloDeCargaPlanillaDeEmbarque
                         {
@@ -354,7 +354,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Exportador = exportador,
                             BodegaParcel = planilla.BodegaParcel,
                             TanqueDeAbordo = planilla.TanqueDeAbordo,
-                            Destino = destino,
+                            //Destino = destino,
                             Tk = planilla.Tk,
                             Tn = planilla.Tn,
                             Cantidad = planilla.Cantidad,
@@ -564,7 +564,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     foreach (var planilla in planillaDeEmbarque)
                     {
                         if (planilla.Id <= 0) continue;
-                        if (planilla.Id == planilla_DB.Id && planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                        if (planilla.Id == planilla_DB.Id && planilla.Exportador != null && planilla.MaterialPuerto != null)
                         {
                             exist = true;
                         }
@@ -579,7 +579,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     foreach (var planilla in planillaDeEmbarque)
                     {
-                        if (planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                        if (planilla.Exportador != null && planilla.MaterialPuerto != null)
                         {
                             ModuloDeCargaPlanillaDeEmbarque planillaDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.Id == planilla.Id);
                             if (planillaDB != null)
@@ -587,7 +587,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 planillaDB.ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(moduloDeCarga_Id);
                                 planillaDB.Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id);
                                 planillaDB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id);
-                                planillaDB.Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id);
+                                //planillaDB.Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id);
                                 planillaDB.FechaComienzoCarga = planilla.FechaComienzoCarga;
                                 planillaDB.FechaFinalizacionCarga = planilla.FechaFinalizacionCarga;
                                 planillaDB.TanqueDeAbordo = planilla.TanqueDeAbordo;
@@ -603,7 +603,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(moduloDeCarga_Id),
                                     Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id),
                                     MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id),
-                                    Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id),
+                                    //Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id),
                                     FechaComienzoCarga = planilla.FechaComienzoCarga,
                                     FechaFinalizacionCarga = planilla.FechaFinalizacionCarga,
                                     TanqueDeAbordo = planilla.TanqueDeAbordo,

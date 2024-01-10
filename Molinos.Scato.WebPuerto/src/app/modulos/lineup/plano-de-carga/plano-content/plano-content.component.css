@@ -1,6 +1,7 @@
 table {
   table-layout: fixed;
 }
+
 table td {
   position: relative;
 }
@@ -64,4 +65,8 @@ td .disabled-overlay {
   inset: 0;
   z-index: 1;
   background: rgba(235, 235, 228, 0.3);
+}
+
+td.multiselect-container {
+  padding: 0;
 }

@@ -35,6 +35,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { Subject, Subscription } from 'rxjs';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 
 
 @Component({
@@ -62,8 +63,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   producto: any[];
   tanques: any[];
   hoy: any;
-  toneladasLineas:any[]=[];
-  bodegas: any[];
+  toneladasLineas: any[] = [];
+  bodegas: PlanoDeCargaBodega[];
   productos: any[];
   destinos: any[];
   turnos = ['00-06', '06-12', '12-18', '18-24'];
@@ -83,7 +84,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   destinoPuerto: Destino[];
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
-  totalABordo:number=0;
+  totalABordo: number = 0;
 
   private suscripciones: Subscription[] = [];
 
@@ -126,7 +127,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     }
   }
 
-  private setCargarFormularioPlanilla(){
+  private setCargarFormularioPlanilla() {
     this.newForm()
     setTimeout(() => {
       this.fillPlanilla();
@@ -134,25 +135,25 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.initFormularioObs();
   }
 
-  private setCargarValoresPlanilla(){
+  private setCargarValoresPlanilla() {
     this.user = this.session.getUser();
-    if(!this.esSoloLectura){
-        this.embarqueId = this.procesoService.getEmbarqueId();
-        const sus = this._turnosService.sendBodega.subscribe(res => {
-        this.bodegas = res;
+    if (!this.esSoloLectura) {
+      this.embarqueId = this.procesoService.getEmbarqueId();
+      const sus = this._turnosService.sendBodega.subscribe((bodegas: PlanoDeCargaBodega[]) => {
+        this.bodegas = bodegas;
         if (this.formExportarExcel) this.addParcelChecks();
         this.getProductos();
         this.getDestinos();
-        });
-        this.suscripciones.push(sus);
-        this.setCargarFormularioPlanilla();
-    }else{
-        const sus = this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data=>{
-          if (data!= null && data!= undefined)
-            this.embarqueId = data.embarque_Id;
-        });
-        this.suscripciones.push(sus);
-        this.setCargarFormularioPlanilla();
+      });
+      this.suscripciones.push(sus);
+      this.setCargarFormularioPlanilla();
+    } else {
+      const sus = this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
+        if (data != null && data != undefined)
+          this.embarqueId = data.embarque_Id;
+      });
+      this.suscripciones.push(sus);
+      this.setCargarFormularioPlanilla();
     }
   }
 
@@ -542,10 +543,10 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   }
 
   getObservacionTurnos(d, t) {
-    const observacionesCalidad = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad  as FormArray;
+    const observacionesCalidad = this.getTurnos(d)['controls'][t]['controls'].moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad as FormArray;
     let listaObservacionesCalidad = observacionesCalidad.value;
 
-    for(let observacion of listaObservacionesCalidad){
+    for (let observacion of listaObservacionesCalidad) {
       observacion.fechaMiliseconds = new Date(observacion.fechaHora).getTime();
     }
 
@@ -592,18 +593,18 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     let fechaHoraIncorrecta = this.comparaFechaHoraObs(fecha, hora);
 
     // this.procesoCalidadService.guardarObservacionesDeCalidad(this.turnoPuerto.id, this.obsCalidadForm)
-          //obtengo el turno en el que tengo que guardar
+    //obtengo el turno en el que tengo que guardar
     let horaDate = new Date(fechaHora)
     let idTurnoPuerto = Math.floor(horaDate.getHours() / 6) + 1;
     //me traigo todos los turnos de la fecha seleccionada
     const planillaDeTurnoSel = this.planillaDeTurnos.filter(x => x.fecha.includes(fecha)).filter(x => x.turnoPuerto.id == idTurnoPuerto);
-    if (planillaDeTurnoSel.length == 0){
+    if (planillaDeTurnoSel.length == 0) {
       this.confirmationDialogService.confirm('¡Atención!', 'No se ha encontrado un turno para la fecha y hora seleccionada.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
-    if (planillaDeTurnoSel.length > 0){
+    if (planillaDeTurnoSel.length > 0) {
       const esTurnoCerrado = planillaDeTurnoSel[0].guardadoPorRecibidor;
-      if (esTurnoCerrado){
+      if (esTurnoCerrado) {
         this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una observacion para un turno cerrado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
         return;
       }
@@ -727,9 +728,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurnoCalc(turnos);
     }
-    if(this.diasTurno.length == 1) {
+    if (this.diasTurno.length == 1) {
       contador += 1;
-    }else{
+    } else {
       contador++;
     }
     return contador;
@@ -803,7 +804,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       contador += this.getCantDia(dia);
       contador = parseInt(contador.toString());
     }
-    this.totalABordo =contador;
+    this.totalABordo = contador;
     return contador;
   }
 
@@ -1012,12 +1013,18 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   }
 
   getDestinos() {
-    this.destinos = new Array();
-    this.bodegas.forEach(b => {
-      if (!this.destinos.find(d => d.nombre == b.destino)) {
-        this.destinos.push(b.destino);
+    this.destinos = [];
+    const bodegas = this.bodegas || [];
+    for (const bodega of bodegas) {
+      if (bodega.destino && !this.destinos.some(destino => destino.nombre == bodega.destino.nombre)) {
+        this.destinos.push(bodega.destino);
       }
-    })
+      for (const destinoBodega of bodega.destinos) {
+        if (!this.destinos.some(destino => destino.nombre == destinoBodega.destino.nombre)) {
+          this.destinos.push(destinoBodega.destino);
+        }
+      }
+    }
   }
 
   getCantidadLinea(linea: any) {
@@ -1052,18 +1059,18 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     }
   }
 
-  async onExportarExcelLiquido(esEnviarPlanilla: boolean = false){
-    const planillaTurnosCerrado = this.planillaDeTurnos.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
-    if (planillaTurnosCerrado.length == 0){
+  async onExportarExcelLiquido(esEnviarPlanilla: boolean = false) {
+    const planillaTurnosCerrado = this.planillaDeTurnos.filter(x => x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
+    if (planillaTurnosCerrado.length == 0) {
       const mensaje = esEnviarPlanilla ? "No se encontraron turnos cerrados para enviar la planilla." : "No se encontraron turnos cerrados para exportar la planilla.";
       this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
       return false;
     }
     this.exportaPlanilla = true;
-    this.toneladasLineas.push({linea:'nueva', total:this.getToneladasLinea('nueva')});
-    this.toneladasLineas.push({linea:'vieja', total:this.getToneladasLinea('vieja')});
-    this.toneladasLineas.push({linea:'vicentin', total:this.getToneladasLinea('vicentin')});
-    this.toneladasLineas.push({linea:'biodiesel', total:this.getToneladasLinea('biodiesel')});
+    this.toneladasLineas.push({ linea: 'nueva', total: this.getToneladasLinea('nueva') });
+    this.toneladasLineas.push({ linea: 'vieja', total: this.getToneladasLinea('vieja') });
+    this.toneladasLineas.push({ linea: 'vicentin', total: this.getToneladasLinea('vicentin') });
+    this.toneladasLineas.push({ linea: 'biodiesel', total: this.getToneladasLinea('biodiesel') });
 
     this.exportaPlanilla = true;
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas);
@@ -1189,33 +1196,33 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       console.error(error);
     }
   };
-  guardarTurnoDetallado(enviado, planillaTurno){
+  guardarTurnoDetallado(enviado, planillaTurno) {
     this.confirmationDialogService.confirm(enviado ? "Cerrar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "cerrar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
-    .then((confirmed) => {
-      if (confirmed) {
-        planillaTurno.guardadoPorRecibidor = true;
-        this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
+      .then((confirmed) => {
+        if (confirmed) {
+          planillaTurno.guardadoPorRecibidor = true;
+          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
 
-          this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+            this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
 
-          this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-            if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-              this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
-              const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-              this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
-              this.fillPlanilla();
-            }
-          });
-        }, error => {
-          console.log(error);
-          this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "cerrar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
-        })
-      }
-    })
-    .catch((e) => {
-      this.hideSpinner.emit(false)
-      return;
-    });
+            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+                this.fillPlanilla();
+              }
+            });
+          }, error => {
+            console.log(error);
+            this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "cerrar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
+          })
+        }
+      })
+      .catch((e) => {
+        this.hideSpinner.emit(false)
+        return;
+      });
   }
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);

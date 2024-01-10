@@ -68,7 +68,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   public setConfigListaMultiple() {
     this.configListaMultiple = {
       singleSelection: false,
-      idField: 'id',
+      primaryKey: 'id',
       textField: 'descripcionCorta',
       selectAllText: 'Marcar Todos',
       unSelectAllText: 'Desmarcar Todos',
