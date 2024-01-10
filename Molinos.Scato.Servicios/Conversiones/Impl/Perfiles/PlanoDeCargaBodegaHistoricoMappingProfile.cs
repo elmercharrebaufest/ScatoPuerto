@@ -12,7 +12,11 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         }
         protected override void Configure()
         {
-            Mapper.CreateMap<PlanoDeCargaBodegaHistorico, PlanoDeCargaBodegaHistoricoDto>();
+            Mapper.CreateMap<PlanoDeCargaBodegaDestinoHistorico, PlanoDeCargaBodegaDestinoHistoricoDto>();
+            Mapper.CreateMap<PlanoDeCargaBodegaDestinoHistoricoDto, PlanoDeCargaBodegaDestinoHistorico>();
+            Mapper.CreateMap<PlanoDeCargaBodegaHistorico, PlanoDeCargaBodegaHistoricoDto>()
+                .ForMember(x => x.PlanoDeCargaBodegaDestinoHistorico,
+                x => x.MapFrom(y => y.PlanoDeCargaBodegaDestinoHistorico));
             Mapper.CreateMap<PlanoDeCargaBodegaHistoricoDto, PlanoDeCargaBodegaHistorico>();
         }
     }

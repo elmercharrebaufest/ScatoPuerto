@@ -1,4 +1,7 @@
-﻿namespace Molinos.Scato.Dominio.Dto
+﻿using Molinos.Scato.Dominio.Entidades;
+using System.Collections.Generic;
+
+namespace Molinos.Scato.Dominio.Dto
 {
     public class PlanoDeCargaBodegaHistoricoDto
     {
@@ -10,5 +13,6 @@
         public string SfFull { get; set; }
         public DestinoDto Destino { get; set; }
         public string TanqueDeAbordo { get; set; }
+        public IList<PlanoDeCargaBodegaDestinoHistoricoDto> PlanoDeCargaBodegaDestinoHistorico { get; set; }
     }
 }
