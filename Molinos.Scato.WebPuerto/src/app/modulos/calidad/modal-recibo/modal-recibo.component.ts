@@ -109,23 +109,23 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
 
   keyUpCantidadEnLetras(cantidad: any, event: any) {
     if (cantidad != null || event.key == 'Backspace') {
-      const toWords = new ToWords({ localeCode: 'en-US' });
-      // this.reciboDeBuqueForm.controls.cantidadLetras.setValue(converter.toWords(cantidad).toUpperCase());
-      if (cantidad != null) {
-        let convertido = toWords.convert(cantidad)
-        this.reciboDeBuqueForm.controls.cantidadLetras.setValue(convertido.toString().toUpperCase());
-      } else {
-        this.reciboDeBuqueForm.controls.cantidadLetras.setValue('');
-      }
+      const texto = this.getCantidadEnLetras(cantidad);
+      this.reciboDeBuqueForm.controls.cantidadLetras.setValue(texto);
     }
   }
 
-  getCantidadEnLetras(cantidad: any): string {
+  getCantidadEnLetras(cantidad: number): string {
+    let texto = '';
     if (cantidad != null) {
+      let [enteros, decimales] = cantidad.toString().split('.');
       const toWords = new ToWords({ localeCode: 'en-US' });
-      return toWords.convert(cantidad).toUpperCase();
+      texto = toWords.convert(+enteros);
+      if (decimales) {
+        decimales = (decimales + '000').substring(0, 3);
+        texto += ` AND ${decimales}/1000`;
+      }
     }
-    return '';
+    return texto.toUpperCase();
   }
 
   public decimalOnly(event): boolean {
@@ -133,7 +133,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
     if ((charCode > 47 && charCode < 58) || charCode == 46 || charCode == 8){
       return true;
     }
-      
+
     return false;
   }
 
