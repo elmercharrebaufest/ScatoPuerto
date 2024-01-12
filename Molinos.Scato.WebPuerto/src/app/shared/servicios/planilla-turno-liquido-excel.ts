@@ -501,12 +501,7 @@ export class PlanillaTurnoLiquidoExcelService {
     async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
 
       planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-        turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((corte: CorteTurno, index ) => {
-          if(corte.motivosDeCorte==null)
-            turno.moduloDeCargaPlanillaDeTurnosCortes.pop();
-
-        });
-
+        turno.moduloDeCargaPlanillaDeTurnosCortes = [];
       });
 
 

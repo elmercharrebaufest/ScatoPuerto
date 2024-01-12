@@ -51,9 +51,11 @@
                             (click)="cerrarCoem(coem.id, coem.identificadorCOEM)">
                             <i class="fa fa-check-circle-o fs-icon text-success" aria-hidden="true" title="CERRAR"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="mostrarSolicitarNoABordo(coem.afipCoemEstado.codigo)"
-                            (click)="solicitarNoABordo(coem)">
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarNoABordo(coem.afipCoemEstado.codigo)" (click)="solicitarNoABordo(coem)">
                             <i class="fa fa-exclamation-circle fs-icon text-info" aria-hidden="true" title="SOLICITAR NO A BORDO"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarAnulacion(coem.afipCoemEstado.codigo)" (click)="solicitarAnulacion(coem)">
+                            <i class="fa fa-trash-restore fs-icon text-danger" aria-hidden="true" title="SOLICITAR ANULACIÓN"></i>
                         </button>
                     </td>
                 </tr>
@@ -121,10 +123,11 @@
 </ng-template>
 
 <ng-template #cerrarCoems let-modal>
-    <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas" [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
+    <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas"
+        [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
 </ng-template>
 
-<ng-template #modalSolicitudNoABordo let-modal>   
+<ng-template #modalSolicitudNoABordo let-modal>
     <div class="modal-content modal-solicitud">
         <div class="modal-header">
             <h5 class="modal-title">Solicitar No A Bordo</h5>
@@ -137,11 +140,11 @@
                         <select formControlName="codigoMotivo" class="form-control custom-select" maxlength="200">
                             <option selected="true">Seleccione un motivo...</option>
                             <option *ngFor="let motivo of listaMotivos" [ngValue]="motivo.codigo">
-                              {{motivo.descripcion}}
+                                {{motivo.descripcion}}
                             </option>
-                          </select>
+                        </select>
                     </div>
-                </div>                
+                </div>
             </form>
         </div>
         <div class="modal-footer justify-content-center">

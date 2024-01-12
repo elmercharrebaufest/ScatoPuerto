@@ -26,7 +26,7 @@ export class CoemAfipComponent implements OnInit {
   coemIdentificador: string;
   coemImo: string;
   listaEstados: EstadoCOEM[] = [];
-  solicitarNoABordoForm : FormGroup;
+  solicitarNoABordoForm: FormGroup;
 
   public caratulaId: number;
   public coemsSeleccionadas: COEM[] = [];
@@ -95,38 +95,38 @@ export class CoemAfipComponent implements OnInit {
   }
 
   public async eliminarCoem(id: number, identificadorCOEM: string) {
-    const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de eliminar la COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+    const confirmacion = await this.confirmationDialogService.confirmar('Advertencia', `¿Está seguro de eliminar la COEM con id: ${identificadorCOEM}?`);
     if (!confirmacion) {
       return;
     }
 
     this.load = true;
     this.coemAfipService.anularCoem(id).subscribe(() => {
-      this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La COEM con id: ${identificadorCOEM} fue eliminada con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
+      this.confirmationDialogService.exito(`Se ha eliminado la COEM con id: ${identificadorCOEM}`);
       this.cargarDatos();
     }, (err) => {
       console.error(err);
       this.load = false;
       const msj = err.error || 'No se ha podido anular la COEM, comunicarse con soporte técnico';
-      this.confirmationDialogService.confirm(`¡Error!`, msj, 'Cerrar', '', null, null, Tipoalerta.Error);
+      this.confirmationDialogService.error(msj);
     })
   }
 
   public async cerrarCoem(id: number, identificadorCOEM: string) {
-    const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de <b>CERRAR</b> la COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
+    const confirmacion = await this.confirmationDialogService.confirmar('Advertencia', `¿Está seguro de <b>CERRAR</b> la COEM con id: ${identificadorCOEM}?`);
     if (!confirmacion) {
       return;
     }
 
     this.load = true;
     this.coemAfipService.cerrarCoem(id).subscribe(() => {
-      this.confirmationDialogService.confirm('¡Felicitaciones', `¡La COEM con id ${identificadorCOEM} se ha podido cerrar con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      this.confirmationDialogService.exito(`Se ha cerrado la COEM con id ${identificadorCOEM}`);
       this.cargarDatos();
     }, (err) => {
       console.error(err);
       this.load = false;
       const msj = err.error || `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`;
-      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
+      this.confirmationDialogService.error(msj);
     });
   }
 
@@ -147,26 +147,26 @@ export class CoemAfipComponent implements OnInit {
       }, (error) => {
         console.error(error);
         this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
-      }) 
-    }else{
+      })
+    } else {
       this.cargarDatos();
-    }          
+    }
   }
 
-  openModal(titulo: string, texto: string, tipoAlerta: Tipoalerta){
+  openModal(titulo: string, texto: string, tipoAlerta: Tipoalerta) {
     return this.confirmationDialogService.confirm(titulo, texto, 'Cerrar', '', null, null, tipoAlerta);
   }
 
-  async validarEstadoCoem(selectElement, codigoEstado) : Promise<boolean> {
+  async validarEstadoCoem(selectElement, codigoEstado): Promise<boolean> {
 
     const codigoSeleccionado = this.listaEstados.find(e => e.id === selectElement.selectedIndex).codigo;
-    let valido : boolean = true;
+    let valido: boolean = true;
 
-    const showModalAndCheckConfirmation = async (texto : string) : Promise<void> => {
-       const confirmation = await this.openModal("¡Alerta!", texto, Tipoalerta.Warning);
-       if (confirmation) {
+    const showModalAndCheckConfirmation = async (texto: string): Promise<void> => {
+      const confirmation = await this.openModal("¡Alerta!", texto, Tipoalerta.Warning);
+      if (confirmation) {
         valido = false;
-       } 
+      }
     };
 
     switch (codigoSeleccionado) {
@@ -175,45 +175,45 @@ export class CoemAfipComponent implements OnInit {
           await showModalAndCheckConfirmation("La COEM no puede volver a estar en el estado EN CURSO");
         }
         break;
-  
+
       case "ANU":
         if (codigoEstado !== "CUR" && codigoEstado !== "REG" && codigoEstado !== "PRE") {
           await showModalAndCheckConfirmation("Para ANULAR la COEM, debe estar en CURSO, REGISTRADA o PRESENTADA");
         }
         break;
-  
+
       case "REG":
         if (codigoEstado !== "CUR") {
           await showModalAndCheckConfirmation("Para cambiar la COEM a REGISTRADA, debe estar en estado EN CURSO");
         }
         break;
-  
+
       case "PRE":
         if (codigoEstado !== "REG") {
           await showModalAndCheckConfirmation("Para cambiar la COEM a PRESENTADA, debe estar en estado REGISTRADA");
         }
         break;
-  
+
       case "REC":
         if (codigoEstado !== "PRE") {
           await showModalAndCheckConfirmation("Para cambiar la COEM a RECHAZADA, debe estar en estado PRESENTADA");
         }
         break;
-  
-      case "AUT":
+
+      case "AUTO":
         if (codigoEstado !== "PRE") {
           await showModalAndCheckConfirmation("Para cambiar la COEM a AUTORIZADA, debe estar en estado PRESENTADA");
         }
         break;
-  
+
       case "CAN":
         if (codigoEstado !== "AUTO") {
           await showModalAndCheckConfirmation("Para cambiar la COEM a CANCELADA, debe estar en estado AUTORIZADA");
         }
         break;
-  
+
       case "CODE":
-        if (codigoEstado !== "AUT") {
+        if (codigoEstado !== "AUTO") {
           await showModalAndCheckConfirmation("Para transformar la COEM en una CODE, debe estar en estado AUTORIZADA");
         }
         break;
@@ -255,36 +255,47 @@ export class CoemAfipComponent implements OnInit {
     });
   }
 
+  public async solicitarAnulacion(coem: COEM) {
+    const confirmacion = await this.confirmationDialogService.confirmar('Advertencia', `¡Está seguro de solicitar la anulación de la COEM ${coem.identificadorCOEM}?`);
+    if (!confirmacion) {
+      return;
+    }
+    this.load = true;
+    this.coemAfipService.solicitarAnulacionCoem(coem.id).subscribe(() => {
+      this.confirmationDialogService.exito('Se ha soliitado correctamente la anulación de la COEM');
+    }, (err) => {
+      console.error(err);
+      const msj = err.error || 'Ha ocurrido un error al solicitar no a bordo';
+      this.confirmationDialogService.error(msj);
+    }, () => this.load = false);
+  }
+
   public async solicitarCierreCarga(modalCierreCarga: any) {
     this.coemsSeleccionadas = this.listadoCoems.filter(coem => coem.afipCoemEstado.codigo != 'ANU');
     const estadosValidos = ['AUTO', 'ANU'];
     const coemsEstadoinvalido = this.coemsSeleccionadas
       .filter(coem => !estadosValidos.includes(coem.afipCoemEstado.codigo))
-            .map(coem => coem.identificadorCOEM).join('\n');
-        if (coemsEstadoinvalido) {
-            const msj = 'Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido;
-            this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
-            return;
-        }
-      this.modalService.open(modalCierreCarga, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
+      .map(coem => coem.identificadorCOEM).join('\n');
+    if (coemsEstadoinvalido) {
+      this.confirmationDialogService.error('Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido);
+      return;
+    }
+    this.modalService.open(modalCierreCarga, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
-  public abrirModal(modal: any, coem : COEM) {
+  public abrirModal(modal: any, coem: COEM) {
     this.coemId = coem.id;
     this.coemIdentificador = coem.identificadorCOEM;
-    
     this.modal = this.modalService.open(modal, { size: 'md', centered: true, backdrop: 'static', keyboard: false });
   }
 
   public cerrarModal() {
     this.modal.close();
     this.load = false;
-  }    
+  }
 
   private initForms() {
-       this.solicitarNoABordoForm = this.formBuilder.group({      
-        codigoMotivo: ['', Validators.required]      
-    });    
+    this.solicitarNoABordoForm = this.formBuilder.group({ codigoMotivo: ['', Validators.required] });
   }
 
   //#region Funciones de paginado
@@ -352,17 +363,15 @@ export class CoemAfipComponent implements OnInit {
   }
   //#endregion
 
-  mostrarRectificarAnular(codigoEstado : string) : boolean {
-    if (codigoEstado == "CUR" || codigoEstado == "REG") {
-      return true;
-    }
-    return false;
+  mostrarRectificarAnular(codigoEstado: string): boolean {
+    return ['CUR', 'REG'].includes(codigoEstado);
   }
 
-  mostrarSolicitarNoABordo(codigoEstado: string) : boolean {
-    if (codigoEstado == "PRE" || codigoEstado == "AUT") {
-      return true;
-    }
-    return false;
+  mostrarSolicitarNoABordo(codigoEstado: string): boolean {
+    return ['PRE', 'AUTO'].includes(codigoEstado);
+  }
+
+  mostrarSolicitarAnulacion(codigoEstado:string):boolean{
+    return ['REG','PRE'].includes(codigoEstado);
   }
 }

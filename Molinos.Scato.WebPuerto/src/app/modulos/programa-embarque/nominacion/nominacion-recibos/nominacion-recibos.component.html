@@ -34,8 +34,8 @@
                     <div class="form-group col-md-3">
                         <div><b>Cargador</b></div>
                         <div>
-                            <select formControlName='exportador' 
-                                    class="custom-select" 
+                            <select formControlName='exportador'
+                                    class="custom-select"
                                     [compareWith]='compareFields' >
                                 <option value=""></option>
                                 <option *ngFor='let exportador of exportadores' [ngValue]='exportador'>
@@ -101,15 +101,13 @@
                             </div>
                             <div class="form-group col-md-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio"  id="reciboDiaSi"
-                                        formControlName="recibosPorDia" [value]="true" (change)="onActivarCantidad(recibo,true)">
+                                    <input class="form-check-input" type="radio"  id="reciboDiaSi" formControlName="recibosPorDia" [value]="true">
                                     <label class="form-check-label" for="reciboDiaSi">Si</label>
                                 </div>
                             </div>
                             <div class="form-group col-md-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio"  id="reciboDiaNo"
-                                        formControlName="recibosPorDia" [value]="false" (change)="onActivarCantidad(recibo,false)">
+                                    <input class="form-check-input" type="radio"  id="reciboDiaNo" formControlName="recibosPorDia" [value]="false">
                                     <label class="form-check-label" for="reciboDiaNo">No</label>
                                 </div>
                             </div>
@@ -123,20 +121,20 @@
                             </div>
                             <div class="form-group col-md-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" 
+                                    <input class="form-check-input" type="radio"
                                         id="mostrarDestinosSi" formControlName="mostrarDestinos" [value]="true" (change)="onActivarDischargePort(recibo, true)">
                                     <label class="form-check-label" for="mostrarDestinosSi">Si</label>
                                 </div>
                             </div>
                             <div class="form-group col-md-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" 
+                                    <input class="form-check-input" type="radio"
                                         id="mostrarDestinosNo" formControlName="mostrarDestinos" [value]="false" (change)="onActivarDischargePort(recibo, false)">
                                     <label class="form-check-label" for="mostrarDestinosNo">No</label>
                                 </div>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <!-- Mostrar bodegas -->
                     <div class="form-group col-md-3">
                         <div class="row form-row">
@@ -145,14 +143,14 @@
                             </div>
                             <div class="form-group col-md-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" 
+                                    <input class="form-check-input" type="radio"
                                         id="mostrarBodegasSi" formControlName="mostrarBodegas" [value]="true">
                                     <label class="form-check-label" for="mostrarBodegasSi">Si</label>
                                 </div>
                             </div>
                             <div class="form-group col-md-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" 
+                                    <input class="form-check-input" type="radio"
                                         id="mostrarBodegasNo" formControlName="mostrarBodegas" [value]="false">
                                     <label class="form-check-label" for="mostrarBodegasNo">No</label>
                                 </div>
