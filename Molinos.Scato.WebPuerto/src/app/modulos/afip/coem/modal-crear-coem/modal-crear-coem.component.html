@@ -15,8 +15,9 @@
         <div class="form-group col-md-4">
           <select class="custom-select" formControlName="identificadorCaratula" required>
             <option selected value="" disabled>Selecciona</option>
-            <option *ngFor="let p of caratulas" [value]="p.identificadorCaratula"
-              [selected]="p.identificadorCaratula==idCaratula">{{p.identificadorCaratula}}</option>
+            <option *ngFor="let p of caratulas" [value]="p.identificadorCaratula" [selected]="p.identificadorCaratula==idCaratula">
+              {{p.identificadorCaratula}}
+            </option>
           </select>
         </div>
       </div>
@@ -37,9 +38,7 @@
                 <input type="number" class="form-control" formControlName="peso" required>
               </td>
               <td class="lista-coem-row-item">
-                <input type="text" class="form-control" formControlName="identificadorDeclaracion" maxlength="17"
-                  required [(ngModel)]="identificadorDeclaracion" mask="00000SSAA000000S" [showMaskTyped]="true"
-                  [dropSpecialCharacters]="false" required>
+                <input type="text" class="form-control" formControlName="identificadorDeclaracion" maxlength="17" required mask="00000SSAA000000S" [showMaskTyped]="true" [dropSpecialCharacters]="false" required>
               </td>
               <td class="lista-coem-row-item">
                 <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="eliminarNuevoCoem(i)" alt="Eliminar">
