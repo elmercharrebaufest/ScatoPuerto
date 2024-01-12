@@ -335,14 +335,9 @@ export class PlanillaTurnoSolidoExcelService {
     async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean=false, totalABordo: number=0) {
       const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
 
-      planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-        turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((corte: CorteTurno, index ) => {
-          if(corte.motivosDeCorte==null)
-            turno.moduloDeCargaPlanillaDeTurnosCortes.pop();
-
+        planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
+          turno.moduloDeCargaPlanillaDeTurnosCortes = [];
         });
-
-      });
 
         const fname = this.getNombreArchivo();
         const imgMolinos = await this.getImgMolinos();
