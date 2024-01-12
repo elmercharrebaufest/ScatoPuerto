@@ -35,4 +35,16 @@ export class ConfirmationDialogService {
     modalRef.componentInstance.inputTitle = inputTitle;
     return modalRef.result;
   }
+
+  public confirmar(titulo: string, mensaje: string, tipo: Tipoalerta = Tipoalerta.Warning) {
+    return this.confirm(titulo, mensaje, 'Si', 'Cerrar', null, null, tipo);
+  }
+
+  public exito(mensaje: string) {
+    return this.confirm('Resultado exitoso', mensaje, 'Cerrar', '', null, null, Tipoalerta.Success);
+  }
+
+  public error(mensaje: string, titulo: string = '¡Error!') {
+    return this.confirm(titulo, mensaje, 'Cerrar', '', null, null, Tipoalerta.Error);
+  }
 }
