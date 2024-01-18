@@ -27,6 +27,7 @@ export class CoemAfipComponent implements OnInit {
   coemImo: string;
   listaEstados: EstadoCOEM[] = [];
   solicitarNoABordoForm: FormGroup;
+  public formFiltros: FormGroup;
 
   public caratulaId: number;
   public coemsSeleccionadas: COEM[] = [];
@@ -67,9 +68,12 @@ export class CoemAfipComponent implements OnInit {
     );
   }
 
-  public cargarDatos() {
+  public cargarDatos(params: any = {}) {
     this.load = true;
-    const obsCoems = this.caratulaId ? this.coemAfipService.listarCoemsDeCaratula(this.caratulaId) : this.coemAfipService.listarCoems();
+    params.pagina = this.currentPage;
+    params.itemsPorPagina = this.itemsPerPage;
+    params.idCaratula = this.caratulaId || null;
+    const obsCoems = this.coemAfipService.listarCoems(params);
     const obsEstados: Observable<EstadoCOEM[]> = this.listaEstados.length ? of(null) : this.coemAfipService.estadosCoem(); // no es necesario cargar los estados si ya estan
     forkJoin([obsEstados, obsCoems]).subscribe(([estados, coems]) => {
       if (estados) {
@@ -296,6 +300,21 @@ export class CoemAfipComponent implements OnInit {
 
   private initForms() {
     this.solicitarNoABordoForm = this.formBuilder.group({ codigoMotivo: ['', Validators.required] });
+    this.formFiltros = this.formBuilder.group({
+      identificador: '',
+      declaracion: '',
+      estado: ''
+    });
+  }
+
+  public filtrar() {
+    const params = this.formFiltros.value;
+    this.cargarDatos(params);
+  }
+
+  public limpiarFiltros() {
+    this.formFiltros.reset();
+    this.formFiltros.get('estado').setValue('');
   }
 
   //#region Funciones de paginado
@@ -371,7 +390,7 @@ export class CoemAfipComponent implements OnInit {
     return ['PRE', 'AUTO'].includes(codigoEstado);
   }
 
-  mostrarSolicitarAnulacion(codigoEstado:string):boolean{
-    return ['REG','PRE'].includes(codigoEstado);
+  mostrarSolicitarAnulacion(codigoEstado: string): boolean {
+    return ['REG', 'PRE'].includes(codigoEstado);
   }
 }

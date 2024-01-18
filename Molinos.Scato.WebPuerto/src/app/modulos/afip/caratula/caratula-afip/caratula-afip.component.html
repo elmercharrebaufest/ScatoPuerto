@@ -1,5 +1,18 @@
-<ship-spinner [message]="'Cargando Historial de carátulas. Por favor, espere...'"
-    *ngIf='cargarCaratulas'></ship-spinner>
+<ship-spinner [message]="'Cargando Historial de carátulas. Por favor, espere...'" *ngIf='cargarCaratulas'></ship-spinner>
+
+<form class="filtros" [formGroup]="formFiltros">
+    <input type="month" class="form-control" ngbTooltip="Fecha de arribo" formControlName="fechaArribo">
+    <input type="text" class="form-control" placeholder="Buque" formControlName="buque">
+    <input type="text" class="form-control" placeholder="Identificador" formControlName="identificador">
+    <select class="form-control" formControlName="estado">
+        <option value="" selected style="display: none;">Estado</option>
+        <option *ngFor="let estado of estados | keyvalue" [ngValue]="estado.value">
+            {{estado.value}}
+        </option>
+    </select>
+    <button class="btn btn-primary" (click)="filtrar()">Buscar</button>
+    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limipar Búsqueda</button>
+</form>
 
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-caratula-table'>
@@ -7,11 +20,11 @@
             <th>Identificador</th>
             <th>Buque</th>
             <th>IMO</th>
-            <th>Puerto Destino</th>
             <th>Fecha Arribo</th>
             <th>Fecha Zarpada</th>
             <th>Fecha Registro</th>
             <th>Estado</th>
+            <th>Identificador de cierre</th>
             <th>Acciones</th>
         </thead>
         <tbody *ngFor="let historial of displayedItems">
@@ -19,7 +32,6 @@
                 <td>{{historial.identificadorCaratula}}</td>
                 <td>{{historial.nombreMedioTransporte}}</td>
                 <td>{{historial.identificadorBuque}}</td>
-                <td>{{ historial.puertoDestino }}</td>
                 <td>{{ historial.fechaArribo | date:'dd/MM/yyyy'}}</td>
                 <td>{{ historial.fechaZarpada | date:'dd/MM/yyyy'}}</td>
                 <td>{{ historial.fechaRegistro | date:'dd/MM/yyyy'}}</td>
@@ -31,6 +43,7 @@
                     </option>
                   </select>
                 </td>
+                <td>{{ historial.identificadorCierre }}</td>
                 <td class="celda-icono">
                   <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" title="RECTIFICAR">
                     <i class="fa fa-pencil fs-icon text-warning"></i>

@@ -22,12 +22,14 @@ export class CoemAfipService {
     return this.http.put<any[]>(`${this.url}Afip/RectificarCoem`, coem, { 'withCredentials': true });
   }
 
-  public listarCoems() {
-    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true });
-  }
-
-  public listarCoemsDeCaratula(idCaratula: number) {
-    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoemsPorCaratula?idCaratula=${idCaratula}`, { 'withCredentials': true });
+  public listarCoems(params:any) {
+    // Se remueven los filtros vacíos
+    for (const prop in params) {
+      if (!params[prop]) {
+        delete params[prop];
+      }
+    }
+    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true, params });
   }
 
   public estadosCoem() {
