@@ -118,12 +118,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var embarque = Repositorio.Obtener<Embarque>(idEmbarque);
                     var nominaciones = Repositorio.Listar<Nominacion>(x => x.Embarque != null && x.Embarque.Id == idEmbarque);
                     var lineup = Repositorio.Obtener<LineUp>(x => x.Embarque != null && x.Embarque.Id == idEmbarque);
+                    var historicoActores = Repositorio.Listar<HistoricoActores>(x => x.Embarque.Id == idEmbarque);
 
                     foreach (var nominacion in nominaciones)
                     {
                         nominacion.Embarque = null;
                         nominacion.FechaEnvioLineUp = null;
                         nominacion.ObservacionEnvioLineUp = "";
+                    }
+
+                    foreach (var historicoActor in historicoActores)
+                    {
+                        Repositorio.Remover(historicoActor);
                     }
                     Repositorio.Remover(embarque);
                     Repositorio.Remover(lineup);
