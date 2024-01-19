@@ -230,10 +230,13 @@ export class CargaLiquidosComponent implements OnInit {
           selects[i].classList.remove('mostrarBackground');
         }
       }
-
     }
     // #endregion
 
+    // Arreglo de scroll de lineas de embarque
+    let lineas = document.getElementsByClassName('lineas-detalles')[0] as HTMLDivElement;
+    lineas.className = '';
+    lineas.style.marginTop = "-20px";
 
     //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
     // #region setValores
@@ -275,13 +278,13 @@ export class CargaLiquidosComponent implements OnInit {
           }
         }
 
+        lineas.className = 'lineas-detalles';
       }
     }, 5000);
     // #endregion
   }
 
   imprimir(imprimir: boolean = false, finalizado?: boolean) {
-
     this.ocultarBotonesParaImpresion();
     this.cargaPdf = true;
     //OBTENGO EL ID DE QUE ESTABLECÍ EN EL HTML
@@ -294,14 +297,13 @@ export class CargaLiquidosComponent implements OnInit {
       jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }     // PROPIEDADES Y VALORES DE LA IMPRESION
     };
 
-    if (finalizado) {
-      let fileBlobParaAdjuntar = html2pdf().from(element).set(opt).outputPdf()
-        .then(() => { if (!imprimir) this.cargaPdf = false }).output('blob');
+    let archivo = html2pdf().from(element).set(opt).outputPdf().then(() => { if (!imprimir) { this.cargaPdf = false; } });
 
+    if (finalizado) {
+      let fileBlobParaAdjuntar = archivo.output('blob');
       fileBlobParaAdjuntar.then(() => this.cargarPDF(fileBlobParaAdjuntar._result));
     } else {
-      html2pdf().from(element).set(opt).outputPdf()
-        .then(() => { if (!imprimir) this.cargaPdf = false }).save();
+      archivo.save();
     }
   }
 
@@ -400,16 +402,16 @@ export class CargaLiquidosComponent implements OnInit {
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
 
-      this._procesoGuardar.sendGuardar.emit([finalizar, true]);
+    this._procesoGuardar.sendGuardar.emit([finalizar, true]);
 
-      let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
-      if (ok) {
-        this.guardarModuloDeCarga(finalizar, moduloCarga) ;
-      }
+    let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
+    if (ok) {
+      this.guardarModuloDeCarga(finalizar, moduloCarga);
+    }
 
   }
 
-  guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga){
+  guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga) {
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
 
       if (finalizar) {
@@ -470,10 +472,11 @@ export class CargaLiquidosComponent implements OnInit {
                 .then((confirmed) => {
                   if (confirmed) {
                     this.hideSpinner.emit(false)
-                    return
+                    return;
                   }
-                  else
-                  window.location.reload();
+                  else {
+                    window.location.reload();
+                  }
                 }).catch(() => window.location.reload());
             }, error => {
               this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
@@ -515,7 +518,7 @@ export class CargaLiquidosComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.Operadores_EnviarATablerista);
   }
 
-  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string) {
     if (selector != null) {
       for (let i = 0; i < selector.length; i++) {
         selector[i].style.display = ocultarMostrar;
