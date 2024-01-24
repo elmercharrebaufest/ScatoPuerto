@@ -115,7 +115,7 @@ export class PlanillaTurnoLiquidoExcelService {
               currentRow.getCell('A').value = planillaDeEmbarque[i].exportador.nombre;
               currentRow.getCell('B').value = planillaDeEmbarque[i].bodegaParcel;
               currentRow.getCell('C').value = planillaDeEmbarque[i].tanqueDeAbordo;
-              currentRow.getCell('E').value = planillaDeEmbarque[i].destino.nombre;
+              currentRow.getCell('E').value = planillaDeEmbarque[i].destino?.nombre || '';
               currentRow.getCell('F').value = planillaDeEmbarque[i].tk;
               currentRow.getCell('H').value = planillaDeEmbarque[i].tn;
               currentRow.getCell('I').value = planillaDeEmbarque[i].materialPuerto.descripcion;
@@ -274,7 +274,7 @@ export class PlanillaTurnoLiquidoExcelService {
     }
     private setDetallePlanillaTurno(lineas, turno, worksheet, offset, borders, esRecibidores: boolean) {
         let lineaDescripcion;
-        const lineaFiltro = lineas.filter(linea => linea.id == turno.linea_Id);
+        const lineaFiltro = lineas?.filter(linea => linea.id == turno.linea_Id) || [];
         if (lineaFiltro.length > 0) {
           lineaDescripcion = lineaFiltro[0].tipoLineaEmbarque != null ? lineaFiltro[0].tipoLineaEmbarque.linea : '';
         }
