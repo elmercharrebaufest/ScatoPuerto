@@ -349,6 +349,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true);
     this.lineaDeEmbarque = this.procesoService.getModuloDeCarga()?.moduloDeCargaLineasDeEmbarque;
+    this.obtenerTipoLineaEmbarque();
     this.diasTurno.clear();
 
     //Si la planilla tiene turnos
