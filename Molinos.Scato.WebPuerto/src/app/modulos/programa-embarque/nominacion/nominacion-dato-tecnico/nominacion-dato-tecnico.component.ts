@@ -557,7 +557,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const listaCalidadSeleccionada = this.listaNominacionDatoTecnicoCalidad.filter(data=> data.esSeleccionado == true).map(calidad => ({
       nominacionDatoTecnicoCalidad_Id: 0,
       calidadValor: calidad.calidadValor,
-      nominacionDatoTecnico: null
+      nominacionDatoTecnico: null,
+      calidadValorEditado: calidad.calidadValorEditado
     }));
     this.datoTecnicoForm.controls['nominacionDatoTecnicoCalidad'].setValue(listaCalidadSeleccionada);
     this.datoTecnicoForm.value.nominacionDatoTecnicoCalidad = listaCalidadSeleccionada;
@@ -615,17 +616,21 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const listaCalidad = this.listaCalidadValor.filter(x=> x.tipoDeCalidad.id == tipoDeCalidad.id);
     listaCalidad.forEach(calidad =>{
       let esSeleccionado = false;
+      let valorEditado;
       if (editarNominacion){
         const existe = nominacionDatoTecnicoCalidad.filter(x=> x.calidadValor.id == calidad.id);
-        if (existe!=null && existe.length > 0) esSeleccionado = true;
+        if (existe!=null && existe.length > 0) {
+          esSeleccionado = true;
+          valorEditado = existe[0].calidadValorEditado;
+        }
       }
       const calidadValor:ListaNominacionCalidad = {
         calidadValor : calidad,
-        esSeleccionado: esSeleccionado
+        esSeleccionado: esSeleccionado,
+        calidadValorEditado: valorEditado,
       };
       this.listaNominacionDatoTecnicoCalidad.push(calidadValor);
     });
-
   }
   onAgregarDatoTecnicoExportador(){
     this.datoTecnicoExportadorFormArray.push(this.inicializarFormExportador());
@@ -709,6 +714,13 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     }
 
   }
+
+  onEditCalidadValor(event: any, calidad: ListaNominacionCalidad){
+    if(calidad.calidadValor.valor !== event.target.value){
+      calidad.calidadValorEditado = event.target.value;
+    }
+    
+  }
   //#endregion
 
 }
@@ -717,6 +729,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 export class ListaNominacionCalidad {
   calidadValor: CalidadValor;
   esSeleccionado: boolean;
+  calidadValorEditado: string;
 }
 enum Mensajes {
   cargando = "Cargando información de dato tecnico. Por favor, espere...",

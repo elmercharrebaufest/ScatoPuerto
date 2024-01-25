@@ -76,7 +76,10 @@
                                     (change)="onSeleccionarParametro(calidad.calidadValor)" />
                                 {{calidad.calidadValor.parametro}}
                             </td>
-                            <td>{{calidad.calidadValor.valor}}</td>
+                            <td>
+                                <input class="inputCalidadValor" type="text" value="{{calidad.calidadValorEditado && calidad.esSeleccionado? calidad.calidadValorEditado : calidad.calidadValor.valor}}" 
+                                (change)="onEditCalidadValor($event, calidad)" [disabled]="!calidad.esSeleccionado"/>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
