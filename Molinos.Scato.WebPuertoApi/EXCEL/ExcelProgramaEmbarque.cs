@@ -73,7 +73,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             InsertarFilaTitulo("Programa de Embarque de Molinos Agro S.A.", true);
             _nroFila++;
-            foreach (var nominacion in _nominaciones) InsertarNominacion(nominacion);
+            foreach (var nominacion in _nominaciones)
+            {
+                InsertarNominacion(nominacion);
+            }
             // Ajustar columnas
             for (int i = 1; i <= 12; i++)
             {
@@ -97,21 +100,40 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             string[] valoresCeldas;
 
             #region BUQUE Y PRODUCTO
-            valoresCeldas = new string[] { "Producto", "Nombre Buque", "Bandera", "Tipo de buque", "IMO", "Detalle Producto", "Cantidad Total", "Calidad", "Tolerancia", "Observaciones" };
+            valoresCeldas = new string[] { "Nombre Buque", "Bandera", "Tipo de buque", "IMO" };
             InsertarFilaConValores(valoresCeldas, true, true); // Negrita y borde sup
             valoresCeldas = new string[] {
-                datoTecnico.MaterialPuerto == null ? "-" : datoTecnico.MaterialPuerto.DescripcionCortaIngles,
                 datoTecnico.VaporInformacion?.NombreBuque ?? "-",
                 datoTecnico.VaporInformacion?.Bandera?.Nombre ?? "-",
                 datoTecnico.VaporInformacion?.TipoBuque ?? "-",
-                datoTecnico.VaporInformacion?.ImoVapor ?? "-",
+                datoTecnico.VaporInformacion?.ImoVapor ?? "-"
+            };
+            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 }); // Negrita y fuente grande
+            _flagColor = !_flagColor;
+            #endregion
+
+            #region Producto y parametros de calidad
+            valoresCeldas = new string[] { "Producto", "Detalle", "Calidad", "Cantidad Total", "Tolerancia", "Observaciones" };
+            InsertarFilaConValores(valoresCeldas, true, true);
+            valoresCeldas = new string[] {
+                datoTecnico.MaterialPuerto == null ? "-" : datoTecnico.MaterialPuerto.DescripcionCortaIngles,
                 datoTecnico.MaterialPuerto.Descripcion,
-                datoTecnico.CantidadTotal.ToString(),
                 datoTecnico.NominacionDatoTecnicoCalidad?.FirstOrDefault()?.CalidadValor?.TipoDeCalidad?.Descripcion ?? "-",
+                datoTecnico.CantidadTotal.ToString(),
                 String.Format("+/- {0}%", datoTecnico.Tolerancia),
                 datoTecnico.Observaciones ?? "-"
             };
-            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1, 2 }); // Negrita y fuente grande
+            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 });
+            if (datoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
+            {
+                InsertarFilaTitulo("Parametros de Calidad");
+                foreach (var calidad in datoTecnico.NominacionDatoTecnicoCalidad)
+                {
+                    var valor = calidad.CalidadValorEditado ?? calidad.CalidadValor.Valor;
+                    valoresCeldas = new string[] { calidad.CalidadValor.Parametro, valor };
+                    InsertarFilaConValores(valoresCeldas);
+                }
+            }
             _flagColor = !_flagColor;
             #endregion
 
