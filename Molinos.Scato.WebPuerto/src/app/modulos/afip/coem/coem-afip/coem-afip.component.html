@@ -1,4 +1,18 @@
 <ship-spinner [message]="'Cargando listado de COEMs. Por favor, espere...'" *ngIf='load'></ship-spinner>
+
+<form class="filtros" [formGroup]="formFiltros">
+    <input type="text" class="form-control" placeholder="Identificador" formControlName="identificador">
+    <input type="text" class="form-control" placeholder="Declaración" formControlName="declaracion">
+    <select class="form-control" formControlName="estado">
+        <option value="" selected style="display: none;">Estado</option>
+        <option *ngFor="let p of listaEstados" [value]="p.id">
+            ({{p.codigo}}) {{p.estado}}
+        </option>
+    </select>
+    <button class="btn btn-primary" (click)="filtrar()">Buscar</button>
+    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limipar Búsqueda</button>
+</form>
+
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-coem-table'>
         <thead>

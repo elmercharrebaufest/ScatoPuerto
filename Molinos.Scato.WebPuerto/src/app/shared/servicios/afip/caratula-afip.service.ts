@@ -35,8 +35,14 @@ export class CaratulaAfipService {
     return this.http.put<boolean>(this.url + 'RectificarCaratula', caratula, { withCredentials: true });
   }
 
-  public listarCaratulas(): Observable<Caratula[]> {
-    return this.http.get<Caratula[]>(this.url + 'ListarCaratulas', { withCredentials: true });
+  public listarCaratulas(params?: any): Observable<Caratula[]> {
+    // Se remueven los filtros vacíos
+    for (const prop in params) {
+      if (!params[prop]) {
+        delete params[prop];
+      }
+    }
+    return this.http.get<Caratula[]>(this.url + 'ListarCaratulas', { withCredentials: true, params });
   }
 
   public listarEstadosCaratula(): Observable<string[]> {
