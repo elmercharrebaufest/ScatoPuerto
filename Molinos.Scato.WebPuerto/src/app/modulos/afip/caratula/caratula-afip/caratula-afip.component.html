@@ -45,12 +45,14 @@
                 </td>
                 <td>{{ historial.identificadorCierre }}</td>
                 <td class="celda-icono">
-                  <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" title="RECTIFICAR">
-                    <i class="fa fa-pencil fs-icon text-warning"></i>
-                  </button>
-                  <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" title="ANULAR">
-                    <i class="fa fa-trash-o fs-icon text-danger"></i>
-                  </button>
+                  <ng-container *ngIf="historial.estado != 'CODE'">
+                    <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="editarCaratula(historial, editCaratula)" title="RECTIFICAR">
+                      <i class="fa fa-pencil fs-icon text-warning"></i>
+                    </button>
+                    <button class="btn btn-light" *ngIf="historial.estado != estados.Eliminado" (click)="eliminarCaratula(historial.id, historial.identificadorCaratula)" title="ANULAR">
+                      <i class="fa fa-trash-o fs-icon text-danger"></i>
+                    </button>
+                  </ng-container>
                   <button class="btn btn-light text-primary" [routerLink]="[historial.id, 'coems']" title="VER COEMS">
                     <i class="fa fa-eye fs-icon"></i>
                   </button>

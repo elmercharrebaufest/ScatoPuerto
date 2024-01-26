@@ -32,7 +32,9 @@
             </label>
         </div>
         <div class="col-md-2 col-sm-1 align-self-center" style="display: flex; flex-direction: row-reverse;">
-            <button class="btn btn-success" (click)="openModalCrearCaratula(crearCoem)">Nuevo COEM</button>
+            <button class="btn btn-success" (click)="openModalCrearCaratula(crearCoem)" *ngIf="!caratulaId || caratula?.estado != 'CODE'">
+              Nuevo COEM
+            </button>
         </div>
     </div>
     <div class="row m-lg-4">
