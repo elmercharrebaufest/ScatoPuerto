@@ -14,8 +14,8 @@ import { Estiba } from '@ScatoModels/estiba';
 import { Exportador } from '@ScatoModels/exportador';
 import { Mail } from '@ScatoModels/mail';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { Observable, Subscription, forkJoin } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, tap, switchMap } from 'rxjs/operators';
 import { AlertService } from '@ScatoServicios/alert.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -110,9 +110,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
-
-
     this.getEmbarqueData();
   }
 
@@ -284,7 +281,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       })
     } else {
       return this.formBuilder.group({
-        id: '',
+        id: 0,
         exportador: [],
         nombre: '',
         materialPuerto: [],
@@ -310,8 +307,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   cargarEmbarque() {
-    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
-      res => {
+    this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).pipe(
+      switchMap((res) => {
         this.embarque = res;
         this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
           id: m.materialId,
@@ -332,49 +329,30 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
           listaMateriales: res.materialesPuertoCantidad.map(x => ({ id: x.materialId, descripcionCorta: x.descripcionCorta, color: x.color })),
         }
         this._procesoService.setDatosGrafico(this.datosGrafico);
-        this.cargarDestinos();
-        this.getExportadores();
-      }, () => {
-        this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${this.embarqueSelected.id}`, 'Cerrar', '', null, null, Tipoalerta.Error);
-      });
-  }
-
-  cargarDestinos() {
-    this.planoDeCargaService.obtenerDestinos().subscribe(res => this.destinos = res);
+        return forkJoin([
+        this.planoDeCargaService.obtenerDestinos(),
+        this.planoDeCargaService.obtenerExportadores(),
+        this.planoDeCargaService.obtenerListadoEstibas(),
+        this.planoDeCargaService.obtenerListadoAgenciasControlPrivado(),
+        this.planoDeCargaService.obtenerListadoAgentesControlPrivado()
+      ])
+    })
+    ).subscribe(
+      ([destinos,exportadores, estibas, agencias, agentes]) => {
+        this.destinos = destinos; 
+        this.exportadores = exportadores;
+        this.estibasList = estibas.map(x => new Estiba(x.id, x.nombre, x.apellido));
+        this.agenciasControlPrivadoList = agencias.map(x => new AgenciaControlPrivado(x.id, x.nombre));
+        this.agentesControlPrivadoList = agentes.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido));
+        this.cargarCargasComerciales();
+      },
+      error => {
+        this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${this.embarqueSelected.id}`, 'Cerrar', '', null, null, Tipoalerta.Error);}
+    );
   }
 
   public getDestinos() {
     return this.destinos;
-  }
-
-  getExportadores() {
-    this.planoDeCargaService.obtenerExportadores().subscribe(
-      res => {
-        this.exportadores = res;
-        this.getListadoEstibas();
-      });
-  }
-
-  getListadoEstibas() {
-    this.planoDeCargaService.obtenerListadoEstibas().subscribe(
-      res => {
-        this.estibasList = res.map(x => new Estiba(x.id, x.nombre, x.apellido));
-        this.getListadoAgenciasControlPrivado();
-      });
-  }
-
-  getListadoAgenciasControlPrivado() {
-    this.planoDeCargaService.obtenerListadoAgenciasControlPrivado().subscribe(res => {
-      this.agenciasControlPrivadoList = res.map(x => new AgenciaControlPrivado(x.id, x.nombre));
-      this.getListadoAgentesControlPrivado();
-    });
-  }
-
-  getListadoAgentesControlPrivado() {
-    this.planoDeCargaService.obtenerListadoAgentesControlPrivado().subscribe(res => {
-      this.agentesControlPrivadoList = res.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido));
-      this.cargarCargasComerciales();
-    });
   }
 
   cargarCargasComerciales() {
