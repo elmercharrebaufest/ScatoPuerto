@@ -82,13 +82,14 @@ export class ModalCrearCoemComponent implements OnInit {
     });
   }
   public inicializarFormMercaderias(mercaderias: any = null): FormGroup {
+    const regex = /^(\d{5}[a-zA-Z]{2}[\da-zA-Z]{2}\d{6}[a-zA-Z])$/;
     if (mercaderias != null) {
       return this.formBuilder.group({
         cuitATA: mercaderias.cuitATA,
         codigoEmbalaje: mercaderias.codigoEmbalaje,
         cantidadBultos: mercaderias.peso,
         peso: mercaderias.peso,
-        identificadorDeclaracion: mercaderias.identificadorDeclaracion,
+        identificadorDeclaracion: [mercaderias.identificadorDeclaracion, Validators.pattern(regex)],
       });
     } else {
       return this.formBuilder.group({
@@ -96,7 +97,7 @@ export class ModalCrearCoemComponent implements OnInit {
         codigoEmbalaje: [''],
         cantidadBultos: [''],
         peso: ['', Validators.required],
-        identificadorDeclaracion: [''],
+        identificadorDeclaracion: ['', Validators.pattern(regex)],
       });
     }
   }
@@ -204,5 +205,10 @@ export class ModalCrearCoemComponent implements OnInit {
         this.embalajeForm.get('identificadorDeclaracion').setValue(datos.mercaderiasSueltas[0].identificadorDeclaracion);
       });
     }
+  }
+
+  onInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    input.value = input.value.toUpperCase();
   }
 }
