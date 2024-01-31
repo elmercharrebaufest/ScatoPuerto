@@ -391,6 +391,6 @@ export class CoemAfipComponent implements OnInit {
   }
 
   mostrarSolicitarAnulacion(codigoEstado: string): boolean {
-    return ['REG', 'PRE'].includes(codigoEstado);
+    return codigoEstado == 'PRE';
   }
 }
