@@ -227,7 +227,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   obtenerDatosPlanillaDeEmbarque() {
-    return this.lineasEmbarque.getRawValue()['linea'].filter(x => x.materialPuerto != null && x.exportador != null && x.destino != null);;
+    return this.lineasEmbarque.getRawValue()['linea'].filter(x => x.materialPuerto != null && x.exportador != null);;
   }
 
   getTanqueAbordo() {
