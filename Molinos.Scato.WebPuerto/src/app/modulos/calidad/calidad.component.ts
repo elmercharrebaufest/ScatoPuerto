@@ -57,8 +57,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   startBalanza8: string = '';
   resultados: Balanzas[] = [];
   embarque: EmbarqueNav;
-  moduloDeCarga_Id: number = 0;
-  confirmationDialogService: any;
+  moduloDeCarga_Id: number = 0;  
   periodoDeCarga: PeriodoDeCarga;
   estadoBuque: EstadoBuque;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'},
@@ -78,28 +77,31 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private embarqueService: EmbarqueService,
     private parametrosService: ParametrosService,
     private calidadSharedService: CalidadSharedService,
-    confirmationDialogService: ConfirmationDialogService,
+    private confirmationDialogService: ConfirmationDialogService,
     private router: Router,
     private moduloDeCargaService: ModuloDeCargaService,
     private auth: AutenticadorService
-    ) {
-    this.auth.renovarAuthUsuario();
-    this.confirmationDialogService = confirmationDialogService;
-    this.unsubscribe = new Subject();
-    this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
-    this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-    this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
-
-    this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => this.trabajoOrdenado());
-    this.escuchaActualizacionNavtabs();
-    this.escuchaFinalizarHijos();
+    ) {    
   }
 
   ngOnInit(): void {
+    this.inicializacion();
     this.lineUpService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => { this.ubicacionDeBuquePuerto = res; });
     this.embarque = this._procesoService.getEmbarqueSelected();
     this.trabajoOrdenado();
   }
+
+ inicializacion(): void {
+  this.auth.renovarAuthUsuario();    
+  this.unsubscribe = new Subject();
+  this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
+  this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
+  this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
+
+  this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => this.trabajoOrdenado());
+  this.escuchaActualizacionNavtabs();
+  this.escuchaFinalizarHijos();
+ }
 
   escuchaActualizacionNavtabs(){
     this._procesoService.sendSeActualizoEmbarque.subscribe( res => {

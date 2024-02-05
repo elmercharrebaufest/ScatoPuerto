@@ -17,7 +17,15 @@
               <th scope="col">Producto</th>
               <th scope="col">Condición</th>
               <th scope="col">SF/ % FULL</th>
-              <th scope="col">Destino</th>
+              <th scope="col" class="header-destino">
+                Destino
+                <div class="custom-switch">
+                  <input type="checkbox" id="chkDestino" class="custom-control-input"
+                    [(ngModel)]="checkMismosDestinos" (change)="onChangeCheckDestinos()"
+                    [ngModelOptions]="{standalone: true}">
+                  <label class="custom-control-label" for="chkDestino">Destino Unico</label>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody formArrayName="planoDeCargaBodegas">
@@ -41,13 +49,12 @@
                     <option>Slack</option>
                   </select>
                 </td>
-                <td><input type="text" formControlName="sfFull" (keypress)="numberOnly($event)"
-                         maxlength="2"></td>
                 <td>
-                  <select class="custom-select" formControlName="destino">
-                    <option value="" selected></option>
-                    <option *ngFor="let d of destinos" [ngValue]="d">{{ d.nombre }}</option>
-                  </select>
+                  <input type="text" formControlName="sfFull" (keypress)="numberOnly($event)" maxlength="2">
+                </td>
+                <td class="multiselect-container">
+                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                  <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()" [data]="getDestinos()"></ng-multiselect-dropdown>
                 </td>
               </ng-container>
             </tr>
@@ -68,7 +75,15 @@
               <th scope="col">Tanque de abordo</th>
               <th scope="col">Producto</th>
               <th scope="col">Condición</th>
-              <th scope="col">Destino</th>
+              <th scope="col" class="header-destino">
+                Destino
+                <div class="custom-switch">
+                  <input type="checkbox" id="chkDestino" class="custom-control-input"
+                    [(ngModel)]="checkMismosDestinos" (change)="onChangeCheckDestinos()"
+                    [ngModelOptions]="{standalone: true}">
+                  <label class="custom-control-label" for="chkDestino">Destino Unico</label>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody formArrayName="planoDeCargaBodegas">
@@ -76,28 +91,31 @@
               <ng-container [formGroupName]="i">
                 <td>{{bodega.bodegaParcel}}</td>
                 <td>
-                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'>
+                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)" (focusout)='sendDataParcel()'>
                 </td>
-                <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'></td>
+                <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel()'></td>
                 <td>
-                  <select class="custom-select" formControlName="materialPuerto" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'>
+                  <select class="custom-select" formControlName="materialPuerto" (focusout)='sendDataParcel()'>
                     <option value="" selected></option>
                     <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
                   </select>
                 </td>
                 <td>
                   <select class="custom-select" formControlName="condicion"
-                          (change)="onChangeCondicion($event.target.value, i)" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'>
+                          (change)="onChangeCondicion($event.target.value, i)" (focusout)='sendDataParcel()'>
                     <option value="" selected ></option>
                     <option >Full</option>
                     <option>Slack</option>
                   </select>
                 </td>
-                <td>
-                  <select class="custom-select" formControlName="destino" (focusout)='sendDataParcel(planoDeCargaForm.get("planoDeCargaBodegas").value)'>
+                <td class="multiselect-container">
+                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                  <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
+                    [data]="getDestinos()" ></ng-multiselect-dropdown>
+                  <!-- <select class="custom-select" formControlName="destino" (focusout)='sendDataParcel()'>
                     <option value="" selected></option>
-                    <option *ngFor="let d of destinos" [ngValue]="d">{{ d.nombre }}</option>
-                  </select>
+                    <option *ngFor="let d of destinosBodega" [ngValue]="d">{{ d.nombre }}</option>
+                  </select> -->
                 </td>
               </ng-container>
             </tr>

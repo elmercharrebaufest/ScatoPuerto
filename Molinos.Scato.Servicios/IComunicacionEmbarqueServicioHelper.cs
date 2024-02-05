@@ -1,0 +1,23 @@
+﻿using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
+using System;
+
+namespace Molinos.Scato.Servicios
+{
+    public interface IComunicacionEmbarqueServicioHelper
+    {
+        RegistrarCaratulaResponse RegistrarCaratula(AfipCaratulaDto afipCaratulaDto);
+        RectificarCaratulaResponse RectificarCaratula(AfipCaratulaDto afipCaratulaDto);
+        AnularCaratulaResponse AnularCaratula(string identificadorCaratula);
+        SolicitarCambioBuqueResponse SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto, string identificadorCaratula);
+        SolicitarCambioFechasResponse SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto, string identificadorCaratula);
+        RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto);
+        RectificarCOEMResponse RectificarCOEM(AfipCoemDto afipCoemDto);
+        AnularCOEMResponse AnularCOEM(string identificadorCaratula, string identificadorCOEM);
+        CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM);
+        SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM);
+        SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto dto);
+        SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, AfipMotivoNoABordo afipMotivoSolicitudCambio);
+    }
+}

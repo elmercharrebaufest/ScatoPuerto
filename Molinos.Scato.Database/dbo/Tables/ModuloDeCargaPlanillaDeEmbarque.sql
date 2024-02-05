@@ -5,7 +5,7 @@
 	[Exportador_Id]				INT NOT NULL,
 	[BodegaParcel]				INT NOT NULL,
 	[TanqueDeAbordo]			nvarchar(50),
-	[Destino_Id]				INT NOT NULL,
+	[Destino_Id]				INT NULL,
 	[Tk]						nvarchar(10),
 	[Tn]						int,
 	[Cantidad]					int,

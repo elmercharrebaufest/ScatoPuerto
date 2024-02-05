@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -14,5 +15,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Destino Destino { get; set; }
         public virtual PlanoDeCargaHistorico PlanoDeCargaHistorico { get; set; }
         public virtual string TanqueDeAbordo { get; set; }
+        public virtual ICollection<PlanoDeCargaBodegaDestinoHistorico> PlanoDeCargaBodegaDestinoHistorico { get; set; }
     }
 }

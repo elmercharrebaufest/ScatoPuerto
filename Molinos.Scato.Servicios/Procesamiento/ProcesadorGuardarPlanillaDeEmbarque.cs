@@ -28,7 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 foreach (var planilla in comando.Dto)
                 {
                     if (planilla.Id <= 0) continue;
-                    if (planilla.Id == planilla_DB.Id && planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                    if (planilla.Id == planilla_DB.Id && planilla.Exportador != null && planilla.MaterialPuerto != null)
                     {
                         exist = true;
                     }
@@ -43,7 +43,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 foreach (var planilla in comando.Dto)
                 {
-                    if (planilla.Exportador != null && planilla.MaterialPuerto != null && planilla.Destino != null)
+                    if (planilla.Exportador != null && planilla.MaterialPuerto != null)
                     {
                         ModuloDeCargaPlanillaDeEmbarque planillaDB = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.Id == planilla.Id);
                         if (planillaDB != null)
@@ -51,7 +51,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             planillaDB.ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
                             planillaDB.Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id);
                             planillaDB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id);
-                            planillaDB.Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id);
+                            //planillaDB.Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id);
                             planillaDB.FechaComienzoCarga = planilla.FechaComienzoCarga;
                             planillaDB.FechaFinalizacionCarga = planilla.FechaFinalizacionCarga;
                             planillaDB.TanqueDeAbordo = planilla.TanqueDeAbordo;
@@ -67,7 +67,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 ModuloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga),
                                 Exportador = Repositorio.Obtener<Exportador>(planilla.Exportador.Id),
                                 MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(planilla.MaterialPuerto.Id),
-                                Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id),
+                                //Destino = Repositorio.Obtener<Destino>(x => x.Id == planilla.Destino.Id),
                                 FechaComienzoCarga = planilla.FechaComienzoCarga,
                                 FechaFinalizacionCarga = planilla.FechaFinalizacionCarga,
                                 TanqueDeAbordo = planilla.TanqueDeAbordo,

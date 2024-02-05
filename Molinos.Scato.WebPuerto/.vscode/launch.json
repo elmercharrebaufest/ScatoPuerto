@@ -19,16 +19,22 @@
             // "runtimeExecutable": "/usr/bin/google-chrome",  // Ruta a Chrome en Linux (ejemplo)
             "userDataDir": "${workspaceFolder}/.vscode/chrome",
             "smartStep": true,
-            "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"],
-            "breakOnLoad": true
+            "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"]
         },
         {
             "type": "chrome",
             "request": "launch",
-            "reAttach": false,
-            "name": "Launch Firefox against localhost",
+            "name": "Launch Chome against localhost",
             "url": "http://localhost:4200",
             "webRoot": "${workspaceFolder}"
-        }
+        },
+        {
+          "type": "chrome",
+          "request": "launch",
+          "name": "Debuggear con task",
+          "url": "http://localhost:4200",
+          "webRoot": "${workspaceFolder}",
+          "preLaunchTask": "npm: start"
+      }
     ]
 }

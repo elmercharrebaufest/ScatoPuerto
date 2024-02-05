@@ -1,0 +1,69 @@
+import { Caratula } from '@ScatoModels/afip/caratula';
+import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
+import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { environment } from 'environments/environment';
+import { Observable, of } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoemAfipService {
+
+  private url: string = environment.apiUrl;
+  constructor(private http: HttpClient) { }
+
+  public registrarCoem(coem: COEM): Observable<any[]> {
+    return this.http.post<any[]>(`${this.url}Afip/RegistrarCoem`, coem, { 'withCredentials': true });
+  }
+
+  public editarCoem(coem: COEM): Observable<any[]> {
+    return this.http.put<any[]>(`${this.url}Afip/RectificarCoem`, coem, { 'withCredentials': true });
+  }
+
+  public listarCoems() {
+    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true });
+  }
+
+  public listarCoemsDeCaratula(idCaratula: number) {
+    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoemsPorCaratula?idCaratula=${idCaratula}`, { 'withCredentials': true });
+  }
+
+  public estadosCoem() {
+    return this.http.get<EstadoCOEM[]>(`${this.url}Afip/ListarEstadosCoem`, { 'withCredentials': true });
+  }
+
+  public cambiarEstadosCoem(id, idCoem): Observable<any[]> {
+    return this.http.put<any[]>(`${this.url}Afip/CambiarEstadoCoem?idCoem=${idCoem}&idEstado=${id}`, { 'withCredentials': true });
+  }
+
+  public obtenerCoemId(id: number): Observable<COEM> {
+    return this.http.get<COEM>(`${this.url}Afip/ObtenerCoem?id=${id}`, { 'withCredentials': true });
+  }
+
+  public comboCaratulas(): Observable<Caratula[]> {
+    return this.http.get<any>(`${this.url}Afip/ComboCaratulas`, { 'withCredentials': true });
+  }
+
+  public anularCoem(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.url}Afip/AnularCoem?id=${id}&idEstado=5`, { 'withCredentials': true });
+  }
+
+  public cerrarCoem(id: number): Observable<any> {
+    return this.http.put<any>(`${this.url}Afip/CerrarCoem?id=${id}&idEstado=1`, { 'withCredentials': true });
+  }
+
+  public solicitarAnulacionCoem(id: number): Observable<any> {
+    return this.http.put<any>(`${this.url}Afip/SolicitarAnulacionCoem?id=${id}`, { 'withCredentials': true });
+  }
+
+  public solicitarCierreDeCarga(dto: SolicitudCierreCargaDto) {
+    return this.http.post<boolean>(`${this.url}Afip/SolicitarCierreCargaGranel`, dto, { withCredentials: true });
+  }
+
+  public solicitarNoABordo(idCoem: number, idCaratula: number, codigoMotivo: string) {
+    const body = { idCaratula, idCoem, codigoMotivo };
+    return this.http.post<boolean>(`${this.url}Afip/SolicitarNoAbordo`, body, { withCredentials: true });
+  }
+}

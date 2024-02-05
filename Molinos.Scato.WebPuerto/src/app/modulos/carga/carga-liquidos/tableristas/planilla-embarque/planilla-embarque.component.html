@@ -44,17 +44,14 @@
                                     <td>
                                         <select formControlName='bodegaParcel' [compareWith]='compareLineaItem' (change)='autoCompleteParcel($event.target.value, l)'>
                                             <option [value]='0'></option>
-                                            <option *ngFor='let bodega of bodegas' [value]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}</option>
+                                            <option *ngFor='let bodega of bodegas; trackBy: trackBodegas' [value]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}</option>
                                         </select>
                                     </td>
                                     <td>
                                         <input formControlName="tanqueDeAbordo" class="control-bloqueado">
                                     </td>
                                     <td>
-                                        <select formControlName='destino' [compareWith]='compareLineaItem' class="control-bloqueado">
-                                            <option [value]='0'></option>
-                                            <option *ngFor='let bodega of bodegas' [ngValue]='bodega.destino ? bodega.destino : ""'>{{bodega.destino ? bodega.destino.nombre : ''}}</option>
-                                        </select>
+                                        <input formControlName="destinoTexto" disabled>
                                     </td>
                                     <td>
                                         <input formControlName="tk">

@@ -36,6 +36,8 @@ import { NotificacionesComponent } from "./notificaciones/notificaciones.compone
 import { EnvioMailDialogComponent } from "./envio-mail-dialog/envio-mail-dialog.component";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
+import { NgxMaskModule } from "ngx-mask";
+import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 
 const components = [
     AlertComponent,
@@ -77,6 +79,8 @@ const libs = [
     KnobModule,
     ToastModule,
     CKEditorModule,
+    NgxMaskModule,
+    NgMultiSelectDropDownModule
 ]
 
 @NgModule({

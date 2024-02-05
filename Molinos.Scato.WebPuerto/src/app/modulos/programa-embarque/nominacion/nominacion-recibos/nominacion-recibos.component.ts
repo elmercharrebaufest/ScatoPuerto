@@ -67,7 +67,6 @@ export class NominacionRecibosComponent implements OnInit {
       const formulario: FormGroup = (item as FormGroup);
       const recibosPorDia = item['controls'].recibosPorDia.value;
       const mostrarDestinos = item['controls'].mostrarDestinos.value;
-      this.onActivarCantidad(formulario, recibosPorDia);
       this.onActivarDischargePort(formulario, mostrarDestinos);
     });
 
@@ -138,9 +137,7 @@ export class NominacionRecibosComponent implements OnInit {
       });
       this.recibosFormArray['controls'].forEach(item => {
         const formulario: FormGroup = (item as FormGroup);
-        const recibosPorDia = item['controls'].recibosPorDia.value;
         const mostrarDestinos = item['controls'].mostrarDestinos.value;
-        this.onActivarCantidad(formulario, recibosPorDia);
         this.onActivarDischargePort(formulario, mostrarDestinos);
       });
     }
@@ -203,16 +200,6 @@ export class NominacionRecibosComponent implements OnInit {
       this.unidades = this.nominacionDatoTecnicoRegistroService.listarUnidades();
       this.cargandoRecibos = false;
     });
-  }
-
-  onActivarCantidad(recibo: FormGroup, estado: boolean) {
-    if (estado) {
-      recibo.controls['cantidad'].disable();
-      recibo.controls['cantidad'].setValue('');
-    }
-    else {
-      recibo.controls['cantidad'].enable();
-    }
   }
 
   onActivarDischargePort(recibo: FormGroup, estado: boolean) {

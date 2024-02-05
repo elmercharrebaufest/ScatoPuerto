@@ -1,10 +1,10 @@
 import { MaterialPuerto } from './material-puerto';
 
-export class LineasDeEmbarque{
+export class LineasDeEmbarque {
     id?: number;
     linea: string;
     tipoLineaEmbarque: any;
-    materialPuerto: MaterialPuerto[];
+    materialPuerto: MaterialPuerto;
     tkInicial: string;
     temperaturaInicial: number;
     alturaInicialCM: number;
@@ -19,6 +19,6 @@ export class LineasDeEmbarque{
     tkFinal: string;
     kilosFinales: number;
     litrosFinales: number;
-    alturaInicialCMyMM:number;
-    alturaFinalCMyMM:number;
+    alturaInicialCMyMM: number;
+    alturaFinalCMyMM: number;
 }
