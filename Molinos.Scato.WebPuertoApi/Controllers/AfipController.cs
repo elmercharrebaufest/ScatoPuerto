@@ -441,6 +441,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         #region Solicitudes
 
+        #region Solicitar Cierre de Carga
         [HttpPost]
         [Route("api/afip/SolicitarCierreCargaGranel")]
         public HttpResponseMessage SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCargaGranelDto)
@@ -463,6 +464,65 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
         }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCierreCarga")]
+        public HttpResponseMessage ListarSolicitudesCierreCarga()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCierreCarga());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCierreCarga/id")]
+        public HttpResponseMessage ListarSolicitudesCierreCarga(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCierreCarga(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/EfectuarSolicitudCierreCarga/{id}")]
+        public HttpResponseMessage EfectuarSolicitudCierreCarga(int id)
+        {
+            try
+            {
+                servicioAfip.EfectuarSolicitudCierreCarga(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/RechazarSolicitudCierreCarga/{id}")]
+        public HttpResponseMessage RechazarSolicitudCierreCarga(int id)
+        {
+            try
+            {
+                servicioAfip.RechazarSolicitudCierreCarga(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
 
         [HttpPost]
         [Route("api/afip/SolicitarNoAbordo")]

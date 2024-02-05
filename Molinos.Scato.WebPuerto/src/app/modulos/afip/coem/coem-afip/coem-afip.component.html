@@ -43,7 +43,7 @@
                         <div class="btn-group">
                             <select class="custom-select" id="inputGroupSelect01"
                                 (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM, coem.afipCoemEstado.codigo)"
-                                [disabled]="coem.afipCoemEstado.codigo=='ANU'">
+                                [disabled]="coem.afipCoemEstado.codigo == 'ANU' || coem.afipCoemEstado.codigo == 'CODE'">
                                 <option selected value="" disabled>Estado</option>
                                 <option *ngFor="let p of listaEstados" [value]="p.id"
                                     [selected]="coem.afipCoemEstado.id == p.id">
@@ -103,13 +103,6 @@
         </tbody>
     </table>
 </div>
-
-<div class="flex-center mb-3" *ngIf="caratulaId">
-    <button class="btn btn-primary" (click)="solicitarCierreCarga(cerrarCoems)">
-        Solicitar cierre de carga
-    </button>
-</div>
-
 <!--Paginado -->
 <nav aria-label="Page navigation example" class="centrado">
     <ul class="pagination justify-content-center paginado-buque-fondo">
@@ -134,11 +127,6 @@
 <ng-template #editCoem let-modal>
     <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId"
         [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
-</ng-template>
-
-<ng-template #cerrarCoems let-modal>
-    <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas"
-        [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
 </ng-template>
 
 <ng-template #modalSolicitudNoABordo let-modal>

@@ -110,8 +110,20 @@ namespace Molinos.Scato.Servicios
         #endregion
 
         #region Solicitudes
+
+        #region Solicitar Cierre de Carga
         [OperationContract]
         bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto);
+
+        [OperationContract]
+        IList<AfipSolicitudCierreCargaDto> ListarSolicitudesCierreCarga(int id = 0);
+
+        [OperationContract]
+        void EfectuarSolicitudCierreCarga(int id);
+
+        [OperationContract]
+        void RechazarSolicitudCierreCarga(int id);
+        #endregion
 
         [OperationContract]
         bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto);
