@@ -1,0 +1,8 @@
+/* Estilo necesario para que las opciones desplegables sean visibles, sino quedan detras del modal */
+::ng-deep .cdk-overlay-container {
+  z-index: 1100;
+}
+
+input.ng-invalid:not(.ng-untouched):not(:focus-within) {
+  border: 1px solid red;
+}

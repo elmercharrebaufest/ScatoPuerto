@@ -9166,25 +9166,39 @@ namespace Molinos.Scato.Servicios.Impl
 
             body += "\n\0\f DESTINO(S): \0\0\f\f\n";
             var planoDeCargaBodegas = Listar<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(x => x.PlanoDeCarga.Id == planoDeCargaId);
-            var destinos = planoDeCargaBodegas.GroupBy(x => x.Destino == null ? "No Definido" : x.Destino.Nombre).Select(group => new
+            var destinosAgrupados = planoDeCargaBodegas
+                .SelectMany(p => p.Destinos.Select(b => new { Destino = b.Destino.Nombre, Cantidad = p.Cantidad}))
+                .GroupBy(bodegaDestino => bodegaDestino.Destino)
+                .Select(group => new
+                {
+                    Destino = group.Key,
+                    Cantidad = group.Sum(y => y.Cantidad)
+                });
+            foreach (var grupoDestino in destinosAgrupados)
             {
-                Destino = group.Key,
-                Cantidad = group.Sum(y => y.Cantidad)
-            }).ToList();
-            foreach (var destino in destinos)
-            {
-                body += $"\t {destino.Destino.Trim().PadRight(10, '.')} {destino.Cantidad.ToString().Replace('.', ',')} tn. \n";
+                // Sumo las cantidades de aquellas bodegas que aun tienen el destino con el formato viejo (solo si no tienen valores nuevos de destinos multiples)
+                var cantidadDestinoSimple = planoDeCargaBodegas.Where(d => (d.Destinos == null || d.Destinos.Count == 0) && (d.Destino.Nombre == grupoDestino.Destino)).Sum(d => d.Cantidad) ?? 0;
+                var cantidad = (grupoDestino.Cantidad + cantidadDestinoSimple);
+                body += $"\t {grupoDestino.Destino.Trim().PadRight(10, '.')} {cantidad.ToString().Replace('.', ',')} tn. \n";
             }
 
             body += "\n\f-------------------------------------------------------------------------------------------------\f\f\n";
             body += " \fPlano de carga: \f\f\n";
+            string inicialParcel = embarque.EsLiquido ? "P" : "H";
             foreach (var bodega in planoDeCargaBodegas)
             {
-                body += $"\t H{bodega.BodegaParcel}S - {bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.')} {bodega.Cantidad.ToString().Replace('.', ',')} tn. ";
-                if (bodega.Destino != null)
-                    body += $"{bodega.Destino.Nombre.Trim()}. \n";
+                string tanqueDeAbordo = embarque.EsLiquido ? $"TANQUE ({bodega.TanqueDeAbordo}) " : "";
+                string material = bodega.MaterialPuerto.DescripcionCorta.Trim().PadRight(10, '.');
+                string cantidad = bodega.Cantidad.ToString().Replace('.', ',');
+                body += $"\t {inicialParcel}{bodega.BodegaParcel} {bodega.Condicion} - {tanqueDeAbordo}{material} {cantidad} tn. ";
+                if (bodega.Destinos != null || bodega.Destinos.Count > 0)
+                {
+                    body += string.Join(" | ", bodega.Destinos.Select(d => d.Destino.Nombre)) + $".\n";
+                }
                 else
-                    body += "No Definido.\n";
+                {
+                    body += (bodega.Destino?.Nombre ?? "No Definido") + ".\n";
+                }                                                                          
             }
 
             var planoDeCarga = repositorio.Obtener<PlanoDeCarga>(planoDeCargaId);
@@ -11802,12 +11816,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        public Dictionary<string, string> ObtenerActores(int idEmbarque)
+        public Dictionary<string, object> ObtenerActores(int idEmbarque)
         {
             try
             {
                 #region variables
-                string coordinador = "-";
+                string[] coordinadores = new string[] { };
                 string ata = "-";
                 string agenciaMaritima = "-";
                 string estiba = "-";
@@ -11816,7 +11830,7 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
 
                 #region obtener datos
-                Dictionary<string, string> actoresEmbarque = new Dictionary<string, string>();
+                Dictionary<string, object> actoresEmbarque = new Dictionary<string, object>();
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
                 Embarque embarque = lineUp.Embarque;
                 PlanoDeCarga plano = lineUp.PlanoDeCarga;
@@ -11824,7 +11838,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 #region comprobaciones
                 if (embarque.Coordinadores != null)
-                    coordinador = embarque.Coordinadores.Nombre != null ? embarque.Coordinadores.Nombre : "";
+                    coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
 
                 if (embarque.ATA != null)
                     ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
@@ -11843,9 +11857,8 @@ namespace Molinos.Scato.Servicios.Impl
                     encargado = plano.AgentesControlPrivado.First().name;
                 }
                 #endregion
-
                 #region llenarLista
-                actoresEmbarque.Add("coordinador", coordinador);
+                actoresEmbarque.Add("coordinadores", coordinadores);
                 actoresEmbarque.Add("ata", ata);
                 actoresEmbarque.Add("agenciaMaritima", agenciaMaritima);
                 actoresEmbarque.Add("estiba", estiba);

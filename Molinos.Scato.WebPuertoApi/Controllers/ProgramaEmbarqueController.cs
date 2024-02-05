@@ -719,8 +719,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             embarqueDto.MaterialesPuertoCantidad = listaMaterialesPuertoCantidad;
             if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
             {
-                var nominacionDatoTecnicoCoordinadorPuerto = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.ElementAt(0);
-                embarqueDto.Coordinadores = nominacionDatoTecnicoCoordinadorPuerto.CoordinadorPuerto;
+                var nominacionDatoTecnicoCoordinadorPuerto = nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto;
+                embarqueDto.Coordinadores = nominacionDatoTecnicoCoordinadorPuerto.Select(
+                    coo => new EmbarqueCoordinadorDto
+                    {
+                        CoordinadorPuerto = coo.CoordinadorPuerto
+                    }).ToList();
             }
             embarqueDto.Agencias = nominacion.NominacionDatoTecnico.AgenciaMaritimaPuerto;
             embarqueDto.CentroId = centroId;

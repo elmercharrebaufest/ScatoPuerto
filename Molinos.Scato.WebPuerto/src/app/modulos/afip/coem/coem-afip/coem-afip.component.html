@@ -1,0 +1,155 @@
+<ship-spinner [message]="'Cargando listado de COEMs. Por favor, espere...'" *ngIf='load'></ship-spinner>
+<div style="overflow-x:auto;" class="table-responsive">
+    <table class='table table-bordered lista-coem-table'>
+        <thead>
+            <th>Identificador</th>
+            <th *ngIf="!caratulaId">Caratula</th>
+            <th>Mercaderías Sueltas</th>
+            <th>Estados</th>
+            <th class="centrado">Acciones</th>
+        </thead>
+        <tbody #tbody>
+            <ng-container *ngFor="let coem of listadoCoems">
+                <tr #tr>
+                    <td>{{coem.identificadorCOEM}}</td>
+                    <td *ngIf="!caratulaId">{{coem.identificadorCaratula}}</td>
+                    <td>
+                        <div class="flex-between">
+                            <span>
+                                {{coem.mercaderiasSueltas.length}}
+                            </span>
+                            <label role="button">
+                                <input type="checkbox" class="d-none"
+                                    (click)="mostrarMercaderias($event, trMercaderia)">
+                                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <select class="custom-select" id="inputGroupSelect01"
+                                (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM, coem.afipCoemEstado.codigo)"
+                                [disabled]="coem.afipCoemEstado.codigo=='ANU'">
+                                <option selected value="" disabled>Estado</option>
+                                <option *ngFor="let p of listaEstados" [value]="p.id"
+                                    [selected]="coem.afipCoemEstado.id == p.id">
+                                    ({{p.codigo}}) {{p.estado}}
+                                </option>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="centrado">
+                        <button class="btn btn-light" *ngIf="mostrarRectificarAnular(coem.afipCoemEstado.codigo)"
+                            (click)="editarCoem(coem,editCoem)">
+                            <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="RECTIFICAR"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="mostrarRectificarAnular(coem.afipCoemEstado.codigo)"
+                            (click)="eliminarCoem(coem.id, coem.identificadorCOEM)">
+                            <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ANULAR"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="coem.afipCoemEstado.codigo == 'CUR'"
+                            (click)="cerrarCoem(coem.id, coem.identificadorCOEM)">
+                            <i class="fa fa-check-circle-o fs-icon text-success" aria-hidden="true" title="CERRAR"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarNoABordo(coem.afipCoemEstado.codigo)" (click)="solicitarNoABordo(coem)">
+                            <i class="fa fa-exclamation-circle fs-icon text-info" aria-hidden="true" title="SOLICITAR NO A BORDO"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarAnulacion(coem.afipCoemEstado.codigo)" (click)="solicitarAnulacion(coem)">
+                            <i class="fa fa-trash-restore fs-icon text-danger" aria-hidden="true" title="SOLICITAR ANULACIÓN"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr #trMercaderia class="d-none desplegable">
+                    <td *ngIf="caratulaId"></td>
+                    <td colspan="100%" class="contenedor-tabla-mercaderias">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cuit ATA</th>
+                                    <th>Declaración</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let mercaderia of coem.mercaderiasSueltas">
+                                    <td>{{mercaderia.cuitATA}}</td>
+                                    <td>{{mercaderia.identificadorDeclaracion}}</td>
+                                    <td>{{mercaderia.embalajes[0].peso}} kg</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </ng-container>
+            <tr *ngIf="!listadoCoems?.length">
+                <td colspan="100%" class="centrado">
+                    No se encontraron Comunicaciones de Embarque.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="flex-center mb-3" *ngIf="caratulaId">
+    <button class="btn btn-primary" (click)="solicitarCierreCarga(cerrarCoems)">
+        Solicitar cierre de carga
+    </button>
+</div>
+
+<!--Paginado -->
+<nav aria-label="Page navigation example" class="centrado">
+    <ul class="pagination justify-content-center paginado-buque-fondo">
+        <li [ngClass]="{'page-item disabled': currentPage === 1}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
+                &lt;&lt;
+            </a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
+        <li *ngFor="let page of visiblePages" [ngClass]="{'page-item disabled': page == currentPage}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
+        <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
+            <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)">
+                &gt;&gt;
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<ng-template #editCoem let-modal>
+    <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId"
+        [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
+</ng-template>
+
+<ng-template #cerrarCoems let-modal>
+    <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas"
+        [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
+</ng-template>
+
+<ng-template #modalSolicitudNoABordo let-modal>
+    <div class="modal-content modal-solicitud">
+        <div class="modal-header">
+            <h5 class="modal-title">Solicitar No A Bordo</h5>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="solicitarNoABordoForm">
+                <div class="row justify-content-center">
+                    <div class="pt-4">
+                        <label>Motivo*</label>
+                        <select formControlName="codigoMotivo" class="form-control custom-select" maxlength="200">
+                            <option selected="true">Seleccione un motivo...</option>
+                            <option *ngFor="let motivo of listaMotivos" [ngValue]="motivo.codigo">
+                                {{motivo.descripcion}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-success" (click)="solicitarNoABordo()">Enviar solicitud</button>
+            <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</ng-template>

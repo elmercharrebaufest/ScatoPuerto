@@ -117,7 +117,23 @@ export enum PermisosScato {
   Vapor_Visualizar = "Vapor_Visualizar",
   Vapor_Editar = "Vapor_Editar",
   Vapor_Crear = "Vapor_Crear",
-  Vapor_Eliminar = "Vapor_Eliminar"
+  Vapor_Eliminar = "Vapor_Eliminar",
 
+  // Afip
+
+  Caratula_Visualizar="Caratula_Visualizar",
+  Caratula_Editar="Caratula_Editar",
+  Caratula_Crear="Caratula_Crear",
+  Caratula_Eliminar="Caratula_Eliminar",
+
+  Coem_Visualizar="Coem_Visualizar",
+  Coem_Editar="Coem_Editar",
+  Coem_Crear="Coem_Crear",
+  Coem_Eliminar="Coem_Eliminar",
+
+  Code_Visualizar="Code_Visualizar",
+  Code_Editar="Code_Editar",
+  Code_Crear="Code_Crear",
+  Code_Eliminar="Code_Eliminar",
 
 }

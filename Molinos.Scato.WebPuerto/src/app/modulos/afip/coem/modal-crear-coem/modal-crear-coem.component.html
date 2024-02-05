@@ -1,0 +1,57 @@
+<ship-spinner [message]="'Enviando datos'" *ngIf='cargando'></ship-spinner>
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">{{titleCoem}}</h5>
+    <button (click)="closeModalEditarCrearCoem()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="crearEditarCoemForm">
+      <div class="row margen ">
+        <div class="form-group col-md-12">
+          <label class="font-weight-bold">Carátula</label>
+        </div>
+        <div class="form-group col-md-4">
+          <select class="custom-select" formControlName="identificadorCaratula" required>
+            <option selected value="" disabled>Selecciona</option>
+            <option *ngFor="let p of caratulas" [value]="p.identificadorCaratula" [selected]="p.identificadorCaratula==idCaratula">
+              {{p.identificadorCaratula}}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div style="overflow-x:auto;" class="table-responsive">
+        <table class='table table-bordered lista-coem-table'>
+          <thead class="lista-coem-header">
+            <th>CUIT ATA</th>
+            <th>Peso (kg)</th>
+            <th>Identificador de la declaración</th>
+            <th></th>
+          </thead>
+          <tbody formArrayName="mercaderiasSueltas">
+            <tr *ngFor="let mercaderia of mercaderiasSueltasFormArray.controls; let i = index; last as isLast" class="lista-coem-row" [formGroupName]="i">
+              <td class="lista-coem-row-item">
+                <input type="text" class="form-control" formControlName="cuitATA" maxlength="11" required>
+              </td>
+              <td class="lista-coem-row-item">
+                <input type="number" class="form-control" formControlName="peso" required>
+              </td>
+              <td class="lista-coem-row-item">
+                <input type="text" class="form-control" formControlName="identificadorDeclaracion" maxlength="17" required mask="00000SSAA000000S" [showMaskTyped]="true" [dropSpecialCharacters]="false" required>
+              </td>
+              <td class="lista-coem-row-item">
+                <img *ngIf="!isLast" src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="eliminarNuevoCoem(i)" alt="Eliminar">
+                <button *ngIf="isLast" type="button" class="btn btn-dark bt-circle" (click)="agregarNuevoCoem()">+</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer justify-content-center">
+    <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onCrearCoem()">Guardar</button>
+    <button type="button" class="btn btn-danger" (click)="closeModalEditarCrearCoem()">Cancelar</button>
+  </div>
+</div>

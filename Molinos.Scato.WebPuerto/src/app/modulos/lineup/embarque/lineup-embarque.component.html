@@ -281,8 +281,9 @@
 
     <div class="col col-xs-6" style="text-align: left;">
       <p class="text-left mb-0">
-        <strong>Coordinador: </strong>
-        {{extraeNombre(instanciaWorkflow.embarque.coordinadores)}}
+        <strong>Coordinador/es: </strong>
+        <span *ngFor="let coordinador of instanciaWorkflow.embarque.coordinadores"> {{extraeNombre(coordinador.coordinadorPuerto)}},</span>
+       
       </p>
     </div>
 

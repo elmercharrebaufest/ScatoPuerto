@@ -308,8 +308,12 @@ input[type=number]::-webkit-outer-spin-button{
     border-radius: 0.25rem;
     -webkit-appearance: none;
     -moz-appearance: none;
-    appearance: none;  
+    appearance: none;
   }
   .ocultar-botones{
     display: none !important;
+  }
+
+  .modal-body{
+    white-space: pre-wrap; /* Para ver lo saltos de linea */
   }

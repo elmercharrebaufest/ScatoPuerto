@@ -6,7 +6,7 @@
 	[Formato] [varchar](10) NULL,
 	[Cantidad] [int] NULL,
 	[Unidad] [varchar](10) NULL,
-	[Ajuste] [varchar](10) NULL,
+	[Ajuste] [varchar](50) NULL,
 	[PuertoDeCarga] [varchar](250) NULL,
 	[PuertoDeDescarga] [varchar](250) NULL,
 	[DescripcionesBienes] [varchar](250) NULL,

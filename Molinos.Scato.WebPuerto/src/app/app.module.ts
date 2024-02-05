@@ -24,8 +24,9 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 import { ToastrModule } from 'ngx-toastr';
 import { LoginComponent } from './modulos/login/login.component';
-
-
+import { NgxMaskModule } from 'ngx-mask';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,10 @@ import { LoginComponent } from './modulos/login/login.component';
       ProductoState, 
       BuquesState
     ]),
-   
+    FormsModule,
+    ReactiveFormsModule,
+    NgxMaskModule.forRoot(),
+    NgMultiSelectDropDownModule.forRoot()
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },

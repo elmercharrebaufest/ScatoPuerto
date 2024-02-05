@@ -287,7 +287,7 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   obtenerModuloDeCarga() {
-    this.idModuloDeCarga = this._procesoService.getModuloDeCarga().id;
+    this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
 
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
 
@@ -487,16 +487,16 @@ export class LineasComponent implements OnInit, OnChanges {
   onGuardar() {
 
     if (this.esCalidad) return;
-    const bValidarDuplicadas = this.validarLineasDuplicadas();
-    if (bValidarDuplicadas){
-      const mensaje = "No se puede guardar, debido a que existe un tipo de linea, producto y tanque duplicado en la conformacion de lineas de embarque.";
-      this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
-      return;
-    }
+    // const bValidarDuplicadas = this.validarLineasDuplicadas();
+    // if (bValidarDuplicadas){
+    //   const mensaje = "No se puede guardar, debido a que existe un tipo de linea, producto y tanque duplicado en la conformacion de lineas de embarque.";
+    //   this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+    //   return;
+    // }
 
     this.esGuardadoActivo = false;
 
-    
+
     const lineasEmabarque = this.obtenerLineasEmbarque();
     let erroresLinea = false;
     lineasEmabarque.forEach(item => {

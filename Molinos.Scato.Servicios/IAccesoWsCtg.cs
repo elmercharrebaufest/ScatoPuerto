@@ -6,7 +6,7 @@ using Molinos.Scato.Servicios.AfipCTGWebService;
 namespace Molinos.Scato.Servicios
 {
     [ServiceContract]
-    public interface IAccesoWsCtg
+    public interface IAccesoWsCtg : IAccesoAFIP
     {
         [OperationContract]
         authType ObtenerAuthType(string cuitRepresentado, Resultado resultado);

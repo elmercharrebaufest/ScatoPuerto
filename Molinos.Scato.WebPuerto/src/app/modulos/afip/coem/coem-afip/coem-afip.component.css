@@ -1,0 +1,50 @@
+.lista-coem-table {
+  border: 0;
+  border-radius: 4px 4px 0px 0px;
+}
+
+.lista-coem-table>thead {
+  background: #3376A1 0% 0% no-repeat padding-box;
+  color: #ffffff;
+  border-radius: 4px 4px 0px 0px;
+  height: 59px;
+  border: 0px;
+}
+
+.lista-coem-table>tbody>tr {
+  background: #ffffff 0% 0% no-repeat padding-box;
+  box-shadow: 0px 3px 11px #00000029;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.lista-coem-table>tbody>tr>td {
+  border-bottom: 0px;
+  border-top: 0px;
+}
+
+.lista-coem-table td,
+.lista-coem-table th {
+  vertical-align: middle;
+}
+
+.centrado {
+  text-align: center;
+}
+
+.fs-icon {
+  font-size: x-large;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  transform: scale(1.5);
+}
+
+.contenedor-tabla-mercaderias {
+  padding: 0;
+}
+
+.contenedor-tabla-mercaderias table {
+  width: 100%;
+}

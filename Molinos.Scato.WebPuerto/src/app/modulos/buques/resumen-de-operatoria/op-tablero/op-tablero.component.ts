@@ -1072,61 +1072,74 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
   }
 
   public guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
-    this.hideSpinner.emit(true);
-    this.planoDeCargaForm.value.estiba =
-      this.planoDeCargaForm.value.estibasList != null && this.planoDeCargaForm.value.estibasList.length > 0 ?
-        this.estibasList.find(x => x.id == this.planoDeCargaForm.value.estibasList[0].id) : '';
+    
+    //Bodegas cargadas sin destino
+    var bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && x.destino == null);
+    
+    if (bodegasCargadas.length > 0) {
+      this.confirmationDialogService.confirm("Alerta", "No se ha ingresado el DESTINO para una o mas bodegas cargadas.", 'Cerrar', '', null, null, Tipoalerta.Warning)
+      .then((confirmed) => {
+        if(confirmed)
+          return;
+      }).catch(() => window.location.reload());
+    }else{        
 
-    this.planoDeCargaForm.value.agenciaControlPrivado =
-      this.planoDeCargaForm.value.agenciasControlPrivadoList != null && this.planoDeCargaForm.value.agenciasControlPrivadoList.length > 0 ?
-        this.agenciasControlPrivadoList.find(x => x.id == this.planoDeCargaForm.value.agenciasControlPrivadoList[0].id) : '';
-
-    this.planoDeCargaForm.value.agentesControlPrivado =
-      this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.length > 0 ?
-        this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido)) : '';
-
-    if (!this.planoDeCargaForm.value.enviado)
-      this.planoDeCargaForm.value.enviado = finalizar;
-
-    if (finalizar)
-      this.planoDeCargaForm.value.usuarioFinalizacion = this.user.username;
-    else
-      this.planoDeCargaForm.value.usuarioFinalizacion = null;
-
-    this.planoDeCargaForm.value.filePathPlano = this.filePlano;
-    this.planoDeCargaForm.value.planoDeCargaArchivoPlanoNombre = this.fileNamePlano;
-    this.planoDeCargaForm.value.filePathSecuencia = this.fileSecuencia;
-    this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
-    this.planoDeCargaForm.value.usuario = this.user.username;
-    this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
-    try {
-      this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value)
-        .subscribe((res: any) => {
-          if (!moduloCarga) {
-            if (finalizar)
-              this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-                .then(() => { this.enviarMail(); },
-                  error => {
-                    this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-                  }
-                ).catch(() => window.location.reload())
-            else {
-              this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Volver Line up', '', null, null, Tipoalerta.Success)
-                .then((confirmed) => {
-                  if (confirmed) {
-                    this.router.navigate(['/lineup']);
-                  }
-                }).catch(() => window.location.reload())
+      this.hideSpinner.emit(true);
+      this.planoDeCargaForm.value.estiba =
+        this.planoDeCargaForm.value.estibasList != null && this.planoDeCargaForm.value.estibasList.length > 0 ?
+          this.estibasList.find(x => x.id == this.planoDeCargaForm.value.estibasList[0].id) : '';
+  
+      this.planoDeCargaForm.value.agenciaControlPrivado =
+        this.planoDeCargaForm.value.agenciasControlPrivadoList != null && this.planoDeCargaForm.value.agenciasControlPrivadoList.length > 0 ?
+          this.agenciasControlPrivadoList.find(x => x.id == this.planoDeCargaForm.value.agenciasControlPrivadoList[0].id) : '';
+  
+      this.planoDeCargaForm.value.agentesControlPrivado =
+        this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.length > 0 ?
+          this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido)) : '';
+  
+      if (!this.planoDeCargaForm.value.enviado)
+        this.planoDeCargaForm.value.enviado = finalizar;
+  
+      if (finalizar)
+        this.planoDeCargaForm.value.usuarioFinalizacion = this.user.username;
+      else
+        this.planoDeCargaForm.value.usuarioFinalizacion = null;
+  
+      this.planoDeCargaForm.value.filePathPlano = this.filePlano;
+      this.planoDeCargaForm.value.planoDeCargaArchivoPlanoNombre = this.fileNamePlano;
+      this.planoDeCargaForm.value.filePathSecuencia = this.fileSecuencia;
+      this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
+      this.planoDeCargaForm.value.usuario = this.user.username;
+      this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
+      try {
+        this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value)
+          .subscribe((res: any) => {
+            if (!moduloCarga) {
+              if (finalizar)
+                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Cerrar', '', null, null, Tipoalerta.Success)
+                  .then(() => { this.enviarMail(); },
+                    error => {
+                      this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+                    }
+                  ).catch(() => window.location.reload())
+              else {
+                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Volver Line up', '', null, null, Tipoalerta.Success)
+                  .then((confirmed) => {
+                    if (confirmed) {
+                      this.router.navigate(['/lineup']);
+                    }
+                  }).catch(() => window.location.reload())
+              }
             }
-          }
-          this.hideSpinner.emit(false);
-        },
-          errmess => {
-            console.log(errmess.error)
-            // this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-          });
-    } catch (e) {
-      console.log(e);
+            this.hideSpinner.emit(false);
+          },
+            errmess => {
+              console.log(errmess.error)
+              // this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+            });
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 

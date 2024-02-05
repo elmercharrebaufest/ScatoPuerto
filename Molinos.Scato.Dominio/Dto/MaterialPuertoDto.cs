@@ -13,8 +13,7 @@ namespace Molinos.Scato.Dominio.Dto
         [StringLength(100, ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_ExcedeLargoMaximo")]
         public string CodigoSAP { get; set; }
 
-        [Display(ResourceType = typeof(Textos), Name = "Descripcion")]
-        [Required(ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_Requerido")]
+        [Display(ResourceType = typeof(Textos), Name = "Descripcion")]        
         [StringLength(200, ErrorMessageResourceType = typeof(Textos), ErrorMessageResourceName = "Error_ExcedeLargoMaximo")]
         public string Descripcion { get; set; }
 

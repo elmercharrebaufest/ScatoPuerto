@@ -1,0 +1,153 @@
+<ship-spinner [message]="mensajeCarga" *ngIf='cargando'></ship-spinner>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <span class="s28">Solicitudes de cambio de buque</span>
+  <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioBuque)">
+    Solicitar Cambio de Buque
+  </button>
+</div>
+
+<div style="overflow-x:auto;" class="table-responsive">
+  <table class="table table-bordered bg-white">
+    <thead>
+      <th>IMO</th>
+      <th>Nombre Buque</th>
+      <th>Fecha de Creacion</th>
+      <th>Fecha de Actualizacion</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let solicitud of (caratula?.solicitudesCambioBuque || [])">
+        <td class="align-middle">{{ solicitud.identificadorBuque }}</td>
+        <td class="align-middle">{{ solicitud.nombreMedioTransporte }}</td>
+        <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+        <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+        <td class="align-middle">{{ solicitud.estado }}</td>
+        <td class="text-center">
+          <ng-container *ngIf="solicitud.estado == 'Pendiente'">
+            <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('buque', solicitud.id)">
+              <i class="fa fs-icon fa-check text-success"></i>
+            </button>
+            <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('buque', solicitud.id)">
+              <i class="fa fs-icon fa-close text-danger"></i>
+            </button>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <span class="s28">Solicitudes de cambio de fechas</span>
+  <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioFechas)">
+    Solicitar Cambio de Fechas
+  </button>
+</div>
+
+<div style="overflow-x:auto;" class="table-responsive">
+  <table class="table table-bordered bg-white">
+    <thead>
+      <th>Fecha de Arribo</th>
+      <th>Fecha Zarpada</th>
+      <th>Motivo</th>
+      <th>Detalle Motivo</th>
+      <th>Fecha de Creacion</th>
+      <th>Fecha de Actualizacion</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let solicitud of (caratula?.solicitudesCambioFechas || [])">
+        <td class="align-middle">{{ solicitud.fechaArribo | date:'MM/dd/yyyy hh:mm a' }}</td>
+        <td class="align-middle">{{ solicitud.fechaZarpada | date:'MM/dd/yyyy hh:mm a' }}</td>
+        <td class="align-middle">{{ solicitud.motivoSolicitud }}</td>
+        <td class="align-middle">{{ solicitud.motivoSolicitudDetalle }}</td>
+        <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+        <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+        <td class="align-middle">{{ solicitud.estado }}</td>
+        <td class="text-center">
+          <ng-container *ngIf="solicitud.estado == 'Pendiente'">
+            <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('fechas', solicitud.id)">
+              <i class="fa fs-icon fa-check text-success"></i>
+            </button>
+            <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('fechas', solicitud.id)">
+              <i class="fa fs-icon fa-close text-danger"></i>
+            </button>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- #region Modales -->
+<ng-template #modalCambioFechas let-modal>
+  <div class="modal-content modal-solicitud">
+    <div class="modal-header">
+      <h5 class="modal-title">Solicitar cambio de fechas</h5>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="solicitarCambioFechasForm">
+        <div class="row">
+          <div class="col-md-4 pt-4">
+            <label>Fecha de Arribo</label>
+            <input type="datetime-local" class="form-control" placeholder="Ingrese la nueva fecha de arribo"
+              formControlName="fechaArribo" required>
+          </div>
+          <div class="col-md-4 pt-4">
+            <label>Fecha de Zarpada</label>
+            <input type="datetime-local" class="form-control" placeholder="Ingrese la nueva fecha de zarpado"
+              formControlName="fechaZarpada" [min]="solicitarCambioFechasForm.get('fechaArribo').value" required>
+          </div>
+          <div class="col-md-4 pt-4">
+            <label>Motivo</label>
+            <select formControlName="codigoMotivo" class="form-control custom-select" maxlength="200">
+              <option *ngFor="let motivo of listaMotivos" [ngValue]="motivo.codigo">
+                {{motivo.descripcion}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col pt-4">
+            <label>Descripcion del motivo</label>
+            <textarea class="form-control" formControlName="descripcionMotivo"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer justify-content-center">
+      <button type="button" class="btn btn-success" (click)="solicitarCambio('fechas')">Enviar solicitud</button>
+      <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #modalCambioBuque let-modal>
+  <div class="modal-content modal-solicitud">
+    <div class="modal-header">
+      <h5 class="modal-title">Solicitar cambio de buque</h5>
+    </div>
+    <div class="modal-body">
+      <form class="row margen" [formGroup]="solicitarCambioBuqueForm">
+        <div class="col-md-6 pt-4">
+          <label>IMO</label>
+          <input class="form-control" placeholder="Ingrese nuevo IMO" formControlName="identificadorBuque" maxLength="7"
+            minlength="7" required>
+        </div>
+        <div class="col-md-6 pt-4">
+          <label>Buque</label>
+          <input class="form-control" placeholder="Ingrese nuevo nombre de buque"
+            formControlName="nombreMedioTransporte" required>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer justify-content-center">
+      <button type="button" class="btn btn-success" (click)="solicitarCambio('buque')">Enviar solicitud</button>
+      <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</ng-template>
+<!-- #endregion -->

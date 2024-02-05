@@ -1,0 +1,3 @@
+.modal-solicitud :not(form).ng-invalid:not(.ng-untouched):not(:focus-within) {
+  border: 1px solid red;
+}

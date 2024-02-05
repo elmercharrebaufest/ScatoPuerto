@@ -27,6 +27,8 @@ import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liq
 import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { take } from 'rxjs/operators';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -103,14 +105,14 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   initFormulario() {
-    
+
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
         this.embarque = res;
 
         // this.mostrarTableristaOperando = res.estadoBuque.descripcion == "Operando";
         //Lo dejo como PreOperativo si no trae estado.
-        
+
         let estado = res.estadoBuque ? res.estadoBuque.descripcion.trim() : "PreOperativo";
         this.mostrarTableristaOperando = (estado != "PreOperativo")
 
@@ -160,13 +162,13 @@ export class CargaLiquidosComponent implements OnInit {
     let botonExportarTurnoLiquidos = this.mostrarTableristaOperando == true ? document.getElementById("btn-exportar-planilla-liquidos") : null;
     if (botonExportarTurnoLiquidos != null) valueBotonExpTurnosLiquidos = botonExportarTurnoLiquidos.style.display;
     let btonConformacionLineasEmbarque = document.getElementById("guardar-conformacion-lineas-embarque");
-    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display    
-    let iconosRelojes = document.getElementsByName('relojPeriodo');   
+    let valueGuardarLieasEmbarque = btonConformacionLineasEmbarque.style.display
+    let iconosRelojes = document.getElementsByName('relojPeriodo');
     //Botones que siempre tienen que estar ocultos.
     let guardarPeriodoDeCarga = document.getElementById("guardarPeriodoDeCarga");
     let collapse = this.elem.nativeElement.querySelectorAll("#ocultarCollapse");
     let agregarNuevaFila = document.getElementById("btn-add-container-lineas");
-    let guardarPlanillaEmbarque = document.getElementById("guardarPlanillaEmbarque");   
+    let guardarPlanillaEmbarque = document.getElementById("guardarPlanillaEmbarque");
     let guardarTurnoLiquido = this.elem.nativeElement.querySelectorAll("#btn-guardar-turno-liquidos");
     let ocultarAgregarLinea = this.elem.nativeElement.querySelectorAll(".ocultarAgregarLinea");
     let ocultarAgregarCorte = this.elem.nativeElement.querySelectorAll(".ocultarAgregarCorte");
@@ -179,37 +181,37 @@ export class CargaLiquidosComponent implements OnInit {
     let eliminarLineasDeEmbarque = this.elem.nativeElement.querySelectorAll(".btn-eliminar");
     let ocultarPdf = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     let selects = this.elem.nativeElement.querySelectorAll(".seleccionable");
-    
-    
+
+
     // #endregion
 
 
     //UNA VEZ OBTENIDOS LOS BOTONES LOS OCULTOS CAMBIANDO SU DYSPLAY = 'none'
     // #region OcultarBotones
-    
+
     iconosRelojes.forEach(reloj => reloj.style.display = 'none');
 
     btonConformacionLineasEmbarque.style.display = 'none';
-   
-    
+
+
     if (botonEnviarTableristas != null) botonEnviarTableristas.style.display = 'none';
 
     if (this.mostrarTableristaOperando == true) {
       if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'none';
-     
+
       if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'none';
       if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = 'none';
       if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = 'auto';
-      
+
       //Botones que siempre tienen que estar ocultos
-      if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'none';      
+      if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'none';
       if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'none';
-      if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'none';    
-      if (totalABordo != null) totalABordo.style.display = 'none';    
-     
+      if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'none';
+      if (totalABordo != null) totalABordo.style.display = 'none';
+
       if (tablaTurno != null) {
-        for (let i = 0; i < tablaTurno.length; i++) {        
-          tablaTurno[i].classList.add('borrarBordes');         
+        for (let i = 0; i < tablaTurno.length; i++) {
+          tablaTurno[i].classList.add('borrarBordes');
         }
       }
       this.ocultarCamposEnPDFListas(collapse, "none");
@@ -219,16 +221,16 @@ export class CargaLiquidosComponent implements OnInit {
       this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "none");
       this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "none");
       this.ocultarCamposEnPDFListas(ocultarAgregarLinea, "none");
-      this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "none");    
+      this.ocultarCamposEnPDFListas(ocultarAgregarCorte, "none");
       this.ocultarCamposEnPDFListas(enviarTurnoARecibidor, "none");
-      this.ocultarCamposEnPDFListas(IconoTotalABordo, "none");  
+      this.ocultarCamposEnPDFListas(IconoTotalABordo, "none");
       if (selects != null) {
         for (let i = 0; i < selects.length; i++) {
           selects[i].classList.add('ocultarBackground');
           selects[i].classList.remove('mostrarBackground');
         }
       }
-      
+
     }
     // #endregion
 
@@ -243,12 +245,12 @@ export class CargaLiquidosComponent implements OnInit {
         if (botonAgregarTurnosLiquidos != null) botonAgregarTurnosLiquidos.style.display = 'block';
         if (botonTurnoEnviadoLiquidos != null) botonTurnoEnviadoLiquidos.style.display = 'block';
         if (botonExportarTurnoLiquidos != null) botonExportarTurnoLiquidos.style.display = valueBotonExpTurnosLiquidos;
-        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;       
+        if (scrollTurnosLiquidos != null) scrollTurnosLiquidos.style.height = scrollValue;
         //Botones que siempre tienen que estar ocultos
-        if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'block';        
+        if (guardarPeriodoDeCarga != null) guardarPeriodoDeCarga.style.display = 'block';
         if (agregarNuevaFila != null) agregarNuevaFila.style.display = 'block';
         if (guardarPlanillaEmbarque != null) guardarPlanillaEmbarque.style.display = 'block';
-        if (totalABordo != null) totalABordo.style.display = 'block';    
+        if (totalABordo != null) totalABordo.style.display = 'block';
         this.ocultarCamposEnPDFListas(eliminarLineasDeEmbarque, "block");
         this.ocultarCamposEnPDFListas(guardarTurnoLiquido, "block");
         this.ocultarCamposEnPDFListas(ocultarEliminarTurno, "revert");
@@ -269,10 +271,10 @@ export class CargaLiquidosComponent implements OnInit {
         if (selects != null) {
           for (let i = 0; i < selects.length; i++) {
             selects[i].classList.add("mostrarBackground");
-            selects[i].classList.remove("ocultarBackground");            
+            selects[i].classList.remove("ocultarBackground");
           }
         }
-       
+
       }
     }, 5000);
     // #endregion
@@ -385,7 +387,7 @@ export class CargaLiquidosComponent implements OnInit {
       });
   }
 
-  guardarContinuacion(finalizar: boolean) {
+  async guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
       this.enviado = finalizar;
 
@@ -397,8 +399,19 @@ export class CargaLiquidosComponent implements OnInit {
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
-    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
+
+      let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
+      if (ok) {
+        this.guardarModuloDeCarga(finalizar, moduloCarga) ;
+      }
+
+  }
+
+  guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga){
+    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+
       if (finalizar) {
         this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
           .then(() => {
@@ -421,6 +434,7 @@ export class CargaLiquidosComponent implements OnInit {
 
     });
   }
+
 
   modificarEstadoBuque(estado: string) {
     let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes(estado));

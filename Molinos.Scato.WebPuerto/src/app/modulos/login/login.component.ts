@@ -116,7 +116,8 @@ mensaje.style.removeProperty("display");
 
 }
 navigate(permisos) {
-  let primerPermiso = permisos.find((p: string) => p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver' || p=='Comex_Nominacion_Ver' || p=='Vapor_Visualizar');
+  let primerPermiso = permisos.find((p: string) => p == 'Comex_Nominacion_Ver' || p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver'
+  || p == 'Coem_Visualizar' || p == 'Caratula_Visualizar');
   if(primerPermiso == undefined)
   {
     this.iniciandoSession=false;
@@ -155,6 +156,14 @@ navigate(permisos) {
       this.router.navigate(['/programa']);
       break;
     }
+    case 'Caratula_Visualizar': {
+      this.router.navigate(['/afip/caratula']);
+      break;
+    }
+    case 'Coem_Visualizar': {
+      this.router.navigate(['afip/coem']);
+      break;
+    }    
   }
 }
 

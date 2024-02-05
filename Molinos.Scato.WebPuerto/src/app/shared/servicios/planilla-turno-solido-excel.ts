@@ -299,55 +299,45 @@ export class PlanillaTurnoSolidoExcelService {
             }
 
     }
-    private enviarPlanillaLiquido(blob, nombreBuque,idModuloDeCarga) {
 
-        const titulo = "Enviar Planilla de Turno Líquido";
-        const text = "Cuerpo del Mail:"
+    private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number) {
+        const titulo = "Enviar Planilla de Turno Sólido";
         const textoCuerpoMail = `Se enviara la planilla de turnos. \n
-          Buque: ${nombreBuque}`;
+            Buque: ${nombreBuque}`;
         const inputTitle = "Destinatarios";
-        const mail = new Mail(`Planilla de turnos.`, `${textoCuerpoMail}`);
-        this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosLiquido').subscribe(x => mail.destinatarios = x);
-        const button1 = 'Enviar';
-        const button2 = 'Cancelar';
+        const mail = new Mail(`Planilla de turnos Solido Modulo de carga ${idModuloDeCarga}`, `${textoCuerpoMail}`);
+        this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosSolido').subscribe(x => mail.destinatarios = x);
 
-        this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mail, null, inputTitle, true)
-          .then(async (confirmed) => {
-            if (confirmed) {
+        const confirm = await this.confirmationDialogService.confirm(titulo, 'Cuerpo del Mail:', 'Enviar', 'Cancelar', 'lg', mail, null, inputTitle, true);
+        if (!confirm) {
+            return;
+        }
 
-              const convertBlobToBase64 = (blob) => new Promise((resolve, reject) => {
-                const reader = new FileReader;
-                reader.onerror = reject;
-                reader.onload = () => {
-                  resolve(reader.result);
-                };
-                reader.readAsDataURL(blob);
-              });
+        const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
+            const reader = new FileReader;
+            reader.onerror = reject;
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.readAsDataURL(blob);
+        });
 
-              const base64String = await convertBlobToBase64(blob);
-              this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
-                this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success)
-              });
-            }
-          })
-          .catch((e) => {
-            return
-          });
-
+        const base64String = await convertBlobToBase64(blob);
+        this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
+            this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
+        }, (err) => {
+            console.error(err);
+            this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error a enviar el email', 'Cerrar', '', null, null, Tipoalerta.Error);
+        });
     }
 
 
     async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean=false, totalABordo: number=0) {
       const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
 
-      planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-        turno.moduloDeCargaPlanillaDeTurnosCortes.forEach((corte: CorteTurno, index ) => {
-          if(corte.motivosDeCorte==null)
-            turno.moduloDeCargaPlanillaDeTurnosCortes.pop();
-
+        planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
+          turno.moduloDeCargaPlanillaDeTurnosCortes = [];
         });
-
-      });
 
         const fname = this.getNombreArchivo();
         const imgMolinos = await this.getImgMolinos();
@@ -516,7 +506,7 @@ export class PlanillaTurnoSolidoExcelService {
           const archivo = fname + '.xlsx'
           const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           if (esEnviarPlanilla){
-             this.enviarPlanillaLiquido(blob, procesoService.getEmbarqueSelected().nombreBuque,procesoService.getModuloDeCargaId())
+             this.enviarPlanillaSolido(blob, procesoService.getEmbarqueSelected().nombreBuque,procesoService.getModuloDeCargaId())
           }else{
              saveAs(blob, archivo);
           }
