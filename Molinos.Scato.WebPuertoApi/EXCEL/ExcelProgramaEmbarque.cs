@@ -220,39 +220,40 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             string[] valoresCeldas;
             #region INTERVENCIONES
             InsertarFilaTitulo("Intervenciones");
-            valoresCeldas = new string[] { "", "Aplica", "A cuenta de", "Observaciones" };
+            valoresCeldas = new string[] { "", "Aplica", "A cuenta de", "Compañía", "Observaciones" };
             InsertarFilaConValores(valoresCeldas, true); // Negrita
             valoresCeldas = new string[] {
                 "Precintado de bodegas",
                 detalleIntervencion == null ? "-" : detalleIntervencion.Precintado ? "SI" : "NO",
                 detalleIntervencion?.PrecintadoACuentaDe ?? "-",
-                "-"
+                "-","-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Draft Survey",
                 detalleIntervencion == null ? "-" : detalleIntervencion.DraftSurvey ? "SI" : "NO",
                 detalleIntervencion?.SurveyACuentaDe ?? "-",
-                "-"
+                "-","-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Permiso de embarque",
                 detalleIntervencion == null ? "-" : detalleIntervencion.PermisoDeEmbarque ? "SI" : "NO",
-                "-", "-"
+                "-", "-","-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Estibado y trimado",
                 detalleIntervencion == null ? "-" : detalleIntervencion.EstibadorYTrimado ? "SI" : "NO",
-                "-", "-"
+                "-", "-","-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Fumigación",
                 detalleIntervencion?.Fumigacion ?? "-",
                 detalleIntervencion?.CompaniaACuentaDe ?? "-",
-                detalleIntervencion?.TipoDeFumigacion?.Descripcion ?? "-"
+                detalleIntervencion?.CompaniaDeFumigacion?.Descripcion?? "-",
+                detalleIntervencion?.TipoDeFumigacion?.Descripcion ?? "-",
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             _flagColor = !_flagColor;
