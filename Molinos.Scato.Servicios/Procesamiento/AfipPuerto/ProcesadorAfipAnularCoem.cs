@@ -28,12 +28,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             var resultado = new ResultadoCrear();
             try
             {
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");                
-
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Id) ?? throw new Exception("No existe la COEM con el id especificado");
+                var codigoEstado = coemDB.AfipCoemEstado.Codigo;
                 //Se anula la COEM, siempre que esta se encuentre en el estado en CURSO/REGISTRADA, identificada por un identificador de Caratula
-                if (coemDB.AfipCoemEstado.Estado != EstadosCoemAFIP.Registrada)
+                if (codigoEstado != "REG" && codigoEstado != "CUR")
                 {
-                    throw new Exception("La COEM debe estar en estado Registrada (REG) para poder anularlse");
+                    throw new Exception("La COEM debe estar en estado 'En curso' (CUR) o 'Registrada' (REG) para poder anularlse");
                 }
 
                 var res = comunicacionEmbarqueServicioHelper.AnularCOEM(coemDB.IdentificadorCaratula, coemDB.IdentificadorCOEM).Body.AnularCOEMResult;

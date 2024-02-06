@@ -28,11 +28,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             try
             {
                 var coem = comando.Dto;
-                               
-                var mercaderiasSueltasDB = Repositorio.Obtener<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coem.Id);
-                int embalajeId = mercaderiasSueltasDB.Embalajes.Select(x => x.Id).FirstOrDefault();
-                var embalajeDB = Repositorio.Obtener<AfipCoemMercaderiaSueltaEmbalaje>(x => x.Id == embalajeId);
-
                 var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id) ?? throw new Exception("No existe la COEM con el id especificado");
 
                 // Campos que no vienen en el dto pero que igual no deben variar
@@ -50,20 +45,22 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     throw new Exception(sb.ToString());
                 }
 
-                var mercaderiasSueltas = this.Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(coem.MercaderiasSueltas.FirstOrDefault());
-                
-                mercaderiasSueltasDB.CuitATA = mercaderiasSueltas.CuitATA;
-                mercaderiasSueltasDB.IdentificadorDeclaracion = mercaderiasSueltas.IdentificadorDeclaracion;
+                var mercaderiasSueltas = this.Conversor.Convertir<AfipCoemDto, AfipCoem>(coem).MercaderiasSueltas;
+                foreach (var declaracion in coemDb.MercaderiasSueltas.ToList())
+                {
+                    Repositorio.Remover(declaracion);
+                }
+                foreach (var declaracion in mercaderiasSueltas)
+                {
+                    coemDb.MercaderiasSueltas.Add(declaracion);
+                }
 
-                embalajeDB.Peso = mercaderiasSueltas.Embalajes.FirstOrDefault().Peso;
-                embalajeDB.CantidadBultos = mercaderiasSueltas.Embalajes.FirstOrDefault().CantidadBultos;
-             
                 Repositorio.GuardarCambios();
             }
             catch (Exception ex)
             {
                 resultado.Error("", ex.Message);
-                Log.Error("Error al rectificar Coem {0}", ex);                
+                Log.Error("Error al rectificar Coem {0}", ex);
             }
             return resultado;
         }

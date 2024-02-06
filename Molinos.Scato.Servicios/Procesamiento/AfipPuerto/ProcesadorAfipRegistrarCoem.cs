@@ -32,6 +32,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (coem.Id == 0) // Registro
                 {
                     var caratula = Repositorio.Obtener<AfipCaratula>(x => x.IdentificadorCaratula == coem.IdentificadorCaratula) ?? throw new Exception("No existe la caratula a cual asociar la COEM");
+                    var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "CUR") ?? throw new Exception("No existe el estado 'CUR' en la base de datos");
                     var res = this.comunicacionEmbarqueServicioHelper.RegistrarCOEM(coem).Body.RegistrarCOEMResult;
                     var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
                     if (cuerpoRespuesta == null)
@@ -48,7 +49,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var mercaderiasSueltas = coem.MercaderiasSueltas.Select(x => Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(x)).ToList();
                     
                     caratula.Estado = EstadosCaratulaAFIP.Enviado;
-                    var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "CUR");
                     var coemDb = new AfipCoem
                     {
                         AfipCaratula = caratula,

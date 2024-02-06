@@ -13,5 +13,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual CalidadValor CalidadValor { get; set; }
         public virtual NominacionDatoTecnico NominacionDatoTecnico { get; set; }
+        public virtual string CalidadValorEditado { get; set; }
     }
 }

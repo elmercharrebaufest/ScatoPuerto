@@ -18,6 +18,7 @@ export class Caratula {
     via?: string;
     solicitudesCambioBuque?: SolicitudCambioBuque[];
     solicitudesCambioFechas?: SolicitudCambioFechas[];
+    solicitudesCierreCarga?: SolicitudCambioFechas[];
 }
 
 interface SolicitudAFIP {
@@ -30,11 +31,15 @@ interface SolicitudAFIP {
 export interface SolicitudCambioBuque extends SolicitudAFIP {
     fechaArribo: string;
     fechaZarpada: string;
-    motivoSolicitud:string;
-    motivoSolicitudDetalle:string;
+    motivoSolicitud: string;
+    motivoSolicitudDetalle: string;
 }
 
 export interface SolicitudCambioFechas extends SolicitudAFIP {
     fechaZarpada: string;
     nombreMedioTransporte: string;
+}
+
+export interface SolicitudCierreCarga extends SolicitudAFIP {
+    identificadorCierre: string;
 }

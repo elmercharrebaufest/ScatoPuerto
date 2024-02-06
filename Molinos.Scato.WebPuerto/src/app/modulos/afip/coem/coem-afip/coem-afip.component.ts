@@ -2,21 +2,26 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { COEM } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
 import { AfipMotivoSolicitudCambio } from '@ScatoModels/afip/tablas-afip';
+import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, forkJoin, of } from 'rxjs';
+import { Observable, Subscription, forkJoin, of } from 'rxjs';
 
+
+// TODO: AHORA QUE SE LISTAN LAS COEMS POR PÁGINAS, PODRÍA OCURRIR QUE NO SE LISTEN TODAS LAS COEMS DE LA CARATULA
+// ESTO PROVOCARÍA QUE AL MOMENTO DE SOLICITAR CIERRE NO SE VEAN EN EL MODAL TODAS LAS COEMS!!!
+// Esto podría no ser prioritario porque dificilmente se dé que haya más de una página de COEMs por carátula
 @Component({
   selector: 'app-coem-afip',
   templateUrl: './coem-afip.component.html',
   styleUrls: ['./coem-afip.component.css']
 })
-export class CoemAfipComponent implements OnInit {
+export class CoemAfipComponent implements OnInit, OnDestroy {
 
   private listaHistorialCoem: COEM[] = [];
   public load: boolean = false;
@@ -27,10 +32,11 @@ export class CoemAfipComponent implements OnInit {
   coemImo: string;
   listaEstados: EstadoCOEM[] = [];
   solicitarNoABordoForm: FormGroup;
+  public formFiltros: FormGroup;
 
   public caratulaId: number;
-  public coemsSeleccionadas: COEM[] = [];
   public listaMotivos: AfipMotivoSolicitudCambio[] = [];
+  private suscripcion: Subscription;
 
   private modal: NgbModalRef;
 
@@ -47,6 +53,7 @@ export class CoemAfipComponent implements OnInit {
   constructor(
     private modalService: NgbModal,
     private coemAfipService: CoemAfipService,
+    private caratulaService: CaratulaAfipService,
     private confirmationDialogService: ConfirmationDialogService,
     private route: ActivatedRoute,
     private tablasAfipService: TablasAfipService,
@@ -58,6 +65,9 @@ export class CoemAfipComponent implements OnInit {
 
     this.route.params.subscribe(params => {
       this.caratulaId = Number(params['id']);
+      this.suscripcion = this.coemAfipService.$recargarCoems.subscribe(() => {
+        this.cargarDatos();
+      });
       this.cargarDatos();
     });
 
@@ -67,13 +77,23 @@ export class CoemAfipComponent implements OnInit {
     );
   }
 
-  public cargarDatos() {
+  ngOnDestroy(): void {
+    this.suscripcion.unsubscribe();
+  }
+
+  public cargarDatos(params: any = {}) {
     this.load = true;
-    const obsCoems = this.caratulaId ? this.coemAfipService.listarCoemsDeCaratula(this.caratulaId) : this.coemAfipService.listarCoems();
+    params.pagina = this.currentPage;
+    params.itemsPorPagina = this.itemsPerPage;
+    params.idCaratula = this.caratulaId || null;
+    const obsCoems = this.coemAfipService.listarCoems(params);
     const obsEstados: Observable<EstadoCOEM[]> = this.listaEstados.length ? of(null) : this.coemAfipService.estadosCoem(); // no es necesario cargar los estados si ya estan
     forkJoin([obsEstados, obsCoems]).subscribe(([estados, coems]) => {
       if (estados) {
         this.listaEstados = estados;
+      }
+      if (this.caratulaId) {
+        this.caratulaService.$caratulaCoems.next(coems);
       }
       this.listaHistorialCoem = coems;
       this.crearPaginado();
@@ -270,19 +290,6 @@ export class CoemAfipComponent implements OnInit {
     }, () => this.load = false);
   }
 
-  public async solicitarCierreCarga(modalCierreCarga: any) {
-    this.coemsSeleccionadas = this.listadoCoems.filter(coem => coem.afipCoemEstado.codigo != 'ANU');
-    const estadosValidos = ['AUTO', 'ANU'];
-    const coemsEstadoinvalido = this.coemsSeleccionadas
-      .filter(coem => !estadosValidos.includes(coem.afipCoemEstado.codigo))
-      .map(coem => coem.identificadorCOEM).join('\n');
-    if (coemsEstadoinvalido) {
-      this.confirmationDialogService.error('Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido);
-      return;
-    }
-    this.modalService.open(modalCierreCarga, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
-  }
-
   public abrirModal(modal: any, coem: COEM) {
     this.coemId = coem.id;
     this.coemIdentificador = coem.identificadorCOEM;
@@ -296,6 +303,21 @@ export class CoemAfipComponent implements OnInit {
 
   private initForms() {
     this.solicitarNoABordoForm = this.formBuilder.group({ codigoMotivo: ['', Validators.required] });
+    this.formFiltros = this.formBuilder.group({
+      identificador: '',
+      declaracion: '',
+      estado: ''
+    });
+  }
+
+  public filtrar() {
+    const params = this.formFiltros.value;
+    this.cargarDatos(params);
+  }
+
+  public limpiarFiltros() {
+    this.formFiltros.reset();
+    this.formFiltros.get('estado').setValue('');
   }
 
   //#region Funciones de paginado
@@ -371,7 +393,7 @@ export class CoemAfipComponent implements OnInit {
     return ['PRE', 'AUTO'].includes(codigoEstado);
   }
 
-  mostrarSolicitarAnulacion(codigoEstado:string):boolean{
-    return ['REG','PRE'].includes(codigoEstado);
+  mostrarSolicitarAnulacion(codigoEstado: string): boolean {
+    return codigoEstado == 'PRE';
   }
 }

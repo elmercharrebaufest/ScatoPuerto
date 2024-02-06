@@ -5,6 +5,7 @@ import { Caratula } from '@ScatoModels/afip/caratula';
 import { CaratulaAfipService, EstadosCaratulaAFIP } from '@ScatoServicios/afip/caratula-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -14,7 +15,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class CaratulaAfipComponent implements OnInit {
 
-  // #region Variables
   private listaHistorialCaratulas: Caratula[] = [];
   public cargarCaratulas: boolean = true;
   caratulaId: number;
@@ -24,6 +24,7 @@ export class CaratulaAfipComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   public estados: EstadosCaratulaAFIP;
+  public formFiltros: FormGroup;
 
   // Paginado
   currentPage: number = 1; // Página actual
@@ -38,19 +39,49 @@ export class CaratulaAfipComponent implements OnInit {
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
-    private caratulaService: CaratulaAfipService
+    private caratulaService: CaratulaAfipService,
+    private formBuilder: FormBuilder
   ) {
     this.estados = caratulaService.estados;
+    this.iniciarFormFiltros();
   }
 
   ngOnInit(): void {
-    this.listarCaratulas();
+    this.filtrar();
   }
 
+  private iniciarFormFiltros() {
+    this.formFiltros = this.formBuilder.group({
+      fechaArribo: '',
+      buque: '',
+      identificador: '',
+      estado: ''
+    });
+    this.setMesActual();
+  }
 
-  listarCaratulas() {
+  private setMesActual() {
+    const date = new Date()
+    const month = ("0" + (date.getMonth() + 1)).slice(-2)
+    const year = date.getFullYear();
+    this.formFiltros.get('fechaArribo').setValue(`${year}-${month}`);
+  }
+
+  public filtrar() {
+    const params = this.formFiltros.value;
+    this.listarCaratulas(params);
+  }
+
+  public limpiarFiltros() {
+    this.formFiltros.reset();
+    this.formFiltros.get('estado').setValue('');
+  }
+
+  listarCaratulas(params: any = {}) {
     this.cargarCaratulas = true;
-    this.caratulaService.listarCaratulas().subscribe((datos) => {
+    params.pagina = this.currentPage;
+    params.itemsPorPagina = this.itemsPerPage;
+    this.caratulaService.listarCaratulas(params).subscribe((datos) => {
       this.listaHistorialCaratulas = datos;
       this.esNoExisteRegistros = !Boolean(datos.length);
 
@@ -63,10 +94,10 @@ export class CaratulaAfipComponent implements OnInit {
 
       // Calcular las páginas visibles
       this.calculateVisiblePages();
+      this.cargarCaratulas = false;
     }, (error) => {
       console.error(error);
       this.confirmationDialogService.confirm(`¡Error!`, 'No se han podido cargar correctamente las Caratulas', 'Cerrar', '', null, null, Tipoalerta.Error);
-    }, () => {
       this.cargarCaratulas = false;
     });
   }
