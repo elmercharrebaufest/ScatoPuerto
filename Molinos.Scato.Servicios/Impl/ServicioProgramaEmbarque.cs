@@ -718,9 +718,11 @@ namespace Molinos.Scato.Servicios.Impl
                     $"<thead> <td style=\"border: 1px solid #ddd;padding: 8px; background-color: #ddd;\"><strong> {((nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0) ? nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault().CalidadValor?.TipoDeCalidad?.Descripcion.Trim() : "-")} </strong> </td><thead>";
             if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
             {
+                string calidadValor = string.Empty;
                 foreach (var item in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad)
                 {
-                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong> {item.CalidadValor.Parametro} </strong> {item.CalidadValor.Valor} - </td>";
+                    calidadValor = !string.IsNullOrEmpty(item.CalidadValorEditado) ? item.CalidadValorEditado : item.CalidadValor.Valor;
+                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong> {item.CalidadValor.Parametro} </strong> {calidadValor} - </td>";
                     body += $"</tr>";
                 }
 
@@ -732,8 +734,24 @@ namespace Molinos.Scato.Servicios.Impl
             body += $" </tr>" +
                     $"</table>";
 
+            //Observaciones
+            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null)
+            {
+                body += $"<br/>";
+                body += $"<label><strong>OBSERVACIONES</strong></label>";
+                body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
+                        $"<tbody>";
+                body += $"<tr style=\"border: text-align:center;\">" +
+                            $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {nominacion.NominacionDatoTecnico.Observaciones} </td>" +
+                        $"</tr>";
+                body += $"</tbody>" +
+                        $"</table>";
+            }
+
             //Recibo
             body += $"<br/>";
+
+
             if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
             {
                 body += $"<label><strong>RECIBO</strong></label>";
@@ -852,8 +870,11 @@ namespace Molinos.Scato.Servicios.Impl
                               $"</tr>";
                 }
                 body += $"</tbody>" +
-                       $"</table></div>";
+                       $"</table>";
             }
+
+            body += "</ div > ";
+
             mail.Body = body;
             return mail;
         }

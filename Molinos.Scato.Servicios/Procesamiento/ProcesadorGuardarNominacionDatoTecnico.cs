@@ -173,6 +173,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var datoTecnicoCalidad = new NominacionDatoTecnicoCalidad();
                     datoTecnicoCalidad.NominacionDatoTecnico = nominacionDatoTecnico;
                     datoTecnicoCalidad.CalidadValor = Repositorio.Obtener<CalidadValor>(x => x.Id == calidad.CalidadValor.Id);
+                    datoTecnicoCalidad.CalidadValorEditado = calidad.CalidadValorEditado;
                     Repositorio.Agregar(datoTecnicoCalidad);
                     Repositorio.GuardarCambios();
                 }
@@ -260,6 +261,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var datoTecnicoCalidad = new NominacionDatoTecnicoCalidad();
                     datoTecnicoCalidad.NominacionDatoTecnico = nominacionDatoTecnico;
                     datoTecnicoCalidad.CalidadValor = Repositorio.Obtener<CalidadValor>(x => x.Id == calidad.CalidadValor.Id);
+                    datoTecnicoCalidad.CalidadValorEditado = calidad.CalidadValorEditado;
                     Repositorio.Agregar(datoTecnicoCalidad);
                     Repositorio.GuardarCambios();
                 }
@@ -302,6 +304,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var dto = datoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault(x => x.Id == calidad.Id);
                     calidad.NominacionDatoTecnico = nominacionDatoTecnico;
                     calidad.CalidadValor = Repositorio.Obtener<CalidadValor>(x => x.Id == dto.CalidadValor.Id);
+                    calidad.CalidadValorEditado = calidad.CalidadValorEditado;
                     Repositorio.GuardarCambios();
                 }
 

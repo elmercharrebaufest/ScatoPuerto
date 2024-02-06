@@ -4,7 +4,9 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             try
             {
                 var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula) ?? throw new Exception("No existe la caratula con el id " + comando.Dto.IdCaratula);
+                if (caratulaDB.SolicitudesCierreCarga.Any(x => x.Estado == ((int)EstadosSolicitudesAFIP.Pendiente)))
+                {
+                    throw new Exception("Ya existe una solicitud pendiente de cierre de carga para esta carátula");
+                }
+
                 comando.Dto.IdentificadorCaratula = caratulaDB.IdentificadorCaratula;
 
                 foreach (var coem in comando.Dto.Coems)
@@ -56,8 +63,19 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
                     throw new Exception(sb.ToString());
                 }
+                var identificadorCierre = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                caratulaDB.IdentificadorCierre = identificadorCierre;
+                caratulaDB.Estado = EstadosCaratulaAFIP.CierreSolicitado;
 
-                caratulaDB.IdentificadorCierre = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                var solicitudCierre = new AfipSolicitudCierreCarga
+                {
+                    AfipCaratula = caratulaDB,
+                    IdentificadorCierre = identificadorCierre,
+                    FechaCreacion = DateTime.Now,
+                    FechaActualizacion = DateTime.Now,
+                    Estado = (int)EstadosSolicitudesAFIP.Pendiente
+                };
+                Repositorio.Agregar(solicitudCierre);
                 this.Repositorio.GuardarCambios();
             }
             catch (Exception ex)

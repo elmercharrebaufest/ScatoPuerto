@@ -1,4 +1,18 @@
 <ship-spinner [message]="'Cargando listado de COEMs. Por favor, espere...'" *ngIf='load'></ship-spinner>
+
+<form class="filtros" [formGroup]="formFiltros">
+    <input type="text" class="form-control" placeholder="Identificador" formControlName="identificador">
+    <input type="text" class="form-control" placeholder="Declaración" formControlName="declaracion">
+    <select class="form-control" formControlName="estado">
+        <option value="" selected style="display: none;">Estado</option>
+        <option *ngFor="let p of listaEstados" [value]="p.id">
+            ({{p.codigo}}) {{p.estado}}
+        </option>
+    </select>
+    <button class="btn btn-primary" (click)="filtrar()">Buscar</button>
+    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limipar Búsqueda</button>
+</form>
+
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-coem-table'>
         <thead>
@@ -29,7 +43,7 @@
                         <div class="btn-group">
                             <select class="custom-select" id="inputGroupSelect01"
                                 (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM, coem.afipCoemEstado.codigo)"
-                                [disabled]="coem.afipCoemEstado.codigo=='ANU'">
+                                [disabled]="coem.afipCoemEstado.codigo == 'ANU' || coem.afipCoemEstado.codigo == 'CODE'">
                                 <option selected value="" disabled>Estado</option>
                                 <option *ngFor="let p of listaEstados" [value]="p.id"
                                     [selected]="coem.afipCoemEstado.id == p.id">
@@ -89,13 +103,6 @@
         </tbody>
     </table>
 </div>
-
-<div class="flex-center mb-3" *ngIf="caratulaId">
-    <button class="btn btn-primary" (click)="solicitarCierreCarga(cerrarCoems)">
-        Solicitar cierre de carga
-    </button>
-</div>
-
 <!--Paginado -->
 <nav aria-label="Page navigation example" class="centrado">
     <ul class="pagination justify-content-center paginado-buque-fondo">
@@ -120,11 +127,6 @@
 <ng-template #editCoem let-modal>
     <app-modal-crear-coem (editOCrearFinish)="editFinish($event)" [id]="coemId"
         [title]="'Rectificar Coem Nro '+ coemIdentificador"></app-modal-crear-coem>
-</ng-template>
-
-<ng-template #cerrarCoems let-modal>
-    <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coemsSeleccionadas"
-        [idCaratula]="caratulaId"></app-modal-cerrar-carga-coems>
 </ng-template>
 
 <ng-template #modalSolicitudNoABordo let-modal>

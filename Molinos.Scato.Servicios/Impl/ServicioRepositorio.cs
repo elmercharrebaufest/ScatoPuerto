@@ -10642,6 +10642,11 @@ namespace Molinos.Scato.Servicios.Impl
 
             foreach (var item in observacionesDeCalidadDto)
             {
+                if(item.Observaciones.Length > 200)
+                {
+                    throw new Exception("El texto Observaciones no puede superar la cantidad de 200 caracteres.");
+                }
+
                 ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad observacionesDeCalidad_db = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == item.Id);
                 if (observacionesDeCalidad_db != null)
                 {

@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Servicios;
@@ -154,11 +155,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/afip/ListarCaratulas")]
-        public HttpResponseMessage ListarCaratulas()
+        public HttpResponseMessage ListarCaratulas(int? pagina = null, int? itemsPorPagina = null, DateTime? fechaArribo = null, string buque = null, string identificador = null, string estado = null)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCaratulas());
+                var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
+                var response = servicioAfip.ListarCaratulas(paginacion, fechaArribo, buque, identificador, estado);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
             {
@@ -285,11 +288,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/afip/ListarCoems")]
-        public HttpResponseMessage ListarCoems()
+        public HttpResponseMessage ListarCoems(int? idCaratula = null, int? pagina = null, int? itemsPorPagina = null, string identificador = null, string declaracion = null, string estado = null)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoems());
+                var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoems(idCaratula, paginacion, identificador, declaracion, estado));
             }
             catch (Exception e)
             {
@@ -304,20 +308,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ObtenerCoem(id));
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpGet]
-        [Route("api/afip/ListarCoemsPorCaratula")]
-        public HttpResponseMessage ListarCoemsPorCaratula(int idCaratula)
-        {
-            try
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoemsPorCaratula(idCaratula));
             }
             catch (Exception e)
             {
@@ -451,6 +441,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         #region Solicitudes
 
+        #region Solicitar Cierre de Carga
         [HttpPost]
         [Route("api/afip/SolicitarCierreCargaGranel")]
         public HttpResponseMessage SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCargaGranelDto)
@@ -473,6 +464,65 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
         }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCierreCarga")]
+        public HttpResponseMessage ListarSolicitudesCierreCarga()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCierreCarga());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ListarSolicitudesCierreCarga/id")]
+        public HttpResponseMessage ListarSolicitudesCierreCarga(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarSolicitudesCierreCarga(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/EfectuarSolicitudCierreCarga/{id}")]
+        public HttpResponseMessage EfectuarSolicitudCierreCarga(int id)
+        {
+            try
+            {
+                servicioAfip.EfectuarSolicitudCierreCarga(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/RechazarSolicitudCierreCarga/{id}")]
+        public HttpResponseMessage RechazarSolicitudCierreCarga(int id)
+        {
+            try
+            {
+                servicioAfip.RechazarSolicitudCierreCarga(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
 
         [HttpPost]
         [Route("api/afip/SolicitarNoAbordo")]

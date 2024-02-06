@@ -882,4 +882,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CantidadReal" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="96dafa65-0e60-4127-b0d4-a132362423d0" ChangeDateTime="01/22/2024 12:44:58">
+    <Property Name="ElementName" Value="[dbo].[AfipSolicitudCierreCarga].[FechaModificación]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipSolicitudCierreCarga]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FechaModificacion" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dfe21473-fef3-4ef1-b266-cbf52aa401e3" ChangeDateTime="01/24/2024 14:22:57">
+    <Property Name="ElementName" Value="[dbo].[AfipSolicitudCierreCarga].[FechaModificacion]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AfipSolicitudCierreCarga]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FechaActualizacion" />
+  </Operation>
 </Operations>
