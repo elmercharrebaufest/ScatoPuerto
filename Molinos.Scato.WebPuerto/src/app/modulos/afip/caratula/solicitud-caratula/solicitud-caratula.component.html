@@ -1,86 +1,141 @@
 <ship-spinner [message]="mensajeCarga" *ngIf='cargando'></ship-spinner>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <span class="s28">Solicitudes de cambio de buque</span>
-  <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioBuque)">
+<div class="d-flex justify-content-center align-items-center mb-3" style="gap: 2rem;" *ngIf="caratula?.estado != 'CODE'">
+  <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioBuque)" *ngIf="!caratula?.solicitudesCambioBuque?.length">
     Solicitar Cambio de Buque
   </button>
-</div>
-
-<div style="overflow-x:auto;" class="table-responsive">
-  <table class="table table-bordered bg-white">
-    <thead>
-      <th>IMO</th>
-      <th>Nombre Buque</th>
-      <th>Fecha de Creacion</th>
-      <th>Fecha de Actualizacion</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </thead>
-    <tbody>
-      <tr *ngFor="let solicitud of (caratula?.solicitudesCambioBuque || [])">
-        <td class="align-middle">{{ solicitud.identificadorBuque }}</td>
-        <td class="align-middle">{{ solicitud.nombreMedioTransporte }}</td>
-        <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-        <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-        <td class="align-middle">{{ solicitud.estado }}</td>
-        <td class="text-center">
-          <ng-container *ngIf="solicitud.estado == 'Pendiente'">
-            <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('buque', solicitud.id)">
-              <i class="fa fs-icon fa-check text-success"></i>
-            </button>
-            <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('buque', solicitud.id)">
-              <i class="fa fs-icon fa-close text-danger"></i>
-            </button>
-          </ng-container>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <span class="s28">Solicitudes de cambio de fechas</span>
-  <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioFechas)">
+  <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioFechas)" *ngIf="!caratula?.solicitudesCambioFechas?.length">
     Solicitar Cambio de Fechas
+  </button>
+  <button type="button" class="btn btn-primary" (click)="solicitarCierreCarga(modalCerrarCarga)"  *ngIf="!caratula?.solicitudesCierreCarga?.length">
+    Solicitar cierre de carga
   </button>
 </div>
 
-<div style="overflow-x:auto;" class="table-responsive">
-  <table class="table table-bordered bg-white">
-    <thead>
-      <th>Fecha de Arribo</th>
-      <th>Fecha Zarpada</th>
-      <th>Motivo</th>
-      <th>Detalle Motivo</th>
-      <th>Fecha de Creacion</th>
-      <th>Fecha de Actualizacion</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </thead>
-    <tbody>
-      <tr *ngFor="let solicitud of (caratula?.solicitudesCambioFechas || [])">
-        <td class="align-middle">{{ solicitud.fechaArribo | date:'MM/dd/yyyy hh:mm a' }}</td>
-        <td class="align-middle">{{ solicitud.fechaZarpada | date:'MM/dd/yyyy hh:mm a' }}</td>
-        <td class="align-middle">{{ solicitud.motivoSolicitud }}</td>
-        <td class="align-middle">{{ solicitud.motivoSolicitudDetalle }}</td>
-        <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-        <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-        <td class="align-middle">{{ solicitud.estado }}</td>
-        <td class="text-center">
-          <ng-container *ngIf="solicitud.estado == 'Pendiente'">
-            <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('fechas', solicitud.id)">
-              <i class="fa fs-icon fa-check text-success"></i>
-            </button>
-            <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('fechas', solicitud.id)">
-              <i class="fa fs-icon fa-close text-danger"></i>
-            </button>
-          </ng-container>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+<ng-container *ngIf="caratula?.solicitudesCambioBuque?.length">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="s28">Solicitudes de cambio de buque</span>
+    <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioBuque)" *ngIf="caratula?.estado != 'CODE'">
+      Solicitar Cambio de Buque
+    </button>
+  </div>
+
+  <div style="overflow-x:auto;" class="table-responsive">
+    <table class="table table-bordered bg-white">
+      <thead>
+        <th>IMO</th>
+        <th>Nombre Buque</th>
+        <th>Fecha de Creacion</th>
+        <th>Fecha de Actualizacion</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </thead>
+      <tbody>
+        <tr *ngFor="let solicitud of caratula.solicitudesCambioBuque">
+          <td class="align-middle">{{ solicitud.identificadorBuque }}</td>
+          <td class="align-middle">{{ solicitud.nombreMedioTransporte }}</td>
+          <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.estado }}</td>
+          <td class="text-center">
+            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
+              <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('buque', solicitud.id)">
+                <i class="fa fs-icon fa-check text-success"></i>
+              </button>
+              <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('buque', solicitud.id)">
+                <i class="fa fs-icon fa-close text-danger"></i>
+              </button>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="caratula?.solicitudesCambioFechas?.length">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="s28">Solicitudes de cambio de fechas</span>
+    <button type="button" class="btn btn-primary" (click)="abrirModal(modalCambioFechas)" *ngIf="caratula?.estado != 'CODE'">
+      Solicitar Cambio de Fechas
+    </button>
+  </div>
+
+  <div style="overflow-x:auto;" class="table-responsive">
+    <table class="table table-bordered bg-white">
+      <thead>
+        <th>Fecha de Arribo</th>
+        <th>Fecha Zarpada</th>
+        <th>Motivo</th>
+        <th>Detalle Motivo</th>
+        <th>Fecha de Creacion</th>
+        <th>Fecha de Actualizacion</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </thead>
+      <tbody>
+        <tr *ngFor="let solicitud of caratula.solicitudesCambioFechas">
+          <td class="align-middle">{{ solicitud.fechaArribo | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaZarpada | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.motivoSolicitud }}</td>
+          <td class="align-middle">{{ solicitud.motivoSolicitudDetalle }}</td>
+          <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.estado }}</td>
+          <td class="text-center">
+            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
+              <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('fechas', solicitud.id)">
+                <i class="fa fs-icon fa-check text-success"></i>
+              </button>
+              <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('fechas', solicitud.id)">
+                <i class="fa fs-icon fa-close text-danger"></i>
+              </button>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="caratula?.solicitudesCierreCarga?.length">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="s28">Solicitudes de cierre de carga</span>
+    <button type="button" class="btn btn-primary" (click)="solicitarCierreCarga(modalCerrarCarga)" *ngIf="caratula?.estado != 'CODE'">
+      Solicitar cierre de carga
+    </button>
+  </div>
+
+  <div style="overflow-x:auto;" class="table-responsive">
+    <table class="table table-bordered bg-white">
+      <thead>
+        <th>Identificador de cierre</th>
+        <th>Fecha de Creacion</th>
+        <th>Fecha de Actualizacion</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </thead>
+      <tbody>
+        <tr *ngFor="let solicitud of caratula?.solicitudesCierreCarga">
+          <td class="align-middle">{{ solicitud.identificadorCierre }}</td>
+          <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.estado }}</td>
+          <td class="text-center">
+            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
+              <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCierre(solicitud.id)">
+                <i class="fa fs-icon fa-check text-success"></i>
+              </button>
+              <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCierre(solicitud.id)">
+                <i class="fa fs-icon fa-close text-danger"></i>
+              </button>
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
 
 <!-- #region Modales -->
 <ng-template #modalCambioFechas let-modal>
@@ -149,5 +204,10 @@
       <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cancelar</button>
     </div>
   </div>
+</ng-template>
+
+<ng-template #modalCerrarCarga let-modal>
+  <app-modal-cerrar-carga-coems [coemsSeleccionadas]="coems" [idCaratula]="caratula.id" (finalizar)="finalizarCierreCarga()">
+  </app-modal-cerrar-carga-coems>
 </ng-template>
 <!-- #endregion -->

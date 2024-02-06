@@ -361,6 +361,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         #region Solicitudes
 
+        #region Solicitar Cierre de Carga
         public bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto)
         {
             var res = this.servicioComandos.Ejecutar(new AfipSolicitarCierreCargaGranel { Dto = solicitarCierreCargaGranelDto });
@@ -370,6 +371,39 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return !res.HayErrores;
         }
+
+        public IList<AfipSolicitudCierreCargaDto> ListarSolicitudesCierreCarga(int id = 0)
+        {
+            IList<AfipSolicitudCierreCargaDto> resultado;
+            resultado = Listar<AfipSolicitudCierreCarga, AfipSolicitudCierreCargaDto>(x => id == 0 || x.AfipCaratula.Id == id);
+            return resultado.OrderByDescending(x => x.FechaCreacion).ToList();
+        }
+
+        public void EfectuarSolicitudCierreCarga(int id)
+        {
+            var solicitudDb = repositorio.Obtener<AfipSolicitudCierreCarga>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitudDb.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            var estadoCoem = repositorio.Obtener<AfipCoemEstado>(estado => estado.Codigo == "CODE") ?? throw new Exception("No existe el estado 'CODE' en la base de datos");
+            var caratula = solicitudDb.AfipCaratula;
+            foreach (var coem in caratula.Coems)
+            {
+                coem.AfipCoemEstado = estadoCoem;
+            }
+            caratula.Estado = EstadosCaratulaAFIP.Code;
+            solicitudDb.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            solicitudDb.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+
+        public void RechazarSolicitudCierreCarga(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudCierreCarga>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+        #endregion
 
         public bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
         {

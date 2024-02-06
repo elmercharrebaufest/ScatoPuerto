@@ -8,13 +8,7 @@ import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-  FormArray,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
 
@@ -59,18 +53,18 @@ export class ModalCrearCoemComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.id == null ? this.operacionNuevo : (this.operacionNuevo = false);
+    this.operacionNuevo = !this.id;
     this.titleCoem = this.title;
-    this.agregarNuevoCoem();
     this.cargarCombos();
-    this.setValoresFormEditar();
+    if (this.operacionNuevo) {
+      this.agregarNuevoCoem();
+    } else {
+      this.setValoresFormEditar();
+    }
   }
 
   get mercaderiasSueltasFormArray(): FormArray {
     return this.crearEditarCoemForm.get('mercaderiasSueltas') as FormArray;
-  }
-  get embalajeForm(): FormGroup {
-    return this.mercaderiasSueltasFormArray.controls[0] as FormGroup;
   }
 
   private initFormCrearEditarCode() {
@@ -81,15 +75,16 @@ export class ModalCrearCoemComponent implements OnInit {
       mercaderiasSueltas: this.formBuilder.array([]),
     });
   }
-  public inicializarFormMercaderias(mercaderias: any = null): FormGroup {
+
+  public inicializarFormMercaderias(mercaderia: NuevasMercaderiasSueltasCoem = null): FormGroup {
     const regex = /^(\d{5}[a-zA-Z]{2}[\da-zA-Z]{2}\d{6}[a-zA-Z])$/;
-    if (mercaderias != null) {
+    if (mercaderia != null) {
       return this.formBuilder.group({
-        cuitATA: mercaderias.cuitATA,
-        codigoEmbalaje: mercaderias.codigoEmbalaje,
-        cantidadBultos: mercaderias.peso,
-        peso: mercaderias.peso,
-        identificadorDeclaracion: [mercaderias.identificadorDeclaracion, Validators.pattern(regex)],
+        cuitATA: [mercaderia.cuitATA, Validators.required],
+        codigoEmbalaje: mercaderia.embalajes[0].codigoEmbalaje,
+        cantidadBultos: mercaderia.embalajes[0].peso,
+        peso: [mercaderia.embalajes[0].peso, Validators.required],
+        identificadorDeclaracion: [mercaderia.identificadorDeclaracion, Validators.pattern(regex)]
       });
     } else {
       return this.formBuilder.group({
@@ -192,19 +187,17 @@ export class ModalCrearCoemComponent implements OnInit {
   }
 
   setValoresFormEditar() {
-    if (!this.operacionNuevo) {
-      this.coemAfipService.obtenerCoemId(this.id).subscribe((datos) => {
-        this.crearEditarCoemForm.controls['id'].setValue(datos.id);
-        this.crearEditarCoemForm.controls['identificadorCaratula'].setValue(datos.identificadorCaratula);
-        this.idCaratula = this.crearEditarCoemForm.get('identificadorCaratula').value;
-        this.crearEditarCoemForm.controls['identificadorCaratula'].disable();
-        this.embalajeForm.get('cuitATA').setValue(datos.mercaderiasSueltas[0].cuitATA);
-        this.embalajeForm.get('codigoEmbalaje').setValue(datos.mercaderiasSueltas[0].embalajes[0].codigoEmbalaje);
-        this.embalajeForm.get('cantidadBultos').setValue(datos.mercaderiasSueltas[0].embalajes[0].peso);
-        this.embalajeForm.get('peso').setValue(datos.mercaderiasSueltas[0].embalajes[0].peso);
-        this.embalajeForm.get('identificadorDeclaracion').setValue(datos.mercaderiasSueltas[0].identificadorDeclaracion);
-      });
-    }
+    this.coemAfipService.obtenerCoemId(this.id).subscribe((datos) => {
+      this.crearEditarCoemForm.controls['id'].setValue(datos.id);
+      this.crearEditarCoemForm.controls['identificadorCaratula'].setValue(datos.identificadorCaratula);
+      this.idCaratula = this.crearEditarCoemForm.get('identificadorCaratula').value;
+      this.crearEditarCoemForm.controls['identificadorCaratula'].disable();
+
+      for (const mercaderia of datos.mercaderiasSueltas) {
+        const mercaderiaForm = this.inicializarFormMercaderias(mercaderia);
+        this.mercaderiasSueltasFormArray.push(mercaderiaForm);
+      }
+    });
   }
 
   onInput(e: Event) {

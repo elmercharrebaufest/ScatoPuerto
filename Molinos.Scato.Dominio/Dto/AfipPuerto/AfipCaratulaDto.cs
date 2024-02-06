@@ -26,5 +26,6 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<AfipSolicitudCambioBuqueDto> SolicitudesCambioBuque { get; set; }
         public IList<AfipSolicitudCambioFechasDto> SolicitudesCambioFechas { get; set; }
         public string IdentificadorCierre { get; set; }
+        public IList<AfipSolicitudCierreCargaDto> SolicitudesCierreCarga { get; set; }
     }
 }

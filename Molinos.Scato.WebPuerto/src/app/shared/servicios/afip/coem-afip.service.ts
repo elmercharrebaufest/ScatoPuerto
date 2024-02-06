@@ -4,7 +4,7 @@ import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { Observable, of } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +12,7 @@ import { Observable, of } from 'rxjs';
 export class CoemAfipService {
 
   private url: string = environment.apiUrl;
+  public $recargarCoems = new Subject<void>();
   constructor(private http: HttpClient) { }
 
   public registrarCoem(coem: COEM): Observable<any[]> {
@@ -22,7 +23,7 @@ export class CoemAfipService {
     return this.http.put<any[]>(`${this.url}Afip/RectificarCoem`, coem, { 'withCredentials': true });
   }
 
-  public listarCoems(params:any) {
+  public listarCoems(params: any) {
     // Se remueven los filtros vacíos
     for (const prop in params) {
       if (!params[prop]) {
