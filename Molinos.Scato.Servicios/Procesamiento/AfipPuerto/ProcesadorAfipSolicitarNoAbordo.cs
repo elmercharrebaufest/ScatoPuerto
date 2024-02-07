@@ -5,6 +5,7 @@ using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -29,14 +30,27 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
             try
             {
-                var caratulaDB = Repositorio.Obtener<AfipCaratula>(comando.Dto.IdCaratula) ?? throw new Exception("No existe la Caratula con el id especificado");
-                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Dto.IdCoem);
+                var coemDB = Repositorio.Obtener<AfipCoem>(comando.Dto.IdCoem) ?? throw new Exception("No existe la COEM con el id especificado");
+                var motivoDb = Repositorio.Obtener<AfipMotivoNoABordo>(x => x.Codigo == comando.Dto.CodigoMotivo) ?? throw new Exception("No se ha encontrado el motivo seleccionado");
 
-                var contenedoresDeclaracionesMercaderiaSuelta = Repositorio.Listar<AfipCoemMercaderiaSuelta>(x => x.AfipCoem.Id == coemDB.Id);
-                var declaraciones = this.Conversor.Convertir<IList<AfipCoemMercaderiaSuelta>, IList<Declaracion>>(contenedoresDeclaracionesMercaderiaSuelta).ToArray();
-                var motivo = Repositorio.Listar<AfipMotivoNoABordo>(x => x.Codigo == comando.Dto.CodigoMotivo).FirstOrDefault();
+                if (coemDB.AfipSolicitudesNoABordo.Any(s => s.Estado == (int)EstadosSolicitudesAFIP.Pendiente))
+                {
+                    throw new Exception("Ya existe una solicitud de 'No a bordo' pendiente para esta COEM");
+                }
 
-                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(caratulaDB.IdentificadorCaratula, coemDB.IdentificadorCOEM, declaraciones, motivo).Body.SolicitarNoABordoResult;
+                var identificadorCaratula = coemDB.AfipCaratula.IdentificadorCaratula;
+                var declaracionesDB = coemDB.MercaderiasSueltas.Where(m => comando.Dto.Declaraciones.Contains(m.IdentificadorDeclaracion)).ToList();
+
+                if (declaracionesDB.Any(d => d.NoABordo))
+                {
+                    throw new Exception("Ya se ha declarado 'No a bordo' para una o más declaraciones seleccionadas");
+                }
+
+                var declaraciones = this.Conversor.Convertir<IList<AfipCoemMercaderiaSuelta>, IList<Declaracion>>(declaracionesDB).ToArray();
+                var codigoMotivo = comando.Dto.CodigoMotivo;
+                var descripcionMotivo = comando.Dto.DescripcionMotivo;
+
+                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(identificadorCaratula, coemDB.IdentificadorCOEM, declaraciones, codigoMotivo, descripcionMotivo).Body.SolicitarNoABordoResult;
                 var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
                 if (cuerpoRespuesta == null)
                 {
@@ -47,11 +61,25 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 }
 
                 var identificadorSolicitud = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
+                var declaracionesSolicitud = declaracionesDB.Select(d => new AfipSolicitudNoABordoDeclaracion { AfipCoemMercaderiaSuelta = d }).ToList();
+                var solicitudDB = new AfipSolicitudNoABordo
+                {
+                    IdentificadorSolicitud = identificadorSolicitud,
+                    AfipCoem = coemDB,
+                    AfipMotivoNoABordo = motivoDb,
+                    AfipSolicitudNoABordoDeclaraciones = declaracionesSolicitud,
+                    DescripcionMotivo = descripcionMotivo,
+                    Estado = (int)EstadosSolicitudesAFIP.Pendiente,
+                    FechaCreacion = DateTime.Now,
+                    FechaActualizacion = DateTime.Now
+                };
+                Repositorio.Agregar(solicitudDB);
+                Repositorio.GuardarCambios();
             }
             catch (Exception ex)
             {
                 resultado.Error("", ex.Message);
-                Log.Error("Error al solicitar no abordo {0}", ex);                
+                Log.Error("Error al solicitar no abordo {0}", ex);
             }
             return resultado;
         }

@@ -1,5 +1,6 @@
 import { Caratula, SolicitudCambioBuque, SolicitudCambioFechas, SolicitudCierreCarga } from '@ScatoModels/afip/caratula';
 import { COEM } from '@ScatoModels/afip/coem';
+import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
@@ -41,14 +42,14 @@ export class CaratulaAfipService {
     return this.http.put<boolean>(this.url + 'RectificarCaratula', caratula, { withCredentials: true });
   }
 
-  public listarCaratulas(params?: any): Observable<Caratula[]> {
+  public listarCaratulas(params?: any) {
     // Se remueven los filtros vacíos
     for (const prop in params) {
       if (!params[prop]) {
         delete params[prop];
       }
     }
-    return this.http.get<Caratula[]>(this.url + 'ListarCaratulas', { withCredentials: true, params });
+    return this.http.get<ListaPaginada<Caratula>>(this.url + 'ListarCaratulas', { withCredentials: true, params });
   }
 
   public listarEstadosCaratula(): Observable<string[]> {

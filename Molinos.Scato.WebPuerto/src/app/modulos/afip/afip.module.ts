@@ -20,6 +20,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { SolicitudCaratulaComponent } from './caratula/solicitud-caratula/solicitud-caratula.component';
 import { ModalCerrarCargaCoemsComponent } from './coem/modal-cerrar-carga-coems/modal-cerrar-carga-coems.component';
+import { ModalNoAbordoComponent } from './coem/modal-no-abordo/modal-no-abordo.component';
+import { ListadoNoAbordoComponent } from './coem/listado-no-abordo/listado-no-abordo.component';
 
 
 @NgModule({
@@ -35,7 +37,9 @@ import { ModalCerrarCargaCoemsComponent } from './coem/modal-cerrar-carga-coems/
     CaratulaAfipComponent,
     ModalCrearCaratulaComponent,
     SolicitudCaratulaComponent,
-    ModalCerrarCargaCoemsComponent
+    ModalCerrarCargaCoemsComponent,
+    ModalNoAbordoComponent,
+    ListadoNoAbordoComponent
   ],
   imports: [
     CommonModule,

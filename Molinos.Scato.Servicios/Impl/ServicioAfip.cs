@@ -19,6 +19,8 @@ using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
+using System.Diagnostics;
+using Ninject.Infrastructure.Language;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -405,6 +407,7 @@ namespace Molinos.Scato.Servicios.Impl
         }
         #endregion
 
+        #region Solicitar No a bordo
         public bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
         {
             var res = this.servicioComandos.Ejecutar(new AfipSolicitarNoAbordo { Dto = solicitarNoAbordoDto });
@@ -419,6 +422,30 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<AfipMotivoNoABordo, AfipMotivoNoAbordoDto>();
         }
+
+        public void EfectuarSolicitudNoABordo(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudNoABordo>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            var declaraciones = solicitud.AfipSolicitudNoABordoDeclaraciones.Select(x => x.AfipCoemMercaderiaSuelta).ToList();
+            foreach (var declaracion in declaraciones)
+            {
+                declaracion.NoABordo = true;
+            }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+
+        public void RechazarSolicitudNoABordo(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudNoABordo>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+        #endregion
 
         #region Solicitar Cambio de Buque
         public void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto)

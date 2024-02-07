@@ -160,7 +160,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
-                var response = servicioAfip.ListarCaratulas(paginacion, fechaArribo, buque, identificador, estado);
+                var listaPaginada = servicioAfip.ListarCaratulas(paginacion, fechaArribo, buque, identificador, estado);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
@@ -293,7 +294,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoems(idCaratula, paginacion, identificador, declaracion, estado));
+                var listaPaginada = servicioAfip.ListarCoems(idCaratula, paginacion, identificador, declaracion, estado);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+                return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
             {
@@ -524,6 +527,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
         #endregion
 
+        #region Solicitar No a Bordo
         [HttpPost]
         [Route("api/afip/SolicitarNoAbordo")]
         public HttpResponseMessage SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
@@ -560,6 +564,37 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+        [HttpPut]
+        [Route("api/afip/EfectuarSolicitudNoABordo/{id}")]
+        public HttpResponseMessage EfectuarSolicitudNoABordo(int id)
+        {
+            try
+            {
+                servicioAfip.EfectuarSolicitudNoABordo(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/RechazarSolicitudNoABordo/{id}")]
+        public HttpResponseMessage RechazarSolicitudNoABordo(int id)
+        {
+            try
+            {
+                servicioAfip.RechazarSolicitudNoABordo(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
 
 
         #region Solicitar Cambio de Buque

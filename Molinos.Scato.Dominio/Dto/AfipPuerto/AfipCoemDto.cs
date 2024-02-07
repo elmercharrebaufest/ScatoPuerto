@@ -15,6 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<AfipCoemContenedorConCargaDto> ContenedoresConCarga { get; set; }
         public IList<AfipCoemContenedorVacioDto> ContenedoresVacios { get; set; }
         public IList<AfipCoemMercaderiaSueltaDto> MercaderiasSueltas { get; set; }
+        public IList<AfipSolicitudNoABordoDto> AfipSolicitudesNoABordo { get; set; }
         public AfipCoemEstadoDto AfipCoemEstado { get; set; }
         public DateTime FechaRegistro { get; set; }
 
