@@ -15,7 +15,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class CaratulaAfipComponent implements OnInit {
 
-  private listaHistorialCaratulas: Caratula[] = [];
   public cargarCaratulas: boolean = true;
   caratulaId: number;
   caratulaImo: string;
@@ -25,6 +24,7 @@ export class CaratulaAfipComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
   public estados: EstadosCaratulaAFIP;
   public formFiltros: FormGroup;
+  private parametrosFiltro: any;
 
   // Paginado
   currentPage: number = 1; // Página actual
@@ -47,7 +47,7 @@ export class CaratulaAfipComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.filtrar();
+    this.onBuscar();
   }
 
   private iniciarFormFiltros() {
@@ -67,9 +67,14 @@ export class CaratulaAfipComponent implements OnInit {
     this.formFiltros.get('fechaArribo').setValue(`${year}-${month}`);
   }
 
-  public filtrar() {
-    const params = this.formFiltros.value;
-    this.listarCaratulas(params);
+  public onBuscar() {
+    this.parametrosFiltro = this.formFiltros.value;
+    this.currentPage = 1;
+    this.filtrar();
+  }
+
+  private filtrar() {
+    this.listarCaratulas(this.parametrosFiltro);
   }
 
   public limpiarFiltros() {
@@ -81,16 +86,15 @@ export class CaratulaAfipComponent implements OnInit {
     this.cargarCaratulas = true;
     params.pagina = this.currentPage;
     params.itemsPorPagina = this.itemsPerPage;
-    this.caratulaService.listarCaratulas(params).subscribe((datos) => {
-      this.listaHistorialCaratulas = datos;
-      this.esNoExisteRegistros = !Boolean(datos.length);
+    this.caratulaService.listarCaratulas(params).subscribe(({ items, itemsTotales }) => {
+      this.esNoExisteRegistros = itemsTotales == 0;
 
       // Calcular el total de elementos y las páginas
-      this.totalItems = this.listaHistorialCaratulas.length;
+      this.totalItems = itemsTotales;
       this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
 
       // Mostrar los elementos de la página actual
-      this.displayedItems = this.getItemsForPage(this.currentPage);
+      this.displayedItems = items;
 
       // Calcular las páginas visibles
       this.calculateVisiblePages();
@@ -165,15 +169,8 @@ export class CaratulaAfipComponent implements OnInit {
     // Validar que la página esté dentro de los límites
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.displayedItems = this.getItemsForPage(this.currentPage);
-      this.calculateVisiblePages();
+      this.filtrar();
     }
-  }
-
-  getItemsForPage(page: number): any[] {
-    const startIndex = (page - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.listaHistorialCaratulas.slice(startIndex, endIndex);
   }
 
   calculateVisiblePages() {

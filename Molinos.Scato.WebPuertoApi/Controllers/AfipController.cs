@@ -160,7 +160,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
-                var response = servicioAfip.ListarCaratulas(paginacion, fechaArribo, buque, identificador, estado);
+                var listaPaginada = servicioAfip.ListarCaratulas(paginacion, fechaArribo, buque, identificador, estado);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
@@ -293,7 +294,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarCoems(idCaratula, paginacion, identificador, declaracion, estado));
+                var listaPaginada = servicioAfip.ListarCoems(idCaratula, paginacion, identificador, declaracion, estado);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+                return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
             {
