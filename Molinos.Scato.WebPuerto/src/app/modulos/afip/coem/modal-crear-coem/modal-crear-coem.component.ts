@@ -77,13 +77,14 @@ export class ModalCrearCoemComponent implements OnInit {
   }
 
   public inicializarFormMercaderias(mercaderia: NuevasMercaderiasSueltasCoem = null): FormGroup {
+    const regex = /^(\d{5}[a-zA-Z]{2}[\da-zA-Z]{2}\d{6}[a-zA-Z])$/;
     if (mercaderia != null) {
       return this.formBuilder.group({
-        cuitATA: mercaderia.cuitATA,
+        cuitATA: [mercaderia.cuitATA, Validators.required],
         codigoEmbalaje: mercaderia.embalajes[0].codigoEmbalaje,
         cantidadBultos: mercaderia.embalajes[0].peso,
-        peso: mercaderia.embalajes[0].peso,
-        identificadorDeclaracion: mercaderia.identificadorDeclaracion,
+        peso: [mercaderia.embalajes[0].peso, Validators.required],
+        identificadorDeclaracion: [mercaderia.identificadorDeclaracion, Validators.pattern(regex)]
       });
     } else {
       return this.formBuilder.group({
@@ -91,7 +92,7 @@ export class ModalCrearCoemComponent implements OnInit {
         codigoEmbalaje: [''],
         cantidadBultos: [''],
         peso: ['', Validators.required],
-        identificadorDeclaracion: [''],
+        identificadorDeclaracion: ['', Validators.pattern(regex)],
       });
     }
   }
@@ -197,5 +198,10 @@ export class ModalCrearCoemComponent implements OnInit {
         this.mercaderiasSueltasFormArray.push(mercaderiaForm);
       }
     });
+  }
+
+  onInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    input.value = input.value.toUpperCase();
   }
 }
