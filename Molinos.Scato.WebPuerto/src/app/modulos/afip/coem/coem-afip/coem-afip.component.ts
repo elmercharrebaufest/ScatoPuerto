@@ -12,10 +12,6 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subscription, forkJoin, of } from 'rxjs';
 
-
-// TODO: AHORA QUE SE LISTAN LAS COEMS POR PÁGINAS, PODRÍA OCURRIR QUE NO SE LISTEN TODAS LAS COEMS DE LA CARATULA
-// ESTO PROVOCARÍA QUE AL MOMENTO DE SOLICITAR CIERRE NO SE VEAN EN EL MODAL TODAS LAS COEMS!!!
-// Esto podría no ser prioritario porque dificilmente se dé que haya más de una página de COEMs por carátula
 @Component({
   selector: 'app-coem-afip',
   templateUrl: './coem-afip.component.html',
@@ -23,7 +19,6 @@ import { Observable, Subscription, forkJoin, of } from 'rxjs';
 })
 export class CoemAfipComponent implements OnInit, OnDestroy {
 
-  private listaHistorialCoem: COEM[] = [];
   public load: boolean = false;
   esNoExisteRegistros: boolean = true;
   coem: COEM = new COEM();
@@ -32,6 +27,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   coemImo: string;
   listaEstados: EstadoCOEM[] = [];
   public formFiltros: FormGroup;
+  private parametrosFiltro: any;
 
   public caratulaId: number;
   public listaMotivos: AfipMotivoSolicitudCambio[] = [];
@@ -64,10 +60,13 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
 
     this.route.params.subscribe(params => {
       this.caratulaId = Number(params['id']);
+      if (this.caratulaId) {
+        this.itemsPerPage = 1000; // las COEM de las caratula no serían necesarias paginarlas, además traería problemas
+      }
       this.suscripcion = this.coemAfipService.$recargarCoems.subscribe(() => {
-        this.cargarDatos();
+        this.onBuscar();
       });
-      this.cargarDatos();
+      this.onBuscar();
     });
   }
 
@@ -82,15 +81,15 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     params.idCaratula = this.caratulaId || null;
     const obsCoems = this.coemAfipService.listarCoems(params);
     const obsEstados: Observable<EstadoCOEM[]> = this.listaEstados.length ? of(null) : this.coemAfipService.estadosCoem(); // no es necesario cargar los estados si ya estan
-    forkJoin([obsEstados, obsCoems]).subscribe(([estados, coems]) => {
+    forkJoin([obsEstados, obsCoems]).subscribe(([estados, { items: coems, itemsTotales }]) => {
       if (estados) {
         this.listaEstados = estados;
       }
       if (this.caratulaId) {
         this.caratulaService.$caratulaCoems.next(coems);
       }
-      this.listaHistorialCoem = coems;
-      this.crearPaginado();
+      this.listadoCoems = coems;
+      this.crearPaginado(itemsTotales);
       this.load = false;
     }, error => {
       console.error(error);
@@ -99,7 +98,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   }
 
   editFinish(event) {
-    this.cargarDatos();
+    this.filtrar();
   }
 
   public editarCoem(historial, modal) {
@@ -117,7 +116,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     this.load = true;
     this.coemAfipService.anularCoem(id).subscribe(() => {
       this.confirmationDialogService.exito(`Se ha eliminado la COEM con id: ${identificadorCOEM}`);
-      this.cargarDatos();
+      this.filtrar();
     }, (err) => {
       console.error(err);
       this.load = false;
@@ -135,7 +134,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     this.load = true;
     this.coemAfipService.cerrarCoem(id).subscribe(() => {
       this.confirmationDialogService.exito(`Se ha cerrado la COEM con id ${identificadorCOEM}`);
-      this.cargarDatos();
+      this.filtrar();
     }, (err) => {
       console.error(err);
       this.load = false;
@@ -151,19 +150,19 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
       const selectedOption = selectElement.value;
       const confirmacion = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de cambiar el estado del COEM con id: ${identificadorCOEM}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning)
       if (!confirmacion) {
-        this.cargarDatos();
+        this.filtrar();
         return;
       }
       this.load = true;
       this.coemAfipService.cambiarEstadosCoem(selectedOption, idCoem).subscribe((datos) => {
         this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Estado del COEM con id: ${identificadorCOEM} fue cambiado con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
-        this.cargarDatos();
+        this.filtrar();
       }, (error) => {
         console.error(error);
         this.confirmationDialogService.confirm(`¡Error!`, 'No se ha podido cambiar el estado del COEM, comunicarse con soporte técnico', 'Cerrar', '', null, null, Tipoalerta.Error);
       })
     } else {
-      this.cargarDatos();
+      this.filtrar();
     }
   }
 
@@ -291,9 +290,14 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     });
   }
 
-  public filtrar() {
-    const params = this.formFiltros.value;
-    this.cargarDatos(params);
+  public onBuscar() {
+    this.parametrosFiltro = this.formFiltros.value;
+    this.currentPage = 1;
+    this.filtrar();
+  }
+
+  private filtrar() {
+    this.cargarDatos(this.parametrosFiltro);
   }
 
   public limpiarFiltros() {
@@ -302,12 +306,10 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   }
 
   //#region Funciones de paginado
-  private crearPaginado() {
+  private crearPaginado(total: number) {
     // Calcular el total de elementos y las páginas
-    this.totalItems = this.listaHistorialCoem.length;
+    this.totalItems = total;
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    // Mostrar los elementos de la página actual
-    this.listadoCoems = this.getItemsForPage(this.currentPage);
     // Calcular las páginas visibles
     this.calculateVisiblePages();
   }
@@ -320,15 +322,8 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     // Validar que la página esté dentro de los límites
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.listadoCoems = this.getItemsForPage(this.currentPage);
-      this.calculateVisiblePages();
+      this.filtrar();
     }
-  }
-
-  getItemsForPage(page: number): any[] {
-    const startIndex = (page - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.listaHistorialCoem.slice(startIndex, endIndex);
   }
 
   calculateVisiblePages() {

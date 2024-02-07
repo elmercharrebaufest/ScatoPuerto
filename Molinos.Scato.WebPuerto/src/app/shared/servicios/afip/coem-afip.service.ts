@@ -1,6 +1,7 @@
 import { Caratula } from '@ScatoModels/afip/caratula';
 import { COEM, SolicitudCierreCargaDto, SolicitudNoABordoDto } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
+import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
@@ -30,7 +31,7 @@ export class CoemAfipService {
         delete params[prop];
       }
     }
-    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true, params });
+    return this.http.get<ListaPaginada<COEM>>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true, params });
   }
 
   public estadosCoem() {
