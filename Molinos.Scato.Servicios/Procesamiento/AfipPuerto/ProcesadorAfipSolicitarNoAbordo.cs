@@ -50,18 +50,17 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 var codigoMotivo = comando.Dto.CodigoMotivo;
                 var descripcionMotivo = comando.Dto.DescripcionMotivo;
 
-                //var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(identificadorCaratula, coemDB.IdentificadorCOEM, declaraciones, codigoMotivo, descripcionMotivo).Body.SolicitarNoABordoResult;
-                //var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
-                //if (cuerpoRespuesta == null)
-                //{
-                //    StringBuilder sb = new StringBuilder();
-                //    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
-                //    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
-                //    throw new Exception(sb.ToString());
-                //}
+                var res = comunicacionEmbarqueServicioHelper.SolicitarNoAbordo(identificadorCaratula, coemDB.IdentificadorCOEM, declaraciones, codigoMotivo, descripcionMotivo).Body.SolicitarNoABordoResult;
+                var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
+                if (cuerpoRespuesta == null)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    throw new Exception(sb.ToString());
+                }
 
-                //var identificadorSolicitud = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
-                var identificadorSolicitud = "NB" + DateTime.Now.ToString("yyyyMMddhhmmss");
+                var identificadorSolicitud = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
                 var declaracionesSolicitud = declaracionesDB.Select(d => new AfipSolicitudNoABordoDeclaracion { AfipCoemMercaderiaSuelta = d }).ToList();
                 var solicitudDB = new AfipSolicitudNoABordo
                 {
