@@ -524,6 +524,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
         #endregion
 
+        #region Solicitar No a Bordo
         [HttpPost]
         [Route("api/afip/SolicitarNoAbordo")]
         public HttpResponseMessage SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
@@ -560,6 +561,37 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+        [HttpPut]
+        [Route("api/afip/EfectuarSolicitudNoABordo/{id}")]
+        public HttpResponseMessage EfectuarSolicitudNoABordo(int id)
+        {
+            try
+            {
+                servicioAfip.EfectuarSolicitudNoABordo(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/afip/RechazarSolicitudNoABordo/{id}")]
+        public HttpResponseMessage RechazarSolicitudNoABordo(int id)
+        {
+            try
+            {
+                servicioAfip.RechazarSolicitudNoABordo(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
 
 
         #region Solicitar Cambio de Buque
