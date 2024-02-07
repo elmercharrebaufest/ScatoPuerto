@@ -3,7 +3,7 @@ import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
 import { NuevasMercaderiasSueltasCoem } from '@ScatoModels/afip/nuevasMercaderiasSueltasCoem';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -12,7 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './modal-cerrar-carga-coems.component.html',
   styleUrls: ['./modal-cerrar-carga-coems.component.css']
 })
-export class ModalCerrarCargaCoemsComponent implements OnInit {
+export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
 
   @Input() coemsSeleccionadas: COEM[];
   @Input() idCaratula: number;
@@ -30,6 +30,12 @@ export class ModalCerrarCargaCoemsComponent implements OnInit {
 
   ngOnInit(): void {
     this.inicializarForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.coemsSeleccionadas) {
+      this.inicializarForm();
+    }
   }
 
   private inicializarForm() {
@@ -56,7 +62,7 @@ export class ModalCerrarCargaCoemsComponent implements OnInit {
   }
 
   private crearDeclaracionesFormArray(mercaderias: NuevasMercaderiasSueltasCoem[]) {
-    const formGroups = mercaderias.map(mercaderia => this.formBuilder.group({
+    const formGroups = mercaderias.filter(m => !m.noABordo).map(mercaderia => this.formBuilder.group({
       identificadorDeclaracion: mercaderia.identificadorDeclaracion,
       fechaEmbarque: ['', Validators.required],
       cantidadReal: ['', Validators.required],

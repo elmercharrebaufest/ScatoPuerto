@@ -213,7 +213,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
     this.cargando = true;
     this.caratulaAfipService.efectuarSolicitudCierreCarga(id).subscribe(async () => {
       this.cargando = false;
-      await this.confirmationDialogService.exito(`Se ha solicitado el cierre de carga`);
+      await this.confirmationDialogService.exito(`Se ha efectuado el cierre de carga`);
       this.caratulaAfipService.$recargarCaratula.next(); // Este flujo sigue en modal-crear-caratula.ts
       this.coemService.$recargarCoems.next();
     }, (err) => {

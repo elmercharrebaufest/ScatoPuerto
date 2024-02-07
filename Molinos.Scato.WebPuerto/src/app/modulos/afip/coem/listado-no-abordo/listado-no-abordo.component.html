@@ -1,0 +1,75 @@
+<ship-spinner message="Efectuando cambios" *ngIf='cargando'></ship-spinner>
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Solicitudes de No a bordo</h5>
+        <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <th>Identificador</th>
+                <th>Declaraciones</th>
+                <th>Motivo</th>
+                <th>Fecha Creacion</th>
+                <th>Fecha Modificacion</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let solicitud of solicitudes">
+                    <tr>
+                        <td class="align-middle">{{solicitud.identificadorSolicitud}}</td>
+                        <td class="align-middle">
+                            <div class="flex-between">
+                                <span>{{solicitud.declaraciones.length}}</span>
+                                <label role="button">
+                                    <input type="checkbox" class="d-none" (click)="mostrarDeclaraciones($event, trDeclaraciones)">
+                                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                                </label>
+                            </div>
+                        </td>
+                        <td class="align-middle">{{solicitud.motivo}} {{solicitud.descripcionMotivo}}</td>
+                        <td class="align-middle">{{solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm'}}</td>
+                        <td class="align-middle">{{solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm'}}</td>
+                        <td class="align-middle">{{solicitud.estado}}</td>
+                        <td class="text-center">
+                            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
+                                <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio(solicitud.id)">
+                                    <i class="fa fs-icon fa-check text-success"></i>
+                                </button>
+                                <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio(solicitud.id)">
+                                    <i class="fa fs-icon fa-close text-danger"></i>
+                                </button>
+                            </ng-container>
+                        </td>
+                    </tr>
+                    <tr #trDeclaraciones class="d-none">
+                        <td colspan="100%" class="p-0">
+                            <table class="table table-bordered mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Cuit ATA</th>
+                                        <th>Declaracion</th>
+                                        <th>Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let declaracion of getDeclaraciones(solicitud)">
+                                        <td>{{declaracion.cuitATA}}</td>
+                                        <td>{{declaracion.identificadorDeclaracion}}</td>
+                                        <td>{{declaracion.embalajes[0].peso}} kg</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cerrar</button>
+    </div>
+</div>

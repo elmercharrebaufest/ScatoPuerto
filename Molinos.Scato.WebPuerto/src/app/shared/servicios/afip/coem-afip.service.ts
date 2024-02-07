@@ -1,5 +1,5 @@
 import { Caratula } from '@ScatoModels/afip/caratula';
-import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
+import { COEM, SolicitudCierreCargaDto, SolicitudNoABordoDto } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -65,8 +65,15 @@ export class CoemAfipService {
     return this.http.post<boolean>(`${this.url}Afip/SolicitarCierreCargaGranel`, dto, { withCredentials: true });
   }
 
-  public solicitarNoABordo(idCoem: number, idCaratula: number, codigoMotivo: string) {
-    const body = { idCaratula, idCoem, codigoMotivo };
-    return this.http.post<boolean>(`${this.url}Afip/SolicitarNoAbordo`, body, { withCredentials: true });
+  public solicitarNoABordo(body: SolicitudNoABordoDto) {
+    return this.http.post<boolean>(`${this.url}Afip/SolicitarNoABordo`, body, { withCredentials: true });
+  }
+
+  public efectuarSolicitudNoABordo(id: number) {
+    return this.http.put(`${this.url}Afip/EfectuarSolicitudNoABordo/${id}`, null, { withCredentials: true });
+  }
+
+  public rechazarSolicitudNoABordo(id: number) {
+    return this.http.put(`${this.url}Afip/RechazarSolicitudNoABordo/${id}`, null, { withCredentials: true });
   }
 }

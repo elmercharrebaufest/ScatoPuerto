@@ -34,8 +34,8 @@
         <tr *ngFor="let solicitud of caratula.solicitudesCambioBuque">
           <td class="align-middle">{{ solicitud.identificadorBuque }}</td>
           <td class="align-middle">{{ solicitud.nombreMedioTransporte }}</td>
-          <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm' }}</td>
+          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.estado }}</td>
           <td class="text-center">
             <ng-container *ngIf="solicitud.estado == 'Pendiente'">
@@ -75,12 +75,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let solicitud of caratula.solicitudesCambioFechas">
-          <td class="align-middle">{{ solicitud.fechaArribo | date:'MM/dd/yyyy hh:mm a' }}</td>
-          <td class="align-middle">{{ solicitud.fechaZarpada | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaArribo | date:'dd/MM/yyyy hh:mm' }}</td>
+          <td class="align-middle">{{ solicitud.fechaZarpada | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.motivoSolicitud }}</td>
           <td class="align-middle">{{ solicitud.motivoSolicitudDetalle }}</td>
-          <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm' }}</td>
+          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.estado }}</td>
           <td class="text-center">
             <ng-container *ngIf="solicitud.estado == 'Pendiente'">
@@ -118,8 +118,8 @@
       <tbody>
         <tr *ngFor="let solicitud of caratula?.solicitudesCierreCarga">
           <td class="align-middle">{{ solicitud.identificadorCierre }}</td>
-          <td class="align-middle">{{ solicitud.fechaCreacion | date:'MM/dd/yyyy hh:mm a' }}</td>
-          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'MM/dd/yyyy hh:mm a' }}</td>
+          <td class="align-middle">{{ solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm' }}</td>
+          <td class="align-middle">{{ solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.estado }}</td>
           <td class="text-center">
             <ng-container *ngIf="solicitud.estado == 'Pendiente'">

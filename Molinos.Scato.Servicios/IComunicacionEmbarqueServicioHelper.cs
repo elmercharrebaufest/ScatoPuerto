@@ -18,6 +18,6 @@ namespace Molinos.Scato.Servicios
         CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM);
         SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM);
         SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto dto);
-        SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, AfipMotivoNoABordo afipMotivoSolicitudCambio);
+        SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, string codigoMotivo, string descripcionMotivo);
     }
 }

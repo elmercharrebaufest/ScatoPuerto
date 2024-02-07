@@ -12,5 +12,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string IdentificadorDeclaracion { get; set; }
         public virtual string CuitATA { get; set; }
         public virtual ICollection<AfipCoemMercaderiaSueltaEmbalaje> Embalajes { get; set; }
+        public virtual bool NoABordo { get; set; }
     }
 }

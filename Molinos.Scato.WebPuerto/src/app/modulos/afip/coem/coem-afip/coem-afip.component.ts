@@ -31,7 +31,6 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   coemIdentificador: string;
   coemImo: string;
   listaEstados: EstadoCOEM[] = [];
-  solicitarNoABordoForm: FormGroup;
   public formFiltros: FormGroup;
 
   public caratulaId: number;
@@ -39,6 +38,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   private suscripcion: Subscription;
 
   private modal: NgbModalRef;
+  public coemNoAbordo: COEM;
 
   // Paginado
   currentPage: number = 1; // Página actual
@@ -56,8 +56,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     private caratulaService: CaratulaAfipService,
     private confirmationDialogService: ConfirmationDialogService,
     private route: ActivatedRoute,
-    private tablasAfipService: TablasAfipService,
-    private formBuilder: FormBuilder,
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit(): void {
@@ -70,11 +69,6 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
       });
       this.cargarDatos();
     });
-
-    this.tablasAfipService.listarMotivosNoABordo().subscribe(motivos =>
-      this.listaMotivos = motivos,
-      err => console.error(err)
-    );
   }
 
   ngOnDestroy(): void {
@@ -253,26 +247,14 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     }
   }
 
-  public async solicitarNoABordo(coem: COEM) {
-    const alertar = (titulo: string, mensaje: string, tipo: Tipoalerta, confirmar?: boolean) => this.confirmationDialogService.confirm(
-      titulo, mensaje, confirmar ? 'Sí' : 'Cerrar', confirmar ? 'Cancelar' : '', null, null, tipo
-    );
+  public onSolicitarNoABordo(coem: COEM, modal: any) {
+    this.coemNoAbordo = coem;
+    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
+  }
 
-    const confirmacion = await alertar('Advertencia', `¿Está seguro de solicitar no a bordo a para la COEM ${this.coemIdentificador}?`, Tipoalerta.Warning, true);
-    if (!confirmacion) {
-      return;
-    }
-    var codigoMotivo = this.solicitarNoABordoForm.get('codigoMotivo').value;
-    this.load = true;
-    this.coemAfipService.solicitarNoABordo(this.coemId, this.caratulaId, codigoMotivo).subscribe(() => {
-      alertar('Resultado exitoso', 'Se ha solicitado no a bordo correctamente para la COEM ' + this.coemIdentificador, Tipoalerta.Success);
-    }, (err) => {
-      console.error(err);
-      const msj = err.error || 'Ha ocurrido un error al solicitar no a bordo';
-      alertar('¡Error!', msj, Tipoalerta.Error);
-    }, () => {
-      this.load = false;
-    });
+  public onVerNoABordo(coem: COEM, modal: any) {
+    this.coemNoAbordo = coem;
+    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
   }
 
   public async solicitarAnulacion(coem: COEM) {
@@ -302,7 +284,6 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   }
 
   private initForms() {
-    this.solicitarNoABordoForm = this.formBuilder.group({ codigoMotivo: ['', Validators.required] });
     this.formFiltros = this.formBuilder.group({
       identificador: '',
       declaracion: '',
@@ -389,8 +370,8 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     return ['CUR', 'REG'].includes(codigoEstado);
   }
 
-  mostrarSolicitarNoABordo(codigoEstado: string): boolean {
-    return ['PRE', 'AUTO'].includes(codigoEstado);
+  mostrarSolicitarNoABordo(coem: COEM): boolean {
+    return ['PRE', 'AUTO'].includes(coem.afipCoemEstado.codigo) && !coem.afipSolicitudesNoABordo.some(s => s.estado == 'Pendiente');
   }
 
   mostrarSolicitarAnulacion(codigoEstado: string): boolean {

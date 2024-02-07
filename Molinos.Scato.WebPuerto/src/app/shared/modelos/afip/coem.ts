@@ -8,6 +8,7 @@ export class COEM {
   contenedoresConCarga?: Array<any> = [];
   contenedoresVacios?: Array<any> = [];
   mercaderiasSueltas: Array<NuevasMercaderiasSueltasCoem>;
+  afipSolicitudesNoABordo: SolicitudNoABordo[];
   afipCoemEstado: EstadoCOEM;
 }
 
@@ -27,4 +28,22 @@ export interface SolicitudCierreCargaCoemDeclaracionDto {
   identificadorDeclaracion: string;
   fechaEmbarque: string;
   cantidadReal: string;
+}
+
+export interface SolicitudNoABordoDto {
+  idCoem: number;
+  codigoMotivo: string;
+  descripcionMotivo: string;
+  declaraciones: string[];
+}
+
+export interface SolicitudNoABordo {
+  id: number;
+  identificadorSolicitud: string;
+  motivo: string;
+  declaraciones: string[];
+  descripcionMotivo: string;
+  estado: string;
+  fechaCreacion: string;
+  fechaActualizacion: string;
 }
