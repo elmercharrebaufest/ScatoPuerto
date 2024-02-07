@@ -125,8 +125,16 @@ namespace Molinos.Scato.Servicios
         void RechazarSolicitudCierreCarga(int id);
         #endregion
 
+        #region Solicitar No a bordo
         [OperationContract]
         bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto);
+
+        [OperationContract]
+        void EfectuarSolicitudNoABordo(int id);
+
+        [OperationContract]
+        void RechazarSolicitudNoABordo(int id);
+        #endregion
 
         #region Solicitar Cambio de Buque
         [OperationContract]

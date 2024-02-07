@@ -5,11 +5,11 @@
     <input type="text" class="form-control" placeholder="Declaración" formControlName="declaracion">
     <select class="form-control" formControlName="estado">
         <option value="" selected style="display: none;">Estado</option>
-        <option *ngFor="let p of listaEstados" [value]="p.id">
+        <option *ngFor="let p of listaEstados" [value]="p.codigo">
             ({{p.codigo}}) {{p.estado}}
         </option>
     </select>
-    <button class="btn btn-primary" (click)="filtrar()">Buscar</button>
+    <button class="btn btn-primary" (click)="onBuscar()">Buscar</button>
     <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limipar Búsqueda</button>
 </form>
 
@@ -65,30 +65,46 @@
                             (click)="cerrarCoem(coem.id, coem.identificadorCOEM)">
                             <i class="fa fa-check-circle-o fs-icon text-success" aria-hidden="true" title="CERRAR"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="mostrarSolicitarNoABordo(coem.afipCoemEstado.codigo)" (click)="solicitarNoABordo(coem)">
-                            <i class="fa fa-exclamation-circle fs-icon text-info" aria-hidden="true" title="SOLICITAR NO A BORDO"></i>
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarNoABordo(coem)"
+                            (click)="onSolicitarNoABordo(coem, modalSolicitudNoABordo)">
+                            <i class="fa fa-exclamation-circle fs-icon text-info" aria-hidden="true"
+                                title="SOLICITAR NO A BORDO"></i>
                         </button>
-                        <button class="btn btn-light" *ngIf="mostrarSolicitarAnulacion(coem.afipCoemEstado.codigo)" (click)="solicitarAnulacion(coem)">
-                            <i class="fa fa-trash-restore fs-icon text-danger" aria-hidden="true" title="SOLICITAR ANULACIÓN"></i>
+                        <button class="btn btn-light" *ngIf="coem.afipSolicitudesNoABordo?.length"
+                            (click)="onVerNoABordo(coem, modalListadoNoABordo)">
+                            <i class="fa fa-exclamation-circle fs-icon text-warning" aria-hidden="true"
+                                title="VER SOLICITUDES NO A BORDO"></i>
+                        </button>
+                        <button class="btn btn-light" *ngIf="mostrarSolicitarAnulacion(coem.afipCoemEstado.codigo)"
+                            (click)="solicitarAnulacion(coem)">
+                            <i class="fa fa-trash-restore fs-icon text-danger" aria-hidden="true"
+                                title="SOLICITAR ANULACIÓN"></i>
                         </button>
                     </td>
                 </tr>
                 <tr #trMercaderia class="d-none desplegable">
-                    <td *ngIf="caratulaId"></td>
                     <td colspan="100%" class="contenedor-tabla-mercaderias">
                         <table>
-                            <thead>
+                            <thead class="thead-light">
                                 <tr>
+                                    <th style="width: 0;"></th>
                                     <th>Cuit ATA</th>
                                     <th>Declaración</th>
                                     <th>Cantidad</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let mercaderia of coem.mercaderiasSueltas">
+                                <tr *ngFor="let mercaderia of coem.mercaderiasSueltas"
+                                    [ngClass]="{'noabordo': mercaderia.noABordo}">
+                                    <td>
+                                        <i *ngIf="mercaderia.noABordo" class="fa fa-exclamation-circle fs-icon"
+                                            title="NO A BORDO"></i>
+                                    </td>
                                     <td>{{mercaderia.cuitATA}}</td>
                                     <td>{{mercaderia.identificadorDeclaracion}}</td>
-                                    <td>{{mercaderia.embalajes[0].peso}} kg</td>
+                                    <td>
+                                        {{mercaderia.embalajes[0].peso}} kg
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -104,7 +120,7 @@
     </table>
 </div>
 <!--Paginado -->
-<nav aria-label="Page navigation example" class="centrado">
+<nav aria-label="Page navigation example" class="centrado" *ngIf="!caratulaId">
     <ul class="pagination justify-content-center paginado-buque-fondo">
         <li [ngClass]="{'page-item disabled': currentPage === 1}">
             <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
@@ -130,28 +146,9 @@
 </ng-template>
 
 <ng-template #modalSolicitudNoABordo let-modal>
-    <div class="modal-content modal-solicitud">
-        <div class="modal-header">
-            <h5 class="modal-title">Solicitar No A Bordo</h5>
-        </div>
-        <div class="modal-body">
-            <form [formGroup]="solicitarNoABordoForm">
-                <div class="row justify-content-center">
-                    <div class="pt-4">
-                        <label>Motivo*</label>
-                        <select formControlName="codigoMotivo" class="form-control custom-select" maxlength="200">
-                            <option selected="true">Seleccione un motivo...</option>
-                            <option *ngFor="let motivo of listaMotivos" [ngValue]="motivo.codigo">
-                                {{motivo.descripcion}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer justify-content-center">
-            <button type="button" class="btn btn-success" (click)="solicitarNoABordo()">Enviar solicitud</button>
-            <button type="button" class="btn btn-danger" (click)="cerrarModal()">Cancelar</button>
-        </div>
-    </div>
+    <app-modal-no-abordo [coem]="coemNoAbordo"></app-modal-no-abordo>
+</ng-template>
+
+<ng-template #modalListadoNoABordo let-modal>
+    <app-listado-no-abordo [coem]="coemNoAbordo"></app-listado-no-abordo>
 </ng-template>

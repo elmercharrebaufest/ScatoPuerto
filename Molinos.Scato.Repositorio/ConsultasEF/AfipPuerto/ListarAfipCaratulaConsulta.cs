@@ -40,7 +40,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                         orderby c.FechaRegistro descending
                         select c;
 
-            var itemsTotales = caratulas.Count();
+            var itemsTotales = query.Count();
             var saltear = (paginacion.Pagina - 1) * paginacion.ItemsPorPagina;
 
             var resultado = query.Skip(saltear).Take(paginacion.ItemsPorPagina).ToList();

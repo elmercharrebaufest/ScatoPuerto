@@ -67,3 +67,11 @@ input.ng-invalid:not(.ng-untouched):not(:focus-within) {
 select.ng-invalid:not(.ng-untouched):not(:focus-within) {
   border: 1px solid red;
 }
+
+.msj-error {
+  display: none;
+}
+
+input.ng-invalid:not(.ng-untouched):not(:focus-within)+.msj-error {
+  display: inline;
+}
