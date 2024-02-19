@@ -5,14 +5,11 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorAfipRegistrarCode : ProcesadorComando<AfipRegistrarCode>
+	public class ProcesadorAfipRegistrarCode : ProcesadorComando<AfipRegistrarCode>
     {
         public ProcesadorAfipRegistrarCode(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
 

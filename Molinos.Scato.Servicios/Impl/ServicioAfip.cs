@@ -1,30 +1,23 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.AfipPuerto;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.AfipPuerto;
+using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
-using NPOI.Util;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Web;
-using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Dto.AfipPuerto;
-using Molinos.Scato.Servicios.Enumeradores;
-using Molinos.Scato.Dominio.Comandos.AfipPuerto;
-using Molinos.Scato.Servicios.Orquestador;
-using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
-using System.Diagnostics;
-using Ninject.Infrastructure.Language;
 
 namespace Molinos.Scato.Servicios.Impl
 {
-    public class ServicioAfip : IServicioAfip
+	public class ServicioAfip : IServicioAfip
     {
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;

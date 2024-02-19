@@ -1,20 +1,16 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
-using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 {
-    public class ProcesadorAfipCerrarCoem : ProcesadorComando<AfipCerrarCoem>
+	public class ProcesadorAfipCerrarCoem : ProcesadorComando<AfipCerrarCoem>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
 
