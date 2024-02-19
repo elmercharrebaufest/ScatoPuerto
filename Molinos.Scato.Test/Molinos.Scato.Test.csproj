@@ -50,6 +50,12 @@
     <Reference Include="Elmah">
       <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
     </Reference>
+    <Reference Include="FluentAssertions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.5.0.0\lib\net45\FluentAssertions.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Activities.Extensions">
       <HintPath>..\packages\Microsoft.Activities.UnitTesting.2.0.6.9\lib\Net45\Microsoft.Activities.Extensions.dll</HintPath>
     </Reference>
@@ -68,11 +74,14 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject">
+    <Reference Include="Ninject, Version=3.0.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.0.1.10\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject.Extensions.Logging">
+    <Reference Include="Ninject.Extensions.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.Extensions.Logging.3.0.1.0\lib\net45-full\Ninject.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging.Log4Net, Version=3.0.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Logging.Log4net.3.0.1.0\lib\net45-full\Ninject.Extensions.Logging.Log4Net.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -100,6 +109,9 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Activities" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -127,6 +139,7 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actividades\ActualizarMuestraEnvioACamaraTest.cs" />
@@ -908,15 +921,19 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Servicios\CalculadoraDescuentoTest.cs" />
+    <Compile Include="Servicios\ComunicacionEmbarqueServicioHelperTests.cs" />
     <Compile Include="Servicios\ServicioComandosTest.cs" />
     <Compile Include="Servicios\ServicioMercadoPagoTest.cs" />
     <Compile Include="Servicios\ServicioRepositorioTest.cs" />
     <Compile Include="Servicios\ServicioWorkflowsTest.cs" />
+    <Compile Include="Utils\JsonConverterTests.cs" />
+    <Compile Include="Utils\XmlConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="log4net.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -971,6 +988,10 @@
     <ProjectReference Include="..\Molinos.Scato.Servicios\Molinos.Scato.Servicios.csproj">
       <Project>{15B3E0D2-6217-493A-A690-158C497F5318}</Project>
       <Name>Molinos.Scato.Servicios</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Molinos.Scato.Utils\Molinos.Scato.Utils.csproj">
+      <Project>{a31734cc-b037-4d64-bb45-0360fb5050d0}</Project>
+      <Name>Molinos.Scato.Utils</Name>
     </ProjectReference>
     <ProjectReference Include="..\Molinos.Scato.WebMobile\Molinos.Scato.WebMobile.csproj">
       <Project>{4C4B9149-A86A-4C7C-A4CB-90FFE40E734D}</Project>

@@ -2,20 +2,17 @@
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorAfipRegistrarCoem : ProcesadorComando<AfipRegistrarCoem>
+	public class ProcesadorAfipRegistrarCoem : ProcesadorComando<AfipRegistrarCoem>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
         public ProcesadorAfipRegistrarCoem(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log) 
