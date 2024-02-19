@@ -2010,6 +2010,10 @@
       <Project>{c26344c6-9829-4673-940a-a3f44cfa945c}</Project>
       <Name>Molinos.Scato.Repositorio</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Molinos.Scato.Utils\Molinos.Scato.Utils.csproj">
+      <Project>{a31734cc-b037-4d64-bb45-0360fb5050d0}</Project>
+      <Name>Molinos.Scato.Utils</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

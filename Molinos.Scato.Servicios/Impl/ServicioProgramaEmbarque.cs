@@ -971,15 +971,15 @@ namespace Molinos.Scato.Servicios.Impl
             catch { }
 
             DirectorySearcher search = new DirectorySearcher(entry);
-            search.Filter = String.Format("(sAMAccountName={0})", userName);
+            search.Filter = "(sAMAccountName=" + userName + ")";
             search.PropertiesToLoad.Add("givenName");   // first name
             search.PropertiesToLoad.Add("sn");          // last name
             search.PropertiesToLoad.Add("mail");        // smtp mail address
 
             // perform the search
-            SearchResult result = search.FindOne();
             try
             {
+                SearchResult result = search.FindOne();
                 return result.Properties.Contains("mail") ? result.Properties["mail"][0].ToString() : result.Properties["userPrincipalName"][0].ToString();
             }
             catch
