@@ -1095,6 +1095,10 @@ export class AltaEmbarqueComponent implements OnInit {
             if (this.opcionABMSeleccionada == 'Agregar') {
               this.embarqueService[obtener]().subscribe(res => {
                 const nuevo = res.filter(x => x.nombre == abm.nombre)[0];
+                /*Para caso distinto de coordinadores, solo permitimos guardar 1 elemento.*/
+                if(obtener !== 'obtenerListadoCoordinadores'){
+                  this.embarqueForm.get([list]).value.splice(0,this.embarqueForm.get([list]).value.length);
+                }
                 this.embarqueForm.get([list]).value.push(new modelo(nuevo.id, nuevo.nombre));
               });
             }
