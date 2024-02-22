@@ -75,18 +75,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Autorizacion(PermisosScato.PlanoDeCarga_Guardar)]
         [Route("api/PlanoDeCarga/GuardarPlanoDeCarga")]
         public HttpResponseMessage GuardarPlanoDeCarga(PlanoDeCargaDto planoDeCarga)
-        {
-            if (ModelState.IsValid)
-            {
-                comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga, nombreUsuario = base.nombreUsuario });
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            else
-            {
-                // El modelo no es válido, hay errores de validación
-                var errores = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);             
-                return Request.CreateResponse(HttpStatusCode.BadRequest, errores);
-            }            
+        {           
+            comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga, nombreUsuario = base.nombreUsuario });
+            return Request.CreateResponse(HttpStatusCode.OK);                  
         }
 
 
