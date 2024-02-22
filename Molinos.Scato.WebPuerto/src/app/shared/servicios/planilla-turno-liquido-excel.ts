@@ -321,9 +321,8 @@ export class PlanillaTurnoLiquidoExcelService {
     }
     private setPlanillaOrdenarTurnos(planillaDeTurnos, diaOrder){
         planillaDeTurnos = planillaDeTurnos.sort((a, b) => {
-            return (new Date(b.fecha).getDate() - new Date(a.fecha).getDate());
+            return (new Date(a.fecha).getDate() - new Date(b.fecha).getDate());
           });
-
 
           planillaDeTurnos.forEach((turno: PlanillaDeTurnos, i) => {
             if (i == 0) {
