@@ -77,6 +77,7 @@ export class AltaEmbarqueComponent implements OnInit {
   private embarqueSeleccionado;
   private vaporSeleccionado;
   private parametrosSel;
+  private muelleInicial: string;
   // #endregion
 
   // #region Constructor
@@ -236,6 +237,7 @@ export class AltaEmbarqueComponent implements OnInit {
             res.materialesPuertoCantidad.push(x);
           });
           this.embarqueForm.patchValue(res);
+          this.setearMuelleInicial(this.embarqueSeleccionado);
           this.checkLiquidOrSolid(res.materialesPuertoCantidad.find(x => x.cantidad != 0));
           const buqueSel = this.vaporesList.find(x => x.id == res.vapor.id);
           this.embarqueForm.controls.nombreBuque.setValue(buqueSel);
@@ -1158,9 +1160,47 @@ export class AltaEmbarqueComponent implements OnInit {
     }
   }
   // #endregion
+  
+  public validarExistenciaBuqueMuelle(muelle: string){
+    console.log(this.embarqueForm.value)
+    this.embarqueService.existeEmbarqueEnMuelle(this.embarqueForm.value.patente
+    , muelle).subscribe(
+      (res) => {
+        if(res){
+          this.embarqueForm.get(`${muelle}`).setValue(false);
+          this.confirmationDialogService.confirm('Advertencia', `Ya existe otro embarque con las mismas caracteristicas en el muelle: ${this.getNombreMuelle(muelle)}`, 'Cerrar', '', null, null, Tipoalerta.Warning)
+          return;
+        }
+      },
+      (error) => {
+        console.error('Error al obtener datos:', error);
+      }
+    );
+  }
+
+  getNombreMuelle(muelle: string): string{
+    let nombreMuelle = "";
+    switch(muelle){
+      case "sanBenito": nombreMuelle = "San Benito";
+      break;
+      case "noryon": nombreMuelle = "Noryon";
+      break;    
+      case "otrosMuelles": nombreMuelle = "Otros Muelles";
+      break;
+      case "vicentin": nombreMuelle = "Vicentin";
+      break;
+      default: 
+      break;
+    }
+      return nombreMuelle;
+  }
+ 
 
   // #region Eventos Controles
+
   public onChangeVicentin(e) {
+    if(this.muelleInicial !== "vicentin")
+      this.validarExistenciaBuqueMuelle("vicentin");
     if (!this.embarqueForm.value.noryon && !this.embarqueForm.value.sanBenito
       && !this.embarqueForm.value.otrosMuelles) {
       this.embarqueForm.get('vicentin').setValue(true);
@@ -1168,6 +1208,8 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   public onChangeSanBenito(e) {
+    if(this.muelleInicial !== "sanBenito")
+      this.validarExistenciaBuqueMuelle("sanBenito");
     if (!this.embarqueForm.value.noryon && !this.embarqueForm.value.vicentin
       && !this.embarqueForm.value.otrosMuelles) {
       this.embarqueForm.get('sanBenito').setValue(true);
@@ -1175,6 +1217,8 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   public onChangeNoryon(e) {
+    if(this.muelleInicial !== "noryon")
+      this.validarExistenciaBuqueMuelle("noryon");
     if (!this.embarqueForm.value.sanBenito && !this.embarqueForm.value.vicentin
       && !this.embarqueForm.value.otrosMuelles) {
       this.embarqueForm.get('noryon').setValue(true);
@@ -1182,6 +1226,8 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   public onChangeotrosMuelles(e) {
+    if(this.muelleInicial !== "otrosMuelles")
+      this.validarExistenciaBuqueMuelle("otrosMuelles");
     if (!this.embarqueForm.value.sanBenito && !this.embarqueForm.value.vicentin
       && !this.embarqueForm.value.noryon) {
       this.embarqueForm.get('otrosMuelles').setValue(true);
@@ -1259,4 +1305,21 @@ export class AltaEmbarqueComponent implements OnInit {
     tipoBuqueBD !== null && this.embarqueForm.controls.tipoDeBuque.setValue(tipoBuqueBD[0]);
     this.vaporInfo.imoVapor !== null && this.embarqueForm.controls.imo.setValue(this.vaporInfo.imoVapor);
   }
+
+  setearMuelleInicial(embarque :any){
+    if(embarque.noryon){
+      this.muelleInicial = "noryon";
+    }
+    if(embarque.vicentin){
+      this.muelleInicial = "vicentin";
+    }
+    if(embarque.otrosMuelles){
+      this.muelleInicial = "otrosMuelles";
+    }
+    if(embarque.sanBenito){
+      this.muelleInicial = "sanBenito";
+    }
+  }
+
+
 }

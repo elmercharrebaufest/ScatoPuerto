@@ -162,40 +162,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             else
             {
-                //Modificar existente
-                if (embarque.Vicentin && embarqueDb.Vicentin)
-                {
-                    ModificarEmbarque(embarque, true, false, false, false);
-                }
-                if(embarque.SanBenito && embarqueDb.SanBenito)
-                {
-                    ModificarEmbarque(embarque, false, true, false, false);
-                }
-                if(embarque.Noryon && embarqueDb.Noryon)
-                {
-                    ModificarEmbarque(embarque, false, false, true, false);
-                }
-                if (embarque.OtrosMuelles && embarqueDb.OtrosMuelles)
-                {
-                    ModificarEmbarque(embarque, false, false, false, true);
-                }
                 //Crear Nuevo
                 var workflow = ConfigurationManager.AppSettings["Workflow"];
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
                 var servicioWf = factory.CrearServicio(workflowDefinicionId);
-                if (embarque.Vicentin && !embarqueDb.Vicentin)
+                if (embarque.Vicentin && !embarqueDb.Vicentin && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "vicentin"))
                 {
                     IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, true, false, false, false);
                 }
-                if (embarque.SanBenito && !embarqueDb.SanBenito)
+                if (embarque.SanBenito && !embarqueDb.SanBenito && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "sanBenito"))
                 {
                     IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, true, false, false);
                 }
-                if (embarque.Noryon && !embarqueDb.Noryon)
+                if (embarque.Noryon && !embarqueDb.Noryon && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "noryon"))
                 {
                     IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, true, false);
                 }
-                if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles)
+                if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "otrosMuelles"))
                 {
                     IngresarEmbarque(embarque, workflowDefinicionId, servicioWf, false, false, false, true);
                 }
@@ -510,7 +493,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/Embarque/ExisteEmbarqueEnMuelle")]
+        public HttpResponseMessage ExisteEmbarqueEnMuelle(string nombreBuque, string muelle)
+        {
+            bool existe = servicio.ExisteEmbarqueEnMuelle(nombreBuque, muelle);
 
-      
+            return Request.CreateResponse(HttpStatusCode.OK,
+                existe
+            );
+        }
+
+
+
     }
 }
