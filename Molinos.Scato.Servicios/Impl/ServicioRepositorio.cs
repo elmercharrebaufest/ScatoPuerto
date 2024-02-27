@@ -11263,6 +11263,7 @@ namespace Molinos.Scato.Servicios.Impl
                         Emitio = reciboDeBuque.Emitio,
                         Superviso = reciboDeBuque.Superviso,
                         FechaHoraImpresion = reciboDeBuque.FechaHoraImpresion,
+                        Habilitado = true
                     };
 
                     var detalles = new List<ReciboDeBuqueDetalles>();
@@ -11622,7 +11623,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque)
         {
-            return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque);
+            return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque && x.Habilitado == true);
         }
 
 
@@ -12192,6 +12193,33 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
+        public void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario)
+        {
+            try
+            {
+                var reciboBd = this.repositorio.Obtener<ReciboDeBuque>(r => r.Id == recibo.Id);
+                reciboBd.Habilitado = false;
+                var nominacionRecibo = this.repositorio.Obtener<Nominacion>(n => n.Embarque.Id == reciboBd.Embarque.Id);
 
+                var regAuditoria = new Auditoria
+                {
+                    Nominacion_Id = nominacionRecibo != null? nominacionRecibo.Id : 0,
+                    Entidad_Id = reciboBd.Id,
+                    EntidadNombre = "ReciboDeBuque",
+                    Propiedad = "Habilitado",
+                    ValorAnterior = "1",
+                    ValorNuevo = "0",
+                    FechaModificacion = DateTime.Now,
+                    UsuarioEjecuta = nombreUsuario
+                };
+                this.repositorio.Agregar(regAuditoria);
+                this.repositorio.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "No se pudo deshabilitar el Recibo de buque con id: {0}", recibo.Id); 
+                throw e;
+            }
+        }
     }
 }

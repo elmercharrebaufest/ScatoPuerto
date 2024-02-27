@@ -2774,5 +2774,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<BodegaDto> ListarBodegasNir(int planoDeCargaId);
+
+        [OperationContract]
+        void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
     }
 }

@@ -96,6 +96,7 @@
               <th> Supervisó </th>
               <th> Fecha y hora de impresión </th>
               <th class="ocultarPdf" data-html2canvas-ignore="true"> Imprimir </th>
+              <th class="ocultarPdf" data-html2canvas-ignore="true"> Eliminar </th>
             </tr>
           </thead>
 
@@ -114,9 +115,12 @@
               <td *ngIf="recibo.fechaHoraImpresion == null"> - </td>
               <td *ngIf="recibo.fechaHoraImpresion !== null"> {{recibo.fechaHoraImpresion |
                 date:'short'}} </td>
-              <td class="alCentroIconos ocultarPdf" data-html2canvas-ignore="true" (click)="generarPDF(recibo)"> <img
-                  src="assets\iconoImpresion.svg" alt=""> </td>
-
+              <td class="ocultarPdf" data-html2canvas-ignore="true">
+                <img src="assets\iconoImpresion.svg" class="alCentroIconos" alt="Imprimir" (click)="generarPDF(recibo)"> 
+              </td>
+              <td class="ocultarPdf" data-html2canvas-ignore="true">
+                <img src="assets\trashIcon-no-border.svg" class="alCentroIconos" alt="Eliminar" (click)="deshabilitarRecibo(recibo)"> 
+              </td>
             </tr>
 
           </tbody>

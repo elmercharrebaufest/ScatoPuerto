@@ -940,7 +940,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-        }        
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ModuloDeCarga/DeshabilitarReciboBuque")]
+        public HttpResponseMessage DeshabilitarReciboBuque(ReciboDeBuqueDto reciboDeBuque)
+        {
+            try
+            {
+                servicio.DeshabilitarReciboBuque(reciboDeBuque, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
 
         public class CapturaImagenLineUp
         {
