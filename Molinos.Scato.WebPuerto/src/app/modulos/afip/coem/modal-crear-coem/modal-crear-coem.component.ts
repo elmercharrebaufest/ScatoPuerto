@@ -121,17 +121,22 @@ export class ModalCrearCoemComponent implements OnInit {
       this.cargando = false;
       this.modalService.dismissAll();
       this.editOCrearFinish.emit();
-      this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${this.operacionNuevo ? 'creado una nueva' : 'editado la'} Coem con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${this.operacionNuevo ? 'creado una nueva' : 'editado la'} COEM con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
-      this.cargando = false;
-      console.error(err);
-      this.mostrarError(err.error);
+      this.mostrarError(err);
     });
   }
 
-  mostrarError = (err?: string) => {
-    const msj = err || `No se ha podido ${this.operacionNuevo ? 'crear un nuevo' : 'editar el'} Coem, comunicarse con soporte técnico`;
-    this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
+  mostrarError = (err?: any) => {
+    this.cargando = false;
+    console.error(err);
+    let msj: string;
+    if (typeof err.error == 'string') {
+      msj = err.error;
+    } else {
+      msj = err.error?.message || err.error?.error || `Ha ocurrido un error al No se ha podido ${this.operacionNuevo ? 'crear una nueva' : 'editar la'} COEM`;
+    }
+    this.confirmationDialogService.error(msj);
   }
 
   agregarNuevoCoem() {
