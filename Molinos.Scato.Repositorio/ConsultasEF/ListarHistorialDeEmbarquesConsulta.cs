@@ -70,7 +70,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 AgenciaControlPrivado = (from agenteControlPrivado in contexto.Set<AgenteControlPrivado>()
                                                          where item.PlanoDeCarga.AgentesControlPrivado.Contains(agenteControlPrivado)
                                                          orderby agenteControlPrivado.Id descending
-                                                         select agenteControlPrivado.Nombre).FirstOrDefault(),
+                                                         select agenteControlPrivado.Nombre + " " + agenteControlPrivado.Apellido)
+                                                         .FirstOrDefault()?? "",
                                 ProductoExportador =
                                     (from planillaDeTurnoLiquido in contexto.Set<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>()
                                      where planillaDeTurnoLiquido.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == item.ModuloDeCarga.Id
@@ -99,10 +100,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             };         
 
 
-            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || x.ProductoExportador.Any(y => y.NombreExportador.ToUpper().StartsWith(exportador?.ToUpper()))) && 
-                                           (String.IsNullOrEmpty(destino) || x.ProductoExportador.Any( y => y.Destino.ToUpper().StartsWith(destino?.ToUpper()))) &&
+            return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || x.ProductoExportador.Any(y => y.NombreExportador.ToUpper().Contains(exportador?.ToUpper()))) && 
+                                           (String.IsNullOrEmpty(destino) || x.ProductoExportador.Any( y => y.Destino.ToUpper().Contains(destino?.ToUpper()))) &&
                                         (productos == null || x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) && 
-                                        (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado?.ToUpper()))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
+                                        (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().Contains(controlPrivado?.ToUpper()))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
 
                                              
         }
