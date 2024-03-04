@@ -5,6 +5,7 @@ import { Caratula } from '@ScatoModels/afip/caratula';
 import { CaratulaAfipService, EstadosCaratulaAFIP } from '@ScatoServicios/afip/caratula-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -14,8 +15,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class CaratulaAfipComponent implements OnInit {
 
-  // #region Variables
-  private listaHistorialCaratulas: Caratula[] = [];
   public cargarCaratulas: boolean = true;
   caratulaId: number;
   caratulaImo: string;
@@ -24,6 +23,8 @@ export class CaratulaAfipComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   public estados: EstadosCaratulaAFIP;
+  public formFiltros: FormGroup;
+  private parametrosFiltro: any;
 
   // Paginado
   currentPage: number = 1; // Página actual
@@ -38,35 +39,69 @@ export class CaratulaAfipComponent implements OnInit {
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
-    private caratulaService: CaratulaAfipService
+    private caratulaService: CaratulaAfipService,
+    private formBuilder: FormBuilder
   ) {
     this.estados = caratulaService.estados;
+    this.iniciarFormFiltros();
   }
 
   ngOnInit(): void {
-    this.listarCaratulas();
+    this.onBuscar();
   }
 
+  private iniciarFormFiltros() {
+    this.formFiltros = this.formBuilder.group({
+      fechaArribo: '',
+      buque: '',
+      identificador: '',
+      estado: ''
+    });
+    this.setMesActual();
+  }
 
-  listarCaratulas() {
+  private setMesActual() {
+    const date = new Date()
+    const month = ("0" + (date.getMonth() + 1)).slice(-2)
+    const year = date.getFullYear();
+    this.formFiltros.get('fechaArribo').setValue(`${year}-${month}`);
+  }
+
+  public onBuscar() {
+    this.parametrosFiltro = this.formFiltros.value;
+    this.currentPage = 1;
+    this.filtrar();
+  }
+
+  private filtrar() {
+    this.listarCaratulas(this.parametrosFiltro);
+  }
+
+  public limpiarFiltros() {
+    this.formFiltros.reset();
+    this.formFiltros.get('estado').setValue('');
+  }
+
+  listarCaratulas(params: any = {}) {
     this.cargarCaratulas = true;
-    this.caratulaService.listarCaratulas().subscribe((datos) => {
-      this.listaHistorialCaratulas = datos;
-      this.esNoExisteRegistros = !Boolean(datos.length);
+    params.pagina = this.currentPage;
+    params.itemsPorPagina = this.itemsPerPage;
+    this.caratulaService.listarCaratulas(params).subscribe(({ items, itemsTotales }) => {
+      this.esNoExisteRegistros = itemsTotales == 0;
 
       // Calcular el total de elementos y las páginas
-      this.totalItems = this.listaHistorialCaratulas.length;
+      this.totalItems = itemsTotales;
       this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
 
       // Mostrar los elementos de la página actual
-      this.displayedItems = this.getItemsForPage(this.currentPage);
+      this.displayedItems = items;
 
       // Calcular las páginas visibles
       this.calculateVisiblePages();
+      this.cargarCaratulas = false;
     }, (error) => {
       console.error(error);
       this.confirmationDialogService.confirm(`¡Error!`, 'No se han podido cargar correctamente las Caratulas', 'Cerrar', '', null, null, Tipoalerta.Error);
-    }, () => {
       this.cargarCaratulas = false;
     });
   }
@@ -134,15 +169,8 @@ export class CaratulaAfipComponent implements OnInit {
     // Validar que la página esté dentro de los límites
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.displayedItems = this.getItemsForPage(this.currentPage);
-      this.calculateVisiblePages();
+      this.filtrar();
     }
-  }
-
-  getItemsForPage(page: number): any[] {
-    const startIndex = (page - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.listaHistorialCaratulas.slice(startIndex, endIndex);
   }
 
   calculateVisiblePages() {

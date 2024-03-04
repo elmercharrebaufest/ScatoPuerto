@@ -1,4 +1,6 @@
-import { Caratula, SolicitudCambioBuque, SolicitudCambioFechas } from '@ScatoModels/afip/caratula';
+import { Caratula, SolicitudCambioBuque, SolicitudCambioFechas, SolicitudCierreCarga } from '@ScatoModels/afip/caratula';
+import { COEM } from '@ScatoModels/afip/coem';
+import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
@@ -8,7 +10,9 @@ export interface EstadosCaratulaAFIP {
   Aceptado: string;
   Rectificado: string;
   Enviado: string;
-  Eliminado: string
+  Eliminado: string;
+  CierreSolicitado: string;
+  Code: string;
 }
 
 @Injectable({
@@ -19,10 +23,13 @@ export class CaratulaAfipService {
     Aceptado: "Aceptado",
     Rectificado: "Rectificado",
     Enviado: "Enviado (Ya asociado a COEM)",
-    Eliminado: "Eliminado"
+    Eliminado: "Eliminado",
+    CierreSolicitado: "Cierre Solicitado",
+    Code: "CODE"
   };
   private url: string = environment.apiUrl + 'afip/';
   public $caratula = new BehaviorSubject<Caratula>(null);
+  public $caratulaCoems = new Subject<COEM[]>();
   public $recargarCaratula = new Subject<void>();
 
   constructor(private http: HttpClient) { }
@@ -35,8 +42,14 @@ export class CaratulaAfipService {
     return this.http.put<boolean>(this.url + 'RectificarCaratula', caratula, { withCredentials: true });
   }
 
-  public listarCaratulas(): Observable<Caratula[]> {
-    return this.http.get<Caratula[]>(this.url + 'ListarCaratulas', { withCredentials: true });
+  public listarCaratulas(params?: any) {
+    // Se remueven los filtros vacíos
+    for (const prop in params) {
+      if (!params[prop]) {
+        delete params[prop];
+      }
+    }
+    return this.http.get<ListaPaginada<Caratula>>(this.url + 'ListarCaratulas', { withCredentials: true, params });
   }
 
   public listarEstadosCaratula(): Observable<string[]> {
@@ -56,6 +69,20 @@ export class CaratulaAfipService {
   }
 
   //#region Solicitudes
+
+  //#region Solicitud cierre de carga
+  public listarSolicitudesCierreCarga(id: number) {
+    return this.http.get<SolicitudCierreCarga[]>(`${this.url}ListarSolicitudesCierreCarga/${id}`, { withCredentials: true });
+  }
+
+  public efectuarSolicitudCierreCarga(id: number) {
+    return this.http.put<any>(`${this.url}efectuarSolicitudCierreCarga/${id}`, null, { withCredentials: true });
+  }
+
+  public rechazarSolicitudCierreCarga(id: number) {
+    return this.http.put<any>(`${this.url}RechazarSolicitudCierreCarga/${id}`, null, { withCredentials: true });
+  }
+  //#endregion
 
   //#region Solicitud de cambio de buque
   public listarSolicitudesCambioBuque(id: number) {

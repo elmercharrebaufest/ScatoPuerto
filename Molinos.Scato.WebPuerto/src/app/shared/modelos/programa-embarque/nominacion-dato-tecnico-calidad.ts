@@ -5,11 +5,14 @@ export class NominacionDatoTecnicoCalidad {
     nominacionDatoTecnicoCalidad_Id: number;
     calidadValor: CalidadValor;
     nominacionDatoTecnico: NominacionDatoTecnico;
+    calidadValorEditado: string;
     constructor(nominacionDatoTecnicoCalidad_Id: number,
         calidadValor: CalidadValor,
-        nominacionDatoTecnico: NominacionDatoTecnico) {
+        nominacionDatoTecnico: NominacionDatoTecnico,
+        calidadValorEditado: string) {
         this.nominacionDatoTecnicoCalidad_Id = nominacionDatoTecnicoCalidad_Id;
         this.calidadValor = calidadValor;
         this.nominacionDatoTecnico = nominacionDatoTecnico;
+        this.calidadValorEditado = calidadValorEditado;
     }
 }

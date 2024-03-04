@@ -70,6 +70,8 @@
     <Compile Include="ComandosEF\AsignarBalanzadas.cs" />
     <Compile Include="ComandosEF\CrearArchivoDeMovimientos.cs" />
     <Compile Include="ComandosEF\CrearLoteAuditoria.cs" />
+    <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCoemConsulta.cs" />
+    <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCaratulaConsulta.cs" />
     <Compile Include="ConsultasEF\ConsultarEstadosWorkflows.cs" />
     <Compile Include="ConsultasEF\ControlRecorridoLogActividadConsulta.cs" />
     <Compile Include="ComandosEF\CrearLoteBiotecnologia.cs" />

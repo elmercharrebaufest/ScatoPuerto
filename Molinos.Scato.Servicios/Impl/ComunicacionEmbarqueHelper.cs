@@ -4,16 +4,13 @@ using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
+using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Impl
 {
-    public class ComunicacionEmbarqueServicioHelper : IComunicacionEmbarqueServicioHelper
+	public class ComunicacionEmbarqueServicioHelper : IComunicacionEmbarqueServicioHelper
     {
         private IAccesoComunicacionEmbarque accesoComunicacionEmbarque;
         private wgescomunicacionembarqueSoap wgescomunicacionembarque;
@@ -37,14 +34,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public RegistrarCaratulaResponse RegistrarCaratula(AfipCaratulaDto afipCaratulaDto)
         {
-            try
+            log.Info("Inicializando RegistrarCaratula");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                RegistrarCaratulaRequest1 registrarCaratulaRequest =
+                RegistrarCaratulaRequest1 request =
                     new RegistrarCaratulaRequest1(
                         new RegistrarCaratulaRequest1Body
                         {
@@ -52,7 +50,11 @@ namespace Molinos.Scato.Servicios.Impl
                             argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         });
 
-                return this.wgescomunicacionembarque.RegistrarCaratula(registrarCaratulaRequest);
+				log.Info($" request: { XmlConverter<RegistrarCaratulaRequest1>.Serialize(request)}");
+				var response = this.wgescomunicacionembarque.RegistrarCaratula(request);
+				log.Info($" response: { JsonConverter<RegistrarCaratulaResponse>.Serialize(response) }");
+				log.Info("Finalizando RegistrarCaratula");
+				return response;
             }
             catch (Exception ex)
             {
@@ -63,14 +65,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public RectificarCaratulaResponse RectificarCaratula(AfipCaratulaDto afipCaratulaDto)
         {
-            try
+			log.Info("Inicializando RectificarCaratula");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                RectificarCaratulaRequest1 rectificarCaratulaRequest = new RectificarCaratulaRequest1(
+                RectificarCaratulaRequest1 request = new RectificarCaratulaRequest1(
                     new RectificarCaratulaRequest1Body
                     {
                         argRectificarCaratula = new RectificarCaratulaRequest
@@ -82,8 +85,12 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-                return this.wgescomunicacionembarque.RectificarCaratula(rectificarCaratulaRequest);
-            }
+				log.Info($" request: { XmlConverter<RectificarCaratulaRequest1>.Serialize(request)} ");
+				var response = this.wgescomunicacionembarque.RectificarCaratula(request);
+				log.Info($" response: { JsonConverter<RectificarCaratulaResponse>.Serialize(response) }");
+				log.Info("Finalizando RectificarCaratula");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar rectificar la caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -93,14 +100,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public AnularCaratulaResponse AnularCaratula(string identificadorCaratula)
         {
-            try
+			log.Info("Inicializando AnularCaratula");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                AnularCaratulaRequest1 anularCaratulaRequest = new AnularCaratulaRequest1(
+                AnularCaratulaRequest1 request = new AnularCaratulaRequest1(
                     new AnularCaratulaRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
@@ -108,8 +116,12 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-                return this.wgescomunicacionembarque.AnularCaratula(anularCaratulaRequest);
-            }
+				log.Info($" request: { XmlConverter<AnularCaratulaRequest1>.Serialize(request) } ");
+				var response = this.wgescomunicacionembarque.AnularCaratula(request);
+				log.Info($" response: { JsonConverter<AnularCaratulaResponse>.Serialize(response) }");
+				log.Info("Finalizando AnularCaratula");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar anular la caratula. Error {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -183,22 +195,28 @@ namespace Molinos.Scato.Servicios.Impl
 
         public RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto)
         {
-            try
+			log.Info("Inicializando RegistrarCOEM");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                RegistrarCOEMRequest1 registrarCOEMRequest1 =
+                RegistrarCOEMRequest1 request =
                     new RegistrarCOEMRequest1(
                         new RegistrarCOEMRequest1Body
                         {
                             argRegistrarCOEM = new RegistrarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
                             argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         });
-                return this.wgescomunicacionembarque.RegistrarCOEM(registrarCOEMRequest1);
-            }
+
+				log.Info($" request: { XmlConverter<RegistrarCOEMRequest1>.Serialize(request) } ");
+				var response = this.wgescomunicacionembarque.RegistrarCOEM(request);
+				log.Info($" response: { JsonConverter<RegistrarCOEMResponse>.Serialize(response) }");
+				log.Info("Finalizando RegistrarCOEM");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar registrar la Coem, Error {0} trace {1}", ex.Message, ex.StackTrace);
@@ -208,14 +226,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public RectificarCOEMResponse RectificarCOEM(AfipCoemDto afipCoemDto)
         {
-            try
+			log.Info("Inicializando RectificarCOEM");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                RectificarCOEMRequest1 rectificarCOEMRequest1 = new RectificarCOEMRequest1(
+                RectificarCOEMRequest1 request = new RectificarCOEMRequest1(
                     new RectificarCOEMRequest1Body
                     {
                         argRectificarCOEM = new RectificarCOEMRequest
@@ -226,8 +245,13 @@ namespace Molinos.Scato.Servicios.Impl
                         },
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                     });
-                return this.wgescomunicacionembarque.RectificarCOEM(rectificarCOEMRequest1);
-            }
+
+				log.Info($" request: { XmlConverter<RectificarCOEMRequest1>.Serialize(request) } ");
+				var response = this.wgescomunicacionembarque.RectificarCOEM(request);
+				log.Info($" response: { JsonConverter<RectificarCOEMResponse>.Serialize(response) }");
+				log.Info("Finalizando RectificarCOEM");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar rectificar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -237,22 +261,27 @@ namespace Molinos.Scato.Servicios.Impl
 
         public AnularCOEMResponse AnularCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            try
+			log.Info("Inicializando AnularCOEM");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                AnularCOEMRequest1 anularCOEMRequest1 = new AnularCOEMRequest1(
+                AnularCOEMRequest1 request = new AnularCOEMRequest1(
                     new AnularCOEMRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                         argAnularCOEM = new AnularCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
                     });
 
-                return this.wgescomunicacionembarque.AnularCOEM(anularCOEMRequest1);
-            }
+				log.Info($" request: {XmlConverter<AnularCOEMRequest1>.Serialize(request)} ");
+				var response = this.wgescomunicacionembarque.AnularCOEM(request);
+				log.Info($" response: {JsonConverter<AnularCOEMResponse>.Serialize(response)}");
+				log.Info("Finalizando AnularCOEM");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar anular la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -262,14 +291,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            try
+			log.Info("Inicializando CerrarCOEM");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                CerrarCOEMRequest1 cerrarCOEMRequest1 = new CerrarCOEMRequest1(
+                CerrarCOEMRequest1 request = new CerrarCOEMRequest1(
                     new CerrarCOEMRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
@@ -277,8 +307,12 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-                return this.wgescomunicacionembarque.CerrarCOEM(cerrarCOEMRequest1);
-            }
+				log.Info($" request: {XmlConverter<CerrarCOEMRequest1>.Serialize(request)} ");
+				var response = this.wgescomunicacionembarque.CerrarCOEM(request);
+				log.Info($" response: {JsonConverter<CerrarCOEMResponse>.Serialize(response)}");
+				log.Info("Finalizando CerrarCOEM");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -289,22 +323,27 @@ namespace Molinos.Scato.Servicios.Impl
 
         public SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            try
+			log.Info("Inicializando SolicitarAnulacionCOEM");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                SolicitarAnulacionCOEMRequest1 solicitarAnulacionCOEMRequest1 = new SolicitarAnulacionCOEMRequest1(
+                SolicitarAnulacionCOEMRequest1 request = new SolicitarAnulacionCOEMRequest1(
                     new SolicitarAnulacionCOEMRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                         argSolicitarAnulacionCOEM = new SolicitarAnulacionCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
                     });
 
-                return this.wgescomunicacionembarque.SolicitarAnulacionCOEM(solicitarAnulacionCOEMRequest1);
-            }
+				log.Info($" request: { XmlConverter<SolicitarAnulacionCOEMRequest1>.Serialize(request)} ");
+				var response = this.wgescomunicacionembarque.SolicitarAnulacionCOEM(request);
+				log.Info($" response: { JsonConverter<SolicitarAnulacionCOEMResponse>.Serialize(response) }");
+				log.Info("Finalizando SolicitarAnulacionCOEM");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -336,7 +375,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, AfipMotivoNoABordo afipMotivoNoAbordo)
+        public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, string codigoMotivo, string descripcionMotivo)
         {
             try
             {
@@ -354,8 +393,8 @@ namespace Molinos.Scato.Servicios.Impl
                             IdentificadorCaratula = identificadorCaratula,
                             IdentificadorCOEM = identificadorCoem,
                             IdentificadoresDeclaracionesMercaderiaSuelta = identificadoresDeclaracionesMercaderiaSuelta,
-                            CodigoMotivo = afipMotivoNoAbordo.Codigo,
-                            DescripcionMotivo = afipMotivoNoAbordo.Descripcion
+                            CodigoMotivo = codigoMotivo,
+                            DescripcionMotivo = descripcionMotivo
                         }
                     });
                 return this.wgescomunicacionembarque.SolicitarNoABordo(solicitarNoABordoRequest1);
