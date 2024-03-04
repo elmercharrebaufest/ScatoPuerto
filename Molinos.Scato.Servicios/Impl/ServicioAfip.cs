@@ -17,7 +17,7 @@ using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Impl
 {
-	public class ServicioAfip : IServicioAfip
+    public class ServicioAfip : IServicioAfip
     {
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;
@@ -190,6 +190,13 @@ namespace Molinos.Scato.Servicios.Impl
             var caratulas = repositorio.Listar(x => new { x.Id, x.IdentificadorCaratula }, (AfipCaratula x) => true);
             var res = caratulas.Select(x => new AfipCaratulaDto { Id = x.Id, IdentificadorCaratula = x.IdentificadorCaratula }).ToList();
             return res;
+        }
+
+        public void CaratulaCambiarTipoProducto(int id)
+        {
+            var caratula = repositorio.Obtener<AfipCaratula>(id) ?? throw new Exception("No existe la carátula con el id indicado");
+            caratula.EsLiquido = !caratula.EsLiquido;
+            repositorio.GuardarCambios();
         }
         #endregion
 

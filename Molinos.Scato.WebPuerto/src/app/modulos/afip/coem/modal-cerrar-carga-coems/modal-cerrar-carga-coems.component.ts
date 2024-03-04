@@ -1,10 +1,11 @@
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
 import { NuevasMercaderiasSueltasCoem } from '@ScatoModels/afip/nuevasMercaderiasSueltasCoem';
+import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -20,22 +21,35 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
   public form: FormGroup;
   public mensajeCarga: string;
   public cargando: boolean;
+  private esLiquido: boolean;
 
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
     private formBuilder: FormBuilder,
-    private coemAfipService: CoemAfipService
+    private coemAfipService: CoemAfipService,
+    private caratulaService: CaratulaAfipService
   ) { }
 
   ngOnInit(): void {
     this.inicializarForm();
+    this.cargarCaratula();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.coemsSeleccionadas) {
       this.inicializarForm();
     }
+  }
+
+  private cargarCaratula() {
+    this.caratulaService.obtenerCaratulaId(this.idCaratula).subscribe(
+      caratula => this.esLiquido = caratula.esLiquido,
+      err => {
+        console.error(err);
+        this.confirmationDialogService.error('Ocurrió un error al cargar los datos');
+      }
+    );
   }
 
   private inicializarForm() {
@@ -65,7 +79,7 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
     const formGroups = mercaderias.filter(m => !m.noABordo).map(mercaderia => this.formBuilder.group({
       identificadorDeclaracion: mercaderia.identificadorDeclaracion,
       fechaEmbarque: ['', Validators.required],
-      cantidadReal: ['', Validators.required],
+      cantidadReal: ['', [Validators.required, this.ValidadorCantidad.bind(this)]],
       cantidadOriginal: [mercaderia.embalajes[0].peso]
     }));
     return this.formBuilder.array(formGroups);
@@ -113,6 +127,22 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
       this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
       this.cargando = false;
     });
+  }
+
+  private ValidadorCantidad(control: AbstractControl) {
+    const cantidadOriginal = control.parent?.get('cantidadOriginal')?.value;
+    const cantidad = control.value;
+    if (isNaN(cantidadOriginal) || control.value == 0) {
+      return null;
+    }
+    const porcentaje = this.esLiquido ? 0.02 : 0.04;
+    const margen = cantidadOriginal * porcentaje;
+    const minimo = cantidadOriginal - margen;
+    const maximo = cantidadOriginal + margen;
+    if (cantidad < minimo || cantidad > maximo) {
+      return { cantidadInvalida: true };
+    }
+    return null;
   }
 
 }
