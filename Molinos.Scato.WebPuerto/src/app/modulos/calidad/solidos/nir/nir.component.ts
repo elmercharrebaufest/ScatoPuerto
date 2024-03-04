@@ -175,7 +175,12 @@ export class NIRComponent  implements OnInit {
   
   enviarNir(guardarYEnviar : boolean = false) {
     let nir: NirManualPuerto[] = this.obtenerNirCompleto();
-    // this.calcularPromedios(nir);
+
+    if(!nir || nir.length == 0){
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe agregar al menos una fila para poder avanzar.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
     if(guardarYEnviar == true) {
       this.enviarMail(nir);      
     }else{
@@ -204,7 +209,7 @@ export class NIRComponent  implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
-  enviarMail(nir) {
+  enviarMail(nir: NirManualPuerto[]) {
     var titulo = "Enviar NIR";
     var text = "Cuerpo del Mail:"
     var textoCuerpoMail = 'Cuerpo del mail';

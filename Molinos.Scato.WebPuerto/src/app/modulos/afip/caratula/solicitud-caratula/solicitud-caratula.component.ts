@@ -1,7 +1,8 @@
-import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Caratula, SolicitudCambioBuque, SolicitudCambioFechas } from '@ScatoModels/afip/caratula';
+import { COEM } from '@ScatoModels/afip/coem';
 import { AfipMotivoSolicitudCambio } from '@ScatoModels/afip/tablas-afip';
 import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
+import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -18,6 +19,7 @@ import { concatMap, tap } from 'rxjs/operators';
 export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
 
   public caratula: Caratula
+  private coems: COEM[];
   public solicitarCambioFechasForm: FormGroup;
   public solicitarCambioBuqueForm: FormGroup;
 
@@ -34,6 +36,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
     private confirmationDialogService: ConfirmationDialogService,
     private formBuilder: FormBuilder,
     private caratulaAfipService: CaratulaAfipService,
+    private coemService: CoemAfipService,
     private tablasAfipService: TablasAfipService
   ) {
     this.initForms();
@@ -41,7 +44,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // El request se hace en modal-crear-caratula.ts, este es un BehaviorSubject
-    const suscripcion = this.caratulaAfipService.$caratula.subscribe(caratula => {
+    const susCaratula = this.caratulaAfipService.$caratula.subscribe(caratula => {
       if (!caratula) {
         return;
       }
@@ -49,7 +52,12 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
       this.solicitarCambioFechasForm.get('caratulaId').setValue(caratula.id);
       this.solicitarCambioBuqueForm.get('caratulaId').setValue(caratula.id);
     });
-    this.suscripciones.push(suscripcion);
+    this.suscripciones.push(susCaratula);
+
+    const susCoems = this.caratulaAfipService.$caratulaCoems.subscribe(coems => this.coems = coems);
+
+    this.suscripciones.push(susCoems);
+
     this.tablasAfipService.listarMotivosSolicitudCambio().subscribe(motivos =>
       this.listaMotivos = motivos,
       err => console.error(err)
@@ -114,11 +122,11 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
 
     form.markAllAsTouched();
     if (form.invalid) {
-      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.alertar('Advertencia', 'Los campos que estan en rojo son requeridos');
       return;
     }
 
-    const confirm = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de solicitar el cambio de ${solicitud}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+    const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Está seguro de solicitar el cambio de ${solicitud}?`);
     if (!confirm) {
       return;
     }
@@ -129,18 +137,18 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
 
     request.subscribe(() => {
       this.cargando = false;
-      this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha solicitado el cambio de ${solicitud} con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      this.confirmationDialogService.exito(`Ha solicitado el cambio de ${solicitud} con éxito`);
       form.reset();
     }, (err) => {
       console.error(err);
       this.cargando = false;
       const msj = err.error || `No se ha podido enviar la solicitud, comunicarse con soporte técnico`;
-      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error)
+      this.confirmationDialogService.error(msj);
     });
   }
 
   public async efectuarCambio(solicitud: string, id: number) {
-    const confirm = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de marcar como aceptada la solicitud de cambio de ${solicitud}? Esto efectuara los cambios en la carátula`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+    const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea marcar como aceptada la solicitud de cambio de ${solicitud}? Esto efectuara los cambios en la carátula`);
     if (!confirm) {
       return;
     }
@@ -149,17 +157,17 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
     this.cargando = true;
     request.subscribe(async () => {
       this.cargando = false;
-      await this.confirmationDialogService.confirm('¡Felicitaciones!', `Se ha efectuado la solicitud de cambio de ${solicitud} con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      await this.confirmationDialogService.exito(`Se ha efectuado la solicitud de cambio de ${solicitud} con éxito`);
       this.caratulaAfipService.$recargarCaratula.next(); // Este flujo sigue en modal-crear-caratula.ts
     }, (err) => {
       console.error(err);
       this.cargando = false;
-      this.confirmationDialogService.confirm('¡Error!', `No se ha podido efectuar el cambio, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
+      this.confirmationDialogService.error('No se ha podido efectuar el cambio, comunicarse con soporte técnico');
     });
   }
 
   public async rechazarCambio(solicitud: string, id: number) {
-    const confirm = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de marcar como rechazada la solicitud de cambio de ${solicitud}?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+    const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea marcar como rechazada la solicitud de cambio de ${solicitud}?`);
     if (!confirm) {
       return;
     }
@@ -168,13 +176,73 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
     this.cargando = true;
     request.subscribe(async () => {
       this.cargando = false;
-      await this.confirmationDialogService.confirm('¡Felicitaciones!', `Se ha marcado como rechazada la solicitud de cambio de ${solicitud}`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      await this.confirmationDialogService.exito(`Se ha marcado como rechazada la solicitud de cambio de ${solicitud}`);
       this.caratulaAfipService.$recargarCaratula.next(); // Este flujo sigue en modal-crear-caratula.ts
     }, (err) => {
       console.error(err);
       this.cargando = false;
-      this.confirmationDialogService.confirm('¡Error!', `No se ha podido efectuar el cambio, comunicarse con soporte técnico`, 'Cerrar', '', null, null, Tipoalerta.Error);
+      this.confirmationDialogService.error(`Ocurrió un error al efectuar el cambio`);
     });
+  }
+
+  public async solicitarCierreCarga(modalCierreCarga: any) {
+    if (this.caratula.estado == 'CODE') {
+      this.confirmationDialogService.alertar('La caratula ya fue convertida a CODE')
+    }
+    if (this.caratula.solicitudesCierreCarga?.some(s => s.estado == 'Pendiente')) {
+      this.confirmationDialogService.alertar('Ya existe una solicitud de cierre en curso que se encuentra pendiente');
+      return;
+    }
+    const estadosValidos = ['AUTO', 'ANU'];
+    const coemsEstadoinvalido = this.coems
+      .filter(coem => !estadosValidos.includes(coem.afipCoemEstado.codigo))
+      .map(coem => coem.identificadorCOEM).join('\n');
+    if (coemsEstadoinvalido) {
+      this.confirmationDialogService.error('Las siguientes COEMs no se encuentran autorizadas o anuladas:\n' + coemsEstadoinvalido);
+      return;
+    }
+    this.abrirModal(modalCierreCarga);
+  }
+
+  public async efectuarCierre(id: number) {
+    const confirm = await this.confirmationDialogService.confirmar('Advertencia', '¿Desea marcar como aceptada la solicitud de cierre de carga? Esto registrará que la carátula y sus COEM se han convertido en una CODE')
+    if (!confirm) {
+      return;
+    }
+    this.mensajeCarga = 'Efecutando cambios';
+    this.cargando = true;
+    this.caratulaAfipService.efectuarSolicitudCierreCarga(id).subscribe(async () => {
+      this.cargando = false;
+      await this.confirmationDialogService.exito(`Se ha efectuado el cierre de carga`);
+      this.caratulaAfipService.$recargarCaratula.next(); // Este flujo sigue en modal-crear-caratula.ts
+      this.coemService.$recargarCoems.next();
+    }, (err) => {
+      console.error(err);
+      this.cargando = false;
+      this.confirmationDialogService.error('No se ha podido efectuar el cambio');
+    });
+  }
+
+  public async rechazarCierre(id: number) {
+    const confirm = await this.confirmationDialogService.confirmar('Advertencia', '¿Desea marcar como rechazada la solicitud de cierre de carga?');
+    if (!confirm) {
+      return;
+    }
+    this.mensajeCarga = 'Efecutando cambios';
+    this.cargando = true;
+    this.caratulaAfipService.rechazarSolicitudCierreCarga(id).subscribe(async () => {
+      this.cargando = false;
+      await this.confirmationDialogService.exito(`Se ha marcado como rechazada la solicitud de cierre`);
+      this.caratulaAfipService.$recargarCaratula.next(); // Este flujo sigue en modal-crear-caratula.ts
+    }, (err) => {
+      console.error(err);
+      this.cargando = false;
+      this.confirmationDialogService.error(`Ocurrió un error al efectuar el cambio`);
+    });
+  }
+
+  public finalizarCierreCarga() {
+    this.caratulaAfipService.$recargarCaratula.next();
   }
 
 }

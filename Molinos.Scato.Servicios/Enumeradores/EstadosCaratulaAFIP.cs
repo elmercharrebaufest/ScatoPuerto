@@ -12,5 +12,7 @@ namespace Molinos.Scato.Servicios.Enumeradores
         public const string Rectificado = "Rectificado";
         public const string Enviado = "Enviado (Ya asociado a COEM)";
         public const string Eliminado = "Eliminado";
+        public const string CierreSolicitado = "Cierre Solicitado";
+        public const string Code = "CODE";
     }
 }

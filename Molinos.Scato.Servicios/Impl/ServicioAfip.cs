@@ -1,28 +1,23 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.AfipPuerto;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.AfipPuerto;
+using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
-using NPOI.Util;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Web;
-using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Dto.AfipPuerto;
-using Molinos.Scato.Servicios.Enumeradores;
-using Molinos.Scato.Dominio.Comandos.AfipPuerto;
-using Molinos.Scato.Servicios.Orquestador;
-using Molinos.Scato.Dominio.Dto.AfipTablasReferencia;
 
 namespace Molinos.Scato.Servicios.Impl
 {
-    public class ServicioAfip : IServicioAfip
+	public class ServicioAfip : IServicioAfip
     {
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;
@@ -104,16 +99,15 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<AfipMotivoSolicitudCambio, AfipMotivoSolicitudCambioDto>();
         }
-         
+
         #endregion
 
         #region Caratulas
 
-        public IList<AfipCaratulaDto> ListarCaratulas()
+        public ListaPaginada<AfipCaratulaDto> ListarCaratulas(Paginacion paginacion, DateTime? fechaArribo = null, string buque = null, string identificador = null, string estado = null)
         {
-            var caratulas = Listar<AfipCaratula, AfipCaratulaDto>();
-            foreach (var caratula in caratulas) caratula.Itinerario = null;
-            return caratulas;
+            var caratulas = repositorio.ListarConsultaPaginada(new ListarAfipCaratulaConsulta(paginacion, fechaArribo, buque, identificador, estado));
+            return conversor.ConvertirListaPaginada<AfipCaratula, AfipCaratulaDto>(caratulas);
         }
 
         public AfipCaratulaDto ObtenerCaratula(int id)
@@ -200,15 +194,10 @@ namespace Molinos.Scato.Servicios.Impl
         #endregion
 
         #region COEMs
-        public IList<AfipCoemDto> ListarCoems()
+        public ListaPaginada<AfipCoemDto> ListarCoems(int? idCaratula, Paginacion paginacion, string identificador, string declaracion, string estado)
         {
-            return Listar<AfipCoem, AfipCoemDto>();
-        }
-
-        public IList<AfipCoemDto> ListarCoemsPorCaratula(int idCaratula)
-        {
-            var caratulas = Listar<AfipCoem, AfipCoemDto>(x => x.AfipCaratula.Id == idCaratula);
-            return caratulas;
+            var coems = repositorio.ListarConsultaPaginada(new ListarAfipCoemConsulta(paginacion, idCaratula, identificador, declaracion, estado));
+            return conversor.ConvertirListaPaginada<AfipCoem, AfipCoemDto>(coems);
         }
 
         public AfipCoemDto ObtenerCoem(int id)
@@ -276,7 +265,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                if(ValidarEstados(idCoem, idEstado))
+                if (ValidarEstados(idCoem, idEstado))
                 {
                     var coem = this.repositorio.Obtener<AfipCoem>(idCoem);
                     var estado = this.repositorio.Obtener<AfipCoemEstado>(idEstado);
@@ -292,7 +281,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                     coem.AfipCoemEstado = estado;
                     this.repositorio.GuardarCambios();
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -367,6 +356,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         #region Solicitudes
 
+        #region Solicitar Cierre de Carga
         public bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto)
         {
             var res = this.servicioComandos.Ejecutar(new AfipSolicitarCierreCargaGranel { Dto = solicitarCierreCargaGranelDto });
@@ -377,6 +367,40 @@ namespace Molinos.Scato.Servicios.Impl
             return !res.HayErrores;
         }
 
+        public IList<AfipSolicitudCierreCargaDto> ListarSolicitudesCierreCarga(int id = 0)
+        {
+            IList<AfipSolicitudCierreCargaDto> resultado;
+            resultado = Listar<AfipSolicitudCierreCarga, AfipSolicitudCierreCargaDto>(x => id == 0 || x.AfipCaratula.Id == id);
+            return resultado.OrderByDescending(x => x.FechaCreacion).ToList();
+        }
+
+        public void EfectuarSolicitudCierreCarga(int id)
+        {
+            var solicitudDb = repositorio.Obtener<AfipSolicitudCierreCarga>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitudDb.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            var estadoCoem = repositorio.Obtener<AfipCoemEstado>(estado => estado.Codigo == "CODE") ?? throw new Exception("No existe el estado 'CODE' en la base de datos");
+            var caratula = solicitudDb.AfipCaratula;
+            foreach (var coem in caratula.Coems)
+            {
+                coem.AfipCoemEstado = estadoCoem;
+            }
+            caratula.Estado = EstadosCaratulaAFIP.Code;
+            solicitudDb.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            solicitudDb.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+
+        public void RechazarSolicitudCierreCarga(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudCierreCarga>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+        #endregion
+
+        #region Solicitar No a bordo
         public bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto)
         {
             var res = this.servicioComandos.Ejecutar(new AfipSolicitarNoAbordo { Dto = solicitarNoAbordoDto });
@@ -391,6 +415,30 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<AfipMotivoNoABordo, AfipMotivoNoAbordoDto>();
         }
+
+        public void EfectuarSolicitudNoABordo(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudNoABordo>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            var declaraciones = solicitud.AfipSolicitudNoABordoDeclaraciones.Select(x => x.AfipCoemMercaderiaSuelta).ToList();
+            foreach (var declaracion in declaraciones)
+            {
+                declaracion.NoABordo = true;
+            }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Aceptado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+
+        public void RechazarSolicitudNoABordo(int id)
+        {
+            var solicitud = repositorio.Obtener<AfipSolicitudNoABordo>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
+            if (solicitud.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
+            solicitud.Estado = (int)EstadosSolicitudesAFIP.Rechazado;
+            solicitud.FechaActualizacion = DateTime.Now;
+            repositorio.GuardarCambios();
+        }
+        #endregion
 
         #region Solicitar Cambio de Buque
         public void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto)

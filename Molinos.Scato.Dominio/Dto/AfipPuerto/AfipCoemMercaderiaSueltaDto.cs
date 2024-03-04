@@ -11,6 +11,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Id { get; set; }
         public string IdentificadorDeclaracion { get; set; }
         public string CuitATA { get; set; }
+        public bool NoABordo { get; set; }
         public IList<AfipCoemMercaderiaSueltaEmbalajeDto> Embalajes { get; set; }
     }
 }

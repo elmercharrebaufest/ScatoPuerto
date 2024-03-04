@@ -146,7 +146,7 @@ export class PlanillaTurnoLiquidoExcelService {
         if (esRecibidores)
             headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "Cant."];
             else
-            headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Cm.", "Destino", "Cant."];
+            headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Mm.", "Destino", "Cant."];
 
         headerDetallePlanilla.forEach((text, index) => {
             let currentCell = worksheet.getRow(offset).getCell(index + 3);

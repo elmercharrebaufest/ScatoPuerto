@@ -18,7 +18,7 @@ export class ConfirmationDialogService {
     dialogSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md',
     mail: Mail = null,
     tipo: Tipoalerta = Tipoalerta.Success,
-    inputTitle : string = null,
+    inputTitle: string = null,
     centered: boolean = false): Promise<boolean> {
     const modalRef = this.modalService.open(ConfirmationDialogComponent, {
       backdrop: 'static',
@@ -38,6 +38,10 @@ export class ConfirmationDialogService {
 
   public confirmar(titulo: string, mensaje: string, tipo: Tipoalerta = Tipoalerta.Warning) {
     return this.confirm(titulo, mensaje, 'Si', 'Cerrar', null, null, tipo);
+  }
+
+  public alertar(mensaje: string, titulo: string = 'Atención', tipo: Tipoalerta = Tipoalerta.Warning) {
+    return this.confirm(titulo, mensaje, 'Cerrar', null, null, null, tipo);
   }
 
   public exito(mensaje: string) {

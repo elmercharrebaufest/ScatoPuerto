@@ -3,7 +3,7 @@ import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
 import { NuevasMercaderiasSueltasCoem } from '@ScatoModels/afip/nuevasMercaderiasSueltasCoem';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -12,10 +12,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './modal-cerrar-carga-coems.component.html',
   styleUrls: ['./modal-cerrar-carga-coems.component.css']
 })
-export class ModalCerrarCargaCoemsComponent implements OnInit {
+export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
 
   @Input() coemsSeleccionadas: COEM[];
   @Input() idCaratula: number;
+  @Output() finalizar: EventEmitter<void> = new EventEmitter();
   public form: FormGroup;
   public mensajeCarga: string;
   public cargando: boolean;
@@ -29,6 +30,12 @@ export class ModalCerrarCargaCoemsComponent implements OnInit {
 
   ngOnInit(): void {
     this.inicializarForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.coemsSeleccionadas) {
+      this.inicializarForm();
+    }
   }
 
   private inicializarForm() {
@@ -55,7 +62,7 @@ export class ModalCerrarCargaCoemsComponent implements OnInit {
   }
 
   private crearDeclaracionesFormArray(mercaderias: NuevasMercaderiasSueltasCoem[]) {
-    const formGroups = mercaderias.map(mercaderia => this.formBuilder.group({
+    const formGroups = mercaderias.filter(m => !m.noABordo).map(mercaderia => this.formBuilder.group({
       identificadorDeclaracion: mercaderia.identificadorDeclaracion,
       fechaEmbarque: ['', Validators.required],
       cantidadReal: ['', Validators.required],
@@ -93,10 +100,16 @@ export class ModalCerrarCargaCoemsComponent implements OnInit {
     this.coemAfipService.solicitarCierreDeCarga(solicitudCierreCargaDto).subscribe(async () => {
       await this.confirmationDialogService.confirm('Resultado exitoso', 'Se ha solicitado correctamente el cierre de carga', 'Cerrar', '', null, null, Tipoalerta.Success);
       this.cargando = false;
+      this.finalizar.emit();
       this.closeModal();
     }, (err) => {
       console.error(err);
-      const msj = err.error || 'Ha ocurrido un error al solicitar cierre de carga';
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al solicitar cierre de carga';
+      }
       this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
       this.cargando = false;
     });

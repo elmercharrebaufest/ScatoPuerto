@@ -1094,8 +1094,8 @@ export class AltaEmbarqueComponent implements OnInit {
 
             if (this.opcionABMSeleccionada == 'Agregar') {
               this.embarqueService[obtener]().subscribe(res => {
-                this.embarqueForm.get([list]).setValue(
-                  res.filter(x => x.nombre == abm.nombre).map(x => new modelo(x.id, x.nombre)));
+                const nuevo = res.filter(x => x.nombre == abm.nombre)[0];
+                this.embarqueForm.get([list]).value.push(new modelo(nuevo.id, nuevo.nombre));
               });
             }
             else {

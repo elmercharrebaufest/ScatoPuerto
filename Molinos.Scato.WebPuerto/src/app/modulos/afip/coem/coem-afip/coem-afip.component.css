@@ -1,3 +1,13 @@
+.filtros {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.filtros>* {
+  width: auto;
+}
+
 .lista-coem-table {
   border: 0;
   border-radius: 4px 4px 0px 0px;
@@ -47,4 +57,17 @@ input[type="checkbox"] {
 
 .contenedor-tabla-mercaderias table {
   width: 100%;
+}
+
+.contenedor-tabla-mercaderias table tr :first-child {
+  border-right: none;
+}
+
+.contenedor-tabla-mercaderias table tr :nth-child(2) {
+  border-left: none;
+}
+
+.noabordo {
+  background-color: lightgray;
+  color: gray;
 }

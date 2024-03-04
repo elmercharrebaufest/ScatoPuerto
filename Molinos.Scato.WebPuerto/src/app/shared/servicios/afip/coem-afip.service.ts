@@ -1,10 +1,11 @@
 import { Caratula } from '@ScatoModels/afip/caratula';
-import { COEM, SolicitudCierreCargaDto } from '@ScatoModels/afip/coem';
+import { COEM, SolicitudCierreCargaDto, SolicitudNoABordoDto } from '@ScatoModels/afip/coem';
 import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
+import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
-import { Observable, of } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ import { Observable, of } from 'rxjs';
 export class CoemAfipService {
 
   private url: string = environment.apiUrl;
+  public $recargarCoems = new Subject<void>();
   constructor(private http: HttpClient) { }
 
   public registrarCoem(coem: COEM): Observable<any[]> {
@@ -22,12 +24,14 @@ export class CoemAfipService {
     return this.http.put<any[]>(`${this.url}Afip/RectificarCoem`, coem, { 'withCredentials': true });
   }
 
-  public listarCoems() {
-    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true });
-  }
-
-  public listarCoemsDeCaratula(idCaratula: number) {
-    return this.http.get<COEM[]>(`${this.url}Afip/ListarCoemsPorCaratula?idCaratula=${idCaratula}`, { 'withCredentials': true });
+  public listarCoems(params: any) {
+    // Se remueven los filtros vacíos
+    for (const prop in params) {
+      if (!params[prop]) {
+        delete params[prop];
+      }
+    }
+    return this.http.get<ListaPaginada<COEM>>(`${this.url}Afip/ListarCoems`, { 'withCredentials': true, params });
   }
 
   public estadosCoem() {
@@ -62,8 +66,15 @@ export class CoemAfipService {
     return this.http.post<boolean>(`${this.url}Afip/SolicitarCierreCargaGranel`, dto, { withCredentials: true });
   }
 
-  public solicitarNoABordo(idCoem: number, idCaratula: number, codigoMotivo: string) {
-    const body = { idCaratula, idCoem, codigoMotivo };
-    return this.http.post<boolean>(`${this.url}Afip/SolicitarNoAbordo`, body, { withCredentials: true });
+  public solicitarNoABordo(body: SolicitudNoABordoDto) {
+    return this.http.post<boolean>(`${this.url}Afip/SolicitarNoABordo`, body, { withCredentials: true });
+  }
+
+  public efectuarSolicitudNoABordo(id: number) {
+    return this.http.put(`${this.url}Afip/EfectuarSolicitudNoABordo/${id}`, null, { withCredentials: true });
+  }
+
+  public rechazarSolicitudNoABordo(id: number) {
+    return this.http.put(`${this.url}Afip/RechazarSolicitudNoABordo/${id}`, null, { withCredentials: true });
   }
 }

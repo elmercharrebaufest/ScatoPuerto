@@ -10439,7 +10439,7 @@ namespace Molinos.Scato.Servicios.Impl
                 int totalPesoNeto = 0;
                 foreach (Carga carga in cargas)
                 {
-                    totalPesoNeto += repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id).Sum(x => x.PesoNeto);
+                    totalPesoNeto += repositorio.Listar<Balanzada>(x => x.CargaInicial_Id == carga.CargaOpuesta_Id && x.NumeroBalanza == numeroBalanzaStr).Sum(x => x.PesoNeto);
                 }
                 // Sumatoria de peso neto para Cargas en Curso
                 foreach (Carga cargaEnCurso in cargasEnCurso)
@@ -10642,6 +10642,11 @@ namespace Molinos.Scato.Servicios.Impl
 
             foreach (var item in observacionesDeCalidadDto)
             {
+                if(item.Observaciones.Length > 200)
+                {
+                    throw new Exception("El texto Observaciones no puede superar la cantidad de 200 caracteres.");
+                }
+
                 ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad observacionesDeCalidad_db = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad>(x => x.Id == item.Id);
                 if (observacionesDeCalidad_db != null)
                 {
