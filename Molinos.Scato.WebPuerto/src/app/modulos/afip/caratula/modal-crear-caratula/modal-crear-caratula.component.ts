@@ -236,10 +236,16 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const mostrarError = (err?: string) => {
-      const msj = err || `No se ha podido ${nueva ? 'crear una nueva' : 'editar la'} Caratula, comunicarse con soporte técnico`;
-      this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error)
+    const mostrarError = (err?: any) => {
       this.cargando = false;
+      console.error(err);
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || `Ha ocurrido un error al ${nueva ? 'crear una nueva' : 'editar la'} Caratula`;
+      }
+      this.confirmationDialogService.error(msj);
     };
 
     const caratula: Caratula = form.value;
@@ -257,8 +263,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       this.cargando = false;
       this.modalService.dismissAll();
     }, err => {
-      console.error(err);
-      mostrarError(err.error);
+      mostrarError(err);
     });
   }
 

@@ -142,7 +142,12 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
     }, (err) => {
       console.error(err);
       this.cargando = false;
-      const msj = err.error || `No se ha podido enviar la solicitud, comunicarse con soporte técnico`;
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al enviar la solicitud';
+      }
       this.confirmationDialogService.error(msj);
     });
   }
