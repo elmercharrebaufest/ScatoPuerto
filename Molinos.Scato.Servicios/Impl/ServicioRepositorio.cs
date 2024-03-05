@@ -12192,6 +12192,37 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
+        public bool ExisteEmbarqueEnMuelle(string nombreBuque, string muelle)
+        {
+            Embarque embarqueEnMuelle = null;
+            var embarquesDb = from e in repositorio.Listar<Embarque>()
+                              join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
+                              join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
+                              where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
+                              && v.Nombre == nombreBuque
+                              select (e);
+
+            switch (muelle)
+            {
+                case "vicentin":
+                    embarqueEnMuelle = embarquesDb.Where(x => x.Vicentin == true).FirstOrDefault();
+                    break;
+                case "noryon":
+                    embarqueEnMuelle = embarquesDb.Where(x => x.Noryon == true).FirstOrDefault();
+                    break;
+                case "sanBenito":
+                    embarqueEnMuelle = embarquesDb.Where(x => x.SanBenito == true).FirstOrDefault();
+                    break;
+                case "otrosMuelles":
+                    embarqueEnMuelle = embarquesDb.Where(x => x.OtrosMuelles == true).FirstOrDefault();
+                    break;
+                default: break;
+            }
+            if (embarqueEnMuelle != null)
+                return true;
+            else return false;
+        }
+
 
     }
 }
