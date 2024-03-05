@@ -14,7 +14,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Emitio { get; set; }
         public virtual string Superviso { get; set; }
         public virtual DateTime? FechaHoraImpresion { get; set; }
-
+        public virtual bool Habilitado { get; set; }
         public virtual ICollection<ReciboDeBuqueDetalles> ReciboDeBuqueDetalles { get; set; }
 
     }
