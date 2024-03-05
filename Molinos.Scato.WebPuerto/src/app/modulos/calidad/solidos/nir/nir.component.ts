@@ -181,6 +181,11 @@ export class NIRComponent  implements OnInit {
       return;
     }
 
+    if(this.faltanCompletarCamposNir(nir)){
+      this.confirmationDialogService.confirm('¡Atención!', "Falta ingresar datos en los campos remarcados en rojo.", 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
     if(guardarYEnviar == true) {
       this.enviarMail(nir);      
     }else{
@@ -199,6 +204,17 @@ export class NIRComponent  implements OnInit {
     }
   }
 
+  faltanCompletarCamposNir(nir: NirManualPuerto[]): boolean{
+    let incompleto = false;
+    nir.forEach(linea => {
+      if(!linea.fecha || linea.hd == null || linea.hd === '' || linea.bodega == null 
+      || linea.bodega == "0"){
+        incompleto = true;
+      }
+    });
+    return incompleto;
+  }
+
   compareOrigen(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
@@ -212,9 +228,10 @@ export class NIRComponent  implements OnInit {
   enviarMail(nir: NirManualPuerto[]) {
     var titulo = "Enviar NIR";
     var text = "Cuerpo del Mail:"
-    var textoCuerpoMail = 'Cuerpo del mail';
+    var textoCuerpoMail = 'Resultado muestras de embarque.';
     var inputTitle = "Destinatarios";
-    var mailNir = new Mail(`NIR.`,`${textoCuerpoMail}`);
+    var nombreBuque = this.datosEmbarqueProcesoService.getEmbarqueSelected().nombreBuque;
+    var mailNir = new Mail(`NIR-${nombreBuque}`,`${textoCuerpoMail}`);
 
     this.procesoCalidadService.obtenerDestinatariosNirManual('NirManual')
     .subscribe(data => {mailNir.destinatarios = data
@@ -229,7 +246,6 @@ export class NIRComponent  implements OnInit {
         .then((confirmed) => {
           if (confirmed) {
               console.log(ObjetoMailNir);              
-              let nombreBuque = this.datosEmbarqueProcesoService.getEmbarqueSelected().nombreBuque
               this.guardando = true;
               this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id, nombreBuque ).subscribe(res => {
                 this.confirmationDialogService.confirm('¡Atención!', 'Mail enviado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success)

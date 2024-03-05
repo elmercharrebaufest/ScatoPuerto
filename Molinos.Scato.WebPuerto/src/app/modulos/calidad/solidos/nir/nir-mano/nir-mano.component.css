@@ -149,3 +149,7 @@ table td select {
 .hrCustom {
     background-color: #b8b8b8;
 }
+
+.tdError {
+    border: 1.5px solid red;
+}

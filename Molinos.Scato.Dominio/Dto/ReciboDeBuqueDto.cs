@@ -11,7 +11,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string Emitio { get; set; }
         public string Superviso { get; set; }
         public DateTime? FechaHoraImpresion { get; set; }
-
+        public bool Habilitado { get; set; } 
         public IList<ReciboDeBuqueDetallesDto> ReciboDeBuqueDetalles { get; set; }
     }
 }

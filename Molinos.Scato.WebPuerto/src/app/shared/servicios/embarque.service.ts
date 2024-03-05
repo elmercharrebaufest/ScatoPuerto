@@ -149,5 +149,9 @@ export class EmbarqueService {
   obtenerEmbarqueInformacion(idEmbarque: number): Observable<EmbarqueInformacion>{
     return this.http.get<EmbarqueInformacion>(`${this.url}Embarque/ObtenerEmbarqueInformacion?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
   }
+
+  existeEmbarqueEnMuelle(nombreBuque: string, muelle: string): Observable<any>{
+    return this.http.get<any>(`${this.url}Embarque/ExisteEmbarqueEnMuelle?nombreBuque=${nombreBuque}&muelle=${muelle}`, { 'withCredentials' : true});
+  }
   
 }
