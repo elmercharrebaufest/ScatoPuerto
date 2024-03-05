@@ -473,7 +473,7 @@ export class PlanillaTurnoLiquidoExcelService {
         const textoCuerpoMail = `Se enviara la planilla de turnos. \n
           Buque: ${nombreBuque}`;
         const inputTitle = "Destinatarios";
-        const mail = new Mail(`Planilla de turnos Liquido Modulo de carga ${idModuloDeCarga}`, `${textoCuerpoMail}`);
+        const mail = new Mail(`Planilla de turnos Liquido - ${nombreBuque}`, `${textoCuerpoMail}`);
         this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosLiquido').subscribe(x => mail.destinatarios = x);
 
         const confirm = await this.confirmationDialogService.confirm(titulo, 'Cuerpo del Mail:', 'Enviar', 'Cancelar', 'lg', mail, null, inputTitle, true);
