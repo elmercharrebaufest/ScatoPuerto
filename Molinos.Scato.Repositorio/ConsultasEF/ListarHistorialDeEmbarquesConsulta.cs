@@ -67,11 +67,15 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 HoraDesamarro = moduloPeriodoCarga != null ? moduloPeriodoCarga.HoraDesamarro : "",
                                 EsLiquido = item.Embarque.EsLiquido,
                                 Productos = item.Embarque.MaterialPuertoCantidad.Select(x => x.MaterialPuerto.DescripcionCorta),
-                                AgenciaControlPrivado = (from agenteControlPrivado in contexto.Set<AgenteControlPrivado>()
+                                AgentesControlPrivado = (from agenteControlPrivado in contexto.Set<AgenteControlPrivado>()
                                                          where item.PlanoDeCarga.AgentesControlPrivado.Contains(agenteControlPrivado)
                                                          orderby agenteControlPrivado.Id descending
-                                                         select agenteControlPrivado.Nombre + " " + agenteControlPrivado.Apellido)
-                                                         .FirstOrDefault()?? "",
+                                                         select new AgenteControlPrivadoDto()
+                                                         {
+                                                             Id = agenteControlPrivado.Id,
+                                                             Nombre = agenteControlPrivado.Nombre,
+                                                             Apellido = agenteControlPrivado.Apellido
+                                                         }),
                                 ProductoExportador =
                                     (from planillaDeTurnoLiquido in contexto.Set<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>()
                                      where planillaDeTurnoLiquido.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == item.ModuloDeCarga.Id
@@ -97,15 +101,12 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                      }),
                                 NombreMuelle = item.Embarque.SanBenito ? "San Benito" :
                                 item.Embarque.Vicentin ? "Vicentin" : item.Embarque.Noryon ? "Noryon" : item.Embarque.OtrosMuelles ? "Otros Muelles" : ""
-                            };         
-
+                            };
 
             return resultado.ToList().Where(x => (String.IsNullOrEmpty(exportador) || x.ProductoExportador.Any(y => y.NombreExportador.ToUpper().Contains(exportador?.ToUpper()))) && 
                                            (String.IsNullOrEmpty(destino) || x.ProductoExportador.Any( y => y.Destino.ToUpper().Contains(destino?.ToUpper()))) &&
                                         (productos == null || x.ProductoExportador.Any(y => productos.Contains(y.NombreMaterial))) && 
-                                        (String.IsNullOrEmpty(controlPrivado) || x.AgenciaControlPrivado.ToUpper().Contains(controlPrivado?.ToUpper()))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();
-
-                                             
+                                        (String.IsNullOrEmpty(controlPrivado) || x.AgentesControlPrivado.Any(y => y.name.ToUpper().Contains(controlPrivado?.ToUpper())))).GroupBy(x => x.EmbarqueId).Select(x => x.FirstOrDefault()).ToList();                                            
         }
 
         public virtual List<HistorialDeBusquesDto> Ejecutar(DbContext contexto)

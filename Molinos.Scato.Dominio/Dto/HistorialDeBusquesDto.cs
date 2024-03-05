@@ -29,15 +29,14 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraAmarro { get; set; }
         public string HoraDesamarro { get; set; }
         public string NombreMuelle { get; set; }
+        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; }
     }
     public class ProductoExportadorDto
     {
         public int Exportador_Id { get; set; }
         public string NombreExportador { get; set; }
-        
         public int MaterialPuerto_Id { get; set; }
         public string NombreMaterial { get; set; }
-
         public decimal Toneladas { get; set; }
         public string Destino { get; set; }
     }
