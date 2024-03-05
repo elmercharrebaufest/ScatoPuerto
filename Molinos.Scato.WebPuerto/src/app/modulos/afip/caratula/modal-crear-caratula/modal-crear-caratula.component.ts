@@ -128,6 +128,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     this.crearEditarCaratulaForm.get('codigoLugarOperativo').setValue(this.lugaresOperativos.find(lugarOp => lugarOp.codigo == caratula.codigoLugarOperativo));
 
     this.identificadorCaratula = caratula.identificadorCaratula;
+    this.crearEditarCaratulaForm.get('esLiquido').disable();
   }
 
   public getNombre(option: AfipPuntoAduanero | AfipLugarOperativo) {
@@ -199,7 +200,8 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       via: ['8'],
       numeroViaje: [''],
       fechaArribo: ['', [Validators.required, this.ValidadorFechaArribo]],
-      fechaZarpada: ['', [Validators.required, this.ValidadorFechaZarpada]]
+      fechaZarpada: ['', [Validators.required, this.ValidadorFechaZarpada]],
+      esLiquido: [false]
     });
 
     const controlFechaZarpada = this.crearEditarCaratulaForm.get('fechaZarpada');
@@ -248,7 +250,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.error(msj);
     };
 
-    const caratula: Caratula = form.value;
+    const caratula: Caratula = form.getRawValue();
     caratula.codigoAduana = form.get('codigoAduana').value.codigo;
     caratula.codigoLugarOperativo = form.get('codigoLugarOperativo').value.codigo;
     caratula.puertoDestino = '';
@@ -264,6 +266,25 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
       this.modalService.dismissAll();
     }, err => {
       mostrarError(err);
+    });
+  }
+
+  public async cambiarTipoProducto() {
+    const esLiquido = this.crearEditarCaratulaForm.get('esLiquido').value;
+    const confirm = await this.confirmationDialogService.confirmar('¡Atención!', `¿Está seguro de cambiar el tipo de producto de ${esLiquido ? 'líquido a sólido' : 'sólido a líquido'}?`);
+    if (!confirm) {
+      return;
+    }
+    this.cargando = true;
+    this.mensajeCarga = 'Cambiando tipo de producto';
+    this.caratulaAfipService.cambiarTipoProducto(this.id).subscribe(async () => {
+      this.cargando = false;
+      await this.confirmationDialogService.exito('Se ha cambiado el tipo de producto correctamente');
+      this.modalService.dismissAll();
+    }, err => {
+      console.error(err);
+      this.cargando = false;
+      this.confirmationDialogService.error('Ha ocurrido un error al cambiar el tipo de producto');
     });
   }
 
