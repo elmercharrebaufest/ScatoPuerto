@@ -2776,6 +2776,9 @@ namespace Molinos.Scato.Servicios
         IList<BodegaDto> ListarBodegasNir(int planoDeCargaId);
 
         [OperationContract]
+        bool ExisteEmbarqueEnMuelle(string nombreBuque, string muelle);
+
+        [OperationContract]
         void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
     }
 }

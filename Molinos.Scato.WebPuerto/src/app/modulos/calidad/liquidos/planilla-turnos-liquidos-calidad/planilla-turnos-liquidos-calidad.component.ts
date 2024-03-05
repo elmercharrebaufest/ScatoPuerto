@@ -1060,6 +1060,17 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   }
 
   async onExportarExcelLiquido(esEnviarPlanilla: boolean = false) {
+    // <ARMOA005-1659 - Dylan Lopez>
+    let destinos = '';
+    const res = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
+    res.planoDeCargaBodegas.forEach(pcb => {
+      pcb.destinos.forEach(des => {
+        destinos += des.destino.nombre + '|';
+      });
+    });
+    destinos = destinos.substring(0, destinos.length - 1);
+    // </ ARMOA005-1659 - Dylan Lopez>
+
     const planillaTurnosCerrado = this.planillaDeTurnos.filter(x => x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
     if (planillaTurnosCerrado.length == 0) {
       const mensaje = esEnviarPlanilla ? "No se encontraron turnos cerrados para enviar la planilla." : "No se encontraron turnos cerrados para exportar la planilla.";
@@ -1073,7 +1084,12 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.toneladasLineas.push({ linea: 'biodiesel', total: this.getToneladasLinea('biodiesel') });
 
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas);
+
+    // <ARMOA005-1659 - Dylan Lopez>
+    // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos);
+    // </ ARMOA005-1659 - Dylan Lopez>
+
     this.exportaPlanilla = false;
   }
 

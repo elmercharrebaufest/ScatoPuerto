@@ -99,9 +99,9 @@ export class CaratulaAfipComponent implements OnInit {
       // Calcular las páginas visibles
       this.calculateVisiblePages();
       this.cargarCaratulas = false;
-    }, (error) => {
-      console.error(error);
-      this.confirmationDialogService.confirm(`¡Error!`, 'No se han podido cargar correctamente las Caratulas', 'Cerrar', '', null, null, Tipoalerta.Error);
+    }, (err) => {
+      console.error(err);
+      this.confirmationDialogService.error('No se han podido cargar correctamente las Caratulas');
       this.cargarCaratulas = false;
     });
   }
@@ -121,13 +121,20 @@ export class CaratulaAfipComponent implements OnInit {
     if (!confirm) {
       return;
     }
+    this.cargarCaratulas = true;
     this.caratulaService.eliminarCaratula(id).subscribe(() => {
       this.confirmationDialogService.confirm('¡Felicitaciones!', `¡La Caratula con id: ${idCaratula} fue anulada con éxito!`, 'Cerrar', '', null, null, Tipoalerta.Success)
       this.listarCaratulas();
     }, (err) => {
+      this.cargarCaratulas = false;
       console.error(err);
-      const msj = err.error || 'No se ha podido anular la Caratula, comunicarse con soporte técnico';
-      this.confirmationDialogService.confirm(`¡Error!`, msj, 'Cerrar', '', null, null, Tipoalerta.Error);
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al anular la Caratula';
+      }
+      this.confirmationDialogService.error(msj);
     });
   }
 

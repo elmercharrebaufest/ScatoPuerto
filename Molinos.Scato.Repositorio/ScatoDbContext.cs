@@ -57,6 +57,10 @@ namespace Molinos.Scato.Repositorio
                 .HasKey(c => new { c.Id_Grupo, c.Id_Rol });
             modelBuilder.Entity<ADPuertoRolesPermisos>()
                 .HasKey(c => new { c.Id_Rol, c.Id_Permiso });
+
+            modelBuilder.Entity<ReciboDeBuqueDetalles>()
+                .Property(r => r.Cantidad)
+                .HasPrecision(20, 4);
         }
 
         private void MapearAssemblyDe<TEntidad>(DbModelBuilder modelBuilder, Predicate<Type> incluir, Predicate<Type> excluir)
