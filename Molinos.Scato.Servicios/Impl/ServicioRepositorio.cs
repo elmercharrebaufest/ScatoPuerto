@@ -10133,6 +10133,11 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
+                        if (!BalanzaCorteEnPeriodoValido(item)) {
+                            throw new ValidationCustomException("¡Atención! Verifique que las fechas ingresadas se " +
+                                "encuentren dentro de un turno y que hayan cargas en el mismo.");
+                        }
+
                         balanzasCortes_db = new BalanzasCortes()
                         {
                             Cerrado = item.Cerrado,
@@ -10165,6 +10170,9 @@ namespace Molinos.Scato.Servicios.Impl
                         moduloDeCargaPlanillaDeTurnosCortes.TiempoTotal = Convert.ToDateTime(balanzasCortes_db.Fecha_Corte.Value.Subtract(balanzasCortes_db.Fecha_Inicio.Value).ToString()).ToString("HH:mm");
                         moduloDeCargaPlanillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == balanzasCortes_db.MotivosFallasBalanza_id);
                         repositorio.Agregar(moduloDeCargaPlanillaDeTurnosCortes);
+                        ModuloDeCargaPlanillaDeTurnosDetallesSolido moduloDeCargaPlanillaDeTurnosDetallesSolido = new ModuloDeCargaPlanillaDeTurnosDetallesSolido();
+                        moduloDeCargaPlanillaDeTurnosDetallesSolido.ModuloDeCargaPlanillaDeTurnos = moduloDeCargaPlanillaDeTurnos;
+                        repositorio.Agregar(moduloDeCargaPlanillaDeTurnosDetallesSolido);
                     }
                     else
                     {
@@ -10176,14 +10184,83 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 }
                 repositorio.GuardarCambios();
+            }catch(ValidationCustomException vce)
+            {
+                throw vce;
             }
             catch (Exception ex)
             {
+                log.Error(ex, "Error al intentar GuardarBalanzaCorte");
                 throw ex;
             }
-
         }
 
+        private List<Carga> ObtenerCargasEmbarque(int idModuloCarga)
+        {
+            var embarqueBase = repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == idModuloCarga).Embarque;
+            int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarqueBase.Id).Vapor.Id;
+            return repositorio.Listar<Carga>(c => c.Vapor.Id == vapor_id && c.FechaInicio > embarqueBase.FechaHoraInicioCarga
+            && c.CargaOpuesta_Id > 0).ToList();
+        } 
+
+        private bool BalanzaCorteEnPeriodoValido(BalanzasCortesDto corte)
+        {
+            bool esValido = false;
+            DateTime fecHoraInicioTurno, fecHoraFinTurno;
+            
+            var cargasEmbarque = this.ObtenerCargasEmbarque(corte.ModuloDeCarga_id);
+                        
+            fecHoraInicioTurno = ObtenerFechaHoraInicioTurno(corte.Fecha_Inicio.Value);
+            fecHoraFinTurno = ObtenerFechaHoraFinTurno(corte.Fecha_Corte.Value);
+            
+            esValido = cargasEmbarque.Where(c => c.FechaInicio > fecHoraInicioTurno &&
+            c.FechaInicio < fecHoraFinTurno).Count() > 0;
+
+            return esValido;
+        }
+
+        private DateTime ObtenerFechaHoraInicioTurno(DateTime fechaInicio)
+        {
+            DateTime fecIni = fechaInicio;
+            int id_turno = (fechaInicio.Hour / 6) + 1;
+            switch (id_turno)
+            {
+                case 1: fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 0, 0, 0);
+                    break;
+                case 2: fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 6, 0, 0);
+                    break;
+                case 3: fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 12, 0, 0);
+                    break;
+                case 4:
+                    fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 18, 0, 0);
+                    break;
+                default: break;
+            }
+            return fecIni;
+        }
+
+        private DateTime ObtenerFechaHoraFinTurno(DateTime fechaCorte)
+        {
+            DateTime fecFin = fechaCorte;
+            int id_turno = (fechaCorte.Hour / 6) + 1;
+            switch (id_turno)
+            {
+                case 1:
+                    fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 6, 0, 0);
+                    break;
+                case 2:
+                    fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 12, 0, 0);
+                    break;
+                case 3:
+                    fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 18, 0, 0);
+                    break;
+                case 4:
+                    fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 0, 0, 0).AddDays(1);
+                    break;
+                default: break;
+            }
+            return fecFin;
+        }
         public ModuloDeCargaPlanillaDeTurnos CrearModuloDeCargaPlanillaDeTurnos(int idModuloCarga, DateTime fechaInicial, int idTurno)
         {
             try

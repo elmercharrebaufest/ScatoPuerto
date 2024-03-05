@@ -26,6 +26,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { error } from 'console';
 
 interface TotToneladas {
   producto: string;
@@ -662,14 +663,22 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       observaciones: bc.observaciones,
     }
-    if(balanzaCorteManual == 7){
-      this.balanzas7.push( this.initBalanzas7( objetoNuevo ) )
-    }else{
-      this.balanzas8.push( this.initBalanzas8( objetoNuevo ) )
-    }
+    
     cortes.push(objetoNuevo);
-    this._balanzaService.guardarBalanzaCorte( cortes )
-        .subscribe( res => this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id) );
+    this._balanzaService.guardarBalanzaCorte(cortes)
+        .subscribe( res => {
+          if(balanzaCorteManual == 7){
+            this.balanzas7.push( this.initBalanzas7(objetoNuevo))
+          }else{
+            this.balanzas8.push( this.initBalanzas8(objetoNuevo))
+          }
+          this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id) 
+        },error => {
+          console.log(error);
+          this.mensajeGenerico(error.error);
+          return;
+        }
+    );
     this.initCorteManualForm();
     this._modalService.dismissAll(modal);
   }
@@ -824,8 +833,15 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       // cortes = [];
       cortes.push(objetoListadoTotalBalanzadas);
 
-      this._balanzaService.guardarBalanzaCorte( cortes )
-        .subscribe( res => this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id) );
+      this._balanzaService.guardarBalanzaCorte(cortes)
+        .subscribe( res => {
+          this.balanzas78Service.setEmbarqueBalanza(this.moduloDeCarga_Id) 
+        },error => {
+          console.log(error);
+          this.mensajeGenerico(error.error);
+          return;
+        }
+    );
 
     } else {
       console.log('NO DEBERÍA PASAR POR ACÁ PORQUE NO SE ESTÁ IMPLEMENTANDO.');
