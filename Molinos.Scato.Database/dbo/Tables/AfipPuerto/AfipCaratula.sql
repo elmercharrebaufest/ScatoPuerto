@@ -13,7 +13,8 @@
     [NumeroViaje] NVARCHAR(16) NULL, 
     [FechaRegistro] DATETIME NOT NULL,
     [Estado] NVARCHAR(50) NULL,
-    [IdentificadorCierre] NVARCHAR(50) NULL
+    [IdentificadorCierre] NVARCHAR(50) NULL,
+    [EsLiquido] BIT NOT NULL DEFAULT 0
 
     CONSTRAINT [PK_AfipCaratula] PRIMARY KEY ([Id])
 )

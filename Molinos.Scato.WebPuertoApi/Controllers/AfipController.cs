@@ -283,6 +283,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("api/afip/CaratulaCambiarTipoProducto")]
+        public HttpResponseMessage CaratulaCambiarTipoProducto(int id)
+        {
+            try
+            {
+                servicioAfip.CaratulaCambiarTipoProducto(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion
 
         #region COEMs

@@ -19,6 +19,7 @@ export class Caratula {
     solicitudesCambioBuque?: SolicitudCambioBuque[];
     solicitudesCambioFechas?: SolicitudCambioFechas[];
     solicitudesCierreCarga?: SolicitudCambioFechas[];
+    esLiquido?:boolean;
 }
 
 interface SolicitudAFIP {

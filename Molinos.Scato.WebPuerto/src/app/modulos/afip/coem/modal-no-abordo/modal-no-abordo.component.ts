@@ -89,7 +89,12 @@ export class ModalNoAbordoComponent implements OnInit, OnChanges {
     }, (err) => {
       this.cargando = false;
       console.error(err);
-      const msj = err.error ? err.error.message || err.error : err.message;
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al solicitar no a bordo';
+      }
       this.confirmationDialogService.error(msj);
     });
   }

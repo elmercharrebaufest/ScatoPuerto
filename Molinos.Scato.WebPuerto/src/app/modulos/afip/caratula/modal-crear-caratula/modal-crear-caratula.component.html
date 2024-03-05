@@ -9,23 +9,38 @@
     </div>
     <form [formGroup]="crearEditarCaratulaForm">
         <div class="modal-body">
-            <div class="row margen font-weight-bold">
-                <div class="col">
-                    <ng-container *ngIf="ver; then vistaCoem else vistaModal"></ng-container>
-                    <ng-template #vistaCoem>Identificador de Caratula: {{identificadorCaratula}}</ng-template>
-                    <ng-template #vistaModal>User Details</ng-template>
+            <div class="row margen font-weight-bold" *ngIf="ver">
+                <div class="col-6">
+                    Identificador de Caratula: {{identificadorCaratula}}
                 </div>
             </div>
-            <div class="row margen ">
-                <div class="col-md-4 pt-4 col-sm-12">
+            <div class="row">
+                <div class="col">
+                    <div class="tipo-producto">
+                        <div class="form-check">
+                            <input type="radio" id="liquidoNo" formControlName="esLiquido" class="form-check-input" [value]="false">
+                            <label for="liquidoNo">Sólido</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="liquidoSi" formControlName="esLiquido" class="form-check-input" [value]="true">
+                            <label for="liquidoSi">Líquido</label>
+                        </div>
+                        <button class="btn btn-add-container" title="Cambiar tipo de producto" *ngIf="id && !ver" (click)="cambiarTipoProducto()">
+                            <i class="fa fa-pencil fs-icon text-warning"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row margen">
+                <div class="col-md-4 col-sm-12">
                     <label class="">IMO</label>
                     <input type="text" class="form-control" placeholder="Ingrese IMO" formControlName="identificadorBuque" maxLength="7" minlength="7" required />
                 </div>
-                <div class="col-md-4 col-sm-12 pt-4">
+                <div class="col-md-4 col-sm-12">
                     <label class="">Buque</label>
                     <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreMedioTransporte" required />
                 </div>
-                <div class="col-md-4 col-sm-12 pt-4">
+                <div class="col-md-4 col-sm-12">
                     <label class="">Aduana</label>
                     <input type="text" class="form-control" placeholder="Ingrese el código de aduana" formControlName="codigoAduana" [matAutocomplete]="listaAduanas" required />
                     <mat-autocomplete autoActiveFirstOption #listaAduanas="matAutocomplete" class="test-class" [classList]="'test-class'" [displayWith]="getNombre">

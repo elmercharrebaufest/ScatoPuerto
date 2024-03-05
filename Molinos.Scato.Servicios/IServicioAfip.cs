@@ -69,6 +69,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<AfipCaratulaDto> ComboCaratulas();
+
+        [OperationContract]
+        void CaratulaCambiarTipoProducto(int id);
         #endregion
 
         #region COEMs
