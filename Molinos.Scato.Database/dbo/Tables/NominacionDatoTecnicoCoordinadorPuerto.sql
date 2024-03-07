@@ -55,7 +55,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
             IF ((SELECT CoordinadorPuerto_Id FROM deleted) <> (SELECT CoordinadorPuerto_Id FROM inserted) )
             BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion, d.id, 'NominacionDatoTecnicoCoordinadorPuerto', 'CoordinadorPuerto_Id', d.CoordinadorPuerto_Id, i.CoordinadorPuerto_Id , GETDATE()
+                SELECT @idNominacion, d.id, 'NominacionDatoTecnicoCoordinadorPuerto', 'CoordinadorPuerto_Id', d.CoordinadorPuerto_Id, i.CoordinadorPuerto_Id , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -67,7 +67,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
             IF ((SELECT Cantidad FROM deleted) <> (SELECT Cantidad FROM inserted) )
             BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE()
+                SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -80,7 +80,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
         -- INSERT (Excepto que sea en el mismo momento de la creación de la nominación)
         ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 5 BEGIN 
             INSERT INTO Auditoria
-            SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', NULL, @coordinadorNuevo, GETDATE()
+            SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', NULL, @coordinadorNuevo, GETDATE(), NULL
             FROM inserted
 
             IF (@idEmbarque > 0) BEGIN
@@ -91,7 +91,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCoordinadorPuerto]
         -- DELETE
         ELSE IF EXISTS (SELECT 1 FROM deleted) BEGIN
             INSERT INTO Auditoria
-            SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', @coordinadorPrevio, NULL, GETDATE()
+            SELECT @idNominacion, Id, 'NominacionDatoTecnicoCoordinadorPuerto', 'Coordinador Puerto', @coordinadorPrevio, NULL, GETDATE(), NULL
             FROM deleted
             
             IF (@idEmbarque > 0) BEGIN
