@@ -1,0 +1,18 @@
+<ship-spinner [message]="'Cargando clientes Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<form id="filtroBuquedaForm" [formGroup]="getFiltroBusquedaForm()">
+  <div class="row">   
+    <div class="form-group col-md-2 colorGris">
+        <input type="text" class="form-control" placeholder="Nombre" formControlName="nombre">
+    </div>
+    <div class="form-group col-md-2 colorGris">
+        <input type="text" class="form-control" placeholder="CUIT" formControlName="cuit">
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn buscar" (click)="onBuscar()">Buscar</button>
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn limpiar" (click)="onLimpiarFiltros()">Limpiar Búsqueda</button>
+    </div>
+  </div>
+</form>
