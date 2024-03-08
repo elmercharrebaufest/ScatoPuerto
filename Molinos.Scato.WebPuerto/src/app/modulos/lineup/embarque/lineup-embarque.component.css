@@ -227,6 +227,18 @@ li{
    color:gray;
    font-size: 0.975rem;
   }
+
+  .modal-body .form-group {
+    min-height: auto;
+    width: 100%;
+  }
+
+  .modal-body .form-control {
+    position: relative;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+  }
+
 @media (min-width: 768px) {
   .col-sm-15 {
     width: 9.09%;
