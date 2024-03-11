@@ -122,7 +122,7 @@ export class PlanillaTurnoLiquidoExcelService {
             arrDestinos.forEach(destino => {
               formattedDestinos += `${destino}  \r\n `;
               height += 12;
-            }); 
+            });
             formattedDestinos = formattedDestinos.substring(0, formattedDestinos.length - 5);
             height -= 12;
           }
@@ -220,7 +220,7 @@ export class PlanillaTurnoLiquidoExcelService {
             }
         });
     }
-    private setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos, borders, esRecibidores: boolean = false, esTurnoSinDetalle: boolean = false){
+  private setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, esRecibidores: boolean = false, esTurnoSinDetalle: boolean = false, verObservacionesCalidad: boolean = true) {
         const nombreTurno = turno.turnoPuerto.nombre;
         let inicioTurnoMerge = offset;
         let finTurnoMerge    = inicioTurnoMerge;
@@ -230,7 +230,7 @@ export class PlanillaTurnoLiquidoExcelService {
         });
 
         if(esTurnoSinDetalle){
-            if (esRecibidores){
+            if (esRecibidores && verObservacionesCalidad){
                 let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
                 numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
                 inicioTurnoMerge+=1;
@@ -253,7 +253,7 @@ export class PlanillaTurnoLiquidoExcelService {
               registrosTurno += registroCorte;
             }
 
-            if (esRecibidores){
+            if (esRecibidores && verObservacionesCalidad){
                 let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
                 numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
                 registrosTurno += numeroObservaciones;
@@ -525,7 +525,7 @@ export class PlanillaTurnoLiquidoExcelService {
 
     // <ARMOA005-1659 - Dylan Lopez>
     // async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[], destino: string = "") {    // </ ARMOA005-1659 - Dylan Lopez>
+    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true) {    // </ ARMOA005-1659 - Dylan Lopez>
       planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
         turno.moduloDeCargaPlanillaDeTurnosCortes = [];
       });
@@ -600,7 +600,7 @@ export class PlanillaTurnoLiquidoExcelService {
           numeroTurno += 1;
           /* Planilla de turnos */
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0)
-            this.setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos,borders, esRecibidores, true);
+            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, esRecibidores, true, verObservacionesCalidad);
 
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length > 0) {
 
@@ -609,7 +609,7 @@ export class PlanillaTurnoLiquidoExcelService {
             offset = offset + 1;
 
             // Cargando Agrupador de Turnos
-            this.setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos,borders, esRecibidores, false);
+            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, esRecibidores, false, verObservacionesCalidad);
 
             turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach((turno: any, index) => {
               this.setDetallePlanillaTurno(lineas, turno, worksheet, offset, borders, esRecibidores)
@@ -627,7 +627,7 @@ export class PlanillaTurnoLiquidoExcelService {
               });
 
           }
-          if (esRecibidores){
+          if (esRecibidores && verObservacionesCalidad){
             if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
                 this.setObservacionesCalidad(headerObservaciones,worksheet, offset, borders);
                 offset = offset + 1;
@@ -658,7 +658,7 @@ export class PlanillaTurnoLiquidoExcelService {
               if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
                 CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosCortes?.length + 1);
               }
-              if (esRecibidores){
+              if (esRecibidores && verObservacionesCalidad){
                 if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
                     CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad?.length + 1);
                 }

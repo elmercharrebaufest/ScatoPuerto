@@ -16,6 +16,12 @@
                 (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
         </div>
         <br>
+        <div class="ver-obs-calidad">
+          <label>
+            <input type="checkbox" [(ngModel)]="verObservacionesCalidad">
+            Ver Observaciones de Calidad
+          </label>
+        </div>
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup">
 
             <div id="scrollbar-planilla-recibidores-liquido" class='mt-4 pb-4'
@@ -35,7 +41,7 @@
                                 <th class="header-fijo">Cant. Tn</th>
                             </tr>
                         </thead>
-                        
+
                             <ng-container formArrayName='diasTurno'>
                                 <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
                                     <div class="html2pdf__page-break" *ngIf="d >0">
@@ -77,7 +83,7 @@
                                                             (click)='guardarTurnoGeneral(d,t, true)'>
                                                             Cerrar turno
                                                         </button>
-                                                        <img *ngIf="turno.value.guardadoPorRecibidor" class="ocultarPdf" data-html2canvas-ignore="true"                                                    
+                                                        <img *ngIf="turno.value.guardadoPorRecibidor" class="ocultarPdf" data-html2canvas-ignore="true"
                                                             src="./assets/turno_cerrado.svg" />
                                                     </div>
                                                 </td>
@@ -178,7 +184,7 @@
                                                                         <th colspan="2">Observaciones</th>
                                                                     </tr>
                                                                 </thead>
-                                                                
+
                                                                     <ng-container
                                                                         formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                                         <ng-container
@@ -205,7 +211,7 @@
                                                                             </tr>
                                                                         </ng-container>
                                                                     </ng-container>
-                                                                
+
                                                             </table>
                                                         </div>
                                                     </div>
@@ -216,11 +222,11 @@
                                                 <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                             </tr>
 
-                                        
-                                        
-                                                <tr *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false'>
+
+
+                                                <tr *ngIf='verObservacionesCalidad && getObservacionTurnos(d, t) && getObservacionTurnos(d, t).length > 0'>
                                                     <td colspan="6" class='p-0 bg-grisClaro'>
-                                                        <div *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length > 0 : false' class="div-active">
+                                                        <div class="div-active">
                                                             <app-collapse-button collapseSelectorId="collapseObsDeCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                             <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
                                                             <div id="collapseObsDeCalidad_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
@@ -233,7 +239,7 @@
                                                                             <th style="width:85px"></th>
                                                                         </tr>
                                                                     </thead>
-                                                                    
+
                                                                         <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
                                                                             <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
                                                                                 <tr>
@@ -256,7 +262,7 @@
                                                                                 </tr>
                                                                             </ng-container>
                                                                         </ng-container>
-                                                                
+
                                                             </table>
                                                         </div>
                                                     </div>
@@ -272,7 +278,7 @@
                                     </ng-container>
                                 </ng-container>
                             </ng-container>
-                        
+
                     </table>
                 </perfect-scrollbar>
             </div>
