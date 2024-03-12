@@ -1,3 +1,4 @@
+import { ClienteService } from '@ScatoServicios/cliente.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -13,7 +14,7 @@ export class FiltroClientesComponent implements OnInit {
   filtros = new Subject<any>();
   public estaCargando = true;
 
-  constructor(private formBuilder : FormBuilder/*, clienteService: ClienteService*/) { 
+  constructor(private formBuilder : FormBuilder, private clienteService: ClienteService) { 
     this.setFiltroBuquedaForm();
     this.onBuscar();
   }
@@ -24,25 +25,20 @@ export class FiltroClientesComponent implements OnInit {
   public setFiltroBuquedaForm() {
     this.filtroBuquedaForm = this.formBuilder.group({
       nombre: '',
-      cuit: '',
     });    
   }
 
   onLimpiarFiltros() {
     this.filtroBuquedaForm.controls.nombre.setValue('');
-    this.filtroBuquedaForm.controls.cuit.setValue('');
     this.onBuscar();    
   }
 
   onBuscar() {
     this.estaCargando = true;
-    /*this.vaporService.ListarVaporInformacion(
+    this.clienteService.ListarClientes(
       null,
       null,  
-      this.filtroBuquedaForm.controls.buque.value,
-      this.filtroBuquedaForm.controls.imo.value,
-      this.filtroBuquedaForm.controls.tipoBuque.value,
-      this.filtroBuquedaForm.controls.bandera.value)*/
+      this.filtroBuquedaForm.controls.nombre.value)
     this.estaCargando = false;
   } 
 

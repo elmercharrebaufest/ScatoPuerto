@@ -136,4 +136,11 @@ export enum PermisosScato {
   Code_Crear="Code_Crear",
   Code_Eliminar="Code_Eliminar",
 
+  //Clientes
+
+  Clientes_Visualizar = "Clientes_Visualizar",
+  Clientes_Editar = "Clientes_Editar",
+  Clientes_Crear = "Clientes_Crear",
+  Clientes_Eliminar = "Clientes_Eliminar",
+
 }

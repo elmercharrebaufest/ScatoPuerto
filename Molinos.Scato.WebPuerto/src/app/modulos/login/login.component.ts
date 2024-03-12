@@ -163,7 +163,10 @@ navigate(permisos) {
     case 'Coem_Visualizar': {
       this.router.navigate(['afip/coem']);
       break;
-    }    
+    }
+    case 'Clientes_Visualizar': {
+      this.router.navigate(['/clientes']);
+      break;    
   }
 }
 

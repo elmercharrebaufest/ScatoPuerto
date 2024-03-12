@@ -39,13 +39,14 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   disabled = false;
   pageEvent: PageEvent;
   filtros: any;
-  public estaCargando = false;
   interval: any
   confirmationDialogService: any;
   vaporId: number;
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   public estaEnviando= false;
+  public estaCargando = false;
+
   //#endregion
   constructor(private vaporService: VaporService,
     private modalService: NgbModal,
@@ -64,6 +65,7 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
     this.subscripcionBuque = this.vaporService.observableVapor.subscribe(
       (data: Buque[]) => {
         this.vapor = data;
+        console.log(this.vapor);
         this.length = this.vapor.length > 0 ? this.vapor[0].itemsTotales : this.vapor.length;
         this.pageSize = this.vapor.length > 0 ? this.vapor[0].itemPorPagina : 10;
         this.pageIndex = this.vapor.length > 0 ? this.vapor[0].pagina : 1;

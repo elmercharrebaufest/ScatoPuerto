@@ -376,6 +376,7 @@
     <Compile Include="IAccesoAFIP.cs" />
     <Compile Include="IComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
+    <Compile Include="Impl\ServicioClientes.cs" />
     <Compile Include="IServicioAfip.cs" />
     <Compile Include="Impl\ServicioAfip.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
@@ -383,6 +384,7 @@
     <Compile Include="Impl\ServicioProgramaEmbarque.cs" />
     <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
+    <Compile Include="IServicioClientes.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
     <Compile Include="IServicioVapor.cs" />

@@ -50,10 +50,11 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    /*this.estaCargando = true;
+    this.estaCargando = true;
     this.subscripcionCliente = this.clienteService.observableCliente.subscribe(
       (data: Cliente[]) => {
         this.clientes = data;
+        console.log("lol->",data);
         this.length = this.clientes.length > 0 ? this.clientes[0].itemsTotales : this.clientes.length;
         this.pageSize = this.clientes.length > 0 ? this.clientes[0].itemPorPagina : 10;
         this.pageIndex = this.clientes.length > 0 ? this.clientes[0].pagina : 1;
@@ -62,8 +63,11 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
     )
     this.interval = setInterval(
       () => { this.listarClientes() },
-      60000)*/
+      60000)
+
+    console.log(this.clientes);
   }
+
   ngOnDestroy(): void {
     this.subscripcionCliente.unsubscribe();
     clearInterval(this.interval)

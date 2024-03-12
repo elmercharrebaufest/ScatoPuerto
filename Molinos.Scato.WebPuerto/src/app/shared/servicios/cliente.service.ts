@@ -16,7 +16,6 @@ export class ClienteService {
         pagina: 1,
         itemsPorPagina: 20,
         nombre: "",
-        cuit: "",
     }
 
     constructor(
@@ -25,9 +24,9 @@ export class ClienteService {
     }
 
     public ListarClientes(pagina: number = this.filtros.pagina, itemsPorPagina: number = this.filtros.itemsPorPagina,
-        nombre: string = this.filtros.nombre, cuit: string = this.filtros.cuit) {
-        this.actualizarFiltros(pagina, itemsPorPagina, nombre, cuit);
-        return this.http.get<Cliente>(`${this.url}Cliente/ListarClientes?pagina=${this.filtros.pagina}&itemsPorPagina=${this.filtros.itemsPorPagina}&nombre=${this.filtros.nombre}&cuit=${this.filtros.cuit}`,
+        nombre: string = this.filtros.nombre) {
+        this.actualizarFiltros(pagina, itemsPorPagina, nombre);
+        return this.http.get<Cliente>(`${this.url}Clientes/ListarClientes?pagina=${this.filtros.pagina}&itemsPorPagina=${this.filtros.itemsPorPagina}&nombre=${this.filtros.nombre}`,
             {
                 'withCredentials': true
             })
@@ -39,10 +38,8 @@ export class ClienteService {
             );
     }
 
-    actualizarFiltros(pagina: number, itemsPorPagina: number, nombre: string,
-        cuit: string) {
+    actualizarFiltros(pagina: number, itemsPorPagina: number, nombre: string) {
         this.filtros.nombre = nombre;
-        this.filtros.cuit = cuit;
         this.filtros.itemsPorPagina = itemsPorPagina;
         this.filtros.pagina = pagina;
     }
