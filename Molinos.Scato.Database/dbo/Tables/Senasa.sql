@@ -68,7 +68,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             IF((SELECT Exportador_Id from deleted) <> (select Exportador_Id from inserted))
             BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -81,7 +81,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             IF ((SELECT TieneSenasa FROM deleted) <> (SELECT TieneSenasa FROM inserted))
             BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'TieneSenasa', d.TieneSenasa, i.TieneSenasa , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'TieneSenasa', d.TieneSenasa, i.TieneSenasa , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -96,7 +96,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             IF ((SELECT Consumo FROM deleted) <> (SELECT Consumo FROM inserted))
             BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'Consumo', d.Consumo, i.Consumo , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'Consumo', d.Consumo, i.Consumo , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -109,7 +109,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- A Cuenta De
             IF((SELECT ACuentaDe FROM deleted) <> (SELECT ACuentaDe FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'ACuentaDe', d.ACuentaDe, i.ACuentaDe , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'ACuentaDe', d.ACuentaDe, i.ACuentaDe , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -122,7 +122,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- Destino
             IF ((SELECT Destino_Id FROM deleted) <> (SELECT Destino_Id FROM inserted)) BEGIN
                 insert into Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'Destino_Id', d.Destino_Id, i.Destino_Id , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'Destino_Id', d.Destino_Id, i.Destino_Id , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -134,7 +134,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- IP
             IF ((SELECT [IP] FROM deleted) <> (SELECT [IP] FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'IP', d.[IP], i.[IP] , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'IP', d.[IP], i.[IP] , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -148,7 +148,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- GMO
             IF ((SELECT GMO FROM deleted) <> (SELECT GMO FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'GMO', d.GMO, i.GMO , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'GMO', d.GMO, i.GMO , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -162,7 +162,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- FITO
             IF ((SELECT FITO FROM deleted) <> (SELECT FITO FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'FITO', d.FITO, i.FITO , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'FITO', d.FITO, i.FITO , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -176,7 +176,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- Muestra Oficial
             IF ((SELECT MuestraOficial FROM deleted) <> (SELECT MuestraOficial FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'MuestraOficial', d.MuestraOficial, i.MuestraOficial , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'MuestraOficial', d.MuestraOficial, i.MuestraOficial , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -190,7 +190,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- Certificado Inocuidad
             IF ((SELECT CertificadoInocuidad FROM deleted) <> (SELECT CertificadoInocuidad FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'CertificadoInocuidad', d.CertificadoInocuidad, i.CertificadoInocuidad , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'CertificadoInocuidad', d.CertificadoInocuidad, i.CertificadoInocuidad , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -204,7 +204,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- Certificado Veterinario
             IF ((SELECT CertificadoVeterinario FROM deleted) <> (SELECT CertificadoVeterinario from inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'CertificadoVeterinario', d.CertificadoVeterinario, i.CertificadoVeterinario , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'CertificadoVeterinario', d.CertificadoVeterinario, i.CertificadoVeterinario , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -218,7 +218,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
             -- Observaciones
             IF ((SELECT Observaciones FROM deleted) <> (SELECT Observaciones FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'Senasa', 'Observaciones', d.Observaciones, i.Observaciones , GETDATE()
+                SELECT @idNominacion , d.id, 'Senasa', 'Observaciones', d.Observaciones, i.Observaciones , GETDATE(), NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 --IF (@idEmbarque > 0) BEGIN
@@ -231,7 +231,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
         -- INSERT (Excepto que sea en el mismo momento de la creación de la nominación)
         ELSE IF EXISTS (SELECT 1 FROM inserted) AND (@dateDiff > 5) BEGIN
             INSERT INTO Auditoria
-            SELECT @idNominacion , id, 'Senasa', 'Exportador', NULL, @exportadorNuevo, GETDATE()
+            SELECT @idNominacion , id, 'Senasa', 'Exportador', NULL, @exportadorNuevo, GETDATE(), NULL
             FROM inserted
 
             --IF (@idEmbarque > 0) BEGIN
@@ -242,7 +242,7 @@ CREATE TRIGGER [dbo].[Trigger_Senasa]
         -- DELETE
         ELSE IF EXISTS (SELECT 1 FROM deleted) BEGIN
             INSERT INTO Auditoria
-            SELECT @idNominacion, Id, 'Senasa', 'Exportador', @exportadorPrevio, NULL, GETDATE()
+            SELECT @idNominacion, Id, 'Senasa', 'Exportador', @exportadorPrevio, NULL, GETDATE(), NULL
             FROM deleted
 
             --IF (@idEmbarque > 0) BEGIN
