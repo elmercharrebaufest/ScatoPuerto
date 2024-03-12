@@ -15,7 +15,7 @@ import { Session } from 'protractor';
 })
 export class LoginComponent implements OnInit {
 
-  public iniciandoSession:boolean=false;
+  public iniciandoSession: boolean = false;
   constructor(private autenticarAd: AutenticadorService, private router: Router, private session: SessionService, private messageService: MessageService) {
 
   }
@@ -29,146 +29,138 @@ export class LoginComponent implements OnInit {
   pass = "";
   loginButtonEnable = true;
   captchaOk: any = null;
-  mensajeError:string=null;
-  production:boolean=environment.production;
-public iniciarSession()
-{
- this.iniciandoSession=true;
-  var mensaje = document.getElementById("error");
-  mensaje.style.setProperty("display","none");
-  this.username=(window.document.getElementsByName("email")[0] as HTMLInputElement).value;
-  this.pass= (window.document.getElementsByName("Contraseña")[0]as HTMLInputElement).value;
+  mensajeError: string = null;
+  production: boolean = environment.production;
+  public iniciarSession() {
+    this.iniciandoSession = true;
+    var mensaje = document.getElementById("error");
+    mensaje.style.setProperty("display", "none");
+    this.username = (window.document.getElementsByName("email")[0] as HTMLInputElement).value;
+    this.pass = (window.document.getElementsByName("Contraseña")[0] as HTMLInputElement).value;
 
-  if(this.production)
-  {
-    this.autenticar();
+    if (this.production) {
+      this.autenticar();
+    }
+    else {
+      let permi: string[] = ["LAD_MOAAPP_PUERTO_SISTEMA"];
+      let user = {} as Usuario;
+      user.username = this.username.split("@")[0].toString();
+      user.autenticado = true;
+      user.permisos = permi;
+      this.obtenerGruposAD(user);
+    }
+
   }
-  else
-  {
-    let permi:string[]=["LAD_MOAAPP_PUERTO_SISTEMA"];
-    let user= {} as Usuario;
-user.username = this.username.split("@")[0].toString();
-    user.autenticado=true;
-    user.permisos=permi;
-    this.obtenerGruposAD(user);
-  }
-
-}
 
 
-autenticar() {
-  var parametros= new Array();
+  autenticar() {
+    var parametros = new Array();
 
-  parametros.push(this.username);
-  parametros.push(this.pass);
-/*   this.autenticarAd.autenticarUsuarioAd(this.username, this.pass).subscribe( */
+    parametros.push(this.username);
+    parametros.push(this.pass);
+    /*   this.autenticarAd.autenticarUsuarioAd(this.username, this.pass).subscribe( */
 
-this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
-    (res: Usuario) => {
-      if (res) {
-        console.log('========== autenticarUsuario ==========', res);
-        this.session.clear();
-        res.autenticado = true;
-
-
-        this.obtenerGruposAD(res);
+    this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
+      (res: Usuario) => {
+        if (res) {
+          console.log('========== autenticarUsuario ==========', res);
+          this.session.clear();
+          res.autenticado = true;
 
 
-      } else {
-        this.iniciandoSession=false;
-        this.messageService.add({ severity: 'error', detail: 'Error al iniciar sesión', summary: 'No se ha encontrado el usuario' })
+          this.obtenerGruposAD(res);
+
+
+        } else {
+          this.iniciandoSession = false;
+          this.messageService.add({ severity: 'error', detail: 'Error al iniciar sesión', summary: 'No se ha encontrado el usuario' })
+        }
+      }, error => {
+        this.iniciandoSession = false;
+        console.log('========== error ==========');
+        this.mensajeError = "No se pudo autenticar el usuario";
+        this.mostrarError();
       }
-    },  error => {
-      this.iniciandoSession=false;
-      console.log('========== error ==========');
-      this.mensajeError="No se pudo autenticar el usuario";
+
+    )
+  }
+
+  obtenerGruposAD(res: Usuario) {
+    var usuario = this.username.split("@")[0].toString();
+    this.autenticarAd.ObtenerGruposAD(res.permisos, usuario).subscribe(
+      (respuesta: any) => {
+        if (respuesta.permisos.length > 0) {
+          res.permisos = respuesta.permisos;
+          this.session.setUser(res);
+          // this.router.navigateByUrl('/lineup');
+          this.navigate(res.permisos);
+        }
+        else {
+          this.iniciandoSession = false;
+          this.mensajeError = "No tiene permisos para ingresar";
+        }
+      });
+
+  }
+
+  mostrarError() {
+    var mensaje = document.getElementById("error");
+    mensaje.style.removeProperty("display");
+
+  }
+  navigate(permisos) {
+    let primerPermiso = permisos.find((p: string) => p == 'Comex_Nominacion_Ver' || p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver'
+      || p == 'Coem_Visualizar' || p == 'Caratula_Visualizar');
+    if (primerPermiso == undefined) {
+      this.iniciandoSession = false;
+      this.mensajeError = "No tiene permisos para ingresar";
       this.mostrarError();
     }
 
-  )
-}
-
-obtenerGruposAD(res:Usuario)
-{
-  var usuario= this.username.split("@")[0].toString();
-  this.autenticarAd.ObtenerGruposAD(res.permisos, usuario).subscribe(
-    (respuesta: any) => {
-      if(respuesta.permisos.length>0)
-      {
-        res.permisos = respuesta.permisos;
-      this.session.setUser(res);
-      // this.router.navigateByUrl('/lineup');
-      this.navigate(res.permisos);
+    switch (primerPermiso) {
+      case 'LineUp_Ver': {
+        this.router.navigate(['/lineup']);
+        break;
+      };
+      case 'Carga_Ver': {
+        this.router.navigate(['/carga']);
+        break;
       }
-      else
-      {
-        this.iniciandoSession=false;
-        this.mensajeError="No tiene permisos para ingresar";
+      case 'Recibidores_Ver': {
+        this.router.navigate(['/calidad']);
+        break;
       }
-    });
+      case 'Geolocalizacion_Ver': {
+        this.router.navigate(['/geolocalizacion']);
+        break;
+      }
+      case 'Buque_Ver': {
+        this.router.navigate(['/buques']);
+        break;
+      }
 
-}
+      case 'Vapor_Visualizar': {
+        this.router.navigate(['/vapor']);
+        break;
+      }
 
-mostrarError()
-{
-var mensaje = document.getElementById("error");
-mensaje.style.removeProperty("display");
-
-}
-navigate(permisos) {
-  let primerPermiso = permisos.find((p: string) => p == 'Comex_Nominacion_Ver' || p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver'
-  || p == 'Coem_Visualizar' || p == 'Caratula_Visualizar');
-  if(primerPermiso == undefined)
-  {
-    this.iniciandoSession=false;
-    this.mensajeError="No tiene permisos para ingresar";
-    this.mostrarError();
-  }
-
-  switch (primerPermiso) {
-    case 'LineUp_Ver': {
-      this.router.navigate(['/lineup']);
-      break;
-    };
-    case 'Carga_Ver': {
-      this.router.navigate(['/carga']);
-      break;
+      case 'Comex_Nominacion_Ver': {
+        this.router.navigate(['/programa']);
+        break;
+      }
+      case 'Caratula_Visualizar': {
+        this.router.navigate(['/afip/caratula']);
+        break;
+      }
+      case 'Coem_Visualizar': {
+        this.router.navigate(['afip/coem']);
+        break;
+      }
+      case 'Clientes_Visualizar': {
+        this.router.navigate(['/clientes']);
+        break;
+      }
     }
-    case 'Recibidores_Ver': {
-      this.router.navigate(['/calidad']);
-      break;
-    }
-    case 'Geolocalizacion_Ver': {
-      this.router.navigate(['/geolocalizacion']);
-      break;
-    }
-    case 'Buque_Ver': {
-      this.router.navigate(['/buques']);
-      break;
-    }
-
-    case 'Vapor_Visualizar': {
-      this.router.navigate(['/vapor']);
-      break;
-    }
-
-    case 'Comex_Nominacion_Ver': {
-      this.router.navigate(['/programa']);
-      break;
-    }
-    case 'Caratula_Visualizar': {
-      this.router.navigate(['/afip/caratula']);
-      break;
-    }
-    case 'Coem_Visualizar': {
-      this.router.navigate(['afip/coem']);
-      break;
-    }
-    case 'Clientes_Visualizar': {
-      this.router.navigate(['/clientes']);
-      break;    
   }
 }
 
-
-}

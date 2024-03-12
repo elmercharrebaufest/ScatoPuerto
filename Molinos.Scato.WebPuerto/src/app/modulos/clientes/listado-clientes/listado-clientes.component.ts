@@ -54,7 +54,7 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
     this.subscripcionCliente = this.clienteService.observableCliente.subscribe(
       (data: Cliente[]) => {
         this.clientes = data;
-        console.log("lol->",data);
+        console.log("clientes::::>", this.clientes);
         this.length = this.clientes.length > 0 ? this.clientes[0].itemsTotales : this.clientes.length;
         this.pageSize = this.clientes.length > 0 ? this.clientes[0].itemPorPagina : 10;
         this.pageIndex = this.clientes.length > 0 ? this.clientes[0].pagina : 1;
@@ -136,7 +136,7 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
   }
 
   tienePermisoModificarCliente() {
-    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Editar); //Cliente_Editar
+    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Editar); //Cliente_Editar
   }
   /*
     editarVapor(id, modal, bandera, nombreBuque, imo){ 

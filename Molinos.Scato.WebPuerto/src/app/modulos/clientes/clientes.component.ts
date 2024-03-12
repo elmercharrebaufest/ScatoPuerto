@@ -20,7 +20,7 @@ export class ClientesComponent implements OnInit {
   }
 
   tienePermisoCrearNuevoBuque() {
-    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Crear); //Cliente_Crear
+    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Crear);
   }
 
 }

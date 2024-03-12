@@ -41,7 +41,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 @dateDiff = DATEDIFF(SECOND, N.FechaCreacion, GETDATE()) -- Segundos entre la creación de la nominación y el insert de Exportador
         FROM NominacionRecibo R
         INNER JOIN Nominacion N ON R.Nominacion_Id = N.Id
-        WHERE R.Id = (SELECT DISTINCT id FROM (SELECT Id FROM deleted UNION SELECT Id FROM inserted) a)
+        WHERE R.Id = (SELECT DISTINCT Id FROM (SELECT Id FROM deleted UNION SELECT Id FROM inserted) a)
 
         SELECT @exportadorPrevio = E.Nombre FROM deleted D INNER JOIN Exportador E ON D.Exportador_Id = E.Id
         SELECT @exportadorNuevo = E.Nombre FROM inserted I INNER JOIN Exportador E ON I.Exportador_Id = E.Id
