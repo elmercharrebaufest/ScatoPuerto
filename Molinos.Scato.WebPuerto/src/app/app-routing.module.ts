@@ -53,6 +53,11 @@ export const routeConfig: Routes = [
         loadChildren: () => import('./modulos/vapor/vapor.module').then(m => m.VaporModule)
       },
       {
+        path: 'clientes',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/clientes/clientes.module').then(m => m.ClientesModule)
+      },
+      {
         path: 'afip',
         loadChildren: () => import('./modulos/afip/afip.module').then(m => m.AfipModule)
       }

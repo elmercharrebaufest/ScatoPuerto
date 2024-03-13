@@ -8025,6 +8025,19 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<Vapor, VaporDto>(expresionFiltro, paginacion);
         }
 
+        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string filtro)
+        {
+            Expression<Func<CoordinadorPuerto, bool>> expresionFiltro = null;
+            if (!string.IsNullOrEmpty(filtro))
+            {
+                filtro = filtro.Trim();
+                expresionFiltro =
+                    x =>
+                    x.Nombre.Contains(filtro);
+            }
+            return Listar<CoordinadorPuerto, CoordinadorPuertoDto>(expresionFiltro, paginacion);
+        }
+
         public ListaPaginada<BodegaDto> ListarBodegas(Paginacion paginacion, string filtro)
         {
             Expression<Func<Bodega, bool>> expresionFiltro = null;

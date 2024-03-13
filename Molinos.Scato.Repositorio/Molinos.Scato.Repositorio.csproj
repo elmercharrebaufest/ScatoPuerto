@@ -81,6 +81,7 @@
     <Compile Include="ConsultasEF\ExistenMuestraEnvioACamaraAuditoriaPendientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarBajaCTGConErrorConsulta.cs" />
     <Compile Include="ConsultasEF\ListarCaracteristicaConfiguracionDeTabla.cs" />
+    <Compile Include="ConsultasEF\ListarClientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarDatosDeWorkflowsPendientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarEstadoDeCalle.cs" />
     <Compile Include="ConsultasEF\ListarProgramaEmbarqueCombos.cs" />

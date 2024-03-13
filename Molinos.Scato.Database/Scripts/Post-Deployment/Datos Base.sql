@@ -889,3 +889,24 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marke
 
 /* AFIP MOTIVOS DE NO ABORDO */
 IF NOT EXISTS (SELECT * FROM AfipMotivoNoABordo) BEGIN INSERT INTO AfipMotivoNoABordo (Codigo, Descripcion) VALUES ('1', 'OTROS'),('2', 'PEDIDO AGENCIA-ROLEO'),('3', 'CAMBIO BUQUE/BANDERA'),('4', 'IMG SCAN SOSPECHOSA'),('5', 'ALERTA / ADO'),('6', 'RAZONES CLIMATICAS'),('7', 'CONTENEDOR ABIERTO'),('8', 'DIFERENCIA PESO'); END
+
+--Visualizar Clientes
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Visualizar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')); END
+
+--Editar Clientes
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Editar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')); END
+
+--Crear Clientes
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Crear'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')); END
+
+-- Eliminar Cliente
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Eliminar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
+

@@ -2030,6 +2030,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ListaPaginada<VaporDto> ListarVapores(Paginacion paginacion, string filtro);
+        
+        [OperationContract]
+        ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string filtro);
 
         [OperationContract]
         ListaPaginada<BodegaDto> ListarBodegas(Paginacion paginacion, string filtro);

@@ -1,0 +1,36 @@
+<ship-spinner [message]="'Cargando clientes. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+
+<div style="overflow-x:auto; " class="table-responsive tableFixHead">
+    <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
+        <thead class="lista-pe-header tamanioHeader">
+            <tr>
+            <th style="border-radius: 5px 0px 0px 0px;" tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('nombre')">
+                <div class="head noBorder">
+                    Nombre
+                    <span><i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>             
+            <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
+        </tr>
+        </thead>
+        <tbody *ngFor="let cliente of getListaClientes()" style="text-align: center;">
+            <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
+                <td class="noBorder-rigth centradoHorizontal">{{cliente.nombre}}</td>
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarCliente()'>
+                    <div class='icon-editar cursor'></div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
+        [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+        [pageIndex]="pageIndex" aria-label="Select page">
+    </mat-paginator>
+
+
