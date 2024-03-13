@@ -15,7 +15,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
     public class ListarClientesConsulta : IConsultaPaginada<CoordinadorPuertoDto>
     {
         private readonly Paginacion paginacion;
-        public string nombre;
+        private readonly string nombre;
 
         public ListarClientesConsulta(Paginacion paginacion, string nombre = null)
         {
@@ -42,10 +42,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     ItemsTotales = 0
                                 };
 
-                var resultados = resultado;
-                var itemsTotales = resultados.Count();
-                resultados = resultados.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)
-                    .Take(paginacion.ItemsPorPagina);
+                var itemsTotales = resultado.Count();
+                var resultados = resultado.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)
+                    .Take(paginacion.ItemsPorPagina).ToList();
 
                 if (resultados != null && resultados.Count() > 0)
                 {
@@ -57,7 +56,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
     }
