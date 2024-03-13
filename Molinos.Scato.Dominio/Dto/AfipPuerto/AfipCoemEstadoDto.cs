@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Dto.AfipPuerto
         public int Id { get; set; }
         public string Codigo { get; set; }
         public string Estado { get; set; }
+        public int Orden { get; set; }
     }
 }

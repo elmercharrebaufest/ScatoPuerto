@@ -875,14 +875,23 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
 
 /* SCRIPTS DATOS AFIP */
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CUR') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CUR', 'En Curso'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REG') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'PRE') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('PRE', 'Presentada'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'AUTO') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('AUTO', 'Autorizada'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CAN') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CAN', 'Cancelada'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'ANU') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('ANU', 'Anulada'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CUR') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CUR', 'En Curso'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REC') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REC', 'Rechazada'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CODE') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CODE', 'CODE'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'ANU') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('ANU', 'Anulada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REC') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REC', 'Rechazada'); END
+
+DELETE FROM AfipCoemEstado WHERE Codigo IN ('CAN','AUT')
+
+UPDATE AfipCoemEstado SET Orden = 0 WHERE Codigo = 'CUR'
+UPDATE AfipCoemEstado SET Orden = 1 WHERE Codigo = 'REG'
+UPDATE AfipCoemEstado SET Orden = 2 WHERE Codigo = 'PRE'
+UPDATE AfipCoemEstado SET Orden = 3 WHERE Codigo = 'AUTO'
+UPDATE AfipCoemEstado SET Orden = 4 WHERE Codigo = 'CODE'
+UPDATE AfipCoemEstado SET Orden = 5 WHERE Codigo = 'ANU'
+UPDATE AfipCoemEstado SET Orden = 6 WHERE Codigo = 'REC'
 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end
 
