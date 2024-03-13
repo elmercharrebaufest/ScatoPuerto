@@ -3271,20 +3271,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public CartaPorteDto ObtenerCartaPorteVacia(int centroId, string workflowCodigo,
                                                     string destinatarioCodigoSap = "", string titularCodigoSap = "", string centroDestino = "", string rtteComercial = "")
         {
@@ -12356,5 +12342,21 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
-    }
+
+		// <ARMOA005-1421 Dylan Lopez>
+		public IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId)
+		{
+			try
+			{
+				var query = repositorio.Listar<HistoricoEmbarqueLineUp>(q => q.EmbarqueId == embarqueId);
+				var result = conversor.ConvertirList<HistoricoEmbarqueLineUp, HistoricoEmbarqueLineUpDto>(query).ToList();
+				return result;
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+		}
+		// </ ARMOA005-1421 Dylan Lopez>
+	}
 }

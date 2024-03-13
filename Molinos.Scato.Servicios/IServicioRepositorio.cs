@@ -2783,5 +2783,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
-    }
+
+		// <ARMOA005-1421 Dylan Lopez>
+		[OperationContract]
+		IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId);
+		// </ ARMOA005-1421 Dylan Lopez>
+	}
 }

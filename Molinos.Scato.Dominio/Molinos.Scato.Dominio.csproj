@@ -85,11 +85,13 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\EnvioMailZarpado.cs" />
+    <Compile Include="Comandos\CrearHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRectificarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRegistrarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCierreCargaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudNoABordoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipMotivoNoAbordoDto.cs" />
+    <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
@@ -1087,6 +1089,7 @@
     <Compile Include="Entidades\ErroresGeolocalizacion.cs" />
     <Compile Include="Entidades\EstadoBuque.cs" />
     <Compile Include="Entidades\HistoricoActores.cs" />
+    <Compile Include="Entidades\HistoricoEmbarqueLineUp.cs" />
     <Compile Include="Entidades\ImpEtiquetaPuerto.cs" />
     <Compile Include="Entidades\LlenadoMilimetroPorTanque.cs" />
     <Compile Include="Entidades\LogAfipCpe.cs" />

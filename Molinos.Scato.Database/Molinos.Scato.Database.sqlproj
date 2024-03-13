@@ -592,6 +592,7 @@
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudCierreCarga.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudNoABordo.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudNoABordoDeclaracion.sql" />
+    <Build Include="dbo\Tables\HistoricoEmbarqueLineUp.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
