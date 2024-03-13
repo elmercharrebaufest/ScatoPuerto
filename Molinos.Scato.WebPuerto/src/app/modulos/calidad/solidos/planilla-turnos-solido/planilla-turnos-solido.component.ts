@@ -69,6 +69,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   exportaPlanilla: boolean = false;
   totalABordo : number=0;
 
+  public verObservacionesCalidad: boolean = false;
+
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -709,34 +711,16 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   getRowSpan(dia: any) {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
-      contador += this.getRowSpanTurnoCalc(turnos);
+      contador += this.getRowSpanTurno(turnos);
     }
     contador += 1;
     return contador;
   }
 
-  getRowSpanTurnoCalc(turno: any) {
-    let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
-    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
-    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
-
-    registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-    registroSolido += 1;
-    const numeroRegistros = registroSolido + registroCorte + registroCalidad;
-    return numeroRegistros;
-  }
-
   getRowSpanTurno(turno: any) {
-    let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length;
-    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
-    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
-
-    registroSolido = registroSolido > 0 && registroSolido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-    registroSolido += 1;
+    let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length + 1; // tamaño del detalle de cada turno
+    const registroCorte = 1; // tamaño del corte
+    const registroCalidad = this.verObservacionesCalidad ? 1 : 0; // tamaño de la observacion
     const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -1008,7 +992,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService,  this.planillaDeTurnos, esEnviarPlanilla, this.totalABordo);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, esEnviarPlanilla, this.totalABordo, this.verObservacionesCalidad);
     this.exportaPlanilla = false;
   }
 

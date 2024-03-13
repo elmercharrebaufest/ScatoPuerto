@@ -129,7 +129,7 @@ export class PlanillaTurnoSolidoExcelService {
             }
         });
     }
-    private setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos, borders, esTurnoSinDetalle: boolean = false){
+    private setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, esTurnoSinDetalle: boolean = false, verObservacionesCalidad: boolean = true) {
         const nombreTurno = turno.turnoPuerto.nombre;
         let inicioTurnoMerge = offset;
         let finTurnoMerge    = inicioTurnoMerge;
@@ -139,7 +139,7 @@ export class PlanillaTurnoSolidoExcelService {
         });
         console.log('kilos --->>', kilos)
         if(esTurnoSinDetalle){
-            let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
+            let numeroObservaciones = verObservacionesCalidad ? turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length : 0;
             numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
             inicioTurnoMerge+=1;
             finTurnoMerge    = inicioTurnoMerge;
@@ -158,7 +158,7 @@ export class PlanillaTurnoSolidoExcelService {
               registrosTurno += registroCorte;
             }
 
-            let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
+            let numeroObservaciones = verObservacionesCalidad ? turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length : 0;
             numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
             registrosTurno += numeroObservaciones;
             let kilos: number = 0;
@@ -332,7 +332,7 @@ export class PlanillaTurnoSolidoExcelService {
     }
 
 
-    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean=false, totalABordo: number=0) {
+    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean = false, totalABordo: number = 0, verObservacionesCalidad: boolean = true) {
       const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
 
         planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
@@ -398,7 +398,7 @@ export class PlanillaTurnoSolidoExcelService {
           numeroTurno += 1;
           /* Planilla de turnos */
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length == 0)
-            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos,borders);
+            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, verObservacionesCalidad);
 
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0) {
 
@@ -407,7 +407,7 @@ export class PlanillaTurnoSolidoExcelService {
             offset = offset + 1;
 
             // Cargando Agrupador de Turnos
-            this.setAgrupadorTurnos(turno, worksheet, offset,numeroTurno,totalNumeroTurnos,borders);
+            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, verObservacionesCalidad);
 
             turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach((turno: any, index) => {
               this.setDetallePlanillaTurno(turno, worksheet, offset, borders);
@@ -425,7 +425,7 @@ export class PlanillaTurnoSolidoExcelService {
               });
 
           }
-          if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
+          if (verObservacionesCalidad && turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
               this.setObservacionesCalidad(headerObservaciones,worksheet, offset, borders);
               offset = offset + 1;
               turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.forEach((observacion: any) => {
@@ -449,7 +449,7 @@ export class PlanillaTurnoSolidoExcelService {
               if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
                 CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosCortes?.length + 1);
               }
-              if (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
+              if (verObservacionesCalidad && turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length > 0) {
                   CantRows = CantRows + (turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad?.length + 1);
               }
             }

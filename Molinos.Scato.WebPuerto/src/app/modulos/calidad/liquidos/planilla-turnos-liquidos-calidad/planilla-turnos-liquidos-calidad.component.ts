@@ -86,6 +86,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   exportaPlanilla: boolean = false;
   totalABordo: number = 0;
 
+  public verObservacionesCalidad: boolean = false;
+
   private suscripciones: Subscription[] = [];
 
   constructor(
@@ -726,7 +728,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   getRowSpan(dia: any) {
     let contador = 0;
     for (let turnos of dia.controls.turnos.controls) {
-      contador += this.getRowSpanTurnoCalc(turnos);
+      contador += this.getRowSpanTurno(turnos);
     }
     if (this.diasTurno.length == 1) {
       contador += 1;
@@ -735,29 +737,11 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     }
     return contador;
   }
-  getRowSpanTurnoCalc(turno: any) {
 
-    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls.length;
-    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
-    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
-
-    registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-    registroLiquido += 2;
-    let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
-    return numeroRegistros;
-  }
   getRowSpanTurno(turno: any) {
-
-    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls.length;
-    let registroCorte = turno.controls['moduloDeCargaPlanillaDeTurnosCortes'].controls.length;
-    let registroCalidad = turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length;
-
-    registroLiquido = registroLiquido > 0 && registroLiquido; // tamaño del detalle de cada turno
-    registroCorte = registroCorte > 0 ? 1 : 1; // tamaño del corte
-    registroCalidad = registroCalidad > 0 ? 1 : 1; // tamaño de la observacion
-    registroLiquido += 2;
+    let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls.length + 2; // tamaño del detalle de cada turno
+    const registroCorte = 1; // tamaño del corte
+    const registroCalidad = this.verObservacionesCalidad ? 1 : 0; // tamaño de la observacion
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
@@ -1087,7 +1071,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
 
     // <ARMOA005-1659 - Dylan Lopez>
     // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad);
     // </ ARMOA005-1659 - Dylan Lopez>
 
     this.exportaPlanilla = false;
