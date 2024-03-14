@@ -106,11 +106,11 @@ export class LineupEmbarqueComponent implements OnInit {
     this.cargarBuqueGeolocalizacion(this.instanciaWorkflow.embarque.id);
     this._procesoService.disposeData();
 
-    this.embarquesPuerto = this.observador != null ? 
-      this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin && 
-        u.embarque.noryon == this.instanciaWorkflow.embarque.noryon && 
-        u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito && 
-        u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) : 
+    this.embarquesPuerto = this.observador != null ?
+      this.observador.ListarEmbarques().filter(u => u.embarque.vicentin == this.instanciaWorkflow.embarque.vicentin &&
+        u.embarque.noryon == this.instanciaWorkflow.embarque.noryon &&
+        u.embarque.sanBenito == this.instanciaWorkflow.embarque.sanBenito &&
+        u.embarque.otrosMuelles == this.instanciaWorkflow.embarque.otrosMuelles) :
       [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
     this.listadoUbicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.map(u => u.nombre);
@@ -274,22 +274,69 @@ export class LineupEmbarqueComponent implements OnInit {
         }
       } else if (accion == UbicacionBuquePuerto.Zarpo) {
         /**Zarpó**/
-        // <ARMOA005-1421 Dylan Lopez>
-        let lineUpDto = JSON.parse(
-          JSON.stringify(this.instanciaWorkflow.lineUp)
-        );
-        lineUpDto.moduloDeCarga = null;
-        lineUpDto.planoDeCarga = null;
-        
-        this.guardarHistoricoEmbarqueLineUp(lineUpDto);
-        // </ ARMOA005-1421 Dylan Lopez>
-
         this._modalService.open(this.modalPeriodoCarga, { size: 'sm' });
         // Desde el modal se llama a guardarAmarre() al aceptar
       } else {
         this.actualizarUbicacion(accion);
       }
     }
+  }
+
+
+  public guardarAmarre() {
+    if (!this.formPeriodoCarga.valid) {
+      this.confirmationDialogService.alertar('Deben completarse todos los campos');
+      return;
+    }
+    const fechaHoraAmarro: string = this.formPeriodoCarga.get('fechaAmarre').value;
+    const fechaHoraDesamarro: string = this.formPeriodoCarga.get('fechaDesamarre').value;
+    if (new Date(fechaHoraAmarro) > new Date(fechaHoraDesamarro)) {
+      this.confirmationDialogService.alertar('La hora de desamarre no puede ser menor a la de amarre');
+    }
+    const [fechaAmarro, horaAmarro] = fechaHoraAmarro.split('T');
+    const [fechaDesamarro, horaDesamarro] = fechaHoraDesamarro.split('T');
+    const periodoDeCarga = this.instanciaWorkflow.lineUp.moduloDeCarga.moduloDeCargaPeriodoDeCarga[0] || {};
+    const moduloDeCargaId = this.instanciaWorkflow.lineUp.moduloDeCarga.id;
+    periodoDeCarga.fechaAmarro = fechaAmarro;
+    periodoDeCarga.horaAmarro = horaAmarro;
+    periodoDeCarga.fechaDesamarro = fechaDesamarro;
+    periodoDeCarga.horaDesamarro = horaDesamarro;
+
+    this.showSpinner.emit(true);
+    this.moduloDeCargaService.guardarPeriodoDeCarga(periodoDeCarga, moduloDeCargaId).subscribe(() => {
+      this.showSpinner.emit(false);
+      this._modalService.dismissAll();
+      this.zarparEmbarque();
+    }, err => {
+      this.showSpinner.emit(false);
+      console.error(err);
+      this.confirmationDialogService.error('Ha ocurrido un error al guardar las fechas');
+    });
+  }
+
+  private async zarparEmbarque() {
+    const confirmed = await this.confirmationDialogService.confirm('¡Atención!', `Al pasar a Ubicacion "Zarpó", el buque ${this.instanciaWorkflow.embarque.nombreBuque} dejará de mostrarse dentro del line up y geolocalización`, 'Aceptar', 'Cerrar', null, null, Tipoalerta.Warning);
+    if (!confirmed) {
+      return;
+    }
+    const accion = UbicacionBuquePuerto.Zarpo;
+    this.showSpinner.emit(true)
+    this.instanciaWorkflow.embarque.ubicacion = accion;
+    this.instanciaWorkflow.lineUp.ubicacion = accion;
+    let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
+    lineUpDto.moduloDeCarga = null;
+    lineUpDto.planoDeCarga = null;
+    // <ARMOA005-1421 Dylan Lopez
+    this.guardarHistoricoEmbarqueLineUp(lineUpDto);
+    // </ ARMOA005-1421 Dylan Lopez>
+    this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
+      if (this.observador) {
+        setTimeout(() => {
+          this.observador.Actualizar();
+          this.showSpinner.emit(false)
+        }, 5000);
+      }
+    });
   }
 
   // <ARMOA005-1421 Dylan Lopez>
@@ -344,12 +391,12 @@ export class LineupEmbarqueComponent implements OnInit {
     let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
     lineUpDto.moduloDeCarga = null;
     lineUpDto.planoDeCarga = null;
-    this.lineUpService.modificarLineUp(lineUpDto).subscribe((x) => {}, 
+    this.lineUpService.modificarLineUp(lineUpDto).subscribe((x) => {},
       (error) => {},
       () => {
         if (this.embarqueSeleccionado > 0 && accion == UbicacionBuquePuerto.MuelleDeCarga)
           this.crearImagenLineUp();
-        if (this.observador) 
+        if (this.observador)
           this.observador.Actualizar();
 
         this.mostrarSpinnerCaptura = false;
@@ -364,8 +411,8 @@ export class LineupEmbarqueComponent implements OnInit {
     divLineUpAcciones.className += 'ocultar-division';
     divLineUpAcciones.classList.add('ocultar-division')
     let base64data='';
-    htmlToImage.toPng(divEmbarqueLineUp, { 
-      quality: 0.8, 
+    htmlToImage.toPng(divEmbarqueLineUp, {
+      quality: 0.8,
       backgroundColor: '#ffffff'}).then(function (url) {
         var img = new Image();
         img.src = url;
@@ -455,18 +502,18 @@ export class LineupEmbarqueComponent implements OnInit {
     return numero > 0 &&
       numero != null &&
       this.ubicacionDeBuquePuerto != null &&
-      this.ubicacionDeBuquePuerto.find((x) => x.orden == numero) != undefined ? 
-      this.ubicacionDeBuquePuerto.find((x) => x.orden == numero).nombre.toString() : 
+      this.ubicacionDeBuquePuerto.find((x) => x.orden == numero) != undefined ?
+      this.ubicacionDeBuquePuerto.find((x) => x.orden == numero).nombre.toString() :
       '';
   }
 
   numeroUbicacionDeBuquePuerto(nombre): number {
     return nombre.length > 0 &&
       nombre != null &&
-        this.ubicacionDeBuquePuerto != null ? 
+        this.ubicacionDeBuquePuerto != null ?
         this.ubicacionDeBuquePuerto.find(
             (x) => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()
-          ).orden : 
+          ).orden :
         0;
   }
 
@@ -481,9 +528,9 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   colorDelMuelle() {
-    return this.instanciaWorkflow.embarque.sanBenito ? 'color-muelle-sanbenito' : 
-      this.instanciaWorkflow.embarque.vicentin ? 'color-muelle-vicentin' : 
-      this.instanciaWorkflow.embarque.noryon ? 'color-muelle-nouryon' : 
+    return this.instanciaWorkflow.embarque.sanBenito ? 'color-muelle-sanbenito' :
+      this.instanciaWorkflow.embarque.vicentin ? 'color-muelle-vicentin' :
+      this.instanciaWorkflow.embarque.noryon ? 'color-muelle-nouryon' :
       'color-muelle-otros-muelles';
   }
 
@@ -493,7 +540,7 @@ export class LineupEmbarqueComponent implements OnInit {
 
   showWarning() {
     this.messageService.add({
-      severity: 'error', 
+      severity: 'error',
       summary: 'Acceso Denegado',
       detail: 'No posee permisos para la acción',
       key: 'access-lineup',
