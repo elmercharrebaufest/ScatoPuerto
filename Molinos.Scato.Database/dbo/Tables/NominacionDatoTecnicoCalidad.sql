@@ -27,7 +27,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoCalidad]
 
         IF((SELECT ISNULL(CalidadValor_Id, 0) FROM deleted) <> (SELECT ISNULL(CalidadValor_Id, 0) FROM inserted)) BEGIN
             INSERT INTO Auditoria
-            SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCalidad', 'CalidadValor_Id', d.CalidadValor_Id, i.CalidadValor_Id , GETDATE(), NULL
+            SELECT @idNominacion , d.id, 'NominacionDatoTecnicoCalidad', 'CalidadValor_Id', d.CalidadValor_Id, i.CalidadValor_Id , GETDATE(), NULL, NULL
             FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
         END
     END

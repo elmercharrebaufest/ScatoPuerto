@@ -7,5 +7,6 @@ namespace Molinos.Scato.Dominio.Entidades
         [Key]
         public virtual int Id { get; set; }
         public virtual string Nombre { get; set; }
+        public virtual bool Habilitado { get; set; }
     }
 }

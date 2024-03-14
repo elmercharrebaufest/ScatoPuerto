@@ -19,7 +19,7 @@ export class ClientesComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  tienePermisoCrearNuevoBuque() {
+  tienePermisoCrearNuevoCliente() {
     return this.user.permisos.find(p => p === this.permisosScato.Clientes_Crear);
   }
 

@@ -38,6 +38,8 @@ import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
 import { NgxMaskModule } from "ngx-mask";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
+import { EditarCrearClienteComponent } from './editar-crear-cliente/editar-crear-cliente.component';
+import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cliente.component';
 
 const components = [
     AlertComponent,
@@ -62,7 +64,9 @@ const components = [
     AltaBajaMantenimientoComponent,
     NotificacionesComponent,
     EnvioMailDialogComponent,    
-    ModalCrearBuqueComponent
+    ModalCrearBuqueComponent,
+    EditarCrearClienteComponent,
+    ModalCrearClienteComponent,
 ]
 const libs = [
     CommonModule,
@@ -89,7 +93,7 @@ const libs = [
     ],
     declarations: [
         components,
-        IniciarSesionComponent
+        IniciarSesionComponent,
     ],
     exports: [
         components,

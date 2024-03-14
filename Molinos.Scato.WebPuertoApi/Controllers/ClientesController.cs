@@ -9,6 +9,9 @@ using System.Net.Http;
 using System.Net;
 using System.Web;
 using System.Web.Http;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.WebPuertoApi.Atributos;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -27,6 +30,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
                 var response = servicioClientes.ListarClientesPuerto(paginacion, nombre);
                 return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Clientes/GuardarCliente")]
+        public HttpResponseMessage GuardarVaporInformacion(CoordinadorPuertoDto clienteDto)
+        {
+            try
+            {
+                clienteDto.Usuario = base.nombreUsuario;
+                servicioClientes.GuardarCliente(clienteDto);
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {

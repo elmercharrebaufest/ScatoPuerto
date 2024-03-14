@@ -60,7 +60,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Exportador
             IF ((SELECT Exportador_Id FROM deleted) <> (SELECT Exportador_Id FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -74,7 +74,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Formato
             IF ((SELECT Formato FROM deleted) <> (SELECT Formato FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Formato', d.Formato, i.Formato, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Formato', d.Formato, i.Formato, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -88,7 +88,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Cantidad
             IF ((SELECT Cantidad FROM deleted) <> (SELECT Cantidad FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Cantidad', d.Cantidad, i.Cantidad, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Cantidad', d.Cantidad, i.Cantidad, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -102,7 +102,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Unidad
             IF ((SELECT Unidad FROM deleted) <> (SELECT Unidad FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Unidad', d.Unidad, i.Unidad, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Unidad', d.Unidad, i.Unidad, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -116,7 +116,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Ajuste
             IF ((SELECT Ajuste FROM deleted) <> (SELECT Ajuste FROM inserted)) BEGIN
             INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Ajuste', d.Ajuste, i.Ajuste, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Ajuste', d.Ajuste, i.Ajuste, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -130,7 +130,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Puerto de Carga
             IF ((SELECT PuertoDeCarga FROM deleted) <> (SELECT PuertoDeCarga FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'PuertoDeCarga', d.PuertoDeCarga, i.PuertoDeCarga, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'PuertoDeCarga', d.PuertoDeCarga, i.PuertoDeCarga, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -144,7 +144,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Puerto de Descarga
             IF ((SELECT PuertoDeDescarga FROM deleted) <> (SELECT PuertoDeDescarga FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'PuertoDeDescarga', d.PuertoDeDescarga, i.PuertoDeDescarga, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'PuertoDeDescarga', d.PuertoDeDescarga, i.PuertoDeDescarga, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -158,7 +158,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Descripcion Bienes
             IF ((SELECT DescripcionesBienes FROM deleted) <> (SELECT DescripcionesBienes FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'DescripcionesBienes', d.DescripcionesBienes, i.DescripcionesBienes, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'DescripcionesBienes', d.DescripcionesBienes, i.DescripcionesBienes, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -171,7 +171,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Recibos por dia
             IF ((SELECT RecibosPorDia FROM deleted) <> (SELECT RecibosPorDia FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'RecibosPorDia', d.RecibosPorDia, i.RecibosPorDia, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'RecibosPorDia', d.RecibosPorDia, i.RecibosPorDia, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -185,7 +185,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Mostrar Destinos
             IF ((SELECT MostrarDestinos FROM deleted) <> (SELECT MostrarDestinos FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'MostrarDestinos', d.MostrarDestinos, i.MostrarDestinos, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'MostrarDestinos', d.MostrarDestinos, i.MostrarDestinos, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -199,7 +199,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
             -- Mostrar Bodegas
             IF ((SELECT MostrarBodegas FROM deleted) <> (SELECT MostrarBodegas FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'MostrarBodegas', d.MostrarBodegas, i.MostrarBodegas, GETDATE(), NULL
+                SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'MostrarBodegas', d.MostrarBodegas, i.MostrarBodegas, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -213,7 +213,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
         -- INSERT (Excepto que sea en el mismo momento de la creación de la nominación)
         ELSE IF EXISTS (SELECT 1 FROM inserted) AND (@dateDiff > 5) BEGIN
             INSERT INTO Auditoria
-            SELECT Nominacion_Id, id, 'NominacionRecibo', 'Exportador', NULL, NumeroRecibo, GETDATE(), NULL
+            SELECT Nominacion_Id, id, 'NominacionRecibo', 'Exportador', NULL, NumeroRecibo, GETDATE(), NULL, NULL
             FROM inserted
 
             IF (@idEmbarque > 0) BEGIN
@@ -225,7 +225,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
         -- DELETE
         ELSE IF EXISTS (SELECT 1 FROM deleted) BEGIN    
              INSERT INTO Auditoria
-            SELECT Nominacion_Id, Id, 'NominacionRecibo', 'Exportador', NumeroRecibo, NULL, GETDATE(), NULL
+            SELECT Nominacion_Id, Id, 'NominacionRecibo', 'Exportador', NumeroRecibo, NULL, GETDATE(), NULL, NULL
             FROM deleted
 
             IF (@idEmbarque > 0) BEGIN
