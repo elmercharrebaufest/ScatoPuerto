@@ -14,5 +14,8 @@ namespace Molinos.Scato.Servicios
     {
         [OperationContract]
         ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null);
+        
+        [OperationContract]
+        void GuardarCliente(CoordinadorPuertoDto clienteDto);
     }
 }

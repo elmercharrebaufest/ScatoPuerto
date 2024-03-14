@@ -37,7 +37,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
         insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'Precintado', d.Precintado,
-	        i.Precintado , GETDATE(), NULL
+	        i.Precintado , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -47,7 +47,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'PrecintadoACuentaDe', d.PrecintadoACuentaDe,
-	        i.PrecintadoACuentaDe , GETDATE(), NULL
+	        i.PrecintadoACuentaDe , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -57,7 +57,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'DraftSurvey', d.DraftSurvey,
-	        i.DraftSurvey , GETDATE(), NULL
+	        i.DraftSurvey , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -67,7 +67,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'SurveyACuentaDe', d.SurveyACuentaDe,
-	        i.SurveyACuentaDe , GETDATE(), NULL
+	        i.SurveyACuentaDe , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -77,7 +77,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'PermisoDeEmbarque', d.PermisoDeEmbarque,
-	        i.PermisoDeEmbarque , GETDATE(), NULL
+	        i.PermisoDeEmbarque , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -87,7 +87,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'EstibadorYTrimado', d.EstibadorYTrimado,
-	        i.EstibadorYTrimado , GETDATE(), NULL
+	        i.EstibadorYTrimado , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -97,7 +97,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'Fumigacion', d.Fumigacion,
-	        i.Fumigacion , GETDATE(), NULL
+	        i.Fumigacion , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -107,7 +107,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'CompaniaDeFumigacion_Id', d.CompaniaDeFumigacion_Id,
-	        i.CompaniaDeFumigacion_Id , GETDATE(), NULL
+	        i.CompaniaDeFumigacion_Id , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -117,7 +117,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'CompaniaACuentaDe', d.CompaniaACuentaDe,
-	        i.CompaniaACuentaDe , GETDATE(), NULL
+	        i.CompaniaACuentaDe , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -127,7 +127,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'Observaciones', d.Observaciones,
-	        i.Observaciones , GETDATE(), NULL
+	        i.Observaciones , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id
@@ -137,7 +137,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDetalleIntervencion]
         BEGIN
        insert into Auditoria
         SELECT @idNominacion , d.id, 'NominacionDetalleIntervencion', 'TipoDeFumigacion_Id', d.TipoDeFumigacion_Id,
-	        i.TipoDeFumigacion_Id , GETDATE(), NULL
+	        i.TipoDeFumigacion_Id , GETDATE(), NULL, NULL
              FROM deleted AS d
              JOIN inserted AS i
              ON d.Id=i.Id

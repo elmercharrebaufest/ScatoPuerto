@@ -45,7 +45,7 @@ export class ClienteService {
     }
 
     public guardarCliente(cliente: any) {
-        return this.http.post(`${this.url}Cliente/GuardarCliente`, cliente, { 'withCredentials': true });
+        return this.http.post(`${this.url}Clientes/GuardarCliente`, cliente, { 'withCredentials': true });
     }
 
 }
