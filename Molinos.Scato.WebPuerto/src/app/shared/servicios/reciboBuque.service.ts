@@ -38,4 +38,8 @@ export class ReciboBuqueService {
   obtenerNominacionRecibos(idEmbarque: number,): Observable<Nominacion[]>{
     return this.http.get<Nominacion[]>(`${this.url}ModuloDeCarga/ListarNominacionesRecibos?idEmbarque=${idEmbarque}`, { 'withCredentials' : true}) 
   }
+
+  deshabilitarRecibo(reciboDeBuque:ReciboDeBuque ){
+    return this.http.post(`${this.url}ModuloDeCarga/DeshabilitarReciboBuque`, reciboDeBuque, { 'withCredentials' : true});
+  }
 }

@@ -7,6 +7,7 @@
     [Propiedad]			  NVARCHAR (50)   NULL,
     [ValorAnterior]		  NVARCHAR (MAX)   NULL,
     [ValorNuevo]          NVARCHAR (MAX)    NULL,
-    [FechaModificacion]   DATETIME NOT      NULL,
+    [FechaModificacion]   DATETIME NOT      NULL, 
+    [UsuarioEjecuta] VARCHAR(40) NULL,
 )
    

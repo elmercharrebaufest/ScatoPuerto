@@ -6,3 +6,9 @@
 input.ng-invalid:not(.ng-untouched):not(:focus-within) {
   border: 1px solid red;
 }
+
+.tipo-producto {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}

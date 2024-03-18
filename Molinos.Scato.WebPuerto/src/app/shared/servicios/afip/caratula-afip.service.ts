@@ -68,6 +68,10 @@ export class CaratulaAfipService {
     return this.http.delete<any>(`${this.url}AnularCaratula?id=${id}`, { withCredentials: true });
   }
 
+  public cambiarTipoProducto(id: number): Observable<any> {
+    return this.http.put<any>(`${this.url}CaratulaCambiarTipoProducto?id=${id}`, null, { withCredentials: true });
+  }
+
   //#region Solicitudes
 
   //#region Solicitud cierre de carga

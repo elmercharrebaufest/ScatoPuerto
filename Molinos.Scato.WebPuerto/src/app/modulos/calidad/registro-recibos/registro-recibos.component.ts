@@ -11,6 +11,8 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { FormGroup } from '@angular/forms';
 import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 @Component({
   selector: 'app-registro-recibos',
@@ -38,6 +40,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     private _reciboBuqueService: ReciboBuqueService,
     private _reciboSharingService: ReciboSharingService,
     private session: SessionService,
+    private confirmationDialogService: ConfirmationDialogService,
   )
   {
     this.user = this.session.getUser();
@@ -129,5 +132,25 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
 
   hasPermisoRecibidores_Recibo_Imprimir() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Recibo_Imprimir);
+  }
+
+  deshabilitarRecibo(recibo: any){
+    const mensaje = "¿Esta seguro que desea eliminar el recibo seleccionado?";
+    this.confirmationDialogService.confirm("Eliminar recibo", mensaje, "Aceptar", "Cancelar")
+      .then((confirmed) => {
+        if (confirmed) {
+          this._reciboBuqueService.deshabilitarRecibo(recibo).subscribe(res => {            
+            this.confirmationDialogService.confirm('¡Atención!', 'El recibo fue eliminado.', 'Aceptar', '', null, null, Tipoalerta.Success);
+            this._reciboSharingService.setRefreshRecibo(true);
+          }, error => {
+            console.log(error);
+            this.confirmationDialogService.confirm("¡Error!", "Ha ocurrido un error, debe contactar al administrador.", "Cerrar", "", null, null, Tipoalerta.Error)
+          }, () => {
+          })
+        }
+      })
+      .catch((e) => {
+        return;
+      });
   }
 }

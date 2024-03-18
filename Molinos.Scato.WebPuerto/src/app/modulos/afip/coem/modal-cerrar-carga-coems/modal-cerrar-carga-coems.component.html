@@ -49,6 +49,10 @@
                         </td>
                         <td>
                           <input type="number" class="form-control" formControlName="cantidadReal">
+                          <small class="text-danger" *ngIf="declaracion.get('cantidadReal').errors?.cantidadInvalida">
+                            La cantidad real embarcada no debe superar el {{esLiquido ? 2 : 4 }}% de lo declarado en la
+                            COEM
+                          </small>
                         </td>
                         <td>
                           <input type="datetime-local" class="form-control" formControlName="fechaEmbarque">

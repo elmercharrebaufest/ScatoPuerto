@@ -26,5 +26,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<AfipSolicitudCambioFechas> SolicitudesCambioFechas { get; set; }
         public virtual string IdentificadorCierre { get; set; }
         public virtual ICollection<AfipSolicitudCierreCarga> SolicitudesCierreCarga { get; set; }
+        public virtual bool EsLiquido { get; set; }
     }
 }
