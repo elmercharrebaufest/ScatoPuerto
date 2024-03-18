@@ -13,6 +13,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Linq;
+using Molinos.Scato.Repositorio;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -691,8 +692,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/GuardarBalanzaCorte")]
         public HttpResponseMessage GuardarBalanzaCorte(List<BalanzasCortesDto> balanzasCortesDtos)
         {
-            servicio.GuardarBalanzaCorte(balanzasCortesDtos);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            try
+            {
+                servicio.GuardarBalanzaCorte(balanzasCortesDtos);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch(ValidationCustomException vce)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, vce.Message);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         [HttpGet]
@@ -940,7 +952,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-        }        
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ModuloDeCarga/DeshabilitarReciboBuque")]
+        public HttpResponseMessage DeshabilitarReciboBuque(ReciboDeBuqueDto reciboDeBuque)
+        {
+            try
+            {
+                servicio.DeshabilitarReciboBuque(reciboDeBuque, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
 
         public class CapturaImagenLineUp
         {

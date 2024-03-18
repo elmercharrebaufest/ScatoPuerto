@@ -8,6 +8,7 @@
     [FechaHoraImpresion] DATETIME NULL,
 
     [Superviso] NVARCHAR(50) NULL, 
+    [Habilitado] BIT NOT NULL DEFAULT 1, 
     CONSTRAINT [PK_dbo.ReciboDeBuque] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.Embarque_dbo.Embarque_Embarque_Id] FOREIGN KEY ([Embarque_Id]) REFERENCES [dbo].[Embarque] ([Id]),
 )

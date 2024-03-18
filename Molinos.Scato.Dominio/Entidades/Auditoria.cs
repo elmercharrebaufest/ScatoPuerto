@@ -14,6 +14,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string ValorAnterior { get; set; }
         public virtual string ValorNuevo { get; set; }
         public virtual DateTime FechaModificacion { get; set; }
+        public virtual string UsuarioEjecuta{ get; set; }
      
     }
 }

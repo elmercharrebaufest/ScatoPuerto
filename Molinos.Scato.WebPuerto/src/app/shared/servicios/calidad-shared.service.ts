@@ -159,6 +159,10 @@ export class CalidadSharedService {
         item.className = "collapse";      
       })
     },5000)
+
+    let lineas = document.getElementsByClassName('lineas-detalles')[0] as HTMLDivElement;
+    lineas.className = '';
+    lineas.style.marginTop = "-20px";   
   }
 
 }

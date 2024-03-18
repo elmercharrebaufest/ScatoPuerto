@@ -170,6 +170,10 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
               }, []);
               item.productoExportador = result;
             }
+
+            item.agenciaControlPrivado = item.agentesControlPrivado.length > 0 ? 
+            item.agentesControlPrivado.map(a => a.nombre + " " + a.apellido).join(", ") : "";
+
           });
           const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
           if (mostrarPorEmbarque) {
