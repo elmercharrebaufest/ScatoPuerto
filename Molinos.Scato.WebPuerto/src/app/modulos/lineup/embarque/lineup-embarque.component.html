@@ -185,19 +185,19 @@
         <div class="col-1">
             <img src="assets/reloj.svg" class="icon clock" [ngClass]="'clock-'+ fechaRecaladaCorrecta()">
         </div>
-        
+
         <div class="col-9">
-          <div class="row"> 
+          <div class="row">
             <div class="col-12 font-weight-bold" [ngClass]="'text-'+ fechaRecaladaCorrecta()" style="font-size: 16px;">
               {{instanciaWorkflow.embarque.fechaRecalada | date}}&zwnj;
             </div>
             <small class="col-12 mb-1" [ngClass]="'text-'+ fechaRecaladaCorrecta()">
-              {{instanciaWorkflow.embarque.horaRecalada != null ? instanciaWorkflow.embarque.horaRecalada : ''}} 
+              {{instanciaWorkflow.embarque.horaRecalada != null ? instanciaWorkflow.embarque.horaRecalada : ''}}
               {{instanciaWorkflow.embarque.horaRecalada != null && instanciaWorkflow.embarque.horaRecalada.length > 3 ? 'Hrs' : ''}}&zwnj;
             </small>
-          </div>      
+          </div>
         </div>
-        
+
           <!-- <button (click)="openModalFiles(appendFiles)"   style="width: 40px;">
             Adjuntar archivos
           </button> -->
@@ -218,10 +218,10 @@
           <img  id="imgLineup" [ngStyle]="{'cursor': hayBuque ? 'pointer' : 'default'}"  [src]="ruta" class="float-left" (click)="verGeolocalizacion(hayBuque,instanciaWorkflow.embarque.id)">
           <div class="right">
             <p [ngClass]="colorMapa" class="float-left">{{mensajeBuque}}</p>
-          </div>   
+          </div>
         </div>
       </div>
-      
+
     </div>
     </div>
     <div class="col-md-3 col-xs-12 my-auto text-left">
@@ -245,7 +245,7 @@
                   (click)="armarPlanoCarga()">EDITAR PLANO DE CARGA</button>
         </div>
         <div *ngIf="instanciaWorkflow.lineUp.planoDeCarga.enviado && instanciaWorkflow.lineUp.planoDeCarga.cargado && instanciaWorkflow.embarque.sanBenito">
-          <img float-right src="assets/planoDeCargaEnviadoButton.svg" onmouseover="this.src='assets/planoDeCargaEnviadoButtonInvertido.svg';" 
+          <img float-right src="assets/planoDeCargaEnviadoButton.svg" onmouseover="this.src='assets/planoDeCargaEnviadoButtonInvertido.svg';"
           onmouseout="this.src='assets/planoDeCargaEnviadoButton.svg';" class="cursorPointer float-right" (click)="armarPlanoCarga()">
         </div>
       </ng-container>
@@ -283,7 +283,7 @@
       <p class="text-left mb-0">
         <strong>Coordinador/es: </strong>
         <span *ngFor="let coordinador of instanciaWorkflow.embarque.coordinadores"> {{extraeNombre(coordinador.coordinadorPuerto)}},</span>
-       
+
       </p>
     </div>
 
@@ -320,7 +320,7 @@ align-self: center;">
 </ng-template>
 
 <ng-template #appendFiles let-modal >
-  <div class="modal-content" style="width: 700px; 
+  <div class="modal-content" style="width: 700px;
   align-self: center;">
     <div class="modal-header">
       <h5 class="modal-title" style="color: #4d60A8;">Adjuntar archivos</h5>
@@ -331,7 +331,7 @@ align-self: center;">
       <div class="row" style="width: 100%;
       justify-content: space-evenly;
       margin: auto;">
-        <div style="width: 15%; 
+        <div style="width: 15%;
         display: flex;
       align-items: center;
       justify-content: center;">
@@ -345,7 +345,7 @@ align-self: center;">
         </div>
         <div style="width: 15%">
           <label style="font-size: 23px; color: cadetblue;">
-            
+
           </label>
         </div>
       </div>
@@ -362,14 +362,14 @@ align-self: center;">
         </div>
         <div style="display:flex; flex-direction: column; align-items: initial; width: 70%;">
           <div>
-            <tag-input  
+            <tag-input
                     [(ngModel)]="nombreArchivo"
                     [placeholder]="'Nombre del archivo'"
                     [secondaryPlaceholder]="'Nombre del archivo'"
                     [identifyBy]="'id'"
                     [displayBy]="'tipoArchivo'"
                     [maxItems]="1">
-              <tag-input-dropdown 
+              <tag-input-dropdown
                       [appendToBody]="false"
                       [showDropdownIfEmpty]="true"
                       [autocompleteItems]="TipoArchivosDbList"
@@ -379,26 +379,26 @@ align-self: center;">
             </tag-input>
           </div>
           <div>
-            <div fullWidth >        
+            <div fullWidth >
               <label style="font-size: 9px; color: rgb(48, 48, 48);">
                 Completar el nombre con el que desea guardar el documento.
               </label>
             </div>
 
           </div>
-          
+
         </div>
         <div style="width: 15%; display: flex;
                             flex-direction: row;
                             align-content: center;
                             align-items: center;
                             justify-content: center;">
-          <img src="assets/Mas.svg" class="cursorPointer" (click)="addFileToSave()" >          
+          <img src="assets/Mas.svg" class="cursorPointer" (click)="addFileToSave()" >
         </div>
       </div>
 
-      
-      <div *ngIf="ArchivosPuerto != null && ArchivosPuerto.length > 0">      
+
+      <div *ngIf="ArchivosPuerto != null && ArchivosPuerto.length > 0">
         <hr class="solid">
         <div class="row" fullWidth style="margin-left: 8px;" >
           <label  class="font-weight-bold">Archivos adjuntos</label>
@@ -415,7 +415,7 @@ align-self: center;">
           border-width: 1px;
           border-color: lightgray;
           padding: 2px;">
-            <label style="color: #5cb85c; margin-bottom: 0px; margin-left: 10px;">{{a.tipoArchivoPuerto.tipoArchivo}}</label> 
+            <label style="color: #5cb85c; margin-bottom: 0px; margin-left: 10px;">{{a.tipoArchivoPuerto.tipoArchivo}}</label>
             <label style="color: #5cb85c; margin-bottom: 0px; margin-right: 10px">.{{a.extension}}/{{a.size}} Kb</label>
           </div>
           <div   *ngIf="a.id != null && a.id > 0"   style="width: 73%;
@@ -427,10 +427,10 @@ align-self: center;">
           border-width: 1px;
           border-color: lightgray;
           padding: 2px;">
-            <label style="color: darkgray; margin-bottom: 0px; margin-left: 10px">{{a.tipoArchivoPuerto.tipoArchivo}}</label> 
+            <label style="color: darkgray; margin-bottom: 0px; margin-left: 10px">{{a.tipoArchivoPuerto.tipoArchivo}}</label>
             <label style="color: darkgray; margin-bottom: 0px; margin-right: 10px">.{{a.extension}}/{{a.size}} Kb</label>
           </div>
-        
+
           <!-- <input [value]="a.tipoArchivoPuerto.tipoArchivo" *ngIf="a.id == null || a.id == 0" class="col-9" style="color: #5cb85c;" disabled/>
           <input [value]="a.tipoArchivoPuerto.tipoArchivo" *ngIf="a.id != null && a.id > 0" class="col-9" disabled/> -->
 
@@ -450,7 +450,7 @@ align-self: center;">
           width: 33px;
           height: 33px;
           padding: 3px;"
-          *ngIf='a.archivo.includes("data:image") || a.archivo.includes("data:application/pdf")'          
+          *ngIf='a.archivo.includes("data:image") || a.archivo.includes("data:application/pdf")'
           (click)="previewFile(previsualizeImageModal, a)"  />
 
           <img src="assets\ojoIconGray.svg" style="    border-radius: 5px;
@@ -460,9 +460,9 @@ align-self: center;">
           width: 33px;
           height: 33px;
           padding: 3px;"
-          *ngIf='!a.archivo.includes("data:image") && !a.archivo.includes("data:application/pdf")'          
+          *ngIf='!a.archivo.includes("data:image") && !a.archivo.includes("data:application/pdf")'
           (click)="previewFile(previsualizeImageModal, a)"  />
-          
+
           <img src="assets\trashIcon-no-border.svg" style="    border-radius: 5px;
           border-style: solid;
           border-color: lightgray;
@@ -473,12 +473,44 @@ align-self: center;">
 
       </div>
     </div>
-      
+
     </div>
     <!-- FOOTER -->
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-grey" data-dismiss="modal" (click)="modal.close('cancelar')">Cancelar</button>
       <button type="button" class="btn btn-primary" (click)=guardarArchivos() >Guardar</button>
     </div>
+  </div>
+</ng-template>
+
+<ng-template #periodoCarga let-modal>
+  <div class="modal-content">
+    <form [formGroup]="formPeriodoCarga">
+    <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Amarró</label>
+            <input type="datetime-local" class="form-control" formControlName="fechaAmarre">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Desamarró</label>
+            <input type="datetime-local" class="form-control" formControlName="fechaDesamarre">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-6" style="padding-right:30px;text-align:center">
+            <button style="margin-top: 18px;" type="button" class="btn btn-danger" [disabled]=""
+              (click)="modal.dismiss('Cross click')">CANCELAR</button>
+          </div>
+          <div class="form-group  col-6" style="padding-left:30px;text-align:center">
+            <button style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]=""
+              (click)="guardarAmarre()">GUARDAR</button>
+          </div>
+
+        </div>
+      </div>
+    </form>
   </div>
 </ng-template>

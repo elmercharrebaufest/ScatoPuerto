@@ -58,7 +58,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
             -- Exportador
             IF ((SELECT Exportador_Id FROM deleted) <> (SELECT Exportador_Id FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id , GETDATE(), NULL
+                SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id , GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -70,7 +70,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
             -- Cantidad
             IF ((SELECT Cantidad FROM deleted) <> (SELECT Cantidad FROM inserted)) BEGIN
                 INSERT INTO Auditoria
-                SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE(), NULL 
+                SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Cantidad', d.Cantidad, i.Cantidad , GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -90,7 +90,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
                 SELECT @idNominacion , d.id, 'NominacionDatoTecnicoExportador', 'Tolerancia', 
                     CASE WHEN ISNULL(d.ToleranciasDiferenciadas, 0) = 0 THEN CONVERT(NVARCHAR(MAX), d.Tolerancia) ELSE CONCAT('+', ISNULL(d.ToleranciaPositiva, 0), '% / -', ISNULL(d.ToleranciaNegativa, 0), '%') END, 
                     CASE WHEN ISNULL(i.ToleranciasDiferenciadas, 0) = 0 THEN CONVERT(NVARCHAR(MAX), i.Tolerancia) ELSE CONCAT('+', ISNULL(i.ToleranciaPositiva, 0), '% / -', ISNULL(i.ToleranciaNegativa, 0), '%') END, 
-                    GETDATE(), NULL
+                    GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
                 IF (@idEmbarque > 0) BEGIN
@@ -107,7 +107,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
         -- INSERT (Excepto que sea en el mismo momento de la creaci�n de la nominaci�n)
         ELSE IF EXISTS (SELECT 1 FROM inserted) AND @dateDiff > 5 BEGIN
             INSERT INTO Auditoria
-            SELECT @idNominacion , id, 'NominacionDatoTecnicoExportador', 'Exportador', NULL, @exportadorNuevo, GETDATE(), NULL
+            SELECT @idNominacion , id, 'NominacionDatoTecnicoExportador', 'Exportador', NULL, @exportadorNuevo, GETDATE(), NULL, NULL
             FROM inserted
 
             IF (@idEmbarque > 0)  BEGIN
@@ -118,7 +118,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionDatoTecnicoExportador]
         -- DELETE
         ELSE IF EXISTS (SELECT 1 FROM deleted) BEGIN
             INSERT INTO Auditoria
-            SELECT @idNominacion , id, 'NominacionDatoTecnicoExportador', 'Exportador', @exportadorPrevio, NULL, GETDATE(), NULL
+            SELECT @idNominacion , id, 'NominacionDatoTecnicoExportador', 'Exportador', @exportadorPrevio, NULL, GETDATE(), NULL, NULL
             FROM deleted
 
             IF (@idEmbarque > 0)  BEGIN

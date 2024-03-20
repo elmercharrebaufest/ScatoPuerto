@@ -1,0 +1,258 @@
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Repositorio;
+using Molinos.Scato.Repositorio.ConsultasEF;
+using Molinos.Scato.Servicios.Conversiones;
+using Ninject.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Molinos.Scato.Servicios.Impl
+{
+    public class ServicioClientes : IServicioClientes
+    {
+        private readonly IRepositorio repositorio;
+        private readonly IServicioComandos comandos;
+        private readonly ILogger log;
+
+        public ServicioClientes(IRepositorio repositorio, IServicioComandos comandos, ILogger log)
+        {
+            this.repositorio = repositorio;
+            this.comandos = comandos;
+            this.log = log;
+        }
+
+        public void GuardarCliente(CoordinadorPuertoDto clienteDto)
+        {
+            if (String.IsNullOrEmpty(clienteDto.Nombre))
+                throw new Exception("Es obligatorio ingresar un nombre.");
+
+            clienteDto.Nombre = clienteDto.Nombre.Trim();
+
+            if (clienteDto.Id > 0)
+            {
+                this.EditarCliente(clienteDto);
+            }
+            else
+            {
+                this.RegistrarCliente(clienteDto);
+            }
+        }
+
+        private void RegistrarCliente(CoordinadorPuertoDto clienteDto)
+        {
+            var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
+            if (clienteBd != null && clienteBd.Habilitado)
+                throw new Exception("El Nombre ingresado ya existe en otro cliente.");
+
+            if (clienteBd != null && !clienteBd.Habilitado)
+            {
+                clienteDto.Id = clienteBd.Id;
+                clienteDto.Nombre = clienteBd.Nombre;
+                clienteDto.Habilitado = true;
+                this.HabilitarCliente(clienteDto, clienteBd);
+                return;
+            }
+
+            try
+            {
+                comandos.Ejecutar(new CrearCoordinadorPuerto { Dto = clienteDto });
+                this.RegistrarAuditoriaAlta(clienteDto);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Hubo un problema al intentar registrar cliente: " + clienteDto.Nombre);
+                throw new Exception("Hubo un problema al intentar registrar el cliente. Contacte a sistemas.");
+            }
+        }
+
+        private void EditarCliente(CoordinadorPuertoDto clienteDto)
+        {
+            var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
+            var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
+
+            if (ExisteClienteEnEmbarqueActivo(clienteBd))
+            {
+                throw new Exception("No se puede modificar al cliente ya que esta siendo utilizado en un embarque.");
+            }
+
+            if (clienteMismoNombre != null && clienteMismoNombre.Habilitado)
+            {
+                throw new Exception("El Nombre ingresado ya existe en el sistema.");
+            }
+
+            if (clienteMismoNombre != null && !clienteMismoNombre.Habilitado)
+            {
+                clienteDto.Id = clienteMismoNombre.Id;
+                clienteDto.Nombre = clienteMismoNombre.Nombre;
+                clienteDto.Habilitado = true;
+                this.HabilitarCliente(clienteDto, clienteBd);
+                this.DeshabilitarCliente(new CoordinadorPuertoDto { Id = clienteBd.Id, 
+                Nombre = clienteBd.Nombre, Usuario = clienteDto.Usuario});
+                return;
+            }
+
+            try
+            {
+                var valorAnterior = clienteBd.Nombre;
+                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto });
+                this.RegistrarAuditoriaEdicion(clienteDto, valorAnterior);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Hubo un problema al intentar modificar cliente: " + clienteDto.Nombre);
+                throw new Exception("Hubo un problema al intentar editar el cliente. Contacte a sistemas.");
+            }
+        }
+
+        private void HabilitarCliente(CoordinadorPuertoDto clienteDto, CoordinadorPuerto clienteBd)
+        {
+            try
+            {
+                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto });
+                this.RegistrarAuditoriaHabilitacion(clienteDto);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Hubo un problema al intentar modificar cliente: " + clienteDto.Nombre);
+                throw new Exception("Hubo un problema al intentar editar el cliente. Contacte a sistemas.");
+            }
+        }
+
+        private void RegistrarAuditoriaAlta(CoordinadorPuertoDto clienteDto)
+        {
+            var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper() == clienteDto.Nombre.ToUpper());
+
+            var auditoria = new Auditoria
+            {
+                Entidad_Id = clienteBd != null ? clienteBd.Id : 0,
+                EntidadNombre = "CoordinadorPuerto",
+                UsuarioEjecuta = clienteDto.Usuario,
+                ValorNuevo = clienteDto.Nombre,
+                Propiedad = "Nombre",
+                FechaModificacion = DateTime.Now,
+                Accion = "Registro de cliente."
+            };
+
+            this.repositorio.Agregar(auditoria);
+            this.repositorio.GuardarCambios();
+        }
+
+        private void RegistrarAuditoriaEdicion(CoordinadorPuertoDto clienteDto, string valorAnterior)
+        {
+            var auditoria = new Auditoria
+            {
+                Entidad_Id = clienteDto.Id,
+                EntidadNombre = "CoordinadorPuerto",
+                UsuarioEjecuta = clienteDto.Usuario,
+                ValorAnterior = valorAnterior,
+                ValorNuevo = clienteDto.Nombre,
+                Propiedad = "Nombre",
+                FechaModificacion = DateTime.Now,
+                Accion = "Edicion de cliente."
+            };
+
+            this.repositorio.Agregar(auditoria);
+            this.repositorio.GuardarCambios();
+        }
+
+        private void RegistrarAuditoriaHabilitacion(CoordinadorPuertoDto clienteDto)
+        {
+            var auditoria = new Auditoria
+            {
+                Entidad_Id = clienteDto.Id,
+                EntidadNombre = "CoordinadorPuerto",
+                UsuarioEjecuta = clienteDto.Usuario,
+                ValorAnterior = "0",
+                ValorNuevo = "1",
+                Propiedad = "Habilitado",
+                FechaModificacion = DateTime.Now,
+                Accion = "Habilita cliente."
+            };
+
+            this.repositorio.Agregar(auditoria);
+            this.repositorio.GuardarCambios();
+        }
+
+        private void RegistrarAuditoriaDeshabilitacion(CoordinadorPuertoDto clienteDto)
+        {
+            var auditoria = new Auditoria
+            {
+                Entidad_Id = clienteDto.Id,
+                EntidadNombre = "CoordinadorPuerto",
+                UsuarioEjecuta = clienteDto.Usuario,
+                ValorAnterior = "1",
+                ValorNuevo = "0",
+                Propiedad = "Habilitado",
+                FechaModificacion = DateTime.Now,
+                Accion = "Deshabilita cliente."
+            };
+
+            this.repositorio.Agregar(auditoria);
+            this.repositorio.GuardarCambios();
+        }
+
+        public void DeshabilitarCliente(CoordinadorPuertoDto clienteDto)
+        {
+            var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
+            if (ExisteClienteEnEmbarqueActivo(clienteBd))
+            {
+                throw new Exception("No se puede eliminar al cliente ya que esta siendo utilizado en un embarque.");
+            }
+            try
+            {
+                clienteDto.Habilitado = false;
+                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto });
+                this.RegistrarAuditoriaDeshabilitacion(clienteDto);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Hubo un problema al intentar deshabilitar cliente: " + clienteDto.Nombre);
+                throw new Exception("Hubo un problema al intentar deshabilitar el cliente. Contacte a sistemas.");
+            }
+        }
+
+        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null)
+        {
+            return repositorio.ListarConsultaPaginada(new ListarClientesConsulta(paginacion, nombre));
+        }
+
+        public CoordinadorPuertoDto ObtenerCliente(int id)
+        {
+            var cliente = repositorio.Obtener<CoordinadorPuerto>(c => c.Id == id);
+            if (cliente == null)
+                throw new Exception("No se encontró el cliente en el sistema.");
+            return new CoordinadorPuertoDto { Id = cliente.Id, Nombre = cliente.Nombre, Habilitado = cliente.Habilitado };
+        }
+
+        private bool ExisteClienteEnEmbarqueActivo(CoordinadorPuerto clienteBd)
+        {
+            var embarques = (from e in repositorio.Listar<Embarque>()
+                     join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
+                     where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
+                     select (e)).ToList();
+
+            HashSet<int> idsClientes = new HashSet<int>();
+            foreach (var e in embarques)
+            {
+                foreach (var c in e.Coordinadores)
+                {
+                    idsClientes.Add(c.CoordinadorPuerto.Id);
+                }
+            }
+            if (idsClientes.Contains(clienteBd.Id))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+}

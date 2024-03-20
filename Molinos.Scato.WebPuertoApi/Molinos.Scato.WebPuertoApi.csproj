@@ -224,7 +224,9 @@
     <Compile Include="Controllers\AutenticadorController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BuqueController.cs" />
+    <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\GeolocalizacionController.cs" />
+    <Compile Include="Controllers\HistoricoEmbarqueLineupController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />
     <Compile Include="Controllers\PlanoDeCargaController.cs" />
     <Compile Include="Controllers\ProgramaEmbarqueController.cs" />

@@ -1,0 +1,10 @@
+
+
+
+<button (click)='openModalEditarCrearCliente(editarCrearCliente)'  class="btn btn-success" >CREAR CLIENTE</button>
+<ng-template #editarCrearCliente let-modal>  
+<app-modal-crear-cliente (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
+</ng-template>
+
+
+

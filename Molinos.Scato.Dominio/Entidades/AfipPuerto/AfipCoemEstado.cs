@@ -10,5 +10,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual string Codigo { get; set; }
         public virtual string Estado { get; set; }
+        public virtual int Orden { get; set; }
     }
 }

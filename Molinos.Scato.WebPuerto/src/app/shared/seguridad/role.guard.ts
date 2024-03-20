@@ -134,6 +134,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case 'clientes': {
+                if (permisos.find(x => x === 'Clientes_Visualizar')) {
+                    return true;
+                }else{
+                    this.navigate(permisos, "clientes");
+                }
+                break;
+            }
         }
     }
 
@@ -177,6 +185,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'Coem_Visualizar':{
                 this.router.navigate(['afip/coem']);
+                break;
+            }
+            case 'Clientes_Visualizar':{
+                this.router.navigate(['/clientes']);
                 break;
             }
         }

@@ -13,7 +13,12 @@
             </ng-container>
         <br>
         <br>
-
+        <div class="ver-obs-calidad">
+          <label>
+            <input type="checkbox" [(ngModel)]="verObservacionesCalidad">
+            Ver Observaciones de Calidad
+          </label>
+        </div>
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
             <div id="scrollbar-planilla-recibidores-solido" class='mt-4 px-4 pb-4' style="height: 800px;">
                 <!-- ACA VA LA SCROLLBAR -->
