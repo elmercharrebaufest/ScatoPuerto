@@ -215,7 +215,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<CoordinadorPuerto, CoordinadorPuertoDto>();
+                return Listar<CoordinadorPuerto, CoordinadorPuertoDto>(c => c.Habilitado == true);
             }
             catch (Exception ex)
             {

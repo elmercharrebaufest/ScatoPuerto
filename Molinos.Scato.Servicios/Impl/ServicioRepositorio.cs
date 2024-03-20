@@ -8054,7 +8054,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<CoordinadorPuertoDto> ListarCoordinadores()
         {
-            return Listar<CoordinadorPuerto, CoordinadorPuertoDto>();
+            return Listar<CoordinadorPuerto, CoordinadorPuertoDto>(c => c.Habilitado == true);
         }
 
         public ListaPaginada<MaterialPuertoDto> ListarMaterialesPuerto(Paginacion paginacion, string filtro)

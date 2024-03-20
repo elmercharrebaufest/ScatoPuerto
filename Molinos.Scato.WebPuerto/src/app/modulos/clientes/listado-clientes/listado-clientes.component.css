@@ -44,7 +44,11 @@ width: 10px;
 }
 
 .icon-eliminar{
-    color: #f57875;
+    -webkit-mask: url('assets/trashIcon-no-border.svg') no-repeat center;
+    mask-image: url('assets/trashIcon-no-border.svg') no-repeat center;
+    width: 27px;
+    height: 27px; 
+    background-color:#f57875;
     font-size: 21px;
     margin-top: 4px;
     height: 30px !important

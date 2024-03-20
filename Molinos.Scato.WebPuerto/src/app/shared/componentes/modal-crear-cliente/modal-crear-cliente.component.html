@@ -5,13 +5,13 @@
 <ship-spinner [message]="mensajeCliente" *ngIf='mostrarSpinner'></ship-spinner>
 <form [formGroup]="crearEditarClienteForm">
     <div class='modal-header'>
-        <h4 class="modal-title">Registrar cliente</h4>
+        <h4 class="modal-title">{{tituloModal}}</h4>
     </div>
     <div class='modal-body '>
         <div class="row margen font-weight-bold">
             <div class="col pt-4">
-                <label class="">Nombre cliente</label>
-                <input type="text" class="form-control" maxlength="60" placeholder="Ingrese nombre del cliente" formControlName="nombre" (input)="onInputNombreCliente($event)"/>
+                <label class="">Nombre</label>
+                <input type="text" class="form-control" maxlength="60" placeholder="Ingrese un nombre" formControlName="nombre" (input)="onInputNombreCliente($event)"/>
             </div>
         </div>
         <br>

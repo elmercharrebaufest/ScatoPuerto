@@ -31,12 +31,14 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                 ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
                 var resultado = from cliente in contexto.Set<CoordinadorPuerto>()
-                where (nombre == null || cliente.Nombre.ToUpper().Contains(nombre)) 
+                where ((nombre == null || cliente.Nombre.ToUpper().Contains(nombre)) &&
+                (cliente.Habilitado)) 
                                 orderby cliente.Nombre ascending
                                 select new CoordinadorPuertoDto
                                 {
                                     Id = cliente.Id,
                                     Nombre = cliente.Nombre,
+                                    Habilitado = cliente.Habilitado,
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
                                     ItemsTotales = 0

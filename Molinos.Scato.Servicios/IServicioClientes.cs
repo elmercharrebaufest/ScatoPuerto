@@ -17,5 +17,12 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         void GuardarCliente(CoordinadorPuertoDto clienteDto);
+
+        [OperationContract]
+        CoordinadorPuertoDto ObtenerCliente(int id);
+
+        [OperationContract]
+        void DeshabilitarCliente(CoordinadorPuertoDto clienteDto);
+
     }
 }

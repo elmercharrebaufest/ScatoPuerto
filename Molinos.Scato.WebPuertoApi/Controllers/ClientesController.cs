@@ -40,7 +40,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/Clientes/GuardarCliente")]
-        public HttpResponseMessage GuardarVaporInformacion(CoordinadorPuertoDto clienteDto)
+        public HttpResponseMessage GuardarCliente(CoordinadorPuertoDto clienteDto)
         {
             try
             {
@@ -54,5 +54,30 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Clientes/ObtenerCliente")]
+        public HttpResponseMessage ObtenerCliente(int id)
+        {
+            return Request.CreateResponse(HttpStatusCode.OK,
+                servicioClientes.ObtenerCliente(id));
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/Clientes/DeshabilitarCliente")]
+        public HttpResponseMessage DeshabilitarCliente(CoordinadorPuertoDto clienteDto)
+        {
+            try
+            {
+                clienteDto.Usuario = base.nombreUsuario;
+                servicioClientes.DeshabilitarCliente(clienteDto);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
     }
 }

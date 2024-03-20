@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Cliente } from '@ScatoModels/cliente/cliente';
 import { environment } from 'environments/environment';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 @Injectable({
     providedIn: 'root'
 })
@@ -46,6 +46,14 @@ export class ClienteService {
 
     public guardarCliente(cliente: any) {
         return this.http.post(`${this.url}Clientes/GuardarCliente`, cliente, { 'withCredentials': true });
+    }
+
+    public obtenerCliente(id: number): Observable<Cliente> {
+        return this.http.get<Cliente>(`${this.url}Clientes/ObtenerCliente?id=${id}`, { 'withCredentials': true });
+    }
+
+    public eliminarCliente(cliente: any) {
+        return this.http.post(`${this.url}Clientes/DeshabilitarCliente`, cliente, { 'withCredentials': true });
     }
 
 }

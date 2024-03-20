@@ -1,9 +1,10 @@
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Cliente } from '@ScatoModels/cliente/cliente';
 import { AlertService } from '@ScatoServicios/alert.service';
 import { ClienteService } from '@ScatoServicios/cliente.service';
-import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
@@ -34,7 +35,7 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
   filtros: any;
   interval: any
   confirmationDialogService: any;
-  clienteId: number;
+  clienteId: number = 0;
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   public estaEnviando = false;
@@ -43,7 +44,7 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
   constructor(private clienteService: ClienteService,
     private modalService: NgbModal,
     public config: NgbModalConfig,
-    confirmationDialogService: EnvioMailDialogService,
+    confirmationDialogService: ConfirmationDialogService,
     public session: SessionService, private alertService: AlertService) {
     this.confirmationDialogService = confirmationDialogService;
     this.user = this.session.getUser();
@@ -54,7 +55,6 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
     this.subscripcionCliente = this.clienteService.observableCliente.subscribe(
       (data: Cliente[]) => {
         this.clientes = data;
-        console.log("clientes::::>", this.clientes);
         this.length = this.clientes.length > 0 ? this.clientes[0].itemsTotales : this.clientes.length;
         this.pageSize = this.clientes.length > 0 ? this.clientes[0].itemPorPagina : 10;
         this.pageIndex = this.clientes.length > 0 ? this.clientes[0].pagina : 1;
@@ -136,20 +136,42 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
   }
 
   tienePermisoModificarCliente() {
-    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Editar); //Cliente_Editar
+    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Editar); 
   }
-  /*
-    editarVapor(id, modal, bandera, nombreBuque, imo){ 
+
+  tienePermisoEliminarCliente(){
+    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Eliminar); 
+  }
+  
+    editarCliente(id: number, modal: any){ 
       this.clienteId = id;
-      this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
+      this.modalService.open(modal, { size: 'md', centered: true, backdrop: 'static', keyboard: false }).result
       .then(() => {     
         console.log('_modalService.open');
-  
       })
       .catch((res) => { console.log(res) }); 
-    }*/
+    }
 
   actualizarListaDeClientes(event) {
     this.listarClientes();
+  }
+
+  eliminarCliente(cliente: any){
+    this.confirmationDialogService.confirm('Eliminar cliente', `¿Esta seguro de querer eliminar al cliente ${cliente.nombre}?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      .then((confirmed) => {
+        if (confirmed) {
+          this.clienteService.eliminarCliente(cliente).subscribe((res) => {
+            this.confirmationDialogService.confirm('Atención', 'Se eliminó al cliente con exito.', 'Aceptar', '', null, null, Tipoalerta.Success); 
+            this.listarClientes();
+          },(error)=>{
+            this.confirmationDialogService.confirm('Atención', error.error.Message, 'Cerrar', '', null, null, Tipoalerta.Error);
+          });
+          this.modalService.dismissAll();
+        }
+      }).catch(() => {
+        
+        this.modalService.dismissAll()
+      });
+
   }
 }

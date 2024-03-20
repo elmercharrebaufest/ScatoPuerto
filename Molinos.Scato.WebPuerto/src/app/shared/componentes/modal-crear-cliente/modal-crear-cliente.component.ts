@@ -1,10 +1,11 @@
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Cliente } from '@ScatoModels/cliente/cliente';
+import { CoordinadorPuerto } from '@ScatoModels/coordinador-puerto';
 import { ClienteService } from '@ScatoServicios/cliente.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-modal-crear-cliente',
@@ -16,6 +17,8 @@ export class ModalCrearClienteComponent implements OnInit {
   @Output() actualizarListaClientes = new EventEmitter();
   @Input() id: number = 0;
   @Output() cerrar = new EventEmitter<void>()
+  @Output() altaEnPrelineUp = new EventEmitter();
+  @Input() esAltaPrelineUp: boolean = false;
 
   errorMessage: boolean = false;
   editarCliente: boolean = false;
@@ -24,6 +27,7 @@ export class ModalCrearClienteComponent implements OnInit {
   nombre: string;
   mostrarSpinner: boolean = false;
   mensajeCliente: string = '';
+  tituloModal: string = '';
 
   constructor(
     private modalService: NgbModal,
@@ -35,12 +39,23 @@ export class ModalCrearClienteComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.id > 0) {
+      this.tituloModal = "Edicion de cliente";
+      this.obtenerCliente();
+    }else{
+      if(this.esAltaPrelineUp){
+        this.tituloModal = "Alta de Coordinador de Puerto";
+      }else{
+        this.tituloModal = "Alta de cliente";
+      }
+    }
   }
 
   private initFormCrearEditarCliente() {
     this.crearEditarClienteForm = null;
     this.crearEditarClienteForm = this.formBuilder.group({
       nombre: ['', Validators.required],
+      habilitado: true,
     })
   }
 
@@ -64,23 +79,13 @@ export class ModalCrearClienteComponent implements OnInit {
     this.cerrar.emit();
   }
 
-  /*public onEditarCliente() {
-    this.submitted = true
-    let cliente = this.crearEditarClienteForm.getRawValue();
-    if (this.crearEditarClienteForm.controls['nombre'].invalid) {
-      this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-      return;
-    }
-  }*/
-
   public onCrearCliente() {
     this.mostrarSpinner = true;
     this.mensajeCliente = 'Guardando información de cliente';
     this.submitted = true
     let cliente = this.crearEditarClienteForm.getRawValue();
-    if (this.id == 0) {
-      cliente.id = 0;
-    }
+
+    cliente.id = this.id;
     cliente.habilitado = true;
 
     if (this.crearEditarClienteForm.controls['nombre'].invalid) {
@@ -105,6 +110,24 @@ export class ModalCrearClienteComponent implements OnInit {
         this.actualizarListaClientes.emit(true);
         this.onResetForm();
         this.modalService.dismissAll();
+        if(this.esAltaPrelineUp){
+          this.altaEnPrelineUp.emit(cliente);
+        }
       });
+  }
+
+  obtenerCliente() {
+    this.clienteService.obtenerCliente(this.id).subscribe((res: Cliente) => {
+      if (res != null) {
+        console.log(res);
+        this.crearEditarClienteForm.controls.nombre.setValue(res.nombre);
+      }
+    }, error => { 
+      console.log(error);
+    }
+      , () => {
+        this.mostrarSpinner = false;
+        this.mensajeCliente = '';
+      })
   }
 }
