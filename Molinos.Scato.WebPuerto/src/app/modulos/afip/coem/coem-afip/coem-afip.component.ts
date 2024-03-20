@@ -120,7 +120,12 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     }, (err) => {
       console.error(err);
       this.load = false;
-      const msj = err.error || 'No se ha podido anular la COEM, comunicarse con soporte técnico';
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al anular la COEM';
+      }
       this.confirmationDialogService.error(msj);
     })
   }
@@ -138,7 +143,12 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     }, (err) => {
       console.error(err);
       this.load = false;
-      const msj = err.error || `No se ha podido CERRAR la COEM, comunicarse con soporte técnico`;
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al cerrar la COEM';
+      }
       this.confirmationDialogService.error(msj);
     });
   }
@@ -264,11 +274,18 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
     this.load = true;
     this.coemAfipService.solicitarAnulacionCoem(coem.id).subscribe(() => {
       this.confirmationDialogService.exito('Se ha soliitado correctamente la anulación de la COEM');
+      this.load = false;
     }, (err) => {
       console.error(err);
-      const msj = err.error || 'Ha ocurrido un error al solicitar no a bordo';
+      this.load = false;
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al solicitar la anulación de la COEM';
+      }
       this.confirmationDialogService.error(msj);
-    }, () => this.load = false);
+    });
   }
 
   public abrirModal(modal: any, coem: COEM) {

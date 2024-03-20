@@ -27,10 +27,10 @@
         <tbody>
             <ng-container formArrayName='nirManualPuerto'>
                 <tr *ngFor='let nirManual of formMano.get("nirManualPuerto")["controls"]; let i = index' [formGroupName]="i">
-                    <td  class="tdCustom">
+                    <td [ngClass]="{ 'tdError' : !nirManual.controls.fecha.value}" class="tdCustom">
                         <input formControlName="fecha" type="datetime-local" [value]="nirManual.fecha" class="inputLineasEmbarque"/>
                     </td>
-                    <td class="tdCustom">  
+                    <td [ngClass]="{ 'tdError' : !nirManual.controls.hd.value}" class="tdCustom">  
                         <input formControlName="hd" type="number" />              
                     </td >
                     <td class="tdCustom">
@@ -45,7 +45,7 @@
                     <td class="tdCustom">
                         <input formControlName="origen" type="text"/>
                     </td>
-                    <td class="tdCustom">
+                    <td [ngClass]="{ 'tdError' : nirManual.controls.bodega.value == 0}" class="tdCustom">
                         <select formControlName="bodega" class="custom-select" [compareWith]='compareBodegaItem'>
                             <option value="0" >Seleccione una Bodega</option>
                             <option *ngFor="let b of bodegas" [ngValue]='b'> {{ b.nombre }} </option>

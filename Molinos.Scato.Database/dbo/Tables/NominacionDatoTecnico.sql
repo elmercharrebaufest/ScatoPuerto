@@ -55,7 +55,7 @@ BEGIN
 
 	IF ((SELECT MaterialPuerto_Id FROM deleted) <> (SELECT MaterialPuerto_Id FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'MaterialPuerto_Id', d.MaterialPuerto_Id, i.MaterialPuerto_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'MaterialPuerto_Id', d.MaterialPuerto_Id, i.MaterialPuerto_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -66,7 +66,7 @@ BEGIN
 
 	IF ((SELECT CantidadTotal FROM deleted) <> (SELECT CantidadTotal FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'CantidadTotal', d.CantidadTotal, i.CantidadTotal, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'CantidadTotal', d.CantidadTotal, i.CantidadTotal, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -77,7 +77,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(Tolerancia, 0) FROM deleted) <> (SELECT ISNULL(Tolerancia, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'Tolerancia', d.Tolerancia, i.Tolerancia, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'Tolerancia', d.Tolerancia, i.Tolerancia, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -88,7 +88,7 @@ BEGIN
 	
 	IF ((SELECT ISNULL(Observaciones, '') FROM deleted) <> (SELECT ISNULL(Observaciones, '') FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'Observaciones', d.Observaciones, i.Observaciones, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'Observaciones', d.Observaciones, i.Observaciones, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -100,7 +100,7 @@ BEGIN
 	-- El buque en teoría no debería poder cambiar
 	IF ((SELECT VaporInformacion_Id FROM deleted) <> (SELECT VaporInformacion_Id FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'VaporInformacion_Id', d.VaporInformacion_Id, i.VaporInformacion_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'VaporInformacion_Id', d.VaporInformacion_Id, i.VaporInformacion_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		SELECT @nuevoBuque = NombreBuque
@@ -115,7 +115,7 @@ BEGIN
 
 	IF ((SELECT ETARecalada FROM deleted) <> (SELECT ETARecalada FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ETARecalada', d.ETARecalada, i.ETARecalada, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ETARecalada', d.ETARecalada, i.ETARecalada, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -126,7 +126,7 @@ BEGIN
 
 	IF ((SELECT ObligacionDeCarga FROM deleted) <> (SELECT ObligacionDeCarga FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ObligacionDeCarga', d.ObligacionDeCarga, i.ObligacionDeCarga, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ObligacionDeCarga', d.ObligacionDeCarga, i.ObligacionDeCarga, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -137,7 +137,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(MuelleDeCarga_Id, 0) FROM deleted) <> (SELECT ISNULL(MuelleDeCarga_Id, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'MuelleDeCarga_Id', d.MuelleDeCarga_Id, i.MuelleDeCarga_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'MuelleDeCarga_Id', d.MuelleDeCarga_Id, i.MuelleDeCarga_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -148,7 +148,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(TasaDeCarga_Id, 0) FROM deleted) <> (SELECT ISNULL(TasaDeCarga_Id, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'TasaDeCarga', d.TasaDeCarga_Id, i.TasaDeCarga_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'TasaDeCarga', d.TasaDeCarga_Id, i.TasaDeCarga_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -159,7 +159,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(TasaDeCargaValor, 0) FROM deleted) <> (SELECT ISNULL(TasaDeCargaValor, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'TasaDeCargaValor', d.TasaDeCargaValor, i.TasaDeCargaValor, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'TasaDeCargaValor', d.TasaDeCargaValor, i.TasaDeCargaValor, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -170,7 +170,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(DEM, 0) FROM deleted) <> (SELECT ISNULL(DEM, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'DEM', d.DEM, i.DEM, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'DEM', d.DEM, i.DEM, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -181,7 +181,7 @@ BEGIN
 
 	IF ((SELECT ISNULL([DES], 0) FROM deleted) <> (SELECT ISNULL([DES], 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'DES', d.DES, i.DES, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'DES', d.DES, i.DES, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque >0) BEGIN
@@ -192,7 +192,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(TipoDeContrato_Id, 0) FROM deleted) <> (SELECT ISNULL(TipoDeContrato_Id, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'TipoDeContrato', d.TipoDeContrato_Id, i.TipoDeContrato_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'TipoDeContrato', d.TipoDeContrato_Id, i.TipoDeContrato_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -203,7 +203,7 @@ BEGIN
 	
 	IF ((SELECT ISNULL(ATAPuerto_Id, 0) FROM deleted) <> (SELECT ISNULL(ATAPuerto_Id, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ATAPuerto', d.ATAPuerto_Id, i.ATAPuerto_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ATAPuerto', d.ATAPuerto_Id, i.ATAPuerto_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -214,7 +214,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(AgenciaMaritimaPuerto_Id, 0) FROM deleted) <> (SELECT ISNULL(AgenciaMaritimaPuerto_Id, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion,d.id, 'NominacionDatoTecnico', 'AgenciaMaritimaPuerto', d.AgenciaMaritimaPuerto_Id, i.AgenciaMaritimaPuerto_Id, GETDATE()
+		SELECT @idNominacion,d.id, 'NominacionDatoTecnico', 'AgenciaMaritimaPuerto', d.AgenciaMaritimaPuerto_Id, i.AgenciaMaritimaPuerto_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -225,7 +225,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(Surveyor_Id, 0) FROM deleted) <> (SELECT ISNULL(Surveyor_Id, 0) FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'Surveyor', d.Surveyor_Id, i.Surveyor_Id, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'Surveyor', d.Surveyor_Id, i.Surveyor_Id, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN
@@ -236,7 +236,7 @@ BEGIN
 
 	IF ((SELECT ISNULL(ObservacionesSurveyor, '') FROM deleted) <> (SELECT ISNULL(ObservacionesSurveyor, '') FROM inserted)) BEGIN
 		INSERT INTO Auditoria
-		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ObservacionesSurveyor', d.ObservacionesSurveyor, i.ObservacionesSurveyor, GETDATE()
+		SELECT @idNominacion, d.id, 'NominacionDatoTecnico', 'ObservacionesSurveyor', d.ObservacionesSurveyor, i.ObservacionesSurveyor, GETDATE(), NULL
 		FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
 		IF (@idEmbarque > 0) BEGIN

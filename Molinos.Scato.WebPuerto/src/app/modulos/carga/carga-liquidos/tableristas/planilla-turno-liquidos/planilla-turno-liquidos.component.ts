@@ -28,6 +28,9 @@ import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { ToastrService } from 'ngx-toastr';
 import { LineaDeEmbarque } from '@ScatoEnums/lineaEmbarque';
+// <ARMOA005-1659 - Dylan Lopez>
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+// </ ARMOA005-1659 - Dylan Lopez>
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -98,6 +101,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private _builder: FormBuilder,
     private _modalService: NgbModal,
     private datePipe: DatePipe,
+    // <ARMOA005-1659 - Dylan Lopez>
+    private planoDeCargaService: PlanoDeCargaService,
+    // </ ARMOA005-1659 - Dylan Lopez>
     private procesoCalidadService: ProcesoCalidadService,
     private session: SessionService,
     private _turnosService: TurnosService,
@@ -1277,8 +1283,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   async onExportarExcelLiquido() {
+    // <ARMOA005-1659 - Dylan Lopez>
+    let destinos = '';
+    const res = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
+    res.planoDeCargaBodegas.forEach(pcb => {
+      pcb.destinos.forEach(des => {
+        destinos += des.destino.nombre + '|';
+      });
+      
+    });
+    destinos = destinos.substring(0, destinos.length - 1);
+    // </ ARMOA005-1659 - Dylan Lopez>
+    
     this.exportaPlanilla = true;
-
     if (this.toneladasLineas.length == 0) {
       this.addToneladasLineas();
     } else {
@@ -1286,7 +1303,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.addToneladasLineas();
     }
 
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
+    // <ARMOA005-1659 - Dylan Lopez>
+    // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas, destinos);
+    // </ ARMOA005-1659 - Dylan Lopez>
+
     this.exportaPlanilla = false;
   }
 

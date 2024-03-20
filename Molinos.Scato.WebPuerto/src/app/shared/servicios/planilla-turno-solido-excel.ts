@@ -305,7 +305,7 @@ export class PlanillaTurnoSolidoExcelService {
         const textoCuerpoMail = `Se enviara la planilla de turnos. \n
             Buque: ${nombreBuque}`;
         const inputTitle = "Destinatarios";
-        const mail = new Mail(`Planilla de turnos Solido Modulo de carga ${idModuloDeCarga}`, `${textoCuerpoMail}`);
+        const mail = new Mail(`Planilla de turnos Solido - ${nombreBuque}`, `${textoCuerpoMail}`);
         this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosSolido').subscribe(x => mail.destinatarios = x);
 
         const confirm = await this.confirmationDialogService.confirm(titulo, 'Cuerpo del Mail:', 'Enviar', 'Cancelar', 'lg', mail, null, inputTitle, true);
