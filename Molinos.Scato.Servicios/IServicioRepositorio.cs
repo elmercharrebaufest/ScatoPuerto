@@ -2030,6 +2030,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ListaPaginada<VaporDto> ListarVapores(Paginacion paginacion, string filtro);
+        
+        [OperationContract]
+        ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string filtro);
 
         [OperationContract]
         ListaPaginada<BodegaDto> ListarBodegas(Paginacion paginacion, string filtro);
@@ -2780,5 +2783,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
-    }
+
+		// <ARMOA005-1421 Dylan Lopez>
+		[OperationContract]
+		IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId);
+		// </ ARMOA005-1421 Dylan Lopez>
+	}
 }

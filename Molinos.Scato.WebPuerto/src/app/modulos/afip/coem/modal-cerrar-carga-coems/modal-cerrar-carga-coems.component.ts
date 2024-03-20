@@ -104,11 +104,15 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
       return;
     }
 
+    if (!this.fechaValida()) {
+      this.confirmationDialogService.alertar('No es posible remitir el cierre debido que supera las 48 horas hábiles a partir de la fecha/hora de Zarpada');
+      return;
+    }
+
     const confirm = await this.confirmationDialogService.confirm('Advertencia', `¿Está seguro de solicitar el cierre de carga?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
     if (!confirm) {
       return;
     }
-
     this.cargando = true;
     var solicitudCierreCargaDto: SolicitudCierreCargaDto = this.form.getRawValue();
     this.coemAfipService.solicitarCierreDeCarga(solicitudCierreCargaDto).subscribe(async () => {
@@ -127,6 +131,18 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
       this.confirmationDialogService.confirm('¡Error!', msj, 'Cerrar', '', null, null, Tipoalerta.Error);
       this.cargando = false;
     });
+  }
+
+  private fechaValida(): boolean {
+    let fechaMaxima = new Date(this.form.get('fechaZarpada').value);
+    let diasHabiles = 2;
+    while (diasHabiles) {
+      fechaMaxima.setDate(fechaMaxima.getDate() + 1);
+      if (fechaMaxima.getDay() !== 0 && fechaMaxima.getDay() !== 6) {
+        diasHabiles--;
+      }
+    }
+    return new Date() <= fechaMaxima;
   }
 
   private ValidadorCantidad(control: AbstractControl) {

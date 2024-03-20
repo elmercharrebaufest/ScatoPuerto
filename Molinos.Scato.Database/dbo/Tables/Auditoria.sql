@@ -8,6 +8,7 @@
     [ValorAnterior]		  NVARCHAR (MAX)   NULL,
     [ValorNuevo]          NVARCHAR (MAX)    NULL,
     [FechaModificacion]   DATETIME NOT      NULL, 
-    [UsuarioEjecuta] VARCHAR(40) NULL,
+    [UsuarioEjecuta] VARCHAR(40) NULL, 
+    [Accion] VARCHAR(180) NULL,
 )
    

@@ -58,15 +58,14 @@
                             [placeholder]="'Ingrese el Coordinador'"
                             [secondaryPlaceholder]="'Ingrese el Coordinador'"
                             [identifyBy]="'id'"
-                            [displayBy]="'name'"                            
-                            (onSelect)="ABM('Coordinador', 'Modificar-Eliminar')">
+                            [displayBy]="'name'">
                     <tag-input-dropdown [showDropdownIfEmpty]="true"
                                         [autocompleteItems]="coordinadoresList"
                                         [identifyBy]="'id'"
                                         [displayBy]="'name'">
                     </tag-input-dropdown>
                   </tag-input>
-                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Coordinador', 'Agregar')">
+                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="openModalCliente(addCliente)">
                 </div>
               </div>
 
@@ -507,4 +506,9 @@
   </ng-template>
   <!--PANTALLA ABM: AGREGAR, MOFIFICAR Y ELIMINAR-->
   <!----------------------------------------------->
+
+  <!--MODAL ALTA COORDINADOR/CLIENTE CON VALIDACIONES-->
+  <ng-template #addCliente let-modal>
+    <app-modal-crear-cliente [esAltaPrelineUp]="true" (altaEnPrelineUp)="onAddCliente($event)" (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
+  </ng-template>
 </div>

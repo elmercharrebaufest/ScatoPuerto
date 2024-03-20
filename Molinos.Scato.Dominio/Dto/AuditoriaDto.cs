@@ -13,6 +13,7 @@ namespace Molinos.Scato.Dominio.Dto
         public virtual string ValorNuevo { get; set; }
         public virtual DateTime FechaModificacion { get; set; }
         public virtual string UsuarioEjecucion { get; set; }
+        public virtual string Accion { get; set; }
     }
 }
 

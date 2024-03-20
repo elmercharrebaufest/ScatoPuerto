@@ -265,7 +265,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AfipCoemEstadoDto> ListarEstadosCoem()
         {
-            return Listar<AfipCoemEstado, AfipCoemEstadoDto>();
+            var estados = Listar<AfipCoemEstado, AfipCoemEstadoDto>();
+            return estados.OrderBy(x => x.Orden).ToList();
         }
 
         public void CambiarEstadoCoem(int idCoem, int idEstado)

@@ -43,7 +43,7 @@ label{
     height: 40px;
 }
 .celda-elimina-corte{
-    justify-content: flex-start;    
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
 }
@@ -69,11 +69,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .input_img input { margin:0;}
 select { margin: 0; height: 30px;}
 
-.imgClockInput1 { 
-    display:block; 
-    position:absolute; 
-    top:0.3rem; 
-    right: 0.3rem; 
+.imgClockInput1 {
+    display:block;
+    position:absolute;
+    top:0.3rem;
+    right: 0.3rem;
 }
 
 .label-float label{
@@ -250,7 +250,7 @@ table.turnos table.tabla-embebida th{
     flex: auto;
     height: 1rem;
     color: grey;
-    
+
 }
 .color-user{
     font-size: .9rem;
@@ -261,4 +261,14 @@ table.turnos table.tabla-embebida th{
 }
 .bandera{
     height: 38px;
+}
+
+.ver-obs-calidad {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ver-obs-calidad input {
+  transform: scale(1.5);
+  margin-right: 5px;
 }
