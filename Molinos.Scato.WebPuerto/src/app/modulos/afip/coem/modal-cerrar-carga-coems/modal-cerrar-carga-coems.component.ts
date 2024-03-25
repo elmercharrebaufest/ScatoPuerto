@@ -79,7 +79,7 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
     const formGroups = mercaderias.filter(m => !m.noABordo).map(mercaderia => this.formBuilder.group({
       identificadorDeclaracion: mercaderia.identificadorDeclaracion,
       fechaEmbarque: ['', Validators.required],
-      cantidadReal: ['', [Validators.required, this.ValidadorCantidad.bind(this)]],
+      cantidadReal: ['', { updateOn: 'blur', validators: [Validators.required, this.ValidadorCantidad.bind(this)] }],
       cantidadOriginal: [mercaderia.embalajes[0].peso]
     }));
     return this.formBuilder.array(formGroups);
@@ -153,9 +153,8 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
     }
     const porcentaje = this.esLiquido ? 0.02 : 0.04;
     const margen = cantidadOriginal * porcentaje;
-    const minimo = cantidadOriginal - margen;
     const maximo = cantidadOriginal + margen;
-    if (cantidad < minimo || cantidad > maximo) {
+    if (cantidad > maximo) {
       return { cantidadInvalida: true };
     }
     return null;
