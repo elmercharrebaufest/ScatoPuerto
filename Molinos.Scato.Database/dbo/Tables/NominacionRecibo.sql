@@ -35,7 +35,8 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 @exportadorPrevio NVARCHAR(60),
                 @exportadorNuevo NVARCHAR(60),
                 @destinoPrevio NVARCHAR(60),
-                @destinoNuevo NVARCHAR(60);
+                @destinoNuevo NVARCHAR(60),
+                @editado BIT = 0
 
         SELECT  @idEmbarque = N.Embarque_Id,
                 @dateDiff = DATEDIFF(SECOND, N.FechaCreacion, GETDATE()) -- Segundos entre la creación de la nominación y el insert de Exportador
@@ -62,13 +63,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 INSERT INTO Auditoria
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Exportador_Id', d.Exportador_Id, i.Exportador_Id, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Exportador Recibo N°', i.NumeroRecibo,
-                        ' (', @exportadorPrevio, ' -> ', @exportadorNuevo, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Exportador Recibo N°', i.NumeroRecibo,
+                      --  ' (', @exportadorPrevio, ' -> ', @exportadorNuevo, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+               --END 
             END
 
             -- Formato
@@ -77,12 +78,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Formato', d.Formato, i.Formato, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Formato Recibo N°', i.NumeroRecibo, 
-                        ' (', d.Formato, ' -> ', i.Formato, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                    --INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Formato Recibo N°', i.NumeroRecibo, 
+                        --' (', d.Formato, ' -> ', i.Formato, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Cantidad
@@ -90,13 +92,15 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 INSERT INTO Auditoria
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Cantidad', d.Cantidad, i.Cantidad, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                
+                SET @editado = 1;
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Cantidad Recibo N°', i.NumeroRecibo, 
-                        ' (', d.Cantidad, ' -> ', i.Cantidad, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                --IF (@idEmbarque > 0) BEGIN
+                    --INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Cantidad Recibo N°', i.NumeroRecibo, 
+                        --' (', d.Cantidad, ' -> ', i.Cantidad, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Unidad
@@ -105,12 +109,14 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Unidad', d.Unidad, i.Unidad, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Unidad Recibo N°', i.NumeroRecibo, 
-                        ' (', d.Unidad, ' -> ', i.Unidad, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Unidad Recibo N°', i.NumeroRecibo, 
+                      --  ' (', d.Unidad, ' -> ', i.Unidad, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Ajuste
@@ -119,12 +125,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'Ajuste', d.Ajuste, i.Ajuste, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Ajuste Recibo N°', i.NumeroRecibo, 
-                        ' (', d.Ajuste, ' -> ', i.Ajuste, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Ajuste Recibo N°', i.NumeroRecibo, 
+                      --  ' (', d.Ajuste, ' -> ', i.Ajuste, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Puerto de Carga
@@ -133,12 +140,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'PuertoDeCarga', d.PuertoDeCarga, i.PuertoDeCarga, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Puerto de carga Recibo N°', i.NumeroRecibo, 
-                        ' (', d.PuertoDeCarga, ' -> ', i.PuertoDeCarga, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                    --INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Puerto de carga Recibo N°', i.NumeroRecibo, 
+                      --  ' (', d.PuertoDeCarga, ' -> ', i.PuertoDeCarga, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Puerto de Descarga
@@ -147,12 +155,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'PuertoDeDescarga', d.PuertoDeDescarga, i.PuertoDeDescarga, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Puerto de descarga Recibo N°', i.NumeroRecibo, 
-                        ' (', d.PuertoDeDescarga, ' -> ', i.PuertoDeDescarga, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Puerto de descarga Recibo N°', i.NumeroRecibo, 
+                      --  ' (', d.PuertoDeDescarga, ' -> ', i.PuertoDeDescarga, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Descripcion Bienes
@@ -161,11 +170,12 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'DescripcionesBienes', d.DescripcionesBienes, i.DescripcionesBienes, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Descripción de bienes Recibo N°', i.NumeroRecibo), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Descripción de bienes Recibo N°', i.NumeroRecibo), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Recibos por dia
@@ -174,12 +184,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'RecibosPorDia', d.RecibosPorDia, i.RecibosPorDia, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Recibos por día Recibo N°', i.NumeroRecibo, 
-                        ' (', CASE d.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ' -> ', CASE i.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                    --INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Recibos por día Recibo N°', i.NumeroRecibo, 
+                    --    ' (', CASE d.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ' -> ', CASE i.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ')'), GETDATE() 
+                  --  FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Mostrar Destinos
@@ -188,12 +199,13 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'MostrarDestinos', d.MostrarDestinos, i.MostrarDestinos, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Mostrar destinos Recibo N°', i.NumeroRecibo, 
-                        ' (', CASE d.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ' -> ', CASE i.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                  --  SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Mostrar destinos Recibo N°', i.NumeroRecibo, 
+                    --    ' (', CASE d.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ' -> ', CASE i.RecibosPorDia WHEN 1 THEN 'SI' ELSE 'NO' END, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
 
             -- Mostrar Bodegas
@@ -202,13 +214,20 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
                 SELECT d.Nominacion_Id, d.id, 'NominacionRecibo', 'MostrarBodegas', d.MostrarBodegas, i.MostrarBodegas, GETDATE(), NULL, NULL
                 FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
 
-                IF (@idEmbarque > 0) BEGIN
-                    INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                    SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Mostrar bodegas Recibo N°', i.NumeroRecibo, 
-                        ' (', CASE d.MostrarBodegas WHEN 1 THEN 'SI' ELSE 'NO' END, ' -> ', CASE i.MostrarBodegas WHEN 1 THEN 'SI' ELSE 'NO' END, ')'), GETDATE() 
-                    FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
-                END
+                SET @editado = 1;
+                --IF (@idEmbarque > 0) BEGIN
+                  --  INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                    --SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Mostrar bodegas Recibo N°', i.NumeroRecibo, 
+                      --  ' (', CASE d.MostrarBodegas WHEN 1 THEN 'SI' ELSE 'NO' END, ' -> ', CASE i.MostrarBodegas WHEN 1 THEN 'SI' ELSE 'NO' END, ')'), GETDATE() 
+                    --FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+                --END
             END
+             
+            IF (@idEmbarque > 0 AND @editado = 1) BEGIN
+                   INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
+                   SELECT 9, CONCAT('Se ha editado el recibo (' , i.NumeroRecibo ,') del embarque ', @nombreEmbarque, ' - ', @muelle), GETDATE() 
+                   FROM deleted AS d JOIN inserted AS i ON d.Id = i.Id
+            END 
         END
         -- INSERT (Excepto que sea en el mismo momento de la creación de la nominación)
         ELSE IF EXISTS (SELECT 1 FROM inserted) AND (@dateDiff > 5) BEGIN
@@ -218,7 +237,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
 
             IF (@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Nuevo Recibo (', NumeroRecibo, ')'), GETDATE()
+                SELECT 9, CONCAT('Se ha agregado un nuevo recibo al embarque ', @nombreEmbarque, ' - ', @muelle), GETDATE()
                 FROM inserted
             END
         END
@@ -230,7 +249,7 @@ CREATE TRIGGER [dbo].[Trigger_NominacionRecibo]
 
             IF (@idEmbarque > 0) BEGIN
                 INSERT INTO NotificacionProgramaDeEmbarque (TipoAlerta, Mensaje, Fecha)
-                SELECT 9, CONCAT('Se ha editado el embarque ', @nombreEmbarque, ' - ', @muelle, ': Recibo eliminado (', NumeroRecibo, ')'), GETDATE()
+                SELECT 9, CONCAT('Se ha eliminado un recibo al embarque ', @nombreEmbarque, ' - ', @muelle), GETDATE()
                 FROM deleted 
             END
         END
