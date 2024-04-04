@@ -269,9 +269,7 @@
                                                 </td>
                                             </tr>
 
-                                            <tr
-                                                *ngIf='getObservacionTurnos(d, t) ? getObservacionTurnos(d, t).length <= 0 : false'>
-
+                                            <tr *ngIf='getObservacionTurnos(d, t).length == 0 || !verObservacionesCalidad'>
                                             </tr>
 
                                         </ng-container>

@@ -130,48 +130,47 @@ export class PlanillaTurnoSolidoExcelService {
         });
     }
     private setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, esTurnoSinDetalle: boolean = false, verObservacionesCalidad: boolean = true) {
-        const nombreTurno = turno.turnoPuerto.nombre;
-        let inicioTurnoMerge = offset;
-        let finTurnoMerge    = inicioTurnoMerge;
-        let kilos: number = 0;
-        turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido.forEach(item => {
-          kilos+= item.cantidad;
-        });
-        console.log('kilos --->>', kilos)
-        if(esTurnoSinDetalle){
-            let numeroObservaciones = verObservacionesCalidad ? turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length : 0;
-            numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
-            inicioTurnoMerge+=1;
-            finTurnoMerge    = inicioTurnoMerge;
-            finTurnoMerge += numeroObservaciones;
-
-            worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
-            worksheet.getCell(`B${inicioTurnoMerge}`).value = nombreTurno;
-            worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true}
-            worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
-        }else{
-            let registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length - 1;
-
-            if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
-              registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length
-              const registroCorte = turno.moduloDeCargaPlanillaDeTurnosCortes.length;
-              registrosTurno += registroCorte;
-            }
-
-            let numeroObservaciones = verObservacionesCalidad ? turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length : 0;
-            numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
-            registrosTurno += numeroObservaciones;
-            let kilos: number = 0;
-            turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach(item => {
-              kilos += item.cantidad;
-            });
-            let finTurnoMerge = offset + registrosTurno;
-            worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
-            worksheet.getCell(`B${inicioTurnoMerge}`).value = `${nombreTurno} \r\n ${kilos} kg`;
-            worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true}
-            worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
-            worksheet.getCell(`B${offset}`).border = borders;
+      const nombreTurno = turno.turnoPuerto.nombre;
+      let inicioTurnoMerge = offset;
+      let finTurnoMerge = inicioTurnoMerge;
+      if (esTurnoSinDetalle) {
+        inicioTurnoMerge += 1;
+        finTurnoMerge = inicioTurnoMerge;
+        if (verObservacionesCalidad) {
+          let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
+          numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
+          finTurnoMerge += numeroObservaciones;
         }
+
+        worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
+        worksheet.getCell(`B${inicioTurnoMerge}`).value = nombreTurno;
+        worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+        worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
+      } else {
+        let registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length - 1;
+
+        if (turno.moduloDeCargaPlanillaDeTurnosCortes.length > 0) {
+          registrosTurno = turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length
+          const registroCorte = turno.moduloDeCargaPlanillaDeTurnosCortes.length;
+          registrosTurno += registroCorte;
+        }
+
+        if (verObservacionesCalidad) {
+          let numeroObservaciones = turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length;
+          numeroObservaciones = numeroObservaciones > 0 ? numeroObservaciones + 1 : numeroObservaciones;
+          registrosTurno += numeroObservaciones;
+        }
+        let kilos: number = 0;
+        turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach(item => {
+          kilos += item.cantidad;
+        });
+        let finTurnoMerge = offset + registrosTurno;
+        worksheet.mergeCells(`B${inicioTurnoMerge}:B${(finTurnoMerge)}`);
+        worksheet.getCell(`B${inicioTurnoMerge}`).value = `${nombreTurno} \r\n ${kilos} kg`;
+        worksheet.getCell(`B${inicioTurnoMerge}`).alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+        worksheet.getCell(`B${inicioTurnoMerge}`).border = borders;
+        worksheet.getCell(`B${offset}`).border = borders;
+      }
     }
 
     private setDetallePlanillaTurno(turno, worksheet, offset, borders) {
@@ -398,7 +397,7 @@ export class PlanillaTurnoSolidoExcelService {
           numeroTurno += 1;
           /* Planilla de turnos */
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length == 0)
-            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, verObservacionesCalidad);
+            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, null, verObservacionesCalidad);
 
           if (turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0) {
 
@@ -407,7 +406,7 @@ export class PlanillaTurnoSolidoExcelService {
             offset = offset + 1;
 
             // Cargando Agrupador de Turnos
-            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, verObservacionesCalidad);
+            this.setAgrupadorTurnos(turno, worksheet, offset, numeroTurno, totalNumeroTurnos, borders, null, verObservacionesCalidad);
 
             turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.forEach((turno: any, index) => {
               this.setDetallePlanillaTurno(turno, worksheet, offset, borders);

@@ -730,18 +730,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurno(turnos);
     }
-    if (this.diasTurno.length == 1) {
-      contador += 1;
-    } else {
-      contador++;
-    }
+    contador += 1;
     return contador;
   }
 
   getRowSpanTurno(turno: any) {
     let registroLiquido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls.length + 2; // tamaño del detalle de cada turno
     const registroCorte = 1; // tamaño del corte
-    const registroCalidad = this.verObservacionesCalidad ? 1 : 0; // tamaño de la observacion
+    const registroCalidad = 1; // tamaño de la observacion
     let numeroRegistros = registroLiquido + registroCorte + registroCalidad;
     return numeroRegistros;
   }

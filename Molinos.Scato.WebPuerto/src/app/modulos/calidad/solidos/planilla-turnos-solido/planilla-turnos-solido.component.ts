@@ -720,7 +720,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   getRowSpanTurno(turno: any) {
     let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length + 1; // tamaño del detalle de cada turno
     const registroCorte = 1; // tamaño del corte
-    const registroCalidad = this.verObservacionesCalidad ? 1 : 0; // tamaño de la observacion
+    const registroCalidad = 1; // tamaño de la observacion
     const numeroRegistros = registroSolido + registroCorte + registroCalidad;
     return numeroRegistros;
   }
