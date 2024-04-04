@@ -76,9 +76,13 @@ namespace Molinos.Scato.Servicios.Impl
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
             var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
 
-            if (ExisteClienteEnEmbarqueActivo(clienteBd))
+            if (ExisteClienteNominacionActiva(clienteBd))
             {
-                throw new Exception("No se puede modificar al cliente ya que esta siendo utilizado en un embarque.");
+                throw new Exception("No se puede modificar al cliente ya que esta siendo utilizado en una nominación activa.");
+            }
+            if (ExisteClienteLineUp(clienteBd))
+            {
+                throw new Exception("No se puede modificar al cliente ya que el mismo se encuentra en LineUp.");
             }
 
             if (clienteMismoNombre != null && clienteMismoNombre.Habilitado)
@@ -200,9 +204,13 @@ namespace Molinos.Scato.Servicios.Impl
         public void DeshabilitarCliente(CoordinadorPuertoDto clienteDto)
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
-            if (ExisteClienteEnEmbarqueActivo(clienteBd))
+            if (ExisteClienteNominacionActiva(clienteBd))
             {
-                throw new Exception("No se puede eliminar al cliente ya que esta siendo utilizado en un embarque.");
+                throw new Exception("No se puede eliminar al cliente ya que esta siendo utilizado en una nominación activa.");
+            }
+            if (ExisteClienteLineUp(clienteBd))
+            {
+                throw new Exception("No se puede eliminar al cliente ya que el mismo se encuentra en LineUp.");
             }
             try
             {
@@ -230,29 +238,23 @@ namespace Molinos.Scato.Servicios.Impl
             return new CoordinadorPuertoDto { Id = cliente.Id, Nombre = cliente.Nombre, Habilitado = cliente.Habilitado };
         }
 
-        private bool ExisteClienteEnEmbarqueActivo(CoordinadorPuerto clienteBd)
+        private bool ExisteClienteNominacionActiva(CoordinadorPuerto clienteBd)
         {
-            var embarques = (from e in repositorio.Listar<Embarque>()
-                     join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
-                     where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
-                     select (e)).ToList();
+            var existeNominacion = (from n in repositorio.Listar<Nominacion>()
+                                    where !n.FechaEliminacion.HasValue && !n.FechaEnvioLineUp.HasValue &&
+                                    n.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Any(c => c.CoordinadorPuerto.Id == clienteBd.Id)
+                                    select (n)).Any();
+            return existeNominacion;
+        }
 
-            HashSet<int> idsClientes = new HashSet<int>();
-            foreach (var e in embarques)
-            {
-                foreach (var c in e.Coordinadores)
-                {
-                    idsClientes.Add(c.CoordinadorPuerto.Id);
-                }
-            }
-            if (idsClientes.Contains(clienteBd.Id))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        private bool ExisteClienteLineUp(CoordinadorPuerto clienteBd)
+        {
+            var existeEmbarque = (from e in repositorio.Listar<Embarque>()
+                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
+                             where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0 &&
+                             e.Coordinadores.Any(c => c.CoordinadorPuerto.Id == clienteBd.Id)
+                             select (e)).Any();
+            return existeEmbarque;
         }
     }
 }

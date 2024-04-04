@@ -15,7 +15,6 @@ namespace Molinos.Scato.Servicios
     [ServiceContract]
     public interface IServicioVapor
     {
-
         [OperationContract]
         ListaPaginada<VaporInformacionDto> ListarVaporInformacion(Paginacion paginacion, string buque = null, string imo = null, List<string> tipoBuque = null, string bandera = null);
 
@@ -27,6 +26,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         string ValidarBuque(string bandera, string nombreBuque, string IMO, int? id);
-
+        
+        [OperationContract]
+        void DeshabilitarVapor(VaporDto vapor);
     }
 }

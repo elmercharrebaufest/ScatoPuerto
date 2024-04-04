@@ -795,7 +795,7 @@ namespace Molinos.Scato.Servicios.Impl
         }
         public IList<VaporDto> ObtenerVapores()
         {
-            return Listar<Vapor, VaporDto>();
+            return Listar<Vapor, VaporDto>(v => v.Habilitado);
         }
 
         public IList<ProvinciaDto> ListarProvinciasPorPais(int paisId)

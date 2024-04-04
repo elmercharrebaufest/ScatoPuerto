@@ -143,7 +143,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<VaporInformacion, VaporInformacionDto>();
+                return Listar<VaporInformacion, VaporInformacionDto>(v => v.Vapor.Habilitado);
             }
             catch (Exception ex)
             {

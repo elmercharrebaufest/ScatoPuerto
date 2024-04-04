@@ -767,7 +767,7 @@ if not exists(select 1 from TasaDeCarga where Descripcion = 'WWD SHINC') begin i
 --Scripts CompaniaDeFumigacion
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'AB GROUP') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('AB GROUP','abgroup@group-ab.com') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN SAN LORENZO') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN SAN LORENZO','rosario@fugran.com; ship@fugran.com') end
-if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN BAHIA BLANCA') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN BAHIA BLANCA','bblanca@fugran.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN BAHIA BLANCA') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN BAHIA BLANCA','bblanca@fugran.com; ship@fugran.com') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'PROFUM') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('PROFUM','fumigaciones@profum.com.ar; sanlorenzo@profum.com.ar') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'AGROFUM') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('AGROFUM','agrofum@agrofum.com') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'PEST CONTROL') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('PEST CONTROL','administracion@pestcontrolarg.com.ar; comercial@pestcontrolarg.com.ar') end

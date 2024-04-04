@@ -42,7 +42,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 from vaporInfos in vaporJoined.DefaultIfEmpty()
                                 where (Buque == null || vapor.Nombre.ToUpper().StartsWith(Buque)) &&
                                 (IMO == null || vaporInfos.ImoVapor.ToUpper().StartsWith(IMO)) &&
-                                (Bandera == null || vaporInfos.Bandera.Nombre.ToUpper().StartsWith(Bandera))
+                                (Bandera == null || vaporInfos.Bandera.Nombre.ToUpper().StartsWith(Bandera)) &&
+                                (vapor.Habilitado == true)
                                 orderby vapor.Nombre ascending
                                 select new VaporInformacionDto
                                 {

@@ -124,7 +124,8 @@
                             [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'puntual' && orderDirection < 0 }"></i>
                     </span>
                 </div>
-            </th>                 
+            </th>          
+            <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>       
             <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
         </tr>
         </thead>
@@ -147,6 +148,9 @@
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.puntual}} mt</td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarBuque()' (click)="editarVapor(vapor.vaporId, addVapor, vapor.nombreBuque, vapor.banderaInformacion, vapor.imoVapor)">
                     <div class='icon-editar cursor'></div>
+                </td>
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoEliminarBuque()' (click)="eliminarVapor(vapor)">
+                    <div class='icon-eliminar cursor'></div>
                 </td>
                 <!-- <td class="noBorder-left centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
                     <img  src="assets/trashIcon-no-border.svg" class="eliminar cursor">
