@@ -22,14 +22,18 @@ namespace Molinos.Scato.Dominio.Dto
         public IEnumerable<ProductoExportadorDto> ProductoExportador { get; set; }
         public decimal TotalRitmoBaja { get; set; }
         public decimal TotalRitmoNormal { get; set; }
-        public string AgenciaControlPrivado { get; set; }
+        public string AgenciaControlPrivado { get; set; } 
         public double HorasMuelle { get; set; }
         public int ModuloDeCargaId { get; set; }
         public int LineUpId { get; set; }
         public string HoraAmarro { get; set; }
         public string HoraDesamarro { get; set; }
         public string NombreMuelle { get; set; }
-        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; }
+        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; } 
+        public int ItemsTotales { get; set; } = 0;
+        public int Pagina { get; set; } = 0;
+        public int ItemsPorPagina { get; set; } = 0;
+
     }
     public class ProductoExportadorDto
     {

@@ -8,12 +8,15 @@ import { HistorialBuquesComponent } from './historial-buques/historial-buques.co
 import { BuqueFilterPipe } from './buques-pipe-filter';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { CargaModule } from '../carga/carga.module';
+import { MatPaginatorModule } from '@angular/material/paginator';
+
 @NgModule({
   imports: [
     CommonModule,
     SharedModule,
     BuquesRoutingModule,
     CargaModule,
+    MatPaginatorModule,
     NgMultiSelectDropDownModule.forRoot(),
   ],
   declarations: [

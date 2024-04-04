@@ -95,7 +95,9 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
       ata: '',
       nombreExportador: '',
       desde: this.AnioMesActual(),
-      hasta: this.AnioMesActual()
+      hasta: this.AnioMesActual(),
+      pagina: 0,
+      itemsPorPagina: 10
     });
   }
 

@@ -12233,12 +12233,20 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
             }
         }
-        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null)
+        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null)
         {
-            var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
-            var historial = repositorio.ListarConsulta(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto));
-            CompletarDatosHistorialDeEmbarque(historial);
-            return historial;
+            try
+            {
+                var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
+                var historial = repositorio.ListarConsultaPaginada(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto, paginacion)).ToList();
+                CompletarDatosHistorialDeEmbarque(historial);
+                return historial;
+            }
+            catch(Exception e)
+            {
+                log.Error("Hubo un error al intentar obtener historial de embarques: ", e);
+                throw e;
+            }
         }
         public IList<NominacionDto> ListarNominaciones(int idEmbarque)
         {
