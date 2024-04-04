@@ -71,6 +71,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         vaporInformacion_Db.Manga = comando.VaporInformacion.Manga;
                         vaporInformacion_Db.Puntual = comando.VaporInformacion.Puntual;
                         vaporInformacion_Db.CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks;
+                        AgregarAuditoriaEdicion(comando.VaporInformacion);
                     }
                     else
                     {
@@ -91,7 +92,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks,
                         };
                         Repositorio.Agregar(vaporInformacion_Db);
-                    }                
+                        AgregarAuditoriaAlta(comando.VaporInformacion);
+                    }
 
                     Repositorio.GuardarCambios();
                     transaction.Complete();
@@ -134,6 +136,32 @@ namespace Molinos.Scato.Servicios.Procesamiento
         private bool TieneEmbarqueAsociado(CrearBuque comando)
         {
             return Repositorio.Existe<Embarque>(x => comando.VaporInformacion.VaporId == x.Vapor.Id);
+        }
+        private void AgregarAuditoriaAlta(VaporInformacionDto vapor)
+        {
+            var auditoria = new Auditoria
+            {
+                Entidad_Id = 0,
+                EntidadNombre = "Vapor",
+                UsuarioEjecuta = vapor.Usuario,
+                Propiedad = "Nombre",
+                ValorNuevo = vapor.NombreBuque,
+                FechaModificacion = DateTime.Now,
+                Accion = "Registro de vapor."
+            };
+            Repositorio.Agregar(auditoria);
+        }
+        private void AgregarAuditoriaEdicion(VaporInformacionDto vapor)
+        {
+            var auditoria = new Auditoria
+            {
+                Entidad_Id = vapor.VaporId,
+                EntidadNombre = "Vapor",
+                UsuarioEjecuta = vapor.Usuario,
+                FechaModificacion = DateTime.Now,
+                Accion = "Edicion de vapor."
+            };
+            Repositorio.Agregar(auditoria);
         }
     }
 }
