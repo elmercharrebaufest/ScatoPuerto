@@ -86,6 +86,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\EnvioMailZarpado.cs" />
     <Compile Include="Comandos\CrearHistoricoEmbarqueLineUp.cs" />
+    <Compile Include="Dto\ActoresDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRectificarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRegistrarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCierreCargaDto.cs" />

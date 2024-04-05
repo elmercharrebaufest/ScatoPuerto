@@ -2744,7 +2744,7 @@ namespace Molinos.Scato.Servicios
         Dictionary<string, int> ObtenerIdsUsuales(int idEmbarque);
 
         [OperationContract]
-        Dictionary<string, object> ObtenerActores(int idEmbarque);
+        ActoresDto ObtenerActores(int idEmbarque);
 
         [OperationContract]
         EmbarqueInformacionDto obtenerEmbarqueInformacion(int idEmbarque);

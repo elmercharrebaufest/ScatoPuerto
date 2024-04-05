@@ -11912,21 +11912,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        public Dictionary<string, object> ObtenerActores(int idEmbarque)
+        public ActoresDto ObtenerActores(int idEmbarque)
         {
             try
             {
-                #region variables
-                string[] coordinadores = new string[] { };
-                string ata = "-";
-                string agenciaMaritima = "-";
-                string estiba = "-";
-                string agenciaControlPrivado = "-";
-                string encargado = "-";
-                #endregion
-
+                ActoresDto actores = new ActoresDto();
+              
                 #region obtener datos
-                Dictionary<string, object> actoresEmbarque = new Dictionary<string, object>();
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
                 Embarque embarque = lineUp.Embarque;
                 PlanoDeCarga plano = lineUp.PlanoDeCarga;
@@ -11934,39 +11926,31 @@ namespace Molinos.Scato.Servicios.Impl
 
                 #region comprobaciones
                 if (embarque.Coordinadores != null)
-                    coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
+                    actores.Coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
 
                 if (embarque.ATA != null)
-                    ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
+                    actores.Ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
 
                 if (embarque.Agencias != null)
-                    agenciaMaritima = embarque.Agencias != null ? embarque.Agencias.Nombre : "";
+                    actores.AgenciaMaritima = embarque.Agencias != null ? embarque.Agencias.Nombre : "";
 
                 if (plano.Estiba != null)
-                    estiba = (plano.Estiba.Nombre != null ? plano.Estiba.Nombre : "") + ' ' + (plano.Estiba.Apellido != null ? plano.Estiba.Apellido : "");
+                    actores.Estiba = (plano.Estiba.Nombre != null ? plano.Estiba.Nombre : "") + ' ' + (plano.Estiba.Apellido != null ? plano.Estiba.Apellido : "");
 
                 if (plano.AgenciaControlPrivado != null)
-                    agenciaControlPrivado = plano.AgenciaControlPrivado != null ? plano.AgenciaControlPrivado.Nombre : "";
+                    actores.AgenciaControlPrivado = plano.AgenciaControlPrivado != null ? plano.AgenciaControlPrivado.Nombre : "";
 
                 if (plano.AgentesControlPrivado != null && plano.AgentesControlPrivado.Count != 0)
                 {
-                    encargado = plano.AgentesControlPrivado.First().name;
+                    actores.Encargado = plano.AgentesControlPrivado.First().name;
                 }
                 #endregion
-                #region llenarLista
-                actoresEmbarque.Add("coordinadores", coordinadores);
-                actoresEmbarque.Add("ata", ata);
-                actoresEmbarque.Add("agenciaMaritima", agenciaMaritima);
-                actoresEmbarque.Add("estiba", estiba);
-                actoresEmbarque.Add("agenciaControlPrivado", agenciaControlPrivado);
-                actoresEmbarque.Add("encargado", encargado);
-                #endregion
 
-                return actoresEmbarque;
+                return actores;
             }
             catch (Exception ex)
             {
-
+                log.Error(ex, "Error en metodo: ObtenerActores -> idEmbarque:" + idEmbarque);
                 throw ex;
             }
 
