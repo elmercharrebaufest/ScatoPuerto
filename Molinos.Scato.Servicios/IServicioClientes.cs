@@ -16,13 +16,13 @@ namespace Molinos.Scato.Servicios
         ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null);
         
         [OperationContract]
-        void GuardarCliente(CoordinadorPuertoDto clienteDto);
+        void GuardarCliente(CoordinadorPuertoDto clienteDto, string usuario);
 
         [OperationContract]
         CoordinadorPuertoDto ObtenerCliente(int id);
 
         [OperationContract]
-        void DeshabilitarCliente(CoordinadorPuertoDto clienteDto);
+        void DeshabilitarCliente(CoordinadorPuertoDto clienteDto, string usuario);
 
     }
 }

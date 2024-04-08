@@ -4,13 +4,9 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
-using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -27,7 +23,7 @@ namespace Molinos.Scato.Servicios.Impl
             this.log = log;
         }
 
-        public void GuardarCliente(CoordinadorPuertoDto clienteDto)
+        public void GuardarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             if (String.IsNullOrEmpty(clienteDto.Nombre))
                 throw new Exception("Es obligatorio ingresar un nombre.");
@@ -36,15 +32,15 @@ namespace Molinos.Scato.Servicios.Impl
 
             if (clienteDto.Id > 0)
             {
-                this.EditarCliente(clienteDto);
+                this.EditarCliente(clienteDto, usuario);
             }
             else
             {
-                this.RegistrarCliente(clienteDto);
+                this.RegistrarCliente(clienteDto, usuario);
             }
         }
 
-        private void RegistrarCliente(CoordinadorPuertoDto clienteDto)
+        private void RegistrarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
             if (clienteBd != null && clienteBd.Habilitado)
@@ -55,14 +51,13 @@ namespace Molinos.Scato.Servicios.Impl
                 clienteDto.Id = clienteBd.Id;
                 clienteDto.Nombre = clienteBd.Nombre;
                 clienteDto.Habilitado = true;
-                this.HabilitarCliente(clienteDto, clienteBd);
+                this.HabilitarCliente(clienteDto, usuario);
                 return;
             }
 
             try
             {
-                comandos.Ejecutar(new CrearCoordinadorPuerto { Dto = clienteDto });
-                this.RegistrarAuditoriaAlta(clienteDto);
+                comandos.Ejecutar(new CrearCoordinadorPuerto { Dto = clienteDto, Usuario = usuario });
             }
             catch (Exception ex)
             {
@@ -71,7 +66,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        private void EditarCliente(CoordinadorPuertoDto clienteDto)
+        private void EditarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
             var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
@@ -95,17 +90,20 @@ namespace Molinos.Scato.Servicios.Impl
                 clienteDto.Id = clienteMismoNombre.Id;
                 clienteDto.Nombre = clienteMismoNombre.Nombre;
                 clienteDto.Habilitado = true;
-                this.HabilitarCliente(clienteDto, clienteBd);
-                this.DeshabilitarCliente(new CoordinadorPuertoDto { Id = clienteBd.Id, 
-                Nombre = clienteBd.Nombre, Usuario = clienteDto.Usuario});
+                this.HabilitarCliente(clienteDto, usuario);
+                this.DeshabilitarCliente(new CoordinadorPuertoDto
+                {
+                    Id = clienteBd.Id,
+                    Nombre = clienteBd.Nombre,
+                    Usuario = clienteDto.Usuario
+                }, usuario);
                 return;
             }
 
             try
             {
                 var valorAnterior = clienteBd.Nombre;
-                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto });
-                this.RegistrarAuditoriaEdicion(clienteDto, valorAnterior);
+                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto, Usuario = usuario });
             }
             catch (Exception ex)
             {
@@ -114,12 +112,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        private void HabilitarCliente(CoordinadorPuertoDto clienteDto, CoordinadorPuerto clienteBd)
+        private void HabilitarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             try
             {
-                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto });
-                this.RegistrarAuditoriaHabilitacion(clienteDto);
+                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto, Usuario = usuario });
             }
             catch (Exception ex)
             {
@@ -128,80 +125,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        private void RegistrarAuditoriaAlta(CoordinadorPuertoDto clienteDto)
-        {
-            var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper() == clienteDto.Nombre.ToUpper());
-
-            var auditoria = new Auditoria
-            {
-                Entidad_Id = clienteBd != null ? clienteBd.Id : 0,
-                EntidadNombre = "CoordinadorPuerto",
-                UsuarioEjecuta = clienteDto.Usuario,
-                ValorNuevo = clienteDto.Nombre,
-                Propiedad = "Nombre",
-                FechaModificacion = DateTime.Now,
-                Accion = "Registro de cliente."
-            };
-
-            this.repositorio.Agregar(auditoria);
-            this.repositorio.GuardarCambios();
-        }
-
-        private void RegistrarAuditoriaEdicion(CoordinadorPuertoDto clienteDto, string valorAnterior)
-        {
-            var auditoria = new Auditoria
-            {
-                Entidad_Id = clienteDto.Id,
-                EntidadNombre = "CoordinadorPuerto",
-                UsuarioEjecuta = clienteDto.Usuario,
-                ValorAnterior = valorAnterior,
-                ValorNuevo = clienteDto.Nombre,
-                Propiedad = "Nombre",
-                FechaModificacion = DateTime.Now,
-                Accion = "Edicion de cliente."
-            };
-
-            this.repositorio.Agregar(auditoria);
-            this.repositorio.GuardarCambios();
-        }
-
-        private void RegistrarAuditoriaHabilitacion(CoordinadorPuertoDto clienteDto)
-        {
-            var auditoria = new Auditoria
-            {
-                Entidad_Id = clienteDto.Id,
-                EntidadNombre = "CoordinadorPuerto",
-                UsuarioEjecuta = clienteDto.Usuario,
-                ValorAnterior = "0",
-                ValorNuevo = "1",
-                Propiedad = "Habilitado",
-                FechaModificacion = DateTime.Now,
-                Accion = "Habilita cliente."
-            };
-
-            this.repositorio.Agregar(auditoria);
-            this.repositorio.GuardarCambios();
-        }
-
-        private void RegistrarAuditoriaDeshabilitacion(CoordinadorPuertoDto clienteDto)
-        {
-            var auditoria = new Auditoria
-            {
-                Entidad_Id = clienteDto.Id,
-                EntidadNombre = "CoordinadorPuerto",
-                UsuarioEjecuta = clienteDto.Usuario,
-                ValorAnterior = "1",
-                ValorNuevo = "0",
-                Propiedad = "Habilitado",
-                FechaModificacion = DateTime.Now,
-                Accion = "Deshabilita cliente."
-            };
-
-            this.repositorio.Agregar(auditoria);
-            this.repositorio.GuardarCambios();
-        }
-
-        public void DeshabilitarCliente(CoordinadorPuertoDto clienteDto)
+        public void DeshabilitarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
             if (ExisteClienteNominacionActiva(clienteBd))
@@ -215,8 +139,7 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 clienteDto.Habilitado = false;
-                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto });
-                this.RegistrarAuditoriaDeshabilitacion(clienteDto);
+                comandos.Ejecutar(new ModificarCoordinadorPuerto { Dto = clienteDto, Usuario = usuario });
             }
             catch (Exception ex)
             {
@@ -250,10 +173,10 @@ namespace Molinos.Scato.Servicios.Impl
         private bool ExisteClienteLineUp(CoordinadorPuerto clienteBd)
         {
             var existeEmbarque = (from e in repositorio.Listar<Embarque>()
-                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
-                             where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0 &&
-                             e.Coordinadores.Any(c => c.CoordinadorPuerto.Id == clienteBd.Id)
-                             select (e)).Any();
+                                  join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
+                                  where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0 &&
+                                  e.Coordinadores.Any(c => c.CoordinadorPuerto.Id == clienteBd.Id)
+                                  select (e)).Any();
             return existeEmbarque;
         }
     }

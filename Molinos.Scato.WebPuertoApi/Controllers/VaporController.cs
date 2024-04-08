@@ -94,8 +94,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                vaporDto.Usuario = base.nombreUsuario;
-                servicioVapor.DeshabilitarVapor(vaporDto);
+                string usuario = base.nombreUsuario;
+                servicioVapor.DeshabilitarVapor(vaporDto, usuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

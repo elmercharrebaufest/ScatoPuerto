@@ -41,6 +41,8 @@ using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Microsoft.Identity.Client;
+using Molinos.Scato.Servicios.GestionarCartasDePortePE;
+
 namespace Molinos.Scato.Servicios.Impl
 {
     public class ServicioRepositorio : IServicioRepositorio
@@ -12312,20 +12314,18 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var reciboBd = this.repositorio.Obtener<ReciboDeBuque>(r => r.Id == recibo.Id);
                 reciboBd.Habilitado = false;
-                var nominacionRecibo = this.repositorio.Obtener<Nominacion>(n => n.Embarque.Id == reciboBd.Embarque.Id);
+                var reciboDto = conversor.Convertir<ReciboDeBuque, ReciboDeBuqueDto>(reciboBd);
 
-                var regAuditoria = new Auditoria
+                var logBaja = new LogABM
                 {
-                    Nominacion_Id = nominacionRecibo != null ? nominacionRecibo.Id : 0,
-                    Entidad_Id = reciboBd.Id,
-                    EntidadNombre = "ReciboDeBuque",
-                    Propiedad = "Habilitado",
-                    ValorAnterior = "1",
-                    ValorNuevo = "0",
-                    FechaModificacion = DateTime.Now,
-                    UsuarioEjecuta = nombreUsuario
+                    Pantalla = "DeshabilitarReciboBuque",
+                    Usuario = nombreUsuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Baja,
+                    Entidad = reciboDto.ToJson(),
+                    ClaseId = reciboDto.Id
                 };
-                this.repositorio.Agregar(regAuditoria);
+                this.repositorio.Agregar(logBaja);
                 this.repositorio.GuardarCambios();
             }
             catch (Exception e)

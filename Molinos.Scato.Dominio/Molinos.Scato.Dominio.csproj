@@ -84,6 +84,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
+    <Compile Include="Comandos\EliminarBuque.cs" />
     <Compile Include="Comandos\EnvioMailZarpado.cs" />
     <Compile Include="Comandos\CrearHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Dto\ActoresDto.cs" />

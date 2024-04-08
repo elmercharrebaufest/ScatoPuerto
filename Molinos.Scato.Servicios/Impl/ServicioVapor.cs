@@ -104,7 +104,7 @@ namespace Molinos.Scato.Servicios.Impl
         #endregion
 
         #region Eliminar Buque
-        public void DeshabilitarVapor(VaporDto vapor)
+        public void DeshabilitarVapor(VaporDto vapor, string usuario)
         {
             if (ExisteNominacionActivaBuque(vapor))
                 throw new Exception("No se puede eliminar el buque debido a que él mismo esta siendo utilizado" +
@@ -114,10 +114,8 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception("No se puede eliminar el buque debido a que él mismo se encuentra actualmente en LineUp");
             try
             {
-                vapor.Habilitado = false;
-                var modificarVapor = new ModificarVapor() { Dto = vapor };
-                servicioComandos.Ejecutar(modificarVapor);
-                RegistrarAuditoriaEliminacion(vapor);
+                var eliminarBuque = new EliminarBuque() { Id = vapor.Id, UsuarioEjecuta = usuario };
+                servicioComandos.Ejecutar(eliminarBuque);
             }
             catch (Exception e)
             {
@@ -143,24 +141,6 @@ namespace Molinos.Scato.Servicios.Impl
                                   && e.Vapor.Id == vapor.Id
                                   select (e)).Any();
             return existeEnLineUp;
-        }
-
-        private void RegistrarAuditoriaEliminacion(VaporDto vapor)
-        {
-            var auditoria = new Auditoria
-            {
-                Entidad_Id = vapor.Id,
-                EntidadNombre = "Vapor",
-                UsuarioEjecuta = vapor.Usuario,
-                ValorAnterior = "1",
-                ValorNuevo = "0",
-                Propiedad = "Habilitado",
-                FechaModificacion = DateTime.Now,
-                Accion = "Deshabilita buque."
-            };
-
-            this.repositorio.Agregar(auditoria);
-            this.repositorio.GuardarCambios();
         }
 
         #endregion

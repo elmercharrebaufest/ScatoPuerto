@@ -44,8 +44,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                clienteDto.Usuario = base.nombreUsuario;
-                servicioClientes.GuardarCliente(clienteDto);
+                string usuario = base.nombreUsuario;
+                servicioClientes.GuardarCliente(clienteDto, usuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -70,8 +70,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                clienteDto.Usuario = base.nombreUsuario;
-                servicioClientes.DeshabilitarCliente(clienteDto);
+                string usuario = base.nombreUsuario;
+                servicioClientes.DeshabilitarCliente(clienteDto, usuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

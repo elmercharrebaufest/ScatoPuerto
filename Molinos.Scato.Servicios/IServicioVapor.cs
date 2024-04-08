@@ -28,6 +28,6 @@ namespace Molinos.Scato.Servicios
         string ValidarBuque(string bandera, string nombreBuque, string IMO, int? id);
         
         [OperationContract]
-        void DeshabilitarVapor(VaporDto vapor);
+        void DeshabilitarVapor(VaporDto vapor, string usuario);
     }
 }
