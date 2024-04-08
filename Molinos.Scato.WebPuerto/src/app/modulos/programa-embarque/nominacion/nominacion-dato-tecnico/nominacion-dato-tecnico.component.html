@@ -374,7 +374,9 @@
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
-                            (click)="onAltaBajaMantenimiento(2)">
+                            
+                            (click)="nuevaAgenciaMaritimaAta(2, editAgenciaAta)"
+                            >
                     </div>
                 </div>
             </div>
@@ -392,7 +394,9 @@
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
-                            (click)="onAltaBajaMantenimiento(1)">
+                        
+                          (click)="nuevaAgenciaMaritimaAta(1, editAgenciaAta)"
+                        >
                     </div>
                 </div>
             </div>
@@ -432,6 +436,15 @@
 </div>
 
 <ng-template #modalABM let-modal>
-    <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal"
-        (actualizarTipoLista)="onActualizarTipoLista($event)"></app-alta-baja-mantenimiento>
+  <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal" 
+    (actualizarTipoLista)="onActualizarTipoLista($event)">
+  </app-alta-baja-mantenimiento>
+</ng-template>
+
+<ng-template #editAgenciaAta let-modal>
+  <app-modal-modificar-agencias-maritimas-ata (editOCrearFinish)="editFinish($event)" 
+    [id]="idAgencia" 
+    [tittle]="tittle" 
+    [tipo]="typeAgencia">
+  </app-modal-modificar-agencias-maritimas-ata>
 </ng-template>

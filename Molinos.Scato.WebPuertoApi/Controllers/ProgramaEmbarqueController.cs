@@ -691,6 +691,125 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        #region Agencias Maritimas y ATA
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ListarComboATA")]
+        public HttpResponseMessage ListarComboATA()
+        {
+            try
+            {
+                var atas = servicioProgramaEmbarque.listarATAPuerto(true);
+                return Request.CreateResponse(HttpStatusCode.OK, atas);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ListarAgenciasATA")]
+        public HttpResponseMessage ListarAgenciasATA(int pagina = 1, int itemsPorPagina = 10, string nombre = null, string cuit = null, int tipo = 0)
+        {
+            try
+            {
+                var paginacion = new Paginacion(null, DirOrden.Asc, pagina, itemsPorPagina == 0 ? 10 : itemsPorPagina);
+                var listaPaginada = servicioProgramaEmbarque.ListarAgenciasATA(paginacion, nombre, cuit, tipo);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ObtenerAgenciaMaritima")]
+        public HttpResponseMessage ObtenerAgenciaMaritima(int id)
+        {
+            try
+            {
+                var agencia = servicioProgramaEmbarque.ObtenerAgenciaMaritimaPuerto(id);
+                return Request.CreateResponse(HttpStatusCode.OK, agencia);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ObtenerATA")]
+        public HttpResponseMessage ObtenerATA(int id)
+        {
+            try
+            {
+                var ata = servicioProgramaEmbarque.ObtenerATAPuerto(id);
+                return Request.CreateResponse(HttpStatusCode.OK, ata);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/CrearAgenciaMaritimaATA")]
+        public HttpResponseMessage CrearAgenciaMaritimaATA(CrearAgenciaMaritimaATADto agenciaATA)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errores = string.Join("\n", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct());
+                return Request.CreateResponse(HttpStatusCode.BadRequest, errores);
+            }
+            try
+            {
+                servicioProgramaEmbarque.CrearAgenciaMaritimaATA(agenciaATA, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/ProgramaEmbarque/ModificarAgenciaMaritimaATA")]
+        public HttpResponseMessage ModificarAgenciaMaritimaATA(ModificarAgenciaMaritimaATADto agenciaMaritimaATA)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errores = string.Join("\n", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Distinct());
+                return Request.CreateResponse(HttpStatusCode.BadRequest, errores);
+            }
+            try
+            {
+                servicioProgramaEmbarque.ModificarAgenciaMaritimaATA(agenciaMaritimaATA, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/ProgramaEmbarque/EliminarAgenciaMaritimaATA")]
+        public HttpResponseMessage EliminarAgenciaMaritimaATA(int id, int tipo)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarAgenciaMaritimaATA(id, tipo, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        #endregion
+
         private EmbarqueDto CrearEmbarqueDto(NominacionDto nominacion, int centroId)
         {
             EmbarqueDto embarqueDto = new EmbarqueDto();

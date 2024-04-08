@@ -70,7 +70,7 @@ namespace Molinos.Scato.Servicios
         IList<BanderaDto> listarBandera();
 
         [OperationContract]
-        IList<ATAPuertoDto> listarATAPuerto();
+        IList<ATAPuertoDto> listarATAPuerto(bool soloActivas = false);
 
         [OperationContract]
         IList<AgenciaMaritimaPuertoDto> listarAgenciaMaritimaPuerto();
@@ -143,5 +143,25 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EnviarMailNominacionesExcel(byte[] archivo);
+
+        #region Agencias Maritimas ATA
+        [OperationContract]
+        ListaPaginada<AgenciaMaritimaATADto> ListarAgenciasATA(Paginacion paginacion, string nombre, string cuit, int tipo);
+
+        [OperationContract]
+        ATAPuertoDto ObtenerATAPuerto(int id);
+
+        [OperationContract]
+        AgenciaMaritimaPuertoDto ObtenerAgenciaMaritimaPuerto(int id);
+
+        [OperationContract]
+        void CrearAgenciaMaritimaATA(CrearAgenciaMaritimaATADto agenciaATA, string usuario);
+
+        [OperationContract]
+        void ModificarAgenciaMaritimaATA(ModificarAgenciaMaritimaATADto agencia, string usuario);
+
+        [OperationContract]
+        void EliminarAgenciaMaritimaATA(int id, int tipo, string usuario);
+        #endregion
     }
 }

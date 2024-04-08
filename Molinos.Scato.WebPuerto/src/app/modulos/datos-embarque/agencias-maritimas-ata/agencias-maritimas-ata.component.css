@@ -1,0 +1,41 @@
+.agencias-maritimas-ata-modulo{
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+:host ::ng-deep .multiselect-dropdown .dropdown-btn{
+  background: #ffffff !important;
+}
+
+.titulo-historial-buque-letra{
+  font-family: roboto;
+  font-weight: bold;
+  font-size: 36px;
+  text-align: left;
+  color: #1A1A1A;
+}
+
+.colorGris{
+  color: gray !important;
+}
+
+.buscar{
+  background-color: #1C7CD5;
+  border-color: #1C7CD5;
+  color: white;
+}
+
+.limpiar{
+  color: #1C7CD5;
+  background: white;
+  border-color: #1C7CD5;
+}
+
+.centrado {
+  flex: auto;
+}

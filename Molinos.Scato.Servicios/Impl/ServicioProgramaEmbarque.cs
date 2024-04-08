@@ -235,10 +235,14 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public IList<ATAPuertoDto> listarATAPuerto()
+        public IList<ATAPuertoDto> listarATAPuerto(bool soloActivas = false)
         {
             try
             {
+                if (soloActivas)
+                {
+                    return Listar<ATAPuerto, ATAPuertoDto>(ata => ata.Activa);
+                }
                 return Listar<ATAPuerto, ATAPuertoDto>();
             }
             catch (Exception ex)
@@ -1196,6 +1200,50 @@ namespace Molinos.Scato.Servicios.Impl
                 AttachmentName = "Planilla programa de embarque.xls"
             });
         }
+
+        #region Agencias Maritimas ATA
+        public ListaPaginada<AgenciaMaritimaATADto> ListarAgenciasATA(Paginacion paginacion, string nombre, string cuit, int tipo)
+        {
+            return repositorio.ListarConsultaPaginada(new ListarAgenciasATAConsulta(paginacion, nombre, cuit, tipo));
+        }
+
+        public ATAPuertoDto ObtenerATAPuerto(int id)
+        {
+            return Obtener<ATAPuerto, ATAPuertoDto>(id);
+        }
+
+        public AgenciaMaritimaPuertoDto ObtenerAgenciaMaritimaPuerto(int id)
+        {
+            return Obtener<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(id);
+        }
+
+        public void CrearAgenciaMaritimaATA(CrearAgenciaMaritimaATADto agenciaATA, string usuario)
+        {
+            var res = comandos.Ejecutar(new CrearAgenciaMaritimaATA { Dto = agenciaATA, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void ModificarAgenciaMaritimaATA(ModificarAgenciaMaritimaATADto agencia, string usuario)
+        {
+            var res = comandos.Ejecutar(new ModificarAgenciaMaritimaATA { Dto = agencia, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void EliminarAgenciaMaritimaATA(int id, int tipo, string usuario)
+        {
+            var res = comandos.Ejecutar(new EliminarAgenciaMaritimaATA { Id = id, Tipo = tipo, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+        #endregion
 
         #region Metodos Utiles
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class

@@ -165,10 +165,10 @@
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipTablasReferenciaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\HistoricoEmbarqueLineUpMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaATA\AgenciaMaritimaPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaATA\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ArchivosPuertoMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AuditoriaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
@@ -363,6 +363,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ImpIdentificacionMuestraAuditoriaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VinedoTercerosMappingProfile.cs" />
     <Compile Include="CrearException.cs" />
+    <Compile Include="Enumeradores\EnumsAgenciaMaritimaATA.cs" />
     <Compile Include="Enumeradores\EstadosCaratulaAFIP.cs" />
     <Compile Include="Enumeradores\EstadosCoemAFIP.cs" />
     <Compile Include="Enumeradores\EstadosSolicitudesAFIP.cs" />
@@ -577,6 +578,9 @@
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCambioBuque.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCierreCargaGranel.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarNoAbordo.cs" />
+    <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorCrearAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorEliminarAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarBuque.cs" />

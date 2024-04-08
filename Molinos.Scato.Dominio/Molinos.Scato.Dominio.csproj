@@ -85,6 +85,9 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\EliminarBuque.cs" />
+    <Compile Include="Comandos\AgenciaMaritimaATA\CrearAgenciaMaritimaATA.cs" />
+    <Compile Include="Comandos\AgenciaMaritimaATA\EliminarAgenciaMaritimaATA.cs" />
+    <Compile Include="Comandos\AgenciaMaritimaATA\ModificarAgenciaMaritimaATA.cs" />
     <Compile Include="Comandos\EnvioMailZarpado.cs" />
     <Compile Include="Comandos\CrearHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
@@ -94,6 +97,9 @@
     <Compile Include="Dto\AfipPuerto\AfipSolicitudNoABordoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipMotivoNoAbordoDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
+    <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
+    <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
+    <Compile Include="Dto\AgenciaMaritimaATA\AgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
@@ -803,7 +809,7 @@
     <Compile Include="Dto\EstadoSensoresBalanzaDto.cs" />
     <Compile Include="Dto\ImpEtiquetaPuertoDto.cs" />
     <Compile Include="Dto\InfoPatenteDeCalleDto.cs" />
-    <Compile Include="Dto\ATAPuertoDto.cs" />
+    <Compile Include="Dto\AgenciaMaritimaATA\ATAPuertoDto.cs" />
     <Compile Include="Dto\BalanzasCortesDto.cs" />
     <Compile Include="Dto\CargaComercialHistoricoDto.cs" />
     <Compile Include="Dto\CeldaManoDeEmbarqueDto.cs" />
@@ -860,7 +866,7 @@
     <Compile Include="Dto\EstadoPuertoDto.cs" />
     <Compile Include="Dto\DatosInstanciaWorkflowPuertoDto.cs" />
     <Compile Include="Dto\CoordinadorPuertoDto.cs" />
-    <Compile Include="Dto\AgenciaMaritimaPuertoDto.cs" />
+    <Compile Include="Dto\AgenciaMaritimaATA\AgenciaMaritimaPuertoDto.cs" />
     <Compile Include="Dto\InstanciaWorkflowPuertoDto.cs" />
     <Compile Include="Dto\MailDto.cs" />
     <Compile Include="Dto\PlanoDeCargaAgenteControlPrivadoDto.cs" />
@@ -1064,8 +1070,9 @@
     <Compile Include="Entidades\AfipTablasReferencia\AfipTipoDocumento.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipMotivoSolicitudCambio.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipTipoEmbalaje.cs" />
+    <Compile Include="Entidades\AgenciasMaritimaATA\AuditoriaAgenciaMaritimaATA.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
-    <Compile Include="Entidades\ATAPuerto.cs" />
+    <Compile Include="Entidades\AgenciasMaritimaATA\ATAPuerto.cs" />
     <Compile Include="Entidades\Auditoria.cs" />
     <Compile Include="Entidades\BalanzasCortes.cs" />
     <Compile Include="Entidades\CalidadValor.cs" />
@@ -1156,7 +1163,7 @@
     <Compile Include="Entidades\AgenciaControlPrivado.cs" />
     <Compile Include="Entidades\Estiba.cs" />
     <Compile Include="Entidades\EstadoPuerto.cs" />
-    <Compile Include="Entidades\AgenciaMaritimaPuerto.cs" />
+    <Compile Include="Entidades\AgenciasMaritimaATA\AgenciaMaritimaPuerto.cs" />
     <Compile Include="Entidades\CoordinadorPuerto.cs" />
     <Compile Include="Entidades\PlanoDeCarga.cs" />
     <Compile Include="Entidades\LineUp.cs" />
@@ -1803,6 +1810,7 @@
       <Name>Molinos.Scato.Validadores</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

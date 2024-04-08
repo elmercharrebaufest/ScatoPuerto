@@ -40,6 +40,7 @@ import { NgxMaskModule } from "ngx-mask";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { EditarCrearClienteComponent } from './editar-crear-cliente/editar-crear-cliente.component';
 import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cliente.component';
+import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modal-modificacion-agencias-maritimas-ata/modal-modificar-agencias-maritimas-ata.component";
 
 const components = [
     AlertComponent,
@@ -63,10 +64,11 @@ const components = [
     EditarCrearBuquesComponent,
     AltaBajaMantenimientoComponent,
     NotificacionesComponent,
-    EnvioMailDialogComponent,    
+    EnvioMailDialogComponent,
     ModalCrearBuqueComponent,
     EditarCrearClienteComponent,
-    ModalCrearClienteComponent,
+    ModalCrearClienteComponent,,
+    ModalModificarAgenciasMaritimasAtaComponent
 ]
 const libs = [
     CommonModule,

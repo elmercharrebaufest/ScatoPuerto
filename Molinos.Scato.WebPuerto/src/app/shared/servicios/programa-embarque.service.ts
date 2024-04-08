@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ATAPuertoCuit } from '@ScatoModels/ata-puerto';
 import { Mail } from '@ScatoModels/mail';
 import { Auditoria } from '@ScatoModels/programa-embarque/auditoria';
 import { CompaniaDeFumigacion } from '@ScatoModels/programa-embarque/compania-de-fumigacion';
@@ -63,16 +64,20 @@ export class ProgramaEmbarqueService {
       );
   }
 
-  public tieneAuditoria(nominaciones_id: number []): Observable<any[]>{
+  public tieneAuditoria(nominaciones_id: number[]): Observable<any[]> {
     return this.http.post<any[]>(`${this.url}ProgramaEmbarque/TieneAuditoria`, nominaciones_id,
-    { 'withCredentials': true });
+      { 'withCredentials': true });
 
   }
-  
-  public obtenerAuditoria(nominacion_id: number): Observable<Auditoria[]>{
-    return this.http.get<Auditoria[]>(`${this.url}ProgramaEmbarque/ObtenerAuditoria?nominacion_id=${nominacion_id}`,
-    { 'withCredentials': true });
 
+  public obtenerAuditoria(nominacion_id: number): Observable<Auditoria[]> {
+    return this.http.get<Auditoria[]>(`${this.url}ProgramaEmbarque/ObtenerAuditoria?nominacion_id=${nominacion_id}`,
+      { 'withCredentials': true });
+
+  }
+
+  public listarComboATA(): Observable<ATAPuertoCuit[]> {
+    return this.http.get<ATAPuertoCuit[]>(`${this.url}ProgramaEmbarque/ListarComboATA`);
   }
 
   public obtenerDatosComboProgramaEmbarque(): Observable<any> {
@@ -94,50 +99,50 @@ export class ProgramaEmbarqueService {
   }
 
   public registrarNominacionRecibo(nominacion_Id: number, nominacionRecibo: NominacionRecibo[]) {
-    return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionRecibo?nominacion_id=${nominacion_Id}`,nominacionRecibo, { 'withCredentials': true });
+    return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionRecibo?nominacion_id=${nominacion_Id}`, nominacionRecibo, { 'withCredentials': true });
   }
 
-  public registrarNominacionDetalleIntervencion(nominacionDetalleIntervencion: NominacionDetalleIntervencion,nominacion_Id: number){
-    return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionDetalleIntervencion?nominacion_id=${nominacion_Id}`,nominacionDetalleIntervencion, { 'withCredentials': true });
+  public registrarNominacionDetalleIntervencion(nominacionDetalleIntervencion: NominacionDetalleIntervencion, nominacion_Id: number) {
+    return this.http.post(`${this.url}ProgramaEmbarque/RegistrarNominacionDetalleIntervencion?nominacion_id=${nominacion_Id}`, nominacionDetalleIntervencion, { 'withCredentials': true });
   }
 
   public obtenerProgramaEmbarqueRecibo(nominacion_id: number): Observable<NominacionRecibo[]> {
-    return this.http.get<NominacionRecibo[]>(`${this.url}ProgramaEmbarque/ObtenerNominacionRecibos?nominacion_id=${nominacion_id}`,{ 'withCredentials': true });
-  }  
+    return this.http.get<NominacionRecibo[]>(`${this.url}ProgramaEmbarque/ObtenerNominacionRecibos?nominacion_id=${nominacion_id}`, { 'withCredentials': true });
+  }
 
   public ListarCompaniaDeFumigacion(): Observable<CompaniaDeFumigacion[]> {
-    return this.http.get<CompaniaDeFumigacion[]>(`${this.url}ProgramaEmbarque/ListarCompaniaDeFumigacion`,{ 'withCredentials': true });
+    return this.http.get<CompaniaDeFumigacion[]>(`${this.url}ProgramaEmbarque/ListarCompaniaDeFumigacion`, { 'withCredentials': true });
   }
 
   public ListarTipoDeFumigacion(): Observable<TipoDeFumigacion[]> {
-    return this.http.get<TipoDeFumigacion[]>(`${this.url}ProgramaEmbarque/ListarTipoDeFumigacion`,{ 'withCredentials': true });
+    return this.http.get<TipoDeFumigacion[]>(`${this.url}ProgramaEmbarque/ListarTipoDeFumigacion`, { 'withCredentials': true });
   }
   actualizarFiltros(pagina: number,
     itemsPorPagina: number,
     fecha: Date,
     buque: string,
     muelle: string,
-    producto: string){
-      this.filtros.buque = buque;
-      this.filtros.muelle = muelle;
-      this.filtros.producto = producto;
-      this.filtros.itemsPorPagina = itemsPorPagina;
-      this.filtros.pagina = pagina;
-      this.filtros.fecha = fecha
-    }
+    producto: string) {
+    this.filtros.buque = buque;
+    this.filtros.muelle = muelle;
+    this.filtros.producto = producto;
+    this.filtros.itemsPorPagina = itemsPorPagina;
+    this.filtros.pagina = pagina;
+    this.filtros.fecha = fecha
+  }
 
 
-    public EliminarNominacion(id: number){
-      return this.http.post(`${this.url}ProgramaEmbarque/EliminarNominacion?nominacion_id=${id}`, { 'withCredentials': true });
-    }
+  public EliminarNominacion(id: number) {
+    return this.http.post(`${this.url}ProgramaEmbarque/EliminarNominacion?nominacion_id=${id}`, { 'withCredentials': true });
+  }
 
-    public ObtenerDatosMailProgramaEmbarque(nominacionId: number, tipoDeMail: string) {
-      return this.http.get(`${this.url}ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque?nominacionId=${nominacionId}&tipoDeMail=${tipoDeMail}`,{ 'withCredentials': true });
-    }
+  public ObtenerDatosMailProgramaEmbarque(nominacionId: number, tipoDeMail: string) {
+    return this.http.get(`${this.url}ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque?nominacionId=${nominacionId}&tipoDeMail=${tipoDeMail}`, { 'withCredentials': true });
+  }
 
-    public EnviarMailProgramaEmbarque(mail: Mail) {
-      return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque`,mail,{ 'withCredentials': true });
-    }
+  public EnviarMailProgramaEmbarque(mail: Mail) {
+    return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque`, mail, { 'withCredentials': true });
+  }
   // #endregion
 
 }

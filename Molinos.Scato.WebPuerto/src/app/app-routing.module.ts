@@ -37,6 +37,12 @@ export const routeConfig: Routes = [
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/calidad/calidad.module').then(m => m.CalidadModule)
       },
+
+      {
+        path: 'embarque',
+        loadChildren: () => import('./modulos/datos-embarque/datos-embarque.module').then(m => m.DatosEmbarqueModule)
+      },
+      
       {
         path: 'buques',
         canActivateChild: [RoleGuard],

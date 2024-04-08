@@ -4,13 +4,15 @@ import { COEM } from '@ScatoModels/afip/coem';
 import { Embalajes } from '@ScatoModels/afip/embalajes';
 import { NuevasMercaderiasSueltasCoem } from '@ScatoModels/afip/nuevasMercaderiasSueltasCoem';
 import { NuevoCoem } from '@ScatoModels/afip/nuevoCoem';
+import { ATAPuertoCuit } from '@ScatoModels/ata-puerto';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
 import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { ProgramaEmbarqueService } from '@ScatoServicios/programa-embarque.service';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 
 @Component({
   selector: 'app-modal-crear-coem',
@@ -42,12 +44,17 @@ export class ModalCrearCoemComponent implements OnInit {
 
   private codigoEmbalajeGranel: string;
 
+  public mensajeCarga = 'Cargando datos';
+  public ata$: Observable<ATAPuertoCuit[]>[] = [];
+  public atas: ATAPuertoCuit[] = [];
+
   constructor(
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
     private formBuilder: FormBuilder,
     private coemAfipService: CoemAfipService,
-    private tablasAfipService: TablasAfipService
+    private tablasAfipService: TablasAfipService,
+    private programaEmbarqueService: ProgramaEmbarqueService
   ) {
     this.initFormCrearEditarCode();
   }
@@ -55,12 +62,42 @@ export class ModalCrearCoemComponent implements OnInit {
   ngOnInit(): void {
     this.operacionNuevo = !this.id;
     this.titleCoem = this.title;
-    this.cargarCombos();
-    if (this.operacionNuevo) {
-      this.agregarNuevoCoem();
-    } else {
-      this.setValoresFormEditar();
-    }
+    this.cargarDatos();
+  }
+
+  private cargarDatos() {
+    const obtenerCoem: Observable<COEM> = this.operacionNuevo ? of(null) : this.coemAfipService.obtenerCoemId(this.id);
+    this.mensajeCarga = 'Cargando datos';
+    this.cargando = true;
+    forkJoin([
+      this.coemAfipService.comboCaratulas(),
+      this.tablasAfipService.listarNaturalezasEmbalaje(),
+      this.programaEmbarqueService.listarComboATA(),
+      obtenerCoem
+    ]).subscribe(([caratulas, embalajes, atas, coem]) => {
+      this.caratulas = caratulas;
+      this.atas = atas.filter(a => a.cuit);
+
+      this.idCaratula = caratulas.find(c => c.id == this.caratulaId)?.identificadorCaratula;
+      if (this.idCaratula) {
+        const control = this.crearEditarCoemForm.get('identificadorCaratula');
+        control.setValue(this.idCaratula);
+        control.disable();
+      }
+
+      this.codigoEmbalajeGranel = embalajes.find(e => e.descripcion == 'A GRANEL').codigo;
+
+      if (coem) {
+        this.setValoresFormEditar(coem);
+      } else {
+        this.agregarNuevoCoem();
+      }
+      this.cargando = false;
+    }, (error) => {
+      console.error(error);
+      this.cargando = false;
+      this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al cargar los datos', 'Cerrar', '', null, null, Tipoalerta.Error);
+    });
   }
 
   get mercaderiasSueltasFormArray(): FormArray {
@@ -78,23 +115,36 @@ export class ModalCrearCoemComponent implements OnInit {
 
   public inicializarFormMercaderias(mercaderia: NuevasMercaderiasSueltasCoem = null): FormGroup {
     const regex = /^(\d{5}[a-zA-Z]{2}[\da-zA-Z]{2}\d{6}[a-zA-Z])$/;
+    const form = this.formBuilder.group({
+      cuitATA: ['', [Validators.required, this.ValidadorEsObjeto]],
+      codigoEmbalaje: [''],
+      cantidadBultos: [''],
+      peso: ['', Validators.required],
+      identificadorDeclaracion: ['', Validators.pattern(regex)],
+    });
+    const control = form.get('cuitATA');
+    const observable = this.tablasAfipService.crearObservableAutocompletar(control, this.atas, ['nombre', 'cuit']);
+    this.ata$.push(observable);
     if (mercaderia != null) {
-      return this.formBuilder.group({
-        cuitATA: [mercaderia.cuitATA, Validators.required],
-        codigoEmbalaje: mercaderia.embalajes[0].codigoEmbalaje,
-        cantidadBultos: mercaderia.embalajes[0].peso,
-        peso: [mercaderia.embalajes[0].peso, Validators.required],
-        identificadorDeclaracion: [mercaderia.identificadorDeclaracion, Validators.pattern(regex)]
-      });
-    } else {
-      return this.formBuilder.group({
-        cuitATA: ['', Validators.required],
-        codigoEmbalaje: [''],
-        cantidadBultos: [''],
-        peso: ['', Validators.required],
-        identificadorDeclaracion: ['', Validators.pattern(regex)],
-      });
+      const ata = this.atas.find(a => a.cuit == mercaderia.cuitATA);
+      form.get('cuitATA').setValue(ata);
+      form.get('codigoEmbalaje').setValue(mercaderia.embalajes[0].codigoEmbalaje);
+      form.get('cantidadBultos').setValue(mercaderia.embalajes[0].peso);
+      form.get('peso').setValue(mercaderia.embalajes[0].peso);
+      form.get('identificadorDeclaracion').setValue(mercaderia.identificadorDeclaracion);
     }
+    return form;
+  }
+
+  public getNombre(ata: ATAPuertoCuit) {
+    return ata ? `${ata.nombre} - ${ata.cuit}` : '';
+  }
+
+  private ValidadorEsObjeto(control: AbstractControl) {
+    if (typeof control.value !== 'object') {
+      return { invalid: true };
+    }
+    return null;
   }
 
   closeModalEditarCrearCoem() {
@@ -114,8 +164,9 @@ export class ModalCrearCoemComponent implements OnInit {
     this.crearEditarCoem(this.setValoresNuevoOEditarCoem());
   }
 
-  private crearEditarCoem(coem) {
+  private crearEditarCoem(coem: COEM) {
     const request = this.operacionNuevo ? this.coemAfipService.registrarCoem(coem) : this.coemAfipService.editarCoem(coem);
+    this.mensajeCarga = 'Enviando datos';
     this.cargando = true;
     request.subscribe(() => {
       this.cargando = false;
@@ -143,43 +194,25 @@ export class ModalCrearCoemComponent implements OnInit {
     this.mercaderiasSueltasFormArray.push(this.inicializarFormMercaderias());
   }
 
-  eliminarNuevoCoem(i) {
+  eliminarNuevoCoem(i: number) {
     this.mercaderiasSueltasFormArray.removeAt(i);
+    this.ata$.splice(i, 1);
   }
 
   public getListaHistorialCoem() {
     return this.listaNuevoCoem;
   }
 
-  private cargarCombos() {
-    forkJoin([
-      this.coemAfipService.comboCaratulas(),
-      this.tablasAfipService.listarNaturalezasEmbalaje()
-    ]).subscribe(([caratulas, embalajes]) => {
-      this.caratulas = caratulas;
-      this.idCaratula = caratulas.find(c => c.id == this.caratulaId)?.identificadorCaratula;
-      if (this.idCaratula) {
-        const control = this.crearEditarCoemForm.get('identificadorCaratula');
-        control.setValue(this.idCaratula);
-        control.disable();
-      }
-      this.codigoEmbalajeGranel = embalajes.find(e => e.descripcion == 'A GRANEL').codigo;
-    });
-    this.coemAfipService.comboCaratulas().subscribe((datos) => {
-
-    });
-  }
-
   setValoresNuevoOEditarCoem() {
     let coem = new COEM();
     let i = 0;
-    !this.operacionNuevo ? coem.id = this.id : null;
+    coem.id = this.operacionNuevo ? undefined : this.id;
     coem.identificadorCaratula = this.crearEditarCoemForm.controls['identificadorCaratula'].value;
     coem.mercaderiasSueltas = new Array<NuevasMercaderiasSueltasCoem>();
 
     for (let mercaderia of this.mercaderiasSueltasFormArray.value) {
       coem.mercaderiasSueltas.push(new NuevasMercaderiasSueltasCoem());
-      coem.mercaderiasSueltas[i].cuitATA = mercaderia.cuitATA;
+      coem.mercaderiasSueltas[i].cuitATA = mercaderia.cuitATA.cuit;
       coem.mercaderiasSueltas[i].identificadorDeclaracion = mercaderia.identificadorDeclaracion;
       coem.mercaderiasSueltas[i].embalajes = new Array<Embalajes>();
       coem.mercaderiasSueltas[i].embalajes.push(new Embalajes());
@@ -191,18 +224,16 @@ export class ModalCrearCoemComponent implements OnInit {
     return coem;
   }
 
-  setValoresFormEditar() {
-    this.coemAfipService.obtenerCoemId(this.id).subscribe((datos) => {
-      this.crearEditarCoemForm.controls['id'].setValue(datos.id);
-      this.crearEditarCoemForm.controls['identificadorCaratula'].setValue(datos.identificadorCaratula);
-      this.idCaratula = this.crearEditarCoemForm.get('identificadorCaratula').value;
-      this.crearEditarCoemForm.controls['identificadorCaratula'].disable();
+  setValoresFormEditar(coem: COEM) {
+    this.crearEditarCoemForm.controls['id'].setValue(coem.id);
+    this.crearEditarCoemForm.controls['identificadorCaratula'].setValue(coem.identificadorCaratula);
+    this.idCaratula = this.crearEditarCoemForm.get('identificadorCaratula').value;
+    this.crearEditarCoemForm.controls['identificadorCaratula'].disable();
 
-      for (const mercaderia of datos.mercaderiasSueltas) {
-        const mercaderiaForm = this.inicializarFormMercaderias(mercaderia);
-        this.mercaderiasSueltasFormArray.push(mercaderiaForm);
-      }
-    });
+    for (const mercaderia of coem.mercaderiasSueltas) {
+      const mercaderiaForm = this.inicializarFormMercaderias(mercaderia);
+      this.mercaderiasSueltasFormArray.push(mercaderiaForm);
+    }
   }
 
   onInput(e: Event) {

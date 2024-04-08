@@ -1,4 +1,4 @@
-<ship-spinner [message]="'Enviando datos'" *ngIf='cargando'></ship-spinner>
+<ship-spinner [message]="mensajeCarga" *ngIf='cargando'></ship-spinner>
 <div class="modal-content">
   <div class="modal-header">
     <h5 class="modal-title">{{titleCoem}}</h5>
@@ -24,7 +24,7 @@
       <div style="overflow-x:auto;" class="table-responsive">
         <table class='table table-bordered lista-coem-table'>
           <thead class="lista-coem-header">
-            <th>CUIT ATA</th>
+            <th>ATA</th>
             <th>Peso (kg)</th>
             <th>Identificador de la declaración</th>
             <th></th>
@@ -32,7 +32,12 @@
           <tbody formArrayName="mercaderiasSueltas">
             <tr *ngFor="let mercaderia of mercaderiasSueltasFormArray.controls; let i = index; last as isLast" class="lista-coem-row" [formGroupName]="i">
               <td class="lista-coem-row-item">
-                <input type="text" class="form-control" formControlName="cuitATA" maxlength="11" required>
+                <input type="text" class="form-control" formControlName="cuitATA" [matAutocomplete]="listaATA" required />
+                    <mat-autocomplete autoActiveFirstOption #listaATA="matAutocomplete" [displayWith]="getNombre">
+                        <mat-option *ngFor="let ata of ata$[i] | async" [value]="ata">
+                            {{ata?.nombre}} - {{ata?.cuit}}
+                        </mat-option>
+                    </mat-autocomplete>
               </td>
               <td class="lista-coem-row-item">
                 <input type="number" class="form-control" formControlName="peso" required>

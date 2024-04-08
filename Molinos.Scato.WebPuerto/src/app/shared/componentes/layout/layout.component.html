@@ -31,13 +31,48 @@
         </div>
       </a>
 
-      <hr *ngIf='tienePermiso("Vapor_Visualizar")'> 
+      <!-- <ARMOA005-1665 Dylan Lopez> -->
+      <!-- Menu Datos de Embarque -->
+      <!-- <hr *ngIf='tienePermiso("Vapor_Visualizar")'> 
       <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "vapor"'>        
           <div class='icon-vapor'></div>
           <span *ngIf='opened'>Buque</span>
         </div>
+      </a> -->
+
+      <hr *ngIf='tienePermiso("Caratula_Visualizar")'>
+      <a *ngIf='tienePermiso("Caratula_Visualizar")' data-toggle="collapse" href="#collapseDatosEmbarque" aria-expanded="false" aria-controls="collapseDatosEmbarque">
+        <div  class="item-container">
+          <div class="icon-afip"></div>
+          <span *ngIf="opened">Datos de Embarque</span>
+        </div>
       </a>
+      <!-- SubMenu Datos de Embarque -->
+      <div class="collapse item-container" id="collapseDatosEmbarque">
+        <a routerLink="/embarque/agencias" *ngIf='tienePermiso("Caratula_Visualizar")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarque/agencias"'>
+            <div class='icon-pe'></div>
+            <span *ngIf="opened">Agencias Marítimas y A.T.A.</span>
+          </div>
+        </a>
+
+        <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "vapor"'>        
+            <div class='icon-vapor'></div>
+            <span *ngIf='opened'>Buque</span>
+          </div>
+        </a>
+        
+        <a routerLink='/clientes' *ngIf='tienePermiso("Clientes_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "clientes"'>        
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Clientes</span>
+          </div>
+        </a>
+      </div>
+      <!-- </ ARMOA005-1665 Dylan Lopez> -->
+      
     <!--
       <hr *ngIf='tienePermiso("Clientes_Visualizar")'> 
       <a routerLink='/clientes' *ngIf='tienePermiso("Clientes_Visualizar")'>
@@ -97,25 +132,7 @@
             <span *ngIf="opened">Coems</span>
           </div>
         </a>
-      </div>      
-
-      
-
-      <!-- <hr *ngIf='tienePermiso(650)'>
-      <a routerLink='/administracion' *ngIf='tienePermiso(650)'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "administracion"'>
-          <img src='assets/sidebar-icons/administracion.svg' width="32">
-          <span>Administración</span>
-        </div>
-      </a>
-
-      <hr *ngIf='tienePermiso(660)'>
-      <a routerLink='/comex' *ngIf='tienePermiso(660)'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "comex"'>
-          <img src='assets/sidebar-icons/comex.svg' width="32">
-          <span>Comex</span>
-        </div>
-      </a> -->
+      </div>
 
       <!-- Ejemplo de menu-submenu -->
       <!-- <a><div (click)='showSubmenu(menuSide, subCarga)'><img src='../../../assets/sidebar-icons/container.png' width="32"><span>Modulo de Carga</span></div></a>
@@ -133,11 +150,6 @@
 
   <div ng-sidebar-content>
     <app-navbar [onClickHandler]="toggleOpened.bind(this)"></app-navbar>
-    <!-- <app-alert></app-alert> -->
     <router-outlet></router-outlet>
   </div>
 </ng-sidebar-container>
-
-<!-- <app-navbar></app-navbar>
-<app-alert></app-alert>
-<router-outlet></router-outlet> -->
