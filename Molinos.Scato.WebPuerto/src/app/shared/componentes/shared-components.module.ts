@@ -67,7 +67,7 @@ const components = [
     EnvioMailDialogComponent,
     ModalCrearBuqueComponent,
     EditarCrearClienteComponent,
-    ModalCrearClienteComponent,,
+    ModalCrearClienteComponent,
     ModalModificarAgenciasMaritimasAtaComponent
 ]
 const libs = [
