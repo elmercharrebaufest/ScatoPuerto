@@ -8,6 +8,5 @@ namespace Molinos.Scato.Dominio.Comandos
     {
         public int IdModuloDeCarga { get; set; }
         public List<ModuloDeCargaLineasDeEmbarqueDto> Dto { get; set; }
-        public string nombreUsuario { get; set; }
     }
 }

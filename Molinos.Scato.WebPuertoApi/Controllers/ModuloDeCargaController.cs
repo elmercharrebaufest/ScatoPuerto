@@ -697,7 +697,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.GuardarBalanzaCorte(balanzasCortesDtos);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch(ValidationCustomException vce)
+            catch (ValidationCustomException vce)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, vce.Message);
             }
@@ -730,17 +730,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
-                comandos.Ejecutar(new GuardarLineasDeEmbarque { Dto = lineasDeEmbarque, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
-
+                var res = comandos.Ejecutar(new GuardarLineasDeEmbarque { Dto = lineasDeEmbarque, IdModuloDeCarga = idModuloDeCarga, Usuario = base.nombreUsuario });
+                if (res.HayErrores)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, res.Errores[""]);
+                }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
-
-
         }
 
         [HttpPost]
@@ -927,7 +927,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-             
+
                 servicio.GuardarCapturaImagenLineUp(capturaImagenLineUp.Embarque_Id, capturaImagenLineUp.FilePathImgLineUp);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
