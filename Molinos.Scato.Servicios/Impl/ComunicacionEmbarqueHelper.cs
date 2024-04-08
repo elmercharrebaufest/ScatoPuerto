@@ -273,7 +273,11 @@ namespace Molinos.Scato.Servicios.Impl
                     new AnularCOEMRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                        argAnularCOEM = new AnularCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                        argAnularCOEM = new AnularCOEMRequest 
+                        { 
+                            IdentificadorCaratula = identificadorCaratula, 
+                            IdentificadorCOEM = identificadorCOEM 
+                        }
                     });
 
 				log.Info($" request: {XmlConverter<AnularCOEMRequest1>.Serialize(request)} ");
@@ -303,7 +307,11 @@ namespace Molinos.Scato.Servicios.Impl
                     new CerrarCOEMRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                        argCerrarCOEM = new CerrarCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                        argCerrarCOEM = new CerrarCOEMRequest 
+                        { 
+                            IdentificadorCaratula = identificadorCaratula, 
+                            IdentificadorCOEM = identificadorCOEM 
+                        }
                     }
                 );
 
@@ -335,7 +343,11 @@ namespace Molinos.Scato.Servicios.Impl
                     new SolicitarAnulacionCOEMRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                        argSolicitarAnulacionCOEM = new SolicitarAnulacionCOEMRequest { IdentificadorCaratula = identificadorCaratula, IdentificadorCOEM = identificadorCOEM }
+                        argSolicitarAnulacionCOEM = new SolicitarAnulacionCOEMRequest 
+                        { 
+                            IdentificadorCaratula = identificadorCaratula, 
+                            IdentificadorCOEM = identificadorCOEM 
+                        }
                     });
 
 				log.Info($" request: { XmlConverter<SolicitarAnulacionCOEMRequest1>.Serialize(request)} ");
@@ -353,21 +365,26 @@ namespace Molinos.Scato.Servicios.Impl
 
         public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto dto)
         {
-            try
+			log.Info("Inicializando SolicitarCierreCargaGranel");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                SolicitarCierreCargaGranelRequest1 solicitarCierreCargaGranelRequest1 = new SolicitarCierreCargaGranelRequest1(
+                SolicitarCierreCargaGranelRequest1 request = new SolicitarCierreCargaGranelRequest1(
                     new SolicitarCierreCargaGranelRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                         argSolicitarCierreCargaGranel = this.conversor.Convertir<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>(dto)
                     });
-                return this.wgescomunicacionembarque.SolicitarCierreCargaGranel(solicitarCierreCargaGranelRequest1);
-            }
+				log.Info($" request: {XmlConverter<SolicitarCierreCargaGranelRequest1>.Serialize(request)} ");
+				var response = this.wgescomunicacionembarque.SolicitarCierreCargaGranel(request);
+				log.Info($" response: {JsonConverter<SolicitarCierreCargaGranelResponse>.Serialize(response)}");
+				log.Info("Finalizando SolicitarCierreCargaGranel");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar Solicitar cierre de carga granel. Error {0} trace: {1}", ex.Message, ex.StackTrace);
@@ -377,14 +394,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, string codigoMotivo, string descripcionMotivo)
         {
-            try
+			log.Info("Inicializando SolicitarNoAbordo");
+			try
             {
                 this.cuitRepresentada = 30715118773;
                 this.rol = "DEPO";
                 this.tipoAgente = "DEPO";
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
 
-                SolicitarNoABordoRequest1 solicitarNoABordoRequest1 = new SolicitarNoABordoRequest1(
+                SolicitarNoABordoRequest1 request = new SolicitarNoABordoRequest1(
                     new SolicitarNoABordoRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
@@ -397,8 +415,12 @@ namespace Molinos.Scato.Servicios.Impl
                             DescripcionMotivo = descripcionMotivo
                         }
                     });
-                return this.wgescomunicacionembarque.SolicitarNoABordo(solicitarNoABordoRequest1);
-            }
+				log.Info($" request: {XmlConverter<SolicitarNoABordoRequest1>.Serialize(request)} ");
+				var response = this.wgescomunicacionembarque.SolicitarNoABordo(request);
+				log.Info($" response: {JsonConverter<SolicitarNoABordoResponse>.Serialize(response)}");
+				log.Info("Finalizando SolicitarNoAbordo");
+				return response;
+			}
             catch (Exception ex)
             {
                 this.log.Error(ex, "Error al intentar Solicitar No Abordo. Error {0} trace: {1}", ex.Message, ex.StackTrace);
