@@ -29,25 +29,19 @@ export class NavbarComponent implements OnInit {
     }, 30000);
 
     setInterval(() => {
-      if(this.router.url.includes('/lineup')){
         this._cantidadNotificaciones = this.notificaciones.length;
-      } else{
-        this._cantidadNotificaciones = 0
-      }
     }, 1000);
   } 
 
   showNotificacionesVisibles(){
-    if(this.router.url.includes('/lineup') && this.notificaciones.length > 0 || this.notificacionesVisibles)
+    if(this.notificaciones.length > 0 || this.notificacionesVisibles)
       this.notificacionesVisibles = !this.notificacionesVisibles;
   }
 
   obtenerNotificaciones(){
-    if(this.router.url.includes('/lineup')){
       this._notificacionService.obtenerNotificaciones().subscribe((res: NotificacionProgramaDeEmbarque[]) => {
         this.notificaciones = res;
       })
-    }    
   }
 
   cantidadNotificaciones(cantidad: number){
