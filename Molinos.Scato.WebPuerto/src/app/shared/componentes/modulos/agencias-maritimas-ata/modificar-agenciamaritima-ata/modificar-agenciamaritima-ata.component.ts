@@ -8,9 +8,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-modal-modificar-agencias-maritimas-ata',
-  templateUrl: './modal-modificar-agencias-maritimas-ata.component.html',
-  styleUrls: ['./modal-modificar-agencias-maritimas-ata.component.css'],
+  selector: 'app-modificar-agenciamaritima-ata',
+  templateUrl: './modificar-agenciamaritima-ata.component.html',
+  styleUrls: ['./modificar-agenciamaritima-ata.component.css'],
 })
 export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
   @Input() id: number = null;

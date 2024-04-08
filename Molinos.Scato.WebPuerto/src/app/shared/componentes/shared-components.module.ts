@@ -40,7 +40,7 @@ import { NgxMaskModule } from "ngx-mask";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { EditarCrearClienteComponent } from './editar-crear-cliente/editar-crear-cliente.component';
 import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cliente.component';
-import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modal-modificacion-agencias-maritimas-ata/modal-modificar-agencias-maritimas-ata.component";
+import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modificar-agenciamaritima-ata/modificar-agenciamaritima-ata.component";
 
 const components = [
     AlertComponent,
