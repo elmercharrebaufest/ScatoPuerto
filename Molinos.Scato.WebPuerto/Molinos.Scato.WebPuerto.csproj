@@ -270,6 +270,8 @@
     <Content Include="src\app\shared\componentes\estados-puerto\estados-puerto-content.component.html" />
     <Content Include="src\app\shared\componentes\layout\layout.component.css" />
     <Content Include="src\app\shared\componentes\layout\layout.component.html" />
+    <Content Include="src\app\shared\componentes\modulos\agencias-maritimas-ata\modificar-agenciamaritima-ata.component.css" />
+    <Content Include="src\app\shared\componentes\modulos\agencias-maritimas-ata\modificar-agenciamaritima-ata.component.html" />
     <Content Include="src\app\shared\componentes\modulos\carga\reloj-balanzas\reloj-balanzas.component.css" />
     <Content Include="src\app\shared\componentes\modulos\carga\reloj-balanzas\reloj-balanzas.component.html" />
     <Content Include="src\app\shared\componentes\navtabs\navtabs.component.css" />
@@ -581,6 +583,8 @@
     <TypeScriptCompile Include="src\app\modulos\vapor\vapor.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\vapor\vapor.module.ts" />
     <TypeScriptCompile Include="src\app\shared\componentes\editar-crear-buques\editar-crear-buques.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\componentes\modulos\agencias-maritimas-ata\modificar-agenciamaritima-ata.component.spec.ts" />
+    <TypeScriptCompile Include="src\app\shared\componentes\modulos\agencias-maritimas-ata\modificar-agenciamaritima-ata.component.ts" />
     <TypeScriptCompile Include="src\app\shared\componentes\modulos\carga\reloj-balanzas\reloj-balanzas.component.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\ArchivosPuerto.ts" />
     <TypeScriptCompile Include="src\app\shared\modelos\balanza.ts" />
