@@ -56,4 +56,8 @@ export class ClienteService {
         return this.http.post(`${this.url}Clientes/DeshabilitarCliente`, cliente, { 'withCredentials': true });
     }
 
+    public exportarExcel(nombre: string): any{
+        return this.http.get(`${this.url}Clientes/ExportarExcel?nombre=${nombre}`, { 'withCredentials': true, responseType: 'blob'  });
+    }
+
 }

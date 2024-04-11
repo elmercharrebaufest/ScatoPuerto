@@ -11,6 +11,13 @@
     border-color: #1C7CD5;
 }
 
+.exportar {
+    color: #107d38;
+    background: white;
+    border-color: #107d38;
+    margin-left: 30px;
+}
+
 :host ::ng-deep .multiselect-dropdown .dropdown-btn {
     background: #ffffff !important;
     color: #898989 !important;

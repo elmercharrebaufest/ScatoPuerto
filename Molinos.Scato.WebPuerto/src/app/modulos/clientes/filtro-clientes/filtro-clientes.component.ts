@@ -42,6 +42,20 @@ export class FiltroClientesComponent implements OnInit {
     this.estaCargando = false;
   } 
 
+  onExportExcel(){
+    this.clienteService.exportarExcel(this.filtroBuquedaForm.controls.nombre.value).subscribe(
+      (data: any) => { 
+      const element = document.createElement('a');
+      element.href = URL.createObjectURL(data);
+      element.download = "listado_clientes" + '.xls';
+      document.body.appendChild(element);
+      element.click();
+      }, (error) =>{
+        console.error(error);
+      }
+    );
+  }
+
   public getFiltroBusquedaForm() {    
     return this.filtroBuquedaForm;
   }
