@@ -29,7 +29,6 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public nominacion: any;
   subscripcionPrograma: Subscription
 
-
   paginator: any;
   length = 0;
   pageSize: number;
@@ -52,6 +51,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   private user: Usuario;
   public estaEnviando= false;
   //#endregion
+
   constructor(private progamaService: ProgramaEmbarqueService,
     private modalService: NgbModal,
     private route: Router,
@@ -233,7 +233,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   }
 
-  enviarMail(nominacionId: number, nombreBuque, material, datos, tipoDeMail) {
+  enviarMail(nominacionId: number, nombreBuque, material, datos, tipoDeMail, historial) {
     var titulo = tipoDeMail;
     var asunto = nombreBuque + " " + material + " - Nominación " + (datos != null || datos != undefined ? datos : "");
     var text = "Cuerpo del mail:";
@@ -247,7 +247,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         mail.copia = data.copia;
         mail.titulo = asunto;
       }
-    )   
+    )
     mail.tipoDeMail = tipoDeMail;
     mail.id = nominacionId;
     var button1 = 'Enviar';
@@ -255,11 +255,20 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     this.envioDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
         .then((confirmed) => {
         if (confirmed) {
-          this.estaEnviando = true;
-            this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(data => {
+          this.estaEnviando = false;
+          
+          this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(data => {
                 this.envioDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '',null, null, Tipoalerta.Success, null, null, true)
                     .then((confirmed) => {
                     if (confirmed) {
+                      // <ARMOA005-1658 Dylan Lopez>
+                      if (tipoDeMail == 'Surveyor'){
+                        historial.enviadoSurveyor = !historial.enviadoSurveyor;
+                      } else if (tipoDeMail == 'Fumigador'){
+                        historial.enviadoFumigador = !historial.enviadoFumigador;
+                      }
+                      // </ ARMOA005-1658 Dylan Lopez>
+
                       this.estaEnviando = false;
                         return;
                     }
@@ -276,6 +285,5 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.estaEnviando = false;
     });
-}
-
+  }
 }

@@ -140,12 +140,20 @@
                 <td class="lista-buque-row-item noBorder-rigth centradoHorizontal">{{historial.etaRecalada |
                     date:'dd/MM/yyyy'}}</td>
                 <td style="text-align: center;" class="noBorder centradoHorizontal">
-                    <div class='icon-fumigador'
-                        [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoFumigador) }"></div>
+                  <!-- <ARMOA005-1658 Dylan Lopez> -->
+                  <!-- <div class='icon-fumigador'
+                        [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoFumigador) }"></div> -->
+                  <div class='icon-fumigador' [ngClass]="{'color-azul': historial.enviadoFumigador, 'color-gris': !historial.enviadoFumigador}">
+                  </div>
+                  <!-- </ ARMOA005-1658 Dylan Lopez> -->
                 </td>
                 <td style="text-align: center;" class="noBorder centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
-                    <div class='icon-surveyor'
-                        [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div>
+                  <!-- <ARMOA005-1658 Dylan Lopez> -->
+                  <!-- <div class='icon-surveyor'
+                        [ngStyle]="{ 'background-color': retornarColorEnvioMail(historial.enviadoSurveyor) }"></div> -->
+                  <div class='icon-surveyor' [ngClass]="{'color-azul': historial.enviadoSurveyor, 'color-gris': !historial.enviadoSurveyor}">
+                  </div>
+                  <!-- </ ARMOA005-1658 Dylan Lopez> -->
                 </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoParaNominar()'>
                     <div class="btn-group" *ngIf="!historial.fechaEliminacion">
@@ -154,13 +162,17 @@
                             <strong>Nominar</strong>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item cursor"
-                                (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.companiaFumigador, 'Fumigador')">Fumigador</a>
-                            <a class="dropdown-item cursor"
-                                (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.surveyor, 'Surveyor')">Surveyor</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item cursor"
-                                (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
+                          
+                          <!-- <ARMOA005-1658 Dylan Lopez> -->
+                          <!-- <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.companiaFumigador, 'Fumigador')">Fumigador</a> -->
+                          <!-- <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.surveyor, 'Surveyor')">Surveyor</a> -->
+
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.companiaFumigador, 'Fumigador', historial)">Fumigador</a>
+                          <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.surveyor, 'Surveyor', historial)">Surveyor</a>
+                          <!-- </ ARMOA005-1658 Dylan Lopez> -->
+
+                          <div class="dropdown-divider"></div>
+                            <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
                         </div>
                     </div>
                 </td>
