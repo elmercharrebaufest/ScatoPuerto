@@ -30,26 +30,29 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         {
             ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
 
-            var dbAgenciaMaritimaPuerto = contexto.Set<AgenciaMaritimaPuerto>();
-            var dbAtaPuerto = contexto.Set<ATAPuerto>();
+            var queryAgencias = contexto.Set<AgenciaMaritimaPuerto>()
+                .Where(agencia => agencia.Activa &&
+                    (string.IsNullOrEmpty(Nombre) || agencia.Nombre.Contains(Nombre)) &&
+                    (string.IsNullOrEmpty(Cuit) || agencia.Cuit.Contains(Cuit)))
+                .Select(agencia => new AgenciaMaritimaATADto { Id = agencia.Id, Nombre = agencia.Nombre, Cuit = agencia.Cuit, Tipo = 1 });
 
-            var queryAgencias = from agencia in dbAgenciaMaritimaPuerto
-                                where agencia.Activa &&
-                                (string.IsNullOrEmpty(this.Nombre) || agencia.Nombre.Contains(this.Nombre)) &&
-                                (string.IsNullOrEmpty(this.Cuit) || agencia.Cuit.Contains(this.Cuit))
-                                select new AgenciaMaritimaATADto { Id = agencia.Id, Nombre = agencia.Nombre, Cuit = agencia.Cuit, Tipo = 1 };
+            var queryAta = contexto.Set<ATAPuerto>()
+                .Where(ata => ata.Activa &&
+                    (string.IsNullOrEmpty(Nombre) || ata.Nombre.Contains(Nombre)) &&
+                    (string.IsNullOrEmpty(Cuit) || ata.Cuit.Contains(Cuit)))
+                .Select(ata => new AgenciaMaritimaATADto { Id = ata.Id, Nombre = ata.Nombre, Cuit = ata.Cuit, Tipo = 2 });
 
-            var queryATA = from ata in dbAtaPuerto
-                           where ata.Activa &&
-                           (string.IsNullOrEmpty(this.Nombre) || ata.Nombre.Contains(this.Nombre)) &&
-                           (string.IsNullOrEmpty(this.Cuit) || ata.Cuit.Contains(this.Cuit))
-                           select new AgenciaMaritimaATADto { Id = ata.Id, Nombre = ata.Nombre, Cuit = ata.Cuit, Tipo = 2 };
-
-            var query = queryAgencias.Concat(queryATA).Where(a => Tipo == 0 || a.Tipo == Tipo).OrderBy(a => a.Nombre);
+            var query = queryAgencias.Concat(queryAta).Where(a => Tipo == 0 || a.Tipo == Tipo).OrderBy(a => a.Nombre);
             var itemsTotales = query.Count();
             var saltear = (Paginacion.Pagina - 1) * Paginacion.ItemsPorPagina;
 
-            var resultado = query.Skip(saltear).Take(Paginacion.ItemsPorPagina).ToList();
+            var queryFinal = query.Skip(saltear);
+            if (Paginacion.ItemsPorPagina > 0)
+            {
+                queryFinal = queryFinal.Take(Paginacion.ItemsPorPagina);
+            }
+
+            var resultado = queryFinal.ToList();
             return new ListaPaginada<AgenciaMaritimaATADto>(resultado, Paginacion.Pagina, Paginacion.ItemsPorPagina, itemsTotales);
         }
     }

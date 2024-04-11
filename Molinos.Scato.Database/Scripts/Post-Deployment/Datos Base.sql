@@ -921,3 +921,112 @@ if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Elimi
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
 
+-- Agencias Maritimas y ATA
+IF (SELECT COUNT(Cuit) FROM AgenciaMaritimaPuerto) = 0 BEGIN
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MSA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MSA','30709247235') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MARITIMA MARSA SRL') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MARITIMA MARSA SRL','30709539023') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'BROADGRAIN') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('BROADGRAIN','30715631608') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'INTERGRAIN') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('INTERGRAIN','30708877189') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AG.MARITIMA DELTA SA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AG.MARITIMA DELTA SA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'RIO PARANA SA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('RIO PARANA SA','30507057574') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'NORMAN HNOS. SA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('NORMAN HNOS. SA','30-57867162-1') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AGCIA. MAR. EL HAUAR') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AGCIA. MAR. EL HAUAR','30708793627') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AGCIA. MARIT. DELTA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AGCIA. MARIT. DELTA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AG.MAR.TRANSPARANA SA.') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AG.MAR.TRANSPARANA SA.','30707428194') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MULTIMAR') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MULTIMAR','3068078995') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AG. MARITIMA ARGENPAR S.A.') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AG. MARITIMA ARGENPAR S.A.','30709509485') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MEDITERRANEAN SHIPPING COMPANY') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MEDITERRANEAN SHIPPING COMPANY','30693184947') END
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '33578648599' WHERE Nombre = 'CONSULTORES MARITIMOS'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30709874175' WHERE Nombre = 'INCHCAPE'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30645563472' WHERE Nombre = 'CLIPPER'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30645563472' WHERE Nombre = 'RIOPLAT'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30645563472' WHERE Nombre = 'seaplate'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30612732503' WHERE Nombre = 'NABSA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30615647345' WHERE Nombre = 'ALPEMAR'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30650924424' WHERE Nombre = 'SUPERMAR'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30641739916' WHERE Nombre = 'CHRISTOPHERSEN'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30710931891' WHERE Nombre = 'Bonmar'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30680516959' WHERE Nombre = 'Faroship'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30680495064' WHERE Nombre = 'BALTZER'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30707691847' WHERE Nombre = 'FERTIMPORT'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30654214715' WHERE Nombre = 'WAVE'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506727967' WHERE Nombre = 'DULCE'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506764226' WHERE Nombre = 'MARSA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715788779' WHERE Nombre = 'WBL'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715788779' WHERE Nombre = 'JNL'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715312715' WHERE Nombre = 'AT PORT'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708672870' WHERE Nombre = 'OCEAN WAY'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708672870' WHERE Nombre = 'oceanway'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30709513490' WHERE Nombre = 'Antares'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715326570' WHERE Nombre = 'B2B'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708360496' WHERE Nombre = 'B&G'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506888189' WHERE Nombre = 'AMI'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30709155705' WHERE Nombre = 'ABBEY SEA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30717010708' WHERE Nombre = 'Argelan'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '33632809919' WHERE Nombre = 'argenbulk'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30716313146' WHERE Nombre = 'B&M Agencia Marítima'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30710243529' WHERE Nombre = 'BLUE STAR'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506792165' WHERE Nombre = 'Cargill'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '33627794369' WHERE Nombre = 'EUROAMERICA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30590162279' WHERE Nombre = 'HEINLEIN'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708138750' WHERE Nombre = 'ISA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30648168876' WHERE Nombre = 'Myrasa'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30648168876' WHERE Nombre = 'MIRASA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30707647074' WHERE Nombre = 'Topsail'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30710544871' WHERE Nombre = 'Waypoint'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '11111111111' WHERE Nombre = 'a confirmar'
+END
+
+IF (SELECT COUNT(Cuit) FROM ATAPuerto) = 0 BEGIN
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'INCHCAPE') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('INCHCAPE','30709874175') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'RIOPLAT') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('RIOPLAT','30645563472') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'seaplate') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('seaplate','30645563472') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'SUPERMAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('SUPERMAR','30650924424') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Bonmar') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Bonmar','30710931891') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG. MARITIMA MARSA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG. MARITIMA MARSA','30506764226') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'JNL') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('JNL','30715788779') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'OCEAN WAY') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('OCEAN WAY','30708672870') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'oceanway') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('oceanway','30708672870') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Antares') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Antares','30709513490') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'ABBEY SEA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('ABBEY SEA','30709155705') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Argelan') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Argelan','30717010708') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'argenbulk') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('argenbulk','33632809919') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'B&M Agencia Marítima') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('B&M Agencia Marítima','30716313146') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'BLUE STAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('BLUE STAR','30710243529') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Cargill') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Cargill','30506792165') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'EUROAMERICA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('EUROAMERICA','33627794369') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'HEINLEIN') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('HEINLEIN','30590162279') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'ISA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('ISA','30708138750') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Myrasa') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Myrasa','30648168876') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'MIRASA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('MIRASA','30648168876') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Topsail') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Topsail','30707647074') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Waypoint') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Waypoint','30710544871') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG.MARITIMA DELTA SA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG.MARITIMA DELTA SA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'RIO PARANA SA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('RIO PARANA SA','30507057574') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'NORMAN HNOS. SA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('NORMAN HNOS. SA','30-57867162-1') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AGCIA. MAR. EL HAUAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AGCIA. MAR. EL HAUAR','30708793627') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AGCIA. MARIT. DELTA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AGCIA. MARIT. DELTA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG.MAR.TRANSPARANA SA.') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG.MAR.TRANSPARANA SA.','30707428194') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'MULTIMAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('MULTIMAR','3068078995') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG. MARITIMA ARGENPAR S.A.') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG. MARITIMA ARGENPAR S.A.','30709509485') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'MEDITERRANEAN SHIPPING COMPANY') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('MEDITERRANEAN SHIPPING COMPANY','30693184947') END
+    UPDATE ATAPuerto SET Cuit = '33578648599' WHERE Nombre = 'CONS.MARITIMOS SRL'
+    UPDATE ATAPuerto SET Cuit = '30645563472' WHERE Nombre = 'CLIPPER SRL (seaplate)'
+    UPDATE ATAPuerto SET Cuit = '30612732503' WHERE Nombre = 'AG.MARIT.NABSA S.A.'
+    UPDATE ATAPuerto SET Cuit = '30615647345' WHERE Nombre = 'ALPEMAR SRL'
+    UPDATE ATAPuerto SET Cuit = '30641739916' WHERE Nombre = 'CHRISTHOPHERSEN S.A.'
+    UPDATE ATAPuerto SET Cuit = '30680516959' WHERE Nombre = 'FAROSHIP S.R.L.'
+    UPDATE ATAPuerto SET Cuit = '30680495064' WHERE Nombre = 'BALTZER MARITIMA SRL'
+    UPDATE ATAPuerto SET Cuit = '30707691847' WHERE Nombre = 'FERTIMPORT'
+    UPDATE ATAPuerto SET Cuit = '30709247235' WHERE Nombre = 'MARITIME SHIPPING AGENCY SRL'
+    UPDATE ATAPuerto SET Cuit = '30654214715' WHERE Nombre = 'WAVE AG. MARITIMA S.A.'
+    UPDATE ATAPuerto SET Cuit = '30506727967' WHERE Nombre = 'AGENCIA MARITIMA DULCE S.A.'
+    UPDATE ATAPuerto SET Cuit = '30709539023' WHERE Nombre = 'MARITIMA MARSA SRL'
+    UPDATE ATAPuerto SET Cuit = '30715788779' WHERE Nombre = 'WBL (JNL MARITIMA)'
+    UPDATE ATAPuerto SET Cuit = '30715312715' WHERE Nombre = 'at port'
+    UPDATE ATAPuerto SET Cuit = '30715326570' WHERE Nombre = 'B2B'
+    UPDATE ATAPuerto SET Cuit = '30708360496' WHERE Nombre = 'B&G'
+    UPDATE ATAPuerto SET Cuit = '30506888189' WHERE Nombre = 'AMI'
+    UPDATE ATAPuerto SET Cuit = '30715631608' WHERE Nombre = 'BROADGRAIN ARGENTINA'
+    UPDATE ATAPuerto SET Cuit = '30708877189' WHERE Nombre = 'INTERGRAIN'
+END

@@ -1070,7 +1070,6 @@
     <Compile Include="Entidades\AfipTablasReferencia\AfipTipoDocumento.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipMotivoSolicitudCambio.cs" />
     <Compile Include="Entidades\AfipTablasReferencia\AfipTipoEmbalaje.cs" />
-    <Compile Include="Entidades\AgenciasMaritimaATA\AuditoriaAgenciaMaritimaATA.cs" />
     <Compile Include="Entidades\ArchivosPuerto.cs" />
     <Compile Include="Entidades\AgenciasMaritimaATA\ATAPuerto.cs" />
     <Compile Include="Entidades\Auditoria.cs" />

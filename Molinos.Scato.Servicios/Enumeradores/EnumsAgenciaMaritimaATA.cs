@@ -12,12 +12,4 @@ namespace Molinos.Scato.Servicios.Enumeradores
         AgenciaMaritima,
         ATA
     }
-
-    public enum AccionesAgenciaMaritimaATA
-    {
-        Crear,
-        Modificar,
-        Eliminar,
-        Reactivar
-    }
 }

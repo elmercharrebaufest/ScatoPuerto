@@ -1,15 +1,14 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -36,19 +35,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var dto = comando.Dto;
                 var tipo = (AgenciaMaritimaATATipo)dto.Tipo;
 
-                var auditoria = new AuditoriaAgenciaMaritimaATA
+                var logABM = new LogABM
                 {
-                    Accion = (int)AccionesAgenciaMaritimaATA.Modificar,
-                    Usuario = comando.Usuario,
-                    Fecha = DateTime.Now
-                };
-
-                var auditoriaBaja = new AuditoriaAgenciaMaritimaATA
-                {
-                    Accion = (int)AccionesAgenciaMaritimaATA.Eliminar,
+                    Pantalla = comando.GetType().Name,
                     Usuario = comando.Usuario,
                     Fecha = DateTime.Now,
-                    Activa = "1 -> 0"
+                    Evento = EventoABM.Modificacion,
+                    Entidad = comando.ToJson(),
+                    ClaseId = comando.Dto.Id
                 };
 
                 if (tipo == AgenciaMaritimaATATipo.AgenciaMaritima)
@@ -71,26 +65,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var agenciaInactiva = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
                     if (agenciaInactiva == null)
                     {
-                        auditoria.Nombre = agenciaDb.Nombre + "->" + dto.Nombre;
-                        auditoria.Cuit = agenciaDb.Cuit + "->" + dto.Cuit;
-                        auditoria.AgenciaMaritimaPuerto = agenciaDb;
-						auditoria.Activa = "1";
-						agenciaDb.Nombre = dto.Nombre;
+                        agenciaDb.Nombre = dto.Nombre;
                         agenciaDb.Cuit = dto.Cuit ?? "";
-					}
+                    }
                     else
                     {
                         agenciaInactiva.Activa = true;
-                        auditoria.Accion = (int)AccionesAgenciaMaritimaATA.Reactivar;
-                        auditoria.AgenciaMaritimaPuerto = agenciaInactiva;
-                        auditoria.Nombre = dto.Nombre;
-                        auditoria.Cuit = dto.Cuit ?? "";
-                        auditoria.Activa = "0 -> 1";
+                        var agenciaInactivaJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaInactiva).ToJson();
+                        logABM.Entidad = "REACTIVACIÓN" + agenciaInactivaJSON;
+                        logABM.ClaseId = agenciaInactiva.Id;
 
                         agenciaDb.Activa = false;
-                        auditoriaBaja.AgenciaMaritimaPuerto = agenciaDb;
-                        auditoriaBaja.Nombre = agenciaDb.Nombre;
-                        auditoriaBaja.Cuit = agenciaDb.Cuit ?? "";
+                        var agenciaDbJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
+                        var logABM2 = new LogABM
+                        {
+                            Pantalla = comando.GetType().Name,
+                            Usuario = comando.Usuario,
+                            Fecha = DateTime.Now,
+                            Evento = EventoABM.Baja,
+                            Entidad = agenciaDbJSON,
+                            ClaseId = agenciaDb.Id
+                        };
+                        Repositorio.Agregar(logABM2);
                     }
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)
@@ -112,26 +108,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var ataInactiva = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
                     if (ataInactiva == null)
                     {
-                        auditoria.Nombre = ataDb.Nombre + "->" + dto.Nombre;
-                        auditoria.Cuit = ataDb.Cuit + "->" + dto.Cuit;
-                        auditoria.ATAPuerto = ataDb;
-						auditoria.Activa = "1";
-						ataDb.Nombre = dto.Nombre;
+                        ataDb.Nombre = dto.Nombre;
                         ataDb.Cuit = dto.Cuit ?? "";
-					}
+                    }
                     else
                     {
                         ataInactiva.Activa = true;
-                        auditoria.Accion = (int)AccionesAgenciaMaritimaATA.Reactivar;
-                        auditoria.ATAPuerto = ataInactiva;
-                        auditoria.Nombre = dto.Nombre;
-                        auditoria.Cuit = dto.Cuit ?? "";
-                        auditoria.Activa = "0 -> 1";
+                        var ataInactivaJSON = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataInactiva).ToJson();
+                        logABM.Entidad = "REACTIVACIÓN" + ataInactivaJSON;
+                        logABM.ClaseId = ataInactiva.Id;
 
                         ataDb.Activa = false;
-                        auditoriaBaja.ATAPuerto = ataDb;
-                        auditoriaBaja.Nombre = ataDb.Nombre;
-                        auditoriaBaja.Cuit = ataDb.Cuit ?? "";
+                        var ataDbJSON = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataDb).ToJson();
+                        var logABM2 = new LogABM
+                        {
+                            Pantalla = comando.GetType().Name,
+                            Usuario = comando.Usuario,
+                            Fecha = DateTime.Now,
+                            Evento = EventoABM.Baja,
+                            Entidad = ataDbJSON,
+                            ClaseId = ataDb.Id
+                        };
+                        Repositorio.Agregar(logABM2);
                     }
                 }
                 else
@@ -139,12 +137,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception("El tipo especificado no existe");
                 }
 
-                Repositorio.Agregar(auditoria);
-                if (!string.IsNullOrEmpty(auditoriaBaja.Nombre))
-                {
-                    Repositorio.Agregar(auditoriaBaja);
-                }
-
+                Repositorio.Agregar(logABM);
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

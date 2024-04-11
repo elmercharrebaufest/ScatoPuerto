@@ -1,16 +1,13 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Helpers;
+using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
-using Molinos.Scato.Servicios.Orquestador;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -26,15 +23,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var dto = comando.Dto;
                 var tipo = (AgenciaMaritimaATATipo)dto.Tipo;
-
-                var auditoria = new AuditoriaAgenciaMaritimaATA
+                var logABM = new LogABM
                 {
-                    Accion = (int)AccionesAgenciaMaritimaATA.Crear,
-                    Nombre = dto.Nombre,
-                    Cuit = dto.Cuit,
-                    Activa = "1",
+                    Pantalla = comando.GetType().Name,
                     Usuario = comando.Usuario,
-                    Fecha = DateTime.Now
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Alta,
+                    Entidad = comando.ToJson()
                 };
 
                 if (tipo == AgenciaMaritimaATATipo.AgenciaMaritima)
@@ -56,11 +51,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                     else
                     {
+                        logABM.Entidad = "REACTIVACION " + logABM.Entidad;
+                        logABM.ClaseId = agenciaDb.Id;
                         agenciaDb.Activa = true;
-                        auditoria.Accion = (int)AccionesAgenciaMaritimaATA.Reactivar;
-                        auditoria.Activa = "0 -> 1";
                     }
-                    auditoria.AgenciaMaritimaPuerto = agenciaDb;
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)
                 {
@@ -82,16 +76,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     else
                     {
                         ataDb.Activa = true;
-                        auditoria.Accion = (int)AccionesAgenciaMaritimaATA.Reactivar;
-                        auditoria.Activa = "0 -> 1";
+                        logABM.Entidad = "REACTIVACIÓN " + logABM.Entidad;
+                        logABM.ClaseId = ataDb.Id;
                     }
-                    auditoria.ATAPuerto = ataDb;
                 }
                 else
                 {
                     throw new Exception("El tipo especificado no existe");
                 }
-                Repositorio.Agregar(auditoria);
+                Repositorio.Agregar(logABM);
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

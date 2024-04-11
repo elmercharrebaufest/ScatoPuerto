@@ -1207,6 +1207,13 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.ListarConsultaPaginada(new ListarAgenciasATAConsulta(paginacion, nombre, cuit, tipo));
         }
 
+        public List<AgenciaMaritimaATADto> ListarAgenciasATASinPaginar(string nombre, string cuit, int tipo)
+        {
+            var paginacion = new Paginacion();
+            var listaPaginada = repositorio.ListarConsultaPaginada(new ListarAgenciasATAConsulta(paginacion, nombre, cuit, tipo));
+            return listaPaginada.Items.ToList();
+        }
+
         public ATAPuertoDto ObtenerATAPuerto(int id)
         {
             return Obtener<ATAPuerto, ATAPuertoDto>(id);

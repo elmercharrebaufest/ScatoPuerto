@@ -725,6 +725,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
+        [Route("api/ProgramaEmbarque/ListarAgenciasATASinPaginar")]
+        public HttpResponseMessage ListarAgenciasATASinPaginar(string nombre = null, string cuit = null, int tipo = 0)
+        {
+            try
+            {
+                var listado = servicioProgramaEmbarque.ListarAgenciasATASinPaginar(nombre, cuit, tipo);
+                return Request.CreateResponse(HttpStatusCode.OK, listado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
         [Route("api/ProgramaEmbarque/ObtenerAgenciaMaritima")]
         public HttpResponseMessage ObtenerAgenciaMaritima(int id)
         {

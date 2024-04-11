@@ -1,14 +1,14 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -73,12 +73,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var tipo = (AgenciaMaritimaATATipo)comando.Tipo;
                 ValidarEnNominacionLineUp(comando.Id, tipo);
 
-                var auditoria = new AuditoriaAgenciaMaritimaATA
+                var logABM = new LogABM
                 {
-                    Accion = (int)AccionesAgenciaMaritimaATA.Eliminar,
+                    Pantalla = comando.GetType().Name,
                     Usuario = comando.Usuario,
                     Fecha = DateTime.Now,
-                    Activa = "1 -> 0"
+                    Evento = EventoABM.Baja,
+                    ClaseId = comando.Id
                 };
 
                 if (tipo == AgenciaMaritimaATATipo.AgenciaMaritima)
@@ -91,9 +92,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     agenciaDb.Activa = false;
-                    auditoria.Nombre = agenciaDb.Nombre;
-                    auditoria.Cuit = agenciaDb.Cuit ?? "";
-                    auditoria.AgenciaMaritimaPuerto = agenciaDb;
+                    var agenciaJson = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
+                    logABM.Entidad = agenciaJson;
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)
                 {
@@ -105,16 +105,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     ataDb.Activa = false;
-                    auditoria.Nombre = ataDb.Nombre;
-                    auditoria.Cuit = ataDb.Cuit ?? "";
-                    auditoria.ATAPuerto = ataDb;
+                    var ataJson = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataDb).ToJson();
+                    logABM.Entidad = ataJson;
                 }
                 else
                 {
                     throw new Exception("El tipo especificado no existe");
                 }
 
-                Repositorio.Agregar(auditoria);
+                Repositorio.Agregar(logABM);
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

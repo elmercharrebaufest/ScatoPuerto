@@ -149,6 +149,9 @@ namespace Molinos.Scato.Servicios
         ListaPaginada<AgenciaMaritimaATADto> ListarAgenciasATA(Paginacion paginacion, string nombre, string cuit, int tipo);
 
         [OperationContract]
+        List<AgenciaMaritimaATADto> ListarAgenciasATASinPaginar(string nombre, string cuit, int tipo);
+
+        [OperationContract]
         ATAPuertoDto ObtenerATAPuerto(int id);
 
         [OperationContract]
