@@ -1,3 +1,4 @@
+import { formatDate } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -6,6 +7,8 @@ import { AgenciaMaritimaATA } from '@ScatoModels/programa-embarque/agencia-marit
 import { Subscription } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver-es';
 
 @Component({
   selector: 'app-agencias-maritimas-ata',
@@ -149,6 +152,50 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     this.typeAgencia = null;
 
     this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
+  }
+
+  exportarXLS = () => {
+    this.isLoading = true;
+    const obsAgenciasMaritimasAta = this.agenciaMaritimaAtaService.exportar(this.parametrosFiltro);
+
+    obsAgenciasMaritimasAta.subscribe(resp => {
+      console.log(resp);
+
+      let title = 'Agencias Maritimas y ATAs ';
+      if (this.parametrosFiltro.tipo == 1){
+        title = 'Agencias Maritimas ';
+      } else if (this.parametrosFiltro.tipo == 2){
+        title = 'ATAs ';
+      }
+      let workbook = new Workbook();
+      const worksheet = workbook.addWorksheet(title + formatDate(new Date(), 'yyyy-MM-dd', 'en'));
+
+      worksheet.columns = [
+        { header: 'NOMBRE', key: 'nombre', width: 30 },
+        { header: 'CUIT', key: 'cuit', width: 12 },
+        { header: 'TIPO', key: 'tipo', width: 20 }
+      ];
+
+      resp.forEach(agenciaMaritimaAta  => {
+        console.log(agenciaMaritimaAta );
+        worksheet.addRow({
+          nombre: agenciaMaritimaAta.nombre,
+          cuit: agenciaMaritimaAta.cuit,
+          tipo: agenciaMaritimaAta.tipo == 1 ? 'Agencia Maritima': 'ATA'
+        });
+      });
+      
+      workbook.xlsx.writeBuffer().then((data) => {
+        const archivo = title + formatDate(new Date(), 'yyyy-MM-dd', 'en') + '.xlsx'
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, archivo);
+      });
+
+      this.isLoading = false;
+    }, error => {
+      console.error(error);
+      this.isLoading = false;
+    });
   }
 
   editFinish = (event) => {

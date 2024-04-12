@@ -31,6 +31,15 @@ export class AgenciaMaritimaAtaService {
     return this.http.get<ListaPaginada<AgenciaMaritimaATA>>(`${this.url}ProgramaEmbarque/ListarAgenciasATA`, { 'withCredentials': true, params });
   }
 
+  public exportar(params: any) {
+    for (const prop in params) {
+      if (!params[prop]) {
+        delete params[prop];
+      }
+    }
+    return this.http.get<AgenciaMaritimaATA[]>(`${this.url}ProgramaEmbarque/ListarAgenciasATASinPaginar`, { 'withCredentials': true, params });
+  }
+
   public obtenerAgenciaMaritima(id: number): Observable<AgenciaMaritimaATA> {
     return this.http.get<AgenciaMaritimaATA>(`${this.url}ProgramaEmbarque/ObtenerAgenciaMaritima?id=${id}`, { 'withCredentials': true });
   }
