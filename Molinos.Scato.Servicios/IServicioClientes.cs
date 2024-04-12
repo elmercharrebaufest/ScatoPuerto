@@ -24,7 +24,5 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void DeshabilitarCliente(CoordinadorPuertoDto clienteDto, string usuario);
 
-        [OperationContract]
-        IList<CoordinadorPuertoDto> ListarClientes(string nombre);
     }
 }

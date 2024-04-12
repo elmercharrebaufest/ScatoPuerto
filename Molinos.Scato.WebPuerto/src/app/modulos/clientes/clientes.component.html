@@ -1,19 +1,16 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-10">
             <label class="cargando-clientes">Clientes</label>
-        </div>      
-        <div class="col-md-3">             
-            <button class="btn btn-outline-secondary" (click)="onVolver()">
-                < VOLVER 
-            </button>&nbsp;          
-        <app-editar-crear-cliente *ngIf='tienePermisoCrearNuevoCliente()'></app-editar-crear-cliente>&nbsp;
+        </div> 
+        <div class="col-md-2" *ngIf='tienePermisoCrearNuevoCliente()'>          
+        <app-editar-crear-cliente></app-editar-crear-cliente>
         </div>    
     </div>
     <div class="row">
         <div class="col-md-12">
-            <app-filtro-clientes></app-filtro-clientes> 
-        </div>  
+            <app-filtro-clientes></app-filtro-clientes>
+        </div>       
     </div>
     <div class="row">
         <div class="col-md-12">

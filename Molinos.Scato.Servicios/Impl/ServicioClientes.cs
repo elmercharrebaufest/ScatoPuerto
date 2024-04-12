@@ -4,10 +4,8 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
-using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Molinos.Scato.Servicios.Impl
@@ -17,14 +15,12 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IRepositorio repositorio;
         private readonly IServicioComandos comandos;
         private readonly ILogger log;
-        private readonly IConversor conversor;
 
-        public ServicioClientes(IRepositorio repositorio, IServicioComandos comandos, ILogger log, IConversor conversor)
+        public ServicioClientes(IRepositorio repositorio, IServicioComandos comandos, ILogger log)
         {
             this.repositorio = repositorio;
             this.comandos = comandos;
             this.log = log;
-            this.conversor = conversor;
         }
 
         public void GuardarCliente(CoordinadorPuertoDto clienteDto, string usuario)
@@ -182,17 +178,6 @@ namespace Molinos.Scato.Servicios.Impl
                                   e.Coordinadores.Any(c => c.CoordinadorPuerto.Id == clienteBd.Id)
                                   select (e)).Any();
             return existeEmbarque;
-        }
-
-        public IList<CoordinadorPuertoDto> ListarClientes(string nombre)
-        {
-            var clientes = conversor.ConvertirList<CoordinadorPuerto, CoordinadorPuertoDto>(
-                this.repositorio.Listar<CoordinadorPuerto>(c => c.Habilitado == true));
-            if (!string.IsNullOrEmpty(nombre))
-            {
-                return clientes.Where(c2 => c2.Nombre.ToUpper().Contains(nombre.ToUpper())).ToList();
-            }
-            return clientes;
         }
     }
 }

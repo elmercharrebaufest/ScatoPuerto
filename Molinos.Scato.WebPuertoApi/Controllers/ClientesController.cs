@@ -1,15 +1,17 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
-using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.Servicios.Impl;
 using Molinos.Scato.Servicios;
-using Molinos.Scato.WebPuertoApi.Atributos;
-using Molinos.Scato.WebPuertoApi.EXCEL;
+using Ninject.Activation;
 using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Net;
 using System.Web;
 using System.Web.Http;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.WebPuertoApi.Atributos;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -71,29 +73,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 string usuario = base.nombreUsuario;
                 servicioClientes.DeshabilitarCliente(clienteDto, usuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
-            }
-        }
-
-        [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
-        [Route("api/Clientes/ExportarExcel")]
-        public HttpResponseMessage ExportarExcel(string nombre)
-        {
-            try
-            {
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
-                var listado = servicioClientes.ListarClientes(nombre);
-                var excel = new ExcelClientes(listado).GenerarExcel();
-                response.Content = new ByteArrayContent(excel);
-                response.Content.Headers.ContentLength = excel.LongLength;
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                response.Content.Headers.ContentDisposition.FileName = "listado_clientes" + ".xls";
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("listado_clientes.xls"));
-                return response;
             }
             catch (Exception ex)
             {
