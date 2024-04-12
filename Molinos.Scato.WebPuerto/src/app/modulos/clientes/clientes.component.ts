@@ -2,6 +2,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-clientes',
@@ -13,7 +14,7 @@ export class ClientesComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
 
-  constructor(public session: SessionService) {
+  constructor(public session: SessionService, private router: Router) {
     this.user = this.session.getUser(); 
   }
   ngOnInit(): void {
@@ -23,4 +24,7 @@ export class ClientesComponent implements OnInit {
     return this.user.permisos.find(p => p === this.permisosScato.Clientes_Crear);
   }
 
+  onVolver(){
+    this.router.navigate(['/'], { replaceUrl: true });
+  }
 }
