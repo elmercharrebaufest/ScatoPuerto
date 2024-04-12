@@ -3,4 +3,5 @@ export interface AgenciaMaritimaATA {
   nombre: string;
   cuit: string;
   tipo: number;
+  tipoNombre?: string;
 }

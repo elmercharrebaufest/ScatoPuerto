@@ -84,6 +84,13 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
     }
   }
 
+  changeTipo = (selectedValue: number) => {
+    if (selectedValue == 1) {
+      this.isAgenciaMaritima = true;
+    } else {
+      this.isAgenciaMaritima = false;
+    }
+  }
 
   closeModalEditarCrearCoem = () => {
     this.modalService.dismissAll();
@@ -152,7 +159,7 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
     if (this.isAgenciaMaritima) {
       destination += "Agencia Marítima";
     } else {
-      destination += "ATA";
+      destination += "A.T.A.";
     }
     return destination;
   }

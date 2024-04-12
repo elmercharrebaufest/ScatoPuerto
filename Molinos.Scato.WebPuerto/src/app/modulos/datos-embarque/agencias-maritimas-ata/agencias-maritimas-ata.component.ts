@@ -58,6 +58,8 @@ export class AgenciasMaritimasATAComponent implements OnInit {
         this.buscar();
       });
     });
+
+    this.buscar();
   }
 
   initForm = () => {
@@ -86,6 +88,14 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     const obsAgenciasMaritimasAta = this.agenciaMaritimaAtaService.listar(params);
 
     obsAgenciasMaritimasAta.subscribe((resp) => {
+      resp.items.forEach(r => {
+        if (r.tipo == 1) {
+          r.tipoNombre = 'Agencia Marítima';
+        } else {
+          r.tipoNombre = 'A.T.A.';
+        }
+      });
+
       this.listadoAgenciasMaritimasAta = resp.items;
       this.crearPaginado(resp.itemsTotales);
       this.isLoading = false;
@@ -146,7 +156,7 @@ export class AgenciasMaritimasATAComponent implements OnInit {
   }
 
   nuevaAgenciaMaritimaAta = (modal: NgbModal) => {
-    this.tittle = "Nueva Comunicación de Embarque Previa";
+    this.tittle = "Nueva Agencia Marítima / A.T.A.";
 
     this.idAgencia = null;
     this.typeAgencia = null;
@@ -161,11 +171,11 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     obsAgenciasMaritimasAta.subscribe(resp => {
       console.log(resp);
 
-      let title = 'Agencias Maritimas y ATAs ';
+      let title = 'Agencias Marítimas y A.T.A.s ';
       if (this.parametrosFiltro.tipo == 1){
-        title = 'Agencias Maritimas ';
+        title = 'Agencias Marítimas ';
       } else if (this.parametrosFiltro.tipo == 2){
-        title = 'ATAs ';
+        title = 'A.T.A.s ';
       }
       let workbook = new Workbook();
       const worksheet = workbook.addWorksheet(title + formatDate(new Date(), 'yyyy-MM-dd', 'en'));

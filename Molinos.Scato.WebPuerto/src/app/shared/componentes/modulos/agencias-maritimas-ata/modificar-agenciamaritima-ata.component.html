@@ -23,7 +23,7 @@
 
       <div class="row margen justify-content-center">
         <div class="form-group col-md-8 align-self-center">
-          <select class="custom-select" id="inputGroupSelect01" formControlName="tipo">
+          <select class="custom-select" id="inputGroupSelect01" formControlName="tipo" (change)="changeTipo($event.target.value)">
             <!-- <option selected value="0">Todos</option> -->
             <option value="1">Agencia Marítima</option>
             <option value="2">A.T.A.</option>              
