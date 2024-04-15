@@ -114,11 +114,11 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     this.idAgencia = agenciaMaritimaAta.id;
     this.typeAgencia = agenciaMaritimaAta.tipo;
 
-    this.tittle = "Rectificar ";
+    this.tittle = "Editar ";
     if (this.typeAgencia == 1) {
       this.tittle += "Agencia Marítima: " + agenciaMaritimaAta.nombre;
     } else {
-      this.tittle += "ATA: " + agenciaMaritimaAta.nombre;
+      this.tittle += "A.T.A.: " + agenciaMaritimaAta.nombre;
     }
 
     this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
@@ -129,10 +129,10 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     if (agenciaMaritimaAta.tipo == 1) {
       destination += "Agencia Marítima";
     } else {
-      destination += "ATA";
+      destination += "A.T.A.";
     }
 
-    const confirmacion = await this.confirmationDialogService.confirmar('Advertencia', `¿Está seguro de eliminar la ${destination} con id: ${agenciaMaritimaAta.id}?`);
+    const confirmacion = await this.confirmationDialogService.confirmar('Advertencia', `¿Está seguro de eliminar la ${destination}: ${agenciaMaritimaAta.nombre}?`);
     if (!confirmacion) {
       return;
     }
