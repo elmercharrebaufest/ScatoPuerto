@@ -24,10 +24,12 @@
       <div style="overflow-x:auto;" class="table-responsive">
         <table class='table table-bordered lista-coem-table'>
           <thead class="lista-coem-header">
-            <th>ATA</th>
-            <th>Peso (kg)</th>
-            <th>Identificador de la declaración</th>
-            <th></th>
+            <tr>
+              <th>ATA</th>
+              <th>Peso (kg)</th>
+              <th>Identificador de la declaración</th>
+              <th></th>
+            </tr>
           </thead>
           <tbody formArrayName="mercaderiasSueltas">
             <tr *ngFor="let mercaderia of mercaderiasSueltasFormArray.controls; let i = index; last as isLast" class="lista-coem-row" [formGroupName]="i">
