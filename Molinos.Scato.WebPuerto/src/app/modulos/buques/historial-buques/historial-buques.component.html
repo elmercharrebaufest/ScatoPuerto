@@ -4,7 +4,6 @@
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
         <thead class="lista-buque-header">
-
             <th>Buque</th>          
             <th>Desamarre</th>
             <th>Muelle</th>
@@ -23,7 +22,6 @@
                     *ngIf="!getFiltrosSeleccionado()?.esDetalle">{{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item celda-nombre-buque-detalle" *ngIf="getFiltrosSeleccionado()?.esDetalle">
                     {{historial.nombreBuque}}</td>
-              <!--   <td class="lista-buque-row-item">{{historial.embarqueId}}</td> -->
                 <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
@@ -42,9 +40,6 @@
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreExportador }}</div>
                 </td>
                 <td class="lista-buque-row-item">
-                   <!--  <div >{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div> -->
-                    <!--  <div *ngIf="historial.totalRitmoBaja   > 0" class="ritmo-baja-carga">{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div> -->
-                   
                     <div [ngStyle]="{'color': historial.totalRitmoNormal  > ritmoBajaCarga ? 'RGB(13,205,0)' : 'burlywood' }">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
                 </td>
                 <td class="lista-buque-row-item">{{historial.horasMuelle | date:'h:mm:ss ' }} hs</td>

@@ -14,7 +14,7 @@
             <div class="row margen font-weight-bold">
                 <div class="col pt-4">
                     <label class="">Nombre buque</label>
-                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreBuque" (input)="onInputNombreBuque($event)"/>
+                    <input type="text" class="form-control" placeholder="Ingrese nombre del buque" formControlName="nombreBuque" [ngClass]="{'input-error': submitted && f.nombreBuque.invalid}" (input)="onInputNombreBuque($event)"/>
                     </div>
                 <div class="col pt-4">
                     <label>Bandera</label>

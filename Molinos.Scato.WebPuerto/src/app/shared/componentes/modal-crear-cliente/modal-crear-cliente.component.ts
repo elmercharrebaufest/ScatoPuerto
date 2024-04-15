@@ -88,7 +88,7 @@ export class ModalCrearClienteComponent implements OnInit {
     cliente.id = this.id;
     cliente.habilitado = true;
 
-    if (this.crearEditarClienteForm.controls['nombre'].invalid) {
+    if (this.crearEditarClienteForm.controls['nombre'].invalid || this.crearEditarClienteForm.controls['nombre'].value.trim() == '') {
       this.mostrarSpinner = false;
       this.mensajeCliente = "";
       this.confirmationDialogService.confirm('Advertencia', 'Porfavor complete los campos requeridos.', 'Cerrar', '', null, null, Tipoalerta.Warning)

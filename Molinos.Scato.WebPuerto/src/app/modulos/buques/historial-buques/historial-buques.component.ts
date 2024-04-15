@@ -24,10 +24,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   private listaHistorialBuquesFiltro;
   private filtroBuquedaForm: FormGroup;
   private listaHistorialBuques$: any;
-  private tamanioPagina = 6;
-  private paginaActual: number = 1;
-  private totalPaginas: number = 0;
-  private listaPaginas: any;
   public buscarHistorialBuques: boolean = false;
   public esNoExisteRegistros = false;
   public esResumenOperatoria = false;
@@ -97,6 +93,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.listaHistorialBuques = null;
       this.listaHistorialBuquesFiltro = null;
       this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.setValue(false);
+      this.resetPagination();
       return;
     }
     if (this.esResumenOperatoria){
@@ -127,8 +124,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       const control = filtro.controls.control.value ?? "";
       const exportador = filtro.controls.nombreExportador.value ?? "";
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
-      const pagina: number = this.pageIndex?? null;
-      const itemsPorPagina: number = this.pageSize ?? null;
+      const pagina: number = this.pageIndex?? 0;
+      const itemsPorPagina: number = this.pageSize ?? 0;
 
       if (vaporId > 0) {
         desde = null;
@@ -155,15 +152,18 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.buscarHistorialBuques = false;
       return;
     }
+    this.buscarHistorialBuques = true;
     this.storeBuques = this.historialBuques$.subscribe(data => {
       if (data == null || data == undefined){
        this.buscarHistorialBuques = false;
        this.esNoExisteRegistros = true;
+       this.resetPagination();
         return;
       }
-      if (data.length == 0){
+      if (data.length === 0){
         this.buscarHistorialBuques = false;
         this.esNoExisteRegistros = true;
+        this.resetPagination();
         return;
       }
 
@@ -174,7 +174,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
           this.length = data.length > 0 ? data[0].itemsTotales : data.length;
           this.pageSize = data.length > 0 ? data[0].itemsPorPagina : 10;
           this.pageIndex = data.length > 0 ? data[0].pagina : 1;
-          //this.estaCargando = false;
 
           data.forEach(item => {
             if (item.productoExportador != undefined && item.productoExportador != null) {
@@ -203,7 +202,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
             this.listaHistorialBuques = JSON.parse(JSON.stringify(data));
             this.listaHistorialBuquesFiltro = JSON.parse(JSON.stringify(data));
           }
-          //this.setCargarPaginas();
           this.buscarHistorialBuques = false;
         }else{
          this.buscarHistorialBuques = false;
@@ -274,6 +272,12 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.disabled = false;
       this.pageSizeOptions = setPageSizeOptionsInput.split(',').map(str => +str);
     }
+  }
+
+  resetPagination(){
+    this.pageIndex = 0;
+    this.pageSize = 10;
+    this.length = 0;
   }
 // #endregion
 
