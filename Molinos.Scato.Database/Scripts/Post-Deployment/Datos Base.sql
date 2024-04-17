@@ -632,6 +632,7 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'A
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Lead (Pb)','Max: 10.0 mg/kg ')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Aflatoxin B1','Max: 30.0 micro gram/kg ')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Salmonella','No found in 25 grams')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Goods to be finely ground on a representative loading samples 90 pct passing thru 4.50 mm sieve','')
 
 END
 
@@ -723,6 +724,7 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'CET
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'GREEN HOUSE GAS SAVING ','Min: 60 %')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'C.F.P.P.','Max: -2 d. centigrades')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'WATER ','Max: 350 ppm')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'IODINE','Max: 135')
 END
 
 IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
