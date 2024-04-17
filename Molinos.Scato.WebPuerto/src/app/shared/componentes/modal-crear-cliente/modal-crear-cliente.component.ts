@@ -54,7 +54,7 @@ export class ModalCrearClienteComponent implements OnInit {
   private initFormCrearEditarCliente() {
     this.crearEditarClienteForm = null;
     this.crearEditarClienteForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, this.nombreInvalidoValidator()]],
       habilitado: true,
     })
   }
@@ -88,10 +88,10 @@ export class ModalCrearClienteComponent implements OnInit {
     cliente.id = this.id;
     cliente.habilitado = true;
 
-    if (this.crearEditarClienteForm.controls['nombre'].invalid || this.crearEditarClienteForm.controls['nombre'].value.trim() == '') {
+    if (this.crearEditarClienteForm.controls['nombre'].invalid) {
       this.mostrarSpinner = false;
       this.mensajeCliente = "";
-      this.confirmationDialogService.confirm('Advertencia', 'Porfavor complete los campos requeridos.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Advertencia', 'Por favor complete los campos requeridos.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
 
@@ -129,5 +129,27 @@ export class ModalCrearClienteComponent implements OnInit {
         this.mostrarSpinner = false;
         this.mensajeCliente = '';
       })
+  }
+
+  nombreInvalidoValidator() {
+    return (control) => {
+      if(!control.value)
+      return;
+
+      if (control.value.trim().length === 0) {
+        return { nombreInvalido: true };
+      }
+
+      if (control.value.trim().length < 3) {
+        return { nombreInvalido: true };
+      }
+
+      const soloCaracteresEspeciales = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+      if (soloCaracteresEspeciales.test(control.value)) {
+        return { nombreInvalido: true };
+      }
+      
+      return null;
+    };
   }
 }

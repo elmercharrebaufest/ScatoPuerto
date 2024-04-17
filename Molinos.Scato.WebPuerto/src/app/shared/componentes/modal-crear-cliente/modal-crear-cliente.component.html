@@ -11,7 +11,7 @@
         <div class="row margen font-weight-bold">
             <div class="col pt-4">
                 <label class="">Nombre</label>
-                <input type="text" class="form-control" maxlength="60" placeholder="Ingrese un nombre" formControlName="nombre" (input)="onInputNombreCliente($event)"/>
+                <input type="text" class="form-control" minlength="3" maxlength="60" placeholder="Ingrese un nombre" formControlName="nombre" (input)="onInputNombreCliente($event)"/>
             </div>
         </div>
         <br>

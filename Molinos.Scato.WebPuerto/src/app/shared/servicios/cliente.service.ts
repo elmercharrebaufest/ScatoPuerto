@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Cliente } from '@ScatoModels/cliente/cliente';
 import { environment } from 'environments/environment';
@@ -26,9 +26,16 @@ export class ClienteService {
     public ListarClientes(pagina: number = this.filtros.pagina, itemsPorPagina: number = this.filtros.itemsPorPagina,
         nombre: string = this.filtros.nombre) {
         this.actualizarFiltros(pagina, itemsPorPagina, nombre);
-        return this.http.get<Cliente>(`${this.url}Clientes/ListarClientes?pagina=${this.filtros.pagina}&itemsPorPagina=${this.filtros.itemsPorPagina}&nombre=${this.filtros.nombre}`,
+        let nroPagina = pagina != null ? pagina.toString() : null;
+        let itemPorPagina = itemsPorPagina != null ? itemsPorPagina.toString() : null;
+        let params = new HttpParams()
+            .set('pagina', nroPagina)
+            .set('itemsPorPagina', itemPorPagina)
+            .set('nombre', nombre);
+        return this.http.get<Cliente>(`${this.url}Clientes/ListarClientes`,
             {
-                'withCredentials': true
+                params: params,
+                'withCredentials': true,
             })
             .subscribe(
                 (data: any) => {
@@ -56,8 +63,8 @@ export class ClienteService {
         return this.http.post(`${this.url}Clientes/DeshabilitarCliente`, cliente, { 'withCredentials': true });
     }
 
-    public exportarExcel(nombre: string): any{
-        return this.http.get(`${this.url}Clientes/ExportarExcel?nombre=${nombre}`, { 'withCredentials': true, responseType: 'blob'  });
+    public exportarExcel(nombre: string): any {
+        return this.http.get(`${this.url}Clientes/ExportarExcel?nombre=${nombre}`, { 'withCredentials': true, responseType: 'blob' });
     }
 
 }
