@@ -36,10 +36,6 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('ModalModificarAgenciasMaritimasAtaComponent.ngOnInit()');
-    console.log(this.id);
-    console.log(this.tittle);
-    console.log(this.tipo);
     if (this.tipo == 1) {
       this.isAgenciaMaritima = true;
     } else {

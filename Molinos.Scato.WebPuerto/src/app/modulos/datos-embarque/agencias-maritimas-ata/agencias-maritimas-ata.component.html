@@ -107,7 +107,7 @@
 </div>
 
 <ng-template #editAgenciaAta let-modal>
-  <app-modificar-agenciamaritima-ata (editOCrearFinish)="editFinish($event)" 
+  <app-modificar-agenciamaritima-ata (finishEditOrCreate)="editFinish($event)" 
     [id]="idAgencia" 
     [tittle]="tittle" 
     [tipo]="typeAgencia">

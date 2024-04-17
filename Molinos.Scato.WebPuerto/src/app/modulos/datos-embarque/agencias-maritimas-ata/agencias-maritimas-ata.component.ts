@@ -142,14 +142,14 @@ export class AgenciasMaritimasATAComponent implements OnInit {
       this.isLoading = false;
       this.listadoAgenciasMaritimasAta = [];
       this.filtrar();
-    }, (err) => {
-      console.error(err);
+    }, (error) => {
+      console.error(error);
       this.isLoading = false;
       let msj: string;
-      if (typeof err.error == 'string') {
-        msj = err.error;
+      if (typeof error.error == 'string') {
+        msj = error.error;
       } else {
-        msj = err.error?.message || err.error?.error || `Ha ocurrido un error al eliminar la ${destination}`;
+        msj = error.error?.message || error.error?.error || `Ha ocurrido un error al eliminar la ${destination}`;
       }
       this.confirmationDialogService.error(msj);
     });
@@ -169,8 +169,6 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     const obsAgenciasMaritimasAta = this.agenciaMaritimaAtaService.exportar(this.parametrosFiltro);
 
     obsAgenciasMaritimasAta.subscribe(resp => {
-      console.log(resp);
-
       let title = 'Agencias Marítimas y A.T.A.s ';
       if (this.parametrosFiltro.tipo == 1){
         title = 'Agencias Marítimas ';
@@ -187,7 +185,6 @@ export class AgenciasMaritimasATAComponent implements OnInit {
       ];
 
       resp.forEach(agenciaMaritimaAta  => {
-        console.log(agenciaMaritimaAta );
         worksheet.addRow({
           nombre: agenciaMaritimaAta.nombre,
           cuit: agenciaMaritimaAta.cuit,
