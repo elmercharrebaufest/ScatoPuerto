@@ -583,6 +583,7 @@
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
+    <Compile Include="Procesamiento\ProcesadorActualizarCartasLineUp.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorEnvioMailZarpado.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearHistoricoEmbarqueLineUp.cs" />

@@ -84,6 +84,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
+    <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
     <Compile Include="Comandos\EliminarBuque.cs" />
     <Compile Include="Comandos\AgenciaMaritimaATA\CrearAgenciaMaritimaATA.cs" />
     <Compile Include="Comandos\AgenciaMaritimaATA\EliminarAgenciaMaritimaATA.cs" />

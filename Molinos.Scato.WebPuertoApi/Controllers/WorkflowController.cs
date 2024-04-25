@@ -1,11 +1,9 @@
-﻿using Molinos.Scato.Actividades.Interfaces;
-using Molinos.Scato.Actividades.Servicios;
+﻿using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
-using Molinos.Scato.WebPuertoApi.Helper;
 using System;
 using System.Linq;
 using System.Net;
@@ -42,7 +40,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/Workflow/ListarEnLineUp")]
         public HttpResponseMessage ListarEnLineUp()
         {
-          //   var embarques = workflows.ListarEmbarques();
+            //   var embarques = workflows.ListarEmbarques();
             var embarques = servicio.ListarEmbarques();
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
             return Request.CreateResponse(HttpStatusCode.OK,
@@ -67,25 +65,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Autorizacion(PermisosScato.LineUp_Ver)]
         public HttpResponseMessage Eliminar(Guid id)
         {
-            var resultado = Eliminar(servicio, servicioComandos, workflows, nombreUsuario, id);
+            var resultado = EliminarEmbarqueRecorrido(servicio, servicioComandos, nombreUsuario, id);
             return string.IsNullOrEmpty(resultado) ? Request.CreateResponse(HttpStatusCode.OK) : Request.CreateResponse(HttpStatusCode.InternalServerError, resultado);
         }
 
-        public static string Eliminar(IServicioRepositorio servicio, IServicioComandos servicioComandos, IListaDeWorkflows workflows, string nombreUsuario, Guid id)
+        public static string EliminarEmbarqueRecorrido(IServicioRepositorio servicio, IServicioComandos servicioComandos, string nombreUsuario, Guid id)
         {
             var recorridoId = servicio.ObtenerRecorridoIdPorGuid(id);
             var resultado = servicioComandos.Ejecutar(new EliminarRecorrido { Id = recorridoId, NombreUsuario = nombreUsuario }) as ResultadoEliminarRecorrido;
             if (resultado != null && resultado.HayErrores)
             {
                 return resultado.Errores.Values.First();
-            }
-            if (workflows.VerificarExistenciaDeWorkflowPorGuid(id))
-            {
-                var resultadoWf = workflows.EliminarInstanciaWorkflow(id);
-                if (resultadoWf != null && resultadoWf.HayErrores)
-                {
-                    return resultadoWf.Errores.Values.First();
-                }
             }
             return null;
         }

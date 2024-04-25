@@ -1,10 +1,9 @@
-using System;
-using System.Activities;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Servicios;
+using System;
+using System.Activities;
 
 namespace Molinos.Scato.Actividades.Internas
 {
@@ -24,7 +23,7 @@ namespace Molinos.Scato.Actividades.Internas
 
         [RequiredArgument]
         public InArgument<Guid> InstanciaWorkflowId { get; set; }
-       
+
         protected override Resultado Execute(CodeActivityContext context)
         {
             var embarque = Embarque.Get<EmbarqueDto>(context);
@@ -41,9 +40,6 @@ namespace Molinos.Scato.Actividades.Internas
                 var resultadoCrear = servicioComandos.Ejecutar(new Dominio.Comandos.CrearEmbarque
                 {
                     Embarque = embarque,
-                    NombreWorkflow = nombreWorkflow,
-                    InstanciaWorkflowId = instanciaWorkflow,
-                    WorkflowDefinicionId = workflowDefinicionId,
                     Usuario = nombreUsuario
                 }) as ResultadoCrear;
                 resultado.Id = resultadoCrear.Id;

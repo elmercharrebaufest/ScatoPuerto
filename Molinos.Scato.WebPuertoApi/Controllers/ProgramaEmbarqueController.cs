@@ -1,13 +1,9 @@
-﻿using Molinos.Scato.Actividades.Interfaces;
-using Molinos.Scato.Actividades.Servicios;
-using Molinos.Scato.Dominio.Comandos;
+﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
-using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using System;
@@ -16,7 +12,6 @@ using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
@@ -24,20 +19,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     public class ProgramaEmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;
-        private readonly IListaDeWorkflows workflows;
         private readonly IServicioRepositorio servicioRepositorio;
 
-        private readonly IServicioActividadFactory<IIngresarEmbarqueService> factory;
-
-        public ProgramaEmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory, IServicioRepositorio servicio,
+        public ProgramaEmbarqueController(IServicioRepositorio servicio,
             IServicioProgramaEmbarque servicioProgramaEmbarque,
-            IServicioComandos comandos,
-            IListaDeWorkflows workflows) : base(servicio, servicioProgramaEmbarque)
+            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque)
         {
-            this.factory = factory;
             this.comandos = comandos;
             this.servicioRepositorio = servicio;
-            this.workflows = workflows;
         }
 
         [HttpGet]
@@ -101,10 +90,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUpExportar)]
         //[Autorizacion(PermisosScato.LineUp_Exportar)]
@@ -118,7 +107,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
@@ -263,16 +251,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
                 bool bGraboOK = servicioProgramaEmbarque.CrearSurveyor(surveyor);
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
-
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarTipoDeFumigacion")]
@@ -280,16 +267,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
                 bool bGraboOK = servicioProgramaEmbarque.CrearTipoDeFumigacion(tipoDeFumigacion);
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
-
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/RegistrarCompaniaDeFumigacion")]
@@ -297,17 +283,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
                 bool bGraboOK = servicioProgramaEmbarque.CrearCompaniaDeFumigacion(companiaDeFumigacion);
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
-
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-
 
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
@@ -323,29 +306,35 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 if (bGraboOK)
                 {
                     #region Registro de dato tecnico
+
                     nominacion.Id = nominacionDto.Id;
                     resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
                     {
                         Dto = nominacion,
                         EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
                     });
-                    #endregion
+
+                    #endregion Registro de dato tecnico
 
                     #region Registro de recibos
+
                     if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
                     {
                         var listaNominacionRecibo = (List<NominacionReciboDto>)nominacion.NominacionRecibo;
                         servicioProgramaEmbarque.GuardarNominacionRecibo(listaNominacionRecibo, nominacion.Id);
                     }
-                    #endregion
+
+                    #endregion Registro de recibos
 
                     #region Registro de intervencion
+
                     resultado = comandos.Ejecutar(new GuardarNominacionDetalleIntervencion
                     {
                         Dto = nominacion.NominacionDetalleIntervencion,
                         nominacion_id = nominacion.Id
                     });
-                    #endregion
+
+                    #endregion Registro de intervencion
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
@@ -371,7 +360,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 });
                 bGraboOK = resultado.HayErrores ? false : true;
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
-
             }
             catch (Exception ex)
             {
@@ -415,7 +403,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
@@ -445,7 +432,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 servicioProgramaEmbarque.EliminarNominacion(nominacion_id);
                 return Request.CreateResponse(HttpStatusCode.OK);
-
             }
             catch (Exception ex)
             {
@@ -538,7 +524,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK,
                     servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
                 );
-
             }
             catch (Exception ex)
             {
@@ -629,7 +614,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     if (validacionEmbarques.ProgramaEmbarqueEmbarqueMaterial == null) // Nuevo Embarque
                     {
                         this.CrearAltaDeEmbarque(nominacion, centro, workflow, ref programaEmbarqueResultadoEnvioLineUp);
-
                     }
                     else
                     {
@@ -663,7 +647,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                                 });
                             }
                         }
-
                     }
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, programaEmbarqueResultadoEnvioLineUp);
@@ -692,6 +675,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         #region Agencias Maritimas y ATA
+
         [HttpGet]
         [Route("api/ProgramaEmbarque/ListarComboATA")]
         public HttpResponseMessage ListarComboATA()
@@ -823,7 +807,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
-        #endregion
+
+        #endregion Agencias Maritimas y ATA
 
         private EmbarqueDto CrearEmbarqueDto(NominacionDto nominacion, int centroId)
         {
@@ -891,7 +876,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 embarqueDto.Senasa = senasa.TieneSenasa;
             }
 
-
             embarqueDto.CantidadBodegasTanques = 0;
             embarqueDto.Destino = null;
             embarqueDto.ATA = nominacion.NominacionDatoTecnico.ATAPuerto;
@@ -937,7 +921,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     embarqueDto.EmbarqueInformacionViaje = null;
                     embarqueDto.EmbarquePosicion = null;
                 }
-
             }
             else
             {
@@ -948,6 +931,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             return embarqueDto;
         }
+
         private EmbarqueInformacionDto CrearEmbarqueInformacion(NominacionDatoTecnicoDto nominacionDatoTecnico)
         {
             EmbarqueInformacionDto embarqueInformacionDto = new EmbarqueInformacionDto();
@@ -962,6 +946,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             embarqueInformacionDto.FechaRegistro = DateTime.Now;
             return embarqueInformacionDto;
         }
+
         private bool CrearAltaDeEmbarque(NominacionDto nominacion, int centro, string workflow, ref ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp)
         {
             bool bCreacionEmbarque = false;
@@ -971,15 +956,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 EmbarqueDto embarqueDto = this.CrearEmbarqueDto(nominacion, centro);
                 servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Agregar, null, embarqueDto);
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
-                var servicioWf = factory.CrearServicio(workflowDefinicionId);
+
                 var controlRecorrido = new ControlRecorridoDto
                 {
                     Actividad = Textos.ActIngresarEmbarque,
                     ActividadXaml = "IngresarEmbarque",
                     NombreUsuario = nombreUsuario
                 };
-                var datosEmbarqueAux = servicioWf.IngresarEmbarque(embarqueDto, workflow, workflowDefinicionId, controlRecorrido);
-                datosEmbarque = ((ResultadoCrear)datosEmbarqueAux).Id;
+
+                var result = (ResultadoCrear)comandos.Ejecutar(new CrearEmbarque { Embarque = embarqueDto });
+
+                datosEmbarque = result.Id;
                 servicio.ActualizarEstadoBuque(datosEmbarque, 1);
                 servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, datosEmbarque, MensajeEnvioLineUp.ENVIO_OK);
                 bCreacionEmbarque = datosEmbarque > 0 ? true : false;
@@ -996,6 +983,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             return bCreacionEmbarque;
         }
+
         private bool ModificarAltaDeEmbarque(NominacionDto nominacion, ProgramaEmbarqueValidacionLineUpDto programaEmbarqueValidacionLineUp, ref ResultadoEnvioLineUpDto programaEmbarqueResultadoEnvioLineUp)
         {
             bool bModificacionEmbarque = false;
