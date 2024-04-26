@@ -47,7 +47,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var ubicaciones = servicio.ListarUbicacionDeBuquePuerto();
             return Request.CreateResponse(HttpStatusCode.OK,
                             embarques
-                                .Where(y => y.Embarque.SanBenito)
+                                .Where(y => y.Embarque.SanBenito || y.Embarque.Vicentin || y.Embarque.Noryon)
                                 .Select(x => new EmbarqueNavDto
                                 {
                                     Id = x.Embarque.Id,
@@ -56,7 +56,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                                     NombreBuque = x.Embarque != null ? x.Embarque.NombreBuque : "",
                                     Cargado = x.LineUp.PlanoDeCarga != null && x.LineUp.PlanoDeCarga.Cargado,
                                     NombreUbicacion = ubicaciones.Where(z => z.Id == x.Embarque.Ubicacion).FirstOrDefault()?.Nombre,
-                                    EsLiquido = x.Embarque.EsLiquido
+                                    EsLiquido = x.Embarque.EsLiquido,
+                                    Muelle = x.Embarque.SanBenito ? "sanBenito" : x.Embarque.Vicentin ? "vicentin" : "noryon"
                                 }).ToList()
                         );
         }
