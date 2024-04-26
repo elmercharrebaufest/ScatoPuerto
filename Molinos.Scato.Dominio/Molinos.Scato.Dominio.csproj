@@ -84,6 +84,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
+    <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
     <Compile Include="Comandos\Destinos\CrearDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\ModificarDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\EliminarDestinoPuerto.cs" />

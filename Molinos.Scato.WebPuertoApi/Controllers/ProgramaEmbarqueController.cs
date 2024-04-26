@@ -1,6 +1,4 @@
-﻿using Molinos.Scato.Actividades.Interfaces;
-using Molinos.Scato.Actividades.Servicios;
-using Molinos.Scato.Dominio.Comandos;
+﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Recursos;
@@ -23,20 +21,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     public class ProgramaEmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;
-        private readonly IListaDeWorkflows workflows;
         private readonly IServicioRepositorio servicioRepositorio;
 
-        private readonly IServicioActividadFactory<IIngresarEmbarqueService> factory;
-
-        public ProgramaEmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory, IServicioRepositorio servicio,
+        public ProgramaEmbarqueController(IServicioRepositorio servicio,
             IServicioProgramaEmbarque servicioProgramaEmbarque,
-            IServicioComandos comandos,
-            IListaDeWorkflows workflows) : base(servicio, servicioProgramaEmbarque)
+            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque)
         {
-            this.factory = factory;
             this.comandos = comandos;
             this.servicioRepositorio = servicio;
-            this.workflows = workflows;
         }
 
         [HttpGet]
@@ -821,6 +813,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         #endregion Agencias Maritimas y ATA
 
         #region Destinos
+
         [HttpGet]
         [Route("api/ProgramaEmbarque/ListarDestinos")]
         public HttpResponseMessage ListarDestinos(int pagina = 1, int itemsPorPagina = 10, string nombre = null)
@@ -896,7 +889,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
-        #endregion
+
+        #endregion Destinos
 
         private EmbarqueDto CrearEmbarqueDto(NominacionDto nominacion, int centroId)
         {
@@ -1044,15 +1038,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 EmbarqueDto embarqueDto = this.CrearEmbarqueDto(nominacion, centro);
                 servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Agregar, null, embarqueDto);
                 var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
-                var servicioWf = factory.CrearServicio(workflowDefinicionId);
+
                 var controlRecorrido = new ControlRecorridoDto
                 {
                     Actividad = Textos.ActIngresarEmbarque,
                     ActividadXaml = "IngresarEmbarque",
                     NombreUsuario = nombreUsuario
                 };
-                var datosEmbarqueAux = servicioWf.IngresarEmbarque(embarqueDto, workflow, workflowDefinicionId, controlRecorrido);
-                datosEmbarque = ((ResultadoCrear)datosEmbarqueAux).Id;
+
+                var result = (ResultadoCrear)comandos.Ejecutar(new CrearEmbarque { Embarque = embarqueDto });
+
+                datosEmbarque = result.Id;
                 servicio.ActualizarEstadoBuque(datosEmbarque, 1);
                 servicioProgramaEmbarque.AsociarEmbarquePorNominacionEnviada(nominacion.Id, datosEmbarque, MensajeEnvioLineUp.ENVIO_OK);
                 bCreacionEmbarque = datosEmbarque > 0 ? true : false;
