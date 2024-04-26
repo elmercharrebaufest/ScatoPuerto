@@ -41,6 +41,7 @@ import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { EditarCrearClienteComponent } from './editar-crear-cliente/editar-crear-cliente.component';
 import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cliente.component';
 import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modificar-agenciamaritima-ata.component";
+import { EditarCrearCargadorComponent } from './editar-crear-cargador/editar-crear-cargador.component';
 
 const components = [
     AlertComponent,
@@ -68,7 +69,8 @@ const components = [
     ModalCrearBuqueComponent,
     EditarCrearClienteComponent,
     ModalCrearClienteComponent,
-    ModalModificarAgenciasMaritimasAtaComponent
+    ModalModificarAgenciasMaritimasAtaComponent,
+    EditarCrearCargadorComponent,
 ]
 const libs = [
     CommonModule,

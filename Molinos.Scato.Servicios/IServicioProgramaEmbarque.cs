@@ -11,7 +11,6 @@ namespace Molinos.Scato.Servicios
     [ServiceContract]
     public interface IServicioProgramaEmbarque
     {
-
         [OperationContract]
         IList<TipoDeContratoDto> listarTipoDeContrato();
 
@@ -96,23 +95,23 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarNominacion(int nominacion_id);
 
-
         [OperationContract]
         void EliminarNotificacion(int notificacion_id, string username);
 
         [OperationContract]
         IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario);
+
         [OperationContract]
         MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipo);
 
         [OperationContract]
         IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
+
         [OperationContract]
         void ActualizarDatosYEnviarMail(MailDto mail, string usuario);
 
         [OperationContract]
         List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);
-
 
         [OperationContract]
         IList<VaporInformacionDto> ListarBuquesNominacion();
@@ -145,6 +144,7 @@ namespace Molinos.Scato.Servicios
         void EnviarMailNominacionesExcel(byte[] archivo);
 
         #region Agencias Maritimas ATA
+
         [OperationContract]
         ListaPaginada<AgenciaMaritimaATADto> ListarAgenciasATA(Paginacion paginacion, string nombre, string cuit, int tipo);
 
@@ -165,6 +165,26 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarAgenciaMaritimaATA(int id, int tipo, string usuario);
-        #endregion
+
+        #endregion Agencias Maritimas ATA
+
+        #region ABM Exportadores
+
+        [OperationContract]
+        ListaPaginada<ExportadorDto> ListarExportadoresPaginado(Paginacion paginacion, string nombre);
+
+        [OperationContract]
+        IList<ExportadorDto> ListarExportadores(string nombre);
+
+        [OperationContract]
+        void CrearExportador(ExportadorDto exportador, string usuario);
+
+        [OperationContract]
+        ExportadorDto ObtenerExportador(int id);
+
+        [OperationContract]
+        void EditarExportador(ExportadorDto exportador, string usuario);
+
+        #endregion ABM Exportadores 
     }
 }

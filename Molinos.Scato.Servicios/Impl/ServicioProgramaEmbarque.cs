@@ -1,20 +1,17 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
-using NPOI.Util;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
 using System.Collections.ObjectModel;
+using System.DirectoryServices;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Web;
-using Molinos.Scato.Dominio.Comandos;
-using System.Xml.Linq;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -37,7 +34,6 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var fechaHasta = fecha.HasValue ? new DateTime(fecha.Value.Year, fecha.Value.Month, DateTime.DaysInMonth(fecha.Value.Year, fecha.Value.Month)) : (DateTime?)null;
             return repositorio.ListarConsultaPaginada(new ListarProgramaEmbarqueConsulta(paginacion, fecha, buque, muelle, producto));
-
         }
 
         public ProgramaEmbarqueDto ListarDatosCombo()
@@ -348,7 +344,6 @@ namespace Molinos.Scato.Servicios.Impl
                         //Guardo toda la data en la DB.
                         repositorio.Agregar(nominacionReciboDB);
                         repositorio.GuardarCambios();
-
                     }
                 }
                 repositorio.GuardarCambios();
@@ -358,6 +353,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public bool ValidarCreacionNominacion(NominacionValidaDto nominacion)
         {
             bool bValidacion = true;
@@ -401,8 +397,8 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
             return bCreado;
-
         }
+
         public bool CrearTipoDeFumigacion(TipoDeFumigacionDto tipoDeFumigacion)
         {
             bool bCreado = false;
@@ -443,6 +439,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return bCreado;
         }
+
         public NominacionDto GuardarNominacion(NominacionDto nominacion)
         {
             var nominacion_BD = new Nominacion();
@@ -474,7 +471,6 @@ namespace Molinos.Scato.Servicios.Impl
                     nominacion_BD.FechaEnvioLineUp = nominacion.FechaEnvioLineUp;
                     nominacion_BD.FechaEliminacion = nominacion.FechaEliminacion;
                     repositorio.GuardarCambios();
-
                 }
             }
             catch (Exception ex)
@@ -483,7 +479,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return nominacion;
         }
-
 
         public void EliminarNominacion(int nominacion_id)
         {
@@ -499,7 +494,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -518,7 +512,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -564,6 +557,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public enum TipoNotificacion
         {
             Agregar = 0,
@@ -609,8 +603,6 @@ namespace Molinos.Scato.Servicios.Impl
                         break;
                 }
             }
-
-
 
             NotificacionProgramaDeEmbarque notificacionProgramaDeEmbarque = new NotificacionProgramaDeEmbarque()
             {
@@ -660,7 +652,6 @@ namespace Molinos.Scato.Servicios.Impl
             copia.AddRange(direccionesExtra);
 
             copia.RemoveAll(item => item == null || item == "");
-
 
             var mail = new MailDto
             {
@@ -729,7 +720,6 @@ namespace Molinos.Scato.Servicios.Impl
                     body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong> {item.CalidadValor.Parametro} </strong> {calidadValor} - </td>";
                     body += $"</tr>";
                 }
-
             }
             else
             {
@@ -754,7 +744,6 @@ namespace Molinos.Scato.Servicios.Impl
 
             //Recibo
             body += $"<br/>";
-
 
             if (nominacion.NominacionRecibo != null && nominacion.NominacionRecibo.Count > 0)
             {
@@ -894,6 +883,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public void ActualizarDatosYEnviarMail(MailDto mail, string usuario)
         {
             try
@@ -928,7 +918,6 @@ namespace Molinos.Scato.Servicios.Impl
 
                 mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
 
-
                 if (!string.IsNullOrEmpty(mailUsuarioCreador))
                 {
                     mail.Copia.Add(mailUsuarioCreador);
@@ -956,10 +945,8 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
-
         }
 
         private string ObtenerMailDeActiveDirectory(string UserName)
@@ -970,7 +957,6 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var userNameArray = UserName.Split('\\');
                 userName = userNameArray.Length == 1 ? userNameArray[0] : userNameArray[1];
-
             }
             catch { }
 
@@ -992,6 +978,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return string.Empty;
         }
+
         public List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id)
         {
             try
@@ -1002,14 +989,12 @@ namespace Molinos.Scato.Servicios.Impl
                     auditoriasNominaciones.Add(new Tuple<int, bool>(nominacion_id, repositorio.Listar<Auditoria>(x => x.Nominacion_Id == nominacion_id).Count > 0 ? true : false));
                 }
                 return auditoriasNominaciones;
-
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
-
 
         public IList<VaporInformacionDto> ListarBuquesNominacion()
         {
@@ -1030,7 +1015,6 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
             return vapores;
-
         }
 
         public IList<NominacionLineUpDto> ListarNominacionPorBuque(int vaporInformacion_Id)
@@ -1080,7 +1064,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return nominacionLineUps;
         }
-
 
         public ProgramaEmbarqueValidacionLineUpDto ObtenerEmbarque(int materialPuerto_Id, int muelleDeCarga_Id, int vapor_Id)
         {
@@ -1135,6 +1118,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public void AsociarEmbarquePorNominacionEnviada(int nominacion_Id, int embarque_Id, string observacion)
         {
             try
@@ -1151,11 +1135,11 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id)
         {
             try
             {
-
                 Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
                 MaterialPuertoCantidad materialPuertoCantidad = new MaterialPuertoCantidad();
                 materialPuertoCantidad.Embarque = repositorio.Obtener<Embarque>(embarque_Id);
@@ -1202,6 +1186,7 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
         #region Agencias Maritimas ATA
+
         public ListaPaginada<AgenciaMaritimaATADto> ListarAgenciasATA(Paginacion paginacion, string nombre, string cuit, int tipo)
         {
             return repositorio.ListarConsultaPaginada(new ListarAgenciasATAConsulta(paginacion, nombre, cuit, tipo));
@@ -1250,27 +1235,148 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
         }
-        #endregion
+
+        #endregion Agencias Maritimas ATA
 
         #region Metodos Utiles
+
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
         }
+
         private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
         }
+
         private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
         }
+
         private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
         }
 
+        #endregion Metodos Utiles
 
-        #endregion
+        #region ABM Exportadores/Cargadores
+
+        public ListaPaginada<ExportadorDto> ListarExportadoresPaginado(Paginacion paginacion, string nombre)
+        {
+            return repositorio.ListarConsultaPaginada(new ListarExportadoresConsulta(paginacion, nombre));
+        }
+
+        public IList<ExportadorDto> ListarExportadores(string nombre)
+        {
+            var exportadores = conversor.ConvertirList<Exportador, ExportadorDto>(
+                this.repositorio.Listar<Exportador>(e => e.Habilitado &&
+                (string.IsNullOrEmpty(nombre) || e.Nombre.Contains(nombre))));
+
+            return exportadores;
+        }
+
+        public void CrearExportador(ExportadorDto exportador, string usuario)
+        {
+            try
+            {
+                var existe = this.repositorio.Obtener<Exportador>(e => e.Nombre.Trim().ToUpper() == exportador.Nombre.Trim().ToUpper());
+                if (existe != null)
+                {
+                    if (existe.Habilitado)
+                    {
+                        throw new Exception("El nombre ingresado ya existe en otro exportador.");
+                    }
+                    else
+                    {
+                        var resActivacion = comandos.Ejecutar(new ModificarExportador
+                        {
+                            Dto = new ExportadorDto
+                            {
+                                Id = existe.Id,
+                                Nombre = existe.Nombre,
+                                Almacen_Id = existe.Almacen != null ? existe.Almacen.Id : (int?)null,
+                                AlmacenDesc = existe.Almacen?.Descripcion,
+                                Habilitado = true
+                            },
+                            Usuario = usuario
+                        });
+                        if (resActivacion.HayErrores)
+                        {
+                            throw new Exception(resActivacion.Errores[""]);
+                        }
+                    }
+                }
+                else
+                {
+                    var res = comandos.Ejecutar(new CrearExportador { Dto = exportador, Usuario = usuario });
+                    if (res.HayErrores)
+                    {
+                        throw new Exception(res.Errores[""]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Hubo un error al intentar guardar exportador.");
+                throw ex;
+            }
+        }
+
+        public void EditarExportador(ExportadorDto exportador, string usuario)
+        {
+            try
+            {
+                var existe = this.repositorio.Obtener<Exportador>(e => e.Nombre.Trim().ToUpper() == exportador.Nombre.Trim().ToUpper());
+                if (existe != null)
+                {
+                    if (existe.Habilitado)
+                    {
+                        throw new Exception("El nombre ingresado ya existe en otro exportador.");
+                    }
+                    else
+                    {
+                        var resActivacion = comandos.Ejecutar(new ModificarExportador
+                        {
+                            Dto = new ExportadorDto
+                            {
+                                Id = existe.Id,
+                                Nombre = existe.Nombre,
+                                Almacen_Id = existe.Almacen != null ? existe.Almacen.Id : (int?)null,
+                                AlmacenDesc = existe.Almacen?.Descripcion,
+                                Habilitado = true
+                            },
+                            Usuario = usuario
+                        });
+                        if (resActivacion.HayErrores)
+                        {
+                            throw new Exception(resActivacion.Errores[""]);
+                        }
+                    }
+                }
+                else
+                {
+                    var res = comandos.Ejecutar(new ModificarExportador { Dto = exportador, Usuario = usuario });
+                    if (res.HayErrores)
+                    {
+                        throw new Exception(res.Errores[""]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Hubo un error al intentar editar exportador.");
+                throw ex;
+            }
+        }
+
+        public ExportadorDto ObtenerExportador(int id)
+        {
+            return Obtener<Exportador, ExportadorDto>(id);
+        }
+
+        #endregion ABM Exportadores/Cargadores
     }
 }

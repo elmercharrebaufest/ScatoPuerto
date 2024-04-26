@@ -70,6 +70,13 @@
             <span *ngIf='opened'>Clientes</span>
           </div>
         </a>
+        
+        <a routerLink='/embarque/cargadores' *ngIf='tienePermiso("Exportadores_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/cargadores"'>        
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Cargadores ó Exportadores</span>
+          </div>
+        </a>
       </div>
       <!-- </ ARMOA005-1665 Dylan Lopez> -->
       

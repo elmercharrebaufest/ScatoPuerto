@@ -66,11 +66,13 @@ export class LayoutComponent implements OnInit {
     // <ARMOA005-1665 Dylan Lopez>
     if (this.user.permisos.find(x => x === 'Buque_Ver')) // TODO MODIFICAR PERMISO
       this.router.navigate(['/embarque/agencias'])
+    // </ ARMOA005-1665 Dylan Lopez>
     if (this.user.permisos.find(x => x === 'Buque_Ver'))
       this.router.navigate(['/buques'])
     if (this.user.permisos.find(x => x === 'Clientes_Visualizar'))
       this.router.navigate(['/clientes'])
-    // </ ARMOA005-1665 Dylan Lopez>
+    if (this.user.permisos.find(x => x === 'Exportadores_Visualizar'))
+      this.router.navigate(['/embarque/cargadores'])
     if (this.user.permisos.find(x => x === 'Comex_Nominacion_Ver'))
       this.router.navigate(['/programa'])
     if (this.user.permisos.find(x => x === 'Vapor_Visualizar'))

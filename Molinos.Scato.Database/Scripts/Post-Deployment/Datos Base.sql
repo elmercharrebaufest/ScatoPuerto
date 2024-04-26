@@ -923,6 +923,11 @@ if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Elimi
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
 
+--Visualizar Exportadores
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Exportadores_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Exportadores_Visualizar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Exportadores_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Exportadores_Visualizar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Exportadores_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Exportadores_Visualizar')); END
+
 -- Agencias Maritimas y ATA
 IF (SELECT COUNT(Cuit) FROM AgenciaMaritimaPuerto) = 0 BEGIN
     IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MSA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MSA','30709247235') END

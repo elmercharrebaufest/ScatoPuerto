@@ -119,6 +119,9 @@ export enum PermisosScato {
   Vapor_Crear = "Vapor_Crear",
   Vapor_Eliminar = "Vapor_Eliminar",
 
+  //Exportadores ó Cargadores
+  Exportadores_Visualizar = "Exportadores_Visualizar",
+
   // Afip
 
   Caratula_Visualizar="Caratula_Visualizar",
