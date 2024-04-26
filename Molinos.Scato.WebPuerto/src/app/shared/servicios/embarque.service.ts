@@ -24,19 +24,19 @@ export class EmbarqueService {
 
   url: string = environment.apiUrl;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
 
   }
 
   altaEmbarque(embarque: Embarque){
     console.log('altaEmbarque: ', embarque);
-    
+
     return this.http.post(`${this.url}Embarque/AltaEmbarque`, embarque, { 'withCredentials' : true});
   }
 
   modificarEmbarque(embarque: Embarque){
     console.log('modificarEmbarque: ', embarque);
-    
+
     return this.http.post(`${this.url}Embarque/ModificarEmbarque`, embarque, { 'withCredentials' : true});
   }
 
@@ -50,7 +50,7 @@ export class EmbarqueService {
   obtenerListadoAgenciasMaritimas(): Observable<AgenciaMaritimaPuerto[]> {
     return this.http.get<AgenciaMaritimaPuerto[]>(`${this.url}Embarque/ListarAgenciasMaritimas`, { 'withCredentials': true });
   }
-  
+
   obtenerTipoArchivos(): Observable<TipoArchivoPuerto[]> {
     return this.http.get<TipoArchivoPuerto[]>(`${this.url}Embarque/ObtenerTipoArchivos`, { 'withCredentials': true });
   }
@@ -66,7 +66,7 @@ export class EmbarqueService {
   guardarTipoArchivo(tipoArchivo: TipoArchivoPuerto){
     return this.http.post(`${this.url}Embarque/GuardarTipoArchivo`, tipoArchivo, { 'withCredentials': true });
   }
-  
+
   eliminarArchivos(archivos : ArchivoPuerto[]) {
     return this.http.post(`${this.url}Embarque/EliminarArchivos`, archivos, { 'withCredentials': true });
   }
@@ -137,11 +137,11 @@ export class EmbarqueService {
   obtenerBanderas(): Observable<Bandera[]>{
     return this.http.get<Bandera[]>(`${this.url}Embarque/ObtenerBanderas`, { 'withCredentials' : true});
   }
-  
+
    guardarCapturaImagenLineUp(capturaImagenLineUp: any){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarCapturaImagenLineUp`, capturaImagenLineUp, { 'withCredentials': true});
-  } 
-  
+  }
+
   obtenerIdsUsuales(idEmbarque: number): Observable<IdsDelEmbarque>{
     return this.http.get<IdsDelEmbarque>(`${this.url}Embarque/ObtenerIdsUsuales?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
   }
@@ -153,5 +153,5 @@ export class EmbarqueService {
   existeEmbarqueEnMuelle(nombreBuque: string, muelle: string): Observable<any>{
     return this.http.get<any>(`${this.url}Embarque/ExisteEmbarqueEnMuelle?nombreBuque=${nombreBuque}&muelle=${muelle}`, { 'withCredentials' : true});
   }
-  
+
 }

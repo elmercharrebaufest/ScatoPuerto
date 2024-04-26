@@ -187,7 +187,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<Destino, DestinoDto>();
+                return Listar<Destino, DestinoDto>(d => d.Activo);
             }
             catch (Exception ex)
             {
@@ -1237,6 +1237,51 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
         #endregion Agencias Maritimas ATA
+
+        #region Destinos
+        public ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0)
+        {
+            IQueryable<Destino> query = repositorio.Incluir<Destino>()
+                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
+                .OrderBy(d => d.Nombre);
+            var itemsTotales = query.Count();
+            if (pagina > 0 && itemsPorPagina > 0)
+            {
+                var saltear = (pagina - 1) * itemsPorPagina;
+                query = query.Skip(saltear).Take(itemsPorPagina);
+            }
+            var destinosDb = query.ToList();
+            var destinos = conversor.ConvertirList<Destino, DestinoDto>(destinosDb);
+            return new ListaPaginada<DestinoDto>(destinos, pagina, itemsPorPagina, itemsTotales);
+        }
+
+        public void CrearDestino(string nombre, string usuario)
+        {
+            var res = comandos.Ejecutar(new CrearDestinoPuerto { Nombre = nombre, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void ModificarDestino(DestinoDto destino, string usuario)
+        {
+            var res = comandos.Ejecutar(new ModificarDestinoPuerto { Destino = destino, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void EliminarDestino(int id, string usuario)
+        {
+            var res = comandos.Ejecutar(new EliminarDestinoPuerto { Id = id, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+        #endregion
 
         #region Metodos Utiles
 

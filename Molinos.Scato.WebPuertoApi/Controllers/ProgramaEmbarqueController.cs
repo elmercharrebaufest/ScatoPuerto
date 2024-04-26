@@ -820,6 +820,84 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         #endregion Agencias Maritimas y ATA
 
+        #region Destinos
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ListarDestinos")]
+        public HttpResponseMessage ListarDestinos(int pagina = 1, int itemsPorPagina = 10, string nombre = null)
+        {
+            try
+            {
+                var listaPaginada = servicioProgramaEmbarque.ListarDestinos(nombre, pagina, itemsPorPagina);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ListarDestinosSinPaginar")]
+        public HttpResponseMessage ListarDestinosSinPaginar(string nombre = null)
+        {
+            try
+            {
+                var destinos = servicioProgramaEmbarque.ListarDestinos(nombre);
+                return Request.CreateResponse(HttpStatusCode.OK, destinos.Items);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/CrearDestino")]
+        public HttpResponseMessage CrearDestino(string nombre)
+        {
+            try
+            {
+                servicioProgramaEmbarque.CrearDestino(nombre, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/ProgramaEmbarque/ModificarDestino")]
+        public HttpResponseMessage EditarDestino(DestinoDto destino)
+        {
+            try
+            {
+                servicioProgramaEmbarque.ModificarDestino(destino, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/ProgramaEmbarque/EliminarDestino")]
+        public HttpResponseMessage EliminarDestino(int id)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarDestino(id, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        #endregion
+
         private EmbarqueDto CrearEmbarqueDto(NominacionDto nominacion, int centroId)
         {
             EmbarqueDto embarqueDto = new EmbarqueDto();

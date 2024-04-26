@@ -1,0 +1,79 @@
+<ship-spinner *ngIf="loading">{{mensaje}}</ship-spinner>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <h1>Destinos</h1>
+        </div>
+        <div class="col-md-2 ng-star-inserted">
+            <button class="btn btn-success" (click)="onCrear()">CREAR DESTINO</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form [formGroup]="filtros" class="row">
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Nombre Destino" formControlName="nombre">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" (click)="onBuscar()">Buscar</button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limpiar Búsqueda</button>
+                    <button class="btn btn-outline-success ml-4" (click)="exportar()">Exportar EXCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nombre Destino</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let destino of destinos">
+                    <td>{{destino.nombre}}</td>
+                    <td>
+                        <button class="btn" (click)="onModificar(destino)">
+                            <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>
+                        </button>
+                        <button class="btn" (click)="onEliminar(destino)">
+                            <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ELIMINAR"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <mat-paginator (page)="onBuscar($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+        [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>
+
+<ng-template #modalDestino let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">{{titulo}}</h5>
+            <button (click)="closeModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="destinoForm">
+                <div class="form-group">
+                    <input type="text" placeholder="Nombre" maxlength="60" class="form-control"
+                        formControlName="nombre">
+                    <small class="text-danger">
+                        El nombre es obligatorio
+                    </small>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onGuardar()">Guardar</button>
+            <button type="button" class="btn btn-danger" (click)="closeModal()">Cancelar</button>
+        </div>
+    </div>
+</ng-template>

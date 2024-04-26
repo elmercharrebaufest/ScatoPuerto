@@ -160,6 +160,10 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/clientes']);
         break;
       }
+      case 'Destinos_Visualizar': {
+        this.router.navigate(['/destinos']);
+        break;
+      }
     }
   }
 }

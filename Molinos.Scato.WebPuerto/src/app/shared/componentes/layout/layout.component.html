@@ -21,11 +21,11 @@
         </div>
       </a> -->
       <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA-->
-      
-      <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'> 
+
+      <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'>
       <a routerLink='/geolocalizacion' *ngIf='tienePermiso("Geolocalizacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
-        
+
           <div class='icon-geolocalizacion'></div>
           <span *ngIf='opened'>Geolocalización</span>
         </div>
@@ -33,9 +33,9 @@
 
       <!-- <ARMOA005-1665 Dylan Lopez> -->
       <!-- Menu Datos de Embarque -->
-      <!-- <hr *ngIf='tienePermiso("Vapor_Visualizar")'> 
+      <!-- <hr *ngIf='tienePermiso("Vapor_Visualizar")'>
       <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "vapor"'>        
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "vapor"'>
           <div class='icon-vapor'></div>
           <span *ngIf='opened'>Buque</span>
         </div>
@@ -58,32 +58,40 @@
         </a>
 
         <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "vapor"'>        
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "vapor"'>
             <div class='icon-vapor'></div>
             <span *ngIf='opened'>Buque</span>
           </div>
         </a>
-        
+
         <a routerLink='/clientes' *ngIf='tienePermiso("Clientes_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "clientes"'>        
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "clientes"'>
             <div class='icon-pe'></div>
             <span *ngIf='opened'>Clientes</span>
           </div>
         </a>
-        
+
         <a routerLink='/embarque/cargadores' *ngIf='tienePermiso("Exportadores_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/cargadores"'>        
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/cargadores"'>
             <div class='icon-pe'></div>
             <span *ngIf='opened'>Cargadores ó Exportadores</span>
           </div>
         </a>
+
+        <a routerLink='/destinos' *ngIf='tienePermiso("Destinos_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "destinos"'>
+            <div class='icon-destinos'></div>
+            <span *ngIf='opened'>Destinos</span>
+          </div>
+        </a>
+
       </div>
       <!-- </ ARMOA005-1665 Dylan Lopez> -->
-      
+
     <!--
-      <hr *ngIf='tienePermiso("Clientes_Visualizar")'> 
+      <hr *ngIf='tienePermiso("Clientes_Visualizar")'>
       <a routerLink='/clientes' *ngIf='tienePermiso("Clientes_Visualizar")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "clientes"'>        
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "clientes"'>
           <div class='icon-vapor'></div>
           <span *ngIf='opened'>Clientes</span>
         </div>
@@ -96,7 +104,7 @@
           <span *ngIf='opened'>Operaciones</span>
         </div>
       </a>
-      
+
       <hr *ngIf='tienePermiso("Recibidores_Ver")'>
       <a routerLink='/calidad' *ngIf='tienePermiso("Recibidores_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "calidad"'>
@@ -104,7 +112,7 @@
           <span *ngIf='opened'>Recibidores</span>
         </div>
       </a>
-    
+
       <hr *ngIf='tienePermiso("Comex_Nominacion_Ver")'>
       <a routerLink='/programa' *ngIf='tienePermiso("Comex_Nominacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "programa"'>
@@ -112,7 +120,7 @@
           <span *ngIf='opened'>Programa Embarque</span>
         </div>
       </a>
-      
+
       <hr *ngIf='tienePermiso("Buque_Ver")'>
       <a routerLink='/buques' *ngIf='tienePermiso("Buque_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "buques"'>
@@ -130,12 +138,12 @@
       </a>
       <div class="collapse item-container" id="collapseAfip">
         <a routerLink="/afip/caratula" *ngIf='tienePermiso("Caratula_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/caratula"'>        
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/caratula"'>
             <span *ngIf="opened">Caratulas</span>
           </div>
-        </a>        
+        </a>
         <a routerLink="/afip/coem" *ngIf='tienePermiso("Coem_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/coem"'>            
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/coem"'>
             <span *ngIf="opened">Coems</span>
           </div>
         </a>

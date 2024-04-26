@@ -18,7 +18,7 @@ export class RoleGuard implements CanActivateChild{
     canActivateChild(route: ActivatedRouteSnapshot){
         let permisos = this.session.getUser().permisos;
         let ruta = route.parent.url.toString();
-        // switcheamos sobre la ultima parte de la ruta y preguntamos si tiene el permiso, sino redireccionamosa su home       
+        // switcheamos sobre la ultima parte de la ruta y preguntamos si tiene el permiso, sino redireccionamosa su home
         switch (ruta) {
             case "": {
                 if (permisos.find(x => x === 'LineUp_Ver')){
@@ -92,7 +92,7 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
-          
+
             case 'programa': {
                 if (permisos.find(x => x === 'Comex_Nominacion_Ver')){
                     return true;
@@ -100,7 +100,7 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "programa");
                 }
                 break;
-            } 
+            }
             case 'nominacion': {
                 if (permisos.find(x => x === 'Comex_Nominacion_Ver')){
                     return true;
@@ -108,7 +108,7 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "nominacion");
                 }
                 break;
-            } 
+            }
             case 'vapor': {
                 if (permisos.find(x => x === 'Vapor_Visualizar')){
                     return true;
@@ -116,7 +116,7 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "vapor");
                 }
                 break;
-            } 
+            }
 
             case 'caratula': {
                 if(permisos.find(x => x === 'Caratula_Visualizar')){
@@ -141,6 +141,14 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "clientes");
                 }
                 break;
+            }
+            case 'destinos': {
+              if (permisos.find(x => x === 'Destinos_Visualizar')) {
+                  return true;
+              }else{
+                  this.navigate(permisos, "destinos");
+              }
+              break;
             }
         }
     }
@@ -191,6 +199,10 @@ export class RoleGuard implements CanActivateChild{
                 this.router.navigate(['/clientes']);
                 break;
             }
+            case 'Destinos_Visualizar':{
+              this.router.navigate(['/destinos']);
+              break;
+          }
         }
     }
 

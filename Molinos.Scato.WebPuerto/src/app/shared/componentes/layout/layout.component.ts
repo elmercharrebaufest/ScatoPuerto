@@ -81,6 +81,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/afip/caratula'])
     if (this.user.permisos.find(x => x === 'Coem_Visualizar'))
       this.router.navigate(['/afip/coem'])
+    if (this.user.permisos.find(x => x === 'Destinos_Visualizar'))
+      this.router.navigate(['/destinos'])
     this.opened = false;
   }
 

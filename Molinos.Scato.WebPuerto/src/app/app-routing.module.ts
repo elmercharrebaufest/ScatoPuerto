@@ -13,8 +13,8 @@ export const routeConfig: Routes = [
     children: [
       {
         path: '',
-       redirectTo: '/lineup',
-    //   redirectTo: '/login',
+        redirectTo: '/lineup',
+        //   redirectTo: '/login',
         pathMatch: 'full'
       },
       {
@@ -37,12 +37,10 @@ export const routeConfig: Routes = [
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/calidad/calidad.module').then(m => m.CalidadModule)
       },
-
       {
         path: 'embarque',
         loadChildren: () => import('./modulos/datos-embarque/datos-embarque.module').then(m => m.DatosEmbarqueModule)
       },
-      
       {
         path: 'buques',
         canActivateChild: [RoleGuard],
@@ -62,6 +60,10 @@ export const routeConfig: Routes = [
         path: 'clientes',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/clientes/clientes.module').then(m => m.ClientesModule)
+      },
+      {
+        path: 'destinos',
+        loadChildren: () => import('./modulos/destinos/destinos.module').then(m => m.DestinosModule)
       },
       {
         path: 'afip',

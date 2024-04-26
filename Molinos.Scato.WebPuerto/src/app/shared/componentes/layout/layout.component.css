@@ -142,6 +142,13 @@
     height: 35px;
 }
 
+.links-container a div.item-container div.icon-destinos {
+    -webkit-mask: url('assets/sidebar-icons/destinos.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/destinos.svg') no-repeat center;
+    height: 30px;
+    width: 30px;
+}
+
 @media screen and (max-width: 480px) {
     /* Estilos para pantallas de hasta 480px de ancho */
     ::ng-deep .ng-sidebar {
