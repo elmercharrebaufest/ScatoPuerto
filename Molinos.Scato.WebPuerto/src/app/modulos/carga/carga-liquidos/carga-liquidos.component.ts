@@ -235,9 +235,11 @@ export class CargaLiquidosComponent implements OnInit {
 
     // Arreglo de scroll de lineas de embarque
     let lineas = document.getElementsByClassName('lineas-detalles')[0] as HTMLDivElement;
-    lineas.className = '';
-    lineas.style.marginTop = "-20px";
-
+    if(lineas !== undefined){
+      lineas.className = '';
+      lineas.style.marginTop = "-20px";   
+    }
+    
     //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
     // #region setValores
     setTimeout(() => {
