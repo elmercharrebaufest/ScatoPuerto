@@ -95,9 +95,11 @@ export class EditarCrearCargadorComponent implements OnInit {
     this.cargadorService.AgregarCargador(this.exportadorForm.value).subscribe(() => {
       this.modalService.dismissAll();
       this.refrescarListado.emit(true);
+      this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha agregado el cargador con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
       console.log(err);
-      this.confirmationDialogService.confirm('Atención', err.error, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      let msjError = err.error || `Ha ocurrido un error al intentar agregar cargador.`;
+      this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
     });
   }
 
@@ -105,9 +107,11 @@ export class EditarCrearCargadorComponent implements OnInit {
     this.cargadorService.EditarCargador(this.exportadorForm.value).subscribe(() => {
       this.modalService.dismissAll();
       this.refrescarListado.emit(true);
+      this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha editado el cargador con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
       console.log(err);
-      this.confirmationDialogService.confirm('Atención', err.error, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      let msjError = err.error || `Ha ocurrido un error al intentar editar cargador.`;
+      this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
     });
   }
 

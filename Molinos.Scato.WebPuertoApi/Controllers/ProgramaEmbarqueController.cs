@@ -1176,6 +1176,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("api/ProgramaEmbarque/EliminarExportador")]
+        public HttpResponseMessage EliminarExportador(int id)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarExportador(id, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion ABM Exportadores
     }
 }
