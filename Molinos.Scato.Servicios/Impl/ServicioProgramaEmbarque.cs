@@ -201,7 +201,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<Exportador, ExportadorDto>();
+                return Listar<Exportador, ExportadorDto>(e => e.Habilitado);
             }
             catch (Exception ex)
             {

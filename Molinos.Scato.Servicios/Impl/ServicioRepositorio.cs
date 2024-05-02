@@ -8179,7 +8179,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ExportadorDto> ListaExportadores()
         {
-            return Listar<Exportador, ExportadorDto>();
+            return Listar<Exportador, ExportadorDto>(e => e.Habilitado);
         }
 
         public BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza)
