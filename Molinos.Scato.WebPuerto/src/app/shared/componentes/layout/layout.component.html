@@ -31,26 +31,16 @@
         </div>
       </a>
 
-      <!-- <ARMOA005-1665 Dylan Lopez> -->
-      <!-- Menu Datos de Embarque -->
-      <!-- <hr *ngIf='tienePermiso("Vapor_Visualizar")'>
-      <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "vapor"'>
-          <div class='icon-vapor'></div>
-          <span *ngIf='opened'>Buque</span>
-        </div>
-      </a> -->
-
-      <hr>
-      <a data-toggle="collapse" href="#collapseDatosEmbarque" aria-expanded="false" aria-controls="collapseDatosEmbarque">
-        <div  class="item-container">
+      <hr *ngIf="tienePermiso('Vapor_Visualizar')">
+      <a *ngIf="tienePermiso('Vapor_Visualizar')" data-toggle="collapse" href="#collapseDatosEmbarque" aria-expanded="false" aria-controls="collapseDatosEmbarque">
+        <div class="item-container">
           <div class="icon-afip"></div>
           <span *ngIf="opened">Datos de Embarque</span>
         </div>
       </a>
-      <!-- SubMenu Datos de Embarque -->
+      <!-- #region SubMenu Datos de Embarque -->
       <div class="collapse item-container" id="collapseDatosEmbarque">
-        <a routerLink="/embarque/agencias" *ngIf='tienePermiso("Caratula_Visualizar")'>
+        <a routerLink="/embarque/agencias" *ngIf='tienePermiso("Vapor_Visualizar")'>
           <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarque/agencias"'>
             <div class='icon-pe'></div>
             <span *ngIf="opened">Agencias Marítimas y A.T.A.</span>
@@ -64,24 +54,15 @@
           </div>
         </a>
 
-        <a routerLink='/clientes' *ngIf='tienePermiso("Clientes_Visualizar")'>
+        <a routerLink='/clientes' *ngIf='tienePermiso("Vapor_Visualizar")'>
           <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "clientes"'>
             <div class='icon-pe'></div>
             <span *ngIf='opened'>Clientes</span>
           </div>
         </a>
       </div>
-      <!-- </ ARMOA005-1665 Dylan Lopez> -->
+      <!-- #endregion SubMenu Datos de Embarque -->
 
-    <!--
-      <hr *ngIf='tienePermiso("Clientes_Visualizar")'>
-      <a routerLink='/clientes' *ngIf='tienePermiso("Clientes_Visualizar")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "clientes"'>
-          <div class='icon-vapor'></div>
-          <span *ngIf='opened'>Clientes</span>
-        </div>
-      </a>
-    -->
       <hr *ngIf='tienePermiso("Carga_Ver")'>
       <a routerLink='/carga' *ngIf='tienePermiso("Carga_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>

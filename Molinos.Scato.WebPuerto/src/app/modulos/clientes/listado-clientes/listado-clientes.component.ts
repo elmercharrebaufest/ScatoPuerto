@@ -136,20 +136,20 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
   }
 
   tienePermisoModificarCliente() {
-    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Editar); 
+    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Editar);
   }
 
   tienePermisoEliminarCliente(){
-    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Eliminar); 
+    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Eliminar);
   }
-  
-    editarCliente(id: number, modal: any){ 
+
+    editarCliente(id: number, modal: any){
       this.clienteId = id;
       this.modalService.open(modal, { size: 'md', centered: true, backdrop: 'static', keyboard: false }).result
-      .then(() => {     
+      .then(() => {
         console.log('_modalService.open');
       })
-      .catch((res) => { console.log(res) }); 
+      .catch((res) => { console.log(res) });
     }
 
   actualizarListaDeClientes(event) {
@@ -161,7 +161,7 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
       .then((confirmed) => {
         if (confirmed) {
           this.clienteService.eliminarCliente(cliente).subscribe((res) => {
-            this.confirmationDialogService.confirm('Atención', 'Se eliminó al cliente con exito.', 'Aceptar', '', null, null, Tipoalerta.Success); 
+            this.confirmationDialogService.confirm('Atención', 'Se eliminó al cliente con exito.', 'Aceptar', '', null, null, Tipoalerta.Success);
             this.listarClientes();
           },(error)=>{
             this.confirmationDialogService.confirm('Atención', error.error.Message, 'Cerrar', '', null, null, Tipoalerta.Error);
@@ -169,7 +169,7 @@ export class ListadoClientesComponent implements OnInit, OnDestroy {
           this.modalService.dismissAll();
         }
       }).catch(() => {
-        
+
         this.modalService.dismissAll()
       });
 
