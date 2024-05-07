@@ -1,0 +1,9 @@
+<div class='bg-white shadow mt-4 px-4 pb-4'>
+  <h4 class="info-header colorTitle pt-4">LineUp</h4>
+  <br>
+  <img *ngIf="captura && mostrarImagen" src="{{captura}}" style='width:100%;' border="0" alt="lineup">
+  <div *ngIf="!captura && mostrarImagen">
+      Imagen no disponible
+  </div>
+</div>
+<ship-spinner [message]="'Cargando imagen de lineup. Por favor, espere...'" *ngIf='cargandoImagenLineUp'></ship-spinner>

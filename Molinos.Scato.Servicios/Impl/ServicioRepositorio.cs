@@ -12155,7 +12155,7 @@ namespace Molinos.Scato.Servicios.Impl
                     if (item.FechaDesamarro != null)
                     {
                         string fechaDesamarro = Convert.ToDateTime(item.FechaDesamarro).ToString("yyyy-MM-dd");
-                        if (item.HoraDesamarro.Length > 0)
+                        if (item.HoraDesamarro?.Length > 0)
                         {
                             fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, item.HoraDesamarro);
                         }
