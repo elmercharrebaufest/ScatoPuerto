@@ -3,6 +3,7 @@ import { NgModule } from "@angular/core";
 import { SharedModule } from "app/shared/shared.module";
 import { ClimaComponent } from "./clima/clima.component";
 import { LineupComponent } from "./lineup/lineup.component";
+import { LineupLegacyComponent } from "./lineup/lineup.legacy.component";
 import { NavtabsBuqueComponent } from "./navtabs-buque/navtabs-buque.component";
 import { ResumenDeOperatoriaRoutingModule } from "./resumen-de-operatoria-routing.module";
 import { ResumenDeOperatoriaComponent } from "./resumen-de-operatoria.component";
@@ -31,6 +32,7 @@ import { ProgramaEmbarqueModule } from "app/modulos/programa-embarque/programa-e
         ResumenDeOperatoriaComponent,
         NavtabsBuqueComponent,
         LineupComponent,
+        LineupLegacyComponent,
         FechasRitmosComponent,
         ClimaComponent,
         OpTableroComponent,
