@@ -910,7 +910,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             IList<MaterialPuertoCantidadDto> listaMaterialesPuertoCantidad = new List<MaterialPuertoCantidadDto>();
             MaterialPuertoCantidadDto materialPuertoCantidad = new MaterialPuertoCantidadDto()
             {
-                Cantidad = nominacion.NominacionDatoTecnico.CantidadTotal,
+                Cantidad = (int)nominacion.NominacionDatoTecnico.CantidadTotal,
                 DescripcionCorta = nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
                 Color = nominacion.NominacionDatoTecnico.MaterialPuerto.Color,
                 MaterialId = nominacion.NominacionDatoTecnico.MaterialPuerto.Id,
@@ -974,7 +974,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             foreach (var destino in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino)
             {
-                observaciones += $"{destino.Destino.Nombre.Trim()} / {destino.Cantidad} tn {Environment.NewLine}";
+                observaciones += $"{destino.Destino.Nombre.Trim()} / {FormatearObservacionesTn(destino.Cantidad)} tn {Environment.NewLine}";
             }
 
             observaciones += $"{Environment.NewLine} {Environment.NewLine}";
@@ -983,7 +983,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             foreach (var exportador in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
             {
-                observaciones += $"{exportador.Exportador.Nombre.Trim()} / {exportador.Cantidad} tn {Environment.NewLine}";
+                observaciones += $"{exportador.Exportador.Nombre.Trim()} / {FormatearObservacionesTn(exportador.Cantidad)} tn {Environment.NewLine}";
             }
 
             embarqueDto.Observaciones = observaciones;
@@ -1012,6 +1012,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 embarqueDto.EmbarqueInformacion = listEmbarqueInformacionDto;
             }
             return embarqueDto;
+        }
+
+        private string FormatearObservacionesTn(decimal valor)
+        {
+            return valor.ToString(valor % 1 == 0 ? "0" : "0.###");
         }
 
         private EmbarqueInformacionDto CrearEmbarqueInformacion(NominacionDatoTecnicoDto nominacionDatoTecnico)

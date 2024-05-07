@@ -756,7 +756,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     body += $" <tr>";
                     body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"> <strong> {item.Exportador.Nombre}</strong></td>";
-                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong>CANTIDAD (Tn)</strong>:   {item.Cantidad.ToString("n0")} </br>";
+                    body += $"<td style=\"border: 1px solid #ddd;padding: 8px;\"><strong>CANTIDAD (Tn)</strong>:   {(item.Unidad == "Kg" ? ((int)item.Cantidad).ToString() : item.Cantidad.ToString("0.000"))} </br>";
                     body += $"<strong>FORMATO/UNIDAD</strong>:  {item.Formato}/{item.Unidad} </br>";
                     body += $"<strong>AJUSTE</strong>:  {item.Ajuste} </br>";
                     body += $"<strong>LOADING PORT</strong>:  {item.PuertoDeCarga} </br>";
@@ -773,7 +773,7 @@ namespace Molinos.Scato.Servicios.Impl
                         $" <tr>" +
                         $" <td style=\"padding: 5px;\"> <strong>CANTIDAD (Tn)</strong>" +
                         $" </td>" +
-                        $" <td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico?.CantidadTotal.ToString("n0")}" +
+                        $" <td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico?.CantidadTotal.ToString("0.000")}" +
                         $" </td>" +
                         $" <td style=\"padding: 5px;\"> <strong>DEM/DES RATE</strong>" +
                         $" </td>" +
@@ -1145,7 +1145,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
                 MaterialPuertoCantidad materialPuertoCantidad = new MaterialPuertoCantidad();
                 materialPuertoCantidad.Embarque = repositorio.Obtener<Embarque>(embarque_Id);
-                materialPuertoCantidad.Cantidad = nominacion.NominacionDatoTecnico.CantidadTotal;
+                materialPuertoCantidad.Cantidad = (int)nominacion.NominacionDatoTecnico.CantidadTotal;
                 materialPuertoCantidad.MaterialPuerto = nominacion.NominacionDatoTecnico.MaterialPuerto;
                 materialPuertoCantidad.Color = nominacion.NominacionDatoTecnico.MaterialPuerto.Color;
                 repositorio.Agregar(materialPuertoCantidad);
