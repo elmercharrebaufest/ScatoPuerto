@@ -45,19 +45,14 @@ export class ResumenActoresComponent implements OnInit {
   }
 
   initActores(){
-    this.buqueService.obtenerActores(this.idEmbarque).subscribe((res: Actores) => {
-      this.actores = res;
+    forkJoin([
+      this.buqueService.obtenerActores(this.idEmbarque),
+      this.buqueService.obtenerOperadores(this.idEmbarque)
+    ]).subscribe(([actores, operadores]) => {
+      this.actores = actores;
       this.mostrarActores = true
-    }, err => {
-      console.log(err);
-    })
-
-    this.buqueService.obtenerOperadores(this.idEmbarque).subscribe((op: Operador[]) => {
-      this.operadores = op;
-    }, err => {
-      console.log(err);
-    })
-   
+      this.operadores = operadores;
+    }, err => { console.log(err); });
   }
   //#endregion
 }

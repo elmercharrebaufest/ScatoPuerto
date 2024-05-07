@@ -56,10 +56,10 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public string NombreBodega { get; set; }
         public string NombreProducto { get; set; }
-        public int Cargado { get; set; }
-        public int RestaCargar { get; set; }
-        public int Excedente { get; set; }
-        public int Programado { get; set; }
+        public decimal Cargado { get; set; }
+        public decimal RestaCargar { get; set; }
+        public decimal Excedente { get; set; }
+        public decimal Programado { get; set; }
     }
 
     public sealed class BalanzadasCompletasDto

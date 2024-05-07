@@ -1,9 +1,127 @@
 <div class='bg-white shadow mt-4 px-4 pb-4'>
-    <h4 class="info-header colorTitle pt-4">LineUp</h4>
-    <br>
-    <img *ngIf="captura && mostrarImagen" src="{{captura}}" style='width:100%;' border="0" alt="lineup">
-    <div *ngIf="!captura && mostrarImagen">
-        Imagen no disponible
-    </div>
+  <div style="overflow-x:auto;" class="table-responsive">
+    <table class='table table-bordered lista-caratula-table'>
+      <thead class="lista-caratula-header">
+        <th>
+          <div class="col-md-2 my-auto d-none d-md-block">
+            <img class="ship" src="assets/ship.svg">
+          </div>
+        </th>
+        <th>Ubicación del Barco</th>
+        <th>Carta de subida enviada</th>
+        <th>Cartas de subida aprobadas</th>
+        <th>Carga en SAP</th>
+        <th>Nominación de practico de rio</th>
+        <th>Seguridad portuaria y sanidad</th>
+        <th>Inspeccion Senasa</th>
+        <th>Control Senasa</th>
+        <th>Control privado</th>
+        <th>Práctico para el amarre</th>
+        <th>Agencia contactada</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <span class="inline s21 font-weight-bold">{{historicoEmbarqueLineUp.vaporNombre}}</span>
+            <label>Actualizado: {{historicoEmbarqueLineUp.actualizado | date : 'dd-MM H:mm'}}hs</label>
+          </td> 
+          <td> <!-- Ubicación del Barco -->
+            <p>{{historicoEmbarqueLineUp.ubicacion}}</p>
+          </td> 
+          <td> <!-- Carta de subida enviada -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.cartaSubidaEnviada ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td> 
+          <td> <!-- Cartas de subida aprobadas -->
+            <p>{{historicoEmbarqueLineUp.cartaSubidaAprobada}}</p>
+          </td> 
+          <td> <!-- Carga en SAP -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.cargaEnSap ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td> <!-- Nominación de practico de rio -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.nominacionDePractico ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td> <!-- Seguridad portuaria y sanidad -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.seguridadPortuaria ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td> <!-- Inspeccion Senasa -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.inspeccionSenasa ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td> <!-- Control Senasa -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.controlSenasa ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td> <!-- Control privado -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.controlPrivado ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td><!-- Práctico para el amarre -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.amarrador ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+          <td> <!-- Agencia contactada -->
+            <div class="my-auto">
+              <img class="circle" [src]="historicoEmbarqueLineUp.agenciaContactada ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <p><strong>Recalada: </strong>{{historicoEmbarqueLineUp.fechaRecalada}}</p>
+          </td> 
+          <td colspan="9">
+            <p><strong>Observaciones: </strong>{{historicoEmbarqueLineUp.observaciones}}</p>
+            <p [innerHTML]="historicoEmbarqueLineUp.materiales"></p>
+          </td> 
+          <td colspan="2">
+            <div class="my-auto">
+              <img [src]="historicoEmbarqueLineUp.planoDeCargaEnviado ? 'assets/planoDeCargaEnviadoButton.svg' : 'assets/planoDeCargaEnviadoButtonInvertido.svg'">
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <p>{{historicoEmbarqueLineUp.puertoActual}}</p>
+          </td> 
+          <td> <!-- Ubicación del Barco -->
+            <p><strong>Oblig. de carga: </strong></p>
+          </td>
+          <td> <!-- Carta de subida enviada -->
+            <p>{{historicoEmbarqueLineUp.obligacionCarga}}</p>
+          </td>
+          <td> <!-- Cartas de subida aprobadas -->
+            <p><strong>Agencia: </strong></p>
+          </td>
+          <td> <!-- Carga en SAP -->
+            <p>{{historicoEmbarqueLineUp.agenteNombre}}</p>
+          </td>
+          <td> <!-- Nominación de practico de rio -->
+            <p><strong>A.T.A.: </strong></p>
+          </td>
+          <td> <!-- Seguridad portuaria y sanidad -->
+            <p>{{historicoEmbarqueLineUp.ataNombre}}</p>
+          </td>
+          <td> <!-- Inspeccion Senasa -->
+            <p><strong>Coordinador/es: </strong></p>
+          </td>
+          <td></td> <!-- Control Senasa -->
+          <td colspan="3"></td> <!-- Control privado -->
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-<ship-spinner [message]="'Cargando imagen de lineup. Por favor, espere...'" *ngIf='cargandoImagenLineUp'></ship-spinner>

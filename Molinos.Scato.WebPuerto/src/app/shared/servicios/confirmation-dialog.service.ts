@@ -41,7 +41,7 @@ export class ConfirmationDialogService {
   }
 
   public alertar(mensaje: string, titulo: string = 'Atención', tipo: Tipoalerta = Tipoalerta.Warning) {
-    return this.confirm(titulo, mensaje, 'Cerrar', null, null, null, tipo);
+    return this.confirm(titulo, mensaje, 'Cerrar', '', null, null, tipo);
   }
 
   public exito(mensaje: string) {

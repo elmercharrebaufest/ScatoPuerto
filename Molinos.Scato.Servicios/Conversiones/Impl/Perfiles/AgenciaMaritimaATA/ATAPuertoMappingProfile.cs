@@ -14,6 +14,11 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         {
             Mapper.CreateMap<ATAPuerto, ATAPuertoDto>();
             Mapper.CreateMap<ATAPuertoDto, ATAPuerto>();
+
+            Mapper.CreateMap<AgenciaMaritimaATADto, ATAPuerto>()
+                .ForMember(dest => dest.Activa, opt => opt.MapFrom(src => true));
+            Mapper.CreateMap<CrearAgenciaMaritimaATADto, ATAPuerto>()
+                .ForMember(dest => dest.Activa, opt => opt.MapFrom(src => true));
         }
     }
 }

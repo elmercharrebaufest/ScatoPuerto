@@ -45,7 +45,14 @@
 
     <div class="tab-pane fade show active nav-tab-item-fondo" id="lineup" role="tabpanel" aria-labelledby="lineup-tab">
       <div *ngIf="vistaSeleccionada == 'lineup-tab'">
-        <app-lineup-buque></app-lineup-buque>
+        <!-- <ARMOA005-1421 Dylan Lopez> -->
+        <h4 class="info-header colorTitle pt-4">Historico de LineUp</h4>
+        <div class="row" *ngFor="let historicoEmbarqueLineUp of historicosEmbarqueLineUp ;let i = index"  fullWidth>
+          <app-lineup-buque [historicoEmbarqueLineUp]="historicoEmbarqueLineUp"></app-lineup-buque>
+        </div>
+
+        <!-- <app-lineup-buque></app-lineup-buque> -->
+        <!-- </ ARMOA005-1421 Dylan Lopez> -->
       </div>
     </div>
 

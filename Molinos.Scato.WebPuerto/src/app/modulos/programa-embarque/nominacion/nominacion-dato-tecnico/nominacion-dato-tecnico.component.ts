@@ -80,6 +80,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaCalidadValor: CalidadValor[];
   public listaNominacionDatoTecnicoCalidad: ListaNominacionCalidad[] = [];
 
+  idAgencia: number;
+  tittle: string;
+  typeAgencia: number;
+
   public cargandoDatoTecnico: boolean = true;
   public mostrarParametroCalidad: boolean = false;
   public grabarNominacion: boolean = false;
@@ -681,6 +685,22 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const nominacionId = this._nominacionParametros.nominacion.id;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
     this.cargarFormulario(nominacionId)
+  }
+
+  nuevaAgenciaMaritimaAta = (type: number, modal: NgbModal) => {
+    console.log('nuevaAgenciaMaritimaAta');
+    this.tittle = "Nueva ";
+
+    this.idAgencia = null;
+    this.typeAgencia = type;
+
+    if (this.typeAgencia == 1) {
+      this.tittle += "Agencia Marítima";
+    } else {
+      this.tittle += "ATA";
+    }
+
+    this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
   onAltaBajaMantenimiento(opcion) {

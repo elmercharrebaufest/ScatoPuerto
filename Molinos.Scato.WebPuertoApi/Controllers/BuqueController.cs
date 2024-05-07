@@ -13,6 +13,8 @@ using System.Web.Http;
 using Molinos.Scato.Actividades.Interfaces;
 using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
+using NPOI.Util;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -25,11 +27,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/Buque/ListarHistorialDeBuques")]
-        public HttpResponseMessage ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, string producto = "")
+        public HttpResponseMessage ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, string producto = "", int? pagina = null, int? itemsPorPagina = null)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeEmbarques(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null)));
+                var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarHistorialDeEmbarques(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null), paginacion));
             }
             catch (Exception ex)
             {

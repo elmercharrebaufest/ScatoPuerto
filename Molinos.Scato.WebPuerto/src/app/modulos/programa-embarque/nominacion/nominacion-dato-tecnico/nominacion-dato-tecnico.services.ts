@@ -174,7 +174,7 @@ export class NominacionDatoTecnicoRegistroService {
         return false;
       }
 
-      if (exportadores.length == 0 || destinos.length == 0 || exportadores.length == 0) {
+      if (coordinadores.length == 0 || destinos.length == 0 || exportadores.length == 0) {
         mostrarError('Debe agregar destino, cargador y cliente a la nominación');
         return false;
       }

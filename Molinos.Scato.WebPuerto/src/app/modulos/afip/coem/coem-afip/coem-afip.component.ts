@@ -4,7 +4,6 @@ import { EstadoCOEM } from '@ScatoModels/afip/estadoCoem';
 import { AfipMotivoSolicitudCambio } from '@ScatoModels/afip/tablas-afip';
 import { CaratulaAfipService } from '@ScatoServicios/afip/caratula-afip.service';
 import { CoemAfipService } from '@ScatoServicios/afip/coem-afip.service';
-import { TablasAfipService } from '@ScatoServicios/afip/tablas-afip.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -104,7 +103,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   public editarCoem(historial, modal) {
     this.coemId = historial.id;
     this.coemIdentificador = historial.identificadorCOEM
-    this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
+    this.modalService.open(modal, { size: 'xl', centered: true, backdrop: 'static', keyboard: false });
   }
 
   public async eliminarCoem(id: number, identificadorCOEM: string) {
@@ -182,7 +181,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
 
   async validarEstadoCoem(selectElement, codigoEstado): Promise<boolean> {
 
-    const codigoSeleccionado = this.listaEstados.find(e => e.id === selectElement.selectedIndex).codigo;
+    const codigoSeleccionado = this.listaEstados.find(e => e.id == selectElement.value).codigo;
     let valido: boolean = true;
 
     const showModalAndCheckConfirmation = async (texto: string): Promise<void> => {

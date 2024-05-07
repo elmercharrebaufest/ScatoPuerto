@@ -32,11 +32,11 @@ export class BuquesState {
     GetObtenerHistorialBuques(
         {getState, setState}: StateContext<BuquesStateModel>,
         {vaporId, desde, hasta, producto, 
-            nombreBuque, destino, exportador, controlPrivado}: GetObtenerHistorialBuques
+            nombreBuque, destino, exportador, controlPrivado, pagina, itemsPorPagina}: GetObtenerHistorialBuques
         ) {
         const anio: number = 0;
         const mes: number = 0;
-        return this.buqueService.obtenerListarHistorialDeBuques(anio, mes, vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, producto).pipe(tap((result) => {
+        return this.buqueService.obtenerListarHistorialDeBuques(anio, mes, vaporId, nombreBuque, destino, exportador, controlPrivado, desde, hasta, producto, pagina, itemsPorPagina).pipe(tap((result) => {
             const state = getState();
             setState({
                 ...state,

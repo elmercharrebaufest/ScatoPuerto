@@ -1,63 +1,68 @@
 .lista-coem-table {
-    border: 0;
-    border-radius: 4px 4px 0px 0px;
+  border: 0;
+  border-radius: 4px 4px 0px 0px;
 }
+
 .lista-coem-header {
-    /* position: sticky; */
-    top:0;
-    z-index: 10;
-    background: #3376A1 0% 0% no-repeat padding-box;
-    color: #ffffff;
-    font-family: roboto;
-    font-weight: bold;
-    font-size: 16px;
-    border-radius: 4px 4px 0px 0px;
-    opacity: 1;
-    height: 59px;
-    border: 0px;
+  /* position: sticky; */
+  top: 0;
+  z-index: 10;
+  background: #3376A1 0% 0% no-repeat padding-box;
+  color: #ffffff;
+  font-family: roboto;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 4px 4px 0px 0px;
+  opacity: 1;
+  height: 59px;
+  border: 0px;
 }
 
 .lista-coem-row {
-    height: 55px;
-    background: #FFFFFF 0% 0% no-repeat padding-box;
-    box-shadow: 0px 3px 11px #00000029;
-    border-radius: 4px;
-    text-align: left;
-    font: normal normal normal 16px/24px Roboto;
-    letter-spacing: 0px;
-    color: #1A1A1A;
-    opacity: 1;
+  height: 55px;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  box-shadow: 0px 3px 11px #00000029;
+  border-radius: 4px;
+  text-align: left;
+  font: normal normal normal 16px/24px Roboto;
+  letter-spacing: 0px;
+  color: #1A1A1A;
+  opacity: 1;
 
 }
+
 .celda-nombre-coem {
-    font-weight: bold;
-    /* cursor: pointer; */
-    color: #1A1A1A;
-    opacity: 1;
+  font-weight: bold;
+  /* cursor: pointer; */
+  color: #1A1A1A;
+  opacity: 1;
 }
+
 .celda-nombre-coem-detalle {
-    color: #1A1A1A;
-    opacity: 1;
+  color: #1A1A1A;
+  opacity: 1;
 }
+
 .lista-coem-row-item {
-    border-bottom: 0px;
-    border-top: 0px;
+  border-bottom: 0px;
+  border-top: 0px;
 
 }
+
 .lista-coem-espacio {
-    margin-bottom: 15px;
-    width: 100%;
+  margin-bottom: 15px;
+  width: 100%;
 }
 
-.ritmo-carga-normal{
-    margin: 0;
-    padding: 0;
-    color: #75C77B;
+.ritmo-carga-normal {
+  margin: 0;
+  padding: 0;
+  color: #75C77B;
 }
 
-.estiloBoton{
-    border-color: #d4d4d4;
-    color: #000000;
+.estiloBoton {
+  border-color: #d4d4d4;
+  color: #000000;
 }
 
 input.ng-invalid:not(.ng-untouched):not(:focus-within) {
@@ -74,4 +79,21 @@ select.ng-invalid:not(.ng-untouched):not(:focus-within) {
 
 input.ng-invalid:not(.ng-untouched):not(:focus-within)+.msj-error {
   display: inline;
+}
+
+/* Estilo necesario para que las opciones desplegables sean visibles, sino quedan detras del modal */
+::ng-deep .cdk-overlay-container {
+  z-index: 1100;
+}
+
+.lista-coem-header th:nth-child(1) {
+  width: 50%;
+}
+
+.lista-coem-header th:nth-child(2) {
+  width: 20%;
+}
+
+.lista-coem-header th:nth-child(3) {
+  width: 30%;
 }

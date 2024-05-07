@@ -125,7 +125,9 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaPro
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'PlanillaProgramaEmbarqueCopia') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('PlanillaProgramaEmbarqueCopia', 'scatoprodMOA@molinosagro.com.ar'); END
 GO
-IF NOT EXISTs (select 1 from ConfiguracionMail where TemplateMail = 'NominacionesExcel') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('NominacionesExcel', 'macarena.asqueri@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar; cintia.maltoni@molinosagro.com.ar; alejandra.sarquis@molinosagro.com.ar; hugo.baratto@molinosagro.com.ar; omar.mazany@molinosagro.com.ar; diego.mazettelle@molinosagro.com.ar; mauricio.mezzavilla@molinosagro.com.ar; nestor.kantt@molinosagro.com.ar; pablo.noceda@molinosagro.com.ar; edgardo.ponce@molinosagro.com.ar; sergio.mossin@molinosagro.com.ar; pablo.kieffer@molinosagro.com.ar; mauro.ortega@molinosagro.com.ar; cristian.frank@molinosagro.com.ar; rodrigo.gonzalez@molinosagro.com.ar; adrian.mauri@molinosagro.com.ar; martin.amado@molinosagro.com.ar; federico.romano@molinosagro.com.ar; damian.calvet@molinosagro.com.ar; daniel.santos@molinosagro.com.ar; sebastian.bertazzo@molinosagro.com.ar; ruben.bisson@molinosagro.com.ar; fabricio.herrera@molinosagro.com.ar; sebastian.muniz@molinosagro.com.ar; marcelo.gustavo.lopez@molinosagro.com.ar; jose.luis.gomez@molinosagro.com.ar; cristian.leonori@molinosagro.com.ar; nestor.sosaguerci@Molinosagro.com.ar; norberto.moriconi@molinosagro.com.ar; sebastian.bolger@molinosagro.com.ar; matias.abramor@molinosagro.com.ar; martin.manoni@molinosagro.com.ar; mauro.mir@molinosagro.com.ar; leandro.armendari@molinosagro.com.ar; lucioano.arario@molinosagro.com.ar; Antonela.Labonia@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar; melina.corio@mocommodities.com; ileana.rodriguez@mocommodities.com; rosario.viana@mocommodities.com; liz.pereira@molinosagro.com.ar; Trading@mocommodities.com; leandro.varela@molinosagro.com.ar; german.turcutto@molinosagro.com.ar; GrupoPeritosDeEmbarque@molinosagro.com.ar; Ariel.Lascano@molinosagro.com.ar; joaquin.sarachaga@mocommodities.com; German.Castagnani@molinosagro.com.ar; jimena.rodriguez@molinosagro.com.ar; emanuel.venica@molinosagro.com.ar; juan.lapissonde@molinosagro.com.ar; hernan.ferreira@mocommodities.com') END
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'NominacionesExcel') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('NominacionesExcel', 'macarena.asqueri@molinosagro.com.ar; gustavo.fridrich@molinosagro.com.ar; cintia.maltoni@molinosagro.com.ar; alejandra.sarquis@molinosagro.com.ar; hugo.baratto@molinosagro.com.ar; omar.mazany@molinosagro.com.ar; diego.mazettelle@molinosagro.com.ar; mauricio.mezzavilla@molinosagro.com.ar; nestor.kantt@molinosagro.com.ar; pablo.noceda@molinosagro.com.ar; edgardo.ponce@molinosagro.com.ar; sergio.mossin@molinosagro.com.ar; pablo.kieffer@molinosagro.com.ar; mauro.ortega@molinosagro.com.ar; cristian.frank@molinosagro.com.ar; rodrigo.gonzalez@molinosagro.com.ar; adrian.mauri@molinosagro.com.ar; martin.amado@molinosagro.com.ar; federico.romano@molinosagro.com.ar; damian.calvet@molinosagro.com.ar; daniel.santos@molinosagro.com.ar; sebastian.bertazzo@molinosagro.com.ar; ruben.bisson@molinosagro.com.ar; fabricio.herrera@molinosagro.com.ar; sebastian.muniz@molinosagro.com.ar; marcelo.gustavo.lopez@molinosagro.com.ar; jose.luis.gomez@molinosagro.com.ar; cristian.leonori@molinosagro.com.ar; nestor.sosaguerci@Molinosagro.com.ar; norberto.moriconi@molinosagro.com.ar; sebastian.bolger@molinosagro.com.ar; matias.abramor@molinosagro.com.ar; martin.manoni@molinosagro.com.ar; mauro.mir@molinosagro.com.ar; leandro.armendari@molinosagro.com.ar; lucioano.arario@molinosagro.com.ar; Antonela.Labonia@molinosagro.com.ar; ariel.pedrozo@molinosagro.com.ar; melina.corio@mocommodities.com; ileana.rodriguez@mocommodities.com; rosario.viana@mocommodities.com; liz.pereira@molinosagro.com.ar; Trading@mocommodities.com; leandro.varela@molinosagro.com.ar; german.turcutto@molinosagro.com.ar; GrupoPeritosDeEmbarque@molinosagro.com.ar; Ariel.Lascano@molinosagro.com.ar; joaquin.sarachaga@mocommodities.com; German.Castagnani@molinosagro.com.ar; jimena.rodriguez@molinosagro.com.ar; emanuel.venica@molinosagro.com.ar; juan.lapissonde@molinosagro.com.ar; hernan.ferreira@mocommodities.com') END
+GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZarpo') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('EmbarqueZarpo', 'ariel.pedrozo@molinosagro.com.ar; federico.romano@molinosagro.com.ar') END
 GO
 
 -- Puntos de Interes para geolocalizacion.
@@ -630,6 +632,7 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'A
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Lead (Pb)','Max: 10.0 mg/kg ')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Aflatoxin B1','Max: 30.0 micro gram/kg ')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Salmonella','No found in 25 grams')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSBMHP, 'Goods to be finely ground on a representative loading samples 90 pct passing thru 4.50 mm sieve','')
 
 END
 
@@ -721,6 +724,7 @@ insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'CET
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'GREEN HOUSE GAS SAVING ','Min: 60 %')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'C.F.P.P.','Max: -2 d. centigrades')
 insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'WATER ','Max: 350 ppm')
+insert into CalidadValor (TipoDeCalidad_Id, Parametro,Valor) values(@CVSME, 'IODINE','Max: 135')
 END
 
 IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BEGIN
@@ -765,7 +769,7 @@ if not exists(select 1 from TasaDeCarga where Descripcion = 'WWD SHINC') begin i
 --Scripts CompaniaDeFumigacion
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'AB GROUP') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('AB GROUP','abgroup@group-ab.com') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN SAN LORENZO') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN SAN LORENZO','rosario@fugran.com; ship@fugran.com') end
-if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN BAHIA BLANCA') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN BAHIA BLANCA','bblanca@fugran.com') end
+if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'FUGRAN BAHIA BLANCA') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('FUGRAN BAHIA BLANCA','bblanca@fugran.com; ship@fugran.com') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'PROFUM') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('PROFUM','fumigaciones@profum.com.ar; sanlorenzo@profum.com.ar') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'AGROFUM') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('AGROFUM','agrofum@agrofum.com') end
 if not exists(select 1 from CompaniaDeFumigacion where Descripcion = 'PEST CONTROL') begin insert into CompaniaDeFumigacion (Descripcion,Mail) values ('PEST CONTROL','administracion@pestcontrolarg.com.ar; comercial@pestcontrolarg.com.ar') end
@@ -875,17 +879,156 @@ if not exists (select 1 from CoordinadorPuerto where Nombre = 'Panocean') begin 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'Sierentz') begin insert into CoordinadorPuerto (Nombre) values ('Sierentz'); end
 
 /* SCRIPTS DATOS AFIP */
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CUR') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CUR', 'En Curso'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REG') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REG', 'Registrada'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'PRE') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('PRE', 'Presentada'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'AUTO') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('AUTO', 'Autorizada'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CAN') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CAN', 'Cancelada'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'ANU') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('ANU', 'Anulada'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CUR') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CUR', 'En Curso'); END
-IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REC') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REC', 'Rechazada'); END
 IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'CODE') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('CODE', 'CODE'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'ANU') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('ANU', 'Anulada'); END
+IF NOT EXISTS (SELECT 1 FROM AfipCoemEstado WHERE Codigo = 'REC') BEGIN INSERT INTO AfipCoemEstado (Codigo, Estado) VALUES ('REC', 'Rechazada'); END
+
+DELETE FROM AfipCoemEstado WHERE Codigo IN ('CAN','AUT')
+
+UPDATE AfipCoemEstado SET Orden = 0 WHERE Codigo = 'CUR'
+UPDATE AfipCoemEstado SET Orden = 1 WHERE Codigo = 'REG'
+UPDATE AfipCoemEstado SET Orden = 2 WHERE Codigo = 'PRE'
+UPDATE AfipCoemEstado SET Orden = 3 WHERE Codigo = 'AUTO'
+UPDATE AfipCoemEstado SET Orden = 4 WHERE Codigo = 'CODE'
+UPDATE AfipCoemEstado SET Orden = 5 WHERE Codigo = 'ANU'
+UPDATE AfipCoemEstado SET Orden = 6 WHERE Codigo = 'REC'
 
 if not exists (select 1 from CoordinadorPuerto where Nombre = 'AMS Ameropa Marketing and Sales AG') begin insert into CoordinadorPuerto (Nombre) values ('AMS Ameropa Marketing and Sales AG'); end
 
 
 /* AFIP MOTIVOS DE NO ABORDO */
 IF NOT EXISTS (SELECT * FROM AfipMotivoNoABordo) BEGIN INSERT INTO AfipMotivoNoABordo (Codigo, Descripcion) VALUES ('1', 'OTROS'),('2', 'PEDIDO AGENCIA-ROLEO'),('3', 'CAMBIO BUQUE/BANDERA'),('4', 'IMG SCAN SOSPECHOSA'),('5', 'ALERTA / ADO'),('6', 'RAZONES CLIMATICAS'),('7', 'CONTENEDOR ABIERTO'),('8', 'DIFERENCIA PESO'); END
+
+--Visualizar Clientes
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Visualizar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Visualizar')); END
+
+--Editar Clientes
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Editar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Editar')); END
+
+--Crear Clientes
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Crear'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Crear')); END
+
+-- Eliminar Cliente
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Clientes_Eliminar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Clientes_Eliminar')); END
+
+-- Agencias Maritimas y ATA
+IF (SELECT COUNT(Cuit) FROM AgenciaMaritimaPuerto) = 0 BEGIN
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MSA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MSA','30709247235') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MARITIMA MARSA SRL') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MARITIMA MARSA SRL','30709539023') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'BROADGRAIN') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('BROADGRAIN','30715631608') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'INTERGRAIN') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('INTERGRAIN','30708877189') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AG.MARITIMA DELTA SA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AG.MARITIMA DELTA SA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'RIO PARANA SA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('RIO PARANA SA','30507057574') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'NORMAN HNOS. SA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('NORMAN HNOS. SA','30-57867162-1') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AGCIA. MAR. EL HAUAR') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AGCIA. MAR. EL HAUAR','30708793627') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AGCIA. MARIT. DELTA') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AGCIA. MARIT. DELTA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AG.MAR.TRANSPARANA SA.') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AG.MAR.TRANSPARANA SA.','30707428194') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MULTIMAR') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MULTIMAR','3068078995') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'AG. MARITIMA ARGENPAR S.A.') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('AG. MARITIMA ARGENPAR S.A.','30709509485') END
+    IF NOT EXISTS(SELECT 1 FROM AgenciaMaritimaPuerto WHERE Nombre = 'MEDITERRANEAN SHIPPING COMPANY') BEGIN INSERT INTO AgenciaMaritimaPuerto(Nombre,Cuit) VALUES ('MEDITERRANEAN SHIPPING COMPANY','30693184947') END
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '33578648599' WHERE Nombre = 'CONSULTORES MARITIMOS'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30709874175' WHERE Nombre = 'INCHCAPE'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30645563472' WHERE Nombre = 'CLIPPER'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30645563472' WHERE Nombre = 'RIOPLAT'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30645563472' WHERE Nombre = 'seaplate'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30612732503' WHERE Nombre = 'NABSA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30615647345' WHERE Nombre = 'ALPEMAR'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30650924424' WHERE Nombre = 'SUPERMAR'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30641739916' WHERE Nombre = 'CHRISTOPHERSEN'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30710931891' WHERE Nombre = 'Bonmar'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30680516959' WHERE Nombre = 'Faroship'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30680495064' WHERE Nombre = 'BALTZER'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30707691847' WHERE Nombre = 'FERTIMPORT'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30654214715' WHERE Nombre = 'WAVE'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506727967' WHERE Nombre = 'DULCE'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506764226' WHERE Nombre = 'MARSA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715788779' WHERE Nombre = 'WBL'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715788779' WHERE Nombre = 'JNL'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715312715' WHERE Nombre = 'AT PORT'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708672870' WHERE Nombre = 'OCEAN WAY'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708672870' WHERE Nombre = 'oceanway'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30709513490' WHERE Nombre = 'Antares'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30715326570' WHERE Nombre = 'B2B'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708360496' WHERE Nombre = 'B&G'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506888189' WHERE Nombre = 'AMI'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30709155705' WHERE Nombre = 'ABBEY SEA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30717010708' WHERE Nombre = 'Argelan'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '33632809919' WHERE Nombre = 'argenbulk'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30716313146' WHERE Nombre = 'B&M Agencia Marítima'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30710243529' WHERE Nombre = 'BLUE STAR'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30506792165' WHERE Nombre = 'Cargill'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '33627794369' WHERE Nombre = 'EUROAMERICA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30590162279' WHERE Nombre = 'HEINLEIN'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30708138750' WHERE Nombre = 'ISA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30648168876' WHERE Nombre = 'Myrasa'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30648168876' WHERE Nombre = 'MIRASA'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30707647074' WHERE Nombre = 'Topsail'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '30710544871' WHERE Nombre = 'Waypoint'
+    UPDATE AgenciaMaritimaPuerto SET Cuit = '11111111111' WHERE Nombre = 'a confirmar'
+END
+
+IF (SELECT COUNT(Cuit) FROM ATAPuerto) = 0 BEGIN
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'INCHCAPE') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('INCHCAPE','30709874175') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'RIOPLAT') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('RIOPLAT','30645563472') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'seaplate') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('seaplate','30645563472') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'SUPERMAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('SUPERMAR','30650924424') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Bonmar') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Bonmar','30710931891') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG. MARITIMA MARSA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG. MARITIMA MARSA','30506764226') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'JNL') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('JNL','30715788779') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'OCEAN WAY') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('OCEAN WAY','30708672870') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'oceanway') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('oceanway','30708672870') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Antares') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Antares','30709513490') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'ABBEY SEA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('ABBEY SEA','30709155705') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Argelan') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Argelan','30717010708') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'argenbulk') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('argenbulk','33632809919') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'B&M Agencia Marítima') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('B&M Agencia Marítima','30716313146') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'BLUE STAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('BLUE STAR','30710243529') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Cargill') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Cargill','30506792165') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'EUROAMERICA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('EUROAMERICA','33627794369') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'HEINLEIN') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('HEINLEIN','30590162279') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'ISA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('ISA','30708138750') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Myrasa') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Myrasa','30648168876') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'MIRASA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('MIRASA','30648168876') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Topsail') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Topsail','30707647074') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'Waypoint') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('Waypoint','30710544871') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG.MARITIMA DELTA SA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG.MARITIMA DELTA SA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'RIO PARANA SA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('RIO PARANA SA','30507057574') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'NORMAN HNOS. SA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('NORMAN HNOS. SA','30-57867162-1') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AGCIA. MAR. EL HAUAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AGCIA. MAR. EL HAUAR','30708793627') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AGCIA. MARIT. DELTA') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AGCIA. MARIT. DELTA','30657927623') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG.MAR.TRANSPARANA SA.') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG.MAR.TRANSPARANA SA.','30707428194') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'MULTIMAR') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('MULTIMAR','3068078995') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'AG. MARITIMA ARGENPAR S.A.') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('AG. MARITIMA ARGENPAR S.A.','30709509485') END
+    IF NOT EXISTS(SELECT 1 FROM ATAPuerto WHERE Nombre = 'MEDITERRANEAN SHIPPING COMPANY') BEGIN INSERT INTO ATAPuerto(Nombre,Cuit) VALUES ('MEDITERRANEAN SHIPPING COMPANY','30693184947') END
+    UPDATE ATAPuerto SET Cuit = '33578648599' WHERE Nombre = 'CONS.MARITIMOS SRL'
+    UPDATE ATAPuerto SET Cuit = '30645563472' WHERE Nombre = 'CLIPPER SRL (seaplate)'
+    UPDATE ATAPuerto SET Cuit = '30612732503' WHERE Nombre = 'AG.MARIT.NABSA S.A.'
+    UPDATE ATAPuerto SET Cuit = '30615647345' WHERE Nombre = 'ALPEMAR SRL'
+    UPDATE ATAPuerto SET Cuit = '30641739916' WHERE Nombre = 'CHRISTHOPHERSEN S.A.'
+    UPDATE ATAPuerto SET Cuit = '30680516959' WHERE Nombre = 'FAROSHIP S.R.L.'
+    UPDATE ATAPuerto SET Cuit = '30680495064' WHERE Nombre = 'BALTZER MARITIMA SRL'
+    UPDATE ATAPuerto SET Cuit = '30707691847' WHERE Nombre = 'FERTIMPORT'
+    UPDATE ATAPuerto SET Cuit = '30709247235' WHERE Nombre = 'MARITIME SHIPPING AGENCY SRL'
+    UPDATE ATAPuerto SET Cuit = '30654214715' WHERE Nombre = 'WAVE AG. MARITIMA S.A.'
+    UPDATE ATAPuerto SET Cuit = '30506727967' WHERE Nombre = 'AGENCIA MARITIMA DULCE S.A.'
+    UPDATE ATAPuerto SET Cuit = '30709539023' WHERE Nombre = 'MARITIMA MARSA SRL'
+    UPDATE ATAPuerto SET Cuit = '30715788779' WHERE Nombre = 'WBL (JNL MARITIMA)'
+    UPDATE ATAPuerto SET Cuit = '30715312715' WHERE Nombre = 'at port'
+    UPDATE ATAPuerto SET Cuit = '30715326570' WHERE Nombre = 'B2B'
+    UPDATE ATAPuerto SET Cuit = '30708360496' WHERE Nombre = 'B&G'
+    UPDATE ATAPuerto SET Cuit = '30506888189' WHERE Nombre = 'AMI'
+    UPDATE ATAPuerto SET Cuit = '30715631608' WHERE Nombre = 'BROADGRAIN ARGENTINA'
+    UPDATE ATAPuerto SET Cuit = '30708877189' WHERE Nombre = 'INTERGRAIN'
+END

@@ -101,7 +101,47 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
         }
+        #endregion
 
+        #region Eliminar Buque
+        public void DeshabilitarVapor(VaporDto vapor, string usuario)
+        {
+            if (ExisteNominacionActivaBuque(vapor))
+                throw new Exception("No se puede eliminar el buque debido a que él mismo esta siendo utilizado" +
+                    " en una nominación activa.");
+
+            if (ExisteBuqueEnLineUp(vapor))
+                throw new Exception("No se puede eliminar el buque debido a que él mismo se encuentra actualmente en LineUp");
+            try
+            {
+                var eliminarBuque = new EliminarBuque() { Id = vapor.Id, UsuarioEjecuta = usuario };
+                servicioComandos.Ejecutar(eliminarBuque);
+            }
+            catch (Exception e)
+            {
+                log.Error(e, $"Hubo un error al intentar eliminar buque con id: {vapor.Id}");
+                throw e;
+            }
+        }
+
+        private bool ExisteNominacionActivaBuque(VaporDto vapor)
+        {
+            var existeNominacion = (from n in repositorio.Listar<Nominacion>()
+                                    where !n.FechaEliminacion.HasValue && !n.FechaEnvioLineUp.HasValue &&
+                                    n.NominacionDatoTecnico.VaporInformacion.Vapor.Id == vapor.Id
+                                    select (n)).Any();
+            return existeNominacion;
+        }
+
+        private bool ExisteBuqueEnLineUp(VaporDto vapor)
+        {
+            var existeEnLineUp = (from e in repositorio.Listar<Embarque>()
+                                  join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
+                                  where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
+                                  && e.Vapor.Id == vapor.Id
+                                  select (e)).Any();
+            return existeEnLineUp;
+        }
 
         #endregion
 

@@ -114,8 +114,10 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
   }
 
   private asignarFuncionesAutocompletado() {
-    this.aduanas$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'codigoAduana', this.aduanas);
-    this.lugaresOperativos$ = this.tablasAfipService.crearObservableAutocompletar(this.crearEditarCaratulaForm, 'codigoLugarOperativo', this.lugaresOperativos);
+    const controlAduana = this.crearEditarCaratulaForm.get('codigoAduana');
+    const controlLugarOperativo = this.crearEditarCaratulaForm.get('codigoLugarOperativo');
+    this.aduanas$ = this.tablasAfipService.crearObservableAutocompletar(controlAduana, this.aduanas);
+    this.lugaresOperativos$ = this.tablasAfipService.crearObservableAutocompletar(controlLugarOperativo, this.lugaresOperativos);
   }
 
   private asignarValoresCaratula(caratula: Caratula) {

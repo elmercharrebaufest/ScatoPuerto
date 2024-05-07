@@ -896,4 +896,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FechaActualizacion" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="135f5a24-b4e2-4ff7-83e3-8d32a877e001" ChangeDateTime="03/15/2024 21:12:12">
+    <Property Name="ElementName" Value="[dbo].[AuditoriaAgenciaMaritimaATA].[Activa]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AuditoriaAgenciaMaritimaATA]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Activo" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="64a9de8d-828c-4176-acaf-d29f54fa8321" ChangeDateTime="03/15/2024 21:14:50">
+    <Property Name="ElementName" Value="[dbo].[AuditoriaAgenciaMaritimaATA].[Activo]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AuditoriaAgenciaMaritimaATA]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Activa" />
+  </Operation>
 </Operations>

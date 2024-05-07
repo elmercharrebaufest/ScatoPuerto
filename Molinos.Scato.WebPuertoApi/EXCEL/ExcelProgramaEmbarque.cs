@@ -233,29 +233,34 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 "Draft Survey",
                 detalleIntervencion == null ? "-" : detalleIntervencion.DraftSurvey ? "SI" : "NO",
                 detalleIntervencion?.SurveyACuentaDe ?? "-",
-                "-","-"
+                "-", "-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Permiso de embarque",
                 detalleIntervencion == null ? "-" : detalleIntervencion.PermisoDeEmbarque ? "SI" : "NO",
-                "-", "-","-"
+                "-", "-", "-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Estibado y trimado",
                 detalleIntervencion == null ? "-" : detalleIntervencion.EstibadorYTrimado ? "SI" : "NO",
-                "-", "-","-"
+                "-", "-", "-"
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
             valoresCeldas = new string[] {
                 "Fumigación",
                 detalleIntervencion?.Fumigacion ?? "-",
                 detalleIntervencion?.CompaniaACuentaDe ?? "-",
-                detalleIntervencion?.CompaniaDeFumigacion?.Descripcion?? "-",
-                detalleIntervencion?.TipoDeFumigacion?.Descripcion ?? "-",
+                detalleIntervencion?.CompaniaDeFumigacion?.Descripcion ?? "-",
+                detalleIntervencion?.Observaciones ?? "-",
             };
             InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true); // Negrita solo primero
+            valoresCeldas = new string[] {
+                "Tipo de fumigación",
+                detalleIntervencion?.TipoDeFumigacion?.Descripcion ?? "-"
+            };
+            InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true);
             _flagColor = !_flagColor;
             #endregion
 

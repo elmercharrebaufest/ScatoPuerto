@@ -9,15 +9,13 @@ import { NominacionIntervencionesComponent } from './nominacion-intervenciones/n
 import { SharedModule } from 'app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 
-
-const libComponents = [
-  NominacionRegistroComponent, 
-  NominacionDatoTecnicoComponent, 
-  NominacionRecibosComponent, 
-  NominacionIntervencionesComponent
-];
 @NgModule({
-  declarations: [NominacionRegistroComponent, NominacionDatoTecnicoComponent, NominacionRecibosComponent, NominacionIntervencionesComponent],
+  declarations: [
+    NominacionRegistroComponent, 
+    NominacionDatoTecnicoComponent, 
+    NominacionRecibosComponent, 
+    NominacionIntervencionesComponent
+  ],
   imports: [
     CommonModule,
     SharedModule,

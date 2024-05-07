@@ -37,6 +37,12 @@ export const routeConfig: Routes = [
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/calidad/calidad.module').then(m => m.CalidadModule)
       },
+
+      {
+        path: 'embarque',
+        loadChildren: () => import('./modulos/datos-embarque/datos-embarque.module').then(m => m.DatosEmbarqueModule)
+      },
+      
       {
         path: 'buques',
         canActivateChild: [RoleGuard],
@@ -51,6 +57,11 @@ export const routeConfig: Routes = [
         path: 'vapor',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/vapor/vapor.module').then(m => m.VaporModule)
+      },
+      {
+        path: 'clientes',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/clientes/clientes.module').then(m => m.ClientesModule)
       },
       {
         path: 'afip',

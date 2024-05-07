@@ -1,0 +1,40 @@
+<!-- <ship-spinner [message]="'Enviando datos'" *ngIf='cargando'></ship-spinner> -->
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">{{tittle}}</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeModalEditarCrearCoem()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="frmCrearEditar">
+      <div class="row margen justify-content-center">
+        <div class="form-group col-md-8 align-self-center">
+          <input type="text" class="form-control" placeholder="Nombre Agencia" formControlName="nombre">
+        </div>
+      </div>
+
+      <div class="row margen justify-content-center">
+        <div class="form-group col-md-8 align-self-center">
+          <input type="text" class="form-control" placeholder="CUIT" formControlName="cuit">
+        </div>
+      </div>
+
+      <div class="row margen justify-content-center">
+        <div class="form-group col-md-8 align-self-center">
+          <select class="custom-select" id="inputGroupSelect01" formControlName="tipo" (change)="changeTipo($event.target.value)">
+            <!-- <option selected value="0">Todos</option> -->
+            <option value="1">Agencia Marítima</option>
+            <option value="2">A.T.A.</option>              
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer justify-content-center">
+    <button type="button" class="btn btn-success" data-dismiss="modal" (click)="grabar()">Guardar</button>
+    <button type="button" class="btn btn-danger" (click)="closeModalEditarCrearCoem()">Cancelar</button>
+  </div>
+</div>

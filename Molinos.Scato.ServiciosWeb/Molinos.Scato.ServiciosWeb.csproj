@@ -138,6 +138,7 @@
     <Content Include="ServicioEstadoPuesto.svc" />
     <Content Include="FirmaProvider.svc" />
     <Content Include="ServicioAfip.svc" />
+    <Content Include="ServicioClientes.svc" />
     <Content Include="ServicioVapor.svc" />
     <Content Include="ServicioProgramaEmbarque.svc" />
     <Content Include="ServicioSuscriptor.svc" />

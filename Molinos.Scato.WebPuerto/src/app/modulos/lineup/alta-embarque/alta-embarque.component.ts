@@ -29,6 +29,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { Pais } from '@ScatoModels/Buques/Pais';
 import { EmbarqueCoordinador } from '@ScatoModels/embarque-coordinador';
+
 @Component({
   selector: 'app-alta-embarque',
   templateUrl: './alta-embarque.component.html',
@@ -465,12 +466,13 @@ export class AltaEmbarqueComponent implements OnInit {
     /** Coordinadores */
     var coordinadoresEncontrados = [];
     this.embarqueForm.value.coordinadoresList.forEach(element => {
-      coordinadoresEncontrados.push(this.coordinadoresList.find(x => x.id == element.id));
+      coordinadoresEncontrados.push(element);
     });
+
     var coordinadores = [];
     coordinadoresEncontrados.forEach(coordinador => {
       if (this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0) {
-        coordinadores.push(new EmbarqueCoordinador(0, coordinador))
+        coordinadores.push(new EmbarqueCoordinador(0, new CoordinadorPuerto(coordinador.id, coordinador.nombre)))
       }
 
     })
@@ -988,8 +990,7 @@ export class AltaEmbarqueComponent implements OnInit {
     this.opcionABMSeleccionada = opcion;
     this.tituloABM =
       (this.opcionABMSeleccionada == 'Agregar' ? 'Agregar nuevo registro ' : 'Editar ') +
-      (this.pantallaSeleccionada == 'Coordinador' ? 'Coordinador de Puerto' :
-        this.pantallaSeleccionada == 'Ata' ? 'ATA de Puerto' :
+      (this.pantallaSeleccionada == 'Ata' ? 'ATA de Puerto' :
           this.pantallaSeleccionada == 'Agencia' ? 'Agencia Maritima de Puerto' : 'Motivo Limpieza');
 
     return this.modalService.open(this.modalABM);
@@ -1004,23 +1005,6 @@ export class AltaEmbarqueComponent implements OnInit {
   submitABM(accion) {
     var condicion: string = this.pantallaSeleccionada
     switch (condicion) {
-      case 'Coordinador':
-        var abm: CoordinadorPuerto = new CoordinadorPuerto('', '');
-        var list = 'coordinadoresList';
-        var opcionABM = this.opcionABMSeleccionada == 'Agregar' ?
-          'agregarCoordinadorPuerto' : accion == 'Guardar' ?
-            'modificarCoordinadorPuerto' : 'eliminarCoordinadorPuerto';
-        var obtener = 'obtenerListadoCoordinadores';
-        var modelo = CoordinadorPuerto;
-        var mensaje1 = this.opcionABMSeleccionada == 'Agregar' ?
-          'Ha cargado con éxito un nuevo Coordinador de Puerto' : accion == 'Guardar' ?
-            'Ha modificado con éxito el Coordinador de Puerto' : 'Ha eliminado con éxito el Coordinador de Puerto';
-        var mensaje2 = accion == 'Guardar' ? 'Los datos de este Coordinador de Puerto ya existen' :
-          'Los datos de este Coordinador de Puerto NO existen';
-        var mensaje3 = 'Debe Inidcar un Nombre para el Coordinador de Puerto';
-        var mensaje4 = 'No se puede eliminar el Coordinador de Puerto, ya que está asociado a un Embarque';
-        break;
-
       case 'Ata':
         var abm: ATAPuerto = new ATAPuerto('', '');
         var list = 'ataList';
@@ -1097,10 +1081,7 @@ export class AltaEmbarqueComponent implements OnInit {
             if (this.opcionABMSeleccionada == 'Agregar') {
               this.embarqueService[obtener]().subscribe(res => {
                 const nuevo = res.filter(x => x.nombre == abm.nombre)[0];
-                /*Para caso distinto de coordinadores, solo permitimos guardar 1 elemento.*/
-                if(obtener !== 'obtenerListadoCoordinadores'){
-                  this.embarqueForm.get([list]).value.splice(0,this.embarqueForm.get([list]).value.length);
-                }
+                this.embarqueForm.get([list]).value.splice(0,this.embarqueForm.get([list]).value.length);                
                 this.embarqueForm.get([list]).value.push(new modelo(nuevo.id, nuevo.nombre));
               });
             }
@@ -1258,7 +1239,6 @@ export class AltaEmbarqueComponent implements OnInit {
       if (res != null) {
         this.vaporInfo = res;
         this.vaporSeleccionado.tipoBuque = res.tipoBuque;
-        //this.embarqueForm.controls.nombreBuque.disable();
         this.setinfoSelected();
       }
     });
@@ -1321,5 +1301,24 @@ export class AltaEmbarqueComponent implements OnInit {
     }
   }
 
+  openModalCliente(modal: any){ 
+    this.modalService.open(modal, { size: 'md', centered: true, backdrop: 'static', keyboard: false }).result
+    .then(() => {     
+      console.log('_modalService.open');
+    })
+    .catch((res) => { console.log(res) }); 
+  }
 
+  onAddCliente(event: any){
+    var nombre = event.nombre.trim();
+    this.embarqueService['obtenerListadoCoordinadores']().subscribe(res => {
+      let nuevo = res.filter(x => x.nombre == nombre)[0];
+      var obj = {
+        id: nuevo.id,
+        nombre: nuevo.nombre,
+        name: nuevo.nombre
+      }
+      this.embarqueForm.value.coordinadoresList.push(obj)
+    });
+  }
 }

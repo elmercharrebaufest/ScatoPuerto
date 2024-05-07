@@ -65,6 +65,7 @@ export class Embarque {
 export class Vapor{
   id: number;
   nombre: string;
+  habilitado: boolean;
 }
 export class EstadoBuque{
   id: number;
