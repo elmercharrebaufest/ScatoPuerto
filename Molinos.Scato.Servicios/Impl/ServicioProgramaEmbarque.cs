@@ -1,4 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Exportador;
+using Molinos.Scato.Dominio.Comandos.Exportadores;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
@@ -199,7 +201,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<Exportador, ExportadorDto>();
+                return Listar<Exportador, ExportadorDto>(e => e.Habilitado);
             }
             catch (Exception ex)
             {
@@ -1239,6 +1241,7 @@ namespace Molinos.Scato.Servicios.Impl
         #endregion Agencias Maritimas ATA
 
         #region Destinos
+
         public ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0)
         {
             IQueryable<Destino> query = repositorio.Incluir<Destino>()
@@ -1281,7 +1284,8 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
         }
-        #endregion
+
+        #endregion Destinos
 
         #region Metodos Utiles
 
@@ -1325,101 +1329,34 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void CrearExportador(ExportadorDto exportador, string usuario)
         {
-            try
+            var res = comandos.Ejecutar(new CrearExportadorPuerto { Dto = exportador, Usuario = usuario });
+            if (res.HayErrores)
             {
-                var existe = this.repositorio.Obtener<Exportador>(e => e.Nombre.Trim().ToUpper() == exportador.Nombre.Trim().ToUpper());
-                if (existe != null)
-                {
-                    if (existe.Habilitado)
-                    {
-                        throw new Exception("El nombre ingresado ya existe en otro exportador.");
-                    }
-                    else
-                    {
-                        var resActivacion = comandos.Ejecutar(new ModificarExportador
-                        {
-                            Dto = new ExportadorDto
-                            {
-                                Id = existe.Id,
-                                Nombre = existe.Nombre,
-                                Almacen_Id = existe.Almacen != null ? existe.Almacen.Id : (int?)null,
-                                AlmacenDesc = existe.Almacen?.Descripcion,
-                                Habilitado = true
-                            },
-                            Usuario = usuario
-                        });
-                        if (resActivacion.HayErrores)
-                        {
-                            throw new Exception(resActivacion.Errores[""]);
-                        }
-                    }
-                }
-                else
-                {
-                    var res = comandos.Ejecutar(new CrearExportador { Dto = exportador, Usuario = usuario });
-                    if (res.HayErrores)
-                    {
-                        throw new Exception(res.Errores[""]);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Hubo un error al intentar guardar exportador.");
-                throw ex;
+                throw new Exception(res.Errores[""]);
             }
         }
 
         public void EditarExportador(ExportadorDto exportador, string usuario)
         {
-            try
+            var res = comandos.Ejecutar(new ModificarExportadorPuerto { Dto = exportador, Usuario = usuario });
+            if (res.HayErrores)
             {
-                var existe = this.repositorio.Obtener<Exportador>(e => e.Nombre.Trim().ToUpper() == exportador.Nombre.Trim().ToUpper());
-                if (existe != null)
-                {
-                    if (existe.Habilitado)
-                    {
-                        throw new Exception("El nombre ingresado ya existe en otro exportador.");
-                    }
-                    else
-                    {
-                        var resActivacion = comandos.Ejecutar(new ModificarExportador
-                        {
-                            Dto = new ExportadorDto
-                            {
-                                Id = existe.Id,
-                                Nombre = existe.Nombre,
-                                Almacen_Id = existe.Almacen != null ? existe.Almacen.Id : (int?)null,
-                                AlmacenDesc = existe.Almacen?.Descripcion,
-                                Habilitado = true
-                            },
-                            Usuario = usuario
-                        });
-                        if (resActivacion.HayErrores)
-                        {
-                            throw new Exception(resActivacion.Errores[""]);
-                        }
-                    }
-                }
-                else
-                {
-                    var res = comandos.Ejecutar(new ModificarExportador { Dto = exportador, Usuario = usuario });
-                    if (res.HayErrores)
-                    {
-                        throw new Exception(res.Errores[""]);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, "Hubo un error al intentar editar exportador.");
-                throw ex;
+                throw new Exception(res.Errores[""]);
             }
         }
 
         public ExportadorDto ObtenerExportador(int id)
         {
             return Obtener<Exportador, ExportadorDto>(id);
+        }
+
+        public void EliminarExportador(int id, string usuario)
+        {
+            var res = comandos.Ejecutar(new EliminarExportadorPuerto { Id = id, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
         }
 
         #endregion ABM Exportadores/Cargadores

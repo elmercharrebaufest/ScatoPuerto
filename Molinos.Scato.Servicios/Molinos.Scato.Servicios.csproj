@@ -584,6 +584,9 @@
     <Compile Include="Procesamiento\Destinos\ProcesadorCrearDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorEliminarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorModificarDestinoPuerto.cs" />
+    <Compile Include="Procesamiento\Exportadores\ProcesadorCrearExportadorPuerto.cs" />
+    <Compile Include="Procesamiento\Exportadores\ProcesadorEliminarExportadorPuerto.cs" />
+    <Compile Include="Procesamiento\Exportadores\ProcesadorModificarExportadorPuerto.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarCartasLineUp.cs" />

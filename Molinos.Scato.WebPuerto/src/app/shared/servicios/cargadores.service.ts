@@ -2,6 +2,7 @@ import { Exportador } from '@ScatoModels/exportador';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,11 +33,15 @@ export class CargadoresService {
     return this.http.get(`${this.url}ProgramaEmbarque/ExcelExportadores?nombre=${nombre}`, { 'withCredentials': true, responseType: 'blob' });
   }
 
-  public ObtenerExportador(id: number): any {
+  public ObtenerExportador(id: number): Observable<any> {
     return this.http.get(`${this.url}ProgramaEmbarque/ObtenerExportador?id=${id}`, { 'withCredentials': true });
   }
 
   public EditarCargador(agencia: Exportador) {
     return this.http.put<boolean>(`${this.url}ProgramaEmbarque/EditarExportador`, agencia, { 'withCredentials': true });
+  }
+
+  public EliminarCargador(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.url}ProgramaEmbarque/EliminarExportador?id=${id}`, { 'withCredentials': true });
   }
 }

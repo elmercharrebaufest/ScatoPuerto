@@ -165,9 +165,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarAgenciaMaritimaATA(int id, int tipo, string usuario);
+
         #endregion Agencias Maritimas ATA
 
         #region Destinos
+
         [OperationContract]
         ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0);
 
@@ -179,7 +181,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarDestino(int id, string usuario);
-        #endregion
+
+        #endregion Destinos
 
         #region ABM Exportadores
 
@@ -198,6 +201,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EditarExportador(ExportadorDto exportador, string usuario);
 
-        #endregion ABM Exportadores 
+        [OperationContract]
+        void EliminarExportador(int id, string usuario);
+
+        #endregion ABM Exportadores
+
     }
 }
