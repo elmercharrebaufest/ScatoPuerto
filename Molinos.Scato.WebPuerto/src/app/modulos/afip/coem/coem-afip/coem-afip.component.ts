@@ -181,7 +181,7 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
 
   async validarEstadoCoem(selectElement, codigoEstado): Promise<boolean> {
 
-    const codigoSeleccionado = this.listaEstados.find(e => e.id === selectElement.selectedIndex).codigo;
+    const codigoSeleccionado = this.listaEstados.find(e => e.id == selectElement.value).codigo;
     let valido: boolean = true;
 
     const showModalAndCheckConfirmation = async (texto: string): Promise<void> => {

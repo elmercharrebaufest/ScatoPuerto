@@ -135,7 +135,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'clientes': {
-                if (permisos.find(x => x === 'Clientes_Visualizar')) {
+                if (permisos.find(x => x === 'Vapor_Visualizar')) { // TODO: Modificar
                     return true;
                 }else{
                     this.navigate(permisos, "clientes");

@@ -15,13 +15,13 @@ export class ClientesComponent implements OnInit {
   private user: Usuario;
 
   constructor(public session: SessionService, private router: Router) {
-    this.user = this.session.getUser(); 
+    this.user = this.session.getUser();
   }
   ngOnInit(): void {
   }
 
   tienePermisoCrearNuevoCliente() {
-    return this.user.permisos.find(p => p === this.permisosScato.Clientes_Crear);
+    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Crear);
   }
 
   onVolver(){

@@ -41,7 +41,7 @@
                     </td>
                     <td>
                         <div class="btn-group">
-                            <select class="custom-select" id="inputGroupSelect01"
+                            <select class="custom-select" [id]="'inputGroupSelect01-' + coem.identificadorCOEM"
                                 (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM, coem.afipCoemEstado.codigo)"
                                 [disabled]="coem.afipCoemEstado.codigo == 'ANU' || coem.afipCoemEstado.codigo == 'CODE'">
                                 <option selected value="" disabled>Estado</option>
