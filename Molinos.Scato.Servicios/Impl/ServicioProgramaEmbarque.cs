@@ -107,7 +107,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<TipoDeContrato, TipoDeContratoDto>();
+                return Listar<TipoDeContrato, TipoDeContratoDto>(tc => tc.Descripcion != "FAS");
             }
             catch (Exception ex)
             {
@@ -1360,5 +1360,14 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
         #endregion ABM Exportadores/Cargadores
+
+        public void CrearNominacionFAS(int embarqueId, List<NominacionReciboDto> recibos)
+        {
+            var resultado = comandos.Ejecutar(new CrearEmbarqueFAS { EmbarqueId = embarqueId, Recibos = recibos });
+            if (resultado.HayErrores)
+            {
+                throw new Exception(resultado.Errores[""]);
+            }
+        }
     }
 }

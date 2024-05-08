@@ -116,7 +116,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     var embarqueCoordinadores = comando.Embarque.Coordinadores.Select(coo => new EmbarqueCoordinador
                     {
-                        CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto.Id),
+                        CoordinadorPuerto = Repositorio.Obtener<CoordinadorPuerto>(coo.CoordinadorPuerto?.Id ?? coo.Id),
                         Embarque = embarque
                     }).ToList();
 
@@ -172,7 +172,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     //lineup.Embarque.Ubicacion = comando.LineUp.Ubicacion;
                     Repositorio.GuardarCambios();
-
+                    resultado.Id = embarque.Id;
                     #endregion LINEUP
                 }
             }
