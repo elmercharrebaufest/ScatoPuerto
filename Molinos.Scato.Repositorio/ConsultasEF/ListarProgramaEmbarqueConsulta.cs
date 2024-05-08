@@ -41,6 +41,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 item.NominacionDatoTecnico.ETARecalada.Value.Month == FechaInicio.Value.Month))
                                 && (item.Embarque == null || item.Embarque.Ubicacion != 1)
                                 && (item.FechaEliminacion == null || (ayer < item.FechaEliminacion.Value && item.FechaEliminacion.Value < hoy))
+                                && item.NominacionDatoTecnico.TipoDeContrato.Descripcion != "FAS"
 
                                 orderby item.FechaCreacion descending
 

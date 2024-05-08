@@ -85,6 +85,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
+    <Compile Include="Comandos\CrearEmbarqueFAS.cs" />
     <Compile Include="Comandos\Destinos\CrearDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\ModificarDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\EliminarDestinoPuerto.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCierreCargaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudNoABordoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipMotivoNoAbordoDto.cs" />
+    <Compile Include="Dto\AltaEmbarqueFASDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />

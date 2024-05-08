@@ -113,12 +113,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
         [Route("api/ProgramaEmbarque/ValidarPuedeCambiarBuque")]
-        public HttpResponseMessage ValidarPuedeCambiarBuque(int nominacionId)
+        public HttpResponseMessage ValidarPuedeCambiarBuque(int id)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ValidarPuedeCambiarBuque(nominacionId));
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ValidarPuedeCambiarBuque(id));
             }
             catch (Exception ex)
             {
@@ -1197,5 +1198,25 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         #endregion ABM Exportadores
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/CrearNominacionEmbarqueFAS")]
+        public HttpResponseMessage CrearNominacionEmbarqueFAS(AltaEmbarqueFASDto altaEmbarqueFAS)
+        {
+            try
+            {
+                var embarque = altaEmbarqueFAS.Embarque;
+                embarque.CentroId = int.Parse(ConfigurationManager.AppSettings["Centro"]);
+                embarque.Patente = embarque.NombreBuque;
+                var result = (ResultadoCrear)comandos.Ejecutar(new CrearEmbarque { Embarque = embarque });
+                servicioProgramaEmbarque.CrearNominacionFAS(result.Id, altaEmbarqueFAS.Recibos);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
     }
 }

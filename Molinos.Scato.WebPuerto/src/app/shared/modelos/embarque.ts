@@ -14,7 +14,7 @@ export class Embarque {
   id: number;
   nombreBuque: string;
   agencia: string;
-  agencias: AgenciaMaritimaPuerto[]; 
+  agencias: AgenciaMaritimaPuerto[];
   coordinadores: EmbarqueCoordinador[];
   fechaRecalada: Date;
   horaRecalada: string;
