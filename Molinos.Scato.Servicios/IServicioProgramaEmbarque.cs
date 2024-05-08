@@ -206,5 +206,7 @@ namespace Molinos.Scato.Servicios
 
         #endregion ABM Exportadores
 
+        [OperationContract]
+        void CrearNominacionFAS(int embarqueId, List<NominacionReciboDto> recibos);
     }
 }

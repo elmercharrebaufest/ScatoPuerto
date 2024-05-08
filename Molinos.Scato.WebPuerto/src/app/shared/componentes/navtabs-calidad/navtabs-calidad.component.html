@@ -39,7 +39,7 @@
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle Nouryon </div>
         <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button" id="{{buqueNoryon2.id}}"
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button" id="{{buqueNoryon2?.id}}"
                 (click)="onClickHandlerClient(buqueNoryon2)">
                 <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)"></div>
                 {{estadoNoryon()}}

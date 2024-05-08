@@ -11,11 +11,11 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { Bandera } from '@ScatoModels/bandera';
-import { identifierName } from '@angular/compiler';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
 import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
+import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 
 @Injectable({
   providedIn: 'root'
@@ -28,10 +28,8 @@ export class EmbarqueService {
 
   }
 
-  altaEmbarque(embarque: Embarque){
-    console.log('altaEmbarque: ', embarque);
-
-    return this.http.post(`${this.url}Embarque/AltaEmbarque`, embarque, { 'withCredentials' : true});
+  altaEmbarque(embarque: Embarque, recibos:NominacionRecibo[]){
+    return this.http.post(`${this.url}ProgramaEmbarque/CrearNominacionEmbarqueFAS`, { embarque, recibos }, { 'withCredentials' : true});
   }
 
   modificarEmbarque(embarque: Embarque){
