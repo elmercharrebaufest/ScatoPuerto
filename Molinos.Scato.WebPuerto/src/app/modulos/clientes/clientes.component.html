@@ -1,0 +1,23 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <label class="cargando-clientes">Clientes</label>
+        </div>      
+        <div class="col-md-3">             
+            <button class="btn btn-outline-secondary" (click)="onVolver()">
+                < VOLVER 
+            </button>&nbsp;          
+        <app-editar-crear-cliente *ngIf='tienePermisoCrearNuevoCliente()'></app-editar-crear-cliente>&nbsp;
+        </div>    
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <app-filtro-clientes></app-filtro-clientes> 
+        </div>  
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <app-listado-clientes ></app-listado-clientes>
+        </div>
+    </div>
+</div>

@@ -230,5 +230,51 @@ namespace Molinos.Scato.Test.Servicios
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
+
+		[Test]
+		public void SolicitarCierreCargaGranel_Ok()
+		{
+			// Arrange
+			var dto = new AfipSolicitarCierreCargaGranelDto();
+			var respuestaEsperada = new SolicitarCierreCargaGranelResponse();
+
+			mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+				.Returns(new Caratula());
+			mockWebService.Setup(ws => ws.SolicitarCierreCargaGranel(It.IsAny<SolicitarCierreCargaGranelRequest1>()))
+				.Returns(respuestaEsperada);
+
+			// Act
+			var resultado = servicioHelper.SolicitarCierreCargaGranel(dto);
+
+			// Assert
+			Assert.AreEqual(respuestaEsperada, resultado);
+			resultado.Should().NotBeNull();
+			resultado.Should().Equals(respuestaEsperada);
+		}
+
+		[Test]
+		public void SolicitarNoAbordo_Ok()
+		{
+			// Arrange
+			var identificadorCaratula = string.Empty;
+			var identificadorCOEM = string.Empty;
+			var identificadoresDeclaracionesMercaderiaSuelta = new Declaracion[1];
+			var codigoMotivo = string.Empty;
+			var descripcionMotivo = string.Empty;
+			var respuestaEsperada = new SolicitarNoABordoResponse();
+
+			mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+				.Returns(new Caratula());
+			mockWebService.Setup(ws => ws.SolicitarNoABordo(It.IsAny<SolicitarNoABordoRequest1>()))
+				.Returns(respuestaEsperada);
+
+			// Act
+			var resultado = servicioHelper.SolicitarNoAbordo(identificadorCaratula, identificadorCOEM, identificadoresDeclaracionesMercaderiaSuelta, codigoMotivo, descripcionMotivo);
+
+			// Assert
+			Assert.AreEqual(respuestaEsperada, resultado);
+			resultado.Should().NotBeNull();
+			resultado.Should().Equals(respuestaEsperada);
+		}
 	}
 }

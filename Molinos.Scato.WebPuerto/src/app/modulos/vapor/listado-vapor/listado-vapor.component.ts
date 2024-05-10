@@ -11,11 +11,11 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { AlertService } from '@ScatoServicios/alert.service';
 import { Alerta } from '@ScatoModels/alerta';
-import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { VaporService } from '@ScatoServicios/vapor.service';
 import { Buque } from '@ScatoModels/vapor/vapor';
 import { BuqueService } from '@ScatoServicios/buque.service';
-
+import { Vapor } from '@ScatoModels/embarque';
 
 @Component({
   selector: 'app-listado-vapor',
@@ -39,19 +39,20 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   disabled = false;
   pageEvent: PageEvent;
   filtros: any;
-  public estaCargando = false;
   interval: any
   confirmationDialogService: any;
   vaporId: number;
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   public estaEnviando= false;
+  public estaCargando = false;
+
   //#endregion
   constructor(private vaporService: VaporService,
     private modalService: NgbModal,
     private route: Router,
     public config: NgbModalConfig,
-    confirmationDialogService: EnvioMailDialogService,
+    confirmationDialogService: ConfirmationDialogService,
     public session: SessionService, private alertService: AlertService, 
     private buqueService: BuqueService) {
     this.confirmationDialogService = confirmationDialogService;
@@ -64,6 +65,7 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
     this.subscripcionBuque = this.vaporService.observableVapor.subscribe(
       (data: Buque[]) => {
         this.vapor = data;
+        console.log(this.vapor);
         this.length = this.vapor.length > 0 ? this.vapor[0].itemsTotales : this.vapor.length;
         this.pageSize = this.vapor.length > 0 ? this.vapor[0].itemPorPagina : 10;
         this.pageIndex = this.vapor.length > 0 ? this.vapor[0].pagina : 1;
@@ -150,7 +152,7 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
 
   editarVapor(id, modal, bandera, nombreBuque, imo){ 
     this.vaporId = id;
-    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
+    this.modalService.open(modal, { size: 'md', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
     .then(() => {     
       console.log('_modalService.open');
 
@@ -175,5 +177,31 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
       .catch((res) => { console.log(res) });
       this.vaporService.DevolverHistoricoVapor(id)
     }
+
+  tienePermisoEliminarBuque() {
+    return this.user.permisos.find(p => p === this.permisosScato.Vapor_Eliminar);
+  }
+
+  eliminarVapor(vapor: any){
+    const objVapor: Vapor = {
+      id: vapor.vaporId,
+      nombre: vapor.nombreBuque,
+      habilitado: true
+    }
+    this.confirmationDialogService.confirm('Eliminar Buque', `¿Esta seguro de querer eliminar al buque ${vapor.nombreBuque}?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      .then((confirmed) => {
+        if (confirmed) {
+          this.vaporService.eliminarVapor(objVapor).subscribe((res) => {
+            this.confirmationDialogService.confirm('Atención', 'Se eliminó al buque con exito.', 'Aceptar', '', null, null, Tipoalerta.Success); 
+            this.listarVapores();
+          },(error)=>{
+            this.confirmationDialogService.confirm('Atención', error.error.Message, 'Cerrar', '', null, null, Tipoalerta.Error);
+          });
+          this.modalService.dismissAll();
+        }
+      }).catch(() => {
+        this.modalService.dismissAll()
+      });
+  }
 
 }

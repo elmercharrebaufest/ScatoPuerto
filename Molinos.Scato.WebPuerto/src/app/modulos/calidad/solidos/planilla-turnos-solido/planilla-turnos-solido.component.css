@@ -239,3 +239,13 @@ table.turnos table.tabla-embebida th{
     cursor: pointer;
     margin-top: 5px;
 }
+
+.ver-obs-calidad {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ver-obs-calidad input {
+  transform: scale(1.5);
+  margin-right: 5px;
+}

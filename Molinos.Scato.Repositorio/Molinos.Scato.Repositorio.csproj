@@ -72,6 +72,7 @@
     <Compile Include="ComandosEF\CrearLoteAuditoria.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCoemConsulta.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCaratulaConsulta.cs" />
+    <Compile Include="ConsultasEF\AgenciasMaritimasATA\ListarAgenciasATAConsulta.cs" />
     <Compile Include="ConsultasEF\ConsultarEstadosWorkflows.cs" />
     <Compile Include="ConsultasEF\ControlRecorridoLogActividadConsulta.cs" />
     <Compile Include="ComandosEF\CrearLoteBiotecnologia.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="ConsultasEF\ExistenMuestraEnvioACamaraAuditoriaPendientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarBajaCTGConErrorConsulta.cs" />
     <Compile Include="ConsultasEF\ListarCaracteristicaConfiguracionDeTabla.cs" />
+    <Compile Include="ConsultasEF\ListarClientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarDatosDeWorkflowsPendientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarEstadoDeCalle.cs" />
     <Compile Include="ConsultasEF\ListarProgramaEmbarqueCombos.cs" />

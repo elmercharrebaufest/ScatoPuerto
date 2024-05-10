@@ -1,10 +1,6 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { EmbarqueService } from '@ScatoServicios/embarque.service';
-import { Embarque } from '@ScatoModels/embarque';
-import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
+import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
-import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
+import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 
 @Component({
   selector: 'app-lineup-buque',
@@ -12,48 +8,19 @@ import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria
   styleUrls: ['./lineup.component.css']
 })
 export class LineupComponent implements OnInit {
-  captura: string | ArrayBuffer;
-  mostrarImagen: boolean = false;
-  cargandoImagenLineUp: boolean = true;
+  @Input() historicoEmbarqueLineUp: HistoricoEmbarqueLineUp;
   
   private embarqueId: number = 0;
 
-  constructor(private route: ActivatedRoute,
-              private buqueSharingService: BuqueSharingService,
-              private embarqueService: EmbarqueService) { 
+  constructor(
+    private route: ActivatedRoute,
+    ) { 
     
     this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));  
-    this.actualizarEmbarqueLineUp();
   }
 
   ngOnInit(): void {
-    this.mostrarImagenLineUp();
+    // console.log('LineupComponent.ngOnInit()');
+    // console.log(this.historicoEmbarqueLineUp);
   }
-
-  private actualizarEmbarqueLineUp(){
-    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
-      const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
-      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
-          this.embarqueId = resumenOperatoriaEmbarque.embarqueId;
-          this.mostrarImagenLineUp();
-      }
-    });
-  }
-  
-  private mostrarImagenLineUp(){
-    this.mostrarImagen = false;
-    this.embarqueService.obtenerEmbarque(this.embarqueId)
-    .subscribe( embarque => {
-      if (embarque!=null){
-        this.captura = embarque.filePathImgLineUp;
-      }
-    }, error => {
-      this.mostrarImagen = true;
-      this.cargandoImagenLineUp = false;
-    }, () => {
-      this.mostrarImagen = true;
-      this.cargandoImagenLineUp = false;
-     });
-  }
-  
 }

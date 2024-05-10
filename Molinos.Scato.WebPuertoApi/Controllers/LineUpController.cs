@@ -109,12 +109,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             try
             {
+                Resultado res = null;
                 if (lineUp.Ubicacion == 1) /**Zarpó**/
+                {
                     lineUp.PlanoDeCargaEnviado = true;
+                    res = servicioComandos.Ejecutar(new EnvioMailZarpado { LineUpId = lineUp.Id });
+                }
                 var resultado = servicioWf.LineUp(controlRecorrido, lineUp, lineUp.InstanciaWorkflow) as Dominio.Comandos.ResultadoCrearWorkflow;
                 if (resultado.HayErrores)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Mensaje);
+                }
+                if (res != null && res.HayErrores)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, res.Errores[""]);
                 }
             }
             catch (Exception e)

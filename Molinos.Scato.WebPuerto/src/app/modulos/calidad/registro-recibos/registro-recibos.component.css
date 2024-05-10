@@ -20,6 +20,10 @@
    background-color: rgb(28, 124, 213);
 }
 
+.cursor{
+    cursor: pointer;
+}
+
 
 .centradoHorizontal{
     vertical-align: inherit;

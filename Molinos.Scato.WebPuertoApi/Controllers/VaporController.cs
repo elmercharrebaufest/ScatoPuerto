@@ -88,6 +88,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/Vapor/DeshabilitarBuque")]
+        public HttpResponseMessage DeshabilitarBuque(VaporDto vaporDto)
+        {
+            try
+            {
+                string usuario = base.nombreUsuario;
+                servicioVapor.DeshabilitarVapor(vaporDto, usuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
 
     }
 }

@@ -4,7 +4,6 @@
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
         <thead class="lista-buque-header">
-
             <th>Buque</th>          
             <th>Desamarre</th>
             <th>Muelle</th>
@@ -17,13 +16,12 @@
             <th>Control Privado</th>           
         </thead>
         <tbody *ngFor="let historial of getListaHistorialBuques()">
-            <tr class="lista-buque-row" *ngIf="historial.numeroPaginado == getPaginaActual()">
+            <tr class="lista-buque-row">
                 <td class="lista-buque-row-item celda-nombre-buque"
                     (click)="onVerHistorial(historial.embarqueId, historial.vaporId, historial.moduloDeCargaId, historial.nombreBuque, historial.esLiquido)"
                     *ngIf="!getFiltrosSeleccionado()?.esDetalle">{{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item celda-nombre-buque-detalle" *ngIf="getFiltrosSeleccionado()?.esDetalle">
                     {{historial.nombreBuque}}</td>
-              <!--   <td class="lista-buque-row-item">{{historial.embarqueId}}</td> -->
                 <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
@@ -42,41 +40,22 @@
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreExportador }}</div>
                 </td>
                 <td class="lista-buque-row-item">
-                   <!--  <div >{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div> -->
-                    <!--  <div *ngIf="historial.totalRitmoBaja   > 0" class="ritmo-baja-carga">{{historial.totalRitmoBaja | number:'0.0-0' }} tn/hs <br></div> -->
-                   
                     <div [ngStyle]="{'color': historial.totalRitmoNormal  > ritmoBajaCarga ? 'RGB(13,205,0)' : 'burlywood' }">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
                 </td>
                 <td class="lista-buque-row-item">{{historial.horasMuelle | date:'h:mm:ss ' }} hs</td>
                 <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>               
             </tr>
-            <div class="lista-buque-espacio" *ngIf="historial.numeroPaginado == getPaginaActual()">
+            <div class="lista-buque-espacio">
             </div>
         </tbody>
     </table>
-
-    <nav aria-label="Page navigation example" class="centrado"
-        *ngIf="getListaHistorialBuques()?.length > 0 && !getFiltrosSeleccionado()?.esDetalle">
-        <ul class="pagination justify-content-center paginado-buque-fondo">
-            <li [ngClass]="{'page-item disabled': getPaginaActual() == 1 }">
-                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() - 1)">
-                     </a>
-            </li>
-            <li *ngFor="let pagina of getListaPaginas(); let index = index"
-                [ngClass]="{'page-item disabled': getPaginaActual() == (index + 1)}">
-                <a class="page-link" [ngClass]="{'paginado-buque-activo': getPaginaActual() == (index + 1)}"
-                    href="javascript:void(0);" (click)="setPaginaActual(index + 1)">{{index + 1}}</a>
-            </li>
-            <li [ngClass]="{'page-item disabled': getPaginaActual() >= getTotalPaginas() }">
-                <a class="page-link" href="javascript:void(0);" (click)="setPaginaActual(getPaginaActual() + 1)"> >>
-                </a>
-            </li>
-        </ul>
-    </nav>
     <div *ngIf="esNoExisteRegistros && !esResumenOperatoria">
         No se encontraron registros para los filtros ingresados.
     </div>
-    
-
-
+    <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
+        [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize" [pageIndex]="pageIndex"
+        aria-label="Select page">
+    </mat-paginator>
 </div>
+

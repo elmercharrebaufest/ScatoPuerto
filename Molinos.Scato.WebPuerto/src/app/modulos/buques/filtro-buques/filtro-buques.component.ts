@@ -7,7 +7,7 @@ import { Select, Store } from '@ngxs/store';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { ProductoState } from 'app/store/productos/material.state';
 import { GetObtenerProductos } from 'app/store/productos/material.actions';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-filtro-buques',
@@ -95,7 +95,9 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
       ata: '',
       nombreExportador: '',
       desde: this.AnioMesActual(),
-      hasta: this.AnioMesActual()
+      hasta: this.AnioMesActual(),
+      pagina: 0,
+      itemsPorPagina: 10
     });
   }
 

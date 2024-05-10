@@ -17,7 +17,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class AfipController : BaseController
     {
-        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip)
+        public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip, null)
         {
         }
 

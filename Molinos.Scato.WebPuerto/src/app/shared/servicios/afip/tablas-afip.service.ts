@@ -1,7 +1,7 @@
 import { AfipCondicionContenedor, AfipLugarOperativo, AfipMotivoNoABordo, AfipMotivoSolicitudCambio, AfipNaturalezaEmbalaje, AfipPais, AfipPuerto, AfipPuntoAduanero, AfipTipoDocumento, AfipTipoEmbalaje } from '@ScatoModels/afip/tablas-afip';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
 import { debounceTime, startWith, map } from 'rxjs/operators';
@@ -60,29 +60,32 @@ export class TablasAfipService {
   }
 
   //MOTIVO_NAB
-  public listarMotivosNoABordo(): Observable<AfipMotivoNoABordo[]>{
+  public listarMotivosNoABordo(): Observable<AfipMotivoNoABordo[]> {
     return this.http.get<AfipMotivoNoABordo[]>(this.url + 'ListarMotivosNoABordo', { withCredentials: true });
   }
 
-  // Función que setea el comportamiento de un form control autocompletable
-  public crearObservableAutocompletar<T>(form: FormGroup, controlName: string, data: T[]): Observable<T[]> {
-    return form.get(controlName)?.valueChanges.pipe(
+  /**
+   * Función que setea el comportamiento de un form control autocompletable
+   * @param control FormControl que dispara el evento
+   * @param data Array de datos a ser filtrados
+   * @param props Nombre de la propiedad o array de nombres de propiedades por las cuales se filtrará. Por default son ['descripcion', 'codigo']
+   * @returns Array filtrado
+   */
+  public crearObservableAutocompletar<T>(control: AbstractControl, data: T[], props: string[] | string = ['descripcion', 'codigo']): Observable<T[]> {
+    const campos = typeof props === 'string' ? [props] : props ;
+    return control?.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      map(val => this._filtrar(data, val))
+      map(val => this._filtrar(data, val, campos))
     );
   }
 
-  // Función que permite filtrar los arrays para los desplegables
-  private _filtrar<T>(arr: T[], val: string): T[] {
-    if (typeof (val) != 'string') { // Cuando se selecciona una opción se produce un valueChanges con el valor como objeto. Ya no sería necesario filtrar
+  private _filtrar<T>(arr: T[], val: string, props: string[]): T[] {
+    if (typeof (val) != 'string') { // Cuando se selecciona una opción se produce un valueChanges con el valor como objeto. En este caso no se filtraría o sería un loop infinito
       return;
     }
     const lowerVal = val.toLocaleLowerCase().trim();
-    const res = arr.filter(item =>
-      item['descripcion'].toLocaleLowerCase().indexOf(lowerVal) > -1 ||
-      item['codigo'].toLocaleLowerCase().indexOf(lowerVal) > -1
-    );
+    const res = arr.filter(item => props.some(p=>item[p].toString().toLocaleLowerCase().indexOf(lowerVal) > -1));
     return res.slice(0, 10);
   }
 }

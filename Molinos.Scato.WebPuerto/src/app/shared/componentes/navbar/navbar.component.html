@@ -26,7 +26,7 @@
     <button type="button" class="btn btn-light btn-sm bg-white rounded-img"><img class="mx-2 img-user-rounded" src="assets/user.svg"></button>
   </div>
 </nav>
-<div *ngIf="notificacionesVisibles && router.url.includes('/lineup')">
+<div *ngIf="notificacionesVisibles">
   <app-notificaciones [notificaciones]="notificaciones" (eliminarNotificacion)="eliminarNotificacion($event)" (showNotifications)="showNotifications($event)"></app-notificaciones>
 </div>
 

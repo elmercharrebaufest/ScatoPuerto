@@ -24,6 +24,12 @@ import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/st
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+// <ARMOA005-1421 Dylan Lopez>
+import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
+import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
+// </ ARMOA005-1421 Dylan Lopez>
 
 @Component({
   selector: 'app-solidos',
@@ -53,6 +59,8 @@ export class SolidosComponent implements OnInit {
   horaAmarro: string='';
   fechaDesamarro: Date=new Date();
   horaDesamarro: string='';
+  listadoEmbarques: InstanciaWorkflowPuerto[] = null;
+  
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -64,7 +72,12 @@ export class SolidosComponent implements OnInit {
     private _changeDetector: ChangeDetectorRef,
     private _CalidadSharedService: CalidadSharedService,
     private elem: ElementRef,
-    private session: SessionService,) {
+    private session: SessionService,
+    // <ARMOA005-1421 Dylan Lopez>
+    private workflowService: WorkflowService,
+    private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
+    // </ ARMOA005-1421 Dylan Lopez>
+    ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
 
@@ -119,8 +132,6 @@ export class SolidosComponent implements OnInit {
 
     this.hideSpinner.emit(false);
   }
-
-
 
   agregarTabique(tabique, entreColumna, yColumna) {
     this.graficoCarga.agregarTabique(tabique, entreColumna, yColumna);
@@ -245,15 +256,10 @@ export class SolidosComponent implements OnInit {
     })
   }
 
-  guardarAmarre() {
-
+  async guardarAmarre() {
     if(
-      (this.amarreForm.value.fechaAmarro == '' ||
-       this.amarreForm.value.fechaAmarro == null ||
-       this.amarreForm.value.fechaAmarro == undefined) ||
-      (this.amarreForm.value.fechaDesamarro == '' ||
-       this.amarreForm.value.fechaDesamarro == null ||
-       this.amarreForm.value.fechaDesamarro == undefined)
+      (this.amarreForm.value.fechaAmarro == '' || this.amarreForm.value.fechaAmarro == null || this.amarreForm.value.fechaAmarro == undefined) ||
+      (this.amarreForm.value.fechaDesamarro == '' || this.amarreForm.value.fechaDesamarro == null || this.amarreForm.value.fechaDesamarro == undefined)
     ){
     this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
     return false;
@@ -262,25 +268,81 @@ export class SolidosComponent implements OnInit {
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
     } else {
-      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      // <ARMOA005-1421 Dylan Lopez>
+      await this.cargarLineUp();
+      await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
+      // </ ARMOA005-1421 Dylan Lopez>
 
+      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
         let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
-        //let periodoCargarActualizar= this.listadoEmbarques.find(x=>x.embarque.id = this.embarqueId)['lineUp']['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'][0];
         periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
         periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
         periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
         periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
 
-
         this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
           this.modalService.dismissAll();
           this.finalizaCalidad();
         });
-
       });
     }
-
   }
+
+  // <ARMOA005-1421 Dylan Lopez>
+  cargarLineUp = async () => {
+    // console.log(' cargarLineUp()');
+    const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
+    this.listadoEmbarques = listadoEmbarques;
+  }
+
+  guardarHistoricoEmbarqueLineUp = async (embarqueId: number) =>{
+    // console.log(' guardarHistoricoEmbarqueLineUp()');
+    // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
+    this.listadoEmbarques.forEach((embarquePuerto) => {
+      // console.log(embarquePuerto);
+
+      let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
+
+      let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
+        vaporNombre: embarquePuerto.embarque.nombreBuque,
+        actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
+        ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
+        cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
+        cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
+        cargaEnSap: embarquePuerto.lineUp.cargaEnSap, 
+        nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
+        seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
+        inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
+        controlSenasa: embarquePuerto.lineUp.controlSenasa,
+        controlPrivado: embarquePuerto.lineUp.controlPrivado,
+        amarrador: embarquePuerto.lineUp.amarrador,
+        agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
+        fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
+        puertoActual: '',
+        observaciones: embarquePuerto.embarque.observaciones,
+        materiales: '',
+        planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
+        obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
+        agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
+        ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+        lineUpId: lineUpDto.id,
+        embarqueId: embarqueId
+      };
+      embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
+        historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+      });
+      // console.log(historicoEmbarqueLineUp);
+      this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {
+        console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
+      });
+    });
+  }
+
+  extraeNombre(objeto): string {
+    return objeto != null ? objeto?.nombre?.toString(): '';
+  }
+  // </ ARMOA005-1421 Dylan Lopez>
+
   cargarHorasDesamarro(amarre) {
     var newDate = new Date();
     var horaActual = newDate.getHours() + ":" + newDate.getMinutes();

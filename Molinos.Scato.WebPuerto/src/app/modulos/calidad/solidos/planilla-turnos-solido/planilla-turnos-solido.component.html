@@ -13,7 +13,12 @@
             </ng-container>
         <br>
         <br>
-
+        <div class="ver-obs-calidad">
+          <label>
+            <input type="checkbox" [(ngModel)]="verObservacionesCalidad">
+            Ver Observaciones de Calidad
+          </label>
+        </div>
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup"  >
             <div id="scrollbar-planilla-recibidores-solido" class='mt-4 px-4 pb-4' style="height: 800px;">
                 <!-- ACA VA LA SCROLLBAR -->
@@ -139,9 +144,9 @@
                                         <tr *ngIf='getCorteTurnos(d, t).controls.length == 0'>
                                             <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
                                         </tr>
-                                        <tr *ngIf='getObservacionTurnos(d, t).length > 0'>
+                                        <tr *ngIf='verObservacionesCalidad && getObservacionTurnos(d, t).length > 0'>
                                             <td colspan="6" class='p-0 bg-grisClaro'>
-                                                <div *ngIf='getObservacionTurnos(d, t).length > 0' class="div-active">
+                                              <div *ngIf='getObservacionTurnos(d, t).length > 0' class="div-active">
                                                     <app-collapse-button collapseSelectorId="collapseObsDeCalidadSolid_{{t}}" [esChiquito]="true"></app-collapse-button>
                                                     <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
                                                     <div id="collapseObsDeCalidadSolid_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
@@ -179,8 +184,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr  *ngIf='getObservacionTurnos(d, t).length == 0'>
-
+                                        <tr *ngIf='getObservacionTurnos(d, t).length == 0 || !verObservacionesCalidad'>
                                         </tr>
                                     </ng-container>
                                 </ng-container>

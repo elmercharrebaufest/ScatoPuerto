@@ -1,0 +1,115 @@
+<ship-spinner [message]="'Cargando listado de Agencias Marítimas y A.T.A.'" *ngIf='isLoading'></ship-spinner>
+
+<div class="agencias-maritimas-ata-modulo">    
+  <div class="row">
+    <div class="col-md-9"><label class="titulo-historial-buque-letra">Agencias Marítimas y A.T.A.</label></div>
+    <div class="text-md-right margen-boton-buque col-md-3" style="margin-top: 10px;"></div>
+  </div>
+  <br>
+  <form id="filtroBuquedaForm" [formGroup]="frmFiltros">
+    <div class="form-row">
+      <div class="form-group col-md-2 colorGris">
+        <input type="text" class="form-control" placeholder="Nombre Agencia" formControlName="nombre">
+      </div>
+      
+      <div class="form-group col-md-2 colorGris">
+        <input type="text" class="form-control" placeholder="CUIT" formControlName="cuit">
+      </div>
+  
+      <div class="form-group col-md-2 colorGris">
+        <select class="custom-select" id="inputGroupSelect01" formControlName="tipo">
+          <option selected value="0">Todos</option>
+          <option value="1">Agencia Marítima</option>
+          <option value="2">A.T.A.</option>              
+        </select>
+      </div>
+        
+      <div class="form-group col-md-1" >
+        <button class="btn buscar" style="width: 100%;" (click)="buscar()" >Buscar</button>
+      </div>
+      <div class="form-group col-md-2">
+        <button class="btn limpiar" (click)="limpiarFiltros()">Limpiar Búsqueda</button>
+      </div>
+    </div>
+  </form>
+
+  <div style="overflow-x:auto;" class="table-responsive">
+    <table class='table table-bordered lista-agencia-table'>
+      <thead class="lista-agencia-header">
+        <th>Nombre Agencia</th>          
+        <th>CUIT</th>
+        <th>Tipo Agencia</th>
+        <th></th>           
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let agenciaMaritimaAta of listadoAgenciasMaritimasAta">
+          <tr class="lista-agencia-row">
+            <td class="lista-agencia-row-item">
+              <div>{{ agenciaMaritimaAta.nombre }}</div>
+            </td>
+    
+            <td class="lista-agencia-row-item">
+              <div>{{ agenciaMaritimaAta.cuit }}</div>
+            </td>
+            
+            <td class="lista-agencia-row-item">
+              <div>{{ agenciaMaritimaAta.tipoNombre }}</div>
+            </td>
+            
+            <td class="centrado">
+              <button class="btn btn-light" (click)="editarAgenciaMaritimaAta(agenciaMaritimaAta, editAgenciaAta)">
+                <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="RECTIFICAR"></i>
+              </button>
+              <button class="btn btn-light" (click)="eliminarAgenciaMaritimaAta(agenciaMaritimaAta)">
+                <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ANULAR"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+        <tr *ngIf="!listadoAgenciasMaritimasAta?.length"> 
+          <td colspan="100%" class="centrado">No se encontraron Comunicaciones de Embarque.</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!--Paginado -->
+    <nav aria-label="Page navigation example" class="centrado" *ngIf="!id">
+      <ul class="pagination justify-content-center paginado-buque-fondo">
+          <li [ngClass]="{'page-item disabled': currentPage === 1}">
+              <a class="page-link" href="javascript:void(0);" (click)="goToPage(1)">
+                  &lt;&lt;
+              </a>
+          </li>
+          <li class="page-item" *ngIf="showEllipsisStart"><a class="page-link">...</a></li>
+          <li *ngFor="let page of visiblePages" [ngClass]="{'page-item disabled': page == currentPage}">
+              <a class="page-link" href="javascript:void(0);" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" *ngIf="showEllipsisEnd"><a class="page-link">...</a></li>
+          <li [ngClass]="{'page-item disabled': currentPage === totalPages}">
+              <a class="page-link" href="javascript:void(0);" (click)="goToPage(totalPages)">
+                  &gt;&gt;
+              </a>
+          </li>
+      </ul>
+    </nav>
+  
+    <!-- <div *ngIf="esNoExisteRegistros"> No se encontraron registros para los filtros ingresados.</div> -->
+  </div>
+    
+  <div class="row justify-content-center">
+    <div class="form-group col-md-2" style="display: flex; justify-content: center;">
+      <button class="btn buscar" style="width: 100%;" (click)="nuevaAgenciaMaritimaAta(editAgenciaAta)">Nueva Agencia</button>
+    </div>
+    <div class="form-group col-md-2" style="display: flex; justify-content: center;">
+      <button class="btn limpiar" (click)="exportarXLS()">Exportar XLS</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #editAgenciaAta let-modal>
+  <app-modificar-agenciamaritima-ata (finishEditOrCreate)="editFinish($event)" 
+    [id]="idAgencia" 
+    [tittle]="tittle" 
+    [tipo]="typeAgencia">
+  </app-modificar-agenciamaritima-ata>
+</ng-template>

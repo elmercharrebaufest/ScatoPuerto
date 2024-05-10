@@ -4,7 +4,8 @@ export class GetObtenerHistorialBuques {
         public nombreBuque: string, public destino: string, 
         public exportador: string, public controlPrivado: string,
         public desde: Date, public hasta: Date, 
-        public producto: string) {}
+        public producto: string, public pagina: number, 
+        public itemsPorPagina: number) {}
 }
 export class GetObtenerHistorialBuquesSel {
     static readonly type = '[Todo] Get Listar Buques Sel';

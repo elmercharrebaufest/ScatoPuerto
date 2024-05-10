@@ -93,6 +93,7 @@
     <Folder Include="Scripts\bkp16052022" />
     <Folder Include="dbo\Tables\AfipPuerto" />
     <Folder Include="dbo\Tables\AfipTablasReferencia" />
+    <Folder Include="dbo\Tables\AgenciaMaritimaATA" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -437,7 +438,6 @@
     <Build Include="dbo\Tables\LineUp.sql" />
     <Build Include="dbo\Tables\PlanoDeCarga.sql" />
     <Build Include="dbo\Tables\EstadoPuerto.sql" />
-    <Build Include="dbo\Tables\AgenciaMaritimaPuerto.sql" />
     <Build Include="dbo\Tables\CoordinadorPuerto.sql" />
     <Build Include="dbo\Tables\CargaComercial.sql" />
     <Build Include="dbo\Tables\Estiba.sql" />
@@ -445,7 +445,6 @@
     <Build Include="dbo\Tables\AgenteControlPrivado.sql" />
     <Build Include="dbo\Tables\PlanoDeCargaBodega.sql" />
     <Build Include="dbo\Tables\PlanoDeCargaAgenteControlPrivado.sql" />
-    <Build Include="dbo\Tables\ATAPuerto.sql" />
     <Build Include="dbo\Tables\TipoDeBuquePuerto.sql" />
     <Build Include="dbo\Tables\UbicacionDeBuquePuerto.sql" />
     <Build Include="dbo\Tables\CargaComercialHistorico.sql" />
@@ -592,6 +591,9 @@
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudCierreCarga.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudNoABordo.sql" />
     <Build Include="dbo\Tables\AfipPuerto\AfipSolicitudNoABordoDeclaracion.sql" />
+    <Build Include="dbo\Tables\HistoricoEmbarqueLineUp.sql" />
+    <Build Include="dbo\Tables\AgenciaMaritimaATA\AgenciaMaritimaPuerto.sql" />
+    <Build Include="dbo\Tables\AgenciaMaritimaATA\ATAPuerto.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

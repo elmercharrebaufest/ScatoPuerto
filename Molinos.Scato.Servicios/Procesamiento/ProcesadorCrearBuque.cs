@@ -1,16 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Transactions;
-using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Dto;
+﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
-using Molinos.Scato.Dominio.Filtros;
 using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
+using System;
+using System.Transactions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -28,34 +25,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 try
                 {
-                    var vapor = GuardarActualizarVapor(comando);                
+                    var vapor = GuardarActualizarVapor(comando);
                     Bandera bandera = Repositorio.Obtener<Bandera>(x => x.Id == comando.VaporInformacion.Bandera.Id);
                     var vaporInformacion_Db = Repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == comando.VaporInformacion.VaporId);
 
-                    // Validar(comando, resultado);
-                    if (TieneEmbarqueAsociado(comando) && (vaporInformacion_Db != null &&
-                    (vaporInformacion_Db.Bandera.Nombre != comando.VaporInformacion.Bandera.Nombre ||
-                    vaporInformacion_Db.Vapor.Nombre != comando.VaporInformacion.NombreBuque)))
-                    {
-                        try
-                        {
-                            var logAbm = new LogABM
-                            {
-                                Pantalla = comando.GetType().Name,
-                                Usuario = comando.VaporInformacion.Usuario,
-                                Fecha = DateTime.Now,
-                                Evento = EventoABM.Alta,
-                                Entidad = comando.VaporInformacion.ToJson(),
-                                ClaseId = vaporInformacion_Db.Id
-                            };
-                            Repositorio.Agregar(logAbm);
-
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Warn(e, "Ocurrio un error al crear el log AMB Crear");
-                        }
-                    }
                     vapor.Nombre = comando.VaporInformacion.NombreBuque;
                     if (vaporInformacion_Db != null)
                     {
@@ -71,6 +44,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         vaporInformacion_Db.Manga = comando.VaporInformacion.Manga;
                         vaporInformacion_Db.Puntual = comando.VaporInformacion.Puntual;
                         vaporInformacion_Db.CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks;
+                        AgregarLogEdicion(comando, vaporInformacion_Db);
                     }
                     else
                     {
@@ -91,25 +65,20 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks,
                         };
                         Repositorio.Agregar(vaporInformacion_Db);
-                    }                
+                        AgregarLogAlta(comando);
+                    }
 
                     Repositorio.GuardarCambios();
                     transaction.Complete();
                 }
                 catch (Exception e)
                 {
-                    //Log.Error(e, "Error al crear característica de calidad {0}", comando.Dto.Descripcion);
+                    Log.Error(e, "Error en ProcesadorCrearBuque-Metodo:Ejecutar");
                     resultado.Error("", Textos.Error);
                 }
             }
 
             return resultado;
-        }
-
-
-
-        private void Validar(CrearCaracteristicaDeCalidad comando, Resultado resultado)
-        {
         }
 
         private Vapor GuardarActualizarVapor(CrearBuque comando)
@@ -118,7 +87,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var nuevoVapor = new Vapor
                 {
-                    Nombre = comando.VaporInformacion.NombreBuque
+                    Nombre = comando.VaporInformacion.NombreBuque,
+                    Habilitado = true
                 };
                 Repositorio.Agregar(nuevoVapor);
                 Repositorio.GuardarCambios();
@@ -130,9 +100,32 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
         }
 
-        private bool TieneEmbarqueAsociado(CrearBuque comando)
+        private void AgregarLogAlta(CrearBuque comando)
         {
-            return Repositorio.Existe<Embarque>(x => comando.VaporInformacion.VaporId == x.Vapor.Id);
+            var logAlta = new LogABM
+            {
+                Pantalla = comando.GetType().Name,
+                Usuario = comando.VaporInformacion.Usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Alta,
+                Entidad = comando.VaporInformacion.ToJson(),
+                ClaseId = 0
+            };
+            Repositorio.Agregar(logAlta);
+        }
+
+        private void AgregarLogEdicion(CrearBuque comando, VaporInformacion vaporBd)
+        {
+            var logEdicion = new LogABM
+            {
+                Pantalla = comando.GetType().Name,
+                Usuario = comando.VaporInformacion.Usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = comando.VaporInformacion.ToJson(),
+                ClaseId = vaporBd.Id
+            };
+            Repositorio.Agregar(logEdicion);
         }
     }
 }

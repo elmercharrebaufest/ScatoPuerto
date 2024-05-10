@@ -590,5 +590,77 @@ namespace Molinos.Scato.Repositorio
             Int64 nextId = context.Database.SqlQuery<Int64>("SELECT NEXT VALUE FOR NumeroCPESeq").FirstOrDefault();
             return (int)nextId;
         }
+
+        public IQueryable<TEntidad> Incluir<TEntidad>(params Expression<Func<TEntidad, object>>[] includes) where TEntidad : class
+        {
+            IQueryable<TEntidad> query = this.Set<TEntidad>();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return query;
+        }
+
+        public TEntidad Obtener<TEntidad>(Expression<Func<TEntidad, bool>> condition, params Expression<Func<TEntidad, object>>[] navProperties) where TEntidad : class
+        {
+            if (navProperties.Any())
+            {
+                var res = this.context.Set<TEntidad>().Include(navProperties[0]);
+                for (var i = 1; i < navProperties.Count(); i++)
+                {
+                    res = res.Include(navProperties[i]);
+                }
+
+                return res.Where(condition).FirstOrDefault();
+            }
+
+            return this.Obtener(condition);
+        }
+
+        public IQueryable<TEntidad> ListarTodos<TEntidad>() where TEntidad : class
+        {
+            return this.Set<TEntidad>();
+        }
+
+        public IQueryable<TEntidad> ListarTodos<TEntidad>(params Expression<Func<TEntidad, object>>[] navProperties) where TEntidad : class
+        {
+            var res = this.context.Set<TEntidad>().Include(navProperties[0]);
+            for (var i = 1; i < navProperties.Count(); i++)
+            {
+                res = res.Include(navProperties[i]);
+            }
+
+            return res;
+        }
+
+        public IQueryable<TEntidad> ListarConsultable<TEntidad>(Expression<Func<TEntidad, bool>> condition) where TEntidad : class
+        {
+            return this.context.Set<TEntidad>().Where(condition);
+        }
+        public IQueryable<TEntidad> ListarConsultable<TEntidad>(Expression<Func<TEntidad, bool>> condition, params Expression<Func<TEntidad, object>>[] navProperties) where TEntidad : class
+        {
+            if (navProperties.Any())
+            {
+                var res = this.context.Set<TEntidad>().Include(navProperties[0]);
+                for (var i = 1; i < navProperties.Count(); i++)
+                {
+                    res = res.Include(navProperties[i]);
+                }
+
+                return res.Where(condition);
+            }
+
+            return this.ListarConsultable(condition);
+        }
+        public IQueryable<TEntidad> ListarPaginado<TEntidad>(Expression<Func<TEntidad, bool>> condition, Expression<Func<TEntidad, object>> orderBy, int page, int pageSize) where TEntidad : class
+        {
+            return this.ListarConsultable(condition).OrderBy(orderBy).Skip((page - 1) * pageSize).Take(pageSize);
+        }
+        public IQueryable<TEntidad> ListarPaginado<TEntidad>(Expression<Func<TEntidad, bool>> condition, Expression<Func<TEntidad, object>> orderBy, int page, int pageSize, params Expression<Func<TEntidad, object>>[] navProperties) where TEntidad : class
+        {
+            return this.ListarConsultable(condition, navProperties).OrderBy(orderBy).Skip((page - 1) * pageSize).Take(pageSize);
+        }
     }
 }

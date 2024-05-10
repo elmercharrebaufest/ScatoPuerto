@@ -73,6 +73,11 @@ export class IniciarSesionComponent implements OnInit {
         this.router.navigate(['/programa']);
         break;
       }
+
+      case 'Clientes_Visualizar': {
+        this.router.navigate(['/clientes']);
+        break;
+      }
     }
   }
 

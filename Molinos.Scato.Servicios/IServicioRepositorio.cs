@@ -2030,6 +2030,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ListaPaginada<VaporDto> ListarVapores(Paginacion paginacion, string filtro);
+        
+        [OperationContract]
+        ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string filtro);
 
         [OperationContract]
         ListaPaginada<BodegaDto> ListarBodegas(Paginacion paginacion, string filtro);
@@ -2741,7 +2744,7 @@ namespace Molinos.Scato.Servicios
         Dictionary<string, int> ObtenerIdsUsuales(int idEmbarque);
 
         [OperationContract]
-        Dictionary<string, object> ObtenerActores(int idEmbarque);
+        ActoresDto ObtenerActores(int idEmbarque);
 
         [OperationContract]
         EmbarqueInformacionDto obtenerEmbarqueInformacion(int idEmbarque);
@@ -2760,7 +2763,7 @@ namespace Molinos.Scato.Servicios
         ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
 
         [OperationContract]
-        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
+        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null);
 
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);
@@ -2780,5 +2783,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
-    }
+
+		// <ARMOA005-1421 Dylan Lopez>
+		[OperationContract]
+		IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId);
+		// </ ARMOA005-1421 Dylan Lopez>
+	}
 }

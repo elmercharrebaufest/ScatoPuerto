@@ -96,6 +96,10 @@ export class VaporService {
         
     }
 
+    public eliminarVapor(vapor: any) {
+      return this.http.post(`${this.url}Vapor/DeshabilitarBuque`, vapor, { 'withCredentials': true });
+  }
+
   // #endregion
 
 }

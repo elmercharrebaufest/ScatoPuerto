@@ -41,6 +41,8 @@ using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using Microsoft.Identity.Client;
+using Molinos.Scato.Servicios.GestionarCartasDePortePE;
+
 namespace Molinos.Scato.Servicios.Impl
 {
     public class ServicioRepositorio : IServicioRepositorio
@@ -795,7 +797,7 @@ namespace Molinos.Scato.Servicios.Impl
         }
         public IList<VaporDto> ObtenerVapores()
         {
-            return Listar<Vapor, VaporDto>();
+            return Listar<Vapor, VaporDto>(v => v.Habilitado);
         }
 
         public IList<ProvinciaDto> ListarProvinciasPorPais(int paisId)
@@ -3270,20 +3272,6 @@ namespace Molinos.Scato.Servicios.Impl
                 throw;
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public CartaPorteDto ObtenerCartaPorteVacia(int centroId, string workflowCodigo,
                                                     string destinatarioCodigoSap = "", string titularCodigoSap = "", string centroDestino = "", string rtteComercial = "")
@@ -8025,6 +8013,19 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<Vapor, VaporDto>(expresionFiltro, paginacion);
         }
 
+        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string filtro)
+        {
+            Expression<Func<CoordinadorPuerto, bool>> expresionFiltro = null;
+            if (!string.IsNullOrEmpty(filtro))
+            {
+                filtro = filtro.Trim();
+                expresionFiltro =
+                    x =>
+                    x.Nombre.Contains(filtro);
+            }
+            return Listar<CoordinadorPuerto, CoordinadorPuertoDto>(expresionFiltro, paginacion);
+        }
+
         public ListaPaginada<BodegaDto> ListarBodegas(Paginacion paginacion, string filtro)
         {
             Expression<Func<Bodega, bool>> expresionFiltro = null;
@@ -8055,7 +8056,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<CoordinadorPuertoDto> ListarCoordinadores()
         {
-            return Listar<CoordinadorPuerto, CoordinadorPuertoDto>();
+            return Listar<CoordinadorPuerto, CoordinadorPuertoDto>(c => c.Habilitado == true);
         }
 
         public ListaPaginada<MaterialPuertoDto> ListarMaterialesPuerto(Paginacion paginacion, string filtro)
@@ -8132,7 +8133,8 @@ namespace Molinos.Scato.Servicios.Impl
                 }
 
                 var intervencion = nominaciones.FirstOrDefault(n => n.NominacionDetalleIntervencion != null && n.NominacionDetalleIntervencion.Fumigacion == "Si")?.NominacionDetalleIntervencion;
-                if (intervencion != null) {
+                if (intervencion != null)
+                {
                     planoDeCargaDto.Fumigacion = true;
                     planoDeCargaDto.EmpresaFumigadora = intervencion.CompaniaDeFumigacion.Descripcion;
                 }
@@ -9167,7 +9169,7 @@ namespace Molinos.Scato.Servicios.Impl
             body += "\n\0\f DESTINO(S): \0\0\f\f\n";
             var planoDeCargaBodegas = Listar<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(x => x.PlanoDeCarga.Id == planoDeCargaId);
             var destinosAgrupados = planoDeCargaBodegas
-                .SelectMany(p => p.Destinos.Select(b => new { Destino = b.Destino.Nombre, Cantidad = p.Cantidad}))
+                .SelectMany(p => p.Destinos.Select(b => new { Destino = b.Destino.Nombre, Cantidad = p.Cantidad }))
                 .GroupBy(bodegaDestino => bodegaDestino.Destino)
                 .Select(group => new
                 {
@@ -9198,7 +9200,7 @@ namespace Molinos.Scato.Servicios.Impl
                 else
                 {
                     body += (bodega.Destino?.Nombre ?? "No Definido") + ".\n";
-                }                                                                          
+                }
             }
 
             var planoDeCarga = repositorio.Obtener<PlanoDeCarga>(planoDeCargaId);
@@ -9255,7 +9257,7 @@ namespace Molinos.Scato.Servicios.Impl
             body += "\n\fObservacion(es):\f\f\n";
             body += $"\t {planoDeCarga.Observaciones}";
             return body;
-        }        
+        }
 
         public IList<BodegaDto> ListarBodegasNir(int planoDeCargaId)
         {
@@ -9595,7 +9597,11 @@ namespace Molinos.Scato.Servicios.Impl
                 Embarque embarqueBase = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque);
 
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+                {
                     return null;
+                }
+
+                var bodegas = repositorio.Obtener<LineUp>(x => x.Embarque.Id == IdEmbarque).PlanoDeCarga.PlanoDeCargaBodega;
 
                 int idVapor = repositorio.Obtener<Embarque>(x => x.Id == IdEmbarque).Vapor.Id;
                 var cargasAbiertas = repositorio.Listar<Carga>(x => x.Vapor.Id == idVapor && x.FechaInicio == null && x.CargaOpuesta_Id == null);
@@ -9611,10 +9617,13 @@ namespace Molinos.Scato.Servicios.Impl
                         var balanzada = repositorio.Obtener<Balanzada>(x => x.Id == reg.Id && x.NumeroBalanza == reg.NumeroBalanza);
                         pesoTotalBalanzadas += balanzada == null ? 0 : balanzada.PesoNeto;
                     }
+                    // TODO: Revisar si es la unica de relacionar la Bodega que figura en carga con el PlanoDeCargaBodega que es de donde se va a tomar el peso programado.
+                    // Por lo consultado en la DB, pareciera que el nombre de la bodega siempre es "BODEGA N" donde N es el numero de parcel.
+                    var bodega = bodegas.FirstOrDefault(b => carga.Bodega.Nombre.Split(' ').Last() == b.BodegaParcel.ToString());
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
                         Cargado = pesoTotalBalanzadas,
-                        Programado = carga.PesoProgramado,
+                        Programado = bodega.Cantidad,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
                         NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
                     };
@@ -9624,10 +9633,11 @@ namespace Molinos.Scato.Servicios.Impl
                 //Este caso representa cargas cerradas
                 foreach (Carga carga in cargasCerradas)
                 {
+                    var bodega = bodegas.FirstOrDefault(b => carga.Bodega.Nombre.Split(' ').Last() == b.BodegaParcel.ToString());
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
                         Cargado = carga.ToneladasAW,
-                        Programado = carga.PesoProgramado,
+                        Programado = bodega.Cantidad,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
                         NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
                     };
@@ -10133,7 +10143,8 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        if (!BalanzaCorteEnPeriodoValido(item)) {
+                        if (!BalanzaCorteEnPeriodoValido(item))
+                        {
                             throw new ValidationCustomException("¡Atención! Verifique que las fechas ingresadas se " +
                                 "encuentren dentro de un turno y que hayan cargas en el mismo.");
                         }
@@ -10184,7 +10195,8 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 }
                 repositorio.GuardarCambios();
-            }catch(ValidationCustomException vce)
+            }
+            catch (ValidationCustomException vce)
             {
                 throw vce;
             }
@@ -10201,18 +10213,18 @@ namespace Molinos.Scato.Servicios.Impl
             int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarqueBase.Id).Vapor.Id;
             return repositorio.Listar<Carga>(c => c.Vapor.Id == vapor_id && c.FechaInicio > embarqueBase.FechaHoraInicioCarga
             && c.CargaOpuesta_Id > 0).ToList();
-        } 
+        }
 
         private bool BalanzaCorteEnPeriodoValido(BalanzasCortesDto corte)
         {
             bool esValido = false;
             DateTime fecHoraInicioTurno, fecHoraFinTurno;
-            
+
             var cargasEmbarque = this.ObtenerCargasEmbarque(corte.ModuloDeCarga_id);
-                        
+
             fecHoraInicioTurno = ObtenerFechaHoraInicioTurno(corte.Fecha_Inicio.Value);
             fecHoraFinTurno = ObtenerFechaHoraFinTurno(corte.Fecha_Corte.Value);
-            
+
             esValido = cargasEmbarque.Where(c => c.FechaInicio > fecHoraInicioTurno &&
             c.FechaInicio < fecHoraFinTurno).Count() > 0;
 
@@ -10225,11 +10237,14 @@ namespace Molinos.Scato.Servicios.Impl
             int id_turno = (fechaInicio.Hour / 6) + 1;
             switch (id_turno)
             {
-                case 1: fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 0, 0, 0);
+                case 1:
+                    fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 0, 0, 0);
                     break;
-                case 2: fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 6, 0, 0);
+                case 2:
+                    fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 6, 0, 0);
                     break;
-                case 3: fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 12, 0, 0);
+                case 3:
+                    fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 12, 0, 0);
                     break;
                 case 4:
                     fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 18, 0, 0);
@@ -10719,7 +10734,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             foreach (var item in observacionesDeCalidadDto)
             {
-                if(item.Observaciones.Length > 200)
+                if (item.Observaciones.Length > 200)
                 {
                     throw new Exception("El texto Observaciones no puede superar la cantidad de 200 caracteres.");
                 }
@@ -11222,7 +11237,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         log.Error(ex, "Error en joins: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                     }
-                    throw (new Exception("Error en joins: Excepcion "+ ex.Message + ex.StackTrace, ex));
+                    throw (new Exception("Error en joins: Excepcion " + ex.Message + ex.StackTrace, ex));
                 }
                 var embarques = new List<EmbarqueDto>();
                 try
@@ -11235,7 +11250,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     log.Error(ex, "Error en Conversion EbarqueDto: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                     throw (new Exception("Error en Conversion EbarqueDto Excepcion: " + ex.Message + ex.StackTrace, ex));
@@ -11247,6 +11262,7 @@ namespace Molinos.Scato.Servicios.Impl
                     foreach (var embarque in embarques)
                     {
                         var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
+                        lineupDto.Ubicacion = embarque.Ubicacion;
                         InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
                         {
                             Id = lineupDto.InstanciaWorkflow,
@@ -11255,7 +11271,7 @@ namespace Molinos.Scato.Servicios.Impl
                         });
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     log.Error(ex, "Error en Conversion InstanciaWorkflowPuertoDtos: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                     throw (new Exception("Error en Conversion InstanciaWorkflowPuertoDtos Excepcion: " + ex.Message + ex.StackTrace, ex));
@@ -11899,21 +11915,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         }
 
-        public Dictionary<string, object> ObtenerActores(int idEmbarque)
+        public ActoresDto ObtenerActores(int idEmbarque)
         {
             try
             {
-                #region variables
-                string[] coordinadores = new string[] { };
-                string ata = "-";
-                string agenciaMaritima = "-";
-                string estiba = "-";
-                string agenciaControlPrivado = "-";
-                string encargado = "-";
-                #endregion
-
+                ActoresDto actores = new ActoresDto();
+              
                 #region obtener datos
-                Dictionary<string, object> actoresEmbarque = new Dictionary<string, object>();
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
                 Embarque embarque = lineUp.Embarque;
                 PlanoDeCarga plano = lineUp.PlanoDeCarga;
@@ -11921,39 +11929,31 @@ namespace Molinos.Scato.Servicios.Impl
 
                 #region comprobaciones
                 if (embarque.Coordinadores != null)
-                    coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
+                    actores.Coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
 
                 if (embarque.ATA != null)
-                    ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
+                    actores.Ata = embarque.ATA != null ? embarque.ATA.Nombre : "";
 
                 if (embarque.Agencias != null)
-                    agenciaMaritima = embarque.Agencias != null ? embarque.Agencias.Nombre : "";
+                    actores.AgenciaMaritima = embarque.Agencias != null ? embarque.Agencias.Nombre : "";
 
                 if (plano.Estiba != null)
-                    estiba = (plano.Estiba.Nombre != null ? plano.Estiba.Nombre : "") + ' ' + (plano.Estiba.Apellido != null ? plano.Estiba.Apellido : "");
+                    actores.Estiba = (plano.Estiba.Nombre != null ? plano.Estiba.Nombre : "") + ' ' + (plano.Estiba.Apellido != null ? plano.Estiba.Apellido : "");
 
                 if (plano.AgenciaControlPrivado != null)
-                    agenciaControlPrivado = plano.AgenciaControlPrivado != null ? plano.AgenciaControlPrivado.Nombre : "";
+                    actores.AgenciaControlPrivado = plano.AgenciaControlPrivado != null ? plano.AgenciaControlPrivado.Nombre : "";
 
                 if (plano.AgentesControlPrivado != null && plano.AgentesControlPrivado.Count != 0)
                 {
-                    encargado = plano.AgentesControlPrivado.First().name;
+                    actores.Encargado = plano.AgentesControlPrivado.First().name;
                 }
                 #endregion
-                #region llenarLista
-                actoresEmbarque.Add("coordinadores", coordinadores);
-                actoresEmbarque.Add("ata", ata);
-                actoresEmbarque.Add("agenciaMaritima", agenciaMaritima);
-                actoresEmbarque.Add("estiba", estiba);
-                actoresEmbarque.Add("agenciaControlPrivado", agenciaControlPrivado);
-                actoresEmbarque.Add("encargado", encargado);
-                #endregion
 
-                return actoresEmbarque;
+                return actores;
             }
             catch (Exception ex)
             {
-
+                log.Error(ex, "Error en metodo: ObtenerActores -> idEmbarque:" + idEmbarque);
                 throw ex;
             }
 
@@ -12220,12 +12220,22 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
             }
         }
-        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null)
+        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null)
         {
-            var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
-            var historial = repositorio.ListarConsulta(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto));
-            CompletarDatosHistorialDeEmbarque(historial);
-            return historial;
+            try
+            {
+                var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
+                if(producto != null && producto.Count() > 0)
+                    producto = producto.Select(s => s.Trim()).ToList();
+                var historial = repositorio.ListarConsultaPaginada(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto, paginacion)).ToList();
+                CompletarDatosHistorialDeEmbarque(historial);
+                return historial;
+            }
+            catch(Exception e)
+            {
+                log.Error("Hubo un error al intentar obtener historial de embarques: ", e);
+                throw e;
+            }
         }
         public IList<NominacionDto> ListarNominaciones(int idEmbarque)
         {
@@ -12307,27 +12317,41 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var reciboBd = this.repositorio.Obtener<ReciboDeBuque>(r => r.Id == recibo.Id);
                 reciboBd.Habilitado = false;
-                var nominacionRecibo = this.repositorio.Obtener<Nominacion>(n => n.Embarque.Id == reciboBd.Embarque.Id);
+                var reciboDto = conversor.Convertir<ReciboDeBuque, ReciboDeBuqueDto>(reciboBd);
 
-                var regAuditoria = new Auditoria
+                var logBaja = new LogABM
                 {
-                    Nominacion_Id = nominacionRecibo != null? nominacionRecibo.Id : 0,
-                    Entidad_Id = reciboBd.Id,
-                    EntidadNombre = "ReciboDeBuque",
-                    Propiedad = "Habilitado",
-                    ValorAnterior = "1",
-                    ValorNuevo = "0",
-                    FechaModificacion = DateTime.Now,
-                    UsuarioEjecuta = nombreUsuario
+                    Pantalla = "DeshabilitarReciboBuque",
+                    Usuario = nombreUsuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Baja,
+                    Entidad = reciboDto.ToJson(),
+                    ClaseId = reciboDto.Id
                 };
-                this.repositorio.Agregar(regAuditoria);
+                this.repositorio.Agregar(logBaja);
                 this.repositorio.GuardarCambios();
             }
             catch (Exception e)
             {
-                log.Error(e, "No se pudo deshabilitar el Recibo de buque con id: {0}", recibo.Id); 
+                log.Error(e, "No se pudo deshabilitar el Recibo de buque con id: {0}", recibo.Id);
                 throw e;
             }
         }
-    }
+
+		// <ARMOA005-1421 Dylan Lopez>
+		public IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId)
+		{
+			try
+			{
+				var query = repositorio.Listar<HistoricoEmbarqueLineUp>(q => q.EmbarqueId == embarqueId);
+				var result = conversor.ConvertirList<HistoricoEmbarqueLineUp, HistoricoEmbarqueLineUpDto>(query).ToList();
+				return result;
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+		}
+		// </ ARMOA005-1421 Dylan Lopez>
+	}
 }

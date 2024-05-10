@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { finalize, pairwise, startWith } from 'rxjs/operators';
 // MODELOS
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
@@ -16,8 +15,6 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { forkJoin } from 'rxjs';
-import { cpuUsage } from 'process';
-import { regExpEscape } from '@ng-bootstrap/ng-bootstrap/util/util';
 
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
@@ -29,7 +26,6 @@ import { SessionService } from '@ScatoServicios/session.service';
   styleUrls: ['./lineas.component.css']
 })
 export class LineasComponent implements OnInit, OnChanges {
-  confirmationDialogService: any;
   embarque: EmbarqueNav;
   formInitialValues: any;
   tanqueSi: boolean;
@@ -52,7 +48,7 @@ export class LineasComponent implements OnInit, OnChanges {
 
   constructor(
     private formBuilder: FormBuilder,
-    confirmationDialogService: ConfirmationDialogService,
+    private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
     private _procesoService: DatosEmbarquesProcesoService,
     private moduloCargaService: ModuloDeCargaService,
@@ -71,7 +67,6 @@ export class LineasComponent implements OnInit, OnChanges {
 
       this.tanquesOption = tanks;
     });
-    this.confirmationDialogService = confirmationDialogService;
     this.obtenerTipoLineaEmbarque();
   }
 
@@ -82,25 +77,24 @@ export class LineasComponent implements OnInit, OnChanges {
         let tank = { [key]: value, value: key.substr(6), color: (value ? 'tanqueSi' : 'tanqueNo') }
         tanks.push(tank);
       }
-
       this.tanquesOption = tanks;
     });
-    if (this.tanquesOption == undefined) {
-      if (this.tanquesSeleccionados != undefined) {
-        let tanks = new Array();
-        for (var [key, value] of Object.entries(this.tanquesSeleccionados.value)) {
-          let tank = { [key]: value, value: key.substr(6), color: (value ? 'tanqueSi' : 'tanqueNo') }
-          tanks.push(tank);
-        }
-        this.tanquesOption = tanks;
+    if (this.tanquesOption == undefined && this.tanquesSeleccionados != undefined) {
+      let tanks = new Array();
+      for (var [key, value] of Object.entries(this.tanquesSeleccionados.value)) {
+        let tank = { [key]: value, value: key.substr(6), color: (value ? 'tanqueSi' : 'tanqueNo') }
+        tanks.push(tank);
       }
+      this.tanquesOption = tanks;
     }
   }
 
   ngOnInit(): void {
     this.cargarDatosLineas();
 
-    if(!this.hasPermisoLiquido_ConformacionLineasEmb_Editar()) this.lineasDeEmbarqueForm.disable();
+    if (!this.hasPermisoLiquido_ConformacionLineasEmb_Editar()) {
+      this.lineasDeEmbarqueForm.disable();
+    }
   }
 
   expandir() {
@@ -112,8 +106,7 @@ export class LineasComponent implements OnInit, OnChanges {
     forkJoin([
       this.cargarLineasEmbarque(),
       this.obtenerDatosModuloCarga(),
-    ]
-    );
+    ]);
   }
 
   private creaFormLineasEmbarque() {
@@ -139,10 +132,10 @@ export class LineasComponent implements OnInit, OnChanges {
     this.cargarEmbarque(this.embarque.id);
   }
 
-  public validateMedicion(event, linea, inicial:boolean): boolean {
+  public validateMedicion(event, linea, inicial: boolean): boolean {
     var rg = new RegExp(/^(\d)*(\,)?([0-9]{1})?$/);
     var str = inicial ? linea.controls.alturaInicialCMyMM.value.toString() : linea.controls.alturaFinalCMyMM.value.toString();
-    if(rg.test(str + event.key)) return true;
+    if (rg.test(str + event.key)) return true;
     return false;
 
   }
@@ -152,7 +145,8 @@ export class LineasComponent implements OnInit, OnChanges {
     this.obtenerModuloDeCarga();
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
   }
-  public onCalculaLitros(linea, inicial:boolean) {
+
+  public onCalculaLitros(linea, inicial: boolean) {
     //El parametro inicial me indica para que altura calcular (Inicial = true o final = false)
 
     //en base al tk que tengo y a la altura obtengo los litros
@@ -161,21 +155,21 @@ export class LineasComponent implements OnInit, OnChanges {
     let altura = inicial ? linea.controls['alturaInicialCMyMM'].value : linea.controls['alturaFinalCMyMM'].value;
     let tk = linea.controls['tkInicial'].value.value;
 
-    this.obtenerLitros(altura, tk,linea, inicial).subscribe(result => {
+    this.obtenerLitros(altura, tk, linea, inicial).subscribe(result => {
       litros = result;
       let m3 = litros / 1000;
       let tn = this.calcularTn(this.calcularKilos(densidadInicial, litros));
       let salidaTk = 0
 
-      if (inicial){
+      if (inicial) {
         linea.controls['kilos'].setValue(tn.toFixed(3).toString());
         linea.controls['litros'].setValue(m3.toString());
-      }else{
+      } else {
         linea.controls['kilosFinales'].setValue(tn.toFixed(3).toString());
         linea.controls['litrosFinales'].setValue(m3.toString());
 
       }
-       salidaTk  =  parseFloat(linea.controls['kilos'].value != ''? linea.controls['kilos'].value : 0) - parseFloat(linea.controls['kilosFinales'].value != ''? linea.controls['kilosFinales'].value : 0);
+      salidaTk = parseFloat(linea.controls['kilos'].value != '' ? linea.controls['kilos'].value : 0) - parseFloat(linea.controls['kilosFinales'].value != '' ? linea.controls['kilosFinales'].value : 0);
       linea.controls['tkFinal'].setValue(salidaTk.toFixed(3).toString());
 
     });
@@ -183,17 +177,17 @@ export class LineasComponent implements OnInit, OnChanges {
 
   }
 
-  splitMediciones(medicion:Number): any[] {
+  splitMediciones(medicion: Number): any[] {
     let arrMedicion = medicion.toString().split(',');
-    if(arrMedicion != null){
-      if(arrMedicion.length == 1){
-        return [arrMedicion[0] == ''? 0 :arrMedicion[0], '0']
+    if (arrMedicion != null) {
+      if (arrMedicion.length == 1) {
+        return [arrMedicion[0] == '' ? 0 : arrMedicion[0], '0']
       }
-      if(arrMedicion.length == 2){
+      if (arrMedicion.length == 2) {
         return [arrMedicion[0] != '' ? arrMedicion[0] : '0', arrMedicion[1] != '' ? arrMedicion[1] : '0']
       }
-    }else{
-      return ['0','0'];
+    } else {
+      return ['0', '0'];
     }
 
 
@@ -206,24 +200,24 @@ export class LineasComponent implements OnInit, OnChanges {
 
   }
 
-  calcularKilos(densidad: number, litros:number): number{
+  calcularKilos(densidad: number, litros: number): number {
     return densidad * litros;
   }
 
-  calcularTn(kilos:number){
-    return kilos/1000;
+  calcularTn(kilos: number) {
+    return kilos / 1000;
   }
 
-  obtenerLitros(altura:number, tk:string,linea:FormGroup, inicial:boolean){
+  obtenerLitros(altura: number, tk: string, linea: FormGroup, inicial: boolean) {
     let arrMediciones = this.splitMediciones(altura);
     let cm = parseInt(arrMediciones[0]);
     let mm = parseInt(arrMediciones[1]);
 
-    if(inicial){
+    if (inicial) {
       linea.controls['alturaInicialCM'].setValue(cm);
       linea.controls['alturaInicialMM'].setValue(mm);
       linea.controls['alturaInicialCMyMM'].setValue(cm + ',' + mm);
-    }else{
+    } else {
       linea.controls['alturaFinalCM'].setValue(cm);
       linea.controls['alturaFinalMM'].setValue(mm);
       linea.controls['alturaFinalCMyMM'].setValue(cm + ',' + mm);
@@ -234,38 +228,43 @@ export class LineasComponent implements OnInit, OnChanges {
 
   private cargarLineasEmbarque() {
     console.log('entro a cargarLineasEmbarque');
-
   }
 
   private cargarEmbarque(idEmbarque: number) {
-    this.embarqueService.obtenerEmbarque(idEmbarque).subscribe(
-      res => {
-        this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
-          id: m.materialId,
-          descripcionCorta: m.descripcionCorta,
-          descripcion: '',
-          almacenDesc: '',
-          almacenId: 0,
-          codigoSAP: '',
-          esLiquido: m.esLiquido,
-          color: m.color
-        }));
-      }, () => {
-        this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${idEmbarque}`, 'Cerrar', '', null, null, Tipoalerta.Error);
-      });
+    this.embarqueService.obtenerEmbarque(idEmbarque).subscribe(res => {
+      this.materialesPuerto = res.materialesPuertoCantidad.map(m => ({
+        id: m.materialId,
+        descripcionCorta: m.descripcionCorta,
+        descripcion: '',
+        almacenDesc: '',
+        almacenId: 0,
+        codigoSAP: '',
+        esLiquido: m.esLiquido,
+        color: m.color
+      }));
+    }, () => {
+      this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${idEmbarque}`, 'Cerrar', '', null, null, Tipoalerta.Error);
+    });
   }
 
   initLineasEmbarque(x: LineasDeEmbarque = null) {
     let deshabilitar = this.esCalidad ? true : false;
     let esVicentin = x?.linea == 'Vicentin';
+    let tieneTurnoSinCerrar: boolean;
+    let tieneTurnoCerrado: boolean;
+    if (x) {
+      const turnosLinea = this.moduloDeCarga.moduloDeCargaPlanillaDeTurnos?.filter(t => t.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.some((d: any) => d.linea_Id == x.id));
+      tieneTurnoCerrado = turnosLinea.some(t => t.guardadoPorRecibidor);
+      tieneTurnoSinCerrar = turnosLinea.some(t => !t.guardadoPorRecibidor);
+    }
     return this.formBuilder.group({
       id: x?.id ?? "",
       linea: [{ value: x?.linea ?? "", disabled: deshabilitar }],
       tipoLineaEmbarque: [{ value: x?.tipoLineaEmbarque ?? "", disabled: deshabilitar }],
-      tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar || esVicentin}],
-      materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar}],
+      tkInicial: [{ value: (x && this.tanquesOption != undefined) ? this.tanquesOption.find(t => t.value == x.tkInicial) : '', disabled: deshabilitar || esVicentin }],
+      materialPuerto: [{ value: x?.materialPuerto ?? "", disabled: deshabilitar }],
       temperaturaInicial: [{ value: x && x.temperaturaInicial ? x.temperaturaInicial > 0 ? x.temperaturaInicial : "" : "", disabled: deshabilitar || esVicentin, }],
-      alturaInicialCMyMM: [{ value: x?.alturaInicialCM >= 0 ? x.alturaInicialMM >= 0 ? `${x.alturaInicialCM},${x.alturaInicialMM}` :`${x.alturaInicialCM},0`:"", disabled: deshabilitar || esVicentin }],
+      alturaInicialCMyMM: [{ value: x?.alturaInicialCM >= 0 ? x.alturaInicialMM >= 0 ? `${x.alturaInicialCM},${x.alturaInicialMM}` : `${x.alturaInicialCM},0` : "", disabled: deshabilitar || esVicentin }],
       alturaInicialCM: x?.alturaInicialCM >= 0 ? x.alturaInicialCM : 0,
       alturaInicialMM: x?.alturaInicialMM >= 0 ? x.alturaInicialMM : 0,
       densidadInicial: [{ value: x && x.densidadInicial ? x.densidadInicial > 0 ? x.densidadInicial : "" : "", disabled: true || esVicentin }],
@@ -274,11 +273,12 @@ export class LineasComponent implements OnInit, OnChanges {
       densidadFinal: [{ value: x && x.densidadFinal ? x.densidadFinal > 0 ? x.densidadFinal : "" : "", disabled: true || esVicentin }],
       alturaFinalCM: x?.alturaFinalCM >= 0 ? x.alturaFinalCM : 0,
       alturaFinalMM: x?.alturaFinalMM >= 0 ? x.alturaFinalMM : 0,
-      alturaFinalCMyMM: [{ value: x?.alturaFinalCM >= 0 ? x.alturaFinalMM >= 0 ? `${x.alturaFinalCM},${x.alturaFinalMM}` :`${x.alturaFinalCM},0`:"", disabled: deshabilitar || esVicentin }],
+      alturaFinalCMyMM: [{ value: x?.alturaFinalCM >= 0 ? x.alturaFinalMM >= 0 ? `${x.alturaFinalCM},${x.alturaFinalMM}` : `${x.alturaFinalCM},0` : "", disabled: deshabilitar || esVicentin }],
       kilos: [{ value: x && x.kilos ? x.kilos > 0 ? x.kilos : "" : "", disabled: true || esVicentin }],
       tkFinal: [{ value: x?.tkFinal ?? "", disabled: false }],
-      litrosFinales:[{ value: x && x.litrosFinales ? x.litrosFinales > 0 ? x.litrosFinales : "" : "", disabled: deshabilitar || esVicentin }],
-      kilosFinales:[{ value: x && x.kilosFinales ? x.kilosFinales > 0 ? x.kilosFinales : "" : "", disabled: deshabilitar || esVicentin }],
+      litrosFinales: [{ value: x && x.litrosFinales ? x.litrosFinales > 0 ? x.litrosFinales : "" : "", disabled: deshabilitar || esVicentin }],
+      kilosFinales: [{ value: x && x.kilosFinales ? x.kilosFinales > 0 ? x.kilosFinales : "" : "", disabled: deshabilitar || esVicentin }],
+      tieneTurnoCerrado, tieneTurnoSinCerrar
     });
   }
 
@@ -288,20 +288,15 @@ export class LineasComponent implements OnInit, OnChanges {
 
   obtenerModuloDeCarga() {
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
-
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-
       this.moduloDeCarga = resp;
-
       if (this.moduloDeCarga.moduloDeCargaLineasDeEmbarque && this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.length > 0) {
         this.lineasEmbarque.clear();
-        this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.forEach((x, index) => {
-          this.lineasEmbarque.push(this.initLineasEmbarque(x))
-        });
+        this.moduloDeCarga.moduloDeCargaLineasDeEmbarque.forEach(x => this.lineasEmbarque.push(this.initLineasEmbarque(x)));
       }
-
     });
   }
+
   compareLineaEmbarque(c1: any, c2: any) {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
@@ -318,46 +313,48 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   onAgregarLineasEmbarque() {
-    if (this.esCalidad) return;
+    if (this.esCalidad) {
+      return;
+    }
     this.lineasEmbarque.push(this.initLineasEmbarque());
   }
 
-  onEliminarLineasEmbarque(pos: number) {
-    if (this.esCalidad) return;
+  public async onEliminarLineasEmbarque(pos: number) {
+    if (this.esCalidad) {
+      return;
+    }
 
-    this.confirmationDialogService.confirm('¡Atención!', "¿Seguro que desea eliminar la linea de embarque?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
-    .then((confirmed) => {
-      if (confirmed) {
-        this.lineasEmbarque.removeAt(pos);
-        this.colorSelected.splice(pos, 1);
+    // Verificación de que la línea no se encuentre en uso
+    const linea = this.lineasEmbarque.at(pos);
+    if (linea.get('tieneTurnoCerrado').value) {
+      this.confirmationDialogService.error('La línea de embarque no se puede eliminar debido a que está relacionada a un turno cerrado.');
+      return;
+    }
 
-        //Si no queda ninguna agrego una nueva al principio.
-        if (this.lineasEmbarque.length == 0){
-          this.lineasEmbarque.push(this.initLineasEmbarque());
-        }
-      } else return;
-    }).catch();
+    const confirm = await this.confirmationDialogService.confirmar('¡Atención!', "¿Seguro que desea eliminar la linea de embarque?");
+    if (!confirm) {
+      return;
+    }
 
+    if (linea.get('tieneTurnoSinCerrar').value) {
+      const confirm2 = await this.confirmationDialogService.confirmar('¡Atención!', "Si elimina la línea de embarque deberá modificar la línea asociada en el/los turno/s, ¿desea continuar?");
+      if (!confirm2) {
+        return;
+      }
+    }
 
+    this.lineasEmbarque.removeAt(pos);
+    this.colorSelected.splice(pos, 1);
+    //Si no queda ninguna agrego una nueva al principio.
+    if (this.lineasEmbarque.length == 0) {
+      this.lineasEmbarque.push(this.initLineasEmbarque());
+    }
   }
 
-  obtenerLineasEmbarque() {
-    let lineas = this.lineasDeEmbarqueForm ? this.lineasDeEmbarqueForm.getRawValue().lineasEmbarque : null;
-
-    if (lineas != null) {
-      lineas.forEach((l, index) => {
-        if (l.tkInicial?.value == undefined) {
-          // lineas.splice(index, 1);
-          l.tkInicial = null;
-        } else {
-          l.tkInicial = l.tkInicial.value;
-        }
-
-      });
-    }
+  obtenerLineasEmbarque(): any[] {
+    let lineas = this.lineasDeEmbarqueForm?.getRawValue()?.lineasEmbarque || null;
+    lineas?.forEach(l => l.tkInicial = l.tkInicial?.value || null);
     return lineas;
-
-
   }
 
   onLineaSeleccionada(lineaSel: FormGroup) {
@@ -369,7 +366,7 @@ export class LineasComponent implements OnInit, OnChanges {
     //#region Elige vicentin
     let selectedVicentin: boolean;
     selectedVicentin = lineaSel['controls'].tipoLineaEmbarque.value.linea == 'Vicentin'
-    if(selectedVicentin){
+    if (selectedVicentin) {
       lineaSel['controls'].alturaFinalCMyMM.disable();
       lineaSel['controls'].alturaInicialCMyMM.disable();
       lineaSel['controls'].temperaturaInicial.disable();
@@ -391,7 +388,7 @@ export class LineasComponent implements OnInit, OnChanges {
       lineaSel['controls'].kilos.setValue(0);
       lineaSel['controls'].kilosFinales.setValue(0);
       lineaSel['controls'].tkInicial.setValue('');
-    }else {
+    } else {
       lineaSel['controls'].alturaFinalCMyMM.enable();
       lineaSel['controls'].alturaInicialCMyMM.enable();
       lineaSel['controls'].temperaturaInicial.enable();
@@ -407,36 +404,35 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   onFocusOutEvent(index: number, linea) {
-    const materialPuertoId = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['materialPuerto'].value.id;
-    let temperatura = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaInicial'].value;
+    const controles = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls'];
+    const materialPuertoId = controles['materialPuerto'].value.id;
+    let temperatura = controles['temperaturaInicial'].value;
     temperatura = temperatura == '' ? 0 : temperatura;
     linea['controls'].temperaturaFinal.setValue(temperatura);
     if (temperatura == 0) {
-      this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaInicial'].setValue(0);
-      this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['temperaturaFinal'].setValue(0);
-      this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadInicial'].setValue(0);
-      this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadFinal'].setValue(0);
+      controles['temperaturaInicial'].setValue(0);
+      controles['temperaturaFinal'].setValue(0);
+      controles['densidadInicial'].setValue(0);
+      controles['densidadFinal'].setValue(0);
       return;
     }
     console.log('entro onFocusOutEvent')
-    this._lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId, temperatura)
-      .subscribe(res => {
-        if (res == 0 || !res) {
-          const texto = 'No existe la densidad para los valores ingresados.';
-          this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Warning)
-            .then((confirmed) => {
-              if (confirmed) {
-              } else return;
-            }).catch();
+    this._lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId, temperatura).subscribe(async res => {
+      if (res == 0 || !res) {
+        const texto = 'No existe la densidad para los valores ingresados.';
+        const confirmed = await this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Warning)
+        if (!confirmed) {
+          return;
         }
-        this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadInicial'].setValue(res, { emitEvent: false });
-        this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['densidadFinal'].setValue(res, { emitEvent: false });
-        if (this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['litros'].value) {
-          const kilosInicial = (Number(res) * Number(this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['litros'].value)).toFixed(3);
-          this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls']['kilos'].setValue(kilosInicial, { emitEvent: false })
-          // this.onCalculaLitros(linea);
-        }
-      });
+      }
+      controles['densidadInicial'].setValue(res, { emitEvent: false });
+      controles['densidadFinal'].setValue(res, { emitEvent: false });
+      if (controles['litros'].value) {
+        const kilosInicial = (Number(res) * Number(controles['litros'].value)).toFixed(3);
+        controles['kilos'].setValue(kilosInicial, { emitEvent: false })
+        // this.onCalculaLitros(linea);
+      }
+    });
   }
 
   private validarLineasDuplicadas() {
@@ -470,23 +466,27 @@ export class LineasComponent implements OnInit, OnChanges {
       }
     });
 
-    filtroLineas.forEach(filtro =>{
-      const selLinea = lineasEmbarque.filter(item =>{
+    filtroLineas.forEach(filtro => {
+      const selLinea = lineasEmbarque.filter(item => {
         return (filtro.idTipoLinea == item.tipoLineaEmbarque.id &&
-                filtro.idMaterial == item.materialPuerto.id &&
-                filtro.tkInicial == item.tkInicial)
+          filtro.idMaterial == item.materialPuerto.id &&
+          filtro.tkInicial == item.tkInicial)
 
       });
       filtro.cantidad = selLinea.length;
     })
-    const cantidadLineas =  filtroLineas.filter(linea => {return linea.cantidad > 1 });
+    const cantidadLineas = filtroLineas.filter(linea => { return linea.cantidad > 1 });
     if (cantidadLineas.length > 0)
       bValidarDuplicadas = true;
     return bValidarDuplicadas;
   }
-  onGuardar() {
 
-    if (this.esCalidad) return;
+  public async onGuardar() {
+
+    if (this.esCalidad) {
+      return;
+    }
+
     // const bValidarDuplicadas = this.validarLineasDuplicadas();
     // if (bValidarDuplicadas){
     //   const mensaje = "No se puede guardar, debido a que existe un tipo de linea, producto y tanque duplicado en la conformacion de lineas de embarque.";
@@ -495,53 +495,41 @@ export class LineasComponent implements OnInit, OnChanges {
     // }
 
     this.esGuardadoActivo = false;
+    const lineasEmbarque = this.obtenerLineasEmbarque();
 
-
-    const lineasEmabarque = this.obtenerLineasEmbarque();
-    let erroresLinea = false;
-    lineasEmabarque.forEach(item => {
-      if (item.tipoLineaEmbarque.linea == 'Vicentin'){
-        if ( (item.materialPuerto == '' || item.materialPuerto == undefined)){
-          erroresLinea = true;
-          return;
-        }
-      }else{
-        if ((item.tkInicial == '' || item.tkInicial == undefined) ||
-            (item.materialPuerto == '' || item.materialPuerto == undefined)){
-          erroresLinea = true;
-          return;
-        }
-      }
-    });
+    let erroresLinea = lineasEmbarque.some(item => !item.materialPuerto || (item.tipoLineaEmbarque.linea != 'Vicentin' && !item.tkInicial));
     if (erroresLinea) {
       var texto = "No se puede guardar, debido a que no se han completado la información para el registro de linea.";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
-        .then((confirmed) => {
-          this.esGuardadoActivo = true;
-          if (confirmed)
-            return;
-          else
-            return;
-        }).catch();
-    } else {
-
-      console.log('this.obtenerLineasEmbarque()---->>>');
-      console.log(this.obtenerLineasEmbarque());
-
-      this.moduloCargaService.guardarLineasDeEmbarque(this.obtenerLineasEmbarque(), this.idModuloDeCarga).subscribe(res => {
-        let texto = "Se guardaron las lineas de embarque correctamente";
-        this.esGuardadoActivo = true;
-        this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-        this.creaFormLineasEmbarque();
-        this.cargarDatosLineas();
-        this.moduloCargaService.actualizarPlanillaLiquido = true;
-      });
+      await this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      this.esGuardadoActivo = true;
+      return;
     }
+
+    console.log('lineas', lineasEmbarque);
+
+    this.moduloCargaService.guardarLineasDeEmbarque(lineasEmbarque, this.idModuloDeCarga).subscribe(res => {
+      this.esGuardadoActivo = true;
+      this.confirmationDialogService.exito('Se guardaron las lineas de embarque correctamente');
+      this.creaFormLineasEmbarque();
+      this.cargarDatosLineas();
+      this.moduloCargaService.actualizarPlanillaLiquido = true;
+    }, (err) => {
+      console.error(err);
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || `Ha ocurrido un error al guardar las líneas de embarque`;
+      }
+      this.confirmationDialogService.error(msj);
+    });
+
   }
 
   hasPermisoLiquido_ConformacionLineasEmb_Eliminar() {
     return this.user.permisos.find(p => p === this.permisosScato.Liquido_ConformacionLineasEmb_Eliminar);
   }
+
   hasPermisoLiquido_ConformacionLineasEmb_Editar() {
     return this.user.permisos.find(p => p === this.permisosScato.Liquido_ConformacionLineasEmb_Editar);
   }

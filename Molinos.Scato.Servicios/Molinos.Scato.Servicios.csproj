@@ -164,10 +164,11 @@
     <Compile Include="Conversiones\Impl\Perfiles\ADPuertoRolesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCoemMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipTablasReferenciaMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Afip\HistoricoEmbarqueLineUpMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaATA\AgenciaMaritimaPuertoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\AgenciaMaritimaATA\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AgenciaControlPrivadoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ArchivosPuertoMappingProfile.cs" />
-    <Compile Include="Conversiones\Impl\Perfiles\ATAPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\AuditoriaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
@@ -362,6 +363,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ImpIdentificacionMuestraAuditoriaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VinedoTercerosMappingProfile.cs" />
     <Compile Include="CrearException.cs" />
+    <Compile Include="Enumeradores\EnumsAgenciaMaritimaATA.cs" />
     <Compile Include="Enumeradores\EstadosCaratulaAFIP.cs" />
     <Compile Include="Enumeradores\EstadosCoemAFIP.cs" />
     <Compile Include="Enumeradores\EstadosSolicitudesAFIP.cs" />
@@ -376,6 +378,8 @@
     <Compile Include="IAccesoAFIP.cs" />
     <Compile Include="IComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
+    <Compile Include="Impl\ServicioClientes.cs" />
+    <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="IServicioAfip.cs" />
     <Compile Include="Impl\ServicioAfip.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
@@ -383,8 +387,10 @@
     <Compile Include="Impl\ServicioProgramaEmbarque.cs" />
     <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
+    <Compile Include="IServicioClientes.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
+    <Compile Include="IServicioRepositorioBase.cs" />
     <Compile Include="IServicioVapor.cs" />
     <Compile Include="MercadoLibreException.cs" />
     <Compile Include="FormattingHtmlHelper.cs" />
@@ -572,8 +578,14 @@
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCambioBuque.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarCierreCargaGranel.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipSolicitarNoAbordo.cs" />
+    <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorCrearAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorEliminarAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarCupoCTGPorCartaPorte.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
+    <Compile Include="Procesamiento\ProcesadorEliminarBuque.cs" />
+    <Compile Include="Procesamiento\ProcesadorEnvioMailZarpado.cs" />
+    <Compile Include="Procesamiento\ProcesadorCrearHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloBalanza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />
