@@ -39,6 +39,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             //Obtengo el ultimo token creado
             var tiempo = DateTime.Now.AddMinutes(10);
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             var ticketDeAcceso = repositorio.Listar<TicketAccesoAfip>(x => x.Service == servicio && x.ExpirationTime > tiempo).LastOrDefault() ?? GenerarNuevoTicketDeAcceso(cuitRepresentado, resultado, servicio);
             return ticketDeAcceso;
         }
@@ -47,8 +48,6 @@ namespace Molinos.Scato.Servicios.Impl
             TicketAccesoAfip ticketNuevo = null;
             try
             {
-                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-
                 var xmlLoginTicketRequest = GenerarXmlLoginTicketRequest(servicio);
                 var cmsFirmadoBase64 = EncriptarXmlLoginTicketRequest(xmlLoginTicketRequest, this.PathCertificado);
 

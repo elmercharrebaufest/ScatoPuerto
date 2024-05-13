@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  qa: false,
+  qa: true,
   apiUrl: '/Scato.WebPuertoApi/api/',
   apiAzureUrl: '/Scato.AzureAD/'
 };

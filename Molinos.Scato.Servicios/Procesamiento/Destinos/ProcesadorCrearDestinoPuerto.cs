@@ -34,7 +34,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var destinoDb = Repositorio.Obtener<Destino>(d => d.Nombre.ToUpper() == nombre);
                 if (destinoDb == null)
                 {
-                    destinoDb = new Destino { Nombre = nombre };
+                    destinoDb = new Destino { Nombre = nombre, Activo = true };
                     Repositorio.Agregar(destinoDb);
                 }
                 else

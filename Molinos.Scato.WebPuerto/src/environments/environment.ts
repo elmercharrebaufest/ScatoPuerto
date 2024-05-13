@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  qa: false,
   apiUrl: '/api/',
   apiAzureUrl: 'http://localhost/Scato.AzureAD/'
 };

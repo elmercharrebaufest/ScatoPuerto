@@ -848,11 +848,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ProgramaEmbarque/CrearDestino")]
-        public HttpResponseMessage CrearDestino(string nombre)
+        public HttpResponseMessage CrearDestino(DestinoDto destino)
         {
             try
             {
-                servicioProgramaEmbarque.CrearDestino(nombre, this.nombreUsuario);
+                servicioProgramaEmbarque.CrearDestino(destino.Nombre, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
