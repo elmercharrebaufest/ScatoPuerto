@@ -24,7 +24,7 @@ export class DestinosService {
   }
 
   public crearDestino(nombre: string) {
-    return this.http.post(`${this.url}ProgramaEmbarque/CrearDestino`, nombre, { withCredentials: true });
+    return this.http.post(`${this.url}ProgramaEmbarque/CrearDestino`, { nombre }, { withCredentials: true });
   }
 
   public editarDestino(destino: Destino) {
