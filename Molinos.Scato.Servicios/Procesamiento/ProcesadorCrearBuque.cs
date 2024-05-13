@@ -88,7 +88,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var nuevoVapor = new Vapor
                 {
                     Nombre = comando.VaporInformacion.NombreBuque,
-                    Habilitado = true
+                    Habilitado = true;
                 };
                 Repositorio.Agregar(nuevoVapor);
                 Repositorio.GuardarCambios();
