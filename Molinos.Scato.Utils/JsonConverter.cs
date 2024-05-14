@@ -7,13 +7,13 @@ namespace Molinos.Scato.Utils
 		// Convertir un objeto a JSON string
 		public static string Serialize(T obj)
 		{
-			return JsonConvert.SerializeObject(obj);
+			return JsonConvert.SerializeObject(obj, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 		}
 
 		// Convertir un JSON string a objeto
 		public static T Deserialize(string jsonString)
 		{
-			return JsonConvert.DeserializeObject<T>(jsonString);
+			return JsonConvert.DeserializeObject<T>(jsonString, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 		}
 	}
 }
