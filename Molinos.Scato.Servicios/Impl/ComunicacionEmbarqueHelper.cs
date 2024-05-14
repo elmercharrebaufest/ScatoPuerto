@@ -24,7 +24,12 @@ namespace Molinos.Scato.Servicios.Impl
         private string rol;
         private string tipoAgente;
 
-        public ComunicacionEmbarqueServicioHelper(IAccesoComunicacionEmbarque accesoComunicacionEmbarque, wgescomunicacionembarqueSoap wgescomunicacionembarque, IConversor conversor, ILogger log)
+        public ComunicacionEmbarqueServicioHelper(
+            IAccesoComunicacionEmbarque accesoComunicacionEmbarque, 
+            wgescomunicacionembarqueSoap wgescomunicacionembarque, 
+            IConversor conversor, 
+            ILogger log
+        )
         {
             this.accesoComunicacionEmbarque = accesoComunicacionEmbarque;
             this.wgescomunicacionembarque = wgescomunicacionembarque;

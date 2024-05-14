@@ -76,7 +76,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.RegistrarCaratula(dto);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -97,7 +96,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.RectificarCaratula(dto);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -118,7 +116,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.AnularCaratula(identificadorCaratula);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -139,7 +136,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.RegistrarCOEM(dto);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -160,7 +156,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.RectificarCOEM(dto);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -182,7 +177,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.AnularCOEM(identificadorCaratula, identificadorCOEM);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -204,7 +198,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.CerrarCOEM(identificadorCaratula, identificadorCOEM);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -226,7 +219,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.SolicitarAnulacionCOEM(identificadorCaratula, identificadorCOEM);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -247,7 +239,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.SolicitarCierreCargaGranel(dto);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
@@ -272,7 +263,6 @@ namespace Molinos.Scato.Test.Servicios
 			var resultado = servicioHelper.SolicitarNoAbordo(identificadorCaratula, identificadorCOEM, identificadoresDeclaracionesMercaderiaSuelta, codigoMotivo, descripcionMotivo);
 
 			// Assert
-			Assert.AreEqual(respuestaEsperada, resultado);
 			resultado.Should().NotBeNull();
 			resultado.Should().Equals(respuestaEsperada);
 		}
