@@ -297,45 +297,58 @@ export class SolidosComponent implements OnInit {
 
   guardarHistoricoEmbarqueLineUp = async (embarqueId: number) =>{
     // console.log(' guardarHistoricoEmbarqueLineUp()');
-    // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
-    this.listadoEmbarques.forEach((embarquePuerto) => {
-      // console.log(embarquePuerto);
+    try {
+      // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
+      this.listadoEmbarques.forEach((embarquePuerto) => {
+        // console.log(embarquePuerto);
 
-      let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
+        let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
 
-      let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
-        vaporNombre: embarquePuerto.embarque.nombreBuque,
-        actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
-        ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
-        cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
-        cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
-        cargaEnSap: embarquePuerto.lineUp.cargaEnSap, 
-        nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
-        seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
-        inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
-        controlSenasa: embarquePuerto.lineUp.controlSenasa,
-        controlPrivado: embarquePuerto.lineUp.controlPrivado,
-        amarrador: embarquePuerto.lineUp.amarrador,
-        agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
-        fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
-        puertoActual: '',
-        observaciones: embarquePuerto.embarque.observaciones,
-        materiales: '',
-        planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
-        obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
-        agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
-        ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
-        lineUpId: lineUpDto.id,
-        embarqueId: embarqueId
-      };
-      embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
-        historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+        let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
+          vaporNombre: embarquePuerto.embarque.nombreBuque,
+          actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
+          ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
+          cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
+          cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
+          cargaEnSap: embarquePuerto.lineUp.cargaEnSap,
+          nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
+          seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
+          inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
+          controlSenasa: embarquePuerto.lineUp.controlSenasa,
+          controlPrivado: embarquePuerto.lineUp.controlPrivado,
+          amarrador: embarquePuerto.lineUp.amarrador,
+          agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
+          fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
+          puertoActual: '',
+          observaciones: embarquePuerto.embarque.observaciones,
+          materiales: '',
+          planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
+          obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
+          agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
+          ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+          lineUpId: lineUpDto.id,
+          embarqueId: embarqueId
+        };
+        
+        let materiales = '';
+        embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
+          if (planoDeCargaBodega.materialPuerto) {
+            if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
+              materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+            }
+          }
+          // historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+        });
+
+        historicoEmbarqueLineUp.materiales = materiales;
+        // console.log(historicoEmbarqueLineUp);
+        this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {
+          console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
+        });
       });
-      // console.log(historicoEmbarqueLineUp);
-      this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {
-        console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
-      });
-    });
+    } catch (err) {
+      console.error('Ocurrio un error inesperado: ', err.message);
+    }
   }
 
   extraeNombre(objeto): string {
