@@ -29,7 +29,12 @@
 
   <setParameter name="FotosPath Config" value="\\GVICFSPRD00\Scato\ScatoPuerto\ScatoFotos\" />
   <setParameter name="ArchivosPath Config" value="\\GVICFSPRD00\Scato\ScatoPuerto\" />
-	
+
+  <setParameter name="CuitRepresentada Config" value="30715118773" />
+  <setParameter name="UrlAfipApi Config" value="https://localhost/Scato.PuertoApiCore/AFIPApi/" />
+  <setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
+  <setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
+
   <setParameter name="MailSettings Smtp From" value="scatoprodMOA@molinosagro.com.ar" />
   <setParameter name="MailSettings Smtp Host" value="smtp.molinosagro.com.ar" />
   <setParameter name="MailSettings Smtp Port" value="25" />

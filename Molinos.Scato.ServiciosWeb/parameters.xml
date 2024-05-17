@@ -76,8 +76,29 @@
                     match="/configuration/appSettings/add[@key='FotosPath']
                            /@value" />
   </parameter>
+  <parameter name="CuitRepresentada Config">
+	<parameterEntry kind="XmlFile" scope="Web.config"
+					match="/configuration/appSettings/add[@key='CuitRepresentada']
+                           /@value" />
+  </parameter>
+  <parameter name="UserCredentialAfipApi Config">
+	<parameterEntry kind="XmlFile" scope="Web.config"
+					match="/configuration/appSettings/add[@key='UserCredentialAfipApi']
+                           /@value" />
+  </parameter>
+  <parameter name="PassCredentialAfipApi Config">
+	<parameterEntry kind="XmlFile" scope="Web.config"
+					match="/configuration/appSettings/add[@key='PassCredentialAfipApi']
+                           /@value" />
+  </parameter>
+  <parameter name="UrlAfipApi Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='UrlAfipApi']
+                           /@value" />
+  </parameter>	
+
   <parameter name="MailSettings Smtp From">
-    <parameterEntry kind="XmlFile" scope="Web.config"
+        <parameterEntry kind="XmlFile" scope="Web.config"
                     match="/configuration/system.net/mailSettings/smtp
                            /@from" />
   </parameter>
