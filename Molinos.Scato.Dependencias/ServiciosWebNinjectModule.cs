@@ -16,6 +16,7 @@ using System.Data.Entity;
 using System.Net.Http;
 using System.ServiceModel;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
+using Molinos.Scato.Servicios.AFIP;
 
 namespace Molinos.Scato.Dependencias
 {
@@ -47,6 +48,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IServicioVapor, ServicioVapor>().To<ServicioVapor>().InScope(ctx => OperationContext.Current);
             Bind<IServicioAfip, ServicioAfip>().To<ServicioAfip>().InScope(ctx => OperationContext.Current);
             Bind<IServicioClientes, ServicioClientes>().To<ServicioClientes>().InScope(ctx => OperationContext.Current);
+            Bind<IAfipClient, AfipClient>().To<AfipClient>();
 
             this.BindChannelFactory<IServicioNotificarUsuario>("ServicioNotificarUsuario");
             Bind<IServicioEstadoPuesto, ServicioEstadoPuesto>().To<ServicioEstadoPuesto>().InSingletonScope();
