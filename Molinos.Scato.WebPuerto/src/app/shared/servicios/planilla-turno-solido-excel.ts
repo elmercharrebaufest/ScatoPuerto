@@ -178,7 +178,7 @@ export class PlanillaTurnoSolidoExcelService {
       const kilos = turno.cantidad;
       worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
       worksheet.getRow(offset).getCell(3).value = turno.exportador?.nombre;
-      worksheet.getRow(offset).getCell(4).value = turno.bodega.nombre;
+      worksheet.getRow(offset).getCell(4).value = turno.bodega?.nombre;
       worksheet.getRow(offset).getCell(5).value = turno.materialPuerto?.descripcion;
       worksheet.getRow(offset).getCell(6).value = turno.destino?.nombre;
       worksheet.getRow(offset).getCell(7).value = kilos;
