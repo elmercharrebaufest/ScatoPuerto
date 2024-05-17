@@ -3,6 +3,7 @@ export const environment = {
   qa: true,
   apiUrl: '/Scato.WebPuertoApi/api/',
   apiAzureUrl: '/Scato.AzureAD/',
+  apiGraph: 'https://graph.microsoft.com/v1.0/',
   clientIdMoa: '94426e34-9e75-401a-9f55-906c5e2c4246',
   clientIdMoc: '5ab4c0b8-bf3b-42ef-90b9-697559762d72',
   redirectUri: 'http://gslopuertoappqa00.molinosagro.ad/Scato.WebPuerto/',
