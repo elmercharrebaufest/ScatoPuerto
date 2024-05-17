@@ -24,6 +24,9 @@
     </div>
     <button type="button" class="btn btn-light btn-sm bg-white rounded-img mr-2 "><img class="mx-2" src="assets/notificationsBell.svg" (click)="showNotificacionesVisibles()"></button>
     <button type="button" class="btn btn-light btn-sm bg-white rounded-img"><img class="mx-2 img-user-rounded" src="assets/user.svg"></button>
+    <button type="button" class="btn btn-light btn-sm bg-white rounded-img" (click)="logout()">
+      <img class="mx-2 img-user-rounded" src="assets/login/logout.svg">
+    </button>
   </div>
 </nav>
 <div *ngIf="notificacionesVisibles">
