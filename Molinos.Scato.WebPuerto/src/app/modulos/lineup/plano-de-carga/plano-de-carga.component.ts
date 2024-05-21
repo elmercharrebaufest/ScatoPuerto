@@ -52,13 +52,16 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
     console.log('01 subscribeEmbarques', new Date());
     this.workflowService.listarEmbarquesEnLineUp().subscribe(x => {
       this.embarquesEnLineUp = x;
-      this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
       let id = this.route.snapshot.params.id;
-      if (id)
+      if(id){
+        this.embarquesEnLineUp = this.embarquesEnLineUp.filter(e => e.id == id);
+        this._procesoService.setEmbarquesList(this.embarquesEnLineUp);      
         this._procesoService.setEmbarque(Number(id));
+      }else{
+        this._procesoService.setEmbarquesList(this.embarquesEnLineUp);      
+      }
       this.mostrarNavtabs = true;
       console.log('02 subscribeEmbarques', new Date());
-
     });
   }
   

@@ -27,4 +27,8 @@ export class WorkflowService {
   listarEmbarquesEnLineUp(): Observable<EmbarqueNav[]> {
     return this.http.get<EmbarqueNav[]>(`${this.url}Workflow/ListarEnLineUp`, { 'withCredentials': true });
   }
+
+  listarEmbarquesEnLineUpCalidad(): Observable<EmbarqueNav[]> {
+    return this.http.get<EmbarqueNav[]>(`${this.url}Workflow/ListarEnLineUpCalidad`, { 'withCredentials': true });
+  }
 }
