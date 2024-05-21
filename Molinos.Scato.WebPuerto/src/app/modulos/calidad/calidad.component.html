@@ -17,22 +17,28 @@
         <app-navtabs-calidad *ngIf='mostrarTabs' (showPlano)='showPlano($event)' (changeEmbarque)='changeEmbarque()'>
         </app-navtabs-calidad>
     </div>
-
+    <!--SECCION BUQUE EN MUELLE SAN BENITO-->
     <!-- Utilizar un ngcontainer con ngIf para cambiar entre carga-solidos y carga-liquidos -->
-    <ng-container *ngIf='mostrarPlano'>
-        <app-plano-content (showCargas)='showCargas($event)'></app-plano-content>
+    <ng-container *ngIf='buqueEnMuelleSanBenito'>
+        <ng-container *ngIf='mostrarPlano'>
+            <app-plano-content (showCargas)='showCargas($event)'></app-plano-content>
+        </ng-container>
+        <ng-container *ngIf='mostrarCargas'>
+            <!--Modulos Solidos-->
+            <app-solidos *ngIf='!embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)'></app-solidos>
+            <!--Modulos Liquidos-->
+            <app-liquidos *ngIf='embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)'></app-liquidos>
+        </ng-container>
+        <app-obs-calidad></app-obs-calidad>
     </ng-container>
+    <!--END SECCION BUQUE EN MUELLE SAN BENITO-->
 
-    <ng-container *ngIf='mostrarCargas'>
-        <!--Modulos Solidos-->
-        <app-solidos *ngIf='!embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)' ></app-solidos>
-        <!--Modulos Liquidos-->
-        <app-liquidos *ngIf='embarqueSelected.esLiquido' (hideSpinner)='hideSpinner($event)' ></app-liquidos>
+    <!--SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
+    <ng-container *ngIf='buqueEnMuelleVicentin'>
+        <app-registro-recibos class="break"></app-registro-recibos>
     </ng-container>
-
-    <app-obs-calidad></app-obs-calidad>
-
-    
+    <ng-container *ngIf='buqueEnMuelleNoryon'>
+        <app-registro-recibos class="break"></app-registro-recibos>
+    </ng-container>
+    <!--END SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
 </div>
-
-

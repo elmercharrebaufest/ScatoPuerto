@@ -15,7 +15,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Nominacion Nominacion { get; set; }
         public virtual Exportador Exportador { get; set; }
         public virtual string Formato { get; set; }
-        public virtual int Cantidad { get; set; }
+        public virtual decimal Cantidad { get; set; }
         public virtual string Unidad { get; set; }
         public virtual string Ajuste { get; set; }
         public virtual string PuertoDeCarga { get; set; }

@@ -100,7 +100,7 @@ export enum PermisosScato {
 
   // Buques
   Buque_Ver = 'Buque_Ver',
-  Buque_Operatoria_Ver = 'Buque_Operatoria_Ver',  
+  Buque_Operatoria_Ver = 'Buque_Operatoria_Ver',
   Buques_Resumen_De_Operatoria = 'Buques_Resumen_De_Operatoria',
 
   //Programa de embarque
@@ -119,22 +119,25 @@ export enum PermisosScato {
   Vapor_Crear = "Vapor_Crear",
   Vapor_Eliminar = "Vapor_Eliminar",
 
+  //Exportadores ó Cargadores
+  Exportadores_Visualizar = "Exportadores_Visualizar",
+
   // Afip
 
-  Caratula_Visualizar="Caratula_Visualizar",
-  Caratula_Editar="Caratula_Editar",
-  Caratula_Crear="Caratula_Crear",
-  Caratula_Eliminar="Caratula_Eliminar",
+  Caratula_Visualizar = "Caratula_Visualizar",
+  Caratula_Editar = "Caratula_Editar",
+  Caratula_Crear = "Caratula_Crear",
+  Caratula_Eliminar = "Caratula_Eliminar",
 
-  Coem_Visualizar="Coem_Visualizar",
-  Coem_Editar="Coem_Editar",
-  Coem_Crear="Coem_Crear",
-  Coem_Eliminar="Coem_Eliminar",
+  Coem_Visualizar = "Coem_Visualizar",
+  Coem_Editar = "Coem_Editar",
+  Coem_Crear = "Coem_Crear",
+  Coem_Eliminar = "Coem_Eliminar",
 
-  Code_Visualizar="Code_Visualizar",
-  Code_Editar="Code_Editar",
-  Code_Crear="Code_Crear",
-  Code_Eliminar="Code_Eliminar",
+  Code_Visualizar = "Code_Visualizar",
+  Code_Editar = "Code_Editar",
+  Code_Crear = "Code_Crear",
+  Code_Eliminar = "Code_Eliminar",
 
   //Clientes
 
@@ -142,5 +145,12 @@ export enum PermisosScato {
   Clientes_Editar = "Clientes_Editar",
   Clientes_Crear = "Clientes_Crear",
   Clientes_Eliminar = "Clientes_Eliminar",
+
+  //Destinos
+
+  Destinos_Visualizar = "Destinos_Visualizar",
+  Destinos_Editar = "Destinos_Editar",
+  Destinos_Crear = "Destinos_Crear",
+  Destinos_Eliminar = "Destinos_Eliminar",
 
 }

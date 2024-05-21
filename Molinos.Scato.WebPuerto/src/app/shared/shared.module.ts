@@ -1,7 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { SharedComponentModule } from "./componentes/shared-components.module";
-import { LoginGuard } from "./seguridad/login.guard";
 import { RoleGuard } from "./seguridad/role.guard";
 
 @NgModule({
@@ -13,6 +12,6 @@ import { RoleGuard } from "./seguridad/role.guard";
         CommonModule,
         SharedComponentModule,
     ],
-    providers: [RoleGuard, LoginGuard]
+    providers: [RoleGuard]
 })
 export class SharedModule { }

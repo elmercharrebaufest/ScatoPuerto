@@ -539,6 +539,11 @@
     <Compile Include="FactoryContext.cs" />
     <Compile Include="FactoryConversor.cs" />
     <Compile Include="Meta\ExistenciaUnitTestsTest.cs" />
+    <Compile Include="Mock\FakeAfipCaratula.cs" />
+    <Compile Include="Mock\FakeAfipCaratulaDto.cs" />
+    <Compile Include="Mock\FakeAfipCoem.cs" />
+    <Compile Include="Mock\FakeAfipCoemDto.cs" />
+    <Compile Include="Mock\FakeAfipSolicitudCierreCarga.cs" />
     <Compile Include="Mock\FakeHttpMessageHandler.cs" />
     <Compile Include="Mock\NullLogger.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarLecturaDeTarjetaPatenteTest.cs" />
@@ -922,6 +927,7 @@
     </Compile>
     <Compile Include="Servicios\CalculadoraDescuentoTest.cs" />
     <Compile Include="Servicios\ComunicacionEmbarqueServicioHelperTests.cs" />
+    <Compile Include="Servicios\ServicioAfipTest.cs" />
     <Compile Include="Servicios\ServicioComandosTest.cs" />
     <Compile Include="Servicios\ServicioMercadoPagoTest.cs" />
     <Compile Include="Servicios\ServicioRepositorioTest.cs" />

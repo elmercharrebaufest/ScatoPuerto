@@ -14,19 +14,44 @@ import { RouterModule } from '@angular/router';
 import { SharedComponentModule } from './shared/componentes/shared-components.module';
 import { MessageService } from 'primeng/api';
 import { NgxsModule } from '@ngxs/store';
-import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
-import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { ProductoState } from './store/productos/material.state';
 import { BuquesState } from './store/buques/buques.state';
 registerLocaleData(localeEsAr, 'es-Ar');
-import { NgxPermissionsModule, NgxPermissionsService } from 'ngx-permissions';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
-import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 import { ToastrModule } from 'ngx-toastr';
 import { LoginComponent } from './modulos/login/login.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+// <ARMOA005-1819 Dylan Lopez>
+import { BrowserCacheLocation, IPublicClientApplication, InteractionType, PublicClientApplication } from '@azure/msal-browser';
+import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalInterceptor, MsalInterceptorConfiguration, MsalModule, MsalService } from '@azure/msal-angular';
+
+export function MSALInstanceFactory(): IPublicClientApplication {
+  return new PublicClientApplication({
+    auth: {
+      clientId: 'clientId',
+      redirectUri: 'redirectUri',
+      postLogoutRedirectUri: 'postLogoutRedirectUri',
+      authority: 'authority'
+    }, 
+    cache: {
+      cacheLocation: BrowserCacheLocation.LocalStorage,
+      storeAuthStateInCookie: false
+    }
+  })
+}
+
+export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
+  // console.log('MSALInterceptorConfigFactory');
+  const protectedResourceMap = new Map<string, Array<string>>();
+  protectedResourceMap.set('https://graph.microsoft.com/v1.0/me', ['user.read']);
+
+  return {
+    interactionType: InteractionType.Popup,
+    protectedResourceMap
+  }
+}
+// </ ARMOA005-1819 Dylan Lopez>
 
 @NgModule({
   declarations: [
@@ -54,17 +79,31 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
     FormsModule,
     ReactiveFormsModule,
     NgxMaskModule.forRoot(),
-    NgMultiSelectDropDownModule.forRoot()
+    NgMultiSelectDropDownModule.forRoot(),
+    // <ARMOA005-1819 Dylan Lopez>
+    MsalModule,
+    HttpClientModule
+    // </ ARMOA005-1819 Dylan Lopez>
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },
-    // { 
-    //   provide: HTTP_INTERCEPTORS,
-    //   useClass: InterceptorADService,
-    //   multi: true // para que esté atento a todas las peticiones
-    // },
     DatePipe,
     MessageService,
+    // <ARMOA005-1819 Dylan Lopez>
+    {
+      provide: MSAL_INSTANCE,
+      useFactory: MSALInstanceFactory
+    },
+    MsalService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: MsalInterceptor,
+      multi: true
+    }, {
+      provide: MSAL_INTERCEPTOR_CONFIG,
+      useFactory: MSALInterceptorConfigFactory
+    }
+    // </ ARMOA005-1819 Dylan Lopez>
   ],
   bootstrap: [AppComponent]
 })

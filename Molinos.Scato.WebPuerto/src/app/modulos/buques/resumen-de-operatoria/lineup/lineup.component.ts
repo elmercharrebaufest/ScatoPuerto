@@ -21,6 +21,5 @@ export class LineupComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log('LineupComponent.ngOnInit()');
-    // console.log(this.historicoEmbarqueLineUp);
   }
 }

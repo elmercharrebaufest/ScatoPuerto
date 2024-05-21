@@ -4,7 +4,7 @@
 	[Nominacion_Id] [int] NOT NULL,
 	[Exportador_Id] [int] NULL,
 	[Formato] [varchar](10) NULL,
-	[Cantidad] [int] NULL,
+	[Cantidad] DECIMAL(20, 3) NULL,
 	[Unidad] [varchar](10) NULL,
 	[Ajuste] [varchar](50) NULL,
 	[PuertoDeCarga] [varchar](250) NULL,

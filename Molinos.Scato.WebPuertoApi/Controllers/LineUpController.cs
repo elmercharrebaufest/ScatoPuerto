@@ -20,17 +20,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class LineUpController : BaseController
     {
-        private readonly IServicioActividadFactory<ILineUpService> factory;
-        private readonly IListaDeWorkflows workflows;
         private readonly IServicioComandos servicioComandos;
 
-        public LineUpController(IServicioActividadFactory<ILineUpService> factory, 
-            IServicioRepositorio servicio, 
-            IListaDeWorkflows workflows,
+        public LineUpController(
+            IServicioRepositorio servicio,
             IServicioComandos servicioComandos) : base(servicio)
         {
-            this.factory = factory;
-            this.workflows = workflows;
             this.servicioComandos = servicioComandos;
         }
 
@@ -41,8 +36,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var embarques = workflows.ListarEmbarques();
-                foreach(var embarque in embarques.Where(x => x.LineUp != null && x.LineUp.AgenciaContactada))
+                var embarques = servicio.ListarEmbarques();
+                foreach (var embarque in embarques.Where(x => x.LineUp != null && x.LineUp.AgenciaContactada))
                 {
                     embarque.LineUp.AgenciaContactada = false;
                     this.Modificar(embarque.LineUp);
@@ -54,22 +49,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
-        //[HttpGet]
-        //[Autorizacion(PermisosScato.LineUp)]
-        //[Route("api/LineUp/ActualizarEstadoPuerto")]
-        //public HttpResponseMessage ActualizarEstadoPuerto()
-        //{
-        //    try
-        //    {
-        //        servicioComandos.Ejecutar(new ActualizarEstadoPuerto());
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-        //    }
-        //    return Request.CreateResponse(HttpStatusCode.OK);
-        //}
 
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUpLectura)]
@@ -85,7 +64,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }            
+            }
         }
 
         [HttpPost]
@@ -94,28 +73,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/LineUp/Modificar")]
         public HttpResponseMessage Modificar(LineUpDto lineUp)
         {
-            //TODO: asignar codigo de workflow correcto
-            var workflow = "WorkflowPuerto";
-            var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
-            var servicioWf = factory.CrearServicio(workflowDefinicionId);
-
-            var controlRecorrido = new ControlRecorridoDto
-            {
-                Actividad = Textos.ActLineUp,
-                ActividadXaml = "LineUp",
-                NombreUsuario = nombreUsuario,
-                WorkflowInstanceId = lineUp.InstanciaWorkflow
-            };
-
             try
             {
                 Resultado res = null;
-                if (lineUp.Ubicacion == 1) /**Zarpó**/
+                if (lineUp.Ubicacion == 1)
                 {
                     lineUp.PlanoDeCargaEnviado = true;
                     res = servicioComandos.Ejecutar(new EnvioMailZarpado { LineUpId = lineUp.Id });
                 }
-                var resultado = servicioWf.LineUp(controlRecorrido, lineUp, lineUp.InstanciaWorkflow) as Dominio.Comandos.ResultadoCrearWorkflow;
+                var resultado = servicioComandos.Ejecutar(new ActualizarCartasLineUp { LineUp = lineUp }) as ResultadoCrear;
                 if (resultado.HayErrores)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Mensaje);
@@ -127,18 +93,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError,e.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
 
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/LineUp/ModificarOrden")]
-        public HttpResponseMessage ModificarOrden(Dictionary<int,int> idsYOrden)
-        {           
+        public HttpResponseMessage ModificarOrden(Dictionary<int, int> idsYOrden)
+        {
             try
             {
                 servicioComandos.Ejecutar(new ModificarOrdenLineUp { IdsYOrden = idsYOrden });
@@ -161,7 +126,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             try
             {
-               // var embarques = workflows.ListarEmbarques();
+                // var embarques = workflows.ListarEmbarques();
                 var embarques = servicio.ListarEmbarques();
                 var estado = servicio.ObtenerEstadoPuerto();
                 var resultado = new ResultadoPrevisualizar();
@@ -213,7 +178,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
                         .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
                     Destinatarios = mail.Destinatarios,
-                    Titulo= $"Line Up {DateTime.Now:dd-MM-yyyy HH:mm}",
+                    Titulo = $"Line Up {DateTime.Now:dd-MM-yyyy HH:mm}",
                     Attachment = resultado.Archivo,
                     AttachmentName = docFile
                 });

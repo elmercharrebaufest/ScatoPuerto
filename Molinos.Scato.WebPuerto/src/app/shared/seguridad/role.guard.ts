@@ -47,7 +47,7 @@ export class RoleGuard implements CanActivateChild{
             case 'alta-embarque': {
                 if (permisos.find(x => x === 'LineUp_AltaEmbarque') && route.params.state){
                     return true;
-                }else{
+                } else{
                     this.navigate(permisos, "alta-embarque");
                 }
                 break;
@@ -117,7 +117,6 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
-
             case 'caratula': {
                 if(permisos.find(x => x === 'Caratula_Visualizar')){
                     return true;
@@ -141,6 +140,14 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "clientes");
                 }
                 break;
+            }
+            case 'destinos': {
+              if (permisos.find(x => x === 'Destinos_Visualizar')) {
+                  return true;
+              }else{
+                  this.navigate(permisos, "destinos");
+              }
+              break;
             }
         }
     }
@@ -191,6 +198,10 @@ export class RoleGuard implements CanActivateChild{
                 this.router.navigate(['/clientes']);
                 break;
             }
+            case 'Destinos_Visualizar':{
+              this.router.navigate(['/destinos']);
+              break;
+          }
         }
     }
 

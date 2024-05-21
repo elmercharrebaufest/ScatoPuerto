@@ -8179,7 +8179,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ExportadorDto> ListaExportadores()
         {
-            return Listar<Exportador, ExportadorDto>();
+            return Listar<Exportador, ExportadorDto>(e => e.Habilitado);
         }
 
         public BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza)
@@ -9623,7 +9623,7 @@ namespace Molinos.Scato.Servicios.Impl
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
                         Cargado = pesoTotalBalanzadas,
-                        Programado = bodega.Cantidad,
+                        Programado = bodega.Cantidad * 1000,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
                         NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
                     };
@@ -9637,7 +9637,7 @@ namespace Molinos.Scato.Servicios.Impl
                     CargasPorBodega cargasPorBodega = new CargasPorBodega()
                     {
                         Cargado = carga.ToneladasAW,
-                        Programado = bodega.Cantidad,
+                        Programado = bodega.Cantidad * 1000,
                         NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
                         NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
                     };
@@ -9662,7 +9662,6 @@ namespace Molinos.Scato.Servicios.Impl
                     else
                     {
                         cargaBodega.Cargado += carga.Cargado;
-                        cargaBodega.Programado += carga.Programado;
                     }
                 }
 
@@ -12155,7 +12154,7 @@ namespace Molinos.Scato.Servicios.Impl
                     if (item.FechaDesamarro != null)
                     {
                         string fechaDesamarro = Convert.ToDateTime(item.FechaDesamarro).ToString("yyyy-MM-dd");
-                        if (item.HoraDesamarro.Length > 0)
+                        if (item.HoraDesamarro?.Length > 0)
                         {
                             fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, item.HoraDesamarro);
                         }
