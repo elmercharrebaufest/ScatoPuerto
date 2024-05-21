@@ -128,7 +128,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   trabajoOrdenado() {
     forkJoin({
       obtenerListado: this.workflowService.obtenerListado(),
-      listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
+      listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUpCalidad()
     })
       .subscribe((res: {
         obtenerListado: InstanciaWorkflowPuerto[],
