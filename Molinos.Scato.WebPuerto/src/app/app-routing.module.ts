@@ -1,20 +1,18 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './modulos/login/login.component';
-import { IniciarSesionComponent } from './shared/componentes/iniciar-sesion/iniciar-sesion.component';
 import { LayoutComponent } from "./shared/componentes/layout/layout.component";
-import { LoginGuard } from './shared/seguridad/login.guard';
 import { RoleGuard } from './shared/seguridad/role.guard';
+import { MaslGuard } from './shared/seguridad/masl.guard';
 
 export const routeConfig: Routes = [
   {
     path: "",
     component: LayoutComponent,
-    canActivate: [LoginGuard],
+    canActivate: [MaslGuard],
     children: [
       {
         path: '',
-        redirectTo: '/lineup',
-        //   redirectTo: '/login',
+       redirectTo: '/lineup',
         pathMatch: 'full'
       },
       {
