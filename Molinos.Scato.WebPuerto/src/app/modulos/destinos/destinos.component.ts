@@ -126,6 +126,7 @@ export class DestinosComponent implements OnInit {
       this.loading = false;
       this.confirmationDialogService.exito('Destino guardado correctamente');
       this.closeModal();
+      this.onBuscar();
     }, (err) => {
       this.loading = false;
       console.error(err);
