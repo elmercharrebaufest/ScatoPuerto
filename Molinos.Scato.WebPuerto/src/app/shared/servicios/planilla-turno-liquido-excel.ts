@@ -308,7 +308,7 @@ export class PlanillaTurnoLiquidoExcelService {
         if (!esRecibidores){
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
             worksheet.getRow(offset).height = 50;
-            worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
+            worksheet.getRow(offset).getCell(3).value = turno.exportador?.nombre;
             worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
             worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
@@ -323,7 +323,7 @@ export class PlanillaTurnoLiquidoExcelService {
         }else{
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
             worksheet.getRow(offset).height = 50;
-            worksheet.getRow(offset).getCell(3).value = turno.exportador.nombre;
+            worksheet.getRow(offset).getCell(3).value = turno.exportador?.nombre;
             worksheet.getRow(offset).getCell(4).value = lineaDescripcion;
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
             worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
