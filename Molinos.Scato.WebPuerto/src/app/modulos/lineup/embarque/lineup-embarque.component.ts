@@ -447,6 +447,15 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   actualizarOrden(posicion) {
+
+    //Se valida para pasar a primera posicion que haya sido enviado a tablerista.
+    if (posicion == 1 && this.instanciaWorkflow.embarque?.estadoBuque?.descripcion.includes('PreOperativo') &&
+    this.instanciaWorkflow.embarque?.sanBenito == true) {
+      let msjError = "No se puede pasar a posición #1 ya que no se ha enviado el plano de carga al tablerista.";
+      this.confirmationDialogService.alertar(msjError);
+      return;
+    }
+
     if (this.hasPermisoLineUp_EditarOrdenEmbarque()) {
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
 

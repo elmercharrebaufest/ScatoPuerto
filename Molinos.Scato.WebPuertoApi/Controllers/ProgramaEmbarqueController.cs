@@ -541,7 +541,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ObtenerNotificaciones(base.nombreUsuario));
+                var response = Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ObtenerNotificaciones(base.nombreUsuario));
+                return response;
             }
             catch (Exception ex)
             {
