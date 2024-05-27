@@ -55,7 +55,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                                     Cargado = x.LineUp.PlanoDeCarga != null && x.LineUp.PlanoDeCarga.Cargado,
                                     NombreUbicacion = ubicaciones.Where(z => z.Id == x.Embarque.Ubicacion).FirstOrDefault()?.Nombre,
                                     EsLiquido = x.Embarque.EsLiquido,
-                                    Muelle = "sanBenito"
+                                    Muelle = "sanBenito",
+                                    Orden = (int) x.LineUp.Orden
                                 }).ToList()
                         );
         }
