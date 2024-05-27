@@ -42,7 +42,7 @@ export class NavtabsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.ordenarEmbarques();
+      this.filtrarEmbarques();
   }
 
   ngOnChanges(change: SimpleChanges) {
@@ -53,14 +53,6 @@ export class NavtabsComponent implements OnInit, OnChanges {
     }
   }
 
-  ordenarEmbarques(){
-    this.elementos.map( (e: any) => {
-      e.orden = this.elementos.indexOf(e) + 1;
-      return e;
-    });
-    this.filtrarEmbarques();
-  }
-
   filtrarEmbarques() {
     this.embarqueId = this._procesoService.getEmbarqueId();
     if (this.elementos.length > 0) {
@@ -68,11 +60,9 @@ export class NavtabsComponent implements OnInit, OnChanges {
         this.elementosSinPlano = this.elementos.filter(e => e.cargado.toString() === 'false');
         this.elementos = this.elementos.filter(e => e.cargado.toString() === 'true');
       }
-      // if (!this.embarqueId) {
-      //   this.embarqueId = this.elementos[0].id;
-      //   this._procesoService.setEmbarque(this.elementos[0].id);
-      // }
-      if (!this.embarqueId) {
+      if(this.embarqueId){
+        this.elementos = this.elementos.filter(e => e.id == this.embarqueId);
+      }else{
         let embarqueSelectedEnLocalStorage = this.obtenerEmbarqueSelectedEnLocalStorage();
         if(!embarqueSelectedEnLocalStorage){
           this.embarqueId = this.elementos[0].id;
@@ -90,15 +80,12 @@ export class NavtabsComponent implements OnInit, OnChanges {
     return embarqueSelected;
   }
 
-  ngAfterViewInit() {
-    let indice = this.elementos.findIndex( x => x.id == this.embarqueId );
-    if(indice > 7)
-      document.getElementById('mostrarMas2').click();
-
-    if (this.elementos.length > 0) {
+  ngAfterViewInit() {   
+    if (this.embarqueId) {
       var elementoSeleccionado = document.getElementById(this.embarqueId.toString());
       if (elementoSeleccionado) elementoSeleccionado.classList.add("btn-seleccionado");
-    } else {
+    } 
+    if(this.elementos.length == 0){
       document.getElementById('addButton').click();
     }
     this.showPlano.emit(true);

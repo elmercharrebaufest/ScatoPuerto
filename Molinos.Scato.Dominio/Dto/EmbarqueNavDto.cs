@@ -17,5 +17,6 @@ namespace Molinos.Scato.Dominio.Dto
         public bool Cargado { get; set; }
         public bool EsLiquido { get; set; }
         public string Muelle { get; set; }
+        public int Orden { get; set; }
     }
 }

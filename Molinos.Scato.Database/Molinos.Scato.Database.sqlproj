@@ -109,6 +109,7 @@
     <None Include="Molinos_1.Scato.Database.publish.xml" />
     <None Include="Molinos.Scato.Database.GVICSQLTEST2016.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.GVICSQLPROD2016.Puerto.publish.xml" />
+    <None Include="Molinos.Scato.Database.GVICSQLUAT.Puerto.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
