@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  qa: false,
+  envName: 'prod',
   apiUrl: '/Scato.WebPuertoApi/api/',
   apiAzureUrl: '/Scato.AzureAD/',
   apiGraph: 'https://graph.microsoft.com/v1.0/',

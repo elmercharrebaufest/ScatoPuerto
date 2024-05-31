@@ -4,6 +4,14 @@
   color: white !important;
 }
 
+.navbarStyle.env-qa {
+  background: #e8eb50 0% 0% no-repeat padding-box !important;
+}
+
+.navbarStyle.env-uat {
+  background: #df9732 0% 0% no-repeat padding-box !important;
+}
+
 .navbarStyle .fa.fa-bars {
   font-size: 29px;
 }

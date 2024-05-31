@@ -5,6 +5,7 @@ import { NotificacionService } from '@ScatoServicios/notificacionProgramaDeEmbar
 import { SessionService } from '@ScatoServicios/session.service';
 // <ARMOA005-1820 Dylan Lopez>
 import { MsalService } from '@azure/msal-angular';
+import { environment } from 'environments/environment';
 // </ ARMOA005-1820 Dylan Lopez>
 
 @Component({
@@ -20,6 +21,7 @@ export class NavbarComponent implements OnInit {
 
   notificacionesVisibles: boolean = false;
   _cantidadNotificaciones: number = 0;
+  public navClass = 'env-' + environment.envName;
   constructor(
     public session: SessionService,
     public router: Router,
@@ -27,15 +29,15 @@ export class NavbarComponent implements OnInit {
     private msalService: MsalService) { }
 
   ngOnInit(): void {
-    this.obtenerNotificaciones();    
+    this.obtenerNotificaciones();
     setInterval(() => {
-      this.obtenerNotificaciones();      
+      this.obtenerNotificaciones();
     }, 30000);
 
     setInterval(() => {
         this._cantidadNotificaciones = this.notificaciones.length;
     }, 1000);
-  } 
+  }
 
   showNotificacionesVisibles = () => {
     if(this.notificaciones.length > 0 || this.notificacionesVisibles)
@@ -56,7 +58,7 @@ export class NavbarComponent implements OnInit {
 
   eliminarNotificacion = (item: NotificacionProgramaDeEmbarque) => {
     this._notificacionService.eliminarNotificacion(item).subscribe((res: any) => {
-      
+
     })
 
     this.notificaciones.splice(this.notificaciones.findIndex((e) => e.id === item.id),1);
@@ -71,7 +73,7 @@ export class NavbarComponent implements OnInit {
   logout = () => {
     console.log('logout');
     console.log(this.session.getUser());
-    
+
     this.session.setUser = null;
     this.session.clear();
     this.msalService.logout();
