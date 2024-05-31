@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
   mensajeError: string = null;
   production: boolean = environment.production;
 
-  public qa: boolean = environment.qa;
+  private env: string = environment.envName;
   public verPermisos: boolean = false;
   private posicionCodigo: number = 0;
   private codigoPermisos: string[] = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'];
@@ -51,19 +51,22 @@ export class LoginComponent implements OnInit {
     { nombre: 'Comex', permiso: 'LAD_MOAAPP_PUERTO_COMEX', checked: false },
     { nombre: 'Sistemas', permiso: 'LAD_MOAAPP_PUERTO_SISTEMA', checked: false },
   ];
+  public loginBtnTxt = 'Iniciar sesión';
+  public loginBtnClass = 'btn-primary';
 
   constructor(
-    private autenticarAd: AutenticadorService, 
-    private router: Router, 
-    private session: SessionService, 
+    private autenticarAd: AutenticadorService,
+    private router: Router,
+    private session: SessionService,
     // <ARMOA005-1819 Dylan Lopez>
-    // private messageService: MessageService, 
+    // private messageService: MessageService,
     private formBuilder: FormBuilder,
     private msalService: MsalService,
     private msalConfigService: MsalConfigService,
     private graphMicrosoftService: GraphMicrosoftService
     // </ ARMOA005-1819 Dylan Lopez>
   ) {
+    this.setEnvVars(this.env);
     this.initFrmLogin();
   }
 
@@ -93,6 +96,16 @@ export class LoginComponent implements OnInit {
         }
       }
     );
+  }
+
+  private setEnvVars(env: string) {
+    if (env == 'qa') {
+      this.loginBtnTxt += ' [QA]';
+      this.loginBtnClass = 'btn-warning';
+    } else if (env == 'uat') {
+      this.loginBtnTxt += ' [UAT]';
+      this.loginBtnClass = 'btn-danger';
+    }
   }
 
   // <ARMOA005-1819 Dylan Lopez>
@@ -148,12 +161,12 @@ export class LoginComponent implements OnInit {
       console.log(' token expired');
     } else {
       console.log(' token is valid');
-      if (!this.qa && !this.production) {
+      if (this.env != 'prod' && this.verPermisos && this.permisosRoles.some(p => p.checked)) {
+        this.gruposAD = this.permisosRoles.filter(p => p.checked).map(p => p.permiso);
+      }
+      else if (this.env == 'dev') {
         console.log(' Develop');
         this.gruposAD = ["LAD_MOAAPP_PUERTO_SISTEMA"];
-      }
-      else if (this.qa && this.verPermisos && this.permisosRoles.some(p => p.checked)){
-        this.gruposAD = this.permisosRoles.filter(p => p.checked).map(p => p.permiso);
       }
       else {
         await this.getPermissions();
@@ -169,7 +182,7 @@ export class LoginComponent implements OnInit {
         user.autenticado = true;
         user.permisos = this.gruposAD;
         this.obtenerGruposAD(user);
-      } else{
+      } else {
         this.iniciandoSession = false;
         this.mensajeError = "No tiene roles asignados";
         this.mostrarError();
@@ -182,10 +195,10 @@ export class LoginComponent implements OnInit {
     console.log('decodeJwt');
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
-    
+
     return JSON.parse(jsonPayload);
   }
 
@@ -284,14 +297,14 @@ export class LoginComponent implements OnInit {
 
   navigate = (permisos) => {
     console.log('navigate');
-    let primerPermiso = permisos.find((p: string) => 
-      p == 'Comex_Nominacion_Ver' || 
-      p == 'LineUp_Ver' || 
-      p == 'Carga_Ver' || 
-      p == 'Recibidores_Ver' || 
-      p == 'Geolocalizacion_Ver' || 
-      p == 'Buque_Ver' || 
-      p == 'Coem_Visualizar' || 
+    let primerPermiso = permisos.find((p: string) =>
+      p == 'Comex_Nominacion_Ver' ||
+      p == 'LineUp_Ver' ||
+      p == 'Carga_Ver' ||
+      p == 'Recibidores_Ver' ||
+      p == 'Geolocalizacion_Ver' ||
+      p == 'Buque_Ver' ||
+      p == 'Coem_Visualizar' ||
       p == 'Caratula_Visualizar');
     if (primerPermiso == undefined) {
       this.iniciandoSession = false;
@@ -349,7 +362,7 @@ export class LoginComponent implements OnInit {
 
   @HostListener('window:keyup', ['$event'])
   KeyUp(event: KeyboardEvent) {
-    if (!this.qa) {
+    if (this.env == 'prod') {
       return;
     }
     if (event.key == this.codigoPermisos[this.posicionCodigo]) {

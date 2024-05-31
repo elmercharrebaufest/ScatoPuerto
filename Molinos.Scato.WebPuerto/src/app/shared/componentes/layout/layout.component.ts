@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent, Event } from '@angular/router';
 import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { environment } from 'environments/environment';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -16,6 +17,7 @@ export class LayoutComponent implements OnInit {
   keyClose: boolean = false;
   private user: any;
   rutaActual: string;
+  public envClass = 'env-' + environment.envName;
 
   constructor(
     private router: Router,

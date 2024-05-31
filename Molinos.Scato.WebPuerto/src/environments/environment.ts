@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  qa: false,
+  envName: 'uat',
   apiUrl: '/api/',
   apiAzureUrl: 'http://localhost/Scato.AzureAD/',
   apiGraph: 'https://graph.microsoft.com/v1.0/',

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbarStyle demo-header">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbarStyle demo-header" [ngClass]="[navClass]">
   <a (click)="onClickHandler()" class="demo-header__toggle"></a>
   <div class="col-lg-2 col-md-3">  <!--d-md-block">-->
     <input class="form-control search d-none" type="search" placeholder="&#xF002; Buscar" aria-label="Search">
