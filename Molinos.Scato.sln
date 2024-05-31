@@ -524,7 +524,7 @@ Global
 		{DF241327-2EA0-4CC6-AD9C-F47A727F3D77} = {F8FDCB7F-DBC6-4EC8-A409-3CB5B387EC2E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_NeutralResourcesLanguage = es-AR
 		SolutionGuid = {9DDEFB12-34EF-487C-AD39-BE59400A56B5}
+		RESX_NeutralResourcesLanguage = es-AR
 	EndGlobalSection
 EndGlobal
