@@ -22,10 +22,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         {
 
             this.FechaInicio = fechaInicio;
-            this.Productos = productos;
+            this.Productos = productos ?? new List<string>(); 
             this.paginacion = paginacion;
-            this.Muelles = muelles;
-            this.Buques = buques;
+            this.Muelles = muelles ?? new List<string>();
+            this.Buques = buques ?? new List<string>();
         }
 
         public ListaPaginada<ProgramaEmbarqueDto> Ejecutar(DbContext contexto)
@@ -36,62 +36,59 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
 
                 ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
-                var resultado = from item in contexto.Set<Nominacion>()
-                                where (FechaInicio == null || (item.NominacionDatoTecnico.ETARecalada.Value.Year == FechaInicio.Value.Year &&
-                                item.NominacionDatoTecnico.ETARecalada.Value.Month == FechaInicio.Value.Month))
-                                && (item.Embarque == null || item.Embarque.Ubicacion != 1)
-                                && (item.FechaEliminacion == null || (ayer < item.FechaEliminacion.Value && item.FechaEliminacion.Value < hoy))
-                                && item.NominacionDatoTecnico.TipoDeContrato.Descripcion != "FAS"
-
-                                orderby item.FechaCreacion descending
-
-                                select new ProgramaEmbarqueDto
+                var resultado = contexto.Set<Nominacion>()
+                                .Where(n => (FechaInicio == null || n.NominacionDatoTecnico.ETARecalada.Value.Year == FechaInicio.Value.Year &&
+                                n.NominacionDatoTecnico.ETARecalada.Value.Month == FechaInicio.Value.Month)
+                                && (n.FechaEliminacion == null || (ayer < n.FechaEliminacion.Value && n.FechaEliminacion.Value < hoy))
+                                && n.NominacionDatoTecnico.TipoDeContrato.Descripcion != "FAS"
+                                && ((n.Embarque == null && !n.Embarques.Any()) || (n.Embarque.Ubicacion !=1 || n.Embarques.Any(e => e.Embarque.Ubicacion != 1)))
+                                ).Select(pe => new ProgramaEmbarqueDto
                                 {
-                                    Id = item.Id,
-                                    ProductoColor = item.NominacionDatoTecnico.MaterialPuerto.Color,
-                                    Producto = item.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles ?? item.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
-                                    FechaEliminacion = item.FechaEliminacion.HasValue ? item.FechaEliminacion : null,
-                                    FechaCreacion = item.FechaCreacion.HasValue ? item.FechaCreacion : null,
-                                    FechaEnvioLineUp = item.FechaEnvioLineUp.HasValue ? item.FechaEnvioLineUp : null,
-                                    NombreBuque = item.NominacionDatoTecnico.VaporInformacion.NombreBuque,
-                                    MuelleDeCarga = item.NominacionDatoTecnico.MuelleDeCarga.Descripcion,
-                                    Cargadores = from nominacionDatoTecnico in contexto.Set<NominacionDatoTecnicoExportador>()
-                                                 where nominacionDatoTecnico.NominacionDatoTecnico.Id == item.NominacionDatoTecnico.Id
-                                                 select new NominacionCargadorDto()
-                                                 {
-                                                     NombreExportador = nominacionDatoTecnico.Exportador.Nombre,
-                                                     Toneladas = nominacionDatoTecnico.Cantidad
-                                                 },
-                                    ETARecalada = item.NominacionDatoTecnico.ETARecalada != null ? item.NominacionDatoTecnico.ETARecalada : null,
-                                    EnviadoFumigador = item.EnviadoFumigador,
-                                    EnviadoOtros = item.EnviadoOtros,
-                                    EnviadoSurveyor = item.EnviadoSurveyor,
-                                    Contrato = item.NominacionDatoTecnico.TipoDeContrato.Descripcion,
-                                    Estado = item.FechaEnvioLineUp.HasValue && !item.FechaEliminacion.HasValue ? 1 :
-                                    (item.FechaCreacion < hoy && item.FechaCreacion > ayer) && !item.FechaEliminacion.HasValue ? 2
-                                    : item.FechaCreacion < ayer && !item.FechaEliminacion.HasValue ? 3 : item.FechaEliminacion.HasValue ? 4 : 0,
+                                    Id = pe.Id,
+                                    ProductoColor = pe.NominacionDatoTecnico.MaterialPuerto.Color,
+                                    Producto = pe.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles ?? pe.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta,
+                                    FechaEliminacion = pe.FechaEliminacion.HasValue ? pe.FechaEliminacion : null,
+                                    FechaCreacion = pe.FechaCreacion.HasValue ? pe.FechaCreacion : null,
+                                    FechaEnvioLineUp = pe.FechaEnvioLineUp.HasValue ? pe.FechaEnvioLineUp : null,
+                                    NombreBuque = pe.NominacionDatoTecnico.VaporInformacion.NombreBuque,
+                                    MuelleDeCarga = pe.NominacionDatoTecnico.MuelleDeCarga.Descripcion,
+                                    Cargadores = contexto.Set<NominacionDatoTecnicoExportador>().Where(ndte =>
+                                    ndte.NominacionDatoTecnico.Id == pe.NominacionDatoTecnico.Id).Select(nc => new NominacionCargadorDto
+                                    {
+                                        NombreExportador = nc.Exportador.Nombre,
+                                        Toneladas = nc.Cantidad
+                                    }),
+                                    ETARecalada = pe.NominacionDatoTecnico.ETARecalada != null ? pe.NominacionDatoTecnico.ETARecalada : null,
+                                    EnviadoFumigador = pe.EnviadoFumigador,
+                                    EnviadoOtros = pe.EnviadoOtros,
+                                    EnviadoSurveyor = pe.EnviadoSurveyor,
+                                    Contrato = pe.NominacionDatoTecnico.TipoDeContrato.Descripcion,
+                                    Estado = pe.FechaEnvioLineUp.HasValue && !pe.FechaEliminacion.HasValue ? 1 :
+                                    (pe.FechaCreacion < hoy && pe.FechaCreacion > ayer) && !pe.FechaEliminacion.HasValue ? 2
+                                    : pe.FechaCreacion < ayer && !pe.FechaEliminacion.HasValue ? 3 : pe.FechaEliminacion.HasValue ? 4 : 0,
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
                                     ItemsTotales = 0,
-                                    CompaniaFumigador = item.NominacionDetalleIntervencion != null && item.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ?
-                                    item.NominacionDetalleIntervencion.CompaniaDeFumigacion.Descripcion : "",
-                                    Surveyor = item.NominacionDatoTecnico.Surveyor != null ? item.NominacionDatoTecnico.Surveyor.Descripcion : ""
-                                };
+                                    CompaniaFumigador = pe.NominacionDetalleIntervencion != null && pe.NominacionDetalleIntervencion.CompaniaDeFumigacion != null ?
+                                    pe.NominacionDetalleIntervencion.CompaniaDeFumigacion.Descripcion : "",
+                                    Surveyor = pe.NominacionDatoTecnico.Surveyor != null ? pe.NominacionDatoTecnico.Surveyor.Descripcion : ""
+                                }).OrderBy(r => r.FechaCreacion);
 
-                var resultados = resultado.ToList().Where(x => (
-                (!string.IsNullOrEmpty(x.Producto) && (Productos == null || Productos.Any(y => y.Contains(x.Producto))))) &&
-                (!string.IsNullOrEmpty(x.NombreBuque) && (Buques == null || Buques.Any(y => y.Contains(x.NombreBuque)))) &&
-                (!string.IsNullOrEmpty(x.MuelleDeCarga) && (Muelles == null || Muelles.Any(y => y.Contains(x.MuelleDeCarga)))));
+                var resultados = resultado.Where(x => (
+                (!string.IsNullOrEmpty(x.Producto) && (!Productos.Any() || Productos.Any(y => y.Contains(x.Producto))))) &&
+                (!string.IsNullOrEmpty(x.NombreBuque) && (!Buques.Any() || Buques.Any(y => y.Contains(x.NombreBuque)))) &&
+                (!string.IsNullOrEmpty(x.MuelleDeCarga) && (!Muelles.Any() || Muelles.Any(y => y.Contains(x.MuelleDeCarga)))));
 
                 var itemsTotales = resultados.Count();
                 resultados = resultados.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)
                     .Take(paginacion.ItemsPorPagina);
+                var lista = resultados.ToList();
                 if (resultados != null && resultados.Count() > 0)
                 {
-                    resultados.FirstOrDefault().ItemsTotales = itemsTotales;
+                    lista.FirstOrDefault().ItemsTotales = itemsTotales;
                 }
 
-                return new ListaPaginada<ProgramaEmbarqueDto>(resultados.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+                return new ListaPaginada<ProgramaEmbarqueDto>(lista, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
 
             }
             catch (Exception ex)
@@ -99,5 +96,6 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 throw;
             }
         }
+
     }
 }

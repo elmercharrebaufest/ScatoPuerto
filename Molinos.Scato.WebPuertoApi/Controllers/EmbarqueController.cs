@@ -144,7 +144,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             if (CantidadDeDestinos(embarque) == 1)
             {
                 comandos.Ejecutar(new ModificarEmbarque { Dto = embarque });
-                if (embarque.UbicacionDeBuque.Orden == 1) // Zarpó
+                if (embarque.UbicacionDeBuque != null && embarque.UbicacionDeBuque.Orden == 1) // Zarpó
                 {
                     var resultado = comandos.Ejecutar(new EnvioMailZarpado { EmbarqueId = embarque.Id });
                     if (resultado.HayErrores)
@@ -156,22 +156,26 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             else
             {
                 //Crear Nuevo
-
+                int res;
                 if (embarque.Vicentin && !embarqueDb.Vicentin && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "vicentin"))
                 {
-                    IngresarEmbarque(embarque, true, false, false, false);
+                    res = IngresarEmbarque(embarque, true, false, false, false);
+                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
                 }
                 if (embarque.SanBenito && !embarqueDb.SanBenito && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "sanBenito"))
                 {
-                    IngresarEmbarque(embarque, false, true, false, false);
+                    res = IngresarEmbarque(embarque, false, true, false, false);
+                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
                 }
                 if (embarque.Noryon && !embarqueDb.Noryon && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "noryon"))
                 {
-                    IngresarEmbarque(embarque, false, false, true, false);
+                    res = IngresarEmbarque(embarque, false, false, true, false);
+                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
                 }
                 if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "otrosMuelles"))
                 {
-                    IngresarEmbarque(embarque, false, false, false, true);
+                    res = IngresarEmbarque(embarque, false, false, false, true);
+                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
                 }
                 //Eliminar
                 if (!embarque.Vicentin && embarqueDb.Vicentin)

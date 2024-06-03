@@ -2030,7 +2030,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ListaPaginada<VaporDto> ListarVapores(Paginacion paginacion, string filtro);
-        
+
         [OperationContract]
         ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string filtro);
 
@@ -2674,19 +2674,19 @@ namespace Molinos.Scato.Servicios
         //Dictionary<string, string> ObtenerRitmosDeEmbarque(int vapor_id);
         [OperationContract]
         IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
-        
+
         [OperationContract]
         List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
-      
+
         [OperationContract]
         List<HistoricoActoresDto> ListarOperadores(int Embarque_Id);
-    
+
 
         [OperationContract]
         void GuardarHistoricoActor(int Embarque_Id, string accion, string nombreUsuario);
 
         [OperationContract]
-        IList<VaporDto> ObtenerVapores();   
+        IList<VaporDto> ObtenerVapores();
 
         [OperationContract]
         VaporInformacionDto ObtenerVaporInformacion(int vapor_id);
@@ -2768,7 +2768,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);
 
-      
+
         [OperationContract]
         List<LogABM> ObtenerInformacionLog(int claseId);
 
@@ -2784,9 +2784,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
 
-		// <ARMOA005-1421 Dylan Lopez>
-		[OperationContract]
-		IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId);
-		// </ ARMOA005-1421 Dylan Lopez>
-	}
+        // <ARMOA005-1421 Dylan Lopez>
+        [OperationContract]
+        IList<HistoricoEmbarqueLineUpDto> ListarHistoricoEmbarqueLineUpDto(int embarqueId);
+        // </ ARMOA005-1421 Dylan Lopez>
+        [OperationContract]
+        void AsociarEmbarqueCreadoEnLineUpANominacion(EmbarqueDto embarqueDto, int idEmbarque);
+    }
 }
