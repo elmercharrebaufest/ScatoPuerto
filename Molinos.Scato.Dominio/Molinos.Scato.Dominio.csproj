@@ -109,6 +109,7 @@
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\AgenciaMaritimaATADto.cs" />
+    <Compile Include="Dto\NominacionEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
@@ -1148,6 +1149,7 @@
     <Compile Include="Entidades\NominacionDatoTecnicoDestino.cs" />
     <Compile Include="Entidades\NominacionDatoTecnicoExportador.cs" />
     <Compile Include="Entidades\NominacionDetalleIntervencion.cs" />
+    <Compile Include="Entidades\NominacionEmbarque.cs" />
     <Compile Include="Entidades\NominacionRecibo.cs" />
     <Compile Include="Entidades\NotificacionProgramaDeEmbarque.cs" />
     <Compile Include="Entidades\NotificacionExcluidos.cs" />

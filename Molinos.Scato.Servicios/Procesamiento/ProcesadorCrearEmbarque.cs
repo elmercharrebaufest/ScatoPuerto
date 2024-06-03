@@ -94,6 +94,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Puntal = comando.Embarque.Puntal,
                         FechaLibrePlatica = comando.Embarque.FechaLibrePlatica,
                         HoraLibrePlatica = comando.Embarque.HoraLibrePlatica,
+                        EstadoBuque = Repositorio.Obtener<EstadoBuque>(x => x.Descripcion == "PreOperativo"),
                         //Imo = comando.Embarque.Imo;
                         CantidadBodegasTanques = comando.Embarque.CantidadBodegasTanques,
                         Recorrido = recorrido

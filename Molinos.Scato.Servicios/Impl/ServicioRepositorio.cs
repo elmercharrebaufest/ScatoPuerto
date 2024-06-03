@@ -1671,6 +1671,18 @@ namespace Molinos.Scato.Servicios.Impl
             //return Obtener<Embarque, EmbarqueDto>(id);
         }
 
+        private Nominacion ObtenerNominacionPorIdEmbarque(int idEmbarque)
+        {
+            var nominacion = this.repositorio.Obtener<Nominacion>(n => n.Embarque.Id == idEmbarque);
+            if(nominacion == null)
+            {
+                var idNominacion = this.repositorio.Obtener<NominacionEmbarque>(ne => ne.Embarque.Id == idEmbarque).Nominacion.Id;
+                nominacion = this.repositorio.Obtener<Nominacion>(n => n.Id == idNominacion);
+            }
+            return nominacion;
+        }
+
+
         public OrdenCargaInternaFasonDto ObtenerOrdenCargaInternaFason(int id)
         {
             return Obtener<OrdenCargaInternaFason, OrdenCargaInternaFasonDto>(id);
@@ -12351,6 +12363,23 @@ namespace Molinos.Scato.Servicios.Impl
 				throw ex;
 			}
 		}
-		// </ ARMOA005-1421 Dylan Lopez>
-	}
+
+        // </ ARMOA005-1421 Dylan Lopez>
+
+        public void AsociarEmbarqueCreadoEnLineUpANominacion(EmbarqueDto embarqueDto, int idEmbarque)
+        {
+            try
+            {
+                var nominacion = this.ObtenerNominacionPorIdEmbarque(embarqueDto.Id);
+                var embarqueCreado = this.repositorio.Obtener<Embarque>(idEmbarque);
+                this.repositorio.Agregar(new NominacionEmbarque { Embarque = embarqueCreado, Nominacion = nominacion });
+                this.repositorio.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                log.Error($"Error en metodo: AsociarEmbarqueCreadoEnLineUpANominacion, params: {embarqueDto.ToJson()}, {idEmbarque}", e);
+                throw e;
+            }
+        }
+    }
 }
