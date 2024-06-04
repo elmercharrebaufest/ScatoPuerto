@@ -25,12 +25,14 @@ import { Bandera } from '@ScatoModels/bandera';
 import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { Vapor } from '@ScatoModels/embarque';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { Pais } from '@ScatoModels/Buques/Pais';
 import { EmbarqueCoordinador } from '@ScatoModels/embarque-coordinador';
 import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 import { NominacionRecibosComponent } from 'app/modulos/programa-embarque/nominacion/nominacion-recibos/nominacion-recibos.component';
+import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 
 @Component({
   selector: 'app-alta-embarque',
@@ -71,6 +73,7 @@ export class AltaEmbarqueComponent implements OnInit {
   vaporInfo: VaporInformacion
   banderasBuque: Bandera[];
   listadoBanderaModificada: boolean = false;
+  tipoContratoNominacion: string;
   @ViewChild('horaRecalada') horaRecalada: ElementRef;
   @ViewChild('horaDesdeLimpieza') horaDesdeLimpieza: ElementRef;
   @ViewChild('horaHastaLimpieza') horaHastaLimpieza: ElementRef;
@@ -81,6 +84,8 @@ export class AltaEmbarqueComponent implements OnInit {
   private vaporSeleccionado;
   private parametrosSel;
   private muelleInicial: string;
+  private destroy$ = new Subject();
+
   @ViewChild(NominacionRecibosComponent) datoRecibos: NominacionRecibosComponent;
   // #endregion
 
@@ -97,11 +102,11 @@ export class AltaEmbarqueComponent implements OnInit {
       private workflowService: WorkflowService,
       private moduloCargaService: ModuloDeCargaService,
       private buqueService: BuqueService,
-
-
+      private nominacionService: NominacionService
     ) {
     this.state = this.route.snapshot.params.state;
     this.embarqueId = this.route.snapshot.params.id ? this.route.snapshot.params.id : 0;
+    
   }
   // #endregion
 
@@ -113,7 +118,10 @@ export class AltaEmbarqueComponent implements OnInit {
     this.deshabilitaMuelleCarga();
     this.cargarListados();
     // this.editarCrearBuque();
+  }
 
+  ngOnDestroy() {
+    this.nominacionService.NominacionParametros = undefined;
   }
   // #endregion
 
@@ -351,6 +359,12 @@ export class AltaEmbarqueComponent implements OnInit {
           }
           this.mostrarSpinner = false;
           //this.embarqueForm.controls.tipoDeBuque.disable();
+
+          /** Necesario para Edicion embarque FAS **/
+          this.tipoContratoNominacion = this.embarqueSeleccionado.tipoContratoNominacion;
+          if(this.tipoContratoNominacion == 'FAS' && this.embarqueSeleccionado.nominacionId > 0){
+            this.asignarNominacionParametros(this.embarqueSeleccionado.nominacionId);
+          }
 
         },
         errmess => {
@@ -1323,4 +1337,24 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.value.coordinadoresList.push(obj)
     });
   }
+
+  private asignarNominacionParametros(nominacionId: number) {
+    let nominacionParametos: NominacionParametros = {
+      nominacion_Id: nominacionId,
+      actualizarDatoTecnico: true,
+      actualizarRecibos: true,
+      actualizarIntervenciones: true,
+      nominacion: null,
+    };
+    if (nominacionId > 0) {
+      this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data => {
+        nominacionParametos.nominacion = data;
+        this.nominacionService.NominacionParametros = nominacionParametos;
+      });
+    } else {
+      this.nominacionService.NominacionParametros = nominacionParametos;
+    }
+  }
+
+
 }

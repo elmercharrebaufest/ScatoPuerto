@@ -1665,23 +1665,32 @@ namespace Molinos.Scato.Servicios.Impl
                         embarqueDto.FilePathImgLineUp = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
                     }
                 }
+
+                var nominacion = this.ObtenerNominacionPorIdEmbarque(id);
+                embarqueDto.NominacionId = (int)nominacion?.Id;
+                embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
             }
 
             return embarqueDto;
-            //return Obtener<Embarque, EmbarqueDto>(id);
         }
 
         private Nominacion ObtenerNominacionPorIdEmbarque(int idEmbarque)
         {
-            var nominacion = this.repositorio.Obtener<Nominacion>(n => n.Embarque.Id == idEmbarque);
-            if(nominacion == null)
+            var nominacion = repositorio.Obtener<Nominacion>(n => n.Embarque.Id == idEmbarque);
+            if (nominacion != null)
             {
-                var idNominacion = this.repositorio.Obtener<NominacionEmbarque>(ne => ne.Embarque.Id == idEmbarque).Nominacion.Id;
-                nominacion = this.repositorio.Obtener<Nominacion>(n => n.Id == idNominacion);
+                return nominacion;
             }
+
+            var nominacionEmbarque = repositorio.Obtener<NominacionEmbarque>(ne => ne.Embarque.Id == idEmbarque);
+            if (nominacionEmbarque != null)
+            {
+                var idNominacion = nominacionEmbarque.Nominacion.Id;
+                nominacion = repositorio.Obtener<Nominacion>(n => n.Id == idNominacion);
+            }
+
             return nominacion;
         }
-
 
         public OrdenCargaInternaFasonDto ObtenerOrdenCargaInternaFason(int id)
         {
