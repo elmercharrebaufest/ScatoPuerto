@@ -24,42 +24,45 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             try
             {
-                var embarqueBase = Repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == comando.IdModuloDeCarga).Embarque;
-
-                if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
-                    return;
-
-                //Si es un buque que no está en calidad (3 = ControlCalidad)
-                if (embarqueBase.EstadoBuque.Id != 3)
-                    EnviarCalidad(embarqueBase);
-
-
-                IList<Carga> cargasBalanza;
-
-                //Obtengo todos los registros de la tabla BalanzasCortes cuya fecha y hora sea posterior a la fecha de inicio de la carga.
-                var listaRegistros = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == comando.IdModuloDeCarga).Where(x => x.Fecha_Inicio >= embarqueBase.FechaHoraInicioCarga).OrderBy(x => x.Fecha_Corte);
-
-                if (listaRegistros.Count() > 0)
+				var lineup = Repositorio.Obtener<LineUp>(x => x.ModuloDeCarga.Id == comando.IdModuloDeCarga);
+                if (lineup != null)
                 {
-                    var ultimoRegistro = listaRegistros.Last();
-                    cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == embarqueBase.Vapor.Id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio > ultimoRegistro.Fecha_Corte && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
-                }
-                else
-                {
-                    cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == embarqueBase.Vapor.Id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
-                }
+					var embarqueBase = lineup.Embarque;
 
-                ObtenerBalanzadasCargas(cargasBalanza);
+					if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
+						return;
 
-                ValidarCargasRegistroBalanzasCortes(comando.IdModuloDeCarga, listaBalanza7);
-                ValidarCargasRegistroBalanzasCortes(comando.IdModuloDeCarga, listaBalanza8);
+					//Si es un buque que no está en calidad (3 = ControlCalidad)
+					if (embarqueBase.EstadoBuque.Id != 3)
+						EnviarCalidad(embarqueBase);
 
 
-                ValidarBajaCarga(comando.IdModuloDeCarga, embarqueBase.Vapor.Id);
+					IList<Carga> cargasBalanza;
 
-                //Genero los turnos
-                ProcesarCargasPlanillaSolidos(comando.IdModuloDeCarga);
+					//Obtengo todos los registros de la tabla BalanzasCortes cuya fecha y hora sea posterior a la fecha de inicio de la carga.
+					var listaRegistros = Repositorio.Listar<BalanzasCortes>(x => x.ModuloDeCarga_id == comando.IdModuloDeCarga).Where(x => x.Fecha_Inicio >= embarqueBase.FechaHoraInicioCarga).OrderBy(x => x.Fecha_Corte);
 
+					if (listaRegistros.Count() > 0)
+					{
+						var ultimoRegistro = listaRegistros.Last();
+						cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == embarqueBase.Vapor.Id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio > ultimoRegistro.Fecha_Corte && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
+					}
+					else
+					{
+						cargasBalanza = Repositorio.Listar<Carga>(x => x.Vapor.Id == embarqueBase.Vapor.Id && x.ToneladasAW != 0 && x.CargaOpuesta_Id > 0 && x.FechaInicio >= embarqueBase.FechaHoraInicioCarga);
+					}
+
+					ObtenerBalanzadasCargas(cargasBalanza);
+
+					ValidarCargasRegistroBalanzasCortes(comando.IdModuloDeCarga, listaBalanza7);
+					ValidarCargasRegistroBalanzasCortes(comando.IdModuloDeCarga, listaBalanza8);
+
+
+					ValidarBajaCarga(comando.IdModuloDeCarga, embarqueBase.Vapor.Id);
+
+					//Genero los turnos
+					ProcesarCargasPlanillaSolidos(comando.IdModuloDeCarga);
+				}
             }
             catch (Exception ex)
             {
