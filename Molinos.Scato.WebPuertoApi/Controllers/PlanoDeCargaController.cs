@@ -337,7 +337,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.BalanzadasBuque(IdModuloDeCarga));
+                var balanzadas = servicio.BalanzadasBuque(IdModuloDeCarga);
+				return Request.CreateResponse(HttpStatusCode.OK, balanzadas);
             }
             catch (Exception ex)
             {

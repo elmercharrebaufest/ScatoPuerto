@@ -101,7 +101,7 @@ export class LoginComponent implements OnInit {
   private setEnvVars(env: string) {
     if (env == 'qa') {
       this.loginBtnTxt += ' [QA]';
-      this.loginBtnClass = 'btn-warning';
+      this.loginBtnClass = 'btn-success';
     } else if (env == 'uat') {
       this.loginBtnTxt += ' [UAT]';
       this.loginBtnClass = 'btn-danger';
