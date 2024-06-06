@@ -1666,17 +1666,25 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 }
 
-                var nominacion = this.ObtenerNominacionPorIdEmbarque(id);
-                embarqueDto.NominacionId = (int)nominacion?.Id;
-                embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
+                if (EsEmbarqueFAS(id))
+                {
+                    var nominacion = ObtenerNominacionPorIdEmbarque(id);
+                    embarqueDto.NominacionId = (int)nominacion?.Id;
+                    embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
+                }
             }
 
             return embarqueDto;
         }
 
+        private bool EsEmbarqueFAS(int idEmbarque)
+        {
+            return this.repositorio.Existe<Nominacion>(n => n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" && n.Embarque.Id == idEmbarque);
+        }
+
         private Nominacion ObtenerNominacionPorIdEmbarque(int idEmbarque)
         {
-            var nominacion = repositorio.Obtener<Nominacion>(n => n.Embarque.Id == idEmbarque);
+            var nominacion = repositorio.ObtenerPrimero<Nominacion>(n => n.Embarque.Id == idEmbarque);
             if (nominacion != null)
             {
                 return nominacion;
