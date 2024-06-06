@@ -9,6 +9,7 @@ using Molinos.Scato.Servicios.AFIP;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Impl;
+using Molinos.Scato.Test.Mock;
 using Moq;
 using Ninject;
 using Ninject.Extensions.Logging;
@@ -23,33 +24,37 @@ namespace Molinos.Scato.Test.Servicios
 {
     public class ComunicacionEmbarqueServicioHelperTests
     {
-        private Mock<IAccesoComunicacionEmbarque> mockAcceso;
-        private Mock<wgescomunicacionembarqueSoap> mockWebService;
-        private Mock<IConversor> mockConversor;
+        private Mock<IAccesoComunicacionEmbarque> _mockAcceso;
+        private Mock<wgescomunicacionembarqueSoap> _mockWebService;
+        private Mock<IConversor> _mockConversor;
         private ILogger _logger;
-        private Mock<IAfipClient> mockAfipClient;
-        // Otros mocks necesarios
+        private Mock<IAfipClient> _mockAfipClient;
+		private Mock<IServicioRepositorio> _mockServicioRepositorio;
+		// Otros mocks necesarios
 
-        private ComunicacionEmbarqueServicioHelper servicioHelper;
+		private ComunicacionEmbarqueServicioHelper servicioHelper;
 
         [SetUp]
         public void Setup()
         {
-            mockAcceso = new Mock<IAccesoComunicacionEmbarque>();
-            mockWebService = new Mock<wgescomunicacionembarqueSoap>();
-            mockConversor = new Mock<IConversor>();
-            mockAfipClient = new Mock<IAfipClient>();
-            mockAcceso.Setup(s => s.Obtener(It.IsAny<string>(), It.IsAny<Resultado>(), It.IsAny<string>())).Returns(new TicketAccesoAfip());
+            _mockAcceso = new Mock<IAccesoComunicacionEmbarque>();
+            _mockWebService = new Mock<wgescomunicacionembarqueSoap>();
+            _mockConversor = new Mock<IConversor>();
+            _mockAfipClient = new Mock<IAfipClient>();
+			_mockServicioRepositorio = new Mock<IServicioRepositorio>();
+
+			_mockAcceso.Setup(s => s.Obtener(It.IsAny<string>(), It.IsAny<Resultado>(), It.IsAny<string>())).Returns(new TicketAccesoAfip());
             var a = Path.GetFullPath("log4net.config");
             Console.WriteLine(Path.GetFullPath("log4net.config"));
 
             _logger = ConfigureLog();
 
-            servicioHelper = new ComunicacionEmbarqueServicioHelper(mockAcceso.Object,
-                mockWebService.Object,
-                mockConversor.Object,
+            servicioHelper = new ComunicacionEmbarqueServicioHelper(_mockAcceso.Object,
+                _mockWebService.Object,
+                _mockConversor.Object,
                 _logger,
-                mockAfipClient.Object);
+                _mockAfipClient.Object,
+				_mockServicioRepositorio.Object);
         }
 
         [Ignore]
@@ -70,13 +75,15 @@ namespace Molinos.Scato.Test.Servicios
             var dto = new AfipCaratulaDto();
             var respuestaEsperada = new RegistrarCaratulaResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(co => co.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.RegistrarCaratula(It.IsAny<RegistrarCaratulaRequest1>()))
+            _mockWebService.Setup(ws => ws.RegistrarCaratula(It.IsAny<RegistrarCaratulaRequest1>()))
                 .Returns(respuestaEsperada);
+            _mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+                .Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.RegistrarCaratula(dto);
+			// Act
+			var resultado = servicioHelper.RegistrarCaratula(dto);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -90,13 +97,15 @@ namespace Molinos.Scato.Test.Servicios
             var dto = new AfipCaratulaDto();
             var respuestaEsperada = new RectificarCaratulaResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.RectificarCaratula(It.IsAny<RectificarCaratulaRequest1>()))
+            _mockWebService.Setup(ws => ws.RectificarCaratula(It.IsAny<RectificarCaratulaRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.RectificarCaratula(dto);
+			// Act
+			var resultado = servicioHelper.RectificarCaratula(dto);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -110,13 +119,15 @@ namespace Molinos.Scato.Test.Servicios
             var identificadorCaratula = string.Empty;
             var respuestaEsperada = new AnularCaratulaResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.AnularCaratula(It.IsAny<AnularCaratulaRequest1>()))
+            _mockWebService.Setup(ws => ws.AnularCaratula(It.IsAny<AnularCaratulaRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.AnularCaratula(identificadorCaratula);
+			// Act
+			var resultado = servicioHelper.AnularCaratula(identificadorCaratula);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -130,13 +141,15 @@ namespace Molinos.Scato.Test.Servicios
             var dto = new AfipCoemDto();
             var respuestaEsperada = new RegistrarCOEMResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.RegistrarCOEM(It.IsAny<RegistrarCOEMRequest1>()))
+            _mockWebService.Setup(ws => ws.RegistrarCOEM(It.IsAny<RegistrarCOEMRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.RegistrarCOEM(dto);
+			// Act
+			var resultado = servicioHelper.RegistrarCOEM(dto);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -150,13 +163,15 @@ namespace Molinos.Scato.Test.Servicios
             var dto = new AfipCoemDto();
             var respuestaEsperada = new RectificarCOEMResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.RectificarCOEM(It.IsAny<RectificarCOEMRequest1>()))
+            _mockWebService.Setup(ws => ws.RectificarCOEM(It.IsAny<RectificarCOEMRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.RectificarCOEM(dto);
+			// Act
+			var resultado = servicioHelper.RectificarCOEM(dto);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -171,13 +186,15 @@ namespace Molinos.Scato.Test.Servicios
             var identificadorCOEM = string.Empty;
             var respuestaEsperada = new AnularCOEMResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.AnularCOEM(It.IsAny<AnularCOEMRequest1>()))
+            _mockWebService.Setup(ws => ws.AnularCOEM(It.IsAny<AnularCOEMRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.AnularCOEM(identificadorCaratula, identificadorCOEM);
+			// Act
+			var resultado = servicioHelper.AnularCOEM(identificadorCaratula, identificadorCOEM);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -192,13 +209,15 @@ namespace Molinos.Scato.Test.Servicios
             var identificadorCOEM = string.Empty;
             var respuestaEsperada = new CerrarCOEMResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.CerrarCOEM(It.IsAny<CerrarCOEMRequest1>()))
+            _mockWebService.Setup(ws => ws.CerrarCOEM(It.IsAny<CerrarCOEMRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.CerrarCOEM(identificadorCaratula, identificadorCOEM);
+			// Act
+			var resultado = servicioHelper.CerrarCOEM(identificadorCaratula, identificadorCOEM);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -213,13 +232,15 @@ namespace Molinos.Scato.Test.Servicios
             var identificadorCOEM = string.Empty;
             var respuestaEsperada = new SolicitarAnulacionCOEMResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.SolicitarAnulacionCOEM(It.IsAny<SolicitarAnulacionCOEMRequest1>()))
+            _mockWebService.Setup(ws => ws.SolicitarAnulacionCOEM(It.IsAny<SolicitarAnulacionCOEMRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.SolicitarAnulacionCOEM(identificadorCaratula, identificadorCOEM);
+			// Act
+			var resultado = servicioHelper.SolicitarAnulacionCOEM(identificadorCaratula, identificadorCOEM);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -233,13 +254,15 @@ namespace Molinos.Scato.Test.Servicios
             var dto = new AfipSolicitarCierreCargaGranelDto();
             var respuestaEsperada = new SolicitarCierreCargaGranelResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.SolicitarCierreCargaGranel(It.IsAny<SolicitarCierreCargaGranelRequest1>()))
+            _mockWebService.Setup(ws => ws.SolicitarCierreCargaGranel(It.IsAny<SolicitarCierreCargaGranelRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.SolicitarCierreCargaGranel(dto);
+			// Act
+			var resultado = servicioHelper.SolicitarCierreCargaGranel(dto);
 
             // Assert
             resultado.Should().NotBeNull();
@@ -257,13 +280,15 @@ namespace Molinos.Scato.Test.Servicios
             var descripcionMotivo = string.Empty;
             var respuestaEsperada = new SolicitarNoABordoResponse();
 
-            mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
+            _mockConversor.Setup(c => c.Convertir<AfipCaratulaDto, Caratula>(It.IsAny<AfipCaratulaDto>()))
                 .Returns(new Caratula());
-            mockWebService.Setup(ws => ws.SolicitarNoABordo(It.IsAny<SolicitarNoABordoRequest1>()))
+            _mockWebService.Setup(ws => ws.SolicitarNoABordo(It.IsAny<SolicitarNoABordoRequest1>()))
                 .Returns(respuestaEsperada);
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
-            // Act
-            var resultado = servicioHelper.SolicitarNoAbordo(identificadorCaratula, identificadorCOEM, identificadoresDeclaracionesMercaderiaSuelta, codigoMotivo, descripcionMotivo);
+			// Act
+			var resultado = servicioHelper.SolicitarNoAbordo(identificadorCaratula, identificadorCOEM, identificadoresDeclaracionesMercaderiaSuelta, codigoMotivo, descripcionMotivo);
 
             // Assert
             resultado.Should().NotBeNull();

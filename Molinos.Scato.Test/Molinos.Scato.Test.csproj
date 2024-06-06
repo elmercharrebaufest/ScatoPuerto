@@ -545,6 +545,7 @@
     <Compile Include="Mock\FakeAfipCoemDto.cs" />
     <Compile Include="Mock\FakeAfipSolicitudCierreCarga.cs" />
     <Compile Include="Mock\FakeHttpMessageHandler.cs" />
+    <Compile Include="Mock\FakeComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Mock\NullLogger.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarLecturaDeTarjetaPatenteTest.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarPDFCpeTest.cs" />

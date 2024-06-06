@@ -2790,5 +2790,9 @@ namespace Molinos.Scato.Servicios
         // </ ARMOA005-1421 Dylan Lopez>
         [OperationContract]
         void AsociarEmbarqueCreadoEnLineUpANominacion(EmbarqueDto embarqueDto, int idEmbarque);
-    }
+
+		// <ARMOA005-1965 Dylan Lopez>
+		void GuardarLogAfipCpe(string service, string request, string response);
+		// </ ARMOA005-1965 Dylan Lopez>
+	}
 }
