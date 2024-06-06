@@ -12398,7 +12398,6 @@ namespace Molinos.Scato.Servicios.Impl
 				throw ex;
 			}
 		}
-
         // </ ARMOA005-1421 Dylan Lopez>
 
         public void AsociarEmbarqueCreadoEnLineUpANominacion(EmbarqueDto embarqueDto, int idEmbarque)
@@ -12416,5 +12415,28 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
-    }
+
+		// <ARMOA005-1965 Dylan Lopez>
+		public void GuardarLogAfipCpe(string service, string request, string response)
+		{
+			try
+			{
+				var entity = new LogAfipCpe
+				{
+					Servicio = service,
+					Consulta = request,
+					Respuesta = response,
+					Fecha = DateTime.Now
+				};
+				this.repositorio.Agregar(entity);
+				this.repositorio.GuardarCambios();
+			}
+			catch (Exception e)
+			{
+				log.Error("Error en metodo: GuardarLogAfipCpe", e);
+				throw e;
+			}
+		}
+		// </ ARMOA005-1965 Dylan Lopez>
+	}
 }

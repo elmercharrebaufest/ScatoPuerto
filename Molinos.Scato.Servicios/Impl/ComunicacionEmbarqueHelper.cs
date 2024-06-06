@@ -1,4 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.AFIP;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
@@ -12,13 +14,14 @@ namespace Molinos.Scato.Servicios.Impl
 {
     public class ComunicacionEmbarqueServicioHelper : IComunicacionEmbarqueServicioHelper
     {
-        private IAccesoComunicacionEmbarque accesoComunicacionEmbarque;
-        private wgescomunicacionembarqueSoap wgescomunicacionembarque;
-        private IConversor conversor;
-        private ILogger log;
-        private IAfipClient afipClient;
+        private readonly IAccesoComunicacionEmbarque _accesoComunicacionEmbarque;
+        private readonly wgescomunicacionembarqueSoap _wgescomunicacionembarque;
+        private readonly IConversor _conversor;
+        private readonly ILogger _log;
+        private readonly IAfipClient _afipClient;
+		private readonly IServicioRepositorio _servicioRepositorio;
 
-        private ResponseTicketAccesoAfip ticket;
+		private ResponseTicketAccesoAfip ticket;
 
         private WSAutenticacionEmpresa wSAutenticacionEmpresa;
         private string cuitRepresentada;
@@ -30,22 +33,25 @@ namespace Molinos.Scato.Servicios.Impl
             wgescomunicacionembarqueSoap wgescomunicacionembarque,
             IConversor conversor,
             ILogger log,
-            IAfipClient afipClient
-        )
+            IAfipClient afipClient,
+			IServicioRepositorio servicioRepositorio
+		)
         {
-            this.accesoComunicacionEmbarque = accesoComunicacionEmbarque;
-            this.wgescomunicacionembarque = wgescomunicacionembarque;
-            this.conversor = conversor;
-            this.log = log;
-            this.afipClient = afipClient;
-            this.rol = "DEPO";
-            this.tipoAgente = "DEPO";
-            this.cuitRepresentada = ConfigurationManager.AppSettings["cuitRepresentada"];
+            _accesoComunicacionEmbarque = accesoComunicacionEmbarque;
+            _wgescomunicacionembarque = wgescomunicacionembarque;
+            _conversor = conversor;
+            _log = log;
+            _afipClient = afipClient;
+			_servicioRepositorio = servicioRepositorio;
+
+			rol = "DEPO";
+            tipoAgente = "DEPO";
+            cuitRepresentada = ConfigurationManager.AppSettings["cuitRepresentada"];
         }
 
         public RegistrarCaratulaResponse RegistrarCaratula(AfipCaratulaDto afipCaratulaDto)
         {
-            log.Info("Inicializando RegistrarCaratula");
+            _log.Info("Inicializando RegistrarCaratula");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -54,26 +60,29 @@ namespace Molinos.Scato.Servicios.Impl
                     new RegistrarCaratulaRequest1(
                         new RegistrarCaratulaRequest1Body
                         {
-                            argRegistrarCaratula = new RegistrarCaratulaRequest { Caratula = this.conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto) },
+                            argRegistrarCaratula = new RegistrarCaratulaRequest { Caratula = this._conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto) },
                             argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         });
 
-                log.Info($" request: {XmlConverter<RegistrarCaratulaRequest1>.Serialize(request)}");
-                var response = this.wgescomunicacionembarque.RegistrarCaratula(request);
-                log.Info($" response: {JsonConverter<RegistrarCaratulaResponse>.Serialize(response)}");
-                log.Info("Finalizando RegistrarCaratula");
+                var req = XmlConverter<RegistrarCaratulaRequest1>.Serialize(request);
+				_log.Info($" request: { req }");
+                var response = this._wgescomunicacionembarque.RegistrarCaratula(request);
+				var res = JsonConverter<RegistrarCaratulaResponse>.Serialize(response);
+				_log.Info($" response: { res }");
+				_servicioRepositorio.GuardarLogAfipCpe("RegistrarCaratula", req, res);
+				_log.Info("Finalizando RegistrarCaratula");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar registrar la Caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar registrar la Caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public RectificarCaratulaResponse RectificarCaratula(AfipCaratulaDto afipCaratulaDto)
         {
-            log.Info("Inicializando RectificarCaratula");
+            _log.Info("Inicializando RectificarCaratula");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -83,29 +92,32 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         argRectificarCaratula = new RectificarCaratulaRequest
                         {
-                            Caratula = this.conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto),
+                            Caratula = this._conversor.Convertir<AfipCaratulaDto, Caratula>(afipCaratulaDto),
                             IdentificadorCaratula = afipCaratulaDto.IdentificadorCaratula
                         },
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                     }
                 );
 
-                log.Info($" request: {XmlConverter<RectificarCaratulaRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.RectificarCaratula(request);
-                log.Info($" response: {JsonConverter<RectificarCaratulaResponse>.Serialize(response)}");
-                log.Info("Finalizando RectificarCaratula");
+				var req = XmlConverter<RectificarCaratulaRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.RectificarCaratula(request);
+				var res = JsonConverter<RectificarCaratulaResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("RectificarCaratula", req, res);
+				_log.Info("Finalizando RectificarCaratula");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar rectificar la caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar rectificar la caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public AnularCaratulaResponse AnularCaratula(string identificadorCaratula)
         {
-            log.Info("Inicializando AnularCaratula");
+            _log.Info("Inicializando AnularCaratula");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -118,15 +130,18 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-                log.Info($" request: {XmlConverter<AnularCaratulaRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.AnularCaratula(request);
-                log.Info($" response: {JsonConverter<AnularCaratulaResponse>.Serialize(response)}");
-                log.Info("Finalizando AnularCaratula");
+				var req = XmlConverter<AnularCaratulaRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.AnularCaratula(request);
+				var res = JsonConverter<AnularCaratulaResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("AnularCaratula", req, res);
+				_log.Info("Finalizando AnularCaratula");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar anular la caratula. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar anular la caratula. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
@@ -150,11 +165,11 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                 );
 
-                return this.wgescomunicacionembarque.SolicitarCambioBuque(solicitarCambioBuqueRequest);
+                return this._wgescomunicacionembarque.SolicitarCambioBuque(solicitarCambioBuqueRequest);
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar solicitar cambio de buque. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar solicitar cambio de buque. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw ex;
             }
         }
@@ -180,18 +195,18 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                 );
 
-                return this.wgescomunicacionembarque.SolicitarCambioFechas(solicitarCambioFechasRequest);
+                return this._wgescomunicacionembarque.SolicitarCambioFechas(solicitarCambioFechasRequest);
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar solicitar cambio de buque. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar solicitar cambio de buque. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw ex;
             }
         }
 
         public RegistrarCOEMResponse RegistrarCOEM(AfipCoemDto afipCoemDto)
         {
-            log.Info("Inicializando RegistrarCOEM");
+            _log.Info("Inicializando RegistrarCOEM");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -200,26 +215,29 @@ namespace Molinos.Scato.Servicios.Impl
                     new RegistrarCOEMRequest1(
                         new RegistrarCOEMRequest1Body
                         {
-                            argRegistrarCOEM = new RegistrarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
+                            argRegistrarCOEM = new RegistrarCOEMRequest { IdentificadorCaratula = afipCoemDto.IdentificadorCaratula, Coem = this._conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto) },
                             argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         });
 
-                log.Info($" request: {XmlConverter<RegistrarCOEMRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.RegistrarCOEM(request);
-                log.Info($" response: {JsonConverter<RegistrarCOEMResponse>.Serialize(response)}");
-                log.Info("Finalizando RegistrarCOEM");
+				var req = XmlConverter<RegistrarCOEMRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.RegistrarCOEM(request);
+				var res = JsonConverter<RegistrarCOEMResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("RegistrarCOEM", req, res);
+				_log.Info("Finalizando RegistrarCOEM");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar registrar la Coem, Error {0} trace {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar registrar la Coem, Error {0} trace {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public RectificarCOEMResponse RectificarCOEM(AfipCoemDto afipCoemDto)
         {
-            log.Info("Inicializando RectificarCOEM");
+            _log.Info("Inicializando RectificarCOEM");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -231,27 +249,30 @@ namespace Molinos.Scato.Servicios.Impl
                         {
                             IdentificadorCaratula = afipCoemDto.IdentificadorCaratula,
                             IdentificadorCOEM = afipCoemDto.IdentificadorCOEM,
-                            Coem = this.conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto)
+                            Coem = this._conversor.Convertir<AfipCoemDto, Coem>(afipCoemDto)
                         },
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                     });
 
-                log.Info($" request: {XmlConverter<RectificarCOEMRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.RectificarCOEM(request);
-                log.Info($" response: {JsonConverter<RectificarCOEMResponse>.Serialize(response)}");
-                log.Info("Finalizando RectificarCOEM");
+				var req = XmlConverter<RectificarCOEMRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.RectificarCOEM(request);
+				var res = JsonConverter<RectificarCOEMResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("RectificarCOEM", req, res);
+				_log.Info("Finalizando RectificarCOEM");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar rectificar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar rectificar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public AnularCOEMResponse AnularCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            log.Info("Inicializando AnularCOEM");
+            _log.Info("Inicializando AnularCOEM");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -267,22 +288,25 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     });
 
-                log.Info($" request: {XmlConverter<AnularCOEMRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.AnularCOEM(request);
-                log.Info($" response: {JsonConverter<AnularCOEMResponse>.Serialize(response)}");
-                log.Info("Finalizando AnularCOEM");
+				var req = XmlConverter<AnularCOEMRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.AnularCOEM(request);
+				var res = JsonConverter<AnularCOEMResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("AnularCOEM", req, res);
+				_log.Info("Finalizando AnularCOEM");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar anular la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar anular la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public CerrarCOEMResponse CerrarCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            log.Info("Inicializando CerrarCOEM");
+            _log.Info("Inicializando CerrarCOEM");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -299,22 +323,25 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-                log.Info($" request: {XmlConverter<CerrarCOEMRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.CerrarCOEM(request);
-                log.Info($" response: {JsonConverter<CerrarCOEMResponse>.Serialize(response)}");
-                log.Info("Finalizando CerrarCOEM");
+				var req = XmlConverter<CerrarCOEMRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.CerrarCOEM(request);
+				var res = JsonConverter<CerrarCOEMResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("CerrarCOEM", req, res);
+				_log.Info("Finalizando CerrarCOEM");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar Cerrar la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public SolicitarAnulacionCOEMResponse SolicitarAnulacionCOEM(string identificadorCaratula, string identificadorCOEM)
         {
-            log.Info("Inicializando SolicitarAnulacionCOEM");
+            _log.Info("Inicializando SolicitarAnulacionCOEM");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -330,22 +357,25 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     });
 
-                log.Info($" request: {XmlConverter<SolicitarAnulacionCOEMRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.SolicitarAnulacionCOEM(request);
-                log.Info($" response: {JsonConverter<SolicitarAnulacionCOEMResponse>.Serialize(response)}");
-                log.Info("Finalizando SolicitarAnulacionCOEM");
+                var req = XmlConverter<SolicitarAnulacionCOEMRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.SolicitarAnulacionCOEM(request);
+                var res = JsonConverter<SolicitarAnulacionCOEMResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("SolicitarAnulacionCOEM", req, res);
+				_log.Info("Finalizando SolicitarAnulacionCOEM");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar Solicitar Anulación de la COEM. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public SolicitarCierreCargaGranelResponse SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto dto)
         {
-            log.Info("Inicializando SolicitarCierreCargaGranel");
+            _log.Info("Inicializando SolicitarCierreCargaGranel");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -354,24 +384,28 @@ namespace Molinos.Scato.Servicios.Impl
                     new SolicitarCierreCargaGranelRequest1Body
                     {
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
-                        argSolicitarCierreCargaGranel = this.conversor.Convertir<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>(dto)
+                        argSolicitarCierreCargaGranel = this._conversor.Convertir<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>(dto)
                     });
-                log.Info($" request: {XmlConverter<SolicitarCierreCargaGranelRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.SolicitarCierreCargaGranel(request);
-                log.Info($" response: {JsonConverter<SolicitarCierreCargaGranelResponse>.Serialize(response)}");
-                log.Info("Finalizando SolicitarCierreCargaGranel");
+
+				var req = XmlConverter<SolicitarCierreCargaGranelRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.SolicitarCierreCargaGranel(request);
+				var res = JsonConverter<SolicitarCierreCargaGranelResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("SolicitarCierreCargaGranel", req, res);
+				_log.Info("Finalizando SolicitarCierreCargaGranel");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar Solicitar cierre de carga granel. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar Solicitar cierre de carga granel. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
 
         public SolicitarNoABordoResponse SolicitarNoAbordo(string identificadorCaratula, string identificadorCoem, Declaracion[] identificadoresDeclaracionesMercaderiaSuelta, string codigoMotivo, string descripcionMotivo)
         {
-            log.Info("Inicializando SolicitarNoAbordo");
+            _log.Info("Inicializando SolicitarNoAbordo");
             try
             {
                 this.ObtenerAutenticacionEmpresa(cuitRepresentada, rol, tipoAgente);
@@ -389,15 +423,19 @@ namespace Molinos.Scato.Servicios.Impl
                             DescripcionMotivo = descripcionMotivo
                         }
                     });
-                log.Info($" request: {XmlConverter<SolicitarNoABordoRequest1>.Serialize(request)} ");
-                var response = this.wgescomunicacionembarque.SolicitarNoABordo(request);
-                log.Info($" response: {JsonConverter<SolicitarNoABordoResponse>.Serialize(response)}");
-                log.Info("Finalizando SolicitarNoAbordo");
+
+				var req = XmlConverter<SolicitarNoABordoRequest1>.Serialize(request);
+				_log.Info($" request: {req}");
+				var response = this._wgescomunicacionembarque.SolicitarNoABordo(request);
+				var res = JsonConverter<SolicitarNoABordoResponse>.Serialize(response);
+				_log.Info($" response: {res}");
+				_servicioRepositorio.GuardarLogAfipCpe("SolicitarNoAbordo", req, res);
+				_log.Info("Finalizando SolicitarNoAbordo");
                 return response;
             }
             catch (Exception ex)
             {
-                this.log.Error(ex, "Error al intentar Solicitar No Abordo. Error {0} trace: {1}", ex.Message, ex.StackTrace);
+                this._log.Error(ex, "Error al intentar Solicitar No Abordo. Error {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
@@ -406,7 +444,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             if (this.wSAutenticacionEmpresa == null)
             {
-                this.ticket = this.afipClient.GetTicketAccesoAfip();
+                this.ticket = this._afipClient.GetTicketAccesoAfip();
 
                 if (this.ticket != null)
                 {
