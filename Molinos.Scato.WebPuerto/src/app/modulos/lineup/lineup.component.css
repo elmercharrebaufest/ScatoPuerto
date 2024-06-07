@@ -77,3 +77,13 @@ input.search {
 .btn-estado-muelle-no-operando {
   color: #D9534F;
 }
+
+.alta-fas-container {
+  position: relative;
+}
+
+.alta-fas-container .btn {
+  position: absolute;
+  right: 1.5rem;
+  bottom: calc(100% + 1.5rem);
+}
