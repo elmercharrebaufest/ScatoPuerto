@@ -9669,14 +9669,17 @@ namespace Molinos.Scato.Servicios.Impl
                 foreach (Carga carga in cargasCerradas)
                 {
                     var bodega = bodegas.FirstOrDefault(b => carga.Bodega.Nombre.Split(' ').Last() == b.BodegaParcel.ToString());
-                    CargasPorBodega cargasPorBodega = new CargasPorBodega()
+                    if (bodega != null)
                     {
-                        Cargado = carga.ToneladasAW,
-                        Programado = bodega.Cantidad * 1000,
-                        NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
-                        NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
-                    };
-                    cargasCerradasPorBodega.Add(cargasPorBodega);
+						CargasPorBodega cargasPorBodega = new CargasPorBodega()
+						{
+							Cargado = carga.ToneladasAW,
+							Programado = bodega.Cantidad * 1000,
+							NombreBodega = repositorio.Obtener<Bodega>(x => x.Id == carga.Bodega.Id).Nombre,
+							NombreProducto = repositorio.Obtener<MaterialPuerto>(x => x.Id == carga.Material.Id).DescripcionCorta
+						};
+						cargasCerradasPorBodega.Add(cargasPorBodega);
+					}
                 }
 
                 var cargasTotales = cargasAbiertasPorBodega.Concat(cargasCerradasPorBodega).ToList();
