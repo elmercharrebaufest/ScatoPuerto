@@ -75,7 +75,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                this._log.Error(ex, "Error al intentar registrar la Caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
+                _log.Error(ex, "Error al intentar registrar la Caratula. Error: {0} trace: {1}", ex.Message, ex.StackTrace);
                 throw;
             }
         }
@@ -442,7 +442,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         private void ObtenerAutenticacionEmpresa(string cuitRepresentada, string rol, string tipoAgente)
         {
-            if (this.wSAutenticacionEmpresa == null)
+			_log.Info("Inicializando ObtenerAutenticacionEmpresa");
+			if (this.wSAutenticacionEmpresa == null)
             {
                 this.ticket = this._afipClient.GetTicketAccesoAfip();
 
@@ -458,9 +459,11 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 else
                 {
-                    throw new Exception("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
+					_log.Error("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
+					throw new Exception("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
                 }
             }
-        }
+			_log.Info("Finalizando ObtenerAutenticacionEmpresa");
+		}
     }
 }
