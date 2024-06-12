@@ -566,16 +566,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/ModuloDeCarga/ObtenerBalanzadasEnCurso")]
-        public HttpResponseMessage obtenerBalanzadasEnCurso(int IdModuloDeCarga)
+        public HttpResponseMessage obtenerBalanzadasEnCurso([FromUri] int IdModuloDeCarga)
         {
-            try
+			if (IdModuloDeCarga <= 0)
+			{
+				return Request.CreateResponse(HttpStatusCode.BadRequest, "El IdModuloDeCarga debe ser un número entero positivo.");
+			}
+			try
             {
-                BalanzadasCompletas cor = new BalanzadasCompletas()
-                {
-                    balanzadasEnCurso = servicio.ObtenerBalanzadasEnCurso(IdModuloDeCarga)
-                };
+				var balanzadasEnCurso = servicio.ObtenerBalanzadasEnCurso(IdModuloDeCarga);
+				var responseContent = new BalanzadasCompletas { balanzadasEnCurso = balanzadasEnCurso };
 
-                return Request.CreateResponse(HttpStatusCode.OK, cor);
+				return Request.CreateResponse(HttpStatusCode.OK, responseContent);
             }
             catch (Exception ex)
             {
