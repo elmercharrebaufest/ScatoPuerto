@@ -929,7 +929,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Servicios\AFIP\AfipClientTest.cs" />
     <Compile Include="Servicios\CalculadoraDescuentoTest.cs" />
     <Compile Include="Servicios\ComunicacionEmbarqueServicioHelperTests.cs" />
     <Compile Include="Servicios\ServicioAfipTest.cs" />

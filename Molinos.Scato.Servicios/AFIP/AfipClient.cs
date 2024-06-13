@@ -1,22 +1,27 @@
 ﻿using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using RestSharp;
+using RestSharp.Authenticators;
 using System;
+using System.Configuration;
 using System.Net;
 
 namespace Molinos.Scato.Servicios.AFIP
 {
 	public class AfipClient : IAfipClient
     {
-		private readonly IRestClientWrapper _restClientWrapper;
+		private readonly string _url = ConfigurationManager.AppSettings["UrlAfipApi"];
+		private readonly string _username = ConfigurationManager.AppSettings["UserCredentialAfipApi"];
+		private readonly string _password = ConfigurationManager.AppSettings["PassCredentialAfipApi"];
+		private readonly RestClient _restClient;
 		private readonly ILogger _log;
 
-		public AfipClient(
-            IRestClientWrapper restClientWrapper,
-			ILogger log
-            )
+		public AfipClient(ILogger log)
 		{
-			_restClientWrapper = restClientWrapper;
+			_restClient = new RestClient(_url)
+			{
+				Authenticator = new HttpBasicAuthenticator(_username, Encriptador.Decrypt(_password))
+			};
 			_log = log;
 		}
 
@@ -30,10 +35,9 @@ namespace Molinos.Scato.Servicios.AFIP
 				request.AddHeader("content-type", "application/json; charset=utf-8");
 				var req = JsonConverter<RestRequest>.Serialize(request);
 				_log.Info($" request: { req }");
-				var restResponse = _restClientWrapper.Execute(request);
-				//var response = JsonConvert.DeserializeObject<ResponseTicketAccesoAfip>(restResponse.Content);
+				var restResponse = _restClient.Execute(request);
 				var response = JsonConverter<ResponseTicketAccesoAfip>.Deserialize(restResponse.Content);
-				_log.Info($" response: { response }");
+				_log.Info($" response: { restResponse }");
 				_log.Info("Finalizando GetTicketAccesoAfip");
 				return response;
 			}

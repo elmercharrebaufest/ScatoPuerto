@@ -155,9 +155,7 @@
   <ItemGroup>
     <Compile Include="AFIP\AfipClient.cs" />
     <Compile Include="AFIP\IAfipClient.cs" />
-    <Compile Include="AFIP\IRestClientWrapper.cs" />
     <Compile Include="AFIP\ResponseTicketAccesoAfip.cs" />
-    <Compile Include="AFIP\RestClientWrapper.cs" />
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeCoemMappingProfile.cs" />

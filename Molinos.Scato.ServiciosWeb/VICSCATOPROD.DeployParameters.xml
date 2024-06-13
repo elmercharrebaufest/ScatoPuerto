@@ -31,7 +31,7 @@
   <setParameter name="ArchivosPath Config" value="\\GVICFSPRD00\Scato\ScatoPuerto\" />
 
   <setParameter name="CuitRepresentada Config" value="30715118773" />
-  <setParameter name="UrlAfipApi Config" value="https://localhost/Scato.PuertoApiCore/AFIPApi/" />
+  <setParameter name="UrlAfipApi Config" value="https://scatopuerto.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />
   <setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
   <setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
 
