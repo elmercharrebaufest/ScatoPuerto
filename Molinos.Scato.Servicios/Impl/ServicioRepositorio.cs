@@ -1668,9 +1668,13 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (EsEmbarqueFAS(id))
                 {
-                    var nominacion = ObtenerNominacionPorIdEmbarque(id);
-                    embarqueDto.NominacionId = (int)nominacion?.Id;
-                    embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
+                    //En circuito FAS, el embarque siempre nacera de una unica nominacion.
+                    var nominacion = ObtenerNominacionFASPorIdEmbarque(id);
+                    if (nominacion != null)
+                    {
+                        embarqueDto.NominacionId = (int)nominacion?.Id;
+                        embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
+                    }
                 }
             }
 
@@ -1682,23 +1686,27 @@ namespace Molinos.Scato.Servicios.Impl
             return this.repositorio.Existe<Nominacion>(n => n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" && n.Embarque.Id == idEmbarque);
         }
 
-        private Nominacion ObtenerNominacionPorIdEmbarque(int idEmbarque)
+        private IList<Nominacion> ObtenerNominacionesPorIdEmbarque(int idEmbarque)
         {
-            var nominacion = repositorio.ObtenerPrimero<Nominacion>(n => n.Embarque.Id == idEmbarque);
-            if (nominacion != null)
+            var nominaciones = repositorio.Listar<Nominacion>(n => n.Embarque.Id == idEmbarque);
+            if (nominaciones != null && nominaciones.Any())
             {
-                return nominacion;
+                return nominaciones;
             }
-
-            var nominacionEmbarque = repositorio.Obtener<NominacionEmbarque>(ne => ne.Embarque.Id == idEmbarque);
-            if (nominacionEmbarque != null)
+            var nominacionesEmbarque = repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == idEmbarque);
+            if (nominacionesEmbarque != null && nominacionesEmbarque.Any())
             {
-                var idNominacion = nominacionEmbarque.Nominacion.Id;
-                nominacion = repositorio.Obtener<Nominacion>(n => n.Id == idNominacion);
+                var nominacionesIds = nominacionesEmbarque.Select(ne => ne.Nominacion.Id).Distinct();
+                nominaciones = repositorio.Listar<Nominacion>(n => nominacionesIds.Contains(n.Id));
             }
-
-            return nominacion;
+            return nominaciones;
         }
+
+        private Nominacion ObtenerNominacionFASPorIdEmbarque(int idEmbarque)
+        {
+            return repositorio.Obtener<Nominacion>(n => n.Embarque.Id == idEmbarque);
+        }
+
 
         public OrdenCargaInternaFasonDto ObtenerOrdenCargaInternaFason(int id)
         {
@@ -12290,7 +12298,8 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                List<NominacionDto> nominacionReciboDtos = Listar<Nominacion, NominacionDto>(x => x.Embarque.Id == idEmbarque).ToList();
+                var nominaciones = this.repositorio.Listar<Nominacion>(n => n.Embarque.Id == idEmbarque || n.Embarques.Any(e => e.Embarque.Id == idEmbarque));
+                List<NominacionDto> nominacionReciboDtos = conversor.ConvertirList<Nominacion, NominacionDto>(nominaciones).ToList();
                 nominacionReciboDtos = nominacionReciboDtos.Where(x => x.NominacionRecibo != null && x.NominacionRecibo.Count > 0).ToList();
                 return nominacionReciboDtos;
             }
@@ -12407,9 +12416,12 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var nominacion = this.ObtenerNominacionPorIdEmbarque(embarqueDto.Id);
+                var nominacionesPadres = this.ObtenerNominacionesPorIdEmbarque(embarqueDto.Id);
                 var embarqueCreado = this.repositorio.Obtener<Embarque>(idEmbarque);
-                this.repositorio.Agregar(new NominacionEmbarque { Embarque = embarqueCreado, Nominacion = nominacion });
+                foreach(Nominacion nom in nominacionesPadres)
+                {
+                    this.repositorio.Agregar(new NominacionEmbarque { Embarque = embarqueCreado, Nominacion = nom });
+                }
                 this.repositorio.GuardarCambios();
             }
             catch (Exception e)
