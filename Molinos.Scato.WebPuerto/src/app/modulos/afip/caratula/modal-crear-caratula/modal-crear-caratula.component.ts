@@ -86,6 +86,7 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
   }
 
   private cargarDatos() {
+    // console.log('cargarDatos');
     const obtenerCaratula: Observable<Caratula> = !this.id ? of(null) : this.caratulaAfipService.obtenerCaratulaId(this.id);
     this.cargando = true;
     this.mensajeCarga = 'Cargando datos';
@@ -96,6 +97,9 @@ export class ModalCrearCaratulaComponent implements OnInit, OnDestroy {
     ]).subscribe(([aduanas, lugaresOperativos, caratula]) => {
       this.aduanas = aduanas.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
       this.lugaresOperativos = lugaresOperativos.sort((a, b) => a.descripcion > b.descripcion ? 1 : -1); // Ordenado alfabeticamente
+
+      // console.log(' aduanas: ', this.aduanas);
+      // console.log(' lugaresOperativos: ', this.lugaresOperativos);
       this.asignarFuncionesAutocompletado();
 
       if (caratula) {

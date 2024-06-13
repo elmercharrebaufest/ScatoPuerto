@@ -1,8 +1,10 @@
 ﻿using Molinos.Scato.Actividades.Interfaces;
 using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.AFIP;
 using Molinos.Scato.Servicios.Impl;
 using Ninject.Modules;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 
@@ -21,8 +23,7 @@ namespace Molinos.Scato.Dependencias
             this.BindChannelFactory<IServicioVapor>("ServicioVapor");
             this.BindChannelFactory<IServicioAfip>("ServicioAfip");
             this.BindChannelFactory<IServicioClientes>("ServicioClientes");
-            BindServiciosActividad();
-
+			BindServiciosActividad();
         }
 
         private void BindServiciosActividad()

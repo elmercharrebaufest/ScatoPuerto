@@ -43,7 +43,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.ListarPuntosAduaneros());
+                var response = servicioAfip.ListarPuntosAduaneros();
+				return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
             {
