@@ -59,6 +59,11 @@ export class CargaComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.unsubscribe))
         .subscribe(res => {
           this.embarquesEnLineUp = res;
+          let posicion = 0;
+          this.embarquesEnLineUp.forEach(item =>{
+            posicion++;
+            item.posicion = posicion;
+          });
           this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
           this.mostrarTabs = true;
 

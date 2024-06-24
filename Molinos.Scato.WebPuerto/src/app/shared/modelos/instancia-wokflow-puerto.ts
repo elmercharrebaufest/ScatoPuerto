@@ -7,4 +7,5 @@ export class InstanciaWorkflowPuerto {
   fechaUltimaModificacion: Date;
   embarque: Embarque;
   lineUp: LineUp;
+  posicion: number;
 }
