@@ -9,6 +9,7 @@ export class EmbarqueNav {
   esLiquido: boolean;
   muelle: string;
   orden: number;
+  posicion: number;
     constructor(){
       this.id = 0;
       this.planoDeCargaId = 0;
@@ -19,5 +20,6 @@ export class EmbarqueNav {
       this.esLiquido = false;
       this.muelle = '';
       this.orden = 0;
+      this.posicion = 0;
     }
 }
