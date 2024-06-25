@@ -13,7 +13,7 @@
     [EmpresaFumigadora]     NVARCHAR(100)           NULL,
     [FechaDeCreacion] DATETIME NULL,
     [FechaDeModificacion] DATETIME NULL,
-    [Usuario]    NVARCHAR(40)                          NULL,
+    [Usuario]    NVARCHAR(500)                          NULL,
     [FechaDeFinalizacion] DATETIME NULL,
     [UsuarioFinalizacion]    NVARCHAR(40)                          NULL,
     CONSTRAINT [PK_dbo.PlanoDeCarga] PRIMARY KEY CLUSTERED ([Id] ASC),
