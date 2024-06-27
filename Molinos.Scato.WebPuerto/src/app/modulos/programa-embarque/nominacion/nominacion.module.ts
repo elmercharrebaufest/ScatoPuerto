@@ -11,9 +11,9 @@ import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
-    NominacionRegistroComponent, 
-    NominacionDatoTecnicoComponent, 
-    NominacionRecibosComponent, 
+    NominacionRegistroComponent,
+    NominacionDatoTecnicoComponent,
+    NominacionRecibosComponent,
     NominacionIntervencionesComponent
   ],
   imports: [
@@ -21,6 +21,7 @@ import { FormsModule } from '@angular/forms';
     SharedModule,
     FormsModule,
     NominacionRoutingModule
-  ]
+  ],
+  exports: [NominacionRecibosComponent]
 })
 export class NominacionModule { }

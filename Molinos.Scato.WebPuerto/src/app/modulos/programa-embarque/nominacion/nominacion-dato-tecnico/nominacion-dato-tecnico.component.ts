@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NominacionDatoTecnicoExportador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-exportador';
 import { NominacionDatoTecnicoDestino } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-destino';
 import { NominacionDatoTecnicoCoordinador } from '@ScatoModels/programa-embarque/nominacion-dato-tecnico-coordinador';
@@ -740,6 +740,36 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       calidad.calidadValorEditado = event.target.value;
     }
     
+  }
+  //#endregion
+
+  //#region ARMOA005-1771 -> Permitir cantidades con max: tres decimales 
+  onCantidadNominacionDatoTecnicoChange(event: any){
+    const valorInput = parseFloat(event.target.value);
+    this.datoTecnicoForm.controls.cantidadTotal.setValue(valorInput.toFixed(3));
+  }
+
+  onCantidadDestinoChange(event: any, i: number): void {
+    const cantidadFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidad') as FormControl;
+    const valorCantidad = parseFloat(event.target.value);
+    cantidadFormControl.setValue(valorCantidad.toFixed(3));
+  }
+
+  onCantidadExportadorChange(event: any, i: number): void {
+    const cantidadFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidad') as FormControl;
+    const valorCantidad = parseFloat(event.target.value);
+    cantidadFormControl.setValue(valorCantidad.toFixed(3));
+  }
+
+  onCantidadClienteChange(event: any, i: number): void {
+    const cantidadFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad') as FormControl;
+    const valorCantidad = parseFloat(event.target.value);
+    cantidadFormControl.setValue(valorCantidad.toFixed(3));
+  }
+
+  onCantidadLoadingChange(event: any){
+    const valorInput = parseFloat(event.target.value);
+    this.datoTecnicoForm.controls.tasaDeCargaValor.setValue(valorInput.toFixed(3).toString());
   }
   //#endregion
 

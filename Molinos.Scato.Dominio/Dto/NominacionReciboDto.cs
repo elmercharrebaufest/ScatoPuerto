@@ -12,7 +12,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int NumeroRecibo { get; set; }
         public ExportadorDto Exportador { get; set; }
         public string Formato { get; set; }
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
         public string Unidad { get; set; }
         public string Ajuste { get; set; }
         public string PuertoDeCarga { get; set; }

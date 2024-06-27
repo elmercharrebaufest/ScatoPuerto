@@ -98,6 +98,7 @@ export class NavtabsBuqueComponent implements OnInit {
   // </ ARMOA005-1421 Dylan Lopez>
 
   private setCargarEmbarquesPlanillas(){
+    // console.log('setCargarEmbarquesPlanillas');
     this.cargandoInformacion = true;   
     this.planoDeCargaService.obtenerPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id).subscribe(res => {
       this.turnosService.setExportadores(res.cargasComerciales);
@@ -115,10 +116,10 @@ export class NavtabsBuqueComponent implements OnInit {
     });
     
     if (!this.paramEmbarqueSel.esLiquido){
+      // console.log(' paramEmbarqueSel.moduloDeCarga_Id: ', this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
     }
-
   }
   
   private setCargarPeriodoDeCarga() {

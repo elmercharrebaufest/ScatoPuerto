@@ -1,7 +1,7 @@
 create table NominacionDatoTecnicoExportador(
 Id int IDENTITY (1, 1) NOT NULL,
 Exportador_Id int not null,
-Cantidad int not null,
+Cantidad DECIMAL(20, 3) not null,
 Tolerancia int NULL,
 NominacionDatoTecnico_Id  int not null,
 [ToleranciasDiferenciadas] BIT NULL, 

@@ -1,7 +1,7 @@
 create table NominacionDatoTecnicoCoordinadorPuerto(
 Id int IDENTITY (1, 1) NOT NULL,
 CoordinadorPuerto_Id int not null,
-Cantidad int ,
+Cantidad DECIMAL(20, 3) ,
 NominacionDatoTecnico_Id int not null,
 CONSTRAINT [PK_dbo.NominacionDatoTecnicoCoordinadorPuerto] PRIMARY KEY CLUSTERED ([Id] ASC),
 CONSTRAINT [FK_dbo.NominacionDatoTecnicoCoordinadorPuerto_dbo.NominacionDatoTecnico_NominacionDatoTecnico_Id] FOREIGN KEY ([NominacionDatoTecnico_Id]) REFERENCES [dbo].[NominacionDatoTecnico] ([Id]),

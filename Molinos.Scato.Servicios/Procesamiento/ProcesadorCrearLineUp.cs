@@ -8,6 +8,7 @@ using System;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
+    [Obsolete] // TODO: Revisar si se usa aun
     public class ProcesadorCrearLineUp : ProcesadorComando<CrearLineUp>
     {
         public ProcesadorCrearLineUp(IRepositorio repositorio, IConversor conversor, ILogger log)

@@ -135,6 +135,9 @@
     <Content Include="bfdev258-Branch.DeployParameters.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SCATOPUERTOUAT.DeployParameters.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ServicioEstadoPuesto.svc" />
     <Content Include="FirmaProvider.svc" />
     <Content Include="ServicioAfip.svc" />

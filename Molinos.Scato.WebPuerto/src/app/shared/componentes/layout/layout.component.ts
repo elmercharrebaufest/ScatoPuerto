@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterEvent, Event } from '@angular/router';
 import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { environment } from 'environments/environment';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -16,6 +17,7 @@ export class LayoutComponent implements OnInit {
   keyClose: boolean = false;
   private user: any;
   rutaActual: string;
+  public envClass = 'env-' + environment.envName;
 
   constructor(
     private router: Router,
@@ -66,11 +68,13 @@ export class LayoutComponent implements OnInit {
     // <ARMOA005-1665 Dylan Lopez>
     if (this.user.permisos.find(x => x === 'Buque_Ver')) // TODO MODIFICAR PERMISO
       this.router.navigate(['/embarque/agencias'])
+    // </ ARMOA005-1665 Dylan Lopez>
     if (this.user.permisos.find(x => x === 'Buque_Ver'))
       this.router.navigate(['/buques'])
     if (this.user.permisos.find(x => x === 'Clientes_Visualizar'))
       this.router.navigate(['/clientes'])
-    // </ ARMOA005-1665 Dylan Lopez>
+    if (this.user.permisos.find(x => x === 'Exportadores_Visualizar'))
+      this.router.navigate(['/embarque/cargadores'])
     if (this.user.permisos.find(x => x === 'Comex_Nominacion_Ver'))
       this.router.navigate(['/programa'])
     if (this.user.permisos.find(x => x === 'Vapor_Visualizar'))
@@ -79,6 +83,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/afip/caratula'])
     if (this.user.permisos.find(x => x === 'Coem_Visualizar'))
       this.router.navigate(['/afip/coem'])
+    if (this.user.permisos.find(x => x === 'Destinos_Visualizar'))
+      this.router.navigate(['/destinos'])
     this.opened = false;
   }
 

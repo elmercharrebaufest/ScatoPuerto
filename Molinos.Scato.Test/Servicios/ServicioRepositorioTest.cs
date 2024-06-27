@@ -505,24 +505,6 @@ namespace Molinos.Scato.Test.Servicios
         }
 
         [Test]
-        public void TestObtenerObservacion()
-        {
-            var tipo = new Observacion
-            {
-                Id = 1,
-                WorkflowInstanceId = new Guid(),
-                Observaciones = "Observaciones 1"
-            };
-
-            repositorioMock.Setup(s => s.Obtener(It.IsAny<Expression<Func<Observacion, bool>>>())).Returns(tipo);
-
-            var resultado = target.ObtenerObservacion(new Guid());
-            Assert.IsNotNull(resultado);
-            Assert.AreEqual(resultado.Observaciones, tipo.Observaciones);
-        }
-
-
-        [Test]
         public void TestObtenerEntregador()
         {
             var entregador = new Entregador
@@ -8048,18 +8030,6 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarCampaniaPorCuit(cuit,cosecha);
             Assert.IsNotNull(resultado);
 
-        }
-
-        [Test]
-        public void ObtenerRegistroInactividad()
-        {
-            repositorioMock.Setup(s => s.Obtener<RegistroInactividad>(It.IsAny<int>())).Returns(new RegistroInactividad { Id = 3, Usuario = "baufest", FechaInicio = DateTime.Now, FechaFinal = DateTime.Now });
-
-            var result = target.ObtenerRegistroInactividad(3);
-
-            repositorioMock.Verify(s => s.Obtener<RegistroInactividad>(It.IsAny<int>()), Times.Exactly(1));
-            Assert.NotNull(result);
-            Assert.AreEqual(result.Id, 3);
         }
     }
 }

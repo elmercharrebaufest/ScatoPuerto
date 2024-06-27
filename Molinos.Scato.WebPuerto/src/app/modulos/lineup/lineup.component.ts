@@ -161,10 +161,30 @@ export class LineupComponent implements OnInit, Observador {
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
-
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
+    let posicion = 0;
+    this.sanBenito.forEach(item =>{
+      posicion++;
+      item.posicion = posicion;
+    });
+    posicion = 0;
+    this.noryon.forEach(item =>{ 
+      posicion++;
+      item.posicion = posicion;
+    });
+    posicion = 0;
+    this.vicentin.forEach(item =>{ 
+      posicion++;
+      item.posicion = posicion;
+    });
+    posicion = 0;
+    this.otrosMuelles.forEach(item =>{ 
+      posicion++;
+      item.posicion = posicion;
+    });
+
     function_name = 'filtrarMuelles - FIN';
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
   }

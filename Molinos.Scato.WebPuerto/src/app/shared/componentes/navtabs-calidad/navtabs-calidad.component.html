@@ -20,9 +20,8 @@
         <div class="row tituloMuelle mb-2">Muelle San Benito</div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
-                    id="{{buqueSanBenito2.id}}" 
-                    (click)="onClickHandlerClient(buqueSanBenito2)">
-                <div class="icono-seleccionado" [ngClass]="imgSolidoLiquido(buqueSanBenito)" ></div>
+                id="{{buqueSanBenito2.id}}" (click)="onClickHandlerClient(buqueSanBenito2)">
+                <div class="icono-seleccionado" [ngClass]="imgSolidoLiquido(buqueSanBenito)"></div>
                 {{estadoSanBenito()}}
             </button>
         </div>
@@ -30,8 +29,9 @@
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle Vicentin </div>
         <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueVicentin)" ></div>
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
+                id="{{buqueVicentin2?.id}}" (click)="onClickHandlerClient(buqueVicentin2)">
+                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueVicentin)"></div>
                 {{estadoVicentin()}}
             </button>
         </div>
@@ -39,8 +39,9 @@
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle Nouryon </div>
         <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)" ></div>
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button" id="{{buqueNoryon2?.id}}"
+                (click)="onClickHandlerClient(buqueNoryon2)">
+                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)"></div>
                 {{estadoNoryon()}}
             </button>
         </div>
@@ -49,7 +50,7 @@
         <div class="row tituloMuelle mb-2">Otro muelle </div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)" ></div>
+                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)"></div>
                 {{estadoOtros()}}
             </button>
         </div>
@@ -66,19 +67,17 @@
                 <label for='buque-select'><b>Buque</b></label>
                 <select class='form-control' id='buque-select' #selectBuque>
                     <option value='0' selected>Seleccione buque que está cargando</option>
-                    <option *ngFor='let element of elementosSinPlano; let i = index' 
-                            [value]='element.id'>
-                            {{element.nombreBuque}}
+                    <option *ngFor='let element of elementosSinPlano; let i = index' [value]='element.id'>
+                        {{element.nombreBuque}}
                     </option>
                 </select>
                 <div *ngIf='errorMessage' class='txt-red mt-2'>El embarque es <strong>requerido</strong></div>
             </div>
         </form>
         <div class='flex-between w-100 pt-10'>
-            <button type='button' class='btn btn-outline-danger' 
-                    (click)="modal.dismiss('Cross click')">Cancelar</button>
-            <button type='button' class='btn btn-primary'
-                    (click)='agregarEmbarque(selectBuque.value)'>Agregar</button>
+            <button type='button' class='btn btn-outline-danger'
+                (click)="modal.dismiss('Cross click')">Cancelar</button>
+            <button type='button' class='btn btn-primary' (click)='agregarEmbarque(selectBuque.value)'>Agregar</button>
         </div>
     </div>
 </ng-template>

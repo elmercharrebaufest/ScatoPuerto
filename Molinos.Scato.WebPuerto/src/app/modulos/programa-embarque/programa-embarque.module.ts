@@ -10,6 +10,7 @@ import { SharedComponentModule } from 'app/shared/componentes/shared-components.
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { ModalProgramaEmbarqueComponent } from './modal-programa-embarque/modal-programa-embarque.component';
 import { NominacionEnviarLineupComponent } from './nominacion-enviar-lineup/nominacion-enviar-lineup.component';
+import { PipeTnKg } from 'app/shared/pipes/pipe-tn-kg';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { NominacionEnviarLineupComponent } from './nominacion-enviar-lineup/nomi
     ListadoProgramaEmbarqueComponent,
     ProgramaEmbarqueComponent,
     ModalProgramaEmbarqueComponent,
-    NominacionEnviarLineupComponent
+    NominacionEnviarLineupComponent,
+    PipeTnKg
   ],
   imports: [
     CommonModule,

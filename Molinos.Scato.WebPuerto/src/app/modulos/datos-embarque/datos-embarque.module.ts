@@ -10,10 +10,12 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
+import { CargadoresComponent } from './cargadores/cargadores.component';
 
 @NgModule({
   declarations: [
-    AgenciasMaritimasATAComponent
+    AgenciasMaritimasATAComponent,
+    CargadoresComponent
   ],
   imports: [
     CommonModule,

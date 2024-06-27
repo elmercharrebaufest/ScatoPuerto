@@ -423,7 +423,7 @@
                   <div class="form-group col">
                     <label for="manga" class="font-weight-bold">Manga</label>
                     <input type="text" class="form-control" formControlName="manga"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled> 
+                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
                   </div>
 
 
@@ -470,11 +470,14 @@
           </div>
         </div>
       </div>
-      <div class="d-flex justify-content-center my-5">
-        <button type="button" class="btn btn-danger mx-5" [routerLink]="['/']">CANCELAR</button>
-        <button  type="button"  class="btn btn-success" (click)="finalizarAlta()">{{tituloBoton}}</button>
-      </div>
     </form>
+    <div class="shadow bg-white p-3 mt-4" *ngIf="embarqueId == 0 || tipoContratoNominacion === 'FAS'">
+      <app-nominacion-recibos></app-nominacion-recibos>
+    </div>
+    <div class="d-flex justify-content-center my-5">
+      <button type="button" class="btn btn-danger mx-5" [routerLink]="['/']">CANCELAR</button>
+      <button  type="button"  class="btn btn-success" (click)="finalizarAlta()">{{tituloBoton}}</button>
+    </div>
   </div>
 
   <!----------------------------------------------->

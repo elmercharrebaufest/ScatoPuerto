@@ -234,6 +234,7 @@
     <Compile Include="Controllers\WorkflowController.cs" />
     <Compile Include="Controllers\LineUpController.cs" />
     <Compile Include="Controllers\EmbarqueController.cs" />
+    <Compile Include="EXCEL\ExcelExportadores.cs" />
     <Compile Include="EXCEL\ExcelClientes.cs" />
     <Compile Include="EXCEL\ExcelLineUp.cs" />
     <Compile Include="EXCEL\ExcelNirManual.cs" />
