@@ -110,27 +110,27 @@
         </div>
       </a>
 
-
-      <hr *ngIf='tienePermiso("Caratula_Visualizar")'>
-      <a *ngIf='tienePermiso("Caratula_Visualizar")' data-toggle="collapse" href="#collapseAfip" aria-expanded="false" aria-controls="collapseAfip">
-        <div  class="item-container">
-          <div class="icon-afip"></div>
-          <span *ngIf="opened">Afip</span>
+      <ng-container *ngIf="verAfip">
+        <hr *ngIf='tienePermiso("Caratula_Visualizar")'>
+        <a *ngIf='tienePermiso("Caratula_Visualizar")' data-toggle="collapse" href="#collapseAfip" aria-expanded="false" aria-controls="collapseAfip">
+          <div  class="item-container">
+            <div class="icon-afip"></div>
+            <span *ngIf="opened">Afip</span>
+          </div>
+        </a>
+        <div class="collapse item-container" id="collapseAfip">
+          <a routerLink="/afip/caratula" *ngIf='tienePermiso("Caratula_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/caratula"'>
+              <span *ngIf="opened">Caratulas</span>
+            </div>
+          </a>
+          <a routerLink="/afip/coem" *ngIf='tienePermiso("Coem_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/coem"'>
+              <span *ngIf="opened">Coems</span>
+            </div>
+          </a>
         </div>
-      </a>
-      <div class="collapse item-container" id="collapseAfip">
-        <a routerLink="/afip/caratula" *ngIf='tienePermiso("Caratula_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/caratula"'>
-            <span *ngIf="opened">Caratulas</span>
-          </div>
-        </a>
-        <a routerLink="/afip/coem" *ngIf='tienePermiso("Coem_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/coem"'>
-            <span *ngIf="opened">Coems</span>
-          </div>
-        </a>
-      </div>
-
+      </ng-container>
 
       <!-- Ejemplo de menu-submenu -->
       <!-- <a><div (click)='showSubmenu(menuSide, subCarga)'><img src='../../../assets/sidebar-icons/container.png' width="32"><span>Modulo de Carga</span></div></a>
