@@ -25,10 +25,14 @@ import { Bandera } from '@ScatoModels/bandera';
 import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { Vapor } from '@ScatoModels/embarque';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { Pais } from '@ScatoModels/Buques/Pais';
 import { EmbarqueCoordinador } from '@ScatoModels/embarque-coordinador';
+import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
+import { NominacionRecibosComponent } from 'app/modulos/programa-embarque/nominacion/nominacion-recibos/nominacion-recibos.component';
+import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
+import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 
 @Component({
   selector: 'app-alta-embarque',
@@ -69,6 +73,7 @@ export class AltaEmbarqueComponent implements OnInit {
   vaporInfo: VaporInformacion
   banderasBuque: Bandera[];
   listadoBanderaModificada: boolean = false;
+  tipoContratoNominacion: string;
   @ViewChild('horaRecalada') horaRecalada: ElementRef;
   @ViewChild('horaDesdeLimpieza') horaDesdeLimpieza: ElementRef;
   @ViewChild('horaHastaLimpieza') horaHastaLimpieza: ElementRef;
@@ -79,6 +84,9 @@ export class AltaEmbarqueComponent implements OnInit {
   private vaporSeleccionado;
   private parametrosSel;
   private muelleInicial: string;
+  private destroy$ = new Subject();
+
+  @ViewChild(NominacionRecibosComponent) datoRecibos: NominacionRecibosComponent;
   // #endregion
 
   // #region Constructor
@@ -94,11 +102,11 @@ export class AltaEmbarqueComponent implements OnInit {
       private workflowService: WorkflowService,
       private moduloCargaService: ModuloDeCargaService,
       private buqueService: BuqueService,
-
-
+      private nominacionService: NominacionService
     ) {
     this.state = this.route.snapshot.params.state;
     this.embarqueId = this.route.snapshot.params.id ? this.route.snapshot.params.id : 0;
+    
   }
   // #endregion
 
@@ -110,7 +118,10 @@ export class AltaEmbarqueComponent implements OnInit {
     this.deshabilitaMuelleCarga();
     this.cargarListados();
     // this.editarCrearBuque();
+  }
 
+  ngOnDestroy() {
+    this.nominacionService.NominacionParametros = undefined;
   }
   // #endregion
 
@@ -349,6 +360,12 @@ export class AltaEmbarqueComponent implements OnInit {
           this.mostrarSpinner = false;
           //this.embarqueForm.controls.tipoDeBuque.disable();
 
+          /** Necesario para Edicion embarque FAS **/
+          this.tipoContratoNominacion = this.embarqueSeleccionado.tipoContratoNominacion;
+          if(this.tipoContratoNominacion == 'FAS' && this.embarqueSeleccionado.nominacionId > 0){
+            this.asignarNominacionParametros(this.embarqueSeleccionado.nominacionId);
+          }
+
         },
         errmess => {
           this.confirmationDialogService.confirm('¡Error!', 'Error al cargar el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
@@ -574,9 +591,8 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.value.motivosLimpiezaList != null && this.embarqueForm.value.motivosLimpiezaList.length > 0 ?
         this.motivosLimpiezaList.find(x => x.id == this.embarqueForm.value.motivosLimpiezaList[0].id) : '');
 
-    this.embarqueForm.get('coordinadores').setValue(
-      this.embarqueForm.value.coordinadoresList != null && this.embarqueForm.value.coordinadoresList.length > 0 ?
-        this.coordinadoresList.find(x => x.id == this.embarqueForm.value.coordinadoresList[0].id) : '');
+    const coordinadores = this.embarqueForm.get('coordinadoresList').value || [];
+    this.embarqueForm.get('coordinadores').setValue(coordinadores.length ? coordinadores : '');
 
     this.embarqueForm.get('ata').setValue(
       this.embarqueForm.value.ataList != null && this.embarqueForm.value.ataList.length > 0 ?
@@ -616,33 +632,33 @@ export class AltaEmbarqueComponent implements OnInit {
       }
     }
 
+    const recibos = this.datoRecibos.crearObjectoRecibos();
 
-    this.embarqueService.altaEmbarque(altaEmbarque)
-      .subscribe((res: any) => {
-        if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, mostramos el confirm solo con el boton volver
-          setTimeout(() => {
-            this.workflowService.listarEmbarquesEnLineUp().subscribe(listado => {
-              this.PlanoDeCargaId = listado.find(x => x.id == res).planoDeCargaId;
-              this.mostrarSpinner = false;
-              this.moduloCargaService.modificarCargadoPlanoDeCarga(this.PlanoDeCargaId).subscribe(y => {
-                this.openConfirmationDialog('¡Felicitaciones!',
-                  'Ha cargado con éxito un nuevo Buque al Line UP',
-                  'Volver a Modulo de Carga')
-              });
+    this.embarqueService.altaEmbarque(altaEmbarque, recibos).subscribe((res: any) => {
+      if (this.state && this.state.toLowerCase().trim() === 'modulo-carga') { //Si venimos del modulo de carga => /:state = modulo-carga, mostramos el confirm solo con el boton volver
+        setTimeout(() => {
+          this.workflowService.listarEmbarquesEnLineUp().subscribe(listado => {
+            this.PlanoDeCargaId = listado.find(x => x.id == res).planoDeCargaId;
+            this.mostrarSpinner = false;
+            this.moduloCargaService.modificarCargadoPlanoDeCarga(this.PlanoDeCargaId).subscribe(y => {
+              this.openConfirmationDialog('¡Felicitaciones!',
+                'Ha cargado con éxito un nuevo Buque al Line UP',
+                'Volver a Modulo de Carga')
             });
-          }, 1000);
-        } else {
-          this.mostrarSpinner = false;
-          this.openConfirmationDialog('¡Felicitaciones!',
-            'Ha cargado con éxito un nuevo Buque al Line UP',
-            'Ver line up',
-            'Cargar otro buque');
-        }
-      },
-        errmess => {
-          this.confirmationDialogService.confirm('¡Error!', 'Error al crear el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-          this.mostrarSpinner = false;
-        });
+          });
+        }, 1000);
+      } else {
+        this.mostrarSpinner = false;
+        this.openConfirmationDialog('¡Felicitaciones!',
+          'Ha cargado con éxito un nuevo Buque al Line UP',
+          'Ver line up',
+          'Cargar otro buque');
+      }
+    },
+      errmess => {
+        this.confirmationDialogService.confirm('¡Error!', 'Error al crear el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
+        this.mostrarSpinner = false;
+      });
 
   }
 
@@ -991,7 +1007,7 @@ export class AltaEmbarqueComponent implements OnInit {
     this.tituloABM =
       (this.opcionABMSeleccionada == 'Agregar' ? 'Agregar nuevo registro ' : 'Editar ') +
       (this.pantallaSeleccionada == 'Ata' ? 'ATA de Puerto' :
-          this.pantallaSeleccionada == 'Agencia' ? 'Agencia Maritima de Puerto' : 'Motivo Limpieza');
+        this.pantallaSeleccionada == 'Agencia' ? 'Agencia Maritima de Puerto' : 'Motivo Limpieza');
 
     return this.modalService.open(this.modalABM);
   }
@@ -1081,7 +1097,7 @@ export class AltaEmbarqueComponent implements OnInit {
             if (this.opcionABMSeleccionada == 'Agregar') {
               this.embarqueService[obtener]().subscribe(res => {
                 const nuevo = res.filter(x => x.nombre == abm.nombre)[0];
-                this.embarqueForm.get([list]).value.splice(0,this.embarqueForm.get([list]).value.length);                
+                this.embarqueForm.get([list]).value.splice(0, this.embarqueForm.get([list]).value.length);
                 this.embarqueForm.get([list]).value.push(new modelo(nuevo.id, nuevo.nombre));
               });
             }
@@ -1141,46 +1157,46 @@ export class AltaEmbarqueComponent implements OnInit {
     }
   }
   // #endregion
-  
-  public validarExistenciaBuqueMuelle(muelle: string){
+
+  public validarExistenciaBuqueMuelle(muelle: string) {
     console.log(this.embarqueForm.value)
     this.embarqueService.existeEmbarqueEnMuelle(this.embarqueForm.value.patente
-    , muelle).subscribe(
-      (res) => {
-        if(res){
-          this.embarqueForm.get(`${muelle}`).setValue(false);
-          this.confirmationDialogService.confirm('Advertencia', `Ya existe otro embarque con las mismas caracteristicas en el muelle: ${this.getNombreMuelle(muelle)}`, 'Cerrar', '', null, null, Tipoalerta.Warning)
-          return;
+      , muelle).subscribe(
+        (res) => {
+          if (res) {
+            this.embarqueForm.get(`${muelle}`).setValue(false);
+            this.confirmationDialogService.confirm('Advertencia', `Ya existe otro embarque con las mismas caracteristicas en el muelle: ${this.getNombreMuelle(muelle)}`, 'Cerrar', '', null, null, Tipoalerta.Warning)
+            return;
+          }
+        },
+        (error) => {
+          console.error('Error al obtener datos:', error);
         }
-      },
-      (error) => {
-        console.error('Error al obtener datos:', error);
-      }
-    );
+      );
   }
 
-  getNombreMuelle(muelle: string): string{
+  getNombreMuelle(muelle: string): string {
     let nombreMuelle = "";
-    switch(muelle){
+    switch (muelle) {
       case "sanBenito": nombreMuelle = "San Benito";
-      break;
+        break;
       case "noryon": nombreMuelle = "Noryon";
-      break;    
+        break;
       case "otrosMuelles": nombreMuelle = "Otros Muelles";
-      break;
+        break;
       case "vicentin": nombreMuelle = "Vicentin";
-      break;
-      default: 
-      break;
+        break;
+      default:
+        break;
     }
-      return nombreMuelle;
+    return nombreMuelle;
   }
- 
+
 
   // #region Eventos Controles
 
   public onChangeVicentin(e) {
-    if(this.muelleInicial !== "vicentin")
+    if (this.muelleInicial !== "vicentin")
       this.validarExistenciaBuqueMuelle("vicentin");
     if (!this.embarqueForm.value.noryon && !this.embarqueForm.value.sanBenito
       && !this.embarqueForm.value.otrosMuelles) {
@@ -1189,7 +1205,7 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   public onChangeSanBenito(e) {
-    if(this.muelleInicial !== "sanBenito")
+    if (this.muelleInicial !== "sanBenito")
       this.validarExistenciaBuqueMuelle("sanBenito");
     if (!this.embarqueForm.value.noryon && !this.embarqueForm.value.vicentin
       && !this.embarqueForm.value.otrosMuelles) {
@@ -1198,7 +1214,7 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   public onChangeNoryon(e) {
-    if(this.muelleInicial !== "noryon")
+    if (this.muelleInicial !== "noryon")
       this.validarExistenciaBuqueMuelle("noryon");
     if (!this.embarqueForm.value.sanBenito && !this.embarqueForm.value.vicentin
       && !this.embarqueForm.value.otrosMuelles) {
@@ -1207,7 +1223,7 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   public onChangeotrosMuelles(e) {
-    if(this.muelleInicial !== "otrosMuelles")
+    if (this.muelleInicial !== "otrosMuelles")
       this.validarExistenciaBuqueMuelle("otrosMuelles");
     if (!this.embarqueForm.value.sanBenito && !this.embarqueForm.value.vicentin
       && !this.embarqueForm.value.noryon) {
@@ -1286,30 +1302,30 @@ export class AltaEmbarqueComponent implements OnInit {
     this.vaporInfo.imoVapor !== null && this.embarqueForm.controls.imo.setValue(this.vaporInfo.imoVapor);
   }
 
-  setearMuelleInicial(embarque :any){
-    if(embarque.noryon){
+  setearMuelleInicial(embarque: any) {
+    if (embarque.noryon) {
       this.muelleInicial = "noryon";
     }
-    if(embarque.vicentin){
+    if (embarque.vicentin) {
       this.muelleInicial = "vicentin";
     }
-    if(embarque.otrosMuelles){
+    if (embarque.otrosMuelles) {
       this.muelleInicial = "otrosMuelles";
     }
-    if(embarque.sanBenito){
+    if (embarque.sanBenito) {
       this.muelleInicial = "sanBenito";
     }
   }
 
-  openModalCliente(modal: any){ 
+  openModalCliente(modal: any) {
     this.modalService.open(modal, { size: 'md', centered: true, backdrop: 'static', keyboard: false }).result
-    .then(() => {     
-      console.log('_modalService.open');
-    })
-    .catch((res) => { console.log(res) }); 
+      .then(() => {
+        console.log('_modalService.open');
+      })
+      .catch((res) => { console.log(res) });
   }
 
-  onAddCliente(event: any){
+  onAddCliente(event: any) {
     var nombre = event.nombre.trim();
     this.embarqueService['obtenerListadoCoordinadores']().subscribe(res => {
       let nuevo = res.filter(x => x.nombre == nombre)[0];
@@ -1321,4 +1337,24 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.value.coordinadoresList.push(obj)
     });
   }
+
+  private asignarNominacionParametros(nominacionId: number) {
+    let nominacionParametos: NominacionParametros = {
+      nominacion_Id: nominacionId,
+      actualizarDatoTecnico: true,
+      actualizarRecibos: true,
+      actualizarIntervenciones: true,
+      nominacion: null,
+    };
+    if (nominacionId > 0) {
+      this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data => {
+        nominacionParametos.nominacion = data;
+        this.nominacionService.NominacionParametros = nominacionParametos;
+      });
+    } else {
+      this.nominacionService.NominacionParametros = nominacionParametos;
+    }
+  }
+
+
 }

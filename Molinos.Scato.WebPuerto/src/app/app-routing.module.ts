@@ -1,20 +1,18 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './modulos/login/login.component';
-import { IniciarSesionComponent } from './shared/componentes/iniciar-sesion/iniciar-sesion.component';
 import { LayoutComponent } from "./shared/componentes/layout/layout.component";
-import { LoginGuard } from './shared/seguridad/login.guard';
 import { RoleGuard } from './shared/seguridad/role.guard';
+import { MaslGuard } from './shared/seguridad/masl.guard';
 
 export const routeConfig: Routes = [
   {
     path: "",
     component: LayoutComponent,
-    canActivate: [LoginGuard],
+    canActivate: [MaslGuard],
     children: [
       {
         path: '',
        redirectTo: '/lineup',
-    //   redirectTo: '/login',
         pathMatch: 'full'
       },
       {
@@ -37,12 +35,10 @@ export const routeConfig: Routes = [
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/calidad/calidad.module').then(m => m.CalidadModule)
       },
-
       {
         path: 'embarque',
         loadChildren: () => import('./modulos/datos-embarque/datos-embarque.module').then(m => m.DatosEmbarqueModule)
       },
-      
       {
         path: 'buques',
         canActivateChild: [RoleGuard],
@@ -62,6 +58,10 @@ export const routeConfig: Routes = [
         path: 'clientes',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/clientes/clientes.module').then(m => m.ClientesModule)
+      },
+      {
+        path: 'destinos',
+        loadChildren: () => import('./modulos/destinos/destinos.module').then(m => m.DestinosModule)
       },
       {
         path: 'afip',

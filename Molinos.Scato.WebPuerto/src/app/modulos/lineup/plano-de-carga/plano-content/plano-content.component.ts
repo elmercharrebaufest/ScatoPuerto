@@ -714,8 +714,21 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     return this.modalService.open(this.modalABM);
   }
 
-  abrirModalExportador() {
-    return this.modalService.open(this.modalExportadorABM);
+  abrirModalExportador(modal: any) {
+    this.modalService
+    .open(modal, {
+      size: 'md',
+      centered: true,
+      backdrop: 'static',
+      keyboard: false,
+    })
+    .result.then(() => {
+      console.log('_modalService.open');
+    })
+    .catch((res) => {
+      console.log(res);
+    });
+    //return this.modalService.open(this.modalExportadorABM);
   }
 
   public descargarArchivo(tipo: string) {
@@ -1059,31 +1072,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     }
   }
 
-  public submitExportadorABM(nombre: string) {
-    if (!nombre || !nombre.trim()) {
-      // El nombre es nulo o vacío
-      this.confirmationDialogService.confirm('¡Error!', 'Por favor complete el nombre', 'Cerrar', '', null, null, Tipoalerta.Success);
-      return;
-    }
-    if (this.exportadores.some(exp => exp.nombre.toLowerCase() == nombre.toLowerCase())) {
-      // Ya existe el exportador
-      this.confirmationDialogService.confirm('¡Error!', 'Ya existe el exportador', 'Cerrar', '', null, null, Tipoalerta.Success);
-      return;
-    }
-    const exportador: Exportador = new Exportador();
-    exportador.nombre = nombre.toUpperCase();
-    this.planoDeCargaService.agregarExportador(exportador).subscribe((res) => {
-      this.modalService.dismissAll();
-      this.planoDeCargaService.obtenerExportadores().subscribe(res => {
-        this.exportadores = res;
-      });
-      this.confirmationDialogService.confirm('Guardado', 'El exportador fue creado con éxito');
-    }, (err) => {
-      this.confirmationDialogService.confirm('¡Error!', 'Ha ocurrido un error al guardar el exportador', 'Cerrar', '', null, null, Tipoalerta.Success);
-      throw err;
-    });
-  }
-
   sendExportador(value: any, j: number) {
     if (this.cargasComercialesFormArray.controls[j]['controls'].exportador.value === undefined) {
       this.planoDeCargaForm.get('cargasComerciales')['controls'][j]['controls'].exportador.value = null;
@@ -1093,6 +1081,12 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     this.sendExportadores();
 
     this.verificarCargaComercial();
+  }
+
+  refrescarListado(){
+    this.planoDeCargaService.obtenerExportadores().subscribe(res => {
+      this.exportadores = res;
+    });
   }
 
   sendExportadores() {

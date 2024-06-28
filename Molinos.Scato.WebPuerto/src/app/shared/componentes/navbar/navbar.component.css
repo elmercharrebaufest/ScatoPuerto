@@ -4,6 +4,14 @@
   color: white !important;
 }
 
+.navbarStyle.env-qa {
+  background: #74a84d 0% 0% no-repeat padding-box !important;
+}
+
+.navbarStyle.env-uat {
+  background: #df9732 0% 0% no-repeat padding-box !important;
+}
+
 .navbarStyle .fa.fa-bars {
   font-size: 29px;
 }
@@ -89,6 +97,7 @@ h2 {
   position: relative;
   width: 2rem;
 }
+
 .demo-header__toggle:after {
   background: #fff;
   content: "";
@@ -116,6 +125,7 @@ h2 {
   padding: 0.5em 2em;
   transition: background-color 0.15s;
 }
+
 .demo-control:hover {
   background-color: #545555;
   color: #fff;
@@ -130,8 +140,14 @@ h2 {
   align-items: center;
 }
 
+.notification-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .center-imgs{
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
@@ -143,13 +159,13 @@ h2 {
 .notification-number{
   background-color: red;
     position: absolute;
+    top: 0px;
+    right: 0px;
     height: 20px;
     width: 20px;
     border-radius: 10px;
-    font-size: 11px;
-    text-align: center;
     font-size: 12px;
     font-weight: 700;
-    margin-right: 15px;
-    padding: 1px;
+    text-align: center;
+    line-height: 20px;
 }

@@ -14,7 +14,7 @@
     <ng-container *ngFor="let elemento of elementos|slice:0:show let i = index; let last = last" >
         <button #listadoBotones class="btn btn-sm mr-2 mt-2 boton-listado" type="button" id="{{elemento.id}}" [ngClass]="elemento.cargado ? 'btn-cargado' : 'btn-pendiente'" (click)="onClickHandlerClient(elemento)">
             <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(elemento)" ></div>
-            #{{elemento.orden}} {{elemento.nombreBuque}} {{mostrarUbicacion ? (elemento.nombreUbicacion ? ': '+
+            #{{elemento.posicion}} {{elemento.nombreBuque}} {{mostrarUbicacion ? (elemento.nombreUbicacion ? ': '+
             elemento.nombreUbicacion
             :':') : ''}}
         </button>

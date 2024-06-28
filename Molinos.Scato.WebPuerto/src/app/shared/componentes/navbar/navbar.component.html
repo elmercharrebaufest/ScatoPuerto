@@ -1,11 +1,5 @@
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbarStyle demo-header">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbarStyle demo-header" [ngClass]="[navClass]">
   <a (click)="onClickHandler()" class="demo-header__toggle"></a>
-<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbarStyle">
-  <a href="#">
-    <i class="fa fa-bars fnt-white"></i>
-  </a> -->
   <div class="col-lg-2 col-md-3">  <!--d-md-block">-->
     <input class="form-control search d-none" type="search" placeholder="&#xF002; Buscar" aria-label="Search">
   </div>
@@ -15,19 +9,27 @@
     </a>
   </div>
   <div class="col-lg-2 col-md-3 col-sm-6 d-none d-md-block">
-    <!-- <label class="form-control mx-0">Usuario: {{session.getUser().username}}</label> -->
     <label class="form-control mx-0">{{session.getUser().username.split("@")[0]}}</label>
   </div>
   <div class='center-imgs'>
-    <div class="notification-number" *ngIf="_cantidadNotificaciones > 0">
-      {{_cantidadNotificaciones}}
+    <div class="notification-wrapper position-relative">
+      <button type="button" class="btn btn-light btn-sm bg-white rounded-img mr-2 ">
+        <img class="mx-2" src="assets/notificationsBell.svg" (click)="showNotificacionesVisibles()">
+      </button>
+      <div class="notification-number" *ngIf="_cantidadNotificaciones > 0">
+        {{_cantidadNotificaciones}}
+      </div>
     </div>
-    <button type="button" class="btn btn-light btn-sm bg-white rounded-img mr-2 "><img class="mx-2" src="assets/notificationsBell.svg" (click)="showNotificacionesVisibles()"></button>
-    <button type="button" class="btn btn-light btn-sm bg-white rounded-img"><img class="mx-2 img-user-rounded" src="assets/user.svg"></button>
+
+    <button type="button" class="btn btn-light btn-sm bg-white rounded-img">
+      <img class="mx-2 img-user-rounded" src="assets/user.svg">
+    </button>
+    <button type="button" class="btn btn-light btn-sm bg-white rounded-img" (click)="logout()">
+      <img class="mx-2 img-user-rounded" src="assets/login/logout.svg">
+    </button>
   </div>
 </nav>
 <div *ngIf="notificacionesVisibles">
-  <app-notificaciones [notificaciones]="notificaciones" (eliminarNotificacion)="eliminarNotificacion($event)" (showNotifications)="showNotifications($event)"></app-notificaciones>
+  <app-notificaciones [notificaciones]="notificaciones" (eliminarNotificacion)="eliminarNotificacion($event)" (showNotifications)="showNotifications($event)">
+  </app-notificaciones>
 </div>
-
-

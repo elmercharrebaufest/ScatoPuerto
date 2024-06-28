@@ -57,12 +57,14 @@
                     </div>
                     <div class="form-group col-md-2">
                         <div><b>Cantidad</b></div>
-                        <input class="form-control" placeholder="-" formControlName="cantidad" type="text" (keypress)="numberOnly($event)">
+                        <input class="form-control" placeholder="-" formControlName="cantidad" type="number" 
+                        step="0.001" min="0" max="9999999999.999"
+                        (change)="setCantidadNominacionRecibo(i)">
                     </div>
                     <div class="form-group col-md-2" >
                         <div><b>Unidad</b></div>
                         <div>
-                            <select formControlName="unidad" class="custom-select" >
+                            <select formControlName="unidad" class="custom-select" (change)="setCantidadNominacionRecibo(i)">
                                 <option value=""></option>
                                 <option *ngFor='let unidad of unidades' [ngValue]='unidad'>
                                     {{unidad}}

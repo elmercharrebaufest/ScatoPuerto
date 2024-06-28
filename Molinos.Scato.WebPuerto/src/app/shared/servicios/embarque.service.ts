@@ -11,11 +11,11 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { Bandera } from '@ScatoModels/bandera';
-import { identifierName } from '@angular/compiler';
 import { TipoArchivoPuerto } from '@ScatoModels/TipoArchivoPuerto';
 import { ArchivoPuerto } from '@ScatoModels/ArchivosPuerto';
 import { IdsDelEmbarque } from '@ScatoModels/idsDelEmbarque';
 import { EmbarqueInformacion } from '@ScatoModels/embarque-Informacion';
+import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-recibo';
 
 @Injectable({
   providedIn: 'root'
@@ -24,19 +24,17 @@ export class EmbarqueService {
 
   url: string = environment.apiUrl;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
 
   }
 
-  altaEmbarque(embarque: Embarque){
-    console.log('altaEmbarque: ', embarque);
-    
-    return this.http.post(`${this.url}Embarque/AltaEmbarque`, embarque, { 'withCredentials' : true});
+  altaEmbarque(embarque: Embarque, recibos:NominacionRecibo[]){
+    return this.http.post(`${this.url}ProgramaEmbarque/CrearNominacionEmbarqueFAS`, { embarque, recibos }, { 'withCredentials' : true});
   }
 
   modificarEmbarque(embarque: Embarque){
     console.log('modificarEmbarque: ', embarque);
-    
+
     return this.http.post(`${this.url}Embarque/ModificarEmbarque`, embarque, { 'withCredentials' : true});
   }
 
@@ -50,7 +48,7 @@ export class EmbarqueService {
   obtenerListadoAgenciasMaritimas(): Observable<AgenciaMaritimaPuerto[]> {
     return this.http.get<AgenciaMaritimaPuerto[]>(`${this.url}Embarque/ListarAgenciasMaritimas`, { 'withCredentials': true });
   }
-  
+
   obtenerTipoArchivos(): Observable<TipoArchivoPuerto[]> {
     return this.http.get<TipoArchivoPuerto[]>(`${this.url}Embarque/ObtenerTipoArchivos`, { 'withCredentials': true });
   }
@@ -66,7 +64,7 @@ export class EmbarqueService {
   guardarTipoArchivo(tipoArchivo: TipoArchivoPuerto){
     return this.http.post(`${this.url}Embarque/GuardarTipoArchivo`, tipoArchivo, { 'withCredentials': true });
   }
-  
+
   eliminarArchivos(archivos : ArchivoPuerto[]) {
     return this.http.post(`${this.url}Embarque/EliminarArchivos`, archivos, { 'withCredentials': true });
   }
@@ -137,11 +135,11 @@ export class EmbarqueService {
   obtenerBanderas(): Observable<Bandera[]>{
     return this.http.get<Bandera[]>(`${this.url}Embarque/ObtenerBanderas`, { 'withCredentials' : true});
   }
-  
+
    guardarCapturaImagenLineUp(capturaImagenLineUp: any){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarCapturaImagenLineUp`, capturaImagenLineUp, { 'withCredentials': true});
-  } 
-  
+  }
+
   obtenerIdsUsuales(idEmbarque: number): Observable<IdsDelEmbarque>{
     return this.http.get<IdsDelEmbarque>(`${this.url}Embarque/ObtenerIdsUsuales?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
   }
@@ -153,5 +151,5 @@ export class EmbarqueService {
   existeEmbarqueEnMuelle(nombreBuque: string, muelle: string): Observable<any>{
     return this.http.get<any>(`${this.url}Embarque/ExisteEmbarqueEnMuelle?nombreBuque=${nombreBuque}&muelle=${muelle}`, { 'withCredentials' : true});
   }
-  
+
 }

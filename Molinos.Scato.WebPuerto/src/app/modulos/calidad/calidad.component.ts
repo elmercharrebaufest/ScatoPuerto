@@ -35,6 +35,11 @@ export class CalidadComponent implements OnInit, OnDestroy {
   mostrarSpinner: boolean = true;
   mostrarTabs: boolean = false;
   mostrarPlano: boolean = false;
+  buqueEnMuelleSanBenito: boolean = true;
+  buqueEnMuelleVicentin: boolean = false;
+  buqueEnMuelleNoryon: boolean = false;
+  muelleActual: string = "sanBenito";
+
   mostrarCargas: boolean = false;
   embarquesEnLineUp: EmbarqueNav[] = [];
   embarqueSelected: EmbarqueNav;
@@ -57,13 +62,13 @@ export class CalidadComponent implements OnInit, OnDestroy {
   startBalanza8: string = '';
   resultados: Balanzas[] = [];
   embarque: EmbarqueNav;
-  moduloDeCarga_Id: number = 0;  
+  moduloDeCarga_Id: number = 0;
   periodoDeCarga: PeriodoDeCarga;
   estadoBuque: EstadoBuque;
-  estadosBuque = [{id: 1, descripcion: 'PreOperativo'},
-                  {id: 2, descripcion: 'Cargando'},
-                  {id: 3, descripcion: 'ControlCalidad'},
-                  {id: 4, descripcion: 'PostOperativo'}];
+  estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
+  { id: 2, descripcion: 'Cargando' },
+  { id: 3, descripcion: 'ControlCalidad' },
+  { id: 4, descripcion: 'PostOperativo' }];
 
 
 
@@ -81,7 +86,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private router: Router,
     private moduloDeCargaService: ModuloDeCargaService,
     private auth: AutenticadorService
-    ) {    
+  ) {
   }
 
   ngOnInit(): void {
@@ -91,90 +96,94 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.trabajoOrdenado();
   }
 
- inicializacion(): void {
-  this.auth.renovarAuthUsuario();    
-  this.unsubscribe = new Subject();
-  this.embarqueService.obtenerListadoMateriales().subscribe( mat => this.materialesPuerto = mat );
-  this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
-  this.parametrosService.obtenerParametros().subscribe( res => this.parametrosService.setParametros(res) );
+  inicializacion(): void {
+    this.auth.renovarAuthUsuario();
+    this.unsubscribe = new Subject();
+    this.embarqueService.obtenerListadoMateriales().subscribe(mat => this.materialesPuerto = mat);
+    this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
+    this.parametrosService.obtenerParametros().subscribe(res => this.parametrosService.setParametros(res));
 
-  this.procesoCalidadService.sendBuqueCambiaEstado.subscribe( res => this.trabajoOrdenado());
-  this.escuchaActualizacionNavtabs();
-  this.escuchaFinalizarHijos();
- }
+    this.procesoCalidadService.sendBuqueCambiaEstado.subscribe(res => this.trabajoOrdenado());
+    this.escuchaActualizacionNavtabs();
+    this.escuchaFinalizarHijos();
+  }
 
-  escuchaActualizacionNavtabs(){
-    this._procesoService.sendSeActualizoEmbarque.subscribe( res => {
+  escuchaActualizacionNavtabs() {
+    this._procesoService.sendSeActualizoEmbarque.subscribe(res => {
       this.embarqueId = this._procesoService.getEmbarqueId();
       this.moduloDeCarga_Id = this._procesoService.getModuloDeCargaId();
       this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id)
-        .subscribe( res => this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0] : null);
+        .subscribe(res => this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0] ? res.moduloDeCargaPeriodoDeCarga[0] : null);
 
       setTimeout(() => this.estadoBuque = this._procesoService.getEstadoBuque(), 3000);
     });
   }
 
-  escuchaFinalizarHijos(){
+  escuchaFinalizarHijos() {
     this.calidadSharedService.sendFinalizaEnCalidad
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((esLiquido: boolean) => this.finalizaEnCalidad(esLiquido));
   }
 
-  trabajoOrdenado(){
+  trabajoOrdenado() {
     forkJoin({
       obtenerListado: this.workflowService.obtenerListado(),
-      listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUp()
+      listarEmbarquesEnLineUp: this.workflowService.listarEmbarquesEnLineUpCalidad()
     })
-    .subscribe( (res: {
-                        obtenerListado: InstanciaWorkflowPuerto[],
-                        listarEmbarquesEnLineUp: EmbarqueNav[]
-                      }) => {
-      this.listadoEmbarques = res.obtenerListado;
-      this.filtrarMuelles();
+      .subscribe((res: {
+        obtenerListado: InstanciaWorkflowPuerto[],
+        listarEmbarquesEnLineUp: EmbarqueNav[]
+      }) => {
+        this.listadoEmbarques = res.obtenerListado;
+        this.filtrarMuelles();
 
-      this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
+        this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
 
+        let embSanBenitoEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
+        let embVicentinEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnVicentin?.embarque.id);
+        let embNoryonEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnNoryon?.embarque.id);
 
-      let embEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
-      if(embEnLineUp) this.embarquesEnLineUp.push(embEnLineUp);
+        if (embSanBenitoEnLineUp) this.embarquesEnLineUp.push(embSanBenitoEnLineUp);
+        if (embVicentinEnLineUp) this.embarquesEnLineUp.push(embVicentinEnLineUp);
+        if (embNoryonEnLineUp) this.embarquesEnLineUp.push(embNoryonEnLineUp);
 
-      this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
-      this.embarque = this._procesoService.getEmbarqueSelected();
-      this.embarqueId = this._procesoService.getEmbarqueId();
+        this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
+        this.embarque = this._procesoService.getEmbarqueSelected();
+        this.embarqueId = this._procesoService.getEmbarqueId();
 
-
-      if(this.embarqueId){
-        res.obtenerListado.forEach( x => x.embarque.id === this.embarqueId ?? this.barquitos.push(x) );
-        if(this.barquitos){
-          this.vaporId = this.barquitos[0]['embarque'].vapor.id;
-          // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-          const selLineUp = this.barquitos[0].lineUp;
-          const selModuloDeCarga = selLineUp['moduloDeCarga'];
-          this.moduloDeCarga_Id = selModuloDeCarga.id;
-          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
+        if (this.embarqueId) {
+          res.obtenerListado.forEach(x => x.embarque.id === this.embarqueId ?? this.barquitos.push(x));
+          if (this.barquitos) {
+            this.vaporId = this.barquitos[0]['embarque'].vapor.id;
+            // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
+            const selLineUp = this.barquitos[0].lineUp;
+            const selModuloDeCarga = selLineUp['moduloDeCarga'];
+            this.moduloDeCarga_Id = selModuloDeCarga.id;
+            this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCarga_Id);
+          }
         }
-      }
-
-      this.mostrarTabs = true;
-    });
-
+        this.mostrarTabs = true;
+      });
   }
 
   filtrarMuelles() {
     // Hasta que el pasaje a produccion de recibidores, pasar de Cargando → Post operativo (ticket 293)
     let idEstadoCargando = 3; // ControlCalidad
-    // let idEstadoCargando = 4; // PostOperativo
 
     // Filtro los buques de cada muelle. Buque que esta cargando en el muelle
     this.buqueEnSanBenito = this.listadoEmbarques ? this.listadoEmbarques
       .filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon))
       .find(m => m.embarque.estadoBuque?.id == idEstadoCargando) : undefined;
-    this.buqueEnNoryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon)
-      .find(m => m.embarque.estadoBuque?.id == idEstadoCargando) : undefined;
-    this.buqueEnVicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin)
-      .find(m => m.embarque.estadoBuque?.id == idEstadoCargando) : undefined;
-    this.buqueEnOtrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles)
-      .find(m => m.embarque.estadoBuque?.id == idEstadoCargando) : undefined;
+
+    //Para buques de otros puertos se filtran por Posicion de lineUp 1 y estado de buque -> Cargando en muelle.
+    this.buqueEnNoryon = this.listadoEmbarques ? this.listadoEmbarques.find(i => i.embarque.noryon && i.embarque.ubicacion == 2 && i.lineUp.orden == 1)
+      : undefined;
+
+    this.buqueEnVicentin = this.listadoEmbarques ? this.listadoEmbarques.find(i => i.embarque.vicentin && i.embarque.ubicacion == 2 && i.lineUp.orden == 1)
+      : undefined;
+
+    //Para otros muelles calidad no se muestra.
+    this.buqueEnOtrosMuelles = undefined;
 
     this.procesoCalidadService.setSanBenito(this.buqueEnSanBenito);
     this.procesoCalidadService.setNoryoun(this.buqueEnNoryon);
@@ -185,27 +194,27 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean ){
+  finalizaEnCalidad(esLiquido: boolean) {
 
-    if(esLiquido){
-      let fechaFinalizacionCarga  = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
-      let horaFinalizacionCarga   = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
+    if (esLiquido) {
+      let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
+      let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
 
-      if(fechaFinalizacionCarga == null || horaFinalizacionCarga == null){
+      if (fechaFinalizacionCarga == null || horaFinalizacionCarga == null) {
         this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de finalización de carga debe estar completa.', 'Aceptar', '', null, null, Tipoalerta.Warning)
-      }else{
+      } else {
         this.consultaCambioDeEstado();
       }
-    }else{
+    } else {
       let estadoBuque = this.estadoBuque.descripcion.includes('ControlCalidad');
-      if(estadoBuque)
+      if (estadoBuque)
         this.consultaCambioDeEstado();
       else
         this.confirmationDialogService.confirm('¡Atención!', 'El buque continua en estado "Cargando".', 'Aceptar', '', null, null, Tipoalerta.Warning)
     }
   }
 
-  consultaCambioDeEstado(){
+  consultaCambioDeEstado() {
     //let texto = "Desea cambiar el estado del embarque a PostOperativo?";
     let texto = "Desea zarpar el embarque?";
 
@@ -214,8 +223,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
         if (confirmed) {
           this.modificarEstadoBuque('PostOperativo');
           //this.zarparEmbarque();
-     //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
-
+          //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
 
           InstanciaWorkflowPuerto
           this.router.navigate(['/lineup']);
@@ -227,41 +235,40 @@ export class CalidadComponent implements OnInit, OnDestroy {
       });
   }
 
-
-  zarparEmbarque()
-  {
-    let ubicacionBuque = this.ubicacionDeBuquePuerto.find( e => e.orden=1);
-    let embarqueActualizar = this.listadoEmbarques.find(x=>x.embarque.id == this.embarqueId)['embarque'];
-    embarqueActualizar.ubicacionDeBuque =ubicacionBuque;
-    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe( res => console.log(res) );
+  zarparEmbarque() {
+    let ubicacionBuque = this.ubicacionDeBuquePuerto.find(e => e.orden = 1);
+    let embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueId)['embarque'];
+    embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
+    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
 
   }
-  modificarEstadoBuque(estado: string){
+
+  modificarEstadoBuque(estado: string) {
     try {
-      let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
-      this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => console.log(res) );
-     this.zarparEmbarque();
+      let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes(estado));
+      this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe(res => console.log(res));
+      this.zarparEmbarque();
     } catch (e) {
       console.log(e);
       console.log("Error al modificarEstadoBuque");
     }
   }
 
-  getDate(fecha: Date): string{
+  getDate(fecha: Date): string {
     let fechaDate = new Date(fecha);
-    let date = fechaDate.getDate()+"-"+fechaDate.getMonth()+"-"+fechaDate.getFullYear();
+    let date = fechaDate.getDate() + "-" + fechaDate.getMonth() + "-" + fechaDate.getFullYear();
     return date;
   }
 
-  getHour( fecha: Date ): string{
+  getHour(fecha: Date): string {
     let hour = fecha.toString().substr(11, 5);
     return hour;
   }
 
-  getDescripcionCortaMaterial(materialId: number): string{
+  getDescripcionCortaMaterial(materialId: number): string {
     if (!materialId) return '';
 
-    let materialesPuerto = this.materialesPuerto.find( x => x.id == materialId );
+    let materialesPuerto = this.materialesPuerto.find(x => x.id == materialId);
     // TODO: La siguiente linea es para cuando el id del material del corte no está en plano de carga
     let descripcionCorta = materialesPuerto?.descripcionCorta ? materialesPuerto.descripcionCorta : '';
     return descripcionCorta;
@@ -269,7 +276,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
   showPlano(event: boolean) {
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
     setTimeout(() => {
       this.mostrarSpinner = false;
       this.mostrarPlano = event;
@@ -290,6 +296,21 @@ export class CalidadComponent implements OnInit, OnDestroy {
     this.mostrarCargas = false;
     this.mostrarSpinner = true;
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+
+    //Inicializan banderas cuando se cambia de item en nav.
+    this.buqueEnMuelleSanBenito = false;
+    this.buqueEnMuelleNoryon = false;
+    this.buqueEnMuelleVicentin = false;
+
+    if (this.embarqueSelected.muelle == "sanBenito") {
+      this.buqueEnMuelleSanBenito = true;
+    } else if (this.embarqueSelected.muelle == "vicentin") {
+      this.buqueEnMuelleVicentin = true;
+      this.mostrarSpinner = false;
+    } else {
+      this.buqueEnMuelleNoryon = true;
+      this.mostrarSpinner = false;
+    }
   }
 
   ngOnDestroy(): void {

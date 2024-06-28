@@ -32,8 +32,10 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
 
   buqueSanBenito: InstanciaWorkflowPuerto | undefined;
   buqueSanBenito2: EmbarqueNav;
-  buqueNoryon: InstanciaWorkflowPuerto | undefined;
   buqueVicentin: InstanciaWorkflowPuerto | undefined;
+  buqueVicentin2: EmbarqueNav;
+  buqueNoryon: InstanciaWorkflowPuerto | undefined;
+  buqueNoryon2: EmbarqueNav;
   buqueOtrosMuelles: InstanciaWorkflowPuerto | undefined;
 
   embarqueSelected: EmbarqueNav;
@@ -66,7 +68,9 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
 
     this.elementos = this._procesoService.getEmbarquesList();
     this.embarqueId = this._procesoService.getEmbarqueId();
-    this.buqueSanBenito2 = this.elementos[0];
+    this.buqueSanBenito2 = this.elementos.find(b => b.muelle == 'sanBenito');
+    this.buqueVicentin2 = this.elementos.find(b => b.muelle == 'vicentin');
+    this.buqueNoryon2 = this.elementos.find(b => b.muelle == 'noryon');
   }
 
   ngOnInit(): void {

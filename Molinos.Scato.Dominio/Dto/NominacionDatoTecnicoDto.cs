@@ -10,7 +10,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
-        public int CantidadTotal { get; set; }
+        public decimal CantidadTotal { get; set; }
         public int Tolerancia { get; set; }
         public string Observaciones { get; set; }
         public VaporInformacionDto VaporInformacion { get; set; }
@@ -18,7 +18,7 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime? ObligacionDeCarga { get; set; }
         public MuelleDeCargaDto MuelleDeCarga { get; set; }
         public TasaDeCargaDto TasaDeCarga { get; set; }
-        public int? TasaDeCargaValor { get; set; }
+        public decimal? TasaDeCargaValor { get; set; }
         public decimal DEM { get; set; }
         public decimal DES { get; set; }
         public TipoDeContratoDto TipoDeContrato { get; set; }

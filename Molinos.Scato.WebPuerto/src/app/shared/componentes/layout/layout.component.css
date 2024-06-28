@@ -6,6 +6,14 @@
     justify-content: center;
 }
 
+.sidebar-header.env-qa {
+  background: #74a84d 0% 0% no-repeat padding-box !important;
+}
+
+.sidebar-header.env-uat {
+  background: #df9732 0% 0% no-repeat padding-box !important;
+}
+
 .sidebar-header img:hover {
     cursor: pointer;
 }
@@ -140,6 +148,13 @@
     mask-image: url('assets/sidebar-icons/icon-afip.svg') no-repeat center;
     width: 33px;
     height: 35px;
+}
+
+.links-container a div.item-container div.icon-destinos {
+    -webkit-mask: url('assets/sidebar-icons/destinos.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/destinos.svg') no-repeat center;
+    height: 30px;
+    width: 30px;
 }
 
 @media screen and (max-width: 480px) {

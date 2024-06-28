@@ -2,7 +2,7 @@
   <ng-sidebar [(opened)]="opened" [keyClose]="keyClose" [closeOnClickOutside]="true" [animate]="animate" [dock]='false'
     [dockedSize]='"60px"' [mode]="'over'" [autoFocus]='false'>
 
-    <div class='sidebar-header'>
+    <div class='sidebar-header' [ngClass]="[envClass]">
       <img src='assets/sidebar/Logo_Molinos_M.png' (click)='goHome()'>
     </div>
     <div class='links-container' #menuSide>
@@ -60,6 +60,21 @@
             <span *ngIf='opened'>Clientes</span>
           </div>
         </a>
+
+        <a routerLink='/embarque/cargadores' *ngIf='tienePermiso("Vapor_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/cargadores"'>
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Cargadores ó Exportadores</span>
+          </div>
+        </a>
+
+        <a routerLink='/destinos' *ngIf='tienePermiso("Vapor_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "destinos"'>
+            <div class='icon-destinos'></div>
+            <span *ngIf='opened'>Destinos</span>
+          </div>
+        </a>
+
       </div>
       <!-- #endregion SubMenu Datos de Embarque -->
 
@@ -95,7 +110,7 @@
         </div>
       </a>
 
-      <!--
+	  <!--
       <hr *ngIf='tienePermiso("Caratula_Visualizar")'>
       <a *ngIf='tienePermiso("Caratula_Visualizar")' data-toggle="collapse" href="#collapseAfip" aria-expanded="false" aria-controls="collapseAfip">
         <div  class="item-container">
@@ -115,7 +130,7 @@
           </div>
         </a>
       </div>
-      -->
+	  -->
 
       <!-- Ejemplo de menu-submenu -->
       <!-- <a><div (click)='showSubmenu(menuSide, subCarga)'><img src='../../../assets/sidebar-icons/container.png' width="32"><span>Modulo de Carga</span></div></a>

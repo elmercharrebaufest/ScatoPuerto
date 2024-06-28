@@ -1,7 +1,7 @@
 CREATE TABLE NominacionDatoTecnico (
 	Id INT IDENTITY(1, 1) NOT NULL,
 	MaterialPuerto_Id INT NOT NULL,
-	CantidadTotal INT NOT NULL,
+	CantidadTotal DECIMAL(20, 3) NOT NULL,
 	Tolerancia INT NULL,
 	Observaciones VARCHAR(500) NULL,
 	[VaporInformacion_Id] INT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE NominacionDatoTecnico (
 	ObligacionDeCarga DATETIME,
 	MuelleDeCarga_Id INT NOT NULL,
 	TasaDeCarga_Id INT NULL,
-	TasaDeCargaValor INT NULL,
+	TasaDeCargaValor DECIMAL(20, 3) NULL,
 	DEM DECIMAL(8, 2),
 	DES DECIMAL(8, 2),
 	TipoDeContrato_Id INT NULL,

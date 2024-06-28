@@ -3,4 +3,5 @@ export class Exportador {
       nombre: string;
       almacenId: number;
       almacenDesc: string;
+      habilitado: boolean;
 }

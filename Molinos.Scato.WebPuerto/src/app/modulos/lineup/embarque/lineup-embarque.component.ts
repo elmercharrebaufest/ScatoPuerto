@@ -341,47 +341,59 @@ export class LineupEmbarqueComponent implements OnInit {
 
   // <ARMOA005-1421 Dylan Lopez>
   guardarHistoricoEmbarqueLineUp = (lineUpDto: any) => {
-    this.embarquesPuerto.forEach((embarquePuerto) => {
-      // console.log(embarquePuerto);
+    // console.log(' guardarHistoricoEmbarqueLineUp()');
+    try {
+      this.embarquesPuerto.forEach((embarquePuerto) => {
+        // console.log(embarquePuerto);
 
-      let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
-        vaporNombre: embarquePuerto.embarque.nombreBuque,
-        actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
-        ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
-        cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
-        cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
-        cargaEnSap: embarquePuerto.lineUp.cargaEnSap,
-        nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
-        seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
-        inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
-        controlSenasa: embarquePuerto.lineUp.controlSenasa,
-        controlPrivado: embarquePuerto.lineUp.controlPrivado,
-        amarrador: embarquePuerto.lineUp.amarrador,
-        agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
-        fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
-        puertoActual: '',
-        observaciones: embarquePuerto.embarque.observaciones,
-        materiales: '',
-        planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
-        obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
-        agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
-        ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
-        lineUpId: lineUpDto.id,
-        embarqueId: this.instanciaWorkflow.embarque.id,
-      };
-
-      embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach(
-        (planoDeCargaBodega) => {
-          historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
-        }
-      );
-
-      // console.log(historicoEmbarqueLineUp);
-      this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp)
-        .subscribe((x) => {
-          console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
-        });
-    });
+        let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
+          vaporNombre: embarquePuerto.embarque.nombreBuque,
+          actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
+          ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
+          cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
+          cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
+          cargaEnSap: embarquePuerto.lineUp.cargaEnSap,
+          nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
+          seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
+          inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
+          controlSenasa: embarquePuerto.lineUp.controlSenasa,
+          controlPrivado: embarquePuerto.lineUp.controlPrivado,
+          amarrador: embarquePuerto.lineUp.amarrador,
+          agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
+          fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
+          puertoActual: '',
+          observaciones: embarquePuerto.embarque.observaciones,
+          materiales: '',
+          planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
+          obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
+          agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
+          ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+          lineUpId: lineUpDto.id,
+          embarqueId: this.instanciaWorkflow.embarque.id,
+        };
+        
+        let materiales = '';
+        embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach(
+          (planoDeCargaBodega) => {
+            if (planoDeCargaBodega.materialPuerto) {
+              if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
+                materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+              }
+            }
+            // historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+          }
+        );
+  
+        historicoEmbarqueLineUp.materiales = materiales;
+        // console.log(historicoEmbarqueLineUp);
+        this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp)
+          .subscribe((x) => {
+            console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
+          });
+      });
+    } catch (err) {
+      console.error('Ocurrio un error inesperado: ', err.message);
+    }
   }
   // </ ARMOA005-1421 Dylan Lopez>
 
@@ -435,6 +447,15 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   actualizarOrden(posicion) {
+
+    //Se valida para pasar a primera posicion que haya sido enviado a tablerista.
+    if (posicion == 1 && this.instanciaWorkflow.embarque?.estadoBuque?.descripcion.includes('PreOperativo') &&
+    this.instanciaWorkflow.embarque?.sanBenito == true) {
+      let msjError = "No se puede pasar a posición #1 ya que no se ha enviado el plano de carga al tablerista.";
+      this.confirmationDialogService.alertar(msjError);
+      return;
+    }
+
     if (this.hasPermisoLineUp_EditarOrdenEmbarque()) {
         var posicionActual = this.embarquesPuerto.indexOf(this.instanciaWorkflow) + 1;
 

@@ -1,0 +1,142 @@
+.cargando-clientes {
+    font-family: roboto;
+    font-weight: bold;
+    font-size: 36px;
+    text-align: left;
+    color: #1A1A1A;
+}
+
+.container-fluid {
+    padding: 25px;
+}
+
+.buscar {
+    background-color: #1C7CD5;
+    border-color: #1C7CD5;
+    color: white;
+    width: 100%;
+}
+
+.limpiar {
+    color: #1C7CD5;
+    background: white;
+    border-color: #1C7CD5;
+}
+
+.exportar {
+    color: #107d38;
+    background: white;
+    border-color: #107d38;
+    margin-left: 30px;
+}
+
+:host ::ng-deep .multiselect-dropdown .dropdown-btn {
+    background: #ffffff !important;
+    color: #898989 !important;
+}
+
+.unselected {
+    display: none;
+}
+
+.head {
+    cursor: pointer;
+    text-align: center;
+}
+
+.fa {
+    margin-right: -7.5px;
+    font-size: 13px;
+}
+
+.lista-pe-header {
+    border: 0;
+    border-radius: 4px 4px 0px 0px;
+    background-color: #666666;
+    color: white;
+    font-size: 11.5px;
+}
+
+.noBorder {
+    border-right: none;
+    border-left: none;
+}
+
+.centradoHorizontal {
+    vertical-align: inherit;
+}
+
+.anchoDeFila {
+    width: 10px;
+}
+
+.icon-editar {
+    /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
+    -webkit-mask: url('assets/iconoEditar.svg') no-repeat center;
+    mask-image: url('assets/iconoEditar.svg') no-repeat center;
+    width: 27px;
+    height: 27px;
+    background-color: rgb(153, 153, 153);
+}
+
+.icon-eliminar {
+    -webkit-mask: url('assets/trashIcon-no-border.svg') no-repeat center;
+    mask-image: url('assets/trashIcon-no-border.svg') no-repeat center;
+    width: 27px;
+    height: 27px;
+    background-color: #f57875;
+    font-size: 21px;
+    margin-top: 4px;
+    height: 30px !important
+}
+
+.noBorder-rigth {
+    border-right: none;
+}
+
+.noBorder-left {
+    border-left: none;
+}
+
+.cursor {
+    cursor: pointer !important;
+}
+
+.tableFixHead {
+    overflow: auto;
+    height: 500px;
+}
+
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    padding: 8px 13px;
+}
+
+th {
+    background: #666666;
+}
+
+.alinearJustificado {
+    text-align: justify;
+}
+
+.alinearCentro {
+    text-align: center;
+}
+
+.estiloBoton {
+    border-color: #999999;
+    color: #1cba63;
+}

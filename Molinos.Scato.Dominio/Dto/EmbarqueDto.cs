@@ -66,5 +66,7 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<EmbarqueInformacionViajeDto> EmbarqueInformacionViaje { get; set; }
         public IList<EmbarquePosicionDto> EmbarquePosicion { get; set; }
         public string FilePathImgLineUp { get; set; }
+        public string TipoContratoNominacion { get; set; }
+        public int NominacionId { get; set; }
     }
 }

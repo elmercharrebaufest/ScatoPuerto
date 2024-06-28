@@ -86,6 +86,9 @@
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Rotativa, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rotativa.1.6.4\lib\net40\Rotativa.dll</HintPath>
     </Reference>
@@ -539,7 +542,13 @@
     <Compile Include="FactoryContext.cs" />
     <Compile Include="FactoryConversor.cs" />
     <Compile Include="Meta\ExistenciaUnitTestsTest.cs" />
+    <Compile Include="Mock\FakeAfipCaratula.cs" />
+    <Compile Include="Mock\FakeAfipCaratulaDto.cs" />
+    <Compile Include="Mock\FakeAfipCoem.cs" />
+    <Compile Include="Mock\FakeAfipCoemDto.cs" />
+    <Compile Include="Mock\FakeAfipSolicitudCierreCarga.cs" />
     <Compile Include="Mock\FakeHttpMessageHandler.cs" />
+    <Compile Include="Mock\FakeComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Mock\NullLogger.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarLecturaDeTarjetaPatenteTest.cs" />
     <Compile Include="Procesamiento\ProcesadorConsultarPDFCpeTest.cs" />
@@ -922,6 +931,7 @@
     </Compile>
     <Compile Include="Servicios\CalculadoraDescuentoTest.cs" />
     <Compile Include="Servicios\ComunicacionEmbarqueServicioHelperTests.cs" />
+    <Compile Include="Servicios\ServicioAfipTest.cs" />
     <Compile Include="Servicios\ServicioComandosTest.cs" />
     <Compile Include="Servicios\ServicioMercadoPagoTest.cs" />
     <Compile Include="Servicios\ServicioRepositorioTest.cs" />

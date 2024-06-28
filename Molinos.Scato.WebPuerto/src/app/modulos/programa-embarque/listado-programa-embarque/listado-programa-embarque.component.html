@@ -133,7 +133,7 @@
                 <td class="lista-buque-row-item noBorder alinearCentro centradoHorizontal">
                     <div class="alinearJustificado" *ngFor="let exportador of historial.cargadores">{{
                         exportador.toneladas |
-                        number:'0.0-0' }} tn</div>
+                        pipeTnKg: 3 }} tn</div>
                 </td>
                 <td class="lista-buque-row-item celda-nombre-buque noBorder-left centradoHorizontal">
                     {{historial.contrato}}</td>

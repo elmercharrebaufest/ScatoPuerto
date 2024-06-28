@@ -24,7 +24,7 @@ export class NominacionDatoTecnico {
     obligacionDeCarga: Date;
     muelleDeCarga: MuelleDeCarga;
     tasaDeCarga: TasaDeCarga;
-    tasaDeCargaValor: string;
+    tasaDeCargaValor: number;
     dem: number;
     des: number;
     tipoDeContrato: TipoDeContrato;

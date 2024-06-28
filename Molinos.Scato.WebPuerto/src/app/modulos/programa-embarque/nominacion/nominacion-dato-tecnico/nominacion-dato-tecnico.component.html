@@ -16,10 +16,11 @@
             <div class="form-group col-md-3">
                 <label for="cantidadTotal" class="font-weight-bold">Cantidad Total *</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Ingrese la cantidad"
+                    <input type="number" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadTotal"
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required
-                        (keypress)="numberOnly($event)">
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required                        
+                        step="0.001" min="0" max="9999999999.999"
+                        (change)="onCantidadNominacionDatoTecnicoChange($event)">
                     <div class="input-group-append">
                         <span class="input-group-text">Tn</span>
                     </div>
@@ -117,8 +118,9 @@
                             <div class="form-group col-4">
                                 <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" formControlName="cantidad"
-                                        (keypress)="numberOnly($event)">
+                                    <input type="number" class="form-control" formControlName="cantidad"
+                                    step="0.001" min="0" max="9999999999.999"
+                                    (change)="onCantidadDestinoChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
                                     </div>
@@ -156,9 +158,10 @@
                             <div class="form-group col-2">
                                 <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" formControlName="cantidad"
+                                    <input type="number" class="form-control" formControlName="cantidad"
                                         [ngClass]="{'input-error': grabarNominacion && exportador.cantidad.invalid}"
-                                        required (keypress)="numberOnly($event)">
+                                        required step="0.001" min="0" max="9999999999.999"
+                                        (change)="onCantidadExportadorChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
                                     </div>
@@ -241,9 +244,10 @@
                             <div class="form-group col-4">
                                 <label *ngIf="i==0" for="coordinador" class="font-weight-bold">Cantidad</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" formControlName="cantidad"
+                                    <input type="number" class="form-control" formControlName="cantidad"
                                         [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
-                                        required (keypress)="numberOnly($event)">
+                                        required step="0.001" min="0" max="9999999999.999"
+                                        (change)="onCantidadClienteChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
                                     </div>
@@ -317,8 +321,9 @@
             <div class="input-group col-md-5">
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold">Loading</label>
-                    <input type="text" class="form-control" formControlName="tasaDeCargaValor" maxlength="10"
-                        placeholder="" (keypress)="numberOnly($event)" />
+                    <input type="number" class="form-control" formControlName="tasaDeCargaValor"
+                    placeholder="" step="0.001" min="0" max="9999999999.999"
+                    (change)="onCantidadLoadingChange($event)"/>
                 </div>
                 <div class="form-group col-md-8">
                     <label class="font-weight-bold">Rate</label>

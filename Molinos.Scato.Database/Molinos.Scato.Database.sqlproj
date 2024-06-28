@@ -107,8 +107,10 @@
     <None Include="Molinos.Scato.Database.bfdev226-Branch.publish.xml" />
     <Build Include="dbo\Tables\LoteBiotecnologia.sql" />
     <None Include="Molinos_1.Scato.Database.publish.xml" />
-    <None Include="Molinos.Scato.Database.GVICSQLTEST2016.Puerto.publish.xml" />
+    <None Include="Molinos.Scato.Database.SQL_QA_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.GVICSQLPROD2016.Puerto.publish.xml" />
+    <None Include="Molinos.Scato.Database.SQL_UAT_AZ.Puerto.publish.xml" />
+    <None Include="Molinos.Scato.Database.SQL_PROD_AZ.Puerto.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
@@ -594,6 +596,7 @@
     <Build Include="dbo\Tables\HistoricoEmbarqueLineUp.sql" />
     <Build Include="dbo\Tables\AgenciaMaritimaATA\AgenciaMaritimaPuerto.sql" />
     <Build Include="dbo\Tables\AgenciaMaritimaATA\ATAPuerto.sql" />
+    <Build Include="dbo\Tables\NominacionEmbarque.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
