@@ -251,13 +251,14 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     mail.tipoDeMail = tipoDeMail;
     mail.id = nominacionId;
     var button1 = 'Enviar';
-    var button2 = 'Cancelar';   
+    var button2 = 'Cancelar'; 
+      
     this.envioDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
         .then((confirmed) => {
         if (confirmed) {
           this.estaEnviando = false;
           
-          this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(data => {
+          this.progamaService.EnviarMailProgramaEmbarque(mail, this.user.username).subscribe(data => {
                 this.envioDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '',null, null, Tipoalerta.Success, null, null, true)
                     .then((confirmed) => {
                     if (confirmed) {

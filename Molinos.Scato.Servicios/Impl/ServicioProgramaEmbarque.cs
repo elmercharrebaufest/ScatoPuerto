@@ -886,7 +886,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void ActualizarDatosYEnviarMail(MailDto mail, string usuario)
+        public void ActualizarDatosYEnviarMail(MailDto mail, string correoUsuario)
         {
             try
             {
@@ -903,7 +903,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     nominacion.EnviadoOtros = true;
                 }
-                EnviarMail(mail, usuario);
+                EnviarMail(mail, correoUsuario);
                 repositorio.GuardarCambios();
             }
             catch (Exception ex)
@@ -912,14 +912,10 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void EnviarMail(MailDto mail, string usuario)
+        public void EnviarMail(MailDto mail, string mailUsuarioCreador)
         {
             try
             {
-                var mailUsuarioCreador = "";
-
-                mailUsuarioCreador = ObtenerMailDeActiveDirectory(usuario);
-
                 if (!string.IsNullOrEmpty(mailUsuarioCreador))
                 {
                     mail.Copia.Add(mailUsuarioCreador);

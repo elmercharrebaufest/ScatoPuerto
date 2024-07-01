@@ -140,8 +140,8 @@ export class ProgramaEmbarqueService {
     return this.http.get(`${this.url}ProgramaEmbarque/ObtenerDatosMailProgramaEmbarque?nominacionId=${nominacionId}&tipoDeMail=${tipoDeMail}`, { 'withCredentials': true });
   }
 
-  public EnviarMailProgramaEmbarque(mail: Mail) {
-    return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque`, mail, { 'withCredentials': true });
+  public EnviarMailProgramaEmbarque(mail: Mail, mailUsuarioCreador: string) {
+    return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque?mail=${mail}&mailUsuarioCreador=${mailUsuarioCreador}`, { 'withCredentials': true });
   }
   // #endregion
 

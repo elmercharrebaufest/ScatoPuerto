@@ -505,11 +505,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ProgramaEmbarque/EnviarMailProgramaEmbarque")]
-        public HttpResponseMessage EnviarMailProgramaEmbarque(MailDto mail)
+        public HttpResponseMessage EnviarMailProgramaEmbarque(MailDto mail, string mailUsuarioCreador)
         {
             try
             {
-                servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail, this.nombreUsuario);
+                servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail, mailUsuarioCreador);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
