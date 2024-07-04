@@ -49,7 +49,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
 
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
-  public estaEnviando= false;
+  public estaEnviando = false;
   //#endregion
 
   constructor(private progamaService: ProgramaEmbarqueService,
@@ -75,7 +75,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.pageIndex = this.programa.length > 0 ? this.programa[0].pagina : 1;
         this.estaCargando = false;
         let idsNominacion: number[] = [];
-        
+
         this.programa.forEach(element => {
           idsNominacion.push(element.id)
         })
@@ -91,13 +91,13 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     clearInterval(this.interval)
   }
 
-  tieneAuditoria(nominacion_id: number[]){
+  tieneAuditoria(nominacion_id: number[]) {
     this.progamaService.tieneAuditoria(nominacion_id).subscribe((res: any[]) => {
-      if (res != null && res != undefined){
+      if (res != null && res != undefined) {
         res.forEach(e => {
           let indexNominacion = this.programa.findIndex(x => x.id == e["item1"]);
           //Lo oculto si no tiene notificaciones.
-          (document.getElementsByClassName("auditoriaCheck")[indexNominacion] as HTMLElement) .style.visibility = e["item2"] == true ? 'visible' : 'hidden';
+          (document.getElementsByClassName("auditoriaCheck")[indexNominacion] as HTMLElement).style.visibility = e["item2"] == true ? 'visible' : 'hidden';
         })
       }
     })
@@ -212,79 +212,88 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     return this.user.permisos.find(p => p === this.permisosScato.Comex_Nominacion_Nominar);
   }
 
-
-
-
   public eliminarNominacion(nominacionId: number) {
-
     this.confirmationDialogService.confirm('¡Atención!', 'Se eliminara este producto del programa de embarque', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
-    .then((confirmed) => {
-      if (confirmed) {
-        this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
-          //this.guardando = false
-          this.confirmationDialogService.confirm('¡Alerta!', "Se elimino el producto", 'Cerrar', '', null, null, Tipoalerta.Success);
-          this.listarProgramas();
-        });
-
+      .then((confirmed) => {
+        if (confirmed) {
+          this.progamaService.EliminarNominacion(nominacionId).subscribe((res: any) => {
+            //this.guardando = false
+            this.confirmationDialogService.confirm('¡Alerta!', "Se elimino el producto", 'Cerrar', '', null, null, Tipoalerta.Success);
+            this.listarProgramas();
+          });
         }
         else
           return;
       }).catch();
-
   }
 
-  enviarMail(nominacionId: number, nombreBuque, material, datos, tipoDeMail, historial) {
-    var titulo = tipoDeMail;
-    var asunto = nombreBuque + " " + material + " - Nominación " + (datos != null || datos != undefined ? datos : "");
-    var text = "Cuerpo del mail:";
-    var inputPara = "Para:";
-    var inputTitleCopia = "CC:";
-    var mail = new Mail();
+  enviarMail(nominacionId: number, nombreBuque: string, material: string, datos: any, tipoDeMail: string, historial: any) {
+    const titulo = tipoDeMail;
+    const asunto = `${nombreBuque} ${material} - Nominación ${datos ? datos : ""}`;
+    const text = "Cuerpo del mail:";
+    const inputPara = "Para:";
+    const inputTitleCopia = "CC:";
+    const button1 = 'Enviar';
+    const button2 = 'Cancelar';
+
+    let mail = new Mail();
+    mail.tipoDeMail = tipoDeMail;
+    mail.id = nominacionId;
+
     this.progamaService.ObtenerDatosMailProgramaEmbarque(nominacionId, tipoDeMail).subscribe(
       (data: any) => {
         mail.body = data.body;
         mail.destinatarios = data.destinatarios;
         mail.copia = data.copia;
         mail.titulo = asunto;
-      }
-    )
-    mail.tipoDeMail = tipoDeMail;
-    mail.id = nominacionId;
-    var button1 = 'Enviar';
-    var button2 = 'Cancelar'; 
-      
-    this.envioDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
-        .then((confirmed) => {
-        if (confirmed) {
-          this.estaEnviando = false;
-          
-          this.progamaService.EnviarMailProgramaEmbarque(mail, this.user.username).subscribe(data => {
-                this.envioDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '',null, null, Tipoalerta.Success, null, null, true)
-                    .then((confirmed) => {
-                    if (confirmed) {
-                      // <ARMOA005-1658 Dylan Lopez>
-                      if (tipoDeMail == 'Surveyor'){
-                        historial.enviadoSurveyor = !historial.enviadoSurveyor;
-                      } else if (tipoDeMail == 'Fumigador'){
-                        historial.enviadoFumigador = !historial.enviadoFumigador;
-                      }
-                      // </ ARMOA005-1658 Dylan Lopez>
+        mail.mailEmisor = this.user.username;
 
-                      this.estaEnviando = false;
-                        return;
-                    }
-                }).catch(() => this.listarProgramas());
-            }, error => {
-                this.alertService.mostrar(new Alerta(error.error, Tipoalerta.Error));
-                this.estaEnviando = false;
-            });
-        }
-        else 
-        this.estaEnviando = false;
-    })
-        .catch(() => {
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-        this.estaEnviando = false;
-    });
+        this.envioDialogService.confirm(titulo, text, asunto, button1, button2, 'xl', mail, null, inputPara, inputTitleCopia, true)
+          .then((confirmed: Promise<any>) => {
+            if (confirmed) {
+              this.enviarMailConfirmado(mail, historial, tipoDeMail);
+            } else {
+              this.estaEnviando = false;
+            }
+          })
+          .catch((error: Error) => {
+            console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+            console.log(error);
+            this.estaEnviando = false;
+          });
+      },
+      error => {
+        this.alertService.mostrar(new Alerta(error.error, Tipoalerta.Error));
+        console.log(error);
+      }
+    );
   }
+
+  private enviarMailConfirmado(mail: Mail, historial: any, tipoDeMail: string) {
+    this.estaEnviando = true;
+    this.progamaService.EnviarMailProgramaEmbarque(mail).subscribe(
+      () => {
+        this.envioDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el mail con la información de la nominación', '', 'Aceptar', '', null, null, Tipoalerta.Success, null, null, true)
+          .then((confirmed: Promise<any>) => {
+            if (confirmed) {
+              this.actualizarHistorial(historial, tipoDeMail);
+              this.estaEnviando = false;
+            }
+          }).catch(() => this.listarProgramas());
+      },
+      error => {
+        this.alertService.mostrar(new Alerta(error.error, Tipoalerta.Error));
+        this.estaEnviando = false;
+      }
+    );
+  }
+
+  private actualizarHistorial(historial: any, tipoDeMail: string) {
+    if (tipoDeMail === 'Surveyor') {
+      historial.enviadoSurveyor = !historial.enviadoSurveyor;
+    } else if (tipoDeMail === 'Fumigador') {
+      historial.enviadoFumigador = !historial.enviadoFumigador;
+    }
+  }
+
 }

@@ -108,7 +108,7 @@ namespace Molinos.Scato.Servicios
         IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
 
         [OperationContract]
-        void ActualizarDatosYEnviarMail(MailDto mail, string mailUsuarioCreador);
+        void ActualizarDatosYEnviarMail(MailDto mail);
 
         [OperationContract]
         List<Tuple<int, bool>> TieneAuditoria(int[] nominaciones_id);

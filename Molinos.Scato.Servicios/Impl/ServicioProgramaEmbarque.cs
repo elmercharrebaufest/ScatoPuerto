@@ -642,11 +642,11 @@ namespace Molinos.Scato.Servicios.Impl
             copia = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones.Split(';').ToList();
 
             string campoMail = "";
-            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null)
+            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.Surveyor != null)
             {
                 campoMail = nominacion.NominacionDatoTecnico.Surveyor.Mail;
             }
-            else if (tipoDeMail == "Fumigador" && nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null)
+            else if (tipoDeMail == "Fumigador" && nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null)
             {
                 campoMail = nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail;
             }
@@ -666,11 +666,11 @@ namespace Molinos.Scato.Servicios.Impl
                     $" <tr>" +
                     $" <td style=\"padding: 5px;\"> <strong>PRODUCTO</strong>" +
                     $" </td>" +
-                    $"<td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles} ({nominacion.NominacionDatoTecnico.MaterialPuerto.Descripcion.Trim()})" +
+                    $"<td style=\"padding: 5px;\"> {nominacion.NominacionDatoTecnico?.MaterialPuerto?.DescripcionCortaIngles} ({nominacion.NominacionDatoTecnico?.MaterialPuerto?.Descripcion.Trim()})" +
                     $" </td>";
             body += $" <td style=\"padding: 5px;\"> <strong>NOMBRE BUQUE</strong>" +
                     $" </td>" +
-                    $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.VaporInformacion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.NombreBuque) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque : "-")} " +
+                    $" <td style=\"padding: 5px;\"> {(nominacion.NominacionDatoTecnico?.VaporInformacion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque : "-")} " +
                     $" </td>" +
                     $" </tr>" +
                     $" <tr>" +
@@ -696,7 +696,7 @@ namespace Molinos.Scato.Servicios.Impl
                     $" <tr>" +
                     $" <td style=\"padding: 5px;\"><strong>CLIENTE</strong> " +
                     $" </td>";
-            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
+            if (nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Count > 0)
             {
                 body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.Select(x => x.CoordinadorPuerto.Nombre))}</td>";
             }
@@ -712,8 +712,8 @@ namespace Molinos.Scato.Servicios.Impl
             body += $"<label><strong>CALIDAD</strong></label>";
             body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
                     $" <tr>" +
-                    $"<thead> <td style=\"border: 1px solid #ddd;padding: 8px; background-color: #ddd;\"><strong> {((nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0) ? nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.FirstOrDefault().CalidadValor?.TipoDeCalidad?.Descripcion.Trim() : "-")} </strong> </td><thead>";
-            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
+                    $"<thead> <td style=\"border: 1px solid #ddd;padding: 8px; background-color: #ddd;\"><strong> {((nominacion.NominacionDatoTecnico?.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico?.NominacionDatoTecnicoCalidad.Count > 0) ? nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCalidad.FirstOrDefault().CalidadValor?.TipoDeCalidad?.Descripcion.Trim() : "-")} </strong> </td><thead>";
+            if (nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
             {
                 string calidadValor = string.Empty;
                 foreach (var item in nominacion.NominacionDatoTecnico.NominacionDatoTecnicoCalidad)
@@ -731,14 +731,14 @@ namespace Molinos.Scato.Servicios.Impl
                     $"</table>";
 
             //Observaciones
-            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico.Surveyor != null)
+            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico?.Surveyor != null)
             {
                 body += $"<br/>";
                 body += $"<label><strong>OBSERVACIONES</strong></label>";
                 body += $"<table style=\"font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;\">" +
                         $"<tbody>";
                 body += $"<tr style=\"border: text-align:center;\">" +
-                            $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {nominacion.NominacionDatoTecnico.Observaciones} </td>" +
+                            $"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {nominacion.NominacionDatoTecnico?.Observaciones} </td>" +
                         $"</tr>";
                 body += $"</tbody>" +
                         $"</table>";
@@ -804,7 +804,7 @@ namespace Molinos.Scato.Servicios.Impl
                         $" <tr>" +
                         $" <td style=\"padding: 5px;\"> <strong>CARGADOR</strong>" +
                         $" </td>";
-            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Count > 0)
+            if (nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Count > 0)
             {
                 body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(x => x.Exportador.Nombre))}</td>";
             }
@@ -814,7 +814,7 @@ namespace Molinos.Scato.Servicios.Impl
             };
             body += $" <td style=\"padding: 5px;\"> <strong>DESTINO</strong>" +
                     $" </td>";
-            if (nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Count > 0)
+            if (nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino != null && nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Count > 0)
             {
                 body += $"<td style=\"padding: 5px;\">{string.Join(", ", nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Select(x => x.Destino.Nombre))}</td>";
             }
@@ -886,7 +886,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void ActualizarDatosYEnviarMail(MailDto mail, string correoUsuario)
+        public void ActualizarDatosYEnviarMail(MailDto mail)
         {
             try
             {
@@ -903,7 +903,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     nominacion.EnviadoOtros = true;
                 }
-                EnviarMail(mail, correoUsuario);
+                EnviarMail(mail);
                 repositorio.GuardarCambios();
             }
             catch (Exception ex)
@@ -912,13 +912,13 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void EnviarMail(MailDto mail, string mailUsuarioCreador)
+        public void EnviarMail(MailDto mail)
         {
             try
             {
-                if (!string.IsNullOrEmpty(mailUsuarioCreador))
+                if (!string.IsNullOrEmpty(mail.MailEmisor))
                 {
-                    mail.Copia.Add(mailUsuarioCreador);
+                    mail.Copia.Add(mail.MailEmisor);
                 }
                 var mails = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia");
                 if (mails != null)
