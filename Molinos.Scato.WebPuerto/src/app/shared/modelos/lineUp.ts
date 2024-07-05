@@ -19,4 +19,5 @@ export class LineUp {
   agenciaContactada: boolean;
   planoDeCargaEnviado: boolean;
   orden: number;
+  ocultar: boolean;
 }

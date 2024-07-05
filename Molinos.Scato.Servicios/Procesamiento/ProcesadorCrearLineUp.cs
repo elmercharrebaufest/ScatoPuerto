@@ -33,7 +33,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Embarque = embarque,
                         PlanoDeCarga = new PlanoDeCarga(),
                         ModuloDeCarga = new ModuloDeCarga(),
-                        Orden = embarque != null ? embarque.Id : int.MaxValue
+                        Orden = embarque != null ? embarque.Id : int.MaxValue,
+                        Ocultar = false
                     };
                     comando.LineUp.Ubicacion = lineup.Embarque.Ubicacion;
                     Repositorio.Agregar(lineup);

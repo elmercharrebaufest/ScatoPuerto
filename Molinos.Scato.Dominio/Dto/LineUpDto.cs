@@ -23,5 +23,6 @@ namespace Molinos.Scato.Dominio.Dto
         public bool AgenciaContactada { get; set; }
         public bool PlanoDeCargaEnviado { get; set; }
         public decimal Orden { get; set; }
+        public bool? Ocultar { get; set; }
     }
 }

@@ -1164,7 +1164,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
                                 // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
                                 join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
-                                where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0 && n.FechaEnvioLineUp != null && n.FechaEliminacion == null
+                                where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0 && n.FechaEnvioLineUp != null && n.FechaEliminacion == null && l.Ocultar == false
                                 orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
                                 select (n)).ToList();
             return conversor.ConvertirList<Nominacion, NominacionDto>(nominaciones);
