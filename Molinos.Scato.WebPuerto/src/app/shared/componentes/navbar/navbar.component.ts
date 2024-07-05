@@ -80,6 +80,8 @@ export class NavbarComponent implements OnInit {
     console.log(this.session.getUser());
     localStorage.removeItem('accessToken');
     localStorage.removeItem('accountId');
+    window.localStorage.setItem('logout-event', Math.random().toString())
+    this.session.logOut()
   }
   // </ ARMOA005-1820 Dylan Lopez>
 }

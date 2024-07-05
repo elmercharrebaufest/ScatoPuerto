@@ -149,6 +149,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('accountId', this.accountId);
         }
         this.checkTokenExpiration(this.accessToken);
+        this.session.login();
       }
     );
   }
