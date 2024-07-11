@@ -21,6 +21,6 @@ namespace Molinos.Scato.Dominio.Entidades
         //public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetalles> ModuloDeCargaPlanillaDeTurnosDetalles { get; set; }
         public virtual ICollection<ModuloDeCargaPlanillaDeTurnosCortes> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
         public virtual ICollection<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad> ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad { get; set; }
-
+        public virtual ICollection<ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad> ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad { get; set; }
     }
 }

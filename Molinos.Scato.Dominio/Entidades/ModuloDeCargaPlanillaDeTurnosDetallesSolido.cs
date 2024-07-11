@@ -15,5 +15,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Cantidad { get; set; }
         public virtual int idBalanzaCorte { get; set; }
         //  public virtual DateTime? FechaCarga { get; set; }
+        public virtual BalanzaPuerto BalanzaPuerto { get; set; }
+        public virtual SiloCelda SiloCelda { get; set; }
+        public virtual int? Fila { get; set; }
     }
 }
