@@ -141,8 +141,9 @@ export class ProgramaEmbarqueService {
   }
 
   public EnviarMailProgramaEmbarque(mail: Mail) {
-    return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque`, mail, { 'withCredentials': true });
+    return this.http.post(`${this.url}ProgramaEmbarque/EnviarMailProgramaEmbarque`, mail, { withCredentials: true });
   }
+
   // #endregion
 
 }
