@@ -6,15 +6,17 @@ export class Mail {
     nombre: string;
     copia: string;   
     tipoDeMail: string;
+    mailEmisor: string;
     id: number; 
 
     constructor(titulo: string = null, body : string = null, destinatarios : string[] = null, 
-        adjunto : string = null, nombre : string = null, copia : string = null){
+        adjunto : string = null, nombre : string = null, copia : string = null, mailEmisor: string = null){
         this.body = body;
         this.destinatarios = destinatarios;
         this.titulo = titulo;
         this.adjunto = adjunto;
         this.nombre = nombre;
         this.copia = copia;
+        this.mailEmisor = mailEmisor;
     }
 }

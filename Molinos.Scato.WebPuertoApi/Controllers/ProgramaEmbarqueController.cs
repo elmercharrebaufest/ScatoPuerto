@@ -509,7 +509,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail, this.nombreUsuario);
+                servicioProgramaEmbarque.ActualizarDatosYEnviarMail(mail);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
