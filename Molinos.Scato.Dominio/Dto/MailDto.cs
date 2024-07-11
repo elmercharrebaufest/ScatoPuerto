@@ -12,5 +12,6 @@ namespace Molinos.Scato.Dominio.Dto
         public List<string> Copia { get; set; }
         public int? Id { get; set; }
         public string TipoDeMail { get; set; }
+        public string MailEmisor { get; set; }
     }
 }
