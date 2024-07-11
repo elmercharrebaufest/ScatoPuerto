@@ -24,7 +24,7 @@ export class ModuloDeCarga{
     enviado: boolean;
     usuarioFinalizacion: string;
     cargado?: boolean;
-
+    ingresoManualSolido?: boolean;
     constructor(
         id,
         enviado,
@@ -36,8 +36,8 @@ export class ModuloDeCarga{
         moduloDeCargaLineasDeEmbarque?,
         moduloDeCargaPeriodoDeCarga?,
         moduloDeCargaPlanillaDeEmbarque?,
-        moduloDeCargaUmap?
-        // moduloDeCargaBalanzas?,
+        moduloDeCargaUmap?,
+        ingresoManualSolido?
         ){
     this.id = id;
     this.moduloDeCargaElementoGrafico = moduloDeCargaElementoGrafico;
@@ -48,6 +48,7 @@ export class ModuloDeCarga{
     this.moduloDeCargaPlanillaDeEmbarque = moduloDeCargaPlanillaDeEmbarque;
     // this.moduloDeCargaBalanzas = moduloDeCargaBalanzas;
     this.enviado = enviado;
+    this.ingresoManualSolido = ingresoManualSolido;
     this.moduloDeCargaPeriodoDeCarga = moduloDeCargaPeriodoDeCarga;
     this.usuarioFinalizacion = usuarioFinalizacion;
     this.moduloDeCargaUmap = moduloDeCargaUmap;

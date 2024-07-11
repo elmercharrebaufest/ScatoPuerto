@@ -222,6 +222,7 @@
     <Compile Include="Atributos\AutorizacionAttribute.cs" />
     <Compile Include="Controllers\AfipController.cs" />
     <Compile Include="Controllers\AutenticadorController.cs" />
+    <Compile Include="Controllers\BalanzaManualController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BuqueController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />

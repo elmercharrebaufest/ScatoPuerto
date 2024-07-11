@@ -17,9 +17,9 @@ namespace Molinos.Scato.Dominio.Entidades
             public virtual string Usuario { get; set; }
             public virtual DateTime? FechaDeFinalizacion { get; set; }
             public virtual string UsuarioFinalizacion { get; set; }
-
-            // SÓLIDO //
-                public virtual ICollection<ModuloDeCargaElementoGrafico> ModuloDeCargaElementoGrafico { get; set; }
+            public virtual bool IngresoManualSolido { get; set; }
+        // SÓLIDO //
+        public virtual ICollection<ModuloDeCargaElementoGrafico> ModuloDeCargaElementoGrafico { get; set; }
                 public virtual ICollection<ModuloDeCargaManosDeEmbarque> ModuloDeCargaManosDeEmbarque { get; set; }
                 public virtual ICollection<ModuloDeCargaTabiquesDeEmbarque> ModuloDeCargaTabiquesDeEmbarque { get; set; }
             // SÓLIDO //

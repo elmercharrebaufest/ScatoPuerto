@@ -31,7 +31,9 @@
 
         <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
         
-        <app-balanzas *ngIf="inicioCarga" [imprimir]="imprimir"></app-balanzas>
+        <app-balanzas *ngIf="inicioCarga && !ingresoManualSolido" [imprimir]="imprimir"></app-balanzas>
+        
+        <app-balanzas-manual *ngIf="inicioCarga && ingresoManualSolido" ></app-balanzas-manual>
 
         <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
