@@ -26,7 +26,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   public orderedByColumn: string;
   public orderDirection: number;
   programa: any[]
-  public nominacion: any;
+  public nominacion: any; 
   subscripcionPrograma: Subscription
 
   paginator: any;

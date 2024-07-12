@@ -102,7 +102,7 @@ namespace Molinos.Scato.Servicios
         IList<NotificacionProgramaDeEmbarqueDto> ObtenerNotificaciones(string nombreUsuario);
 
         [OperationContract]
-        MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipo);
+        MailDto ObtenerDatosMailProgramaEmbarque(NominacionDto nominacion, string tipoDeMail);
 
         [OperationContract]
         IList<AuditoriaDto> ObtenerAuditoria(int nominacion_id);
