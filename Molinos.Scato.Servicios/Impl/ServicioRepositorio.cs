@@ -12453,6 +12453,11 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 		}
 		// </ ARMOA005-1965 Dylan Lopez>
+
+        public IList<SiloCeldaDto> ListarSiloCelda()
+        {
+            return Listar<SiloCelda, SiloCeldaDto>();
+        }
 		
         // <ARMOA005-1896>
         public void OcultarEmbarqueLineUp(int lineUpId)

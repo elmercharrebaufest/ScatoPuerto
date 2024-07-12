@@ -19,6 +19,7 @@ import {ListboxModule} from 'primeng/listbox';
 import { PeriodoCargaComponent } from "app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component";
 import { BodegasComponent } from './carga-solidos/tableristas/bodegas/bodegas.component';
 import { InicioCargaComponent } from "./carga-solidos/tableristas/inicio-carga/inicio-carga.component";
+import { PlanillaCargaComponent } from './carga-solidos/planilla-carga/planilla-carga.component';
 import { BalanzasManualComponent } from './carga-solidos/tableristas/balanzas-manual/balanzas-manual.component';
 import { BalanzasManualCorteComponent } from './carga-solidos/tableristas/balanzas-manual-corte/balanzas-manual-corte.component';
 import { BalanzasManualBajaCargaComponent } from './carga-solidos/tableristas/balanzas-manual-baja-carga/balanzas-manual-baja-carga.component';
@@ -39,6 +40,7 @@ const components = [
     PlanillaTurnoLiquidosComponent,
     BodegasComponent,
     InicioCargaComponent,
+    PlanillaCargaComponent,
     BalanzasManualComponent,
     BalanzasManualCorteComponent,
     BalanzasManualBajaCargaComponent,

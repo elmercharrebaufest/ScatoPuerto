@@ -972,6 +972,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ListarSiloCelda")]
+        public HttpResponseMessage ListarSiloCelda()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarSiloCelda());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         public class CapturaImagenLineUp
         {

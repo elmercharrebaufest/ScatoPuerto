@@ -22,7 +22,7 @@
 
     <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
 
-    <div  *ngIf="mostrarTableristaOperando">    
+    <div  *ngIf="mostrarTableristaOperando">
         <div id="umap">
             <app-umap #umapComponent [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId"></app-umap>
         </div>
@@ -30,9 +30,9 @@
         <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
 
         <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
-        
+
         <app-balanzas *ngIf="inicioCarga && !ingresoManualSolido" [imprimir]="imprimir"></app-balanzas>
-        
+
         <app-balanzas-manual *ngIf="inicioCarga && ingresoManualSolido" ></app-balanzas-manual>
 
         <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
@@ -41,7 +41,6 @@
             <app-balanzas-ritmos *ngIf="inicioCarga"></app-balanzas-ritmos>
         </ng-container>
 
-        
         <ng-container *ngIf="hasPermisoTableroSolido_VerCargasBodegas()">
             <app-bodegas *ngIf="inicioCarga"></app-bodegas>
         </ng-container>

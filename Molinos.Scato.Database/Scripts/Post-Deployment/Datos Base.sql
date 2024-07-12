@@ -1057,3 +1057,17 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if exists(select 1 from ModuloDeCarga where IngresoManualSolido is null) BEGIN update ModuloDeCarga set IngresoManualSolido = 0 where IngresoManualSolido is null END
 
 UPDATE LineUp SET Ocultar = 0 WHERE Ocultar IS NULL
+
+
+--Silos y Celdas
+IF (SELECT COUNT(*) FROM SiloCelda) = 0 BEGIN
+    INSERT INTO SiloCelda (Nombre, Color) 
+	VALUES	('SILO 31', '#ccc0da'),
+			('SILO 32', '#92cddc'),
+			('Camiones', '#f33954'),
+			('Silos Logística / Celda 29', '#948a54'),
+			('CELDA 7', '#ffcc99'),
+			('CELDA 20', '#ccffcc'),
+			('CELDA 23', '#ffff99'),
+			('CELDA 30', '#e6b8b7')
+END

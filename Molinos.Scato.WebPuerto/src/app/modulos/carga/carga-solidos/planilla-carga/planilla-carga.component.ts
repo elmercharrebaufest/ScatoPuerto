@@ -1,0 +1,648 @@
+import { Destino } from '@ScatoModels/destino';
+import { Exportador } from '@ScatoModels/exportador';
+import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { BalanzaPuerto, PlanillaDeTurnos, SiloCelda, TurnoDetalleSolido, TurnoDetalleSolidoGravedad, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+
+interface DestinoColor extends Destino {
+  color: string;
+}
+
+interface ExportadorColor extends Exportador {
+  color: string;
+}
+
+interface TotalExportadorProducto {
+  material: MaterialPuerto,
+  cantidadesExportadores: {
+    exportador: Exportador,
+    cantidad: number
+  }[]
+}
+
+@Component({
+  selector: 'app-planilla-carga',
+  templateUrl: './planilla-carga.component.html',
+  styleUrls: ['./planilla-carga.component.scss']
+})
+export class PlanillaCargaComponent implements OnInit {
+
+  public bodegas: PlanoDeCargaBodega[] = [];
+  public silosCeldas: SiloCelda[] = [];
+  public destinos: DestinoColor[] = [];
+  public exportadores: ExportadorColor[] = [];
+
+  private coloresEsquinas = ['#83bc08', '#08a7f0', '#dc3545', 'orange', '#bc3aa5']
+  private ultimoColorUsado: number = 0;
+
+  public turnos: PlanillaDeTurnos[] = [];
+  private turnosPuerto: TurnoPuerto[] = [];
+  private form: FormGroup;
+
+  public siloCeldaSeleccionado: SiloCelda;
+  public destinoSeleccionado: DestinoColor;
+  public exportadorSeleccionado: ExportadorColor;
+
+  public totalesBodegas: { bodegaParcel: number, color: string, totalCargado: number, totalPlano: number, faltaCargar: number }[] = [];
+  public totalPlano: number = 0;
+  public totalCargado: number = 0;
+  public faltaCargar: number = 0;
+  public totalGravedad: number = 0;
+  public totalPala: number = 0;
+
+  public totalesSiloCeldaProducto: { material: MaterialPuerto, siloCelda: SiloCelda, cantidad: number }[] = [];
+  public totalesExportadorProducto: TotalExportadorProducto[] = [];
+  public totalesPalaProducto: { material: MaterialPuerto, cantidad: number }[] = [];
+
+  constructor(
+    private _procesoService: DatosEmbarquesProcesoService,
+    private planoDeCargaService: PlanoDeCargaService,
+    private moduloDecargaService: ModuloDeCargaService,
+    private confirmationDialogService: ConfirmationDialogService,
+    private fb: FormBuilder
+  ) {
+    this.inicializarForm();
+  }
+
+  ngOnInit(): void {
+    const embarque = this._procesoService.getEmbarqueSelected();
+    this.form.get('embarqueId').setValue(embarque.id);
+    const fechaHoraInicioCarga = this._procesoService.getFechaHoraInicioCarga();
+    forkJoin([
+      this.planoDeCargaService.obtenerPlanoDeCarga(embarque.planoDeCargaId),
+      this.moduloDecargaService.obtenerTurnoPuerto(),
+      this.moduloDecargaService.listarSiloCelda(),
+    ]).subscribe(([planoDeCarga, turnosPuerto, silosCeldas]) => {
+      this.totalPlano = 0;
+      this.bodegas = planoDeCarga.planoDeCargaBodegas;
+      this.turnosPuerto = turnosPuerto;
+      this.silosCeldas = silosCeldas;
+
+      this.inicializarTotales();
+      this.ultimoColorUsado = 0;
+      this.setDestinos();
+      this.setExportadores(planoDeCarga);
+
+      // TODO: Cargar para edición
+      this.agregarDia(fechaHoraInicioCarga);
+    });
+  }
+
+  private inicializarForm() {
+    this.form = this.fb.group({
+      embarqueId: 0,
+      dias: this.fb.array([]),
+      totalCarga: 0,
+      totalPlano: 0,
+      restaCargar: 0,
+      totalGravedad: 0,
+    });
+  }
+
+  // #region Getters
+  public get dias() {
+    return this.form.get('dias') as FormArray;
+  }
+
+  private get materialesSinRepetir() {
+    const materiales = this.bodegas.map(b => b.materialPuerto);
+    const materialesSinRepetir: MaterialPuerto[] = [];
+    for (const material of materiales) {
+      if (!materialesSinRepetir.some(m => m.id == material.id)) {
+        materialesSinRepetir.push(material);
+      }
+    }
+    return materialesSinRepetir;
+  }
+
+  private get colorAleatorio() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  }
+
+  private getNuevoDia(): Date {
+    if (!this.dias.length) {
+      throw new Error("No hay un día anterior");
+    }
+    const diaStr = this.dias.controls[this.dias.length - 1]?.get('fecha').value;
+    const dia = new Date(diaStr)
+    dia.setDate(dia.getDate() + 1);
+    return dia;
+  }
+
+  private getTurno(fecha: Date) {
+    return Math.floor(fecha.getHours() / 6) + 1;
+  }
+
+  public getFechaRowSpan(dia: FormGroup) {
+    const turnos = (dia.get('turnos') as FormArray).controls;
+    let filas = 0;
+    for (const turno of turnos) {
+      filas += this.getTurnoRowSpan(turno);
+    }
+    return filas;
+  }
+
+  public getTurnoRowSpan(turno: AbstractControl) {
+    return (turno.get('filas') as FormArray).controls.length + 1;
+  }
+
+  private getCargasTurno(turno: AbstractControl, enKilos: boolean = false) {
+    const cargas: TurnoDetalleSolido[] = [];
+    for (const fila of (turno.get('filas') as FormArray).controls) {
+      for (let carga of (fila.get('cargas') as FormArray).controls) {
+        const detalle: TurnoDetalleSolido = (carga as FormGroup).getRawValue();
+        detalle.cantidad = this.parsearNumeros(carga.get('cantidad').value);
+        if (detalle.cantidad) {
+          if (enKilos) {
+            detalle.cantidad = detalle.cantidad * 1000;
+          }
+          cargas.push(detalle);
+        }
+      }
+    }
+    return cargas;
+  }
+
+  private getGravedadesTurno(turno: AbstractControl) {
+    const gravedades: TurnoDetalleSolidoGravedad[] = [];
+    for (const gravedadForm of (turno.get('gravedades') as FormArray).controls) {
+      const gravedadTn = this.parsearNumeros(gravedadForm.get('cantidadGravedad').value);
+      const totalTurnoTn = gravedadForm.get('totalTurnoMaterial').value || 0;
+      gravedades.push({
+        id: 0,
+        materialPuerto: gravedadForm.get('materialPuerto').value,
+        kgGravedad: gravedadTn * 1000,
+        totalTurnoMaterial: totalTurnoTn * 1000
+      });
+    }
+    return gravedades;
+  }
+
+  private getTotalTurno(turno: AbstractControl) {
+    let total = 0;
+    const cargas = this.getCargasTurno(turno);
+    for (const carga of cargas) {
+      total += carga.cantidad;
+    }
+    return total;
+  }
+
+  public getCargaColor(carga: AbstractControl) {
+    if (!carga.get('cantidad').value) {
+      return '#c0c0c0';
+    }
+    const siloCelda = carga.get('siloCelda').value as SiloCelda
+    return siloCelda.color || 'white';
+  }
+
+  private getTurnosFinales() {
+    const turnos: PlanillaDeTurnos[] = [];
+
+    let errGravedad = false;
+    let errSiloCelda = false;
+    let errDestino = false;
+    let errExportador = false;
+
+    for (const dia of (this.form.get('dias') as FormArray).controls) {
+      for (const turnoForm of (dia.get('turnos') as FormArray).controls) {
+        const gravedades = this.getGravedadesTurno(turnoForm);
+        const cargas = this.getCargasTurno(turnoForm, true);
+        const turno: PlanillaDeTurnos = new PlanillaDeTurnos();
+        turno.id = 0;
+        turno.turnoPuerto = turnoForm.get('turnoPuerto').value;
+        turno.moduloDeCargaPlanillaDeTurnosDetallesSolido = cargas;
+        turno.moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad = gravedades;
+        turno.fecha = new Date(dia.get('fecha').value);
+        turnos.push(turno);
+
+        if (!errGravedad && gravedades.some(g => g.kgGravedad > g.totalTurnoMaterial)) {
+          errGravedad = true;
+        }
+        if (!errSiloCelda && cargas.some(c => !c.siloCelda)) {
+          errSiloCelda = true;
+        }
+        if (!errExportador && cargas.some(c => !c.exportador)) {
+          errExportador = true
+        }
+        if (!errDestino && cargas.some(c => !c.destino)) {
+          errDestino = true
+        }
+      }
+    }
+
+    let err = '';
+    if (errGravedad) {
+      err += 'Existen valores de pala negativos';
+    }
+    if (errSiloCelda) {
+      err += (err ? '\n' : '') + 'Existen cargas sin un silo/celda asignado';
+    }
+    if (errExportador) {
+      err += (err ? '\n' : '') + 'Existen cargas sin un exportador asignado';
+    }
+    if (errDestino) {
+      err += (err ? '\n' : '') + 'Existen cargas sin un destino asignado';
+    }
+
+    if (err) {
+      throw new Error(err);
+    }
+
+    return turnos;
+  }
+  // #endregion
+
+  private inicializarTotales() {
+    for (const bodega of this.bodegas) {
+      this.totalesBodegas.push({
+        bodegaParcel: bodega.bodegaParcel,
+        color: bodega.materialPuerto?.color || 'white',
+        totalCargado: 0,
+        totalPlano: bodega.cantidad,
+        faltaCargar: bodega.cantidad
+      });
+      this.totalPlano += bodega.cantidad;
+    }
+
+    this.faltaCargar = this.totalPlano;
+
+    const materiales = this.materialesSinRepetir;
+    this.totalesPalaProducto = materiales.map(material => ({ material, cantidad: 0 }));
+  }
+
+  private setDestinos() {
+    const destinosSinRepetir: DestinoColor[] = [];
+    for (const bodega of this.bodegas) {
+      for (const destino of bodega.destinos) {
+        if (!destinosSinRepetir.some(d => d.id == destino.destino.id)) {
+          const color = this.coloresEsquinas[this.ultimoColorUsado] || this.colorAleatorio;
+          destinosSinRepetir.push({ ...destino.destino, color });
+          this.ultimoColorUsado++;
+        }
+      }
+    }
+    this.destinos = destinosSinRepetir;
+  }
+
+  private setExportadores(planoDeCarga: PlanoDeCarga) {
+    const exportadoresSinRepetir: ExportadorColor[] = [];
+    for (const cargaComercial of planoDeCarga.cargasComerciales) {
+      if (!exportadoresSinRepetir.some(e => e.id == cargaComercial.exportador.id)) {
+        const color = this.coloresEsquinas[this.ultimoColorUsado] || this.colorAleatorio;
+        exportadoresSinRepetir.push({ ...cargaComercial.exportador, color });
+        this.ultimoColorUsado++;
+      }
+    }
+    this.exportadores = exportadoresSinRepetir;
+  }
+
+  // #region Construcción de form
+  private construirTurnosFormArray(fecha: Date, nTurno: number) {
+    const turnosFormArray = this.fb.array([]);
+
+    for (let i = nTurno; i <= 4; i++) {
+      const filas = this.construirFilasFormArray();
+      const gravedades = this.construirGravedadFormArray();
+      const turnoPuerto = this.turnosPuerto.find(t => t.orden == i);
+      const turnoForm = this.fb.group({ fecha, turnoPuerto, filas, totalTurno: 0, gravedades });
+      turnosFormArray.push(turnoForm);
+    }
+
+    return turnosFormArray;
+  }
+
+  private construirFilaForm(nFila: number) {
+    const cargas = this.construirCargasFormArray(nFila);
+    return this.fb.group({ fila: nFila, cargas });
+  }
+
+  private construirGravedadFormArray() {
+    const gravedadFormArray = this.fb.array([]);
+    for (const material of this.materialesSinRepetir) {
+      const gravedad = new TurnoDetalleSolidoGravedad();
+      gravedad.materialPuerto = material;
+      const gravedadForm = this.construirGravedadForm(gravedad);
+      gravedadFormArray.push(gravedadForm)
+    }
+
+    return gravedadFormArray;
+  }
+
+  private construirGravedadForm(gravedad: TurnoDetalleSolidoGravedad) {
+    return this.fb.group({
+      materialPuerto: gravedad.materialPuerto,
+      totalTurnoMaterial: (gravedad.totalTurnoMaterial / 1000) || '',
+      cantidadGravedad: [(gravedad.kgGravedad / 1000) || '', [Validators.required, Validators.min(0)]],
+      cantidadPala: gravedad.totalTurnoMaterial ? (gravedad.totalTurnoMaterial - gravedad.kgGravedad) / 1000 : ''
+    });
+  }
+
+  private construirFilasFormArray() {
+    const filasFormArray = this.fb.array([]);
+
+    for (let i = 0; i < 4; i++) {
+      const filaForm = this.construirFilaForm(i);
+      filasFormArray.push(filaForm);
+    }
+
+    return filasFormArray;
+  }
+
+  private construirCargasFormArray(fila: number) {
+    const balanzas: BalanzaPuerto[] = [{ codigoBalanza: '7' }, { codigoBalanza: '8' }];
+    const cargasFormArray = this.fb.array([]);
+
+    for (const planoCargaBodega of this.bodegas) {
+      for (const balanzaPuerto of balanzas) {
+        const carga = new TurnoDetalleSolido();
+        carga.bodega = planoCargaBodega.bodegaParcel;
+        carga.materialPuerto = planoCargaBodega.materialPuerto;
+        carga.balanzaPuerto = balanzaPuerto;
+        carga.fila = fila;
+        if (this.destinos.length == 1) {
+          carga.destino = this.destinos[0];
+        }
+        if (this.exportadores.length == 1) {
+          carga.exportador = this.exportadores[0];
+        }
+
+        const cargaForm = this.construirCargaForm(carga);
+        cargasFormArray.push(cargaForm);
+      }
+    }
+
+    return cargasFormArray;
+  }
+
+  private construirCargaForm(carga: TurnoDetalleSolido) {
+    return this.fb.group({
+      id: carga.id || 0,
+      materialPuerto: carga.materialPuerto || '',
+      destino: [carga.destino || '', Validators.required],
+      bodega: carga.bodega || '',
+      exportador: [carga.exportador || '', Validators.required],
+      cantidad: [(carga.cantidad / 1000) || '', [Validators.required, Validators.min(0)]],
+      balanzaPuerto: carga.balanzaPuerto || '',
+      siloCelda: [carga.siloCelda || '', Validators.required],
+      fila: carga.fila
+    });
+  }
+  // #endregion
+
+  private formatearNumeros(value: string) {
+    let [strEnteros, strDecimales] = value.split(',').map(n => n.replace(/[^0-9]/g, ''));
+
+    if (!strEnteros) {
+      return '';
+    }
+
+    let res = parseInt(strEnteros).toLocaleString('es-AR');
+
+    if (strDecimales !== undefined) {
+      res += ',' + strDecimales.slice(0, 2);
+    }
+
+    return res;
+  }
+
+  private parsearNumeros(value: string) {
+    return Number(value.replace(/\./g, '').replace(',', '.')) || 0;
+  }
+
+  // #region Cálculos
+  private setTotalesGravedad(turno: AbstractControl) {
+    const cargas = this.getCargasTurno(turno);
+    for (const gravedad of (turno.get('gravedades') as FormArray).controls) {
+
+      const material = gravedad.get('materialPuerto').value as MaterialPuerto;
+      const cargasMaterial = cargas.filter(c => c.materialPuerto.id == material.id);
+
+      let totalMaterial = 0;
+      for (const carga of cargasMaterial) {
+        totalMaterial += carga.cantidad;
+      }
+
+      gravedad.get('totalTurnoMaterial').setValue(totalMaterial);
+    }
+  }
+
+  public actualizarTotal(dia: AbstractControl) {
+    let totalDia = 0;
+    for (const turno of (dia.get('turnos') as FormArray).controls) {
+      const totalTurno = this.getTotalTurno(turno);
+      totalDia += totalTurno;
+      turno.get('totalTurno').setValue(totalTurno.toLocaleString('es-AR'));
+      this.setTotalesGravedad(turno);
+    }
+    dia.get('totalDia').setValue(totalDia.toLocaleString('es-AR'));
+    this.actualizarTotalesFinales();
+    this.actualizarGravedad(dia);
+  }
+
+  public actualizarGravedad(dia: AbstractControl) {
+    let totalPala = 0;
+    this.totalesPalaProducto.forEach(t => t.cantidad = 0);
+    for (const turno of (dia.get('turnos') as FormArray).controls) {
+      for (const gravedad of (turno.get('gravedades') as FormArray).controls) {
+        const total = gravedad.get('totalTurnoMaterial').value as number;
+        const cantidadGravedad = this.parsearNumeros(gravedad.get('cantidadGravedad').value);
+        const cantidadPala = total - cantidadGravedad;
+        gravedad.get('cantidadPala').setValue(cantidadPala);
+        totalPala += cantidadPala;
+
+        const material = gravedad.get('materialPuerto').value as MaterialPuerto;
+        const totalPalaProducto = this.totalesPalaProducto.find(t => t.material.id == material.id);
+        totalPalaProducto.cantidad += cantidadPala;
+      }
+    }
+    dia.get('palaDia').setValue(totalPala);
+    this.actualizarTotalGravedad();
+  }
+
+  private actualizarTotalesFinales() {
+    this.totalCargado = 0;
+    this.totalesBodegas.forEach(tb => tb.totalCargado = 0);
+    this.totalesSiloCeldaProducto = [];
+    this.totalesExportadorProducto = [];
+
+    for (const dia of (this.form.get('dias') as FormArray).controls) {
+      for (const turno of (dia.get('turnos') as FormArray).controls) {
+        for (const carga of this.getCargasTurno(turno)) {
+          const totalBodega = this.totalesBodegas.find(tb => tb.bodegaParcel == carga.bodega);
+          totalBodega.totalCargado += carga.cantidad;
+
+          if (carga.siloCelda) {
+            let totalSiloCelda = this.totalesSiloCeldaProducto.find(t => t.siloCelda.id == carga.siloCelda?.id && t.material.id == carga.materialPuerto.id);
+            if (totalSiloCelda) {
+              totalSiloCelda.cantidad += carga.cantidad;
+            } else {
+              totalSiloCelda = { siloCelda: carga.siloCelda, material: carga.materialPuerto, cantidad: carga.cantidad };
+              this.totalesSiloCeldaProducto.push(totalSiloCelda);
+            }
+          }
+
+          if (carga.exportador) {
+            let totalProducto = this.totalesExportadorProducto.find(t => t.material.id == carga.materialPuerto.id);
+            if (!totalProducto) {
+              totalProducto = { material: carga.materialPuerto, cantidadesExportadores: [] };
+              this.totalesExportadorProducto.push(totalProducto);
+            }
+
+            let totalExportador = totalProducto.cantidadesExportadores.find(e => e.exportador.id == carga.exportador.id);
+            if (totalExportador) {
+              totalExportador.cantidad += carga.cantidad;
+            } else {
+              totalExportador = { exportador: carga.exportador, cantidad: carga.cantidad };
+              totalProducto.cantidadesExportadores.push(totalExportador);
+            }
+          }
+        }
+      }
+    }
+
+    for (const totalBodega of this.totalesBodegas) {
+      this.totalCargado += totalBodega.totalCargado;
+      totalBodega.faltaCargar = totalBodega.totalPlano - totalBodega.totalCargado;
+    }
+
+    this.faltaCargar = this.totalPlano - this.totalCargado;
+  }
+
+  private actualizarTotalGravedad() {
+    this.totalGravedad = 0;
+    for (const dia of (this.form.get('dias') as FormArray).controls) {
+      for (const turno of (dia.get('turnos') as FormArray).controls) {
+        for (const gravedad of (turno.get('gravedades') as FormArray).controls) {
+          this.totalGravedad += this.parsearNumeros(gravedad.get('cantidadGravedad').value);
+        }
+      }
+    }
+    this.totalPala = this.totalCargado - this.totalGravedad;
+  }
+  // #endregion
+
+  // #region ACCIONES
+  public agregarDia(fechaHoraInicioCarga?: Date) {
+    let fecha: Date;
+    let nTurno = 1;
+    if (fechaHoraInicioCarga) {
+      fecha = new Date(fechaHoraInicioCarga);
+      nTurno = this.getTurno(fecha);
+      fecha.setHours(0, 0, 0, 0);
+    } else {
+      fecha = this.getNuevoDia();
+    }
+
+    const turnos = this.construirTurnosFormArray(fecha, nTurno);
+
+    const diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
+    this.dias.push(diaForm);
+  }
+
+  public agregarFila(turnoForm: FormGroup) {
+    const filasFormArray = turnoForm.get('filas') as FormArray;
+    const nFila = filasFormArray.length;
+    const filaForm = this.construirFilaForm(nFila);
+    filasFormArray.push(filaForm);
+  }
+
+  public eliminarFila(turnoForm: FormGroup) {
+    const filasFormArray = turnoForm.get('filas') as FormArray;
+    const index = filasFormArray.length - 1;
+    if (!index) {
+      return;
+    }
+    const cargas = filasFormArray.at(index).get('cargas') as FormArray;
+    const tieneCantidades = cargas.controls.some(c => c.get('cantidad').value !== '');
+    if (tieneCantidades) {
+      console.error('No se puede eliminar la fila porque contiene valores');
+      return;
+    }
+
+    filasFormArray.removeAt(index);
+    const dia = turnoForm.parent.parent;
+    this.actualizarTotal(dia);
+  }
+
+  public seleccionarSiloCelda(siloCelda: SiloCelda) {
+    this.siloCeldaSeleccionado = siloCelda;
+    this.destinoSeleccionado = null;
+    this.exportadorSeleccionado = null;
+  }
+
+  public seleccionarDestino(destino: DestinoColor) {
+    this.destinoSeleccionado = destino;
+    this.siloCeldaSeleccionado = null;
+    this.exportadorSeleccionado = null;
+  }
+
+  public seleccionarExportador(exportador: ExportadorColor) {
+    this.exportadorSeleccionado = exportador;
+    this.siloCeldaSeleccionado = null;
+    this.destinoSeleccionado = null;
+  }
+
+  public onInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const formateado = this.formatearNumeros(input.value);
+    input.value = formateado;
+  }
+
+  public onSiloCeldaClick(carga: AbstractControl) {
+    const formControl = carga.get('siloCelda');
+    const siloCeldaCarga = formControl.value as SiloCelda;
+
+    if (siloCeldaCarga.id == this.siloCeldaSeleccionado.id) {
+      formControl.setValue('');
+    } else {
+      carga.get('siloCelda').setValue(this.siloCeldaSeleccionado);
+    }
+    this.actualizarTotalesFinales();
+  }
+
+  public onDestinoClick(carga: AbstractControl) {
+    const formControl = carga.get('destino');
+    const destinoCarga = formControl.value as DestinoColor;
+
+    if (destinoCarga.id == this.destinoSeleccionado.id) {
+      formControl.setValue('');
+    } else {
+      carga.get('destino').setValue(this.destinoSeleccionado);
+    }
+  }
+
+  public onExportadorClick(carga: AbstractControl) {
+    const formControl = carga.get('exportador');
+    const exportadorCarga = formControl.value as ExportadorColor;
+
+    if (exportadorCarga.id == this.exportadorSeleccionado.id) {
+      formControl.setValue('');
+    } else {
+      carga.get('exportador').setValue(this.exportadorSeleccionado);
+    }
+    this.actualizarTotalesFinales();
+  }
+  // #endregion
+
+  public guardar() {
+    try {
+      const turnos = this.getTurnosFinales();
+      console.log(turnos);
+      this.confirmationDialogService.exito('Todo validado (falta implementar guardado)');
+    } catch (error) {
+      this.confirmationDialogService.error(error.message);
+    }
+  }
+
+  public cancelar() {
+    console.log(this.form.getRawValue());
+  }
+}
