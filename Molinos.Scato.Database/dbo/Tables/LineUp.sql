@@ -16,6 +16,7 @@
 	[AgenciaContactada]			bit NOT NULL default 0,
 	[PlanoDeCargaEnviado]					bit NOT NULL default 0,
 	[Orden]			decimal(18,4) NOT NULL default 0,
+    [Ocultar] BIT NULL DEFAULT 0, 
     CONSTRAINT [PK_dbo.LineUp] PRIMARY KEY CLUSTERED ([Id] ASC),
 	CONSTRAINT [FK_dbo.LineUp_dbo.Embarque_Embarque_Id] FOREIGN KEY ([Embarque_Id]) REFERENCES [dbo].[Embarque] ([Id]),
 	CONSTRAINT [FK_dbo.LineUp_dbo.PlanoDeCarga_PlanoDeCarga_Id] FOREIGN KEY ([PlanoDeCarga_Id]) REFERENCES [dbo].[PlanoDeCarga] ([Id]),

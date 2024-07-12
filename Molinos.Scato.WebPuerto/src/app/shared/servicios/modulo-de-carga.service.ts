@@ -11,20 +11,21 @@ import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
 import { Nir, NirManualPuerto } from '@ScatoModels/nir';
 import { FuncionesGeneralesService } from './funciones-generales.service';
 import { Umap } from '@ScatoModels/umap';
+import { SiloCelda, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModuloDeCargaService {
   private url: string = environment.apiUrl;
-  private _actualizarPlanillaLiquido: BehaviorSubject<any> = new BehaviorSubject<any>(null); 
+  private _actualizarPlanillaLiquido: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   constructor(
     private http: HttpClient,
     private funcionesGeneralesService: FuncionesGeneralesService,
   ) {
 
   }
-  
+
   set actualizarPlanillaLiquido(value: any){
     this._actualizarPlanillaLiquido.next(value);
   }
@@ -61,7 +62,7 @@ export class ModuloDeCargaService {
   }
 
   /**
-   * 
+   *
    * @param {any} planillaTurnos PlanillaDeTurnos
    * @returns {Observable<any>}
    */
@@ -70,16 +71,16 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`,  planillaDeTurnos, { 'withCredentials': true});
   }
 
-  
+
   /**
-   * 
+   *
    * @param {any} planillaTurnos PlanillaDeTurnos
    * @param {any} mail
    * @returns {Observable<any>}
    */
 
   guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}`, planillaDeTurnos, { 'withCredentials': true});  
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}`, planillaDeTurnos, { 'withCredentials': true});
   }
 
    guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail:any): Observable<any>{
@@ -101,7 +102,7 @@ export class ModuloDeCargaService {
   }
 
   /**
-   * 
+   *
    * @returns {Observable<MotivosDeCorte[]>} MotivoDeCorte[]
    */
   obtenerMotivosDeCorte(): Observable<MotivosDeCorte[]>{
@@ -109,15 +110,15 @@ export class ModuloDeCargaService {
   }
 
   /**
-   * 
+   *
    * @returns {Observable<any>} Observable<any>
-   */ 
+   */
 
    obtenerModuloDeCargaPlanillaDeTurnos(turnoPuerto_id, moduloDeCarga_id, esliquido: boolean, fechaTurno: string) {
     return this.http.get(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos?turnoPuerto_id=${turnoPuerto_id}&moduloDeCarga_id=${moduloDeCarga_id}&esliquido=${esliquido}&fechaTurno=${fechaTurno}`, { 'withCredentials': true });
   }
-  obtenerTurnoPuerto(): Observable<any>{
-    return this.http.get(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, {'withCredentials': true});
+  obtenerTurnoPuerto() {
+    return this.http.get<TurnoPuerto[]>(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, { 'withCredentials': true });
   }
 
   guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
@@ -133,17 +134,17 @@ export class ModuloDeCargaService {
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarLineasDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, lineasDeEmbarque, { 'withCredentials': true});  
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarLineasDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, lineasDeEmbarque, { 'withCredentials': true});
   }
 
   guardarPlanillaDeEmbarque(planillaDeEmbarqueDtos: any, idModuloDeCarga: number){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, planillaDeEmbarqueDtos, { 'withCredentials': true});  
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, planillaDeEmbarqueDtos, { 'withCredentials': true});
   }
 
   obtenerNir(moduloDeCarga_id: number): Observable<NirManualPuerto[]>{
     return this.http.get<NirManualPuerto[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
   }
-  
+
   guardarModuloDeCargaNirManualPuerto(objetoMailNir:Object, IdModuloDeCarga: number, nombreBuque?: string){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?IdModuloDeCarga=${IdModuloDeCarga}&nombreBuque=${nombreBuque}`, objetoMailNir, { 'withCredentials': true});
   }
@@ -163,13 +164,17 @@ export class ModuloDeCargaService {
   listarTipoLineaEmbarque() {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials' : true});
   }
-  
+
   eliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle: any): Observable<any>{
     return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido?idModuloDeCargaPlanillaDetalle=${parseInt(idModuloDeCargaPlanillaDetalle)}`, {'withCredentials': true});
   }
 
   eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte: any): Observable<any>{
     return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeTurnosCortes?idModuloDeCargaPlanillaCorte=${parseInt(idModuloDeCargaPlanillaCorte)}`, {'withCredentials': true});
+  }
+
+  listarSiloCelda() {
+    return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
   }
 
 }

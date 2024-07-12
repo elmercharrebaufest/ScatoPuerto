@@ -910,4 +910,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Activa" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="56092057-cde6-4f32-8002-8301650cda04" ChangeDateTime="06/06/2024 19:07:58">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido].[ModuloDeCargaSilosCeldas_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolido]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SilosCeldas_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8057ed8d-2947-4598-ba85-78be87f166a7" ChangeDateTime="06/06/2024 19:24:31">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad].[Gravedad]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="KgGravedad" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="81d17c76-7672-4b52-8ad5-79a9db862449" ChangeDateTime="06/24/2024 12:00:21">
+    <Property Name="ElementName" Value="[dbo].[SiloCelda].[ModuloDeCargaPlanillaDeTurnos_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SiloCelda]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Nombre" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bafab286-f946-480a-85a1-57a88fadf19c" ChangeDateTime="06/24/2024 12:00:44">
+    <Property Name="ElementName" Value="[dbo].[SiloCelda].[MaterialPuerto_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SiloCelda]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Color" />
+  </Operation>
 </Operations>

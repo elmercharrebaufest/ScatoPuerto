@@ -61,6 +61,11 @@ export class LineupComponent implements OnInit, Observador {
   estadoOtrosLp: string;
   embarqueCapturaLineUp: Embarque;
   listaErroresEmbarques: ErroresGeolocalizacion[];
+  listaEmbarquesOcultos: InstanciaWorkflowPuerto[];
+  mensajeCantidadEmbarques: string;
+  existenEmbarquesOcultos: boolean;
+  mostrarEmbarquesOcultos: boolean;
+  primerEmbarqueSanBenito: number = 0;
   constructor(
     private workflowService: WorkflowService,
     private alertService: AlertService,
@@ -85,6 +90,14 @@ export class LineupComponent implements OnInit, Observador {
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
     this.cargarEstadoLineUp();
+
+    this.lineupService.dataRecargarListado$.subscribe(recargar => {
+      if (recargar!=null && recargar){
+        this.mostrarSpinner = true;
+        this.cargarWorkflows();
+      }
+    });
+
   }
 
   cargarGeolocalizacionLineUp() {
@@ -107,8 +120,7 @@ export class LineupComponent implements OnInit, Observador {
 
 
   ngOnInit(): void {
-    let actualDate = new Date();
-    this.cargarWorkflows();
+    this.cargarWorkflows(true);
   }
 
   Actualizar(subject?: any) {
@@ -125,10 +137,23 @@ export class LineupComponent implements OnInit, Observador {
     return this.listadoEmbarques;
   }
 
+  mostrarSoloEmbarquesOcultos(){
+    this.mostrarEmbarquesOcultos = true;
+    this.mostrarSpinner = true;
+    this.cargarWorkflows(true);
+  }
   private cargarWorkflows(blockUI: boolean = false) {
     console.log('INICIO LINEUP ', new Date())
     this.workflowService.obtenerListado().subscribe(ret => {
-      this.listadoEmbarques = ret;
+      if (this.mostrarEmbarquesOcultos){
+        this.mostrarEmbarquesOcultos = false;
+        this.listadoEmbarques = ret;
+      }else
+        this.listadoEmbarques = ret.filter(data=> data.lineUp.ocultar == false);
+
+      this.listaEmbarquesOcultos = ret.filter(data=> data.lineUp.ocultar == true);
+      this.mensajeCantidadEmbarques = this.listaEmbarquesOcultos.length > 1 ? `Existen ${this.listaEmbarquesOcultos.length} embarques ocultos` : `Existe ${this.listaEmbarquesOcultos.length} embarque oculto`;
+      this.existenEmbarquesOcultos = this.listaEmbarquesOcultos.length > 0 ? true : false;
       this.fechaActualizacion = new Date();
       if (!blockUI) { setTimeout(x => this.cargarWorkflows(), 120000); }
     }, errmess => {
@@ -160,6 +185,8 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
+    const primerEmbarque = this.sanBenito.filter(x=> x.lineUp.ocultar == false);
+    this.primerEmbarqueSanBenito = (primerEmbarque !=null && primerEmbarque.length >0) ? primerEmbarque[0].lineUp.id : 0; 
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
@@ -261,6 +288,7 @@ export class LineupComponent implements OnInit, Observador {
     var fecha = this.datepipe.transform(new Date(), 'dd-MM-yyyy');
     var body = `Adjunto encontrara el archivo de line up generado por el sistema Scato Puerto, creado el dia: ${fecha} por el usuario ${this.user.username}.\n\n`;
     var sanBenito = this.sanBenito;
+    sanBenito = sanBenito.filter(x=> x.lineUp.ocultar == false);
     if (sanBenito.length > 0) {
       body += `\f\0- San Benito:\0\0\f\f\n`;
       sanBenito.slice(0, 3).forEach((x, index) => {

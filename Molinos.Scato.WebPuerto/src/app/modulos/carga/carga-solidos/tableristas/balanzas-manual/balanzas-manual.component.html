@@ -1,0 +1,265 @@
+<div class="row">
+  <!-- Inicio BALANZA 7 -->
+  <div class="col">
+    <div id="balanza7" class="mt-4 px-4 pb-4 shadow" style="background-color: white; min-height: 5rem;">
+      <app-collapse-button collapseSelectorId="collapseBalanza7"></app-collapse-button>
+      <label class="mostrarPdf" style="display: none;">* Los cortes se visualizaran con Kg y Tn en 0</label>
+      <h4 class="colorTitulo pt-4">Balanza 7</h4>
+
+      <div id="collapseBalanza7" class="collapse show textoChico">
+
+        <div class="row">
+          <div class="col">
+            <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col ocultarPdf" style="display: flex;justify-content: center;">
+            <ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
+              <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
+                (click)='onOpenModal(modalCorteManual,7, true)' style="margin-left: 5px;margin-right: 5px;">Alta de
+                Corte</button>
+              <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
+                (click)='onOpenModal(modalBajaCarga  ,7)' style="margin-left: 5px;margin-right: 5px;">Alta de Baja
+                Carga</button>
+            </ng-container>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto; " class="table-responsive tableFixHead">
+          <table class='table table-bordered lista-pe-table'
+            style="border-spacing: 0px 0.5rem; border-collapse: separate;">
+            <thead class="lista-pe-header tamanioHeader">
+              <tr>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Inicio
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Corte
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Motivo
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Kg
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Producto
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Bodega
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let balanza of balanza7Form.get('balanzas7')['controls']; let i = index"
+              style="text-align: center;">
+              <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado">{{balanza.value.fechaInicio | date: 'dd/MM/yyyy'}}
+                    {{balanza.value.horaInicio}}</div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado">{{balanza.value.fechaCorte | date: 'dd/MM/yyyy'}}
+                    {{balanza.value.horaCorte}}</div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado">
+                    <label class="m-1"
+                      [ngClass]="{'stop': balanza.value.toneladas==0, 'bajaCarga': balanza.value.toneladas>0}"
+                      data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones">
+                      {{ balanza.value.motivosFallasBalanza.siglas }}
+                    </label>
+                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
+                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
+                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
+                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
+                    <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                      aria-hidden="true"></i>
+                  </div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="balanza.value.kilogramos > 0" class="alinearJustificado">
+                    Kg: {{balanza.value.kilogramos}}
+                  </div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="balanza.value.material" class="alinearJustificado">
+                    {{balanza.value.material.descripcionCorta}}</div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="balanza.value.bodega" class="alinearJustificado">{{balanza.value.bodega.nombre}}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <h6 class="colorSubTitulo">End: </h6>
+          </div>
+          <div class="col totales">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin BALANZA 7 -->
+
+
+
+  <!-- Inicio BALANZA 8 -->
+  <div class="col">
+    <div id="balanza8" class="mt-4 px-4 pb-4 shadow" style="background-color: white; min-height: 5rem;">
+      <app-collapse-button collapseSelectorId="collapseBalanza8"></app-collapse-button>
+      <h4 class="colorTitulo pt-4">Balanza 8</h4>
+
+      <div id="collapseBalanza8" class="collapse show textoChico">
+
+        <div class="row">
+          <div class="col">
+            <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col ocultarPdf" style="display: flex;justify-content: center;">
+            <ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
+              <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
+                (click)='onOpenModal(modalCorteManual ,8, true)' style="margin-left: 5px;margin-right: 5px;">Alta de
+                Corte</button>
+              <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
+                (click)='onOpenModal(modalBajaCarga   ,8)' style="margin-left: 5px;margin-right: 5px;">Alta de Baja
+                Carga</button>
+            </ng-container>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto; " class="table-responsive tableFixHead">
+          <table class='table table-bordered lista-pe-table'
+            style="border-spacing: 0px 0.5rem; border-collapse: separate;">
+            <thead class="lista-pe-header tamanioHeader">
+              <tr>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Inicio
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Corte
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Motivo
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Kg
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Producto
+                  </div>
+                </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                    Bodega
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let balanza of balanza8Form.get('balanzas8')['controls']; let i = index"
+              style="text-align: center;">
+              <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado">{{balanza.value.fechaInicio | date: 'dd/MM/yyyy'}}
+                    {{balanza.value.horaInicio}}</div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado">{{balanza.value.fechaCorte | date: 'dd/MM/yyyy'}}
+                    {{balanza.value.horaCorte}}</div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado">
+                    <label class="m-1"
+                      [ngClass]="{'stop': balanza.value.toneladas==0, 'bajaCarga': balanza.value.toneladas>0}"
+                      data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones">
+                      {{ balanza.value.motivosFallasBalanza.siglas }}
+                    </label>
+                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
+                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
+                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
+                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
+                    <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                      aria-hidden="true"></i>
+                  </div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="balanza.value.kilogramos > 0" class="alinearJustificado">
+                    Kg: {{balanza.value.kilogramos}}
+                  </div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="balanza.value.material" class="alinearJustificado">
+                    {{balanza.value.material.descripcionCorta}}</div>
+                </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="balanza.value.bodega" class="alinearJustificado">
+                    {{balanza.value.bodega.nombre}}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <h6 class="colorSubTitulo">End: </h6>
+          </div>
+
+          <div class="col totales">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Fin BALANZA 8 -->
+</div>
+
+<div>
+  <app-planilla-carga></app-planilla-carga>
+</div>
+
+<div class="col text-center">
+  <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar() && !esSoloLectura">
+    <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR
+      CARGA Y EXPORTAR PLANILLAS</button>
+  </ng-container>
+</div>
+
+<ng-template #modalBajaCarga let-modal>
+  <app-balanzas-manual-baja-carga [numeroBalanza]="numeroBalanza"
+    (balanzaManual)="onAgregarBajaCarga($event, numeroBalanza)" (cerrar)="modal.dismiss()">
+  </app-balanzas-manual-baja-carga>
+</ng-template>
+
+<ng-template #modalCorteManual let-modal>
+  <app-balanzas-manual-corte [numeroBalanza]="numeroBalanza" (balanzaManual)="onAgregarCortes($event, numeroBalanza)"
+    (cerrar)="modal.dismiss()">
+  </app-balanzas-manual-corte>
+</ng-template>

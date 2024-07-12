@@ -2768,7 +2768,6 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);
 
-
         [OperationContract]
         List<LogABM> ObtenerInformacionLog(int claseId);
 
@@ -2793,6 +2792,31 @@ namespace Molinos.Scato.Servicios
 
 		// <ARMOA005-1965 Dylan Lopez>
 		void GuardarLogAfipCpe(string service, string request, string response);
-		// </ ARMOA005-1965 Dylan Lopez>
-	}
+        // </ ARMOA005-1965 Dylan Lopez>
+
+        [OperationContract]
+        IList<SiloCeldaDto> ListarSiloCelda();
+		
+        // <ARMOA005-1896>
+        [OperationContract]
+        void OcultarEmbarqueLineUp(int lineUpId);
+        // <ARMOA005-1896>	
+        
+        [OperationContract]
+        IList<BalanzaManualDto> ListarBalanzaManual(int moduloDeCargaId);
+
+        [OperationContract]
+        BalanzaManualDto ObtenerBalanzaManual(int id);
+
+        [OperationContract]
+        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto);
+
+        [OperationContract]
+        bool EliminarBalanzaManual(int id);
+
+        [OperationContract]
+        ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
+	
+		
+    }
 }

@@ -35,7 +35,6 @@
             </button>
           </td>
         </tr>
-
         <tr>
           <td style="padding-top: 10px">
             <button class="btn btn-muelles color-muelle-vicentin" (click)='goVicentin()'>
@@ -76,8 +75,6 @@
           <i class="fa fa-map-marker fa-2x c-celeste"></i>
         </button>
       </ng-container>
-
-      <!--<input class="form-control search" type="search" placeholder="&#xF002; Buscar" aria-label="Search">-->
     </div>
     <div class="col pr-0">
       <app-estados-puerto-content></app-estados-puerto-content>
@@ -85,6 +82,18 @@
   </div>
   <div class="alta-fas-container" *ngIf="hasPermisoAltaEmbarque()">
     <button class="btn btn-success" (click)="altaEmbarque()">Nuevo LineUp FAS</button>
+  </div>
+  <div *ngIf="existenEmbarquesOcultos" style="display: flex; margin-left: 25px">
+    <div style="width: 25%">
+    </div>
+    <div style="display: flex;width: 75%">
+      <div style="width: 10%">
+      </div>
+      <div style="display: flex;width: 80%">
+        <p class="font-weight-bold" style="margin-bottom: 0px">{{mensajeCantidadEmbarques}}</p>
+        <p class="font-weight-bold" style="margin-left: 150px; margin-bottom: 0px; cursor: pointer; text-decoration: underline" (click)="mostrarSoloEmbarquesOcultos()">Visualizar embarques ocultos</p>
+      </div>
+    </div>
   </div>
   <app-cargando-muelle *ngIf="sanBenitoCargandoMuelle" [instanciaWorkflow]="sanBenitoCargandoMuelle"></app-cargando-muelle>
 
@@ -100,7 +109,10 @@
                              [ubicacionDeBuquePuerto]="ubicacionDeBuquePuerto"
                              [listadoEmbarques]="listadoEmbarques"
                              [listaErroresEmbarques]="listaErroresEmbarques"
-                             [buquesGeolocalizacion]="instanciaWorkflow"></app-lineup-embarque>
+                             [buquesGeolocalizacion]="instanciaWorkflow"
+                             [esSanBenito]="true"
+                             [primerEmbarqueSanBenito]="primerEmbarqueSanBenito"
+                             ></app-lineup-embarque>
       </div>
       <div class="row">
         <div class="col align-self-start"></div>

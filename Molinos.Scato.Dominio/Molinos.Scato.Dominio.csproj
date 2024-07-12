@@ -105,13 +105,16 @@
     <Compile Include="Dto\AfipPuerto\AfipSolicitudNoABordoDto.cs" />
     <Compile Include="Dto\AfipTablasReferencia\AfipMotivoNoAbordoDto.cs" />
     <Compile Include="Dto\AltaEmbarqueFASDto.cs" />
+    <Compile Include="Dto\BalanzaManualDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\AgenciaMaritimaATADto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadDto.cs" />
     <Compile Include="Dto\NominacionEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
+    <Compile Include="Dto\SiloCeldaDto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordo.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordoDeclaracion.cs" />
@@ -1134,6 +1137,7 @@
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosCortes.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesSolido.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesLiquido.cs" />
+    <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.cs" />
     <Compile Include="Entidades\ModuloDeCargaPlanillaDeTurnosUltimaActualizacion.cs" />
     <Compile Include="Entidades\ModuloDeCargaRitmosEmbarque.cs" />
@@ -1197,6 +1201,7 @@
     <Compile Include="Entidades\PuntosInteresGeolocalizacion.cs" />
     <Compile Include="Entidades\Senasa.cs" />
     <Compile Include="Entidades\SentidoManoDeEmbarque.cs" />
+    <Compile Include="Entidades\SiloCelda.cs" />
     <Compile Include="Entidades\Stock.cs" />
     <Compile Include="Entidades\AnalisisObligatorio.cs" />
     <Compile Include="Entidades\CaladoEnPlanta.cs" />

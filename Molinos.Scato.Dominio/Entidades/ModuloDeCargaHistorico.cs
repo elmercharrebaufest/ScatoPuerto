@@ -21,5 +21,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<ModuloDeCargaHabilitacionDeTanquesHistorico> ModuloDeCargaHabilitacionDeTanquesHistorico { get; set; }
         public virtual ICollection<ModuloDeCargaLineasDeEmbarqueHistorico> ModuloDeCargaLineasDeEmbarqueHistorico { get; set; }
         public virtual bool Enviado { get; set; }
+        public virtual bool IngresoManualSolido { get; set; }
     }
 }

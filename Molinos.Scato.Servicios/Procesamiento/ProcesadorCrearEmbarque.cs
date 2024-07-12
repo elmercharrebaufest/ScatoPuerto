@@ -150,9 +150,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Embarque = embarque,
                             PlanoDeCarga = new PlanoDeCarga(),
                             ModuloDeCarga = new ModuloDeCarga(),
-                            Orden = embarque != null ? embarque.Id : int.MaxValue
+                            Orden = embarque != null ? embarque.Id : int.MaxValue,
+                            Ocultar = false
                         };
-
+                        var vaporInformacion = Repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == vapor.Id);
+                        lineup.ModuloDeCarga.IngresoManualSolido = !vaporInformacion.TipoBuque.Equals("Oil Tanker");
                         Repositorio.Agregar(lineup);
                     }
                     //else

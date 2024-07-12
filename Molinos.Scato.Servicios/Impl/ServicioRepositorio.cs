@@ -12453,5 +12453,161 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 		}
 		// </ ARMOA005-1965 Dylan Lopez>
-	}
+
+        public IList<SiloCeldaDto> ListarSiloCelda()
+        {
+            return Listar<SiloCelda, SiloCeldaDto>();
+        }
+		
+        // <ARMOA005-1896>
+        public void OcultarEmbarqueLineUp(int lineUpId)
+        {
+            try
+            {
+                var lineUp = this.repositorio.Obtener<LineUp>(r => r.Id == lineUpId);
+                lineUp.Ocultar = true;
+                this.repositorio.GuardarCambios();
+            }
+             catch (Exception ex)
+            {
+                log.Error("Error en metodo: ListarBalanzaManual", ex);
+                throw ex;
+            }
+        }
+        public IList<BalanzaManualDto> ListarBalanzaManual(int moduloDeCargaId)
+        {
+            try
+            {
+                List<BalanzaManualDto> result = new List<BalanzaManualDto>();
+                BalanzaManualDto balanzaManualDto;
+                int correlativo = 0;
+                var listaBalanzasCorte = Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == moduloDeCargaId);
+                foreach(var balanzasCorte in listaBalanzasCorte)
+                {
+                    correlativo++;
+                    balanzaManualDto = new BalanzaManualDto();
+                    balanzaManualDto.Id = balanzasCorte.Id;
+                    balanzaManualDto.FechaInicio = balanzasCorte.Fecha_Inicio.Value.ToString("yyyy-MM-dd");
+                    balanzaManualDto.HoraInicio = balanzasCorte.Fecha_Inicio.Value.ToString("HH:mm");
+                    balanzaManualDto.FechaCorte = balanzasCorte.Fecha_Corte.Value.ToString("yyyy-MM-dd");
+                    balanzaManualDto.HoraCorte = balanzasCorte.Fecha_Corte.Value.ToString("HH:mm");
+                    balanzaManualDto.Material = balanzasCorte.Material_id != null ? Obtener<MaterialPuerto, MaterialPuertoDto>(x => x.Id == balanzasCorte.Material_id) : null;
+                    balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? Obtener<Bodega, BodegaDto>(x => x.Id == balanzasCorte.Bodega_id) : null;
+                    balanzaManualDto.Destino = balanzasCorte.Destino_Id != null ? Obtener<Destino, DestinoDto>(x => x.Id == balanzasCorte.Destino_Id) : null;
+                    balanzaManualDto.Exportador = balanzasCorte.Exportador_Id != null ? Obtener<Exportador, ExportadorDto>(x => x.Id == balanzasCorte.Exportador_Id) : null;
+                    balanzaManualDto.MotivosFallasBalanza = balanzasCorte.MotivosFallasBalanza_id != null ? Obtener<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Id == balanzasCorte.MotivosFallasBalanza_id) : null;
+                    balanzaManualDto.Kilogramos = balanzasCorte.Kg;
+                    balanzaManualDto.Toneladas = balanzasCorte.Tn;
+                    balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
+                    balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
+                    balanzaManualDto.Correlativo = correlativo;
+                    balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
+                    result.Add(balanzaManualDto);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error en metodo: ListarBalanzaManual", ex);
+                throw ex;
+            }
+        }
+        
+        public BalanzaManualDto ObtenerBalanzaManual(int id)
+        {
+            BalanzaManualDto balanzaManualDto = new BalanzaManualDto();
+            var balanzasCorte = Obtener<BalanzasCortes, BalanzasCortesDto>(x => x.Id == id);
+            balanzaManualDto.Id = balanzasCorte.Id;
+            balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
+            balanzaManualDto.FechaInicio = balanzasCorte.Fecha_Inicio.Value.ToString("yyyy-MM-dd");
+            balanzaManualDto.HoraInicio = balanzasCorte.Fecha_Inicio.Value.ToString("h:mm");
+            balanzaManualDto.FechaCorte = balanzasCorte.Fecha_Inicio.Value.ToString("yyyy-MM-dd");
+            balanzaManualDto.HoraCorte = balanzasCorte.Fecha_Inicio.Value.ToString("h:mm");
+            balanzaManualDto.Material = balanzasCorte.Material_id !=null ? Obtener<MaterialPuerto, MaterialPuertoDto>(x => x.Id == balanzasCorte.Material_id) : null;
+            balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? Obtener<Bodega, BodegaDto>(x => x.Id == balanzasCorte.Bodega_id) : null;
+            balanzaManualDto.Destino = balanzasCorte.Destino_Id != null ? Obtener<Destino, DestinoDto>(x => x.Id == balanzasCorte.Destino_Id) : null;
+            balanzaManualDto.Exportador = balanzasCorte.Exportador_Id != null ? Obtener<Exportador, ExportadorDto>(x => x.Id == balanzasCorte.Exportador_Id) : null;
+            balanzaManualDto.MotivosFallasBalanza = balanzasCorte.MotivosFallasBalanza_id != null ? Obtener<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Id == balanzasCorte.MotivosFallasBalanza_id) : null;
+            balanzaManualDto.Kilogramos = balanzasCorte.Kg;
+            balanzaManualDto.Toneladas = balanzasCorte.Tn;
+            balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
+            balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
+            return balanzaManualDto;
+        }
+        public bool EliminarBalanzaManual(int id)
+        {
+            bool bResultado = true;
+            var balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == id);
+            this.repositorio.Remover(balanzaCortes);
+            this.repositorio.GuardarCambios();
+            return bResultado;
+        }
+
+        public BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto)
+        {
+            try
+            {
+                var balanzaCortes = new BalanzasCortes();
+
+                if (dto.Id > 0)
+                {
+                    balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == dto.Id);
+                    balanzaCortes.Cerrado = dto.Cerrado;
+                    balanzaCortes.Fecha_Corte = dto.Fecha_Corte;
+                    balanzaCortes.Fecha_Inicio = dto.Fecha_Inicio;
+                    balanzaCortes.Kg = dto.Kg;
+                    balanzaCortes.NumeroBalanza = dto.NumeroBalanza;
+                    balanzaCortes.Observaciones = dto.Observaciones;
+                    balanzaCortes.Material_id = dto.Material_id;
+                    balanzaCortes.Tn = dto.Tn;
+                    balanzaCortes.CorteManual = dto.CorteManual;
+                    balanzaCortes.MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id;
+                    balanzaCortes.Bodega_id = dto.Bodega_id;
+                    balanzaCortes.Exportador_Id = dto.Exportador_Id;
+                    balanzaCortes.Destino_Id = dto.Destino_Id;
+                    this.repositorio.GuardarCambios();
+                }
+                else
+                {
+                    balanzaCortes = new BalanzasCortes()
+                    {
+                        Cerrado = dto.Cerrado,
+                        Fecha_Corte = dto.Fecha_Corte,
+                        Fecha_Inicio = dto.Fecha_Inicio,
+                        Kg = dto.Kg,
+                        NumeroBalanza = dto.NumeroBalanza,
+                        Observaciones = dto.Observaciones,
+                        Material_id = dto.Material_id,
+                        Tn = dto.Tn,
+                        CorteManual = dto.CorteManual,
+                        MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
+                        ModuloDeCarga_id = dto.ModuloDeCarga_id,
+                        Bodega_id = dto.Bodega_id,
+                        Exportador_Id = dto.Exportador_Id,
+                        Destino_Id = dto.Destino_Id,
+                        Id = dto.Id
+                    };
+                    this.repositorio.Agregar(balanzaCortes);
+                    this.repositorio.GuardarCambios();
+                    dto.Id = balanzaCortes.Id;
+                }
+                var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
+                return balanzaManual;
+            }
+            catch (Exception e)
+            {
+                log.Error("Error en metodo: GuardarBalanzaManual", e);
+                throw e;
+            }
+        }
+
+
+        public ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId)
+        {
+            var moduloDeCargaPeriodoDeCargaDto = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == moduloDeCargaId);
+            return moduloDeCargaPeriodoDeCargaDto;
+        }
+
+    }
 }

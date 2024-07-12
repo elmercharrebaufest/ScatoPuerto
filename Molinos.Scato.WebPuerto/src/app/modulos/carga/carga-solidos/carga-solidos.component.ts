@@ -58,6 +58,7 @@ export class CargaSolidosComponent implements OnInit {
   adjunto: any;
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
+  ingresoManualSolido: boolean = false;
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -140,11 +141,9 @@ export class CargaSolidosComponent implements OnInit {
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
-
         console.log('obtenerModuloDeCarga: ', res);
-
-
         this.enviado = res.enviado;
+        this.ingresoManualSolido = res.ingresoManualSolido;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();

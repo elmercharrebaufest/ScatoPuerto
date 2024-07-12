@@ -103,9 +103,24 @@ export class BodegasComponent implements OnInit, OnDestroy {
     // this._balanzaService.balanzadasBuque(this.embarqueSelected.moduloDeCargaId)
     this.balanzas78Service.sendCargasPorBodega
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe( CargasPorBodega => {
-        this.cargasPorbodega = CargasPorBodega;
-      } );
+      .subscribe( bodega => {
+      
+        this.cargasPorbodega = bodega;
+
+        this.cargasPorbodega.sort((a, b) => {
+          let bodega1 = a.nombreBodega.toLowerCase();
+          let bodega2 = b.nombreBodega.toLowerCase();
+      
+          if (bodega1 < bodega2) {
+              return -1;
+          }
+          if (bodega1 > bodega2) {
+              return 1;
+          }
+          return 0;
+        });
+
+    } );
   }
 
   

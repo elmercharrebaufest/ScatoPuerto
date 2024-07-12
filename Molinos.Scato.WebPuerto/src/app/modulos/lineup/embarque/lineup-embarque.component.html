@@ -25,18 +25,26 @@
     <div class="col-md-2 d-none d-md-block text-left ">
       <div class="row lh-22 mt-3 pl-3">
         <div class="col block pl-0 pr-0">
-          <p class="inline s28 font-weight-bold">
-            #{{instanciaWorkflow.posicion}}&nbsp;<span class="inline s21 font-weight-bold">{{instanciaWorkflow.embarque.nombreBuque}}</span>
-            <app-toggle-menu-orden>
-              <div class="list-group">
-                <a href="javascript:;" class="list-group-item list-group-item-action" style="width:50px;"
-                   *ngFor="let orden of posicionesDeLineUps"
-                   [class.active]="orden === index + 1"
-                   (click)="actualizarOrden(orden)">{{orden}}</a>
+          <div>
+            <p class="inline s28 font-weight-bold">
+              #{{index + 1}}&nbsp;<span class="inline s21 font-weight-bold">{{instanciaWorkflow.embarque.nombreBuque}}</span>
+            </p>
+            <div style="display: flex;align-items: center;justify-content: space-between;">
+              <div>
+                <app-toggle-menu-orden>
+                  <div class="list-group">
+                    <a href="javascript:;" class="list-group-item list-group-item-action" style="width:50px;"
+                        *ngFor="let orden of posicionesDeLineUps"
+                        [class.active]="orden === index + 1"
+                        (click)="actualizarOrden(orden)">{{orden}}</a>
+                  </div>
+                </app-toggle-menu-orden>
               </div>
-            </app-toggle-menu-orden>
-          </p>
-          <!--<p class="inline s21 font-weight-bold">{{instanciaWorkflow.embarque.nombreBuque}}</p>-->
+              <div *ngIf="esSanBenito && instanciaWorkflow.lineUp.id == primerEmbarqueSanBenito">
+                <button style="margin-top: 5px; margin-bottom: 5px; margin-right: 5px" class="btn btn-primary ml-2" (click)="ocultarEmbarqueLineUp()"> Ocultar </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="row block text-gris text-08">

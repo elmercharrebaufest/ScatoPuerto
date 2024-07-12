@@ -5,10 +5,12 @@ import { MaterialPuertoCantidad } from '@ScatoModels/material-puerto-cantidad';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { Balanzas } from '@ScatoModels/balanzadas/balanza';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { LineupService } from '@ScatoServicios/lineup.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-cargando-muelle',
@@ -17,6 +19,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 })
 export class CargandoMuelleComponent implements OnInit {
   @Input() instanciaWorkflow: InstanciaWorkflowPuerto;
+  private destroy$ = new Subject();
   balanzas:  Balanzas[];
   valorRitmo: number = 0;
   colorRitmo: string = '#28a745';
@@ -33,6 +36,7 @@ export class CargandoMuelleComponent implements OnInit {
     private router: Router,
     private balanzaService: BalanzaService,
     private moduloCargaService: ModuloDeCargaService,
+    private lineupService: LineupService,
     private session: SessionService,) { 
       this.user = this.session.getUser()
   }
@@ -76,9 +80,7 @@ export class CargandoMuelleComponent implements OnInit {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
         }
-      });
-  
-      // this.balanzaService.listarBalanzadaBuque(this.instanciaWorkflow.embarque.vapor.id).subscribe(res => this.balanzas = res.balanzadasBajaCarga);
+      });  
     }
   }
 
@@ -111,5 +113,11 @@ export class CargandoMuelleComponent implements OnInit {
 
   hasPermisoEditarEmbarqueEnCalidad(){
     return this.user.permisos.find(p => p === this.permisosScato.LineUp_EditarEmbarqueEnCalidad);
+  }
+  ocultarEmbarqueLineUp(){
+    let lineUpId = this.instanciaWorkflow.lineUp.id;
+    this.lineupService.ocultarEmbarqueLineUp(lineUpId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+      this.lineupService.sendRecargarListado(true);
+    });
   }
 }

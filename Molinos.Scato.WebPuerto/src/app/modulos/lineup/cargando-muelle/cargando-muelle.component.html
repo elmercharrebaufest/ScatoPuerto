@@ -3,9 +3,16 @@
         <div class="col-8 border-right">
             <div class="row border-bottom">
                 <div class="col-3 border-right mt-2 mx-2">
-                    <div class="text-success font-weight-bold ship-name">{{instanciaWorkflow.embarque.nombreBuque}}</div>
-                    <div class="text-gris">Actualizado: {{instanciaWorkflow.fechaUltimaModificacion | date : 'dd-MM H:mm'}}hs</div>
-                    <div class="text-success font-weight-bold mt-3 ship-status">CARGANDO EN MUELLE</div>
+                    <div style="display: flex">
+                        <div>
+                            <div class="text-success font-weight-bold ship-name">{{instanciaWorkflow.embarque.nombreBuque}}</div>
+                            <div class="text-gris">Actualizado: {{instanciaWorkflow.fechaUltimaModificacion | date : 'dd-MM H:mm'}}hs</div>
+                            <div class="text-success font-weight-bold mt-3 ship-status">CARGANDO EN MUELLE</div>
+                        </div>
+                        <div style="margin-left: 20px; align-content: center;">
+                            <button *ngIf="!instanciaWorkflow.lineUp.ocultar" class="btn btn-primary ml-2" (click)="ocultarEmbarqueLineUp()"> Ocultar </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-3 mt-3 mx-2 mb-2">
                     <div class="form-group" style="text-align: left;">
