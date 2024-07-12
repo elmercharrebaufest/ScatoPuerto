@@ -720,8 +720,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 comandos.Ejecutar(new EnvioMail
                 {
-                    Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                           .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                    Cuerpo = mail.Body,
                     Destinatarios = mail.Destinatarios,
                     Titulo = mail.Titulo,
                     Copia = mail.Copia,
