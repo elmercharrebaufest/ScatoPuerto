@@ -8113,7 +8113,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<DestinoDto> ListarTodosDestinos()
         {
-            return Listar<Destino, DestinoDto>().ToList();
+            return Listar<Destino, DestinoDto>().OrderBy(d => d.Nombre).ToList();
         }
 
         public IList<AgenciaControlPrivadoDto> ListarAgenciasControlPrivado()
