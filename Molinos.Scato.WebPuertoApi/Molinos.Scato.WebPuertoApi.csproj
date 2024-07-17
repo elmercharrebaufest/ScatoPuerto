@@ -240,6 +240,7 @@
     <Compile Include="EXCEL\ExcelLineUp.cs" />
     <Compile Include="EXCEL\ExcelNirManual.cs" />
     <Compile Include="EXCEL\ExcelPlanilladeTurnos.cs" />
+    <Compile Include="EXCEL\ExcelPlanillaTurnosSolidoOp.cs" />
     <Compile Include="EXCEL\ExcelProgramaEmbarque.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

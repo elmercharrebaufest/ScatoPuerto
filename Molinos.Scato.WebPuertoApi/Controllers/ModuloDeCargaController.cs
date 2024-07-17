@@ -15,6 +15,8 @@ using System.Web.Http;
 using System.Linq;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
+using System.Net.Http.Headers;
+using System.Web;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -1049,6 +1051,40 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             public int Embarque_Id { get; set; }
             public string FilePathImgLineUp { get; set; }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GenerarExcelTurnos")]
+        public HttpResponseMessage GenerarExcelTurnos(int moduloDeCargaId)
+        {
+            try
+            {
+                var excel = HttpContext.Current.Request.Files.Count > 0 ?
+                HttpContext.Current.Request.Files[0] : null;
+                if (excel == null || excel.ContentLength == 0)
+                {
+                    throw new Exception("Hubo un error.");
+                }
+                var listaPlanoDeCargaBodega = servicio.ObtenerPlanoDeCargaBodega(moduloDeCargaId);
+                var nombreBuque = servicio.ObtenerBuqueDadoModCarga(moduloDeCargaId);
+                var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
+                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, nombreBuque, excel).GenerarExcel();
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(archivo)
+                };
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = "turnosMica.xlsx"
+                };
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
 

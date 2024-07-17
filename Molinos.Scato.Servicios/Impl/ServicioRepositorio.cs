@@ -12682,6 +12682,22 @@ namespace Molinos.Scato.Servicios.Impl
             var moduloDeCargaPeriodoDeCargaDto = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == moduloDeCargaId);
             return moduloDeCargaPeriodoDeCargaDto;
         }
+        // </ ARMOA005-1965 Dylan Lopez>
 
+        public IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId)
+        {
+            var planoDeCarga = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloDeCargaId)?.PlanoDeCarga;
+            return Listar<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(p => p.PlanoDeCarga.Id == planoDeCarga.Id).OrderBy(x => x.BodegaParcel).ToList();
+        }
+
+        public IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId)
+        {
+            return Listar<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(p => p.ModuloDeCarga.Id == moduloCargaId).OrderBy(x => x.Fecha.Value).ThenBy(x => x.TurnoPuerto.Orden).ToList();
+        }
+
+        public string ObtenerBuqueDadoModCarga(int moduloCargaId)
+        {
+            return this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloCargaId).Embarque.Vapor.Nombre;
+        }
     }
 }

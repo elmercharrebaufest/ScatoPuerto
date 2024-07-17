@@ -2826,6 +2826,14 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
 	
-		
+        // </ ARMOA005-1965 Dylan Lopez>
+        [OperationContract]
+        IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId);
+
+        [OperationContract]
+        IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId);
+       
+        [OperationContract]
+        string ObtenerBuqueDadoModCarga(int moduloCargaId);
     }
 }

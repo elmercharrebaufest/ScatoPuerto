@@ -187,4 +187,8 @@ export class ModuloDeCargaService {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
   }
 
+  generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}`, excel, {'withCredentials': true, responseType: 'blob'});
+  }
+
 }

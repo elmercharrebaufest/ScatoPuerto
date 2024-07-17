@@ -93,6 +93,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   mostrarInfoBalanzadasEnCurso: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+  formData = new FormData();
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -1038,6 +1039,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       //create new excel work book
       let workbook = new Workbook();
 
+      workbook.addWorksheet("Planilla");
       // ---------- inicio BALANZA 7 ----------
       let propiedadesDeBalanza7 = this.procesarPropiedadesBalanza('7');
       //add name to sheet
@@ -1071,17 +1073,27 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       // ---------- fin BALANZA 8 ----------
 
       //set downloadable file name
-      let fname = "Balanzas_7y8"
+      let fname = this.embarque.id + "_" + this.embarque.nombreBuque + ".xlsx"; 
 
       //add data and file name and download
       workbook.xlsx.writeBuffer().then((data) => {
-        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        // fs.saveAs(blob, fname + '-' + new Date().valueOf() + '.xlsx');
-        saveAs(blob, fname + '-' + new Date().valueOf() + '.xlsx');
+        let blob = new Blob([data]);
+
+        this.formData.append('file', blob, fname + ".xlsx");
+        this.moduloDeCargaService.generarExcel(this.moduloDeCarga_Id, this.formData).subscribe(blob=>{
+         var url = window.URL.createObjectURL(blob);
+         var a = document.createElement('a');
+         a.href = url;
+         a.download = fname;
+         document.body.appendChild(a); 
+         a.click(); 
+         document.body.removeChild(a);
+         window.URL.revokeObjectURL(url); 
+      })
       });
     } catch (e) {
+      console.log("Error al exportar Planillas");
       console.log(e);
-      // console.log("Error al exportar Planillas");
       this.confirmationDialogService.confirm('¡Atención!', 'Se produjo un error al exportar la planilla.', 'Aceptar', '', null, null, Tipoalerta.Error)
         .then((confirmed) => {
           if (confirmed) 
