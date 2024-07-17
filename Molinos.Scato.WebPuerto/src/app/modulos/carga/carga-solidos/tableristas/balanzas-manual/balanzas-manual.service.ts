@@ -19,6 +19,7 @@ import { Workbook } from "exceljs";
 import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { saveAs } from 'file-saver-es';
+import { EmbarqueNav } from "@ScatoModels/embarque-nav";
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +34,7 @@ export class BalanzasManualService {
   destinos: Destino[] = null;
   exportadores: Exportador[] = null;
   bodegas: BodegaParcel[] = [];
+  formData = new FormData();
   private estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
   { id: 2, descripcion: 'Cargando' },
   { id: 3, descripcion: 'ControlCalidad' },
@@ -91,7 +93,8 @@ export class BalanzasManualService {
     let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes('ControlCalidad'));
     return this.embarqueService.actualizarEstadoBuque(embarqueId, estadoBuque.id).pipe(map((data) => { return true; }));
   }
-  exportarBalanzasAExcel(balanza7, balanza8) {
+  
+  exportarBalanzasAExcel(balanza7, balanza8, embarque: EmbarqueNav) {
     let header = [
       { header: 'Balanza', key: 'Balanza' },
       { header: 'Fecha', key: 'Fecha' },
@@ -104,6 +107,9 @@ export class BalanzasManualService {
       { header: 'Observaciones', key: 'Observaciones' }
     ];
     let workbook = new Workbook();
+
+    // Planilla turnos solido
+    workbook.addWorksheet("Planilla");
 
     // Balanza 7
     let worksheetBalanza7 = workbook.addWorksheet("Balanza-7");
@@ -142,13 +148,37 @@ export class BalanzasManualService {
       });
     });
 
-    let archivoBalanzas = "Balanzas_7y8";
+    let fname = embarque.id + "-" + embarque.nombreBuque + ".xlsx";
+
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, archivoBalanzas + '-' + new Date().valueOf() + '.xlsx');
+      this.formData.append('file', blob, fname + ".xlsx");
+      this.moduloDeCargaService.generarExcel(embarque.moduloDeCargaId, this.formData).subscribe(blob => {
+        this.descargarArchivo(blob, fname);
+      }, error => {
+        console.error('Error al generar el archivo Excel:', error);
+        this.confirmationDialogService.confirm('¡Atención!', 'Se produjo un error al exportar la planilla.', 'Aceptar', '', null, null, Tipoalerta.Error)
+          .then((confirmed) => {
+            if (confirmed)
+              console.log('Se produjo un error al exportar la planilla');
+            else
+              return;
+          });
+      });
     });
-
   }
+
+  descargarArchivo(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
   cargarBodegasParcel(): BodegaParcel[] {
     this.bodegas = [];
     for (let index = 1; index < 10; index++) {
