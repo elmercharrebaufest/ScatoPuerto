@@ -121,9 +121,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 datoTecnico.NominacionDatoTecnicoCalidad?.FirstOrDefault()?.CalidadValor?.TipoDeCalidad?.Descripcion ?? "-",
                 datoTecnico.CantidadTotal.ToString(),
                 String.Format("+/- {0}%", datoTecnico.Tolerancia),
-                datoTecnico.Observaciones ?? "-"
+                string.IsNullOrEmpty(datoTecnico.Observaciones) ? "-" : datoTecnico.Observaciones.ToString(),
             };
-            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 });
+            InsertarFilaConValoresProducto(valoresCeldas, columnasMayorFuente: new int[] { 1 });
             if (datoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
             {
                 InsertarFilaTitulo("Parametros de Calidad");
@@ -145,8 +145,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             InsertarFilaConValores(valoresCeldas, true, true); // Negrita y borde sup
             valoresCeldas = new string[] {
                 datoTecnico.MuelleDeCarga?.Descripcion ?? "-",
-                datoTecnico.ETARecalada.Value != null ? datoTecnico.ETARecalada.Value.ToString("dd/MM/yyyy") : "-",
-                datoTecnico.ObligacionDeCarga.Value != null ? datoTecnico.ObligacionDeCarga.Value.ToString("dd/MM/yyyy") : "-",
+                datoTecnico.ETARecalada != null ? datoTecnico.ETARecalada.Value.ToString("dd/MM/yyyy") : "-",
+                datoTecnico.ObligacionDeCarga != null ? datoTecnico.ObligacionDeCarga.Value.ToString("dd/MM/yyyy") : "-",
                 datoTecnico.ATAPuerto?.Nombre ?? "-",
                 datoTecnico.AgenciaMaritimaPuerto?.Nombre ?? "-",
                 (datoTecnico.TasaDeCargaValor ?? 0).ToString(),
@@ -338,7 +338,69 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             _nroFila++;
         }
 
-        private void InsertarFilaTitulo(string titulo, bool principal = false)
+        private void InsertarFilaConValoresProducto(string[] datos, bool negrita = false, bool bordeSupGrueso = false, bool bordeInfGrueso = false, bool negritaSoloPrimero = false, int[] columnasMayorFuente = null)
+        {
+            var fila = _sheet.CreateRow(_nroFila);
+            InsertarColumnaColor(fila);
+
+            int nroColumna = 1;
+            foreach (var dato in datos)
+            {
+                var primeraCelda = nroColumna == 1;
+                var ultimaCelda = nroColumna == datos.Length;
+
+                var criterio = _criterioEstilos.FirstOrDefault(x =>
+                    x.BordeIzq == primeraCelda && x.BordeDer == ultimaCelda && x.BordeSup == bordeSupGrueso && x.BordeInf == bordeInfGrueso &&
+                    x.Negrita == (negrita || (negritaSoloPrimero && primeraCelda)) &&
+                    x.Grande == (columnasMayorFuente != null && columnasMayorFuente.Contains(nroColumna)) &&
+                    x.Fondo == _flagColor && !x.Titulo
+                );
+
+                var celda = fila.CreateCell(nroColumna);
+                celda.SetCellValue(dato);
+                celda.CellStyle = criterio.ObjEstilo;
+
+                if (ultimaCelda && nroColumna < 12) // Si sobran celdas a la derecha, estas se combinan con la útima
+                {
+                    _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, nroColumna, 12));
+                    for (int i = nroColumna + 1; i <= 12; i++)
+                    {
+                        var celdaAux = fila.CreateCell(i);
+                        criterio.ObjEstilo.WrapText = true;
+                        celdaAux.CellStyle = criterio.ObjEstilo;
+                    }
+                    AjustarAlturaFila(_sheet, _nroFila, nroColumna, 12);
+                }
+
+                nroColumna++;
+            }
+            _nroFila++;
+        }
+
+        private void AjustarAlturaFila(ISheet sheet, int rowIndex, int startCol, int endCol)
+        {
+            IRow fila = sheet.GetRow(rowIndex);
+            if (fila != null)
+            {
+                ICell celda = fila.GetCell(startCol);
+                if (celda != null)
+                {
+                    string valorCelda = celda.ToString();
+                    int anchoCeldaCombinada = 0;
+
+                    for (int colNum = startCol; colNum <= endCol; colNum++)
+                    {
+                        anchoCeldaCombinada += sheet.GetColumnWidth(colNum);
+                    }
+
+                    int anchoTexto = valorCelda.Length * 256; // Aproximación simple, puede ajustarse según el tipo de fuente y tamaño
+                    int alturaLinea = (int)Math.Ceiling((double)anchoTexto / anchoCeldaCombinada);
+                    fila.Height = (short)(alturaLinea * sheet.DefaultRowHeight);
+                }
+            }
+        }
+
+            private void InsertarFilaTitulo(string titulo, bool principal = false)
         {
             var primeraColumna = principal ? 0 : 1;
             var segundColumna = principal ? 1 : 2;
