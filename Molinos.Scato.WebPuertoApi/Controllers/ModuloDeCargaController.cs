@@ -262,6 +262,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		[HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
+        [Route("api/ModuloDeCarga/ActualizarFechasPeriodoDeCarga")]
+        public HttpResponseMessage ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio)
+        {
+
+            servicio.ActualizarFechasPeriodoDeCarga(moduloDeCargaPeriodoDeCargaDto, moduloDeCarga_Id, esFechaInicio);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeEmbarque")]
         public HttpResponseMessage GuardarPlanillaDeEmbarque(List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarqueDtos, int idModuloDeCarga)
         {

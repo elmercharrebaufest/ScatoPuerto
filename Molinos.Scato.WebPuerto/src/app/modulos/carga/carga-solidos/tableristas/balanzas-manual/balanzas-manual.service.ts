@@ -1,6 +1,6 @@
 import { Tipoalerta } from "@ScatoEnums/tipo-alerta";
 import { BalanzasCortesManual } from "@ScatoModels/balanza-manual/balanza-cortes-manual";
-import { BalanzaManual, DestinosPorMaterialPuertoBodega, ExportadorPorMaterialPuerto } from "@ScatoModels/balanza-manual/balanza-manual";
+import { BalanzaManual, BalanzaManualCargas, DestinosPorMaterialPuertoBodega, ExportadorPorMaterialPuerto } from "@ScatoModels/balanza-manual/balanza-manual";
 import { MotivosFallasBalanza } from '@ScatoModels/balanza-manual/balanza-manual';
 import { BodegaParcel } from "@ScatoModels/bodega-parcel";
 import { Destino } from "@ScatoModels/destino";
@@ -15,8 +15,10 @@ import { PlanoDeCargaService } from "@ScatoServicios/plano-de-carga.service";
 import { formatDate } from "@angular/common";
 import { Injectable } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
+import { Workbook } from "exceljs";
 import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { saveAs } from 'file-saver-es';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +33,10 @@ export class BalanzasManualService {
   destinos: Destino[] = null;
   exportadores: Exportador[] = null;
   bodegas: BodegaParcel[] = [];
+  private estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
+  { id: 2, descripcion: 'Cargando' },
+  { id: 3, descripcion: 'ControlCalidad' },
+  { id: 4, descripcion: 'PostOperativo' }];
 
   constructor(private moduloDeCargaService: ModuloDeCargaService,
     private embarqueService: EmbarqueService,
@@ -81,7 +87,68 @@ export class BalanzasManualService {
   obtenerPeriodoDeCarga(moduloDeCargaId: number): Observable<PeriodoDeCarga> {
     return this.balanzaManualRegistroService.obtenerPeriodoDeCarga(moduloDeCargaId).pipe(map((data: PeriodoDeCarga) => { return data; }));
   }
+  enviarBuqueCalidad(embarqueId: number): Observable<boolean> {
+    let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes('ControlCalidad'));
+    return this.embarqueService.actualizarEstadoBuque(embarqueId, estadoBuque.id).pipe(map((data) => { return true; }));
+  }
+  exportarBalanzasAExcel(balanza7, balanza8) {
+    let header = [
+      { header: 'Balanza', key: 'Balanza' },
+      { header: 'Fecha', key: 'Fecha' },
+      { header: 'Hora', key: 'Hora' },
+      { header: 'Kilos', key: 'Kilos' },
+      { header: 'Toneladas', key: 'Toneladas' },
+      { header: 'Producto', key: 'Producto' },
+      { header: 'Bodega', key: 'Bodega' },
+      { header: 'Motivo', key: 'Motivo' },
+      { header: 'Observaciones', key: 'Observaciones' }
+    ];
+    let workbook = new Workbook();
 
+    // Balanza 7
+    let worksheetBalanza7 = workbook.addWorksheet("Balanza-7");
+    worksheetBalanza7.columns = header;
+    let columnas = [];
+    balanza7.controls.forEach(balanza => {
+      worksheetBalanza7.addRow({
+        Balanza: 7,
+        Fecha: balanza.controls['fechaInicio'].value,
+        Hora: balanza.controls['horaInicio'].value,
+        Kilos: balanza.controls['kilogramos'].value > 0 ? balanza.controls['kilogramos'].value : null,
+        Toneladas: balanza.controls['toneladas'].value > 0 ? balanza.controls['toneladas'].value : null,
+        Producto: balanza.controls['material'].value?.descripcionCorta,
+        Bodega: balanza.controls['bodega'].value?.nombre,
+        Motivo: balanza.controls['motivosFallasBalanza'].value?.siglas + '-' + balanza.controls['motivosFallasBalanza'].value?.nombre,
+        Observaciones: balanza.controls['observaciones'].value
+      });
+
+    });
+
+    // Balanza 8
+    let worksheetBalanza8 = workbook.addWorksheet("Balanza-8");
+    worksheetBalanza8.columns = header;
+    columnas = [];
+    balanza8.controls.forEach(balanza => {
+      worksheetBalanza8.addRow({
+        Balanza: 8,
+        Fecha: balanza.controls['fechaInicio'].value,
+        Hora: balanza.controls['horaInicio'].value,
+        Kilos: balanza.controls['kilogramos'].value > 0 ? balanza.controls['kilogramos'].value : null,
+        Toneladas: balanza.controls['toneladas'].value > 0 ? balanza.controls['toneladas'].value : null,
+        Producto: balanza.controls['material'].value?.descripcionCorta,
+        Bodega: balanza.controls['bodega'].value?.nombre,
+        Motivo: balanza.controls['motivosFallasBalanza'].value?.siglas + '-' + balanza.controls['motivosFallasBalanza'].value?.nombre,
+        Observaciones: balanza.controls['observaciones'].value
+      });
+    });
+
+    let archivoBalanzas = "Balanzas_7y8";
+    workbook.xlsx.writeBuffer().then((data) => {
+      let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, archivoBalanzas + '-' + new Date().valueOf() + '.xlsx');
+    });
+
+  }
   cargarBodegasParcel(): BodegaParcel[] {
     this.bodegas = [];
     for (let index = 1; index < 10; index++) {
@@ -116,17 +183,31 @@ export class BalanzasManualService {
     balanzas.push(this.inicializaCargaManual(registroBalanza, registroBalanza.esCorteManual));
   }
 
-  agregarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean, numeroBalanza: number, moduloDeCargaId: number, usuario: string) {
+  fechasMaximasYMinimas(balanzas): BalanzaManualCargas {
+    let fechasInicio = [];
+    let fechasCortes = [];
+    let cargas: BalanzaManualCargas = new BalanzaManualCargas();
+    balanzas.controls.forEach(balanza => {
+      const fechaInicio = this.convertirFecha(balanza.controls['fechaInicio'].value, balanza.controls['horaInicio'].value);
+      const fechaCorte = this.convertirFecha(balanza.controls['fechaCorte'].value, balanza.controls['horaCorte'].value);
+      fechasInicio.push(fechaInicio);
+      fechasCortes.push(fechaCorte);
+    });
+    if (balanzas.length > 0) {
+      cargas.fechaInicio = new Date(Math.min(...fechasInicio));
+      cargas.fechaFin = new Date(Math.max(...fechasCortes));
+    }else{
+      cargas = null;
+    }
 
-    /*
-    const fechaInicioRegistro = new Date(registroBalanza.fechaInicio + ' ' + registroBalanza.horaInicio);
-    const fechaFinRegistro = new Date(registroBalanza.fechaCorte + ' ' + registroBalanza.horaCorte);
-    */
+    return cargas;
+  }
+
+  agregarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean, numeroBalanza: number, moduloDeCargaId: number, usuario: string) {
 
     const fechaInicioRegistro = this.convertirFecha(registroBalanza.fechaInicio, registroBalanza.horaInicio);
     const fechaFinRegistro = this.convertirFecha(registroBalanza.fechaCorte, registroBalanza.horaCorte);
-
-    let esRegistroValido = this.validarCortesBajasCarga(balanzas, fechaInicioRegistro, fechaFinRegistro);
+    let esRegistroValido = this.validarCortesBajasCarga(balanzas,registroBalanza,fechaInicioRegistro, fechaFinRegistro);
     if (esRegistroValido) {
       let balanzaRegistro = this.crearBalanzaCorteManual(moduloDeCargaId, numeroBalanza, registroBalanza);
       this.balanzaManualRegistroService.guardarCortesBajaCarga(balanzaRegistro).subscribe(res => {
@@ -177,16 +258,21 @@ export class BalanzasManualService {
     return balanzaCortesManual;
   }
 
-  private validarCortesBajasCarga(balanzas, fechaInicioRegistro, fechaFinRegistro): boolean {
+  private validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
     let esRegistroValido: boolean = true;
-
-    let filtro = balanzas.controls.filter(balanza => {
-      const fechaInicio = this.convertirFecha(balanza.controls['fechaInicio'].value, balanza.controls['horaInicio'].value);
-      const fechaCorte = this.convertirFecha(balanza.controls['fechaCorte'].value, balanza.controls['horaCorte'].value);
-      return (fechaInicioRegistro >= fechaInicio && fechaInicioRegistro <= fechaCorte) &&
-        (fechaFinRegistro >= fechaInicio && fechaFinRegistro <= fechaCorte)
-    });
-    if (filtro != null && filtro.length > 0) esRegistroValido = false;
+    let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id); 
+    if (filtroBalanzas!=null && filtroBalanzas.length > 0) {
+      for (let index = 0; index < filtroBalanzas.length; index++) {
+        const balanza = filtroBalanzas[index];
+        const fechaInicio = this.convertirFecha(balanza.controls['fechaInicio'].value, balanza.controls['horaInicio'].value);
+        const fechaCorte = this.convertirFecha(balanza.controls['fechaCorte'].value, balanza.controls['horaCorte'].value);
+        if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro <= fechaCorte) &&
+            (fechaFinRegistro >= fechaInicio && fechaFinRegistro <= fechaCorte)){
+              esRegistroValido = false;
+              return;
+            }
+      }
+    }
     return esRegistroValido;
   }
 
@@ -210,7 +296,7 @@ export class BalanzasManualService {
     let minuto = 0;
     if (valorHora != null) {
       const horaSplit = valorHora.split(':');
-      hora = parseInt(horaSplit[0]) - 1;
+      hora = parseInt(horaSplit[0]);
       minuto = parseInt(horaSplit[1]);
     }
     let nuevaFecha = new Date(anio, mes, dia, hora, minuto);

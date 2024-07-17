@@ -2835,5 +2835,10 @@ namespace Molinos.Scato.Servicios
        
         [OperationContract]
         string ObtenerBuqueDadoModCarga(int moduloCargaId);
+        
+
+ 		[OperationContract]
+        void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio);
+		
     }
 }

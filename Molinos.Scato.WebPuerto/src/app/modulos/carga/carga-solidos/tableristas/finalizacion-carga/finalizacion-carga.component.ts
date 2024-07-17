@@ -44,8 +44,6 @@ export class FinalizacionCargaComponent implements OnInit {
     this.confirmationDialogService = confirmationDialogService;
     this.embarque_Id = this.procesoService.getEmbarqueId();
     this.embarqueSelected = this.procesoService.getEmbarqueSelected();
-    // this.embarque_Id = this.embarqueSelected.moduloDeCargaId;
-
     this.finalizacionCargaForm = this.formBuilder.group({
       fechaFinalizacionCarga: ['', Validators.required],
       horaFinalizacionCarga: ['', Validators.required]
@@ -54,19 +52,11 @@ export class FinalizacionCargaComponent implements OnInit {
 
   ngOnInit(): void {
     this.initFinalizacionCarga();
-
     if(!this.hasPermisoIniciarCargaBalanzas()) this.finalizacionCargaForm.disable();
   }
 
   initFinalizacionCarga = () => {
-    console.log('initFinalizacionCarga');
-    // let fechaHoraFinalizacionCarga_DB: Date = this.procesoService.getFechaHoraFinCarga();
-    // let fechaHoraFinalizacionCarga = String(fechaHoraFinalizacionCarga_DB).split('T');
-    // console.log(' fechaHoraFinalizacionCarga_DB: ', fechaHoraFinalizacionCarga_DB);
-    // console.log(' fechaHoraFinalizacionCarga: ', fechaHoraFinalizacionCarga);
-
     this.moduloCargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((response: any) => {
-      console.log(' response: ', response);
       let isNull = false;
       let sFechaFinalizacionCarga: string = null;
       let sHoraFinalizacionCarga:string = null;
@@ -81,24 +71,15 @@ export class FinalizacionCargaComponent implements OnInit {
         sFechaFinalizacionCarga = formatDate(response.fechaFinalizacionCarga, 'yyyy-MM-dd', 'en-US');
         sHoraFinalizacionCarga = response.horaFinalizacionCarga;
       }
-      
-      console.log(' isNull: ', isNull);
       if(!isNull){
         this.cargaFinalizada = true;
-        this.finalizacionCarga.emit(true);
-        
+        this.finalizacionCarga.emit(true);        
         document.getElementById("FFC").setAttribute("disabled", "true");
       }
-      
-      console.log(' sFechaFinalizacionCarga: ', sFechaFinalizacionCarga);
-      console.log(' sHoraFinalizacionCarga: ', sHoraFinalizacionCarga);
-
       this.finalizacionCargaForm.setValue({
         fechaFinalizacionCarga: sFechaFinalizacionCarga,
         horaFinalizacionCarga: sHoraFinalizacionCarga
-      });
-      
-      console.log(' finalizacionCargaForm: ', this.finalizacionCargaForm);
+      });      
     });
   }
 
@@ -113,8 +94,7 @@ export class FinalizacionCargaComponent implements OnInit {
   }
 
   preguntarGuardarFinalizacionCarga = () => {
-    console.log('preguntarGuardarFinalizacionCarga');
-    if (this.cargaFinalizada) {
+    if (this.cargaFinalizada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
@@ -123,44 +103,31 @@ export class FinalizacionCargaComponent implements OnInit {
             this.finalizacionCarga.emit(true);
           } else {
             this.initFinalizacionCarga();
-            return;
           }
         });
-    } else{
-      this.guardarFinalizacionPeriodoDeCarga();
-      this.finalizacionCarga.emit(true);
+    }else{
+        this.guardarFinalizacionPeriodoDeCarga();
+        this.initFinalizacionCarga();
     }
   }
 
   guardarFinalizacionPeriodoDeCarga = () => {
-    console.log('guardarFinalizacionPeriodoDeCarga');
     let texto = "";
     let fechaFinalizacionCarga = String(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value);
     let horaFinalizacionCarga = String(this.finalizacionCargaForm.controls.horaFinalizacionCarga.value);
-    console.log(' fechaFinalizacionCarga: ', fechaFinalizacionCarga);
-    console.log(' horaFinalizacionCarga: ', horaFinalizacionCarga);
-    console.log(' moduloDeCarga_Id: ', this.embarqueSelected.moduloDeCargaId);
     let periodoCargarActualizar: any = {
       idModuloDeCarga: this.embarqueSelected.moduloDeCargaId,
       fechaFinalizacionCarga: fechaFinalizacionCarga,
       horaFinalizacionCarga: horaFinalizacionCarga
     };
-    // periodoCargarActualizar.idModuloDeCarga = this.embarque_Id;
-    // periodoCargarActualizar.fechaComienzoCarga = fechaInicioCarga;
-    // periodoCargarActualizar.horaComienzoCarga = horaInicioCarga;
-    console.log(' periodoCargarActualizar: ', periodoCargarActualizar);
-    this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-      console.log(' res: ', res);
-
+    this.moduloCargaService.actualizarFechasPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId, false).subscribe((res: any) => {
       if(this.cargaFinalizada){
         texto = "Se modificó la fecha de finalización de carga correctamente.";
       }else{
         texto = "Se finalizó la carga correctamente";
         this.cargaFinalizada = true;
-        document.getElementById("FFC").setAttribute("disabled","true");
-        this._buqueService.GuardarHistoricoOperador(this.embarque_Id, "Inició carga").subscribe();
       }
-
+      this.toggleEditarFecha();
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     });
   }

@@ -10,7 +10,7 @@
 
         <div class="row">
           <div class="col">
-            <h6 class="colorSubTitulo">Start: {{ this.startBalanza7 }}</h6>
+            <h6 class="colorSubTitulo">Start: {{ this.balanza7Cargas!=null ? (this.balanza7Cargas.fechaInicio | date: 'dd/MM/yyyy HH:mm') : '' }}</h6>
           </div>
         </div>
         <div class="row">
@@ -61,6 +61,10 @@
                     Bodega
                   </div>
                 </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody *ngFor="let balanza of balanza7Form.get('balanzas7')['controls']; let i = index"
@@ -81,17 +85,11 @@
                       data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones">
                       {{ balanza.value.motivosFallasBalanza.siglas }}
                     </label>
-                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
-                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
-                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
-                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
-                    <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
-                      aria-hidden="true"></i>
                   </div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div *ngIf="balanza.value.kilogramos > 0" class="alinearJustificado">
-                    Kg: {{balanza.value.kilogramos}}
+                    {{balanza.value.kilogramos}}
                   </div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal">
@@ -101,6 +99,16 @@
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div *ngIf="balanza.value.bodega" class="alinearJustificado">{{balanza.value.bodega.nombre}}</div>
                 </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado" style="display: flex;;justify-content: space-between;">
+                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
+                      class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
+                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                         
+                    <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                      aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>                    
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -108,7 +116,7 @@
 
         <div class="row">
           <div class="col">
-            <h6 class="colorSubTitulo">End: </h6>
+            <h6 class="colorSubTitulo">End: {{ this.balanza7Cargas!=null ? (this.balanza7Cargas.fechaFin | date: 'dd/MM/yyyy HH:mm') : '' }}</h6>
           </div>
           <div class="col totales">
           </div>
@@ -130,7 +138,7 @@
 
         <div class="row">
           <div class="col">
-            <h6 class="colorSubTitulo">Start: {{ this.startBalanza8 }}</h6>
+            <h6 class="colorSubTitulo">Start: {{ this.balanza8Cargas!=null ? (this.balanza8Cargas.fechaInicio | date: 'dd/MM/yyyy HH:mm') : '' }}</h6>
           </div>
         </div>
         <div class="row">
@@ -181,6 +189,10 @@
                     Bodega
                   </div>
                 </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                  <div class="head">
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody *ngFor="let balanza of balanza8Form.get('balanzas8')['controls']; let i = index"
@@ -201,17 +213,11 @@
                       data-toggle="tooltip" data-placement="top" [title]="balanza.value.observaciones">
                       {{ balanza.value.motivosFallasBalanza.siglas }}
                     </label>
-                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
-                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
-                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
-                      class="fa fa-pencil cursorEditar" aria-hidden="true"></i>
-                    <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
-                      aria-hidden="true"></i>
                   </div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div *ngIf="balanza.value.kilogramos > 0" class="alinearJustificado">
-                    Kg: {{balanza.value.kilogramos}}
+                    {{balanza.value.kilogramos}}
                   </div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal">
@@ -222,6 +228,16 @@
                   <div *ngIf="balanza.value.bodega" class="alinearJustificado">
                     {{balanza.value.bodega.nombre}}</div>
                 </td>
+                <td class="noBorder alinearCentro centradoHorizontal">
+                  <div class="alinearJustificado" style="display: flex;;justify-content: space-between;">
+                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
+                      class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
+                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                      
+                    <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                      aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>                    
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -229,9 +245,8 @@
 
         <div class="row">
           <div class="col">
-            <h6 class="colorSubTitulo">End: </h6>
+            <h6 class="colorSubTitulo">End: {{ this.balanza8Cargas!=null ? (this.balanza8Cargas.fechaFin | date: 'dd/MM/yyyy HH:mm') : '' }}</h6>
           </div>
-
           <div class="col totales">
           </div>
         </div>
@@ -241,13 +256,9 @@
   <!-- Fin BALANZA 8 -->
 </div>
 
-<div>
-  <app-planilla-carga></app-planilla-carga>
-</div>
-
 <div class="col text-center">
   <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar() && !esSoloLectura">
-    <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='terminarCargaExportar()'>TERMINAR
+    <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='enviarBuqueCalidad()'>TERMINAR
       CARGA Y EXPORTAR PLANILLAS</button>
   </ng-container>
 </div>

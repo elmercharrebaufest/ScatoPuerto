@@ -40,7 +40,10 @@ export class ModuloDeCargaService {
   obtenerListadoCeldaManoDeEmbarque(): Observable<CeldaManoDeEmbarque[]> {
     return this.http.get<CeldaManoDeEmbarque[]>(`${this.url}ModuloDeCarga/ListarCeldaManoDeEmbarques`, { 'withCredentials': true });
   }
-
+  obtenerPeriodoDeCargaPorIdModuloDeCarga = (idModuloDeCarga: number) => {
+    const response = this.http.get(`${this.url}ModuloDeCarga/ObtenerPeriodoDeCargaPorIdModuloDeCarga?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
+    return response;
+  }
   guardarModuloDeCarga(moduloDeCarga: ModuloDeCarga){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCarga`, moduloDeCarga, { 'withCredentials' : true});
 }
@@ -121,13 +124,11 @@ export class ModuloDeCargaService {
     return this.http.get<TurnoPuerto[]>(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, { 'withCredentials': true });
   }
 
-  obtenerPeriodoDeCargaPorIdModuloDeCarga = (idModuloDeCarga: number) => {
-    const response = this.http.get(`${this.url}ModuloDeCarga/ObtenerPeriodoDeCargaPorIdModuloDeCarga?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
-    return response;
-  }
-
   guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
+  }
+  actualizarFechasPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId: number, esFechaInicio: boolean): Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/ActualizarFechasPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}&esFechaInicio=${esFechaInicio}`, PeriodoDeCarga, {'withCredentials': true});
   }
 
   consultarCombosFechasYTurnos = (idModuloDeCarga: number) => {

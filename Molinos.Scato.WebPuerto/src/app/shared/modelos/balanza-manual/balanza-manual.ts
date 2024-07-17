@@ -2,6 +2,7 @@ import { BodegaParcel } from "@ScatoModels/bodega-parcel";
 import { Destino } from "@ScatoModels/destino";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
+import { TurnoPuerto } from "@ScatoModels/planilla-turnos/planilla-de-turnos";
 
 export class BalanzaManual {
     id           : number;
@@ -14,6 +15,7 @@ export class BalanzaManual {
     destino      : Destino     ;
     exportador   : Exportador  ;
     motivosFallasBalanza: MotivosFallasBalanza ;
+    turnoPuerto  : TurnoPuerto;
     kilogramos   : number;
     toneladas    : number; 
     corteManual  : boolean;
@@ -43,4 +45,9 @@ export class DestinosPorMaterialPuertoBodega {
 export class ExportadorPorMaterialPuerto {
   materiales     : MaterialPuerto;
   exportadores   : Exportador;
+}
+
+export class BalanzaManualCargas {
+  fechaInicio: Date;
+  fechaFin: Date;
 }

@@ -47,8 +47,6 @@ export class InicioCargaComponent implements OnInit {
     // <ARMOA005-1988 Dylan Lopez>
     this.embarque_Id = this.procesoService.getEmbarqueId();
     this.embarqueSelected = this.procesoService.getEmbarqueSelected();
-    // this.embarque_Id = this.embarqueSelected.moduloDeCargaId;
-
     this.inicioCargaForm = this.formBuilder.group({
       fechaInicioCarga: ['', Validators.required],
       horaInicioCarga: ['', Validators.required]
@@ -63,19 +61,13 @@ export class InicioCargaComponent implements OnInit {
   }
 
   initInicioCarga(){
-    console.log('initInicioCarga');
-    // let fechaHoraInicioCarga_DB: Date = this.procesoService.getFechaHoraInicioCarga();
-    // let fechaHoraInicioCarga = String(fechaHoraInicioCarga_DB).split('T');
-    // console.log(' fechaHoraInicioCarga_DB: ', fechaHoraInicioCarga_DB);
-    // console.log(' fechaHoraInicioCarga: ', fechaHoraInicioCarga);
-    
     this.moduloCargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((response: any) => {
-      console.log(' response: ', response);
       let isNull = false;
       let sFechaInicioCarga: string = null;
       let sHoraInicioCarga:string = null;
       if (response == null || (response?.fechaComienzoCarga == null && response?.horaComienzoCarga == null)) {
         isNull = true;
+        console.log('response---->>', response);
         let fechaHoraInicioCarga_DB = this.procesoService.getFechaHoraInicioCarga();
         let fechaHoraInicioCarga = String(fechaHoraInicioCarga_DB).split('T');
 
@@ -86,28 +78,15 @@ export class InicioCargaComponent implements OnInit {
         sHoraInicioCarga = response.horaComienzoCarga;
       }
       
-      console.log(' isNull: ', isNull);
       if(!isNull){
         this.cargaIniciada = true;
         this.inicioCarga.emit(true);
-        
         document.getElementById("FIC").setAttribute("disabled", "true");
       }
-      
-      console.log(' sFechaInicioCarga: ', sFechaInicioCarga);
-      console.log(' sHoraInicioCarga: ', sHoraInicioCarga);
-      
-      // this.inicioCargaForm = this.formBuilder.group({
-      //   fechaInicioCarga: sFechaInicioCarga,
-      //   horaInicioCarga: sHoraInicioCarga,
-      // });
-
       this.inicioCargaForm.setValue({
         fechaInicioCarga: sFechaInicioCarga,
         horaInicioCarga: sHoraInicioCarga
-      });
-      
-      console.log(' inicioCargaForm: ', this.inicioCargaForm);
+      });      
     });
 
     // if(fechaHoraInicioCarga[0] != 'null'){
@@ -140,9 +119,8 @@ export class InicioCargaComponent implements OnInit {
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
-          this.guardarInicioPeriodoDeCarga();
+          this.actualizarFechasPeriodoDeCarga();
           if (confirmed){
-            this.guardarFechaHoraInicioCarga();
             this.inicioCarga.emit(true);
           }else {
             this.initInicioCarga();
@@ -150,9 +128,10 @@ export class InicioCargaComponent implements OnInit {
           }
         });
     } else {
-      this.guardarInicioPeriodoDeCarga();
-      this.guardarFechaHoraInicioCarga();
+      this.actualizarFechasPeriodoDeCarga();
       this.inicioCarga.emit(true);
+      this.cargaIniciada = true;
+      this.editandoFecha = false;
     }
   }
 
@@ -194,24 +173,18 @@ export class InicioCargaComponent implements OnInit {
     }
   }
 
-  guardarInicioPeriodoDeCarga = () => {
-    console.log('guardarInicioPeriodoDeCarga');
+  actualizarFechasPeriodoDeCarga = () => {
     let fechaInicioCarga = String(this.inicioCargaForm.controls.fechaInicioCarga.value);
     let horaInicioCarga = String(this.inicioCargaForm.controls.horaInicioCarga.value);
-    console.log(' fechaInicioCarga: ', fechaInicioCarga);
-    console.log(' horaInicioCarga: ', horaInicioCarga);
-    console.log(' moduloDeCarga_Id: ', this.embarqueSelected.moduloDeCargaId);
     let periodoCargarActualizar: any = {
       idModuloDeCarga: this.embarqueSelected.moduloDeCargaId,
       fechaComienzoCarga: fechaInicioCarga,
       horaComienzoCarga: horaInicioCarga
     };
-    // periodoCargarActualizar.idModuloDeCarga = this.embarque_Id;
-    // periodoCargarActualizar.fechaComienzoCarga = fechaInicioCarga;
-    // periodoCargarActualizar.horaComienzoCarga = horaInicioCarga;
-    console.log(' periodoCargarActualizar: ', periodoCargarActualizar);
-    this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-      console.log(' res: ', res);
+    this.moduloCargaService.actualizarFechasPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId, true).subscribe((res: any) => {
+      this.cargaIniciada = true;
+      this.editandoFecha = false;
+      document.getElementById("FIC").setAttribute("disabled", "true");
     });
   }
 

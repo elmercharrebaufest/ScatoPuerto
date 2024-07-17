@@ -10066,13 +10066,12 @@ namespace Molinos.Scato.Servicios.Impl
             }
             repositorio.GuardarCambios();
         }
-
+        
         public ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga)
         {
             var moduloDeCargaPeriodoDeCarga = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == idModuloDeCarga);
             return moduloDeCargaPeriodoDeCarga;
-		}
-
+        }
 
 		public void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
         {
@@ -12544,15 +12543,16 @@ namespace Molinos.Scato.Servicios.Impl
             }
              catch (Exception ex)
             {
-                log.Error("Error en metodo: ListarBalanzaManual", ex);
+                log.Error("Error en metodo: OcultarEmbarqueLineUp", ex.Message);
                 throw ex;
             }
         }
         public IList<BalanzaManualDto> ListarBalanzaManual(int moduloDeCargaId)
         {
+
             try
             {
-                List<BalanzaManualDto> result = new List<BalanzaManualDto>();
+                List<BalanzaManualDto> listaBalanzaManual = new List<BalanzaManualDto>();
                 BalanzaManualDto balanzaManualDto;
                 int correlativo = 0;
                 var listaBalanzasCorte = Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == moduloDeCargaId);
@@ -12576,10 +12576,19 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
-                    result.Add(balanzaManualDto);
+                    listaBalanzaManual.Add(balanzaManualDto);
                 }
 
-                return result;
+                var turnos = Listar<TurnoPuerto, TurnoPuertoDto>();
+                TurnoPuertoDto turnoPuertoDto;
+                foreach(var balanzaManual in listaBalanzaManual)
+                {
+                    var horas = balanzaManual.HoraInicio.Split(':');
+                    int horaInicio = Convert.ToInt32(horas[0]);
+                    turnoPuertoDto = turnos.Where(item => horaInicio >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaInicio < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+                    balanzaManual.TurnoPuerto = turnoPuertoDto;
+                }
+                return listaBalanzaManual;
             }
             catch (Exception ex)
             {
@@ -12608,7 +12617,7 @@ namespace Molinos.Scato.Servicios.Impl
             balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
             balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
             return balanzaManualDto;
-        }
+        }        
         public bool EliminarBalanzaManual(int id)
         {
             bool bResultado = true;
@@ -12699,5 +12708,22 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloCargaId).Embarque.Vapor.Nombre;
         }
+        public void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio)
+        {
+            ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
+            ModuloDeCargaPeriodoDeCarga moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id);
+            if (esFechaInicio)
+            {
+                moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga;
+                moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.HoraComienzoCarga;
+            }
+            else
+            {
+                moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga;
+                moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga;
+            }
+            repositorio.GuardarCambios();
+        }
+
     }
 }

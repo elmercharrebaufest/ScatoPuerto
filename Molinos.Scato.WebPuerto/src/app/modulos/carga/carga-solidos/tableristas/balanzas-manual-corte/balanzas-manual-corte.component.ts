@@ -61,10 +61,13 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
   cargarMotivosBalanzas() {
     this.balanzasManualCorteService.PeriodoDeCarga.pipe(takeUntil(this.destroy$)).subscribe(periodoDeCarga => {
-      this.fechaComienzoCarga = formatDate(periodoDeCarga.fechaComienzoCarga, 'yyyy-MM-dd', 'es-ar');
-      this.fechaFinalizacionCarga = formatDate(periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'es-ar');
-      this.horaFinalizacionCarga = periodoDeCarga.horaFinalizacionCarga;
-      this.horaComienzoCarga = periodoDeCarga.horaComienzoCarga;
+      console.log('cargarMotivosBalanzas periodoDeCarga--->>', periodoDeCarga);
+      if (periodoDeCarga!=null){
+        this.fechaComienzoCarga = formatDate(periodoDeCarga.fechaComienzoCarga, 'yyyy-MM-dd', 'es-ar');
+        this.fechaFinalizacionCarga = formatDate(periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'es-ar');
+        this.horaFinalizacionCarga = periodoDeCarga.horaFinalizacionCarga;
+        this.horaComienzoCarga = periodoDeCarga.horaComienzoCarga;
+      }
     });
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true);
@@ -74,6 +77,8 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
   cargarFormularioEditar() {
     this.balanzasManualCorteService.BalanzaManual.pipe(takeUntil(this.destroy$)).subscribe(balanzaManual => {
+      console.log('cargarFormularioEditar balanzaManual--->>', balanzaManual);
+
       this.balanzaManualRegistro = balanzaManual;
       this.corteManualForm = this.crearFormularioCorte();
       if (this.balanzaManualRegistro == null) {
@@ -115,7 +120,6 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
     }else{
       this.confirmationDialogService.confirm('Corte', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
-
   }
 
   private crearFormularioCorte(): FormGroup {
