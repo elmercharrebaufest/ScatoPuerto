@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Linq;
 using Molinos.Scato.Repositorio;
+using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -188,9 +189,26 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        [HttpPost]
+		[HttpGet]
+		//[Autorizacion(PermisosScato.LineUp)]
+		[Autorizacion(PermisosScato.LineUp_Ver)]
+		[Route("api/ModuloDeCarga/ObtenerPeriodoDeCargaPorIdModuloDeCarga")]
+		public HttpResponseMessage ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga)
+		{
+			try
+			{
+                var response = servicio.ObtenerPeriodoDeCargaPorIdModuloDeCarga(idModuloDeCarga);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
-        [Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
+        //[Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
         [Route("api/ModuloDeCarga/GuardarPeriodoDeCarga")]
         public HttpResponseMessage GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
         {
@@ -199,7 +217,48 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        [HttpPost]
+		[HttpGet]
+		//[Autorizacion(PermisosScato.LineUp_Ver)]
+		[Route("api/ModuloDeCarga/ConsultarCombosFechasYTurnos")]
+		public HttpResponseMessage ConsultarCombosFechasYTurnos(int idModuloDeCarga)
+		{
+			try
+			{
+                var request = new ConsultarCombosFechasYTurnosRequest()
+                {
+                    IdModuloDeCarga = idModuloDeCarga
+                };
+				var response = comandos.Ejecutar(request);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpGet]
+		//[Autorizacion(PermisosScato.LineUp_Ver)]
+		[Route("api/ModuloDeCarga/ConsultarRitmosBrutos")]
+		public HttpResponseMessage ConsultarRitmosBrutos(int idModuloDeCarga, string fecha)
+		{
+			try
+			{
+				var request = new ConsultarRitmosBrutosRequest()
+				{
+					IdModuloDeCarga = idModuloDeCarga,
+					Fecha = Convert.ToDateTime(fecha)
+				};
+				var response = comandos.Ejecutar(request);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError);
+			}
+		}
+
+		[HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarPlanillaDeEmbarque")]
         public HttpResponseMessage GuardarPlanillaDeEmbarque(List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarqueDtos, int idModuloDeCarga)

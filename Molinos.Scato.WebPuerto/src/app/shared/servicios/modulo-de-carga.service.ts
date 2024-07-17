@@ -121,8 +121,18 @@ export class ModuloDeCargaService {
     return this.http.get<TurnoPuerto[]>(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, { 'withCredentials': true });
   }
 
+  obtenerPeriodoDeCargaPorIdModuloDeCarga = (idModuloDeCarga: number) => {
+    const response = this.http.get(`${this.url}ModuloDeCarga/ObtenerPeriodoDeCargaPorIdModuloDeCarga?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
+    return response;
+  }
+
   guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
+  }
+
+  consultarCombosFechasYTurnos = (idModuloDeCarga: number) => {
+    const response = this.http.get(`${this.url}ModuloDeCarga/ConsultarCombosFechasYTurnos?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
+    return response;
   }
 
   guardarModuloDeCargaUmap(Umap: Umap[], ModuloDeCargaId) {

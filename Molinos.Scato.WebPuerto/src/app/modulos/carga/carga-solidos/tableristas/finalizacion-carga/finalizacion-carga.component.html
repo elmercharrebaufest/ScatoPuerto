@@ -1,32 +1,31 @@
 <div class='bg-white shadow mt-4 px-4 pb-4'>
-  <form [formGroup]="inicioCargaForm">
+  <form [formGroup]="finalizacionCargaForm">
     <div class="row">
       <div class="col-4">
-        <h4 class="info-header colorTitle pt-4">Inicio de carga</h4>
+        <h4 class="info-header colorTitle pt-4">Finalización de carga</h4>
       </div>
 
       <div class="col-2">
-        <input id="FIC" type="date" value="" max="3000-12-31" min="1900-01-01" style="margin-top: 20px;"  class="form-control" formControlName='fechaInicioCarga'/>
+        <input id="FFC" type="date" value="" max="3000-12-31" min="1900-01-01" style="margin-top: 20px;" class="form-control" formControlName='fechaFinalizacionCarga'/>
       </div>
 
       <div class="col-2" >
         <div class="input_img" style="margin-top: 20px;">
-          <input class="form-control" formControlName='horaInicioCarga' placeholder="00:00" [ngxTimepicker]="encendidoTime" [format]="24">
+          <input class="form-control" formControlName='horaFinalizacionCarga' placeholder="00:00" [ngxTimepicker]="encendidoTime" [format]="24">
           <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
         </div>
         <ngx-material-timepicker #encendidoTime ></ngx-material-timepicker>
       </div>
       
-      <div class="col-1 ocultarPdf" *ngIf="!cargaIniciada" style="margin-top: 20px" >
+      <div class="col-1 ocultarPdf" *ngIf="!cargaFinalizada" style="margin-top: 20px" >
         <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
-          <button [disabled]="inicioCargaForm.invalid" 
-                  class="btn btn-success" 
-                  (click)='preguntarGuardarInicioCarga()'>INICIAR</button>
+          <button class="btn btn-success" 
+                  (click)='preguntarGuardarFinalizacionCarga()'>FINALIZAR</button>
         </ng-container>
       </div> 
       
       <!-- LAPIZ PARA EDICIÓN -->
-      <div class="col-1 ocultarPdf" *ngIf="!editandoFecha && cargaIniciada">
+      <div class="col-1 ocultarPdf" *ngIf="!editandoFecha && cargaFinalizada">
         <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
           <svg style="margin-top: 20px"  id="Componente_176_1" 
               data-name="Componente 176 – 1" xmlns="http://www.w3.org/2000/svg" 
@@ -40,12 +39,12 @@
         </ng-container>
       </div> 
         
-      <div class="row" *ngIf="editandoFecha && cargaIniciada">
+      <div class="row" *ngIf="editandoFecha && cargaFinalizada">
         <div class="col">
           <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
             <button class="btn btn-primary" 
                     style="margin-top: 20px;" 
-                    (click)='preguntarGuardarInicioCarga()'>GUARDAR</button>
+                    (click)='preguntarGuardarFinalizacionCarga()'>GUARDAR</button>
           </ng-container>
         </div>
         <div class="col">

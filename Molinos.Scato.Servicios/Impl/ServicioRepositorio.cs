@@ -1,5 +1,6 @@
 ﻿using Microsoft.Web.Administration;
 using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
@@ -15,10 +16,9 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Objects;
 using System.Data.Objects.SqlClient;
 using System.Diagnostics;
@@ -30,22 +30,10 @@ using System.Linq.Expressions;
 using System.Printing;
 using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
-using System.DirectoryServices;
-using System.Security.Principal;
-using System.DirectoryServices.AccountManagement;
-using NPOI.SS.Formula.Functions;
-using System.Drawing.Text;
-using System.Threading;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
-using Microsoft.Identity.Client;
-using Molinos.Scato.Servicios.GestionarCartasDePortePE;
 
 namespace Molinos.Scato.Servicios.Impl
 {
-    public class ServicioRepositorio : IServicioRepositorio
+	public class ServicioRepositorio : IServicioRepositorio
     {
         private readonly IRepositorio repositorio;
         private readonly IConversor conversor;
@@ -10079,7 +10067,14 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        public void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
+        public ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga)
+        {
+            var moduloDeCargaPeriodoDeCarga = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == idModuloDeCarga);
+            return moduloDeCargaPeriodoDeCarga;
+		}
+
+
+		public void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
         {
             ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
             ModuloDeCargaPeriodoDeCarga moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id);
@@ -10100,10 +10095,46 @@ namespace Molinos.Scato.Servicios.Impl
                 moduloDeCargaPeriodoDeCarga_db.HoraConexionMangueras = moduloDeCargaPeriodoDeCargaDto.HoraConexionMangueras;
                 moduloDeCargaPeriodoDeCarga_db.FechaDesconexionMangueras = moduloDeCargaPeriodoDeCargaDto.FechaDesconexionMangueras;
                 moduloDeCargaPeriodoDeCarga_db.HoraDesconexionMangueras = moduloDeCargaPeriodoDeCargaDto.HoraDesconexionMangueras;
-                moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga;
-                moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.HoraComienzoCarga;
-                moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga;
-                moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga;
+
+                if (moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga == null)
+                {
+					moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga;
+                }
+                else if (moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga != null && moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga != null)
+                {
+					moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga;
+				}
+				//moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga;
+
+				if (moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga == null)
+				{
+					moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.HoraComienzoCarga;
+				}
+				else if (moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga != null && moduloDeCargaPeriodoDeCargaDto.HoraComienzoCarga != null)
+				{
+					moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.HoraComienzoCarga;
+				}
+				//moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.HoraComienzoCarga;
+
+				if (moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga == null)
+				{
+					moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga;
+				}
+				else if (moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga != null && moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga != null)
+				{
+					moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga;
+				}
+				//moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaFinalizacionCarga;
+
+				if (moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga == null)
+				{
+					moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga;
+				}
+				else if (moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga != null && moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga != null)
+				{
+					moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga;
+				}
+				//moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.HoraFinalizacionCarga;
             }
             else
             {
@@ -10134,7 +10165,50 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        public List<string> ObtenerDestinatariosPlanillaTurnos()
+        public List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga)
+        {
+			var result = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModuloDeCarga)
+				.GroupBy(m => m.Fecha?.ToString("yyyy-MM-dd"))
+		        .Select(g => new FechaDto
+		        {
+			        //Fecha = new DateTime(g.Key.Year.Value, g.Key.Month.Value, g.Key.Day.Value),
+					Fecha = g.Key,
+					Turnos = g.Select(t => new TurnoDto
+			        {
+				        Id = t.Id,
+				        Turno = Obtener<TurnoPuerto, TurnoPuertoDto>(t.TurnoPuerto.Id)
+			        }).ToList()
+		        }).ToList();
+
+			return result;
+		}
+
+		public List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha)
+        {
+			string fechaString = fecha.ToString("yyyy-MM-dd");
+
+            var result = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(q => q.ModuloDeCarga.Id == idModuloDeCarga)
+            //	q.TurnoPuerto.Id == idTurnoPuerto)
+            .Where(w => w.Fecha?.ToString("yyyy-MM-dd") == fechaString)
+            .SelectMany(s => s.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+			.GroupBy(d => d.BalanzaPuerto)
+			.Select(g => new RitmoBrutoDto
+			{
+				Id = s.Id,
+				IdTurnoPuerto = s.TurnoPuerto.Id,
+				Nombre = s.TurnoPuerto.Nombre,
+                Fecha = s.Fecha?.ToString("yyyy-MM-dd HH:mm:ss"),
+                //Fecha = s.Fecha?.ToString(),
+                IdBalanza = g.Key.Id,
+				CodigoBalanza = g.Key.CodigoBalanza,
+				Cantidad = g.Sum(a => a.Cantidad)
+			}))
+			.ToList();
+
+			return result;
+		}
+
+		public List<string> ObtenerDestinatariosPlanillaTurnos()
         {
             return repositorio.Listar<Usuario, string>(x => x.Email,
                                                        x => x.AvisoPlanoDeCarga == true).ToList();

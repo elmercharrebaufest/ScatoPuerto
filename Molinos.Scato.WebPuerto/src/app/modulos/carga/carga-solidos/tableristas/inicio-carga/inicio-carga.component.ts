@@ -1,5 +1,6 @@
+import { formatDate } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
@@ -10,6 +11,9 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
+// <ARMOA005-1988 Dylan Lopez>
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+// </ ARMOA005-1988 Dylan Lopez>
 
 @Component({
   selector: 'app-inicio-carga',
@@ -18,6 +22,7 @@ import { BuqueService } from '@ScatoServicios/buque.service';
 })
 export class InicioCargaComponent implements OnInit {
   inicioCargaForm: FormGroup;
+  embarqueSelected: any;
   embarque_Id: number = 0;
   confirmationDialogService: any;
   fechaHoraInicioCarga: string[];
@@ -34,11 +39,21 @@ export class InicioCargaComponent implements OnInit {
     private funcionesGeneralesService: FuncionesGeneralesService,
     confirmationDialogService: ConfirmationDialogService,
     private session: SessionService,
-    private _buqueService: BuqueService
+    private _buqueService: BuqueService,
+    private moduloCargaService: ModuloDeCargaService
   ) {
     this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
+    // <ARMOA005-1988 Dylan Lopez>
     this.embarque_Id = this.procesoService.getEmbarqueId();
+    this.embarqueSelected = this.procesoService.getEmbarqueSelected();
+    // this.embarque_Id = this.embarqueSelected.moduloDeCargaId;
+
+    this.inicioCargaForm = this.formBuilder.group({
+      fechaInicioCarga: ['', Validators.required],
+      horaInicioCarga: ['', Validators.required]
+    });
+    // </ ARMOA005-1988 Dylan Lopez>
   }
 
   ngOnInit(): void {
@@ -48,20 +63,65 @@ export class InicioCargaComponent implements OnInit {
   }
 
   initInicioCarga(){
-    let fechaHoraInicioCarga_DB: Date = this.procesoService.getFechaHoraInicioCarga();
-    let fechaHoraInicioCarga = String(fechaHoraInicioCarga_DB).split('T');
+    console.log('initInicioCarga');
+    // let fechaHoraInicioCarga_DB: Date = this.procesoService.getFechaHoraInicioCarga();
+    // let fechaHoraInicioCarga = String(fechaHoraInicioCarga_DB).split('T');
+    // console.log(' fechaHoraInicioCarga_DB: ', fechaHoraInicioCarga_DB);
+    // console.log(' fechaHoraInicioCarga: ', fechaHoraInicioCarga);
     
-    if(fechaHoraInicioCarga[0] != 'null'){
-      this.cargaIniciada = true;
-      this.inicioCarga.emit(true);
-      
-      document.getElementById("FIC").setAttribute("disabled", "true");
-    }
+    this.moduloCargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((response: any) => {
+      console.log(' response: ', response);
+      let isNull = false;
+      let sFechaInicioCarga: string = null;
+      let sHoraInicioCarga:string = null;
+      if (response == null || (response?.fechaComienzoCarga == null && response?.horaComienzoCarga == null)) {
+        isNull = true;
+        let fechaHoraInicioCarga_DB = this.procesoService.getFechaHoraInicioCarga();
+        let fechaHoraInicioCarga = String(fechaHoraInicioCarga_DB).split('T');
 
-    this.inicioCargaForm = this.formBuilder.group({
-      fechaInicioCarga: fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[0] : this.funcionesGeneralesService.getFechaHora(new Date(),'EN').substring(0, 10),
-      horaInicioCarga: fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[1].substring(0,5) : this.funcionesGeneralesService.getFechaHora(new Date()).substring(11, 16),
+        sFechaInicioCarga = fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[0] : this.funcionesGeneralesService.getFechaHora(new Date(),'EN').substring(0, 10);
+        sHoraInicioCarga = fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[1].substring(0,5) : this.funcionesGeneralesService.getFechaHora(new Date()).substring(11, 16);
+      } else {
+        sFechaInicioCarga =formatDate(response.fechaComienzoCarga, 'yyyy-MM-dd', 'en-US');
+        sHoraInicioCarga = response.horaComienzoCarga;
+      }
+      
+      console.log(' isNull: ', isNull);
+      if(!isNull){
+        this.cargaIniciada = true;
+        this.inicioCarga.emit(true);
+        
+        document.getElementById("FIC").setAttribute("disabled", "true");
+      }
+      
+      console.log(' sFechaInicioCarga: ', sFechaInicioCarga);
+      console.log(' sHoraInicioCarga: ', sHoraInicioCarga);
+      
+      // this.inicioCargaForm = this.formBuilder.group({
+      //   fechaInicioCarga: sFechaInicioCarga,
+      //   horaInicioCarga: sHoraInicioCarga,
+      // });
+
+      this.inicioCargaForm.setValue({
+        fechaInicioCarga: sFechaInicioCarga,
+        horaInicioCarga: sHoraInicioCarga
+      });
+      
+      console.log(' inicioCargaForm: ', this.inicioCargaForm);
     });
+
+    // if(fechaHoraInicioCarga[0] != 'null'){
+    //   this.cargaIniciada = true;
+    //   // this.inicioCarga.emit(true);
+      
+    //   document.getElementById("FIC").setAttribute("disabled", "true");
+    // }
+
+    // this.inicioCargaForm = this.formBuilder.group({
+    //   fechaInicioCarga: fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[0] : this.funcionesGeneralesService.getFechaHora(new Date(),'EN').substring(0, 10),
+    //   horaInicioCarga: fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[1].substring(0,5) : this.funcionesGeneralesService.getFechaHora(new Date()).substring(11, 16),
+    // });
+    // console.log(' inicioCargaForm: ', this.inicioCargaForm);
   }
 
   toggleEditarFecha(){
@@ -75,10 +135,12 @@ export class InicioCargaComponent implements OnInit {
   }
 
   preguntarGuardarInicioCarga(){
+    console.log('preguntarGuardarInicioCarga');
     if (this.cargaIniciada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
+          this.guardarInicioPeriodoDeCarga();
           if (confirmed){
             this.guardarFechaHoraInicioCarga();
             this.inicioCarga.emit(true);
@@ -87,13 +149,14 @@ export class InicioCargaComponent implements OnInit {
             return;
           }
         });
-    }else{
+    } else {
+      this.guardarInicioPeriodoDeCarga();
       this.guardarFechaHoraInicioCarga();
       this.inicioCarga.emit(true);
     }
   }
 
-  guardarFechaHoraInicioCarga(){
+  guardarFechaHoraInicioCarga() {
     let fechaInicioCarga = String(this.inicioCargaForm.controls.fechaInicioCarga.value);
     let horaInicioCarga = String(this.inicioCargaForm.controls.horaInicioCarga.value);
     let fechaHorastring = `${fechaInicioCarga} ${horaInicioCarga}`;
@@ -129,6 +192,27 @@ export class InicioCargaComponent implements OnInit {
           this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Error);
         });
     }
+  }
+
+  guardarInicioPeriodoDeCarga = () => {
+    console.log('guardarInicioPeriodoDeCarga');
+    let fechaInicioCarga = String(this.inicioCargaForm.controls.fechaInicioCarga.value);
+    let horaInicioCarga = String(this.inicioCargaForm.controls.horaInicioCarga.value);
+    console.log(' fechaInicioCarga: ', fechaInicioCarga);
+    console.log(' horaInicioCarga: ', horaInicioCarga);
+    console.log(' moduloDeCarga_Id: ', this.embarqueSelected.moduloDeCargaId);
+    let periodoCargarActualizar: any = {
+      idModuloDeCarga: this.embarqueSelected.moduloDeCargaId,
+      fechaComienzoCarga: fechaInicioCarga,
+      horaComienzoCarga: horaInicioCarga
+    };
+    // periodoCargarActualizar.idModuloDeCarga = this.embarque_Id;
+    // periodoCargarActualizar.fechaComienzoCarga = fechaInicioCarga;
+    // periodoCargarActualizar.horaComienzoCarga = horaInicioCarga;
+    console.log(' periodoCargarActualizar: ', periodoCargarActualizar);
+    this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      console.log(' res: ', res);
+    });
   }
 
   hasPermisoIniciarCargaBalanzas() {

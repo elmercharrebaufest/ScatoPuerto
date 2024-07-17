@@ -1159,6 +1159,8 @@
     <Compile Include="Procesamiento\ProcesadorModificarValorCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorSuscribirEventos.cs" />
     <Compile Include="Procesamiento\Respuesta.cs" />
+    <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarCombosFechasYTurnos.cs" />
+    <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarRitmosBrutos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\ServicioRepositorio.cs" />
     <Compile Include="IServicioComandos.cs" />

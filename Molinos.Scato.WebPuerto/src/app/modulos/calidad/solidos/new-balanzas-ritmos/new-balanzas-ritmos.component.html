@@ -1,0 +1,116 @@
+<div class="container-fluid">
+  <!-- First Row -->
+  <div class="row mt-3">
+    <div class="col-md-3">
+      <div class="form-group col-6" style="padding-left:30px;">
+        <label>
+          <input type="checkbox" [(ngModel)]="habilitarFechasYTurnos" (change)="toggleFechasYTurnos()" />Habilitar Día y Turno
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- First Row -->
+
+  <!-- Second Row -->
+  <div class="row mt-3">
+    <div class="col-md-3">
+      <div class="form-group col-6" style="padding-left:30px;">
+        <label>Día: </label>
+        <input type="date" [(ngModel)]="date" [disabled]="!habilitarFechasYTurnos" [attr.min]="dateMin" [attr.max]="dateMax" class="form-control fecha" (change)="updateDate($event)" />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group col-6" style="padding-right:30px;">
+        <label for="turno">Turno: </label>
+          <select id="turno" class="form-control" [(ngModel)]="turno" [disabled]="!habilitarFechasYTurnos" (change)="updateTurn($event)">
+            <option [value]="0">(Seleccionar)</option>
+            <option *ngFor="let turno of turnos" [value]="turno.turno.id">
+              {{turno.turno.nombre}}
+            </option>
+          </select>
+      </div>
+    </div>
+  </div>
+  <!-- Second Row -->
+
+  <!-- Third Row -->
+  <h3>Ritmos del turno: {{turno}} del día {{date | date: 'dd-MMM-yyyy'}}</h3>
+  <div class="row mt-3">
+    <div class="col-md-6">
+      <div class='bg-white shadow'>
+        <div class="row" style="justify-content: space-evenly">
+          <app-reloj-balanzas [titulo]='"Ritmo de carga"' [valor]='valorRitmoBruto' [maximo]='valorRitmoBruto' [color]='"#5CB85C"' [descripcion]='"por hora por mano"' [footer]='""' style="margin-right: 20px;"></app-reloj-balanzas>
+          <app-reloj-balanzas [titulo]='"Llevas cargando"' [valor]='valorCargando' [maximo]='tnTotales > valorCargando ? tnTotales : valorCargando'  [color]='"#5CB85C"' [descripcion]= '"de " + tnTotales + " Tn totales"' [footer]='"Balanza 7 + Balanza 8"'  style="margin-right: 20px;"></app-reloj-balanzas>
+          <app-reloj-balanzas [titulo]='"Ritmo carga neto"' [valor]='valorRitmoNeto' [maximo]='valorRitmoNeto' [color]='"#5CB85C"' [descripcion]='"por hora por mano"' [footer]='"Este ritmo no contempla fuleos ni bajas cargas a pedido del buque"'  style="margin-right: 20px;"></app-reloj-balanzas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-6">
+          <div class="mt-4 px-4 pb-4 shadow" style="background-color: white; min-height: 5rem;">
+            <h5 class='colorTitle text-center py-3 w-100 ritmo-title'>Ritmo de embarque por Balanza 7</h5>
+            <div class="row">
+              <div class="col"> 
+                <span class="subTitulos">Arrancó: </span> 
+                <span class="contenido">{{this.startBalanza7}}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col text-center">
+                <span class="cargaHastaAhora text-center">Cargó hasta ahora: </span>
+                <span class="contenidoCargaHastaAhora">{{this.tnCargadasHastaAhora7}} Tn</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col text-center">
+                <span class="subTitulos">Ritmo de embarque: </span>
+                <span class="contenido">{{this.ritmoEmbarque7 | number : '1.2-2'}} tn/hs</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col text-center">
+                <span class="ultimaActualiz">Última actualización: {{this.ultimaActualizacion7}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="col-6">
+          <div class="mt-4 px-4 pb-4 shadow" style="background-color: white; min-height: 5rem;">
+            <h5 class='colorTitle text-center py-3 w-100 ritmo-title'>Ritmo de embarque por Balanza 8</h5>
+            <div class="row">
+              <div class="col">
+                <span class="subTitulos">Arrancó: </span>
+                <span class="contenido">{{this.startBalanza8}}</span>
+              </div>
+            </div>
+    
+            <div class="row">
+              <div class="col text-center">
+                <span class="cargaHastaAhora text-center">Cargó hasta ahora: </span>
+                <span class="contenidoCargaHastaAhora">{{this.tnCargadasHastaAhora8}} Tn</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col text-center">
+                <span class="subTitulos">Ritmo de embarque: </span>
+                <span class="contenido">{{this.ritmoEmbarque8 | number : '1.2-2'}} tn/hs</span>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col text-center">
+                <span class="ultimaActualiz">Última actualización: {{this.ultimaActualizacion8}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <!-- Third Row -->
+</div>
