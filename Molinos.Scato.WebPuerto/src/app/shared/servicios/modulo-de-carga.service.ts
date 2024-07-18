@@ -40,7 +40,10 @@ export class ModuloDeCargaService {
   obtenerListadoCeldaManoDeEmbarque(): Observable<CeldaManoDeEmbarque[]> {
     return this.http.get<CeldaManoDeEmbarque[]>(`${this.url}ModuloDeCarga/ListarCeldaManoDeEmbarques`, { 'withCredentials': true });
   }
-
+  obtenerPeriodoDeCargaPorIdModuloDeCarga = (idModuloDeCarga: number) => {
+    const response = this.http.get(`${this.url}ModuloDeCarga/ObtenerPeriodoDeCargaPorIdModuloDeCarga?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
+    return response;
+  }
   guardarModuloDeCarga(moduloDeCarga: ModuloDeCarga){
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCarga`, moduloDeCarga, { 'withCredentials' : true});
 }
@@ -124,6 +127,14 @@ export class ModuloDeCargaService {
   guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
   }
+  actualizarFechasPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId: number, esFechaInicio: boolean): Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/ActualizarFechasPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}&esFechaInicio=${esFechaInicio}`, PeriodoDeCarga, {'withCredentials': true});
+  }
+
+  consultarCombosFechasYTurnos = (idModuloDeCarga: number) => {
+    const response = this.http.get(`${this.url}ModuloDeCarga/ConsultarCombosFechasYTurnos?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
+    return response;
+  }
 
   guardarModuloDeCargaUmap(Umap: Umap[], ModuloDeCargaId) {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, {'withCredentials': true});
@@ -175,6 +186,10 @@ export class ModuloDeCargaService {
 
   listarSiloCelda() {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
+  }
+
+  generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
+    return this.http.post(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}`, excel, {'withCredentials': true, responseType: 'blob'});
   }
 
 }

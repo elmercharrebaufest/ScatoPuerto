@@ -523,7 +523,8 @@ namespace Molinos.Scato.Servicios.Impl
             var solicitudDb = _repositorio.Obtener<AfipSolicitudCierreCarga>(id) ?? throw new Exception("No se ha encontrado la solicitud indicada");
             if (solicitudDb.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
 			// <ARMOA005-1708 Dylan Lopez>
-			var estadoCoem = _repositorio.Obtener<AfipCoemEstado>((int) EstadosCoemAFIPEnum.CODE) ?? throw new Exception("No existe el estado 'CODE' en la base de datos");
+			//var estadoCoem = _repositorio.Obtener<AfipCoemEstado>((int) EstadosCoemAFIPEnum.CODE) ?? throw new Exception("No existe el estado 'CODE' en la base de datos");
+			var estadoCoem = _repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "CODE") ?? throw new Exception("No existe el estado 'CODE' en la base de datos");
 			// </ ARMOA005-1708 Dylan Lopez>
 			var caratula = solicitudDb.AfipCaratula;
             foreach (var coem in caratula?.Coems)

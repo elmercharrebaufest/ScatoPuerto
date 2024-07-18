@@ -58,7 +58,13 @@ export class CargaSolidosComponent implements OnInit {
   adjunto: any;
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
+    // <ARMOA005-1988 Dylan Lopez>
+  finalizacionCarga: boolean = false;
+    // </ ARMOA005-1988 Dylan Lopez>
   ingresoManualSolido: boolean = false;
+  existePeriodoDeCarga: boolean = false;
+  existeFechasPeriodoDeCarga: boolean = false;
+
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -157,12 +163,18 @@ export class CargaSolidosComponent implements OnInit {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
         if (res.moduloDeCargaUmap.length > 0) {
-          console.log('this.manosComponent-->>', this.manosComponent)
-
-          console.log('this.umapComponent-->>', this.umapComponent)
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+          this.existePeriodoDeCarga = true;
+          let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
+          if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null && 
+              moduloDeCargaPeriodoDeCarga.fechaFinalizacionCarga !=null && 
+              moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null &&
+              moduloDeCargaPeriodoDeCarga.horaFinalizacionCarga !=null){
+            this.existeFechasPeriodoDeCarga = true;
+          }
+          //existeFechasPeriodoDeCarga
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
@@ -325,6 +337,13 @@ export class CargaSolidosComponent implements OnInit {
   obtenerInicioCarga(inicioCarga){
     this.inicioCarga = inicioCarga;
   }
+  
+  // <ARMOA005-1988 Dylan Lopez>
+  obtenerFinalizacionCarga(finalizacionCarga){
+    this.finalizacionCarga = finalizacionCarga;
+    this.cargarModuloCarga();
+  }
+  // </ ARMOA005-1988 Dylan Lopez>
 
   enviarMail() {
     var titulo = "Enviar carga por mail";

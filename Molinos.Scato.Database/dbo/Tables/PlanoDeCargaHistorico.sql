@@ -16,7 +16,7 @@
     [FechaDeModificacion] DATETIME NULL,
     [Usuario]    NVARCHAR(500)                          NULL,
     [FechaDeFinalizacion] DATETIME NULL,
-    [UsuarioFinalizacion]    NVARCHAR(40)                          NULL,
+    [UsuarioFinalizacion]    NVARCHAR(500)                          NULL,
     CONSTRAINT [PK_dbo.PlanoDeCargaHistorico] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.PlanoDeCargaHistorico_dbo.PlanoDeCarga_PlanoDeCarga_Id] FOREIGN KEY ([PlanoDeCarga_Id]) REFERENCES [dbo].[PlanoDeCarga] ([Id]),
     CONSTRAINT [FK_dbo.PlanoDeCargaHistorico_dbo.Estiba_Estiba_Id] FOREIGN KEY ([Estiba_Id]) REFERENCES [dbo].[Estiba] ([Id]),

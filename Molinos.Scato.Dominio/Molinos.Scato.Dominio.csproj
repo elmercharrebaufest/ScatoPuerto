@@ -98,6 +98,10 @@
     <Compile Include="Comandos\Exportadores\CrearExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\EliminarExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
+    <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarCombosFechasYTurnosResponse.cs" />
+    <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarCombosFechasYTurnosRequest.cs" />
+    <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosRequest.cs" />
+    <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosResponse.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRectificarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRegistrarCaratulaDto.cs" />

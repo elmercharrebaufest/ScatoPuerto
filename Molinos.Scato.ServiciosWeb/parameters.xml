@@ -165,4 +165,9 @@
                     match="/configuration/appSettings/add[@key='PdfCpeDpiY']
                            /@value" />
   </parameter>
+  <parameter name="PathPlanillaSolidos Config">
+	<parameterEntry kind="XmlFile" scope="Web.config"
+					match="/configuration/appSettings/add[@key='PathPlanillaSolidos']
+                           /@value" />
+  </parameter>
 </parameters>

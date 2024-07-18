@@ -19,6 +19,7 @@ namespace Molinos.Scato.Dominio.Dto
         public DestinoDto Destino { get; set; }
         public ExportadorDto Exportador { get; set; }
         public MotivosFallasBalanzaDto MotivosFallasBalanza { get; set; }
+        public TurnoPuertoDto TurnoPuerto { get; set; }
         public int? Kilogramos { get; set; }
         public int? Toneladas { get; set; }
         public bool CorteManual { get; set; }

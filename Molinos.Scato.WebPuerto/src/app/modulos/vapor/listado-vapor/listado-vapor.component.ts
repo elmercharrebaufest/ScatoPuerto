@@ -150,14 +150,13 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
     return this.user.permisos.find(p => p === this.permisosScato.Vapor_Editar);
   }
 
-  editarVapor(id, modal, bandera, nombreBuque, imo){ 
+  editarVapor(id, modal, bandera, nombreBuque, imo) {
     this.vaporId = id;
-    this.modalService.open(modal, { size: 'md', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
-    .then(() => {     
-      console.log('_modalService.open');
-
-    })
-    .catch((res) => { console.log(res) }); 
+    this.modalService.open(modal, { size: 'xl', windowClass: 'window-modal-vapor', backdropClass: 'modal-vapor' }).result
+      .then(() => {
+        console.log('_modalService.open');
+      })
+      .catch((res) => { console.log(res) });
   }
 
   actualizarListaDeVapores(event){

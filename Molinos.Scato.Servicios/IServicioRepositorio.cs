@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
@@ -9,11 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceModel;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios
 {
-    [ServiceContract(Namespace = "http://scato.molinos.com.ar")]
+	[ServiceContract(Namespace = "http://scato.molinos.com.ar")]
     public interface IServicioRepositorio
     {
         [OperationContract]
@@ -2540,10 +2540,19 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id);
 
-        [OperationContract]
+		[OperationContract]
+		ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga);
+
+		[OperationContract]
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
 
-        [OperationContract]
+		[OperationContract]
+		List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga);
+
+		[OperationContract]
+		List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha);
+
+		[OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
 
         [OperationContract]
@@ -2817,6 +2826,20 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
 	
-		
+        // </ ARMOA005-1965 Dylan Lopez>
+        [OperationContract]
+        IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId);
+
+        [OperationContract]
+        IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId);
+       
+        [OperationContract]
+        string ObtenerBuqueDadoModCarga(int moduloCargaId);
+        
+ 		[OperationContract]
+        void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio);
+
+        [OperationContract]
+        void RestaurarEmbarquesOcultosLineUp();
     }
 }

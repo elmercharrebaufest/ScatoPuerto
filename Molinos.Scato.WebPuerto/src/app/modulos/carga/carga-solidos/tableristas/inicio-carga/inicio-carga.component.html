@@ -6,12 +6,12 @@
       </div>
 
       <div class="col-2">
-        <input id="FIC" type="date" value="" max="3000-12-31" min="1000-01-01" style="margin-top: 20px;"  class="form-control" formControlName='fechaInicioCarga'/>
+        <input id="FIC" type="date" value="" max="3000-12-31" min="1900-01-01" style="margin-top: 20px;"  class="form-control" formControlName='fechaInicioCarga'/>
       </div>
 
       <div class="col-2" >
         <div class="input_img" style="margin-top: 20px;">
-          <input class="form-control" formControlName='horaInicioCarga' [disabled]="!editandoFecha && cargaIniciada" placeholder="00:00" [ngxTimepicker]="encendidoTime" [format]="24">
+          <input class="form-control" formControlName='horaInicioCarga' placeholder="00:00" [ngxTimepicker]="encendidoTime" [format]="24">
           <img src="assets/reloj.svg" class="imgClockInput1 ocultarPdf">
         </div>
         <ngx-material-timepicker #encendidoTime ></ngx-material-timepicker>
@@ -24,6 +24,7 @@
                   (click)='preguntarGuardarInicioCarga()'>INICIAR</button>
         </ng-container>
       </div> 
+      
       <!-- LAPIZ PARA EDICIÓN -->
       <div class="col-1 ocultarPdf" *ngIf="!editandoFecha && cargaIniciada">
         <ng-container *ngIf="hasPermisoIniciarCargaBalanzas()">
