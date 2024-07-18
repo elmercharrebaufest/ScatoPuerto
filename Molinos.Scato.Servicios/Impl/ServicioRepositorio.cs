@@ -22,6 +22,7 @@ using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Objects;
 using System.Data.Objects.SqlClient;
 using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -2328,7 +2329,6 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
-
             try
             {
 #if DEBUG
