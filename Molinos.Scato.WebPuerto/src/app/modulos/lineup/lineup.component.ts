@@ -140,7 +140,9 @@ export class LineupComponent implements OnInit, Observador {
   mostrarSoloEmbarquesOcultos(){
     this.mostrarEmbarquesOcultos = true;
     this.mostrarSpinner = true;
-    this.cargarWorkflows(true);
+    this.lineupService.restaurarEmbarquesOcultosLineUp().subscribe(resultado=>{
+      this.cargarWorkflows(true);
+    });
   }
   private cargarWorkflows(blockUI: boolean = false) {
     console.log('INICIO LINEUP ', new Date())
@@ -185,9 +187,14 @@ export class LineupComponent implements OnInit, Observador {
     console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
-    const primerEmbarque = this.sanBenito.filter(x=> x.lineUp.ocultar == false);
+    let primerEmbarque = this.sanBenito.filter(x=> x.lineUp.ocultar == false);
     this.primerEmbarqueSanBenito = (primerEmbarque !=null && primerEmbarque.length >0) ? primerEmbarque[0].lineUp.id : 0; 
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
+    if (this.sanBenitoCargandoMuelle!=null){
+      const esOculto = this.sanBenitoCargandoMuelle.lineUp.ocultar;
+      if (!esOculto)
+        this.primerEmbarqueSanBenito = 0;
+    }
     this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();

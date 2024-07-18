@@ -230,6 +230,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/LineUp/RestaurarEmbarquesOcultosLineUp")]
+        public HttpResponseMessage RestaurarEmbarquesOcultosLineUp()
+        {
+            try
+            {
+                servicio.RestaurarEmbarquesOcultosLineUp();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
 
     }
 }

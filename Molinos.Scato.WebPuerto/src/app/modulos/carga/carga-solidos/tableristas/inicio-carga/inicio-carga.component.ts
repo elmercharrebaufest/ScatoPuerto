@@ -31,7 +31,7 @@ export class InicioCargaComponent implements OnInit {
   @Output() inicioCarga = new EventEmitter<boolean>();
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-
+  periodoDeCarga = null;
   constructor(
     private formBuilder: FormBuilder,
     private procesoService: DatosEmbarquesProcesoService,
@@ -62,12 +62,12 @@ export class InicioCargaComponent implements OnInit {
 
   initInicioCarga(){
     this.moduloCargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((response: any) => {
+      this.periodoDeCarga = response;
       let isNull = false;
       let sFechaInicioCarga: string = null;
       let sHoraInicioCarga:string = null;
       if (response == null || (response?.fechaComienzoCarga == null && response?.horaComienzoCarga == null)) {
         isNull = true;
-        console.log('response---->>', response);
         let fechaHoraInicioCarga_DB = this.procesoService.getFechaHoraInicioCarga();
         let fechaHoraInicioCarga = String(fechaHoraInicioCarga_DB).split('T');
 
@@ -88,19 +88,6 @@ export class InicioCargaComponent implements OnInit {
         horaInicioCarga: sHoraInicioCarga
       });      
     });
-
-    // if(fechaHoraInicioCarga[0] != 'null'){
-    //   this.cargaIniciada = true;
-    //   // this.inicioCarga.emit(true);
-      
-    //   document.getElementById("FIC").setAttribute("disabled", "true");
-    // }
-
-    // this.inicioCargaForm = this.formBuilder.group({
-    //   fechaInicioCarga: fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[0] : this.funcionesGeneralesService.getFechaHora(new Date(),'EN').substring(0, 10),
-    //   horaInicioCarga: fechaHoraInicioCarga[0] != 'null' ? fechaHoraInicioCarga[1].substring(0,5) : this.funcionesGeneralesService.getFechaHora(new Date()).substring(11, 16),
-    // });
-    // console.log(' inicioCargaForm: ', this.inicioCargaForm);
   }
 
   toggleEditarFecha(){
@@ -114,7 +101,14 @@ export class InicioCargaComponent implements OnInit {
   }
 
   preguntarGuardarInicioCarga(){
-    console.log('preguntarGuardarInicioCarga');
+    let fechaFinalizacionCargaPeriodo = formatDate(this.periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'en-US');
+    let fechaInicioCarga = formatDate(this.inicioCargaForm.controls.fechaInicioCarga.value, 'yyyy-MM-dd', 'en-US');
+
+    if (fechaInicioCarga> fechaFinalizacionCargaPeriodo){
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+    
     if (this.cargaIniciada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)

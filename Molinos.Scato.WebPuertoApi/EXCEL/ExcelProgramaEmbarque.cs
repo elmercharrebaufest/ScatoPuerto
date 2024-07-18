@@ -400,7 +400,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             }
         }
 
-            private void InsertarFilaTitulo(string titulo, bool principal = false)
+        private void InsertarFilaTitulo(string titulo, bool principal = false)
         {
             var primeraColumna = principal ? 0 : 1;
             var segundColumna = principal ? 1 : 2;

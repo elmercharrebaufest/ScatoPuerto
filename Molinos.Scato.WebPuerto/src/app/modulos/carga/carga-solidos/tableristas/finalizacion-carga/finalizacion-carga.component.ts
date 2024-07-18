@@ -26,7 +26,7 @@ export class FinalizacionCargaComponent implements OnInit {
   cargaFinalizada: boolean = false;
   editandoFecha: boolean = false;
   @Output() finalizacionCarga = new EventEmitter<boolean>();
-
+  periodoDeCarga = null;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
 
@@ -57,6 +57,7 @@ export class FinalizacionCargaComponent implements OnInit {
 
   initFinalizacionCarga = () => {
     this.moduloCargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((response: any) => {
+      this.periodoDeCarga = response;
       let isNull = false;
       let sFechaFinalizacionCarga: string = null;
       let sHoraFinalizacionCarga:string = null;
@@ -94,6 +95,14 @@ export class FinalizacionCargaComponent implements OnInit {
   }
 
   preguntarGuardarFinalizacionCarga = () => {
+    let fechaComienzoCargaPeriodo = formatDate(this.periodoDeCarga.fechaComienzoCarga, 'yyyy-MM-dd', 'en-US');
+    let fechaFinalizacionCarga = formatDate(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value, 'yyyy-MM-dd', 'en-US');
+    
+    if (fechaComienzoCargaPeriodo> fechaFinalizacionCarga){
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga no puede ser menor a la fecha de inicio de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
     if (this.cargaFinalizada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)

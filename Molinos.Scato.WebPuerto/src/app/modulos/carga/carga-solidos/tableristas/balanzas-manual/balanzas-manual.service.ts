@@ -20,7 +20,6 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { saveAs } from 'file-saver-es';
 import { EmbarqueNav } from "@ScatoModels/embarque-nav";
-
 @Injectable({
   providedIn: 'root'
 })
@@ -93,7 +92,6 @@ export class BalanzasManualService {
     let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes('ControlCalidad'));
     return this.embarqueService.actualizarEstadoBuque(embarqueId, estadoBuque.id).pipe(map((data) => { return true; }));
   }
-  
   exportarBalanzasAExcel(balanza7, balanza8, embarque: EmbarqueNav) {
     let header = [
       { header: 'Balanza', key: 'Balanza' },
@@ -107,7 +105,6 @@ export class BalanzasManualService {
       { header: 'Observaciones', key: 'Observaciones' }
     ];
     let workbook = new Workbook();
-
     // Planilla turnos solido
     workbook.addWorksheet("Planilla");
 
@@ -178,7 +175,7 @@ export class BalanzasManualService {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   }
-
+    
   cargarBodegasParcel(): BodegaParcel[] {
     this.bodegas = [];
     for (let index = 1; index < 10; index++) {

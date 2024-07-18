@@ -12724,6 +12724,15 @@ namespace Molinos.Scato.Servicios.Impl
             }
             repositorio.GuardarCambios();
         }
-
+        public void RestaurarEmbarquesOcultosLineUp()
+        {
+            var embarques = this.ListarEmbarques();
+            foreach(var embarque in embarques.Where(x=> x.LineUp.Ocultar == true).ToList())
+            {
+                var lineUp = this.repositorio.Obtener<LineUp>(r => r.Id == embarque.LineUp.Id);
+                lineUp.Ocultar = false;
+                this.repositorio.GuardarCambios();
+            }
+        }
     }
 }

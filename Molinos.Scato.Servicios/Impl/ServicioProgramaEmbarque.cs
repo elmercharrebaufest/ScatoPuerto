@@ -364,6 +364,7 @@ namespace Molinos.Scato.Servicios.Impl
                                                                       x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
                                                                       x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
                                                                       x.FechaEliminacion == null &&
+                                                                      x.Embarque.Ubicacion != 1 && 
                                                                       x.Id != nominacion.Id);
             if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;

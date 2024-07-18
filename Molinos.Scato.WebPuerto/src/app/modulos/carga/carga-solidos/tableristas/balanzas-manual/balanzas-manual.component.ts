@@ -152,7 +152,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       if (confirmed) {
         this.balanzasManualService.enviarBuqueCalidad(this.embarqueSelected.id).pipe(takeUntil(this.destroy$)).subscribe((data: boolean) =>{
           if (data){
-              this.balanzasManualService.exportarBalanzasAExcel(this.balanzas7,this.balanzas8, this.embarqueSelected);
+            this.balanzasManualService.exportarBalanzasAExcel(this.balanzas7,this.balanzas8, this.embarqueSelected);
           }
         });
       }
