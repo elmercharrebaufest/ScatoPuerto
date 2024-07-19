@@ -1,6 +1,7 @@
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { BalanzaPuerto, PlanillaDeTurnos, SiloCelda, TurnoDetalleSolido, TurnoDetalleSolidoGravedad, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
@@ -62,6 +63,8 @@ export class PlanillaCargaComponent implements OnInit {
   public totalesExportadorProducto: TotalExportadorProducto[] = [];
   public totalesPalaProducto: { material: MaterialPuerto, cantidad: number }[] = [];
 
+  private periodoDeCarga: PeriodoDeCarga;
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private planoDeCargaService: PlanoDeCargaService,
@@ -75,24 +78,24 @@ export class PlanillaCargaComponent implements OnInit {
   ngOnInit(): void {
     const embarque = this._procesoService.getEmbarqueSelected();
     this.form.get('embarqueId').setValue(embarque.id);
-    const fechaHoraInicioCarga = this._procesoService.getFechaHoraInicioCarga();
     forkJoin([
       this.planoDeCargaService.obtenerPlanoDeCarga(embarque.planoDeCargaId),
       this.moduloDecargaService.obtenerTurnoPuerto(),
       this.moduloDecargaService.listarSiloCelda(),
-    ]).subscribe(([planoDeCarga, turnosPuerto, silosCeldas]) => {
+      this.moduloDecargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this._procesoService.getModuloDeCargaId()),
+    ]).subscribe(([planoDeCarga, turnosPuerto, silosCeldas, periodoDeCarga]) => {
       this.totalPlano = 0;
       this.bodegas = planoDeCarga.planoDeCargaBodegas;
       this.turnosPuerto = turnosPuerto;
       this.silosCeldas = silosCeldas;
+      this.periodoDeCarga = periodoDeCarga as PeriodoDeCarga;
 
       this.inicializarTotales();
       this.ultimoColorUsado = 0;
       this.setDestinos();
       this.setExportadores(planoDeCarga);
 
-      // TODO: Cargar para edición
-      this.agregarDia(fechaHoraInicioCarga);
+      this.inicializarDatos();
     });
   }
 
@@ -107,9 +110,62 @@ export class PlanillaCargaComponent implements OnInit {
     });
   }
 
+  private inicializarDatos() {
+    this.inicializarForm();
+    const moduloDeCarga = this._procesoService.getModuloDeCarga();
+    const fechaHoraInicioCarga = this.fechaHoraInicioCarga;
+    if (moduloDeCarga.moduloDeCargaPlanillaDeTurnos.length) {
+      this.cargarDatosEdicion(moduloDeCarga.moduloDeCargaPlanillaDeTurnos)
+    } else {
+      this.agregarDia(fechaHoraInicioCarga);
+    }
+  }
+
+  private cargarDatosEdicion(turnos: PlanillaDeTurnos[]) {
+    const fechasTurnos: { fecha: Date, turnos: PlanillaDeTurnos[] }[] = [];
+    for (const turno of turnos) {
+      turno.fecha = new Date(turno.fecha);
+      turno.fecha.setHours(0, 0, 0, 0);
+      let fechaTurno = fechasTurnos.find(ft => ft.fecha.getTime() == turno.fecha.getTime());
+      if (!fechaTurno) {
+        fechaTurno = { fecha: turno.fecha, turnos: [] };
+        fechasTurnos.push(fechaTurno);
+      }
+      fechaTurno.turnos.push(turno);
+    }
+
+    for (const fechaTurno of fechasTurnos) {
+      this.agregarDiaDatos(fechaTurno.fecha, fechaTurno.turnos);
+    }
+
+    for (const dia of this.dias.controls) {
+      this.actualizarTotal(dia);
+    }
+  }
+
   // #region Getters
   public get dias() {
     return this.form.get('dias') as FormArray;
+  }
+
+  public get fechaHoraInicioCarga() {
+    if (!this.periodoDeCarga.fechaComienzoCarga || !this.periodoDeCarga.horaComienzoCarga) {
+      return undefined;
+    }
+    const fecha = new Date(this.periodoDeCarga.fechaComienzoCarga);
+    const [hora, minutos] = this.periodoDeCarga.horaComienzoCarga.split(':').map(n => Number(n));
+    fecha.setHours(hora, minutos);
+    return fecha;
+  }
+
+  public get fechaHoraFinCarga() {
+    if (!this.periodoDeCarga.fechaFinalizacionCarga || !this.periodoDeCarga.horaFinalizacionCarga) {
+      return undefined;
+    }
+    const fecha = new Date(this.periodoDeCarga.fechaFinalizacionCarga);
+    const [hora, minutos] = this.periodoDeCarga.horaFinalizacionCarga.split(':').map(n => Number(n));
+    fecha.setHours(hora, minutos);
+    return fecha;
   }
 
   private get materialesSinRepetir() {
@@ -177,7 +233,7 @@ export class PlanillaCargaComponent implements OnInit {
       const gravedadTn = this.parsearNumeros(gravedadForm.get('cantidadGravedad').value);
       const totalTurnoTn = gravedadForm.get('totalTurnoMaterial').value || 0;
       gravedades.push({
-        id: 0,
+        id: gravedadForm.get('id').value || 0,
         materialPuerto: gravedadForm.get('materialPuerto').value,
         kgGravedad: gravedadTn * 1000,
         totalTurnoMaterial: totalTurnoTn * 1000
@@ -216,11 +272,11 @@ export class PlanillaCargaComponent implements OnInit {
         const gravedades = this.getGravedadesTurno(turnoForm);
         const cargas = this.getCargasTurno(turnoForm, true);
         const turno: PlanillaDeTurnos = new PlanillaDeTurnos();
-        turno.id = 0;
+        turno.id = turnoForm.get('id').value || 0;
         turno.turnoPuerto = turnoForm.get('turnoPuerto').value;
         turno.moduloDeCargaPlanillaDeTurnosDetallesSolido = cargas;
         turno.moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad = gravedades;
-        turno.fecha = new Date(dia.get('fecha').value);
+        turno.fecha = dia.get('fecha').value;
         turnos.push(turno);
 
         if (!errGravedad && gravedades.some(g => g.kgGravedad > g.totalTurnoMaterial)) {
@@ -305,30 +361,46 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   // #region Construcción de form
-  private construirTurnosFormArray(fecha: Date, nTurno: number) {
+  private construirTurnosFormArray(fecha: Date, nTurno: number, turnos?: PlanillaDeTurnos[]) {
     const turnosFormArray = this.fb.array([]);
 
-    for (let i = nTurno; i <= 4; i++) {
-      const filas = this.construirFilasFormArray();
-      const gravedades = this.construirGravedadFormArray();
+    let max = 4;
+    if (fecha.toDateString() == this.fechaHoraFinCarga.toDateString()) {
+      max = this.getTurno(this.fechaHoraFinCarga);
+    }
+
+    for (let i = nTurno; i <= max; i++) {
+      let filas: FormArray;
+      let gravedades: FormArray;
+      let totalTurno = 0;
+
       const turnoPuerto = this.turnosPuerto.find(t => t.orden == i);
-      const turnoForm = this.fb.group({ fecha, turnoPuerto, filas, totalTurno: 0, gravedades });
+      const turnoDb = turnos?.find(t => t.turnoPuerto.id == turnoPuerto.id);
+      const id = turnoDb?.id || 0;
+
+      filas = this.construirFilasFormArray(turnoDb?.moduloDeCargaPlanillaDeTurnosDetallesSolido);
+      gravedades = this.construirGravedadFormArray(turnoDb?.moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad);
+
+      const turnoForm = this.fb.group({ id, fecha, turnoPuerto, filas, totalTurno, gravedades });
       turnosFormArray.push(turnoForm);
     }
 
     return turnosFormArray;
   }
 
-  private construirFilaForm(nFila: number) {
-    const cargas = this.construirCargasFormArray(nFila);
+  private construirFilaForm(nFila: number, detalles?: TurnoDetalleSolido[]) {
+    const cargas = this.construirCargasFormArray(nFila, detalles);
     return this.fb.group({ fila: nFila, cargas });
   }
 
-  private construirGravedadFormArray() {
+  private construirGravedadFormArray(gravedadesDb?: TurnoDetalleSolidoGravedad[]) {
     const gravedadFormArray = this.fb.array([]);
     for (const material of this.materialesSinRepetir) {
-      const gravedad = new TurnoDetalleSolidoGravedad();
-      gravedad.materialPuerto = material;
+      let gravedad = gravedadesDb?.find(g => g.materialPuerto.id == material.id);
+      if (!gravedad) {
+        gravedad = new TurnoDetalleSolidoGravedad();
+        gravedad.materialPuerto = material;
+      }
       const gravedadForm = this.construirGravedadForm(gravedad);
       gravedadFormArray.push(gravedadForm)
     }
@@ -337,43 +409,61 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   private construirGravedadForm(gravedad: TurnoDetalleSolidoGravedad) {
+    const cantidadGravedad = gravedad.materialPuerto ? this.formatearNumeros((gravedad.kgGravedad / 1000).toString()) : '';
     return this.fb.group({
+      id: gravedad.id || 0,
       materialPuerto: gravedad.materialPuerto,
       totalTurnoMaterial: (gravedad.totalTurnoMaterial / 1000) || '',
-      cantidadGravedad: [(gravedad.kgGravedad / 1000) || '', [Validators.required, Validators.min(0)]],
+      cantidadGravedad: [cantidadGravedad, [Validators.required, Validators.min(0)]],
       cantidadPala: gravedad.totalTurnoMaterial ? (gravedad.totalTurnoMaterial - gravedad.kgGravedad) / 1000 : ''
     });
   }
 
-  private construirFilasFormArray() {
+  private construirFilasFormArray(detalles?: TurnoDetalleSolido[]) {
     const filasFormArray = this.fb.array([]);
-
-    for (let i = 0; i < 4; i++) {
-      const filaForm = this.construirFilaForm(i);
+    let max = 4;
+    if (detalles) {
+      const filas = detalles.map(d => d.fila);
+      const maxFila = Math.max(...filas) + 1;
+      max = Math.max(max, maxFila);
+    }
+    for (let i = 0; i < max; i++) {
+      let cargas: TurnoDetalleSolido[] = [];
+      if (detalles) {
+        cargas = detalles.filter(c => c.fila == i);
+      }
+      const filaForm = this.construirFilaForm(i, cargas);
       filasFormArray.push(filaForm);
     }
 
     return filasFormArray;
   }
 
-  private construirCargasFormArray(fila: number) {
+  private construirCargasFormArray(fila: number, detalles?: TurnoDetalleSolido[]) {
     const balanzas: BalanzaPuerto[] = [{ codigoBalanza: '7' }, { codigoBalanza: '8' }];
     const cargasFormArray = this.fb.array([]);
 
     for (const planoCargaBodega of this.bodegas) {
       for (const balanzaPuerto of balanzas) {
-        const carga = new TurnoDetalleSolido();
-        carga.bodega = planoCargaBodega.bodegaParcel;
-        carga.materialPuerto = planoCargaBodega.materialPuerto;
-        carga.balanzaPuerto = balanzaPuerto;
-        carga.fila = fila;
-        if (this.destinos.length == 1) {
-          carga.destino = this.destinos[0];
-        }
-        if (this.exportadores.length == 1) {
-          carga.exportador = this.exportadores[0];
-        }
+        const parcel = planoCargaBodega.bodegaParcel;
+        const detalle = detalles?.find(c => c.bodega.nombre == 'BODEGA ' + parcel && c.balanzaPuerto.codigoBalanza == balanzaPuerto.codigoBalanza);
 
+        const carga = detalle || new TurnoDetalleSolido();
+        if (detalle) {
+          carga.destino = this.destinos.find(d => d.id == carga.destino.id);
+          carga.exportador = this.exportadores.find(e => e.id == carga.exportador.id);
+        } else {
+          carga.materialPuerto = planoCargaBodega.materialPuerto;
+          carga.balanzaPuerto = balanzaPuerto;
+          carga.fila = fila;
+          if (this.destinos.length == 1) {
+            carga.destino = this.destinos[0];
+          }
+          if (this.exportadores.length == 1) {
+            carga.exportador = this.exportadores[0];
+          }
+        }
+        carga.bodega = { parcel, nombre: 'BODEGA ' + parcel };
         const cargaForm = this.construirCargaForm(carga);
         cargasFormArray.push(cargaForm);
       }
@@ -383,13 +473,14 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   private construirCargaForm(carga: TurnoDetalleSolido) {
+    const cantidad = carga.cantidad ? this.formatearNumeros((carga.cantidad / 1000).toString()) : ''
     return this.fb.group({
       id: carga.id || 0,
       materialPuerto: carga.materialPuerto || '',
       destino: [carga.destino || '', Validators.required],
       bodega: carga.bodega || '',
       exportador: [carga.exportador || '', Validators.required],
-      cantidad: [(carga.cantidad / 1000) || '', [Validators.required, Validators.min(0)]],
+      cantidad: [cantidad, [Validators.required, Validators.min(0)]],
       balanzaPuerto: carga.balanzaPuerto || '',
       siloCelda: [carga.siloCelda || '', Validators.required],
       fila: carga.fila
@@ -476,7 +567,7 @@ export class PlanillaCargaComponent implements OnInit {
     for (const dia of (this.form.get('dias') as FormArray).controls) {
       for (const turno of (dia.get('turnos') as FormArray).controls) {
         for (const carga of this.getCargasTurno(turno)) {
-          const totalBodega = this.totalesBodegas.find(tb => tb.bodegaParcel == carga.bodega);
+          const totalBodega = this.totalesBodegas.find(tb => tb.bodegaParcel == carga.bodega.parcel);
           totalBodega.totalCargado += carga.cantidad;
 
           if (carga.siloCelda) {
@@ -541,8 +632,19 @@ export class PlanillaCargaComponent implements OnInit {
       fecha = this.getNuevoDia();
     }
 
+    if (fecha > this.fechaHoraFinCarga) {
+      return;
+    }
+
     const turnos = this.construirTurnosFormArray(fecha, nTurno);
 
+    const diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
+    this.dias.push(diaForm);
+  }
+
+  private agregarDiaDatos(fecha: Date, turnosDb: PlanillaDeTurnos[]) {
+    const nTurno = turnosDb[0].turnoPuerto.orden;
+    const turnos = this.construirTurnosFormArray(fecha, nTurno, turnosDb);
     const diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
     this.dias.push(diaForm);
   }
@@ -635,14 +737,19 @@ export class PlanillaCargaComponent implements OnInit {
   public guardar() {
     try {
       const turnos = this.getTurnosFinales();
-      console.log(turnos);
-      this.confirmationDialogService.exito('Todo validado (falta implementar guardado)');
+      const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
+      this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
+        this.confirmationDialogService.exito('Guardado con éxito');
+      }, (err) => {
+        console.error(err);
+        this.confirmationDialogService.error('Ha ocurrido un error al guardar las cargas');
+      });
     } catch (error) {
       this.confirmationDialogService.error(error.message);
     }
   }
 
   public cancelar() {
-    console.log(this.form.getRawValue());
+    this.inicializarDatos();
   }
 }

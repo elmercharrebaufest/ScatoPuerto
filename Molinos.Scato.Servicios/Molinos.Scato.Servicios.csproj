@@ -604,6 +604,7 @@
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNominacionDetalleIntervencion.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNominacionDatoTecnico.cs" />
+    <Compile Include="Procesamiento\ProcesadorGuardarPlanillaCargaManualSolidos.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarAsignacionDeCalle.cs" />
     <Compile Include="Procesamiento\ProcesadorAutomatizacionEtapas.cs" />

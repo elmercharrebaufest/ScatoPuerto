@@ -35,9 +35,9 @@
             <div class="html2pdf__page-break"></div>
             <!-- </ ARMOA005-1988 Dylan Lopez> -->
             <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
-        
+
             <app-balanzas *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
-            
+
             <app-balanzas-manual *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga" ></app-balanzas-manual>
         </div>
 
