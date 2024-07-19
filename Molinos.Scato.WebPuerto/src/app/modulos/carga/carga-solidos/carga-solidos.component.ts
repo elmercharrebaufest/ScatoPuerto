@@ -32,6 +32,8 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
+import { FinalizacionCargaComponent } from './tableristas/finalizacion-carga/finalizacion-carga.component';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -47,6 +49,8 @@ export class CargaSolidosComponent implements OnInit {
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(NIRComponent) nirComponent: NIRComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
+  @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
+  @ViewChild(FinalizacionCargaComponent) finalizacionCargaComponent: FinalizacionCargaComponent;
 
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
@@ -168,6 +172,10 @@ export class CargaSolidosComponent implements OnInit {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.existePeriodoDeCarga = true;
           let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
+          
+          this.inicioCargaComponent.periodoDeCarga = moduloDeCargaPeriodoDeCarga;
+          this.finalizacionCargaComponent.periodoDeCarga = moduloDeCargaPeriodoDeCarga;
+
           if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null && 
               moduloDeCargaPeriodoDeCarga.fechaFinalizacionCarga !=null && 
               moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null &&
@@ -336,6 +344,7 @@ export class CargaSolidosComponent implements OnInit {
 
   obtenerInicioCarga(inicioCarga){
     this.inicioCarga = inicioCarga;
+    this.cargarModuloCarga();
   }
   
   // <ARMOA005-1988 Dylan Lopez>

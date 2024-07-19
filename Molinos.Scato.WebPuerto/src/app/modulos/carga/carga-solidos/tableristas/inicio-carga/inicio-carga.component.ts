@@ -101,14 +101,15 @@ export class InicioCargaComponent implements OnInit {
   }
 
   preguntarGuardarInicioCarga(){
-    let fechaFinalizacionCargaPeriodo = formatDate(this.periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'en-US');
-    let fechaInicioCarga = formatDate(this.inicioCargaForm.controls.fechaInicioCarga.value, 'yyyy-MM-dd', 'en-US');
+    if (this.periodoDeCarga.fechaFinalizacionCarga != null){
+      let fechaFinalizacionCargaPeriodo = formatDate(this.periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'en-US');
+      let fechaInicioCarga = formatDate(this.inicioCargaForm.controls.fechaInicioCarga.value, 'yyyy-MM-dd', 'en-US');
 
-    if (fechaInicioCarga> fechaFinalizacionCargaPeriodo){
-      this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-      return;
+      if (fechaInicioCarga> fechaFinalizacionCargaPeriodo){
+        this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+        return;
+      }
     }
-    
     if (this.cargaIniciada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
