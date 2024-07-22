@@ -640,16 +640,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/ObtenerBalanzadasEnCurso")]
         public HttpResponseMessage obtenerBalanzadasEnCurso([FromUri] int IdModuloDeCarga)
         {
-			if (IdModuloDeCarga <= 0)
-			{
-				return Request.CreateResponse(HttpStatusCode.BadRequest, "El IdModuloDeCarga debe ser un número entero positivo.");
-			}
-			try
+            if (IdModuloDeCarga <= 0)
             {
-				var balanzadasEnCurso = servicio.ObtenerBalanzadasEnCurso(IdModuloDeCarga);
-				var responseContent = new BalanzadasCompletas { balanzadasEnCurso = balanzadasEnCurso };
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "El IdModuloDeCarga debe ser un número entero positivo.");
+            }
+            try
+            {
+                var balanzadasEnCurso = servicio.ObtenerBalanzadasEnCurso(IdModuloDeCarga);
+                var responseContent = new BalanzadasCompletas { balanzadasEnCurso = balanzadasEnCurso };
 
-				return Request.CreateResponse(HttpStatusCode.OK, responseContent);
+                return Request.CreateResponse(HttpStatusCode.OK, responseContent);
             }
             catch (Exception ex)
             {
@@ -1056,6 +1056,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GuardarCargaManualSolidos")]
+        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, List<ModuloDeCargaPlanillaDeTurnosDto> turnos)
+        {
+            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, Usuario = base.nombreUsuario });
+            if (resultado.HayErrores)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         public class CapturaImagenLineUp

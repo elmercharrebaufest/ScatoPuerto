@@ -32,6 +32,8 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
+import { FinalizacionCargaComponent } from './tableristas/finalizacion-carga/finalizacion-carga.component';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -47,6 +49,8 @@ export class CargaSolidosComponent implements OnInit {
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(NIRComponent) nirComponent: NIRComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
+  @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
+  @ViewChild(FinalizacionCargaComponent) finalizacionCargaComponent: FinalizacionCargaComponent;
 
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
@@ -143,11 +147,13 @@ export class CargaSolidosComponent implements OnInit {
     let { celda, sentido } = item;
     this.graficoCarga.agregarManoDeEmbarque(celda, sentido);
   }
-
+  recargarPeriodoDeCarga(event){
+    if (event)
+      this.cargarModuloCarga();
+  }
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
-        console.log('obtenerModuloDeCarga: ', res);
         this.enviado = res.enviado;
         this.ingresoManualSolido = res.ingresoManualSolido;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
@@ -168,6 +174,7 @@ export class CargaSolidosComponent implements OnInit {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.existePeriodoDeCarga = true;
           let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
+          
           if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null && 
               moduloDeCargaPeriodoDeCarga.fechaFinalizacionCarga !=null && 
               moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null &&
@@ -324,18 +331,16 @@ export class CargaSolidosComponent implements OnInit {
   modificarEstadoBuque(estado: string){
     let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
     this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
-      console.log(res);
-
       let texto = "Se envió a Tableristas correctamente";
       this.mostrarTableristaOperando = true;
       this.cargarModuloCarga();
-
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }
 
   obtenerInicioCarga(inicioCarga){
     this.inicioCarga = inicioCarga;
+    this.cargarModuloCarga();
   }
   
   // <ARMOA005-1988 Dylan Lopez>
@@ -379,7 +384,6 @@ export class CargaSolidosComponent implements OnInit {
           this.hideSpinner.emit(false);
       })
       .catch(() => {
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.hideSpinner.emit(false);
       });
   }

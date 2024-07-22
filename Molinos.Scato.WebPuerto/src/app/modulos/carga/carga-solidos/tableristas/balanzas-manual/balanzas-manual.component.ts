@@ -92,7 +92,6 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.balanzasManualCorteService.BalanzaManual = balanza;
       this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
     }
-    console.log('balanza.corteManual---->>>', balanza.corteManual);
     if (!balanza.corteManual){
       this.balanzasManualBajaCargaService.BalanzaManual = balanza;
       this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;

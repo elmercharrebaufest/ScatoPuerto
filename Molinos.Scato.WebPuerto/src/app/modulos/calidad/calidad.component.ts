@@ -135,13 +135,36 @@ export class CalidadComponent implements OnInit, OnDestroy {
         listarEmbarquesEnLineUp: EmbarqueNav[]
       }) => {
         this.listadoEmbarques = res.obtenerListado;
-        this.filtrarMuelles();
 
         this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
+        let sanBenitoCargandoMuelle = this.listadoEmbarques.find(m =>m.embarque.sanBenito && m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
+        let posicion = 0;
+        if (sanBenitoCargandoMuelle != null || sanBenitoCargandoMuelle != undefined){
+          let filtroSanBenito = this.listadoEmbarques.filter(x => x.embarque.id == sanBenitoCargandoMuelle.embarque.id && x.embarque.sanBenito);
+          if (filtroSanBenito!=null){
+            posicion++;
+            filtroSanBenito[0].posicion = posicion;
+          }
+        }
+        let filtroSanBenito = this.listadoEmbarques.filter(x=> x.embarque.sanBenito);
+        filtroSanBenito.forEach(item =>{
+          if (item.embarque.id != sanBenitoCargandoMuelle?.embarque?.id){
+            posicion++;
+            item.posicion = posicion;
+          }
+        });
+
+        this.filtrarMuelles();
 
         let embSanBenitoEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
         let embVicentinEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnVicentin?.embarque.id);
         let embNoryonEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnNoryon?.embarque.id);
+
+        if (embSanBenitoEnLineUp!=null && embSanBenitoEnLineUp == undefined){
+          let filtro = this.listadoEmbarques.find(x=>x.embarque.id == embSanBenitoEnLineUp.id);
+          if (filtro!=null && filtro == undefined)
+            embSanBenitoEnLineUp.posicion = filtro.posicion;
+        }
 
         if (embSanBenitoEnLineUp) this.embarquesEnLineUp.push(embSanBenitoEnLineUp);
         if (embVicentinEnLineUp) this.embarquesEnLineUp.push(embVicentinEnLineUp);

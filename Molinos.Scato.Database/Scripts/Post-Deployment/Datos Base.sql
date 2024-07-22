@@ -1058,7 +1058,6 @@ if exists(select 1 from ModuloDeCarga where IngresoManualSolido is null) BEGIN u
 
 UPDATE LineUp SET Ocultar = 0 WHERE Ocultar IS NULL
 
-
 --Silos y Celdas
 IF (SELECT COUNT(*) FROM SiloCelda) = 0 BEGIN
     INSERT INTO SiloCelda (Nombre, Color) 

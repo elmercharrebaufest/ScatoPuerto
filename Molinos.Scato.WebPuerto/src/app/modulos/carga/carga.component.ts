@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
@@ -55,30 +55,42 @@ export class CargaComponent implements OnInit, OnDestroy {
      
     this._procesoService.disposeData();
     try {
-      this.workflowService.listarEmbarquesEnLineUp()
-        .pipe(takeUntil(this.unsubscribe))
-        .subscribe(res => {
-          this.embarquesEnLineUp = res;
-          let posicion = 0;
-          this.embarquesEnLineUp.forEach(item =>{
+
+      forkJoin([
+        this.workflowService.listarEmbarquesEnLineUp(),
+        this.workflowService.obtenerListado()
+      ]).pipe(takeUntil(this.unsubscribe)).subscribe(([listadoCarga,listadoLineUp]) => {
+        this.embarquesEnLineUp = listadoCarga;
+        let sanBenitoCargandoMuelle = listadoLineUp.find(m =>m.embarque.sanBenito && m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
+        let posicion = 0;
+        if (sanBenitoCargandoMuelle != null || sanBenitoCargandoMuelle != undefined){
+          let filtroSanBenito = this.embarquesEnLineUp.filter(x => x.id == sanBenitoCargandoMuelle.embarque.id);
+          if (filtroSanBenito!=null){
+            posicion++;
+            filtroSanBenito[0].posicion = posicion;
+          }
+        }
+        this.embarquesEnLineUp.forEach(item =>{
+          if (item.id != sanBenitoCargandoMuelle?.embarque?.id){
             posicion++;
             item.posicion = posicion;
-          });
-          this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
-          this.mostrarTabs = true;
-
-          let embarqueDelStorage = this.obtenerEmbarqueSelectedEnLocalStorage();
-          if(embarqueDelStorage){
-            let vaporEncontrado = this.embarquesEnLineUp.find( x => x.id == embarqueDelStorage.id);
-            if(vaporEncontrado)
-              this.parametrosService.consola('=== vaporEncontrado === : ', vaporEncontrado);
-            else{
-              this.parametrosService.consola('=== vapor NO Encontrado ===');
-              localStorage.removeItem('embarqueSelected');
-            }
           }
-
         });
+
+        this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
+        this.mostrarTabs = true;
+
+        let embarqueDelStorage = this.obtenerEmbarqueSelectedEnLocalStorage();
+        if(embarqueDelStorage){
+          let vaporEncontrado = this.embarquesEnLineUp.find( x => x.id == embarqueDelStorage.id);
+          if(vaporEncontrado)
+            this.parametrosService.consola('=== vaporEncontrado === : ', vaporEncontrado);
+          else{
+            this.parametrosService.consola('=== vapor NO Encontrado ===');
+            localStorage.removeItem('embarqueSelected');
+          }
+        }        
+      });
     } catch (e) {
       console.log(e);
       console.log("Error en listarEmbarquesEnLineUp");

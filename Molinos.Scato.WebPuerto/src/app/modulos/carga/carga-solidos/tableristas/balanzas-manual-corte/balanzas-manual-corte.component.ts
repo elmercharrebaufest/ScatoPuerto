@@ -61,7 +61,6 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
   cargarMotivosBalanzas() {
     this.balanzasManualCorteService.PeriodoDeCarga.pipe(takeUntil(this.destroy$)).subscribe(periodoDeCarga => {
-      console.log('cargarMotivosBalanzas periodoDeCarga--->>', periodoDeCarga);
       if (periodoDeCarga!=null){
         this.fechaComienzoCarga = formatDate(periodoDeCarga.fechaComienzoCarga, 'yyyy-MM-dd', 'es-ar');
         this.fechaFinalizacionCarga = formatDate(periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'es-ar');
@@ -77,8 +76,6 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
   cargarFormularioEditar() {
     this.balanzasManualCorteService.BalanzaManual.pipe(takeUntil(this.destroy$)).subscribe(balanzaManual => {
-      console.log('cargarFormularioEditar balanzaManual--->>', balanzaManual);
-
       this.balanzaManualRegistro = balanzaManual;
       this.corteManualForm = this.crearFormularioCorte();
       if (this.balanzaManualRegistro == null) {

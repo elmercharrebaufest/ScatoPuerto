@@ -11,7 +11,7 @@ import { Bodega, MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
 import { Nir, NirManualPuerto } from '@ScatoModels/nir';
 import { FuncionesGeneralesService } from './funciones-generales.service';
 import { Umap } from '@ScatoModels/umap';
-import { SiloCelda, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { PlanillaDeTurnos, SiloCelda, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 
 @Injectable({
   providedIn: 'root'
@@ -184,8 +184,12 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeTurnosCortes?idModuloDeCargaPlanillaCorte=${parseInt(idModuloDeCargaPlanillaCorte)}`, {'withCredentials': true});
   }
 
-  listarSiloCelda() {
+  public listarSiloCelda() {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
+  }
+
+  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[]) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}`, turnos, { withCredentials: true });
   }
 
   generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
