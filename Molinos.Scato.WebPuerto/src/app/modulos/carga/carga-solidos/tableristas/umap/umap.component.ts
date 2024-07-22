@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -20,6 +20,7 @@ export class UmapComponent implements OnInit {
 	private user: Usuario;
 	permisosScato: typeof PermisosScato = PermisosScato;
   @Input() esSoloLectura: boolean = false;
+  @Output() cargarPeriodoDeCarga = new EventEmitter<boolean>();
 
   guardando: boolean = false;
   public forms: FormGroup;
@@ -58,7 +59,9 @@ export class UmapComponent implements OnInit {
   obtenerAmarre(){
     return this.amarreComponent.obtenerAmarre();
   }
-
+  recargarPeriodoDeCarga(event){
+    this.cargarPeriodoDeCarga.emit(event);
+  }
   public updateUMAP(umap){
     while(this.umapFormArray.length < umap.length) this.umapFormArray.push(this.initUmap());
     umap.forEach(element => {

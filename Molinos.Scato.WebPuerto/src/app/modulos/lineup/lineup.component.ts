@@ -199,9 +199,19 @@ export class LineupComponent implements OnInit, Observador {
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     let posicion = 0;
+    
+    if (this.sanBenitoCargandoMuelle!=null || this.sanBenitoCargandoMuelle != undefined){
+      let filtroSanBenito = this.sanBenito.filter(x => x.lineUp.id == this.sanBenitoCargandoMuelle.lineUp.id);
+      if (filtroSanBenito!=null){
+        posicion++;
+        filtroSanBenito[0].posicion = posicion;
+      }
+    }
     this.sanBenito.forEach(item =>{
-      posicion++;
-      item.posicion = posicion;
+      if (item.lineUp.id != this.sanBenitoCargandoMuelle?.lineUp?.id){
+        posicion++;
+        item.posicion = posicion;
+      }
     });
     posicion = 0;
     this.noryon.forEach(item =>{ 

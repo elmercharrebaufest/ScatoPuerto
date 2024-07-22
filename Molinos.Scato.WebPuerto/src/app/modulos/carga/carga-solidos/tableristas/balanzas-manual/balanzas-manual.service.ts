@@ -314,7 +314,7 @@ export class BalanzasManualService {
 
     return esFechaValida;
   }
-  private convertirFecha(valorFecha: string, valorHora: string = null): Date {
+  public convertirFecha(valorFecha: string, valorHora: string = null): Date {
     const fechaSplit = valorFecha.split('-');
     const anio = parseInt(fechaSplit[0]);
     const mes = parseInt(fechaSplit[1]) - 1;

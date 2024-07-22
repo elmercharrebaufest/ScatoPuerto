@@ -1,7 +1,7 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { BalanzaService } from '@ScatoServicios/balanza.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -13,6 +13,9 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
 // <ARMOA005-1988 Dylan Lopez>
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { BalanzasManualService } from '../balanzas-manual/balanzas-manual.service';
+import { forkJoin, Subject } from 'rxjs';
+import { InicioFinalizacionCargaService } from '../inicio-finalizacion-carga.services';
 // </ ARMOA005-1988 Dylan Lopez>
 
 @Component({
@@ -20,7 +23,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
   templateUrl: './inicio-carga.component.html',
   styleUrls: ['./inicio-carga.component.css']
 })
-export class InicioCargaComponent implements OnInit {
+export class InicioCargaComponent implements OnInit, OnDestroy {
   inicioCargaForm: FormGroup;
   embarqueSelected: any;
   embarque_Id: number = 0;
@@ -31,7 +34,8 @@ export class InicioCargaComponent implements OnInit {
   @Output() inicioCarga = new EventEmitter<boolean>();
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  periodoDeCarga = null;
+  private destroy$ = new Subject();
+
   constructor(
     private formBuilder: FormBuilder,
     private procesoService: DatosEmbarquesProcesoService,
@@ -40,7 +44,9 @@ export class InicioCargaComponent implements OnInit {
     confirmationDialogService: ConfirmationDialogService,
     private session: SessionService,
     private _buqueService: BuqueService,
-    private moduloCargaService: ModuloDeCargaService
+    private moduloCargaService: ModuloDeCargaService,
+    private balanzasManualService: BalanzasManualService,
+    private inicioFinalizacionCargaService: InicioFinalizacionCargaService
   ) {
     this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
@@ -54,6 +60,10 @@ export class InicioCargaComponent implements OnInit {
     // </ ARMOA005-1988 Dylan Lopez>
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
   ngOnInit(): void {
     this.initInicioCarga();
 
@@ -62,7 +72,6 @@ export class InicioCargaComponent implements OnInit {
 
   initInicioCarga(){
     this.moduloCargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((response: any) => {
-      this.periodoDeCarga = response;
       let isNull = false;
       let sFechaInicioCarga: string = null;
       let sHoraInicioCarga:string = null;
@@ -101,15 +110,49 @@ export class InicioCargaComponent implements OnInit {
   }
 
   preguntarGuardarInicioCarga(){
-    if (this.periodoDeCarga.fechaFinalizacionCarga != null){
-      let fechaFinalizacionCargaPeriodo = formatDate(this.periodoDeCarga.fechaFinalizacionCarga, 'yyyy-MM-dd', 'en-US');
-      let fechaInicioCarga = formatDate(this.inicioCargaForm.controls.fechaInicioCarga.value, 'yyyy-MM-dd', 'en-US');
+    let fechaInicioCarga = '';
+    fechaInicioCarga = formatDate(this.inicioCargaForm.controls.fechaInicioCarga.value, 'yyyy-MM-dd', 'en-US');
+    fechaInicioCarga = fechaInicioCarga + ' ' + this.inicioCargaForm.controls.horaInicioCarga;
 
-      if (fechaInicioCarga> fechaFinalizacionCargaPeriodo){
-        this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-        return;
+    forkJoin([
+      this.balanzasManualService.listarBalanzaManual(this.embarqueSelected.moduloDeCargaId),
+      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual,moduloDeCarga]) => {
+      let fechaFinalizacionCargaPeriodo = '';
+      let fechaInicioCorteBajaCarga = '';
+      let fechaInicioCargaNormal = '';
+
+      if (balanzaManual!=null){
+        fechaInicioCorteBajaCarga = this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, false);
       }
-    }
+      if (moduloDeCarga!=null){
+        if (moduloDeCarga.moduloDeCargaPeriodoDeCarga!=null && moduloDeCarga.moduloDeCargaPeriodoDeCarga.length > 0){
+          fechaFinalizacionCargaPeriodo = this.inicioFinalizacionCargaService.obtenerFechaPeriodoCarga(moduloDeCarga.moduloDeCargaPeriodoDeCarga, true);
+        }
+        fechaInicioCargaNormal = this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(moduloDeCarga.moduloDeCargaPlanillaDeTurnos,false);
+      }
+      if (fechaFinalizacionCargaPeriodo>''){
+        if (fechaInicioCarga > fechaFinalizacionCargaPeriodo){
+          this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+          return;
+        }
+      }
+      if (fechaInicioCargaNormal>''){
+        if (fechaInicioCarga > fechaInicioCargaNormal){
+          this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga es mayor a las fechas de los turnos registrados.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+          return;
+        }
+      }
+      if (fechaInicioCorteBajaCarga>''){
+        if (fechaInicioCarga > fechaInicioCorteBajaCarga){
+          this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga es mayor a las fechas de corte y baja carga registrados.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+          return;
+        }
+      }
+      this.guardarFechaInicioCarga();
+    });
+  }
+  private guardarFechaInicioCarga(){
     if (this.cargaIniciada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
@@ -130,43 +173,6 @@ export class InicioCargaComponent implements OnInit {
     }
   }
 
-  guardarFechaHoraInicioCarga() {
-    let fechaInicioCarga = String(this.inicioCargaForm.controls.fechaInicioCarga.value);
-    let horaInicioCarga = String(this.inicioCargaForm.controls.horaInicioCarga.value);
-    let fechaHorastring = `${fechaInicioCarga} ${horaInicioCarga}`;
-    let guardadoOK = false;
-    let texto = "";
-    this.embarque_Id = this.procesoService.getEmbarqueId();
-
-    if(fechaHorastring != ' '){
-      this.balanzaService.guardarFechaInicioCarga(this.embarque_Id, fechaHorastring)
-        .pipe(finalize(() => {
-          if(guardadoOK){
-            let fechaHorastringParaSet = `${fechaInicioCarga}T${horaInicioCarga}`;
-            this.procesoService.setFechaHoraInicioCarga(fechaHorastringParaSet);
-            this.toggleEditarFecha();
-          }
-        }))
-        .subscribe( res => {
-          guardadoOK = true;
-
-          if(this.cargaIniciada){
-            texto = "Se modificó la fecha de inicio de carga correctamente.";
-          }else{
-            texto = "Se inició la carga correctamente";
-            this.cargaIniciada = true;
-            document.getElementById("FIC").setAttribute("disabled","true");
-            this._buqueService.GuardarHistoricoOperador(this.embarque_Id, "Inició carga").subscribe();
-          }
-  
-          this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-        }, err => {
-          guardadoOK = false;
-          texto = "Ocurrió un error al guardar la fecha y hora";
-          this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Error);
-        });
-    }
-  }
 
   actualizarFechasPeriodoDeCarga = () => {
     let fechaInicioCarga = String(this.inicioCargaForm.controls.fechaInicioCarga.value);

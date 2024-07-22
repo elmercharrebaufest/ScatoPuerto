@@ -121,7 +121,10 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       this.horaInicioMaximo = this.horaFinalizacionCarga;
     }
   }
-
+  onKilosChange(event: any){
+    const kilos = parseFloat(event.target.value);
+    this.bajaCargaForm.controls['kilogramos'].setValue(kilos.toFixed(3));
+  }
   cargarListas() {
     this.materialesPuerto = [];
     this.exportadores = [];
