@@ -24,8 +24,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private readonly string _nombreBuque;
         private readonly HttpPostedFile _excel;
         private int _filaInicioTotales;
-        private int _totalGravedad = 0;
-        private int _totalPala = 0;
+        private decimal _totalGravedad = 0;
+        private decimal _totalPala = 0;
 
         public ExcelPlanillaTurnosSolidoOp(IList<ModuloDeCargaPlanillaDeTurnosDto> planilla, IList<PlanoDeCargaBodegaDto> listaCargaBodega,
             string nombreBuque, HttpPostedFile excel)
@@ -326,12 +326,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             foreach (DateTime fecha in fechasCargas)
             {
-                int totalCargasxFecha = ObtenerTotalCargasPorFecha(fecha);
+                decimal totalCargasxFecha = ObtenerTotalCargasPorFecha(fecha);
                 cantCargasxFecha = ObtenerCargasPorFecha(fecha);
                 IRow row = _sheetTurnos.GetRow(rowIndexDia) ?? _sheetTurnos.CreateRow(rowIndexDia);
                 CrearCelda(row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 0, 0, fecha.ToString("dd-MMM-yy"), estiloFecha, 1, true);
                 PintarTablaGris(rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 2, 19);
-                CrearCelda(row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 21, 21, totalCargasxFecha.ToString(), estiloTotal, 1, true);
+                CrearCelda(row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 21, 21, ToCustomString(totalCargasxFecha), estiloTotal, 1, true);
                 //Por cada turno de fecha dada agrego sus cargas, y sus palas correspondientes.
                 AgregarCargasYPala(fecha, row, rowIndexDia, rowIndexDia + cantCargasxFecha - 1, estiloTurno, totalCargasxFecha);
                 rowIndexDia += cantCargasxFecha;
@@ -351,9 +351,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(row, index, index, 24, 24, $"Total {_totalPala} TN con Palas", stylePala, 2, false);
         }
 
-        private void AgregarCargasYPala(DateTime fecha, IRow rowFecha, int rowIni, int rowFin, ICellStyle estilo, int totalXFecha)
+        private void AgregarCargasYPala(DateTime fecha, IRow rowFecha, int rowIni, int rowFin, ICellStyle estilo, decimal totalXFecha)
         {
-            int cantCargasxTurno = 0, acumPorGravedad = 0, turno = 1, pesoGravedad = 0;
+            int cantCargasxTurno = 0, turno = 1;
+            decimal acumPorGravedad = 0, pesoGravedad = 0;
             bool separador = false;
 
             ICellStyle estilo1 = CrearEstiloCelda("Arial", 9, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin);
@@ -363,7 +364,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             for (int i = rowIni; i < rowFin; i += cantCargasxTurno)
             {
                 var planillaTurno = _planilla.FirstOrDefault(p => p.Fecha.Value.Date == fecha.Date && p.TurnoPuerto.Orden == turno);
-                pesoGravedad = planillaTurno?.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.Sum(p => p.KgGravedad / 1000) ?? 0;
+                pesoGravedad = planillaTurno?.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.Sum(p => ((decimal)(p.KgGravedad)) / 1000) ?? 0;
                 acumPorGravedad += pesoGravedad;
                 _totalGravedad += acumPorGravedad;
                 cantCargasxTurno = ObtenerCantidadCargasPorFechaTurno(fecha, turno);
@@ -373,14 +374,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     separador = true;
                 }
                 CrearCelda(rowAux, i, i + (cantCargasxTurno - 1), 1, 1, ObtenerTurno(turno), estilo, 1, separador);
-                CrearCelda(rowAux, i, i + (cantCargasxTurno - 1), 20, 20, ObtenerTotalCargasPorFechaTurno(fecha, turno).ToString(), estiloTotal, 1, separador);
-                CrearCelda(rowAux, i, i + (cantCargasxTurno - 1), 23, 23, pesoGravedad.ToString(), estilo, 1, separador);
+                CrearCelda(rowAux, i, i + (cantCargasxTurno - 1), 20, 20, ToCustomString(ObtenerTotalCargasPorFechaTurno(fecha, turno)), estiloTotal, 1, separador);
+                CrearCelda(rowAux, i, i + (cantCargasxTurno - 1), 23, 23, ToCustomString(pesoGravedad), estilo, 1, separador);
                 AgregarCargasXTurno(fecha, turno, rowAux, i, i + (cantCargasxTurno - 1));
                 turno++;
             }
-            int valorConPalas = totalXFecha - acumPorGravedad;
+            decimal valorConPalas = totalXFecha - acumPorGravedad;
             _totalPala += valorConPalas;
-            CrearCelda(rowFecha, rowIni, rowFin, 24, 24, valorConPalas.ToString(), estilo, 1, true);
+            CrearCelda(rowFecha, rowIni, rowFin, 24, 24, ToCustomString(valorConPalas), estilo, 1, true);
         }
 
         private void AgregarCargasXTurno(DateTime fecha, int turno, IRow row, int rowIni, int rowFin)
@@ -393,12 +394,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 foreach (ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga in cargas)
                 {
                     if (carga.Bodega?.Nombre != null && carga.BalanzaPuerto?.CodigoBalanza != null && carga.SiloCelda?.Color != null && carga.Fila != null)
-                        PintarValorEnBodegaBlz(rowIni, rowFin, turno, carga.Bodega.Nombre, carga.BalanzaPuerto.CodigoBalanza, carga.Cantidad / 1000, carga.Fila.Value, carga.SiloCelda.Color);
+                        PintarValorEnBodegaBlz(rowIni, rowFin, turno, carga.Bodega.Nombre, carga.BalanzaPuerto.CodigoBalanza, ((decimal)(carga.Cantidad)) / 1000, carga.Fila.Value, carga.SiloCelda.Color);
                 }
             }
         }
 
-        private void PintarValorEnBodegaBlz(int rowIni, int rowFin, int turno, string bodega, string codBalanza, int cantidad, int fila, string color)
+        private void PintarValorEnBodegaBlz(int rowIni, int rowFin, int turno, string bodega, string codBalanza, decimal cantidad, int fila, string color)
         {
             bool separador = false;
             int offsetBlz = codBalanza == "7" ? 0 : 1;
@@ -407,7 +408,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             IRow row = _sheetTurnos.GetRow(rowIni + (fila)) ?? _sheetTurnos.CreateRow(rowIni + (fila));
             if (turno == 4)
                 separador = true;
-            CrearCelda(row, rowIni + (fila), rowIni + (fila), col, col, cantidad.ToString(), estiloCarga, 0, separador);
+            CrearCelda(row, rowIni + (fila), rowIni + (fila), col, col, ToCustomString(cantidad), estiloCarga, 0, separador);
         }
 
         private void CrearCelda(IRow row, int firstRow, int lastRow, int firstCol, int lastCol, string valorCelda, ICellStyle estilo, int bordeRegion, bool separador)
@@ -487,29 +488,29 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return cantCargas;
         }
 
-        private int ObtenerTotalCargasPorFecha(DateTime fecha)
+        private decimal ObtenerTotalCargasPorFecha(DateTime fecha)
         {
-            int total = 0;
+            decimal total = 0;
             var planillaFecha = _planilla.Where(x => x.Fecha.Value.Date == fecha.Date);
             foreach (ModuloDeCargaPlanillaDeTurnosDto planilla in planillaFecha)
             {
                 foreach (ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga in planilla.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
                 {
-                    total += carga.Cantidad / 1000;
+                    total += ((decimal)(carga.Cantidad)) / 1000;
                 }
             }
             return total;
         }
 
-        private int ObtenerTotalCargasPorFechaTurno(DateTime fecha, int turno)
+        private decimal ObtenerTotalCargasPorFechaTurno(DateTime fecha, int turno)
         {
-            int total = 0;
+            decimal total = 0;
             var planillaFecha = _planilla.FirstOrDefault(x => x.Fecha.Value.Date == fecha.Date && x.TurnoPuerto.Orden == turno);
             if (planillaFecha != null)
             {
                 foreach (ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga in planillaFecha.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
                 {
-                    total += carga.Cantidad / 1000;
+                    total += ((decimal)(carga.Cantidad)) / 1000;
                 }
             }
             return total;
@@ -527,7 +528,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private void CalcularTotales()
         {
-            int totalABordo = 0, totalSPlano = 0, faltanEmb = 0, filaBodegas = 10;
+            decimal totalABordo = 0, totalSPlano = 0, faltanEmb = 0;
+            int filaBodegas = 10;
 
             IRow rowTotalxBodega = _sheetTurnos.GetRow(_filaInicioTotales) ?? _sheetTurnos.CreateRow(_filaInicioTotales);
             rowTotalxBodega.HeightInPoints = (short)21.5;
@@ -548,9 +550,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             for (int i = 2; i <= 18; i += 2)
             {
-                int totalxBod = CalcularTotalxBodega(i / 2);
-                int totalxPlCargaBod = CalcularTotalPlanoCargaxBodega(i / 2);
-                int restaCargar = totalxPlCargaBod - totalxBod;
+                decimal totalxBod = CalcularTotalxBodega(i / 2);
+                decimal totalxPlCargaBod = CalcularTotalPlanoCargaxBodega(i / 2);
+                decimal restaCargar = totalxPlCargaBod - totalxBod;
 
                 totalABordo += totalxBod;
                 totalSPlano += totalxPlCargaBod;
@@ -571,15 +573,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 ICellStyle estilo3 = CrearEstiloCelda("Arial", 10, fondoRestaCargar, false,
               backgroundColor, BorderStyle.Thin);
 
-                CrearCelda(rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, i, i + 1, totalxBod.ToString(), estilo1, 1, false);
-                CrearCelda(rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, i, i + 1, totalxPlCargaBod.ToString(), estilo2, 1, false);
-                CrearCelda(rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, i, i + 1, restaCargar.ToString(), estilo3, 1, false);
+                CrearCelda(rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, i, i + 1, ToCustomString(totalxBod), estilo1, 1, false);
+                CrearCelda(rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, i, i + 1, ToCustomString(totalxPlCargaBod), estilo2, 1, false);
+                CrearCelda(rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, i, i + 1, ToCustomString(restaCargar), estilo3, 1, false);
 
-                int totalxBodBlz7 = CalcularTotalxBodegaBlz(i / 2, "7");
-                int totalxBodBlz8 = CalcularTotalxBodegaBlz(i / 2, "8");
+                decimal totalxBodBlz7 = CalcularTotalxBodegaBlz(i / 2, "7");
+                decimal totalxBodBlz8 = CalcularTotalxBodegaBlz(i / 2, "8");
 
-                CrearCelda(rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i, i, totalxBodBlz7.ToString(), estiloTitulo, 1, false);
-                CrearCelda(rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i + 1, i + 1, totalxBodBlz8.ToString(), estiloTitulo, 1, false);
+                CrearCelda(rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i, i, ToCustomString(totalxBodBlz7), estiloTitulo, 1, false);
+                CrearCelda(rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i + 1, i + 1, ToCustomString(totalxBodBlz8), estiloTitulo, 1, false);
             }
 
             ICellStyle estiloTotxBod = CrearEstiloCelda("Arial", 8, IndexedColors.Blue.Index, true,
@@ -597,14 +599,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 20, 20, "TOTAL S/ PLANO", estiloTotalxPlCargaBod, 1, false);
             CrearCelda(rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 20, 20, "FALTAN EMB.", estiloRestaCargar, 1, false);
 
-            CrearCelda(rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 21, 21, totalABordo.ToString(), estiloTotxBod, 1, false);
-            CrearCelda(rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 21, 21, totalSPlano.ToString(), estiloTotalxPlCargaBod, 1, false);
-            CrearCelda(rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 21, 21, faltanEmb.ToString(), estiloRestaCargar, 1, false);
+            CrearCelda(rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 21, 21, ToCustomString(totalABordo), estiloTotxBod, 1, false);
+            CrearCelda(rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 21, 21, ToCustomString(totalSPlano), estiloTotalxPlCargaBod, 1, false);
+            CrearCelda(rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 21, 21, ToCustomString(faltanEmb), estiloRestaCargar, 1, false);
         }
 
-        private int CalcularTotalxBodega(int bodega)
+        private decimal CalcularTotalxBodega(int bodega)
         {
-            int total = 0;
+            decimal total = 0;
             foreach (ModuloDeCargaPlanillaDeTurnosDto turno in _planilla)
             {
                 var cargasBodega = turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
@@ -614,26 +616,26 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 foreach (ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga in cargasBodega)
                 {
-                    total += carga.Cantidad / 1000;
+                    total += ((decimal)(carga.Cantidad)) / 1000;
                 }
             }
             return total;
         }
 
-        private int CalcularTotalPlanoCargaxBodega(int bodega)
+        private decimal CalcularTotalPlanoCargaxBodega(int bodega)
         {
-            int total = 0;
+            decimal total = 0;
             var cargasBodega = _listaCargaBodega.Where(x => x.BodegaParcel == bodega);
             foreach (PlanoDeCargaBodegaDto carga in cargasBodega)
             {
-                total += (int)(carga.Cantidad / 1000);
+                total += carga.Cantidad ?? 0;
             }
             return total;
         }
 
-        private int CalcularTotalxBodegaBlz(int bodega, string blz)
+        private decimal CalcularTotalxBodegaBlz(int bodega, string blz)
         {
-            int total = 0;
+            decimal total = 0;
             foreach (ModuloDeCargaPlanillaDeTurnosDto turno in _planilla)
             {
                 var cargasBodega = turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
@@ -644,7 +646,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 foreach (ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga in cargasBodega)
                 {
-                    total += carga.Cantidad / 1000;
+                    total += ((decimal)(carga.Cantidad)) / 1000;
                 }
             }
             return total;
@@ -665,6 +667,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(rowHeader2, 10, 10, 23, 24, "Toneladas por Turno", estiloHeader2, 2, false);
             CrearCelda(rowHeader3, 11, 11, 23, 23, "Por gravedad", estiloHeader2, 2, false);
             CrearCelda(rowHeader3, 11, 11, 24, 24, "Por palas", estiloHeader2, 2, false);
+        }
+
+        private string ToCustomString(decimal valor)
+        {
+            return valor % 1 == 0 ? valor.ToString("0") : valor.ToString("0.##");
         }
     }
 }
