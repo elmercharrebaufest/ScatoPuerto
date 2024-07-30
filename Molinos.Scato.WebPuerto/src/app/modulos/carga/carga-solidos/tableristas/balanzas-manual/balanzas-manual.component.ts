@@ -137,15 +137,6 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }  
   public async enviarBuqueCalidad() {
-    let registrosBalanzas7 = this.balanzas7.controls.length;
-    let registrosBalanzas8 = this.balanzas8.controls.length;
-
-    if (registrosBalanzas7 == 0 && registrosBalanzas8 == 0){
-      const mensaje: string = 'No existe información de balanzas para terminar la carga.';
-      this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
-      return;
-    }
-
     const mensaje: string = "¿Desea terminar la carga y exportar planillas?";
     this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success).then((confirmed) => {
       if (confirmed) {

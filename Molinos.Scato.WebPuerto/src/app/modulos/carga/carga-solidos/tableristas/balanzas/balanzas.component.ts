@@ -1039,7 +1039,6 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       //create new excel work book
       let workbook = new Workbook();
 
-      workbook.addWorksheet("Planilla");
       // ---------- inicio BALANZA 7 ----------
       let propiedadesDeBalanza7 = this.procesarPropiedadesBalanza('7');
       //add name to sheet
@@ -1073,23 +1072,11 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
       // ---------- fin BALANZA 8 ----------
 
       //set downloadable file name
-      let fname = this.embarque.id + "_" + this.embarque.nombreBuque + ".xlsx"; 
-
+      let fname = "Balanzas_7y8"
       //add data and file name and download
       workbook.xlsx.writeBuffer().then((data) => {
-        let blob = new Blob([data]);
-
-        this.formData.append('file', blob, fname + ".xlsx");
-        this.moduloDeCargaService.generarExcel(this.moduloDeCarga_Id, this.formData).subscribe(blob=>{
-         var url = window.URL.createObjectURL(blob);
-         var a = document.createElement('a');
-         a.href = url;
-         a.download = fname;
-         document.body.appendChild(a); 
-         a.click(); 
-         document.body.removeChild(a);
-         window.URL.revokeObjectURL(url); 
-      })
+        let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, fname + '-' + new Date().valueOf() + '.xlsx');
       });
     } catch (e) {
       console.log("Error al exportar Planillas");

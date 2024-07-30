@@ -1096,10 +1096,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     Content = new ByteArrayContent(archivo)
                 };
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "turnosMica.xlsx"
-                };
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
 
                 return response;
