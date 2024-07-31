@@ -192,4 +192,20 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
   hasPermisoIniciarCargaBalanzas() {
     return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_IniciarCargaBalanzas);
   }
+
+  obtenerFechaInicioCarga(): Date {
+    if(this.inicioCargaForm.controls.fechaInicioCarga.value != null && this.inicioCargaForm.controls.fechaInicioCarga.value!= ''){
+      return new Date(this.inicioCargaForm.controls.fechaInicioCarga.value); 
+    }else{
+      return null;
+    }
+  }
+
+  obtenerHoraInicioCarga(): string {
+    if(this.inicioCargaForm.controls.horaInicioCarga.value != null && this.inicioCargaForm.controls.horaInicioCarga.value!= ''){
+      return this.inicioCargaForm.controls.horaInicioCarga.value; 
+    }else{
+      return null;
+    }
+  }
 }

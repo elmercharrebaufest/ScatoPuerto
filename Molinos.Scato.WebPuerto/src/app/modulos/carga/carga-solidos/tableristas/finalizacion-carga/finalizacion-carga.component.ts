@@ -15,6 +15,7 @@ import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { BalanzasManualService } from '../balanzas-manual/balanzas-manual.service';
 import { InicioFinalizacionCargaService } from '../inicio-finalizacion-carga.services';
+import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 
 @Component({
   selector: 'app-finalizacion-carga',
@@ -69,13 +70,11 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
       let isNull = false;
       let sFechaFinalizacionCarga: string = null;
       let sHoraFinalizacionCarga:string = null;
-      if (response == null || (response?.fechaFinalizacionCarga == null && response?.horaFinalizacionCarga == null)) {
+      if (response == null || (response?.fechaFinalizacionCarga == null && response?.horaFinalizacionCarga == null) 
+      || (response?.fechaFinalizacionCarga == '' && response?.horaFinalizacionCarga == '')) {
         isNull = true;
-        let fechaHoraFinalizacionCarga_DB = this.procesoService.getFechaHoraInicioCarga();
-        let fechaHoraFinalizacionCarga = String(fechaHoraFinalizacionCarga_DB).split('T');
-
-        sFechaFinalizacionCarga = fechaHoraFinalizacionCarga[0] != 'null' ? fechaHoraFinalizacionCarga[0] : this.funcionesGeneralesService.getFechaHora(new Date(),'EN').substring(0, 10);
-        sHoraFinalizacionCarga = fechaHoraFinalizacionCarga[0] != 'null' ? fechaHoraFinalizacionCarga[1].substring(0,5) : this.funcionesGeneralesService.getFechaHora(new Date()).substring(11, 16);
+        sFechaFinalizacionCarga = null;
+        sHoraFinalizacionCarga = null;
       } else {
         sFechaFinalizacionCarga = formatDate(response.fechaFinalizacionCarga, 'yyyy-MM-dd', 'en-US');
         sHoraFinalizacionCarga = response.horaFinalizacionCarga;
@@ -117,6 +116,15 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
       }
     }
     */
+    if (this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value == '' || this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value == undefined) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar una fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
+    if (this.finalizacionCargaForm.controls.horaFinalizacionCarga.value == '' || this.finalizacionCargaForm.controls.horaFinalizacionCarga.value == undefined) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar una hora de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
 
     let fechaFinalizacionCarga = '';
     fechaFinalizacionCarga = formatDate(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value, 'yyyy-MM-dd', 'en-US');
@@ -201,4 +209,21 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
   hasPermisoIniciarCargaBalanzas = () => {
     return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_IniciarCargaBalanzas);
   }
+
+  obtenerFechaFinCarga(): Date {
+    if(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value != null && this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value!= ''){
+      return new Date(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value); 
+    }else{
+      return null;
+    }
+  }
+
+  obtenerHoraFinCarga(): string {
+    if(this.finalizacionCargaForm.controls.horaFinalizacionCarga.value != null && this.finalizacionCargaForm.controls.horaFinalizacionCarga.value!= ''){
+      return this.finalizacionCargaForm.controls.horaFinalizacionCarga.value; 
+    }else{
+      return null;
+    }
+  }
+
 }

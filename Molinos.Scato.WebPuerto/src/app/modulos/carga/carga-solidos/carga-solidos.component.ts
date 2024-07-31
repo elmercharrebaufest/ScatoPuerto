@@ -176,9 +176,7 @@ export class CargaSolidosComponent implements OnInit {
           let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
           
           if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null && 
-              moduloDeCargaPeriodoDeCarga.fechaFinalizacionCarga !=null && 
-              moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null &&
-              moduloDeCargaPeriodoDeCarga.horaFinalizacionCarga !=null){
+              moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null){
             this.existeFechasPeriodoDeCarga = true;
           }
           //existeFechasPeriodoDeCarga
@@ -304,6 +302,8 @@ export class CargaSolidosComponent implements OnInit {
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
       this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
 
+    this.actualizarFechaInicioFinCarga(moduloCarga);
+
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       if (finalizar)
@@ -427,6 +427,15 @@ export class CargaSolidosComponent implements OnInit {
       for (let i = 0; i < selector.length; i++) {
         selector[i].style.display = ocultarMostrar;
       }
+    }
+  }
+
+  actualizarFechaInicioFinCarga(modulo: ModuloDeCarga) {
+    if (modulo.moduloDeCargaPeriodoDeCarga != null && modulo.moduloDeCargaPeriodoDeCarga.length == 1) {
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.inicioCargaComponent.obtenerFechaInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.inicioCargaComponent.obtenerHoraInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.finalizacionCargaComponent.obtenerFechaFinCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.finalizacionCargaComponent.obtenerHoraFinCarga();
     }
   }
 }
