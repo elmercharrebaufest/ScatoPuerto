@@ -1,7 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
-import { RelojBalanzasComponent } from 'app/shared/componentes/modulos/carga/reloj-balanzas/reloj-balanzas.component';
+import { Component, Input, ViewChild } from '@angular/core';
+import { RitmoEmbarqueBalanzaComponent } from 'app/shared/componentes/ritmo-embarque-balanza/ritmo-embarque-balanza.component';
+import { SemaforoRitmoEmbarqueComponent } from 'app/shared/componentes/semaforo-ritmo-embarque/semaforo-ritmo-embarque.component';
 import { BalanzasRitmosService } from '../../../../shared/servicios/calidad/balanzas-ritmos.service';
 import { FechaDto, TurnoDto } from '@ScatoModels/calidad/combos-fechas-y-turnos';
+import { BalanzaCorteFilledDto } from '@ScatoModels/calidad/balanzas-cortes';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 
 @Component({
   selector: 'app-new-balanzas-ritmos',
@@ -9,62 +13,90 @@ import { FechaDto, TurnoDto } from '@ScatoModels/calidad/combos-fechas-y-turnos'
   styleUrls: ['./new-balanzas-ritmos.component.css']
 })
 export class NewBalanzasRitmosComponent {
-  @ViewChild(RelojBalanzasComponent) relojBalanzasComponent: RelojBalanzasComponent;
+  turnosModuloDeCarga: TurnosCerrados;
+  @ViewChild(RitmoEmbarqueBalanzaComponent) ritmoEmbarqueBalanzaComponent: RitmoEmbarqueBalanzaComponent;
+  @ViewChild(SemaforoRitmoEmbarqueComponent) semaforoRitmoEmbarqueComponent: SemaforoRitmoEmbarqueComponent;
   
+  turns = [
+    { id: 1, nombre: '00-06', inicio: 0, fin: 6 },
+    { id: 2, nombre: '06-12', inicio: 6, fin: 12 },
+    { id: 3, nombre: '12-18', inicio: 12, fin: 18 },
+    { id: 4, nombre: '18-24', inicio: 18, fin: 24 }
+  ];
+
   fechas: FechaDto[] = [];
   turnos: TurnoDto[] = [];
   availableDates: string[] = [];
 
-  habilitarFechasYTurnos: boolean = false;
+  habilitarFechasYTurnos: boolean = true;
 
-  date: string;
-  turno: number = 0;
+  selectedDate: string;
+  selectedTurn: number = 0;
+  selectedTurnName: string = "";
   dateMin: string;
   dateMax: string;
 
-  // Variables para los datos de las balanzas
-  startBalanza7: string;
-  tnCargadasHastaAhora7: number;
-  ritmoEmbarque7: number;
+  toneladasCargadas7: string;
+  ritmoEmbarque7: string;
   ultimaActualizacion7: string;
 
-  startBalanza8: string;
-  tnCargadasHastaAhora8: number;
-  ritmoEmbarque8: number;
+  toneladasCargadas8: string;
+  ritmoEmbarque8: string;
   ultimaActualizacion8: string;
 
-  // Variables para los semáforos
-  valorRitmoBruto: number ;
-  valorCargando: number;
-  tnTotales: number;
-  valorRitmoNeto: number;
+  valorRitmoBruto: string ;
+  valorCargando: string;
+  tnTotales: string;
+  valorRitmoNeto: string;
 
   constructor(
-    private balanzasRitmosService: BalanzasRitmosService) {}
+    private procesoService: DatosEmbarquesProcesoService,
+    private balanzasRitmosService: BalanzasRitmosService) {
+    this.balanzasRitmosService.TurnosCalidad.subscribe(turno =>{
+      if (turno!=null){
+        this.turnosModuloDeCarga = turno;
+        this.inicializarCarga();
+      }
+    });
+  }
 
   ngOnInit() {
-    this.updateData();
-    this.startBalanza7 = '';
-    this.tnCargadasHastaAhora7 = 0;
-    this.ritmoEmbarque7 = 0;
+    console.log('this.turnosModuloDeCarga----->>>', this.turnosModuloDeCarga);
+    this.inicializarCarga();
+
+  }
+  private inicializarCarga(){
+    this.inicializarValores();
+    if (this.turnosModuloDeCarga.cargaFinalizada){
+      if (this.turnosModuloDeCarga.todosTurnosCerrados){
+        this.updateData(true);
+      }else{
+        this.toggleFechasYTurnos();
+      }
+    }else{
+      this.toggleFechasYTurnos();
+    }
+  }
+  private inicializarValores(){
+    this.valorRitmoBruto = '0';
+    this.valorCargando = '0';
+    this.tnTotales = '0';
+    this.valorRitmoNeto = '0';
+
+    this.toneladasCargadas7 = '0';
+    this.ritmoEmbarque7 = '0';
     this.ultimaActualizacion7 = '';
-
-    this.startBalanza8 = '';
-    this.tnCargadasHastaAhora8 = 0;
-    this.ritmoEmbarque8 = 0;
+  
+    this.toneladasCargadas8 = '0';
+    this.ritmoEmbarque8 = '0';
     this.ultimaActualizacion8 = '';
-
-    this.valorRitmoBruto = 0;
-    this.valorCargando = 0;
-    this.tnTotales = 0;
-    this.valorRitmoNeto = 0;
   }
 
   toggleFechasYTurnos = () => {
     if (this.habilitarFechasYTurnos) {
-      this.loadFechasYTurnos(290);
+      this.loadFechasYTurnos(this.procesoService.getModuloDeCargaId());
     } else {
-      this.date = null;
+      this.selectedDate = null;
       this.fechas = [];
       this.dateMin = '';
       this.dateMax = '';
@@ -73,146 +105,73 @@ export class NewBalanzasRitmosComponent {
   }
 
   loadFechasYTurnos = (idModuloDeCarga: number): void => {
-    console.log('loadFechasYTurnos');
     this.balanzasRitmosService.consultarCombosFechasYTurnos(idModuloDeCarga).subscribe(response => {
-      console.log(' response: ', response);
       this.fechas = response.fechas;
       this.dateMin = response.fechaMinima;
       this.dateMax = response.fechaMaxima;
-      this.date = this.dateMin;
+      this.selectedDate = this.dateMin;
       this.availableDates = this.fechas.map(f => f.fecha);
       if (this.fechas.length > 0) {
         this.turnos = this.fechas[0].turnos;
+        this.selectedTurn = this.turnos[0].turno.orden;
+        this.updateTurn(null);
       }
     });
   }
 
   updateDate = (event: any) => {
-    // console.log('updateDate');
-    const selectedDate = new Date(event.target.value);
-    const selectedFecha = this.fechas.find(f => new Date(f.fecha).toDateString() === selectedDate.toDateString());
+    const mySelectedDate = new Date(event.target.value);
+    const selectedFecha = this.fechas.find(f => new Date(f.fecha).toDateString() === mySelectedDate.toDateString());
     if (selectedFecha) {
       this.turnos = selectedFecha.turnos;
+      this.selectedTurn = this.turnos[0].turno.orden;
+      this.updateTurn(null)
     } else {
       this.turnos = [];
     }
   }
 
   updateTurn = (event: any) => {
-    console.log('updateTurn');
-    this.turno = event.target.value;
+    this.selectedTurn = event != null ? event.target.value : this.selectedTurn;
+    this.selectedTurnName = this.obtenerNombreTurno(this.selectedTurn);
+    this.inicializarValores();
     this.updateData();
   }
 
-  updateData = () => {
-    console.log('updateData');
-    console.log(' date: ', this.date);
-    console.log(' turno: ', this.turno);
-    // const data = this.balanzasRitmosService.getMockData(this.date, this.turno);
-    // console.log(' data:', data);
-    // if (data) {
-    //   this.startBalanza7 = data.startBalanza7;
-    //   this.tnCargadasHastaAhora7 = data.tnCargadasHastaAhora7;
-    //   this.ritmoEmbarque7 = data.ritmoEmbarque7;
-    //   this.ultimaActualizacion7 = data.ultimaActualizacion7;
+  updateData = (esCargaFinalizada = false) => {
+    let selectedDate = '';
+    let selectedTurn = null;
+    let esCalculoGeneral: boolean = true;
 
-    //   this.startBalanza8 = data.startBalanza8;
-    //   this.tnCargadasHastaAhora8 = data.tnCargadasHastaAhora8;
-    //   this.ritmoEmbarque8 = data.ritmoEmbarque8;
-    //   this.ultimaActualizacion8 = data.ultimaActualizacion8;
-
-    //   console.log(' ritmoEmbarque7: ', this.ritmoEmbarque7);
-    //   console.log(' ritmoEmbarque8: ', this.ritmoEmbarque8);
-    //   this.valorRitmoBruto = this.ritmoEmbarque7 + this.ritmoEmbarque8;
-    //   console.log(' valorRitmoBruto: ', this.valorRitmoBruto);
-    //   this.valorCargando = this.tnCargadasHastaAhora7 + this.tnCargadasHastaAhora8;
-
-    //   const totalTn = this.balanzasRitmosService.getTotalTnForDate(this.date);
-    //   this.tnTotales = totalTn.totalTn7 + totalTn.totalTn8;
-    // }
-
-    let tnCargadas7 = 0;
-    let tnCargadas8 = 0;
-
-    this.tnCargadasHastaAhora7 = 0;
-    this.tnCargadasHastaAhora8 = 0;
-    if (this.date != '' && this.turno != 0) {
-      this.balanzasRitmosService.consultarRitmosBrutos(290, this.date, this.turno).subscribe(response => {
-        console.log(' response: ', response);
-        response.ritmosBrutos.forEach(e => {
-          let turnoHasta = this.getRitmosBrutos(e.fecha, this.turno);
-
-          if (e.codigoBalanza == '7') {
-            this.startBalanza7 = e.fecha;
-
-            if (turnoHasta) {
-              let tnCargadas77 = ((e.cantidad)/1000).toFixed(2);
-              tnCargadas7 = tnCargadas7 + parseFloat(tnCargadas77);
-              // console.log(' tnCargadas7: ', tnCargadas7);
-            }
-          } 
-          if (e.codigoBalanza == '8') {
-            this.startBalanza8 = e.fecha;
-
-            if (turnoHasta) {
-              let tnCargadas88 = ((e.cantidad)/1000).toFixed(2);
-              tnCargadas8 = tnCargadas8 + parseFloat(tnCargadas88);
-              // console.log(' tnCargadas8: ', tnCargadas8);
-            }
-          }
-        });
-
-
-        this.tnCargadasHastaAhora7 = parseFloat(tnCargadas7.toFixed(2));
-        this.tnCargadasHastaAhora8 = parseFloat(tnCargadas8.toFixed(2));
-        console.log(' tnCargadasHastaAhora7: ', this.tnCargadasHastaAhora7);
-        console.log(' tnCargadasHastaAhora8: ', this.tnCargadasHastaAhora8);
-  
-        let ritmo7 = (this.tnCargadasHastaAhora7 / (this.turno * 6)).toFixed(2);
-        let ritmo8 = (this.tnCargadasHastaAhora8 / (this.turno * 6)).toFixed(2);
-  
-        this.ritmoEmbarque7 = parseFloat(ritmo7);
-        this.ritmoEmbarque8 = parseFloat(ritmo8);
-  
-        // console.log(' ritmoEmbarque7: ', this.ritmoEmbarque7);
-        // console.log(' ritmoEmbarque8: ', this.ritmoEmbarque8);
-
-        this.valorRitmoBruto = this.ritmoEmbarque7 + this.ritmoEmbarque8;
-        this.valorCargando = this.tnCargadasHastaAhora7 + this.tnCargadasHastaAhora8;
-        this.tnTotales = this.valorCargando * 2;
-      });
-      
+    if (!esCargaFinalizada){
+      if (this.selectedDate != '' && this.selectedTurn != 0) {
+        selectedDate = this.selectedDate;
+        selectedTurn = this.selectedTurn;
+        esCalculoGeneral = false;
+      }
     }
+    this.balanzasRitmosService.consultaRitmosCargaSolidos(this.procesoService.getModuloDeCargaId(), selectedDate, selectedTurn, esCalculoGeneral).subscribe(data => {
+      this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
+      this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
+      this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
+      this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
+
+      this.toneladasCargadas7  = data.ritmoBalanza7 != -1 ? data.cargaBalanza7.toString(): 'N.A';
+      this.ritmoEmbarque7      = data.ritmoBalanza7 != -1 ? data.ritmoBalanza7.toString(): 'N.A';
+      this.ultimaActualizacion7= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza7: 'N.A';
+
+      this.toneladasCargadas8  = data.cargaBalanza8 != -1 ? data.cargaBalanza8.toString(): 'N.A';
+      this.ritmoEmbarque8      = data.ritmoBalanza8 != -1 ? data.ritmoBalanza8.toString(): 'N.A';
+      this.ultimaActualizacion8= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
+    });
   }
 
-  getRitmosBrutos = (endTime: string, idTurnoPuerto: number): boolean => {
-    // console.log('getRitmosBrutos');
-    let myIdTurnoPuerto = 0;
-    let end = parseInt(endTime.substring(11, 13));
-    // console.log(' endTime: ', endTime);
-    // console.log(' endTime: ', endTime.substring(11, 13));
-    // console.log(' end: ', end);
-    if (end >= 0 && end < 6)
-    {
-      myIdTurnoPuerto = 1;
-    } else if (end >= 6 && end < 12)
-    {
-      myIdTurnoPuerto = 2;
-    } else if (end >= 12 && end < 18)
-    {
-      myIdTurnoPuerto = 3;
+  obtenerNombreTurno = (turnoId: number): string => {
+    const turno = this.turns.find(t => t.id == turnoId);
+    if (turno) {
+      return turno.nombre;
     }
-    else if (end >= 18 && end <= 23)
-    {
-      myIdTurnoPuerto = 4;
-    }
-
-    // console.log(' myIdTurnoPuerto: ', myIdTurnoPuerto);
-    // console.log(' idTurnoPuerto: ', idTurnoPuerto);
-    if (myIdTurnoPuerto <= idTurnoPuerto){
-      return true;
-    }
-
-    return false;
+    return "";
   }
+
 }

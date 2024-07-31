@@ -11,28 +11,88 @@
   </div>
 
   <div class="form-group col-md-6">
-
-    <div class="row" *ngIf="!liquido">
+    <!-- <ARMOA005-1988 Dylan Lopez> -->
+    <!-- <div class="row" *ngIf="!liquido">
       <div class="form-group col-md-12">
         <app-balanzas-ritmos [enBuque]="true">
         </app-balanzas-ritmos>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="form-group col-md-12">
         <app-graficos-ritmos [enBuque]="true"
                              [liquido]="liquido">
         </app-graficos-ritmos>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row" *ngIf="!liquido">
+    <!-- <div class="row" *ngIf="!liquido">
       <div class="form-group col-md-12">
         <app-info-adicional [enBuque]="enBuque">
         </app-info-adicional>
       </div>
+    </div> -->
+    <!-- </ ARMOA005-1988 Dylan Lopez> -->
+
+    <!-- First Row -->
+    <div class="row">
+      <label>
+        <input type="checkbox" [(ngModel)]="habilitarFechasYTurnos" (change)="toggleFechasYTurnos()" />Habilitar Día y Turno
+      </label>
     </div>
+
+    <!-- Second Row -->
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group col-6" style="padding-left:30px;">
+          <label>Día: </label>
+          <input type="date" [(ngModel)]="selectedDate" [disabled]="!habilitarFechasYTurnos" [attr.min]="dateMin" [attr.max]="dateMax" class="form-control fecha" (change)="updateDate($event)" />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group col-6" style="padding-right:30px;">
+          <label for="turno">Turno: </label>
+            <select id="selectedTurn" class="form-control" [(ngModel)]="selectedTurn" [disabled]="!habilitarFechasYTurnos" (change)="updateTurn($event)">
+              <option [value]="0">(Seleccionar)</option>
+              <option *ngFor="let turno of turnos" [value]="turno.turno.id">
+                {{turno.turno.nombre}}
+              </option>
+            </select>
+        </div>
+      </div>
+    </div>
+    <!-- Second Row -->
+
+    <!-- Third Row -->
+    <div class="row">
+      <h4>Turno: Día {{selectedDate | date: 'dd-MMM-yyyy'}} en el Turno {{selectedTurn}}</h4>
+      <app-semaforo-ritmo-embarque
+          [valueRhythmGross]='valorRitmoBruto' 
+          [color1]='"#F0AD4E"' 
+          [valueLoaded]='valorCargando' 
+          [tonsTotal]='tnTotales' 
+          [color2]='"#5CB85C"' 
+          [valueRhythmNet]='valorRitmoNeto' 
+          [color3]='"#F0AD4E"'>
+        </app-semaforo-ritmo-embarque>
+    </div>
+    <!-- Third Row -->
+
+    <!-- Third Row -->
+    <div class="row">
+      <h4>Ritmos Generales</h4>
+      <app-semaforo-ritmo-embarque
+          [valueRhythmGross]='valorRitmoBruto' 
+          [color1]='"#F0AD4E"' 
+          [valueLoaded]='valorCargando' 
+          [tonsTotal]='tnTotales' 
+          [color2]='"#5CB85C"' 
+          [valueRhythmNet]='valorRitmoNeto' 
+          [color3]='"#F0AD4E"'>
+        </app-semaforo-ritmo-embarque>
+    </div>
+    <!-- Third Row -->
 
   </div>
 </div>

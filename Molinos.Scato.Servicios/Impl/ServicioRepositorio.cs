@@ -10167,7 +10167,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga)
         {
-			var result = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModuloDeCarga)
+            var result = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModuloDeCarga && x.Cerrado == true)
 				.GroupBy(m => m.Fecha?.ToString("yyyy-MM-dd"))
 		        .Select(g => new FechaDto
 		        {
@@ -10180,7 +10180,41 @@ namespace Molinos.Scato.Servicios.Impl
 			        }).ToList()
 		        }).ToList();
 
-			return result;
+            var listarBalanzaManual = this.ListarBalanzaManual(idModuloDeCarga);
+            if (listarBalanzaManual != null && listarBalanzaManual.Count > 0)
+            {
+                foreach(var balanza in listarBalanzaManual)
+                {
+                    var turnoPorFecha = result.Where(x => x.Fecha == balanza.FechaInicio).FirstOrDefault();
+                    if (turnoPorFecha != null)
+                    {
+                        var turno = turnoPorFecha.Turnos.Where(x => x.Id == balanza.TurnoPuerto.Id).FirstOrDefault();
+                        if (turno == null)
+                        {
+                            turnoPorFecha.Turnos.Add(new TurnoDto
+                            {
+                                Id = balanza.TurnoPuerto.Id,
+                                Turno = Obtener<TurnoPuerto, TurnoPuertoDto>(balanza.TurnoPuerto.Id)
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var fechaDto = new FechaDto
+                        {
+                            Fecha = balanza.FechaInicio,
+                            Turnos = new List<TurnoDto>()
+                        };
+                        fechaDto.Turnos.Add(new TurnoDto
+                        {
+                            Id = balanza.TurnoPuerto.Id,
+                            Turno = Obtener<TurnoPuerto, TurnoPuertoDto>(balanza.TurnoPuerto.Id)
+                        });
+                        result.Add(fechaDto);
+                    }
+                }
+            }
+            return result;
 		}
 
 		public List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha)
@@ -10188,23 +10222,30 @@ namespace Molinos.Scato.Servicios.Impl
 			string fechaString = fecha.ToString("yyyy-MM-dd");
 
             var result = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(q => q.ModuloDeCarga.Id == idModuloDeCarga)
-            //	q.TurnoPuerto.Id == idTurnoPuerto)
-            .Where(w => w.Fecha?.ToString("yyyy-MM-dd") == fechaString)
-            .SelectMany(s => s.ModuloDeCargaPlanillaDeTurnosDetallesSolido
-			.GroupBy(d => d.BalanzaPuerto)
-			.Select(g => new RitmoBrutoDto
+            //.Where(w => w.Fecha?.ToString("yyyy-MM-dd") == fechaString)
+            .SelectMany(sm => sm.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+			.GroupBy(g => g.BalanzaPuerto)
+			.Select(s => new RitmoBrutoDto
 			{
-				Id = s.Id,
-				IdTurnoPuerto = s.TurnoPuerto.Id,
-				Nombre = s.TurnoPuerto.Nombre,
-                Fecha = s.Fecha?.ToString("yyyy-MM-dd HH:mm:ss"),
-                //Fecha = s.Fecha?.ToString(),
-                IdBalanza = g.Key.Id,
-				CodigoBalanza = g.Key.CodigoBalanza,
-				Cantidad = g.Sum(a => a.Cantidad)
+				Id = sm.Id,
+				IdTurnoPuerto = sm.TurnoPuerto.Id,
+				Nombre = sm.TurnoPuerto.Nombre,
+                Fecha = sm.Fecha?.ToString("yyyy-MM-dd HH:mm:ss"),
+                IdBalanza = s.Key.Id,
+				CodigoBalanza = s.Key.CodigoBalanza,
+				Cantidad = s.Sum(a => a.Cantidad)
 			}))
+			.OrderBy(o => o.Fecha)
 			.ToList();
 
+			return result;
+		}
+
+        public List<BalanzasCortesDto> ConsultarBalanzasCortes(int idModuloDeCarga)
+        {
+			var result = Listar<BalanzasCortes, BalanzasCortesDto>(q => q.ModuloDeCarga_id == idModuloDeCarga)
+				.OrderBy(o => o.Fecha_Inicio)
+				.ToList();
 			return result;
 		}
 
@@ -12735,5 +12776,246 @@ namespace Molinos.Scato.Servicios.Impl
                 this.repositorio.GuardarCambios();
             }
         }
+
+        public decimal ObtenerCargaPorBalanza(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral, int numeroBalanza)
+        {
+            decimal totalCargaNormales = 0;
+            ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
+            
+            if (esCalculoGeneral) {
+                if (numeroBalanza == 0)
+                {
+                    foreach (ModuloDeCargaPlanillaDeTurnos turnos in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
+                    {
+                        decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(x => x.Cantidad);
+                        totalCargaNormales += kilos;
+                    }
+                }
+                else
+                {
+                    foreach (ModuloDeCargaPlanillaDeTurnos turnos in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
+                    {
+                        decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(x => Convert.ToInt32(x.BalanzaPuerto.CodigoBalanza) == numeroBalanza).Sum(x => x.Cantidad);
+                        totalCargaNormales += kilos;
+                    }
+                }
+            }
+            else
+            {
+                if (numeroBalanza == 0)
+                {
+                    var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurno.Value.Date && x.TurnoPuerto.Orden == turno_Id);
+                    foreach (ModuloDeCargaPlanillaDeTurnos turnos in listaTurnos)
+                    {
+                        decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(x => x.Cantidad);
+                        totalCargaNormales += kilos;
+                    }
+                }
+                else
+                {
+                    var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.ToString("yyyy-MM-dd") == fechaTurno.Value.ToString("yyyy-MM-dd") && x.TurnoPuerto.Orden == turno_Id);
+                    foreach (ModuloDeCargaPlanillaDeTurnos turnos in listaTurnos)
+                    {
+                        decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(x => Convert.ToInt32(x.BalanzaPuerto.CodigoBalanza) == numeroBalanza).Sum(x => x.Cantidad);
+                        totalCargaNormales += kilos;
+                    }
+                }
+            }
+            totalCargaNormales = Math.Round( (totalCargaNormales / 1000), 2);
+            return totalCargaNormales;
+        }
+        public decimal ObtenerRitmoCargaPorBalanza(int moduloCargaId, int numeroBalanza)
+        {
+            decimal ritmoDeCarga = 0;
+            decimal toneladasDeCarga = 0;
+            decimal tiempoCarga = 0;
+
+            toneladasDeCarga = this.ObtenerCargaPorBalanza(moduloCargaId, null, null, true, numeroBalanza);
+            ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
+            var listaBajaCargaCortes = this.ListarBalanzaManual(moduloCargaId);
+            var listaBajaCargaCortesPorBalanza = listaBajaCargaCortes.Where(x => Convert.ToInt32(x.NumeroBalanza) == numeroBalanza).ToList();
+            decimal tiempoTurnosHoras = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count * 6;
+            decimal tiempoBCCortesMinutos = 0;
+            if (listaBajaCargaCortesPorBalanza != null && listaBajaCargaCortesPorBalanza.Count > 0)
+            {
+                foreach (var horas in listaBajaCargaCortesPorBalanza)
+                {
+                    DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
+                    DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
+                    tiempoBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                }
+            }
+            tiempoCarga = tiempoTurnosHoras - tiempoBCCortesMinutos;
+            ritmoDeCarga = Math.Round((toneladasDeCarga / tiempoCarga), 2);
+            return ritmoDeCarga;
+        }
+        private decimal CalcularTiempoRestanteInicioFinTurnos(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral)
+        {
+            decimal tiempoRestanteInicioFinCargaEnHoras = 0;
+            ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
+            var turnosPuerto = Listar<TurnoPuerto, TurnoPuertoDto>();
+
+            if (esCalculoGeneral)
+            {
+                var filtroPrimerTurno = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.OrderBy(x => x.Fecha).FirstOrDefault();
+                var filtroUltimoTurno = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.OrderByDescending(x => x.Fecha).FirstOrDefault();
+
+                var fechaTurnoMinimo = filtroPrimerTurno.Fecha;
+                var fechaTurnoMaximo = filtroUltimoTurno.Fecha;
+
+                var turnoMinimo = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.ToString("yyyy-MM-dd") == fechaTurnoMinimo.Value.ToString("yyyy-MM-dd")).OrderBy(x => x.TurnoPuerto.Orden).FirstOrDefault();
+                var turnoMaximo = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.ToString("yyyy-MM-dd") == fechaTurnoMaximo.Value.ToString("yyyy-MM-dd")).OrderByDescending(x => x.TurnoPuerto.Orden).FirstOrDefault();
+
+                if (moduloDeCarga.ModuloDeCargaPeriodoDeCarga != null && moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
+                {
+                    var periodoDeCarga = moduloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
+                    string fecha = "";
+                    if (periodoDeCarga.FechaComienzoCarga != null)
+                    {
+                        fecha = $"{periodoDeCarga.FechaComienzoCarga.Value.ToString("yyyy-MM-dd")} {periodoDeCarga.HoraComienzoCarga}";
+                        DateTime fechaComienzoCarga = Convert.ToDateTime(fecha);
+
+                        if (turnoMinimo.Fecha.Value.ToString("yyyy-MM-dd") == fechaComienzoCarga.ToString("yyyy-MM-dd"))
+                        {
+                            var horas = periodoDeCarga.HoraComienzoCarga.Split(':');
+                            int horaInicio = Convert.ToInt32(horas[0]);
+                            var turno = turnosPuerto.Where(item => horaInicio >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaInicio < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+
+                            DateTime fechaInicioTurno = Convert.ToDateTime(turnoMinimo.Fecha.Value.ToString("yyyy-MM-dd") + ' ' + $"{turno.Nombre.Substring(0, 2)}:00");
+                            tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaComienzoCarga - fechaInicioTurno).TotalMinutes) / 60);
+                        }
+                    }
+                    if (periodoDeCarga.FechaFinalizacionCarga != null)
+                    {
+                        fecha = $"{periodoDeCarga.FechaFinalizacionCarga.Value.ToString("yyyy-MM-dd")} {periodoDeCarga.HoraFinalizacionCarga}";
+                        DateTime fechaFinalizacionCarga = Convert.ToDateTime(fecha);
+
+                        if (turnoMaximo.Fecha.Value.ToString("yyyy-MM-dd") == fechaFinalizacionCarga.ToString("yyyy-MM-dd"))
+                        {
+                            var horas = periodoDeCarga.HoraFinalizacionCarga.Split(':');
+                            int horaFin = Convert.ToInt32(horas[1]);
+                            var turno = turnosPuerto.Where(item => horaFin >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaFin <= Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+
+                            DateTime fechaFinTurno = Convert.ToDateTime(turnoMaximo.Fecha.Value.ToString("yyyy-MM-dd") + ' ' + $"{turno.Nombre.Substring(0, 2)}:00");
+                            tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaFinalizacionCarga - fechaFinTurno).TotalMinutes) / 60);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (moduloDeCarga.ModuloDeCargaPeriodoDeCarga != null && moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
+                {
+                    var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurno.Value.Date && x.TurnoPuerto.Orden == turno_Id).ToList();
+                    var periodoDeCarga = moduloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
+                    var turno = listaTurnos[0];
+                    string fecha = "";
+                    if (periodoDeCarga.FechaComienzoCarga != null)
+                    {
+                        fecha = $"{periodoDeCarga.FechaComienzoCarga.Value.ToString("yyyy-MM-dd")} {periodoDeCarga.HoraComienzoCarga}";
+                        DateTime fechaComienzoCarga = Convert.ToDateTime(fecha);
+
+                        if (fechaTurno.Value.ToString("yyyy-MM-dd") == fechaComienzoCarga.ToString("yyyy-MM-dd"))
+                        {
+                            DateTime fechaInicioTurno = Convert.ToDateTime(fechaTurno.Value.ToString("yyyy-MM-dd") + ' ' + $"{turno.TurnoPuerto.Nombre.Substring(0, 2)}:00");
+                            DateTime fechaFinTurno = Convert.ToDateTime(fechaTurno.Value.ToString("yyyy-MM-dd") + ' ' + (turno.TurnoPuerto.Orden == 4 ? "23:59" : $"{turno.TurnoPuerto.Nombre.Substring(3, 2)}:00"));
+                            if (fechaComienzoCarga >= fechaInicioTurno && fechaComienzoCarga < fechaFinTurno)
+                            {
+                                tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaComienzoCarga - fechaInicioTurno).TotalMinutes) / 60);
+                            }
+                        }
+                    }
+                    if (periodoDeCarga.FechaFinalizacionCarga != null)
+                    {
+                        fecha = $"{periodoDeCarga.FechaFinalizacionCarga.Value.ToString("yyyy-MM-dd")} {periodoDeCarga.HoraFinalizacionCarga}";
+                        DateTime fechaFinalizacionCarga = Convert.ToDateTime(fecha);
+
+                        if (fechaTurno.Value.ToString("yyyy-MM-dd") == fechaFinalizacionCarga.ToString("yyyy-MM-dd"))
+                        {
+                            DateTime fechaInicioTurno = Convert.ToDateTime(fechaTurno.Value.ToString("yyyy-MM-dd") + ' ' + $"{turno.TurnoPuerto.Nombre.Substring(0, 2)}:00");
+                            DateTime fechaFinTurno = Convert.ToDateTime(fechaTurno.Value.ToString("yyyy-MM-dd") + ' ' + (turno.TurnoPuerto.Orden == 4 ? "23:59" : $"{turno.TurnoPuerto.Nombre.Substring(3, 2)}:00"));
+                            if (fechaFinalizacionCarga >= fechaInicioTurno && fechaFinalizacionCarga < fechaFinTurno)
+                            {
+                                tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaFinalizacionCarga - fechaFinTurno).TotalMinutes) / 60);
+                            }
+                        }
+                    }
+                }
+            }
+            return tiempoRestanteInicioFinCargaEnHoras;
+        }
+        public decimal ObtenerRitmoCargaBruta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral)
+        {
+            decimal totalCargaBruta = 0;
+            decimal tiempoDeCarga = 0;
+            decimal tiempoRestanteInicioFinCargaEnHoras = 0;
+            ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
+            totalCargaBruta = this.ObtenerCargaPorBalanza(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral, 0);
+            if (esCalculoGeneral)
+            {
+                decimal tiempoTurnosHoras = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count * 6;
+                decimal tiempoBCCortesMinutos = 0;
+                tiempoRestanteInicioFinCargaEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
+                tiempoDeCarga = tiempoTurnosHoras - (tiempoBCCortesMinutos + tiempoRestanteInicioFinCargaEnHoras);
+            }
+            else
+            {
+                var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurno.Value.Date && x.TurnoPuerto.Orden == turno_Id).ToList();
+                decimal tiempoTurnosHoras = listaTurnos.Count * 6;
+                decimal tiempoBCCortesMinutos = 0;
+                tiempoRestanteInicioFinCargaEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
+                tiempoDeCarga = tiempoTurnosHoras - (tiempoBCCortesMinutos + tiempoRestanteInicioFinCargaEnHoras);
+            }
+            totalCargaBruta = Math.Round((totalCargaBruta / tiempoDeCarga), 2);
+            return totalCargaBruta;
+        }
+        public decimal ObtenerRitmoCargaNeta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral)
+        {
+
+            decimal tiempoTurnosEnHoras = 0;
+            decimal tiempoBCCortesEnHoras = 0;
+            decimal tiempoRestanteInicioFinCargaEnHoras = 0;
+
+            decimal totalCargaToneladas = 0;
+            decimal tiempoTotalDeCarga = 0;
+
+            totalCargaToneladas = this.ObtenerCargaPorBalanza(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral , 0);
+            ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
+            var turnosPuerto = Listar<TurnoPuerto, TurnoPuertoDto>();
+
+            if (esCalculoGeneral)
+            {
+                var listaBajaCargaCortes = this.ListarBalanzaManual(moduloCargaId);
+                tiempoRestanteInicioFinCargaEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
+                tiempoTurnosEnHoras = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count * 6;
+                tiempoBCCortesEnHoras = 0;
+                foreach(var horas in listaBajaCargaCortes)
+                {
+                    DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
+                    DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
+                    tiempoBCCortesEnHoras += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                }
+            }
+            else
+            {
+                var listaBajaCargaCortes = this.ListarBalanzaManual(moduloCargaId);
+                var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurno.Value.Date && x.TurnoPuerto.Orden == turno_Id).ToList();
+                var listaBajaCargaCortesPorTurno = listaBajaCargaCortes.Where(x => Convert.ToDateTime(x.FechaInicio) == fechaTurno.Value.Date && x.TurnoPuerto.Id == turno_Id);
+                tiempoRestanteInicioFinCargaEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
+                tiempoTurnosEnHoras = listaTurnos.Count * 6;
+                tiempoBCCortesEnHoras = 0;
+                foreach (var horas in listaBajaCargaCortesPorTurno)
+                {
+                    DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
+                    DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
+                    tiempoBCCortesEnHoras += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                }
+            }
+            tiempoTotalDeCarga = tiempoTurnosEnHoras - (tiempoBCCortesEnHoras + tiempoRestanteInicioFinCargaEnHoras);
+            totalCargaToneladas = Math.Round( (totalCargaToneladas / tiempoTotalDeCarga), 2);
+
+            return totalCargaToneladas;
+        }
+        
     }
 }
