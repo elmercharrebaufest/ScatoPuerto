@@ -125,7 +125,7 @@
               <!-- #endregion Cargas -->
               <td class="celda-separadora"></td>
               <!-- #region Gravedad -->
-              <td class="gravedad" *ngIf="j == 0" colspan="3" [rowSpan]="getTurnoRowSpan(turno)">
+              <td class="gravedad" *ngIf="j == 0" colspan="3" [rowSpan]="getGravedadRowSpan(turno)">
                 <div>
                   <table>
                     <tbody>
@@ -152,6 +152,14 @@
               <td class="celda-nueva-fila" [colSpan]="bodegas.length * 2">
                 <button (click)="agregarFila(turno)">Añadir fila</button>
                 <button (click)="eliminarFila(turno)">
+                  <i class="fa fa-trash-o fs-icon"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
+              <td [colSpan]="(bodegas.length * 2) + 2" class="celda-nueva-fila">
+                <button (click)="agregarTurno()">Añadir turno</button>
+                <button (click)="eliminarTurno(turno)">
                   <i class="fa fa-trash-o fs-icon"></i>
                 </button>
               </td>
@@ -274,7 +282,7 @@
       <tbody>
         <tr *ngFor="let material of totalesPalaProducto" [style.background]="material.material.color">
           <td>{{material.material.descripcionCorta}}</td>
-          <td>{{material.cantidad}}</td>
+          <td>{{material.cantidad.toLocaleString('es-AR')}}</td>
         </tr>
       </tbody>
     </table>

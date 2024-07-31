@@ -1,6 +1,7 @@
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { BalanzaPuerto, PlanillaDeTurnos, SiloCelda, TurnoDetalleSolido, TurnoDetalleSolidoGravedad, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
@@ -110,9 +111,11 @@ export class PlanillaCargaComponent implements OnInit {
     });
   }
 
-  private inicializarDatos() {
+  private inicializarDatos(moduloDeCarga?: ModuloDeCarga) {
     this.inicializarForm();
-    const moduloDeCarga = this._procesoService.getModuloDeCarga();
+    if (!moduloDeCarga) {
+      moduloDeCarga = this._procesoService.getModuloDeCarga();
+    }
     const fechaHoraInicioCarga = this.fechaHoraInicioCarga;
     if (moduloDeCarga.moduloDeCargaPlanillaDeTurnos.length) {
       this.cargarDatosEdicion(moduloDeCarga.moduloDeCargaPlanillaDeTurnos)
@@ -136,6 +139,10 @@ export class PlanillaCargaComponent implements OnInit {
 
     for (const fechaTurno of fechasTurnos) {
       this.agregarDiaDatos(fechaTurno.fecha, fechaTurno.turnos);
+    }
+
+    for (let i = turnos.length; i < 4; i++) {
+      this.agregarTurno();
     }
 
     for (const dia of this.dias.controls) {
@@ -203,11 +210,22 @@ export class PlanillaCargaComponent implements OnInit {
     for (const turno of turnos) {
       filas += this.getTurnoRowSpan(turno);
     }
+    if (this.dias.at(this.dias.length - 1) == dia) {
+      filas++;
+    }
     return filas;
   }
 
   public getTurnoRowSpan(turno: AbstractControl) {
     return (turno.get('filas') as FormArray).controls.length + 1;
+  }
+
+  public getGravedadRowSpan(turno: AbstractControl) {
+    let rowSpan = (turno.get('filas') as FormArray).controls.length + 1;
+    if (this.esUltimoTurno(turno)) {
+      rowSpan++;
+    }
+    return rowSpan;
   }
 
   private getCargasTurno(turno: AbstractControl, enKilos: boolean = false) {
@@ -314,6 +332,13 @@ export class PlanillaCargaComponent implements OnInit {
 
     return turnos;
   }
+
+  public esUltimoTurno(turno: AbstractControl) {
+    const ultimoDia = this.dias.at(this.dias.length - 1);
+    const turnos = ultimoDia.get('turnos') as FormArray;
+    const ultimoTurno = turnos.at(turnos.length - 1);
+    return turno == ultimoTurno;
+  }
   // #endregion
 
   private inicializarTotales() {
@@ -361,31 +386,47 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   // #region Construcción de form
+
+  private rellenarTurnosUltimoDia() {
+    const diaForm = this.dias.at(this.dias.length - 1);
+    const turnos = diaForm.get('turnos') as FormArray;
+    const ultimoTurno = turnos.at(turnos.length - 1).value as PlanillaDeTurnos;
+    for (let i = ultimoTurno.turnoPuerto.orden; i < 4; i++) {
+      this.agregarTurno();
+    }
+  }
+
   private construirTurnosFormArray(fecha: Date, nTurno: number, turnos?: PlanillaDeTurnos[]) {
     const turnosFormArray = this.fb.array([]);
 
     let max = 4;
-    if (fecha.toDateString() == this.fechaHoraFinCarga.toDateString()) {
+    if (turnos) {
+      max = turnos[turnos.length - 1].turnoPuerto.orden;
+    } else if (fecha.toDateString() == this.fechaHoraFinCarga?.toDateString()) {
       max = this.getTurno(this.fechaHoraFinCarga);
     }
 
     for (let i = nTurno; i <= max; i++) {
-      let filas: FormArray;
-      let gravedades: FormArray;
-      let totalTurno = 0;
-
-      const turnoPuerto = this.turnosPuerto.find(t => t.orden == i);
-      const turnoDb = turnos?.find(t => t.turnoPuerto.id == turnoPuerto.id);
-      const id = turnoDb?.id || 0;
-
-      filas = this.construirFilasFormArray(turnoDb?.moduloDeCargaPlanillaDeTurnosDetallesSolido);
-      gravedades = this.construirGravedadFormArray(turnoDb?.moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad);
-
-      const turnoForm = this.fb.group({ id, fecha, turnoPuerto, filas, totalTurno, gravedades });
+      const turnoDb = turnos?.find(t => t.turnoPuerto.orden == i);
+      const turnoForm = this.construirTurnoForm(fecha, i, turnoDb);
       turnosFormArray.push(turnoForm);
     }
 
     return turnosFormArray;
+  }
+
+  private construirTurnoForm(fecha: Date, nTurno: number, turnoDb?: PlanillaDeTurnos) {
+    let filas: FormArray;
+    let gravedades: FormArray;
+    let totalTurno = 0;
+    const id = turnoDb?.id || 0;
+
+    const turnoPuerto = this.turnosPuerto.find(t => t.orden == nTurno);
+
+    filas = this.construirFilasFormArray(turnoDb?.moduloDeCargaPlanillaDeTurnosDetallesSolido);
+    gravedades = this.construirGravedadFormArray(turnoDb?.moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad);
+
+    return this.fb.group({ id, fecha, turnoPuerto, filas, totalTurno, gravedades });
   }
 
   private construirFilaForm(nFila: number, detalles?: TurnoDetalleSolido[]) {
@@ -409,7 +450,7 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   private construirGravedadForm(gravedad: TurnoDetalleSolidoGravedad) {
-    const cantidadGravedad = gravedad.materialPuerto ? this.formatearNumeros((gravedad.kgGravedad / 1000).toString()) : '';
+    const cantidadGravedad = gravedad.materialPuerto ? this.formatearNumeros((gravedad.kgGravedad / 1000).toLocaleString('es-AR')) : '';
     return this.fb.group({
       id: gravedad.id || 0,
       materialPuerto: gravedad.materialPuerto,
@@ -473,7 +514,7 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   private construirCargaForm(carga: TurnoDetalleSolido) {
-    const cantidad = carga.cantidad ? this.formatearNumeros((carga.cantidad / 1000).toString()) : ''
+    const cantidad = carga.cantidad ? this.formatearNumeros((carga.cantidad / 1000).toLocaleString('es-AR')) : ''
     return this.fb.group({
       id: carga.id || 0,
       materialPuerto: carga.materialPuerto || '',
@@ -629,6 +670,7 @@ export class PlanillaCargaComponent implements OnInit {
       nTurno = this.getTurno(fecha);
       fecha.setHours(0, 0, 0, 0);
     } else {
+      this.rellenarTurnosUltimoDia();
       fecha = this.getNuevoDia();
     }
 
@@ -640,6 +682,10 @@ export class PlanillaCargaComponent implements OnInit {
 
     const diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
     this.dias.push(diaForm);
+
+    for (let i = turnos.length; i < 4; i++) {
+      this.agregarTurno();
+    }
   }
 
   private agregarDiaDatos(fecha: Date, turnosDb: PlanillaDeTurnos[]) {
@@ -672,6 +718,57 @@ export class PlanillaCargaComponent implements OnInit {
     filasFormArray.removeAt(index);
     const dia = turnoForm.parent.parent;
     this.actualizarTotal(dia);
+  }
+
+  public agregarTurno() {
+    const ultimoDia = this.dias.at(this.dias.length - 1);
+    const turnosUltimoDia = ultimoDia.get('turnos') as FormArray;
+    const ultimoTurno = turnosUltimoDia.at(turnosUltimoDia.length - 1).value as PlanillaDeTurnos;
+    if (ultimoTurno.turnoPuerto.orden == 4) {
+      const fecha = this.getNuevoDia();
+      if (fecha > this.fechaHoraFinCarga) {
+        return;
+      }
+
+      const turno = this.construirTurnoForm(fecha, 1);
+      const turnos = this.fb.array([turno]);
+      const diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
+      this.dias.push(diaForm);
+    } else {
+      const nTurno = ultimoTurno.turnoPuerto.orden + 1;
+      const fecha = ultimoDia.get('fecha').value as Date;
+
+      if (fecha.toDateString() == this.fechaHoraFinCarga?.toDateString()) {
+        const turnoMax = this.getTurno(this.fechaHoraFinCarga);
+        if (nTurno > turnoMax) {
+          return;
+        }
+      }
+
+      const turnoForm = this.construirTurnoForm(fecha, nTurno);
+      turnosUltimoDia.push(turnoForm);
+    }
+  }
+
+  public eliminarTurno(turno: FormGroup) {
+    const cargas = this.getCargasTurno(turno);
+    if (cargas.length) {
+      console.error("No se puede eliminar el turno ya que posee cargas");
+      return;
+    }
+
+    const turnosArr = turno.parent as FormArray
+    if (this.dias.length == 1 && turnosArr.length == 1) {
+      console.error("No se puede eliminar el primer turno");
+      return;
+    }
+
+    turnosArr.removeAt(turnosArr.length - 1);
+    if (!turnosArr.length) {
+      this.dias.removeAt(this.dias.length - 1);
+    }
+
+    this.actualizarTotalGravedad();
   }
 
   public seleccionarSiloCelda(siloCelda: SiloCelda) {
@@ -740,6 +837,8 @@ export class PlanillaCargaComponent implements OnInit {
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
       this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
         this.confirmationDialogService.exito('Guardado con éxito');
+        const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
+        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.inicializarDatos(m));
       }, (err) => {
         console.error(err);
         this.confirmationDialogService.error('Ha ocurrido un error al guardar las cargas');
