@@ -132,14 +132,19 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
 
     forkJoin([
       this.balanzasManualService.listarBalanzaManual(this.embarqueSelected.moduloDeCargaId),
-      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
-    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual,moduloDeCarga]) => {
+      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId),
+      this.moduloCargaService.obtenerPlanillaTurnos(this.embarqueSelected.moduloDeCargaId)
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual,moduloDeCarga,planillaTurnos]) => {
       let fechaInicioCargaPeriodo = '';
       let fechaFinCorteBajaCarga = '';
       let fechaFinCargaNormal = '';
+      let fechaUltimaCarga = '';
 
       if (balanzaManual!=null){
         fechaFinCorteBajaCarga = this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, true);
+      }
+      if(planillaTurnos != null){
+        fechaUltimaCarga = this.inicioFinalizacionCargaService.obtenerFechaUltimaCarga(planillaTurnos);
       }
       if (moduloDeCarga!=null){
         if (moduloDeCarga.moduloDeCargaPeriodoDeCarga!=null && moduloDeCarga.moduloDeCargaPeriodoDeCarga.length > 0){
@@ -164,6 +169,10 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
           this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga es menor a las fechas de corte y baja carga registrados.', 'Aceptar', '', null, null, Tipoalerta.Warning);
           return;
         }
+      }
+      if (fechaUltimaCarga != '' && fechaFinalizacionCarga < fechaUltimaCarga){
+        this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga es menor a las fechas de cargas registradas en la planilla de turnos.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+        return;
       }
       this.guardarFechaFinalizacionCarga();
     });

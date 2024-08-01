@@ -27,19 +27,20 @@
     <div id="umap">
       <app-umap #umapComponent (cargarPeriodoDeCarga)="recargarPeriodoDeCarga($event)" [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId"></app-umap>
     </div>
-    <div *ngIf="existePeriodoDeCarga">
-            <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
-            <div class="html2pdf__page-break"></div>
-            <!-- <ARMOA005-1988 Dylan Lopez> -->
-            <div class="html2pdf__page-break"></div>
-            <!-- </ ARMOA005-1988 Dylan Lopez> -->
-            <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
-        
-            <app-balanzas *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
-            
-            <app-balanzas-manual *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga" ></app-balanzas-manual>
-            <app-finalizacion-carga *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga" (finalizacionCarga)="obtenerFinalizacionCarga($event)"></app-finalizacion-carga>
-          </div>
+    <div>
+      <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga>
+      <div class="html2pdf__page-break"></div>
+      <!-- <ARMOA005-1988 Dylan Lopez> -->
+      <div class="html2pdf__page-break"></div>
+      <!-- </ ARMOA005-1988 Dylan Lopez> -->
+      <div *ngIf="mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
+    
+      <app-balanzas *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
+    
+      <app-balanzas-manual *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga"></app-balanzas-manual>
+      <app-finalizacion-carga *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga"
+        (finalizacionCarga)="obtenerFinalizacionCarga($event)"></app-finalizacion-carga>
+    </div>
 
 
 

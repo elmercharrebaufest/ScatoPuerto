@@ -12754,6 +12754,14 @@ namespace Molinos.Scato.Servicios.Impl
         {
             ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
             ModuloDeCargaPeriodoDeCarga moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id);
+            if (moduloDeCargaPeriodoDeCarga_db == null) 
+            {
+                moduloDeCargaPeriodoDeCarga_db = new ModuloDeCargaPeriodoDeCarga
+                {
+                    ModuloDeCarga = moduloDeCarga,
+                };
+                this.repositorio.Agregar(moduloDeCargaPeriodoDeCarga_db);
+            }
             if (esFechaInicio)
             {
                 moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaComienzoCarga;

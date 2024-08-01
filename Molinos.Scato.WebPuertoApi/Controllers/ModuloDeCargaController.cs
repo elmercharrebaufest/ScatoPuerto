@@ -1166,5 +1166,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, ritmoDeCargasBalanzasDto);
         }
 
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ListarPlanillaTurnos")]
+        public HttpResponseMessage ListarPlanillaTurnos(int moduloDeCargaId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

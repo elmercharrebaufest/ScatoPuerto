@@ -66,7 +66,6 @@ export class CargaSolidosComponent implements OnInit {
   finalizacionCarga: boolean = false;
     // </ ARMOA005-1988 Dylan Lopez>
   ingresoManualSolido: boolean = false;
-  existePeriodoDeCarga: boolean = false;
   existeFechasPeriodoDeCarga: boolean = false;
 
   mostrarTableristaOperando: boolean = false;
@@ -172,14 +171,12 @@ export class CargaSolidosComponent implements OnInit {
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
-          this.existePeriodoDeCarga = true;
           let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
           
           if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null && 
               moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null){
             this.existeFechasPeriodoDeCarga = true;
           }
-          //existeFechasPeriodoDeCarga
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
