@@ -10167,11 +10167,10 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga)
         {
-            var result = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModuloDeCarga && x.Cerrado == true)
-				.GroupBy(m => m.Fecha?.ToString("yyyy-MM-dd"))
+            var turnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == idModuloDeCarga && x.Cerrado == true).ToList();
+            var result = turnos.GroupBy(m => m.Fecha?.ToString("yyyy-MM-dd"))
 		        .Select(g => new FechaDto
 		        {
-			        //Fecha = new DateTime(g.Key.Year.Value, g.Key.Month.Value, g.Key.Day.Value),
 					Fecha = g.Key,
 					Turnos = g.Select(t => new TurnoDto
 			        {
@@ -12647,8 +12646,8 @@ namespace Molinos.Scato.Servicios.Impl
             balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
             balanzaManualDto.FechaInicio = balanzasCorte.Fecha_Inicio.Value.ToString("yyyy-MM-dd");
             balanzaManualDto.HoraInicio = balanzasCorte.Fecha_Inicio.Value.ToString("h:mm");
-            balanzaManualDto.FechaCorte = balanzasCorte.Fecha_Inicio.Value.ToString("yyyy-MM-dd");
-            balanzaManualDto.HoraCorte = balanzasCorte.Fecha_Inicio.Value.ToString("h:mm");
+            balanzaManualDto.FechaCorte = balanzasCorte.Fecha_Corte.Value.ToString("yyyy-MM-dd");
+            balanzaManualDto.HoraCorte = balanzasCorte.Fecha_Corte.Value.ToString("h:mm");
             balanzaManualDto.Material = balanzasCorte.Material_id !=null ? Obtener<MaterialPuerto, MaterialPuertoDto>(x => x.Id == balanzasCorte.Material_id) : null;
             balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? Obtener<Bodega, BodegaDto>(x => x.Id == balanzasCorte.Bodega_id) : null;
             balanzaManualDto.Destino = balanzasCorte.Destino_Id != null ? Obtener<Destino, DestinoDto>(x => x.Id == balanzasCorte.Destino_Id) : null;
@@ -12728,25 +12727,16 @@ namespace Molinos.Scato.Servicios.Impl
                     dto.Id = balanzaCortes.Id;
                 }
                 var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
-               
-                string tiempoTotal = "";                
-                DateTime fechaInicio = Convert.ToDateTime($"{balanzaManual.FechaInicio} {balanzaManual.HoraInicio}");
-                DateTime fechaCorte = Convert.ToDateTime($"{balanzaManual.FechaCorte} {balanzaManual.HoraCorte}");
-                var minutos = Math.Round(((fechaCorte - fechaInicio).TotalMinutes / 60), 2);
-                var tiempo = minutos.ToString().Split('.');
-                if (tiempo.Length > 1)
+                var registroBalanzaCorte = repositorio.Obtener<BalanzasCortes>(x => x.Id == balanzaCortes.Id);
+                string tiempoTotal = "00:00";
+                var diferenciaFechas = (registroBalanzaCorte.Fecha_Corte.Value - registroBalanzaCorte.Fecha_Inicio.Value);
+                if (diferenciaFechas!=null)
                 {
-                    var hora = "00" + tiempo[0];
-                    var minuto = "00" + tiempo[1];
+                    var hora = "00" + diferenciaFechas.Hours;
+                    var minuto = "00" + diferenciaFechas.Minutes;
                     tiempoTotal = hora.Substring(hora.Length - 2);
                     tiempoTotal += ":" + minuto.Substring(minuto.Length - 2);
                 }
-                else
-                {
-                    tiempoTotal = "00" + tiempo[0];
-                    tiempoTotal = tiempoTotal.Substring(tiempoTotal.Length - 2) + ":00";
-                }
-
                 var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == dto.ModuloDeCarga_id);
                 var moduloDeCargaPlanillaDeTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date.ToString("yyyy-MM-dd") == balanzaManual.FechaInicio && x.TurnoPuerto.Orden == balanzaManual.TurnoPuerto.Orden).ToList();
 
@@ -12757,7 +12747,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         ModuloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == dto.ModuloDeCarga_id),
                         EsLiquido = false,
-                        Fecha = fechaInicio,
+                        Fecha = registroBalanzaCorte.Fecha_Inicio,
                         Enviado = false,
                         Cerrado = false,
                         TurnoPuerto = repositorio.Obtener<TurnoPuerto>(x => x.Id == balanzaManual.TurnoPuerto.Id)
@@ -12767,28 +12757,31 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 if (turnos != null)
                 {
+                    string horaInicio = registroBalanzaCorte.Fecha_Inicio.Value.ToString("HH:mm"); ;
+                    string horaFin = registroBalanzaCorte.Fecha_Corte.Value.ToString("HH:mm"); ;
+
                     var corte = turnos.ModuloDeCargaPlanillaDeTurnosCortes.Where(x => x.idBalanzaCorte == balanzaCortes.Id).ToList();
                     if (corte != null && corte.Count > 0)
                     {
                         var planillaDeTurnosCortes = corte[0];
-                        planillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == balanzaManual.MotivosFallasBalanza.Id);
-                        planillaDeTurnosCortes.HoraInicio = balanzaManual.HoraInicio;
-                        planillaDeTurnosCortes.HoraFin = balanzaManual.HoraCorte;
+                        planillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == registroBalanzaCorte.MotivosFallasBalanza_id);
+                        planillaDeTurnosCortes.HoraInicio = horaInicio;
+                        planillaDeTurnosCortes.HoraFin = horaFin;
                         planillaDeTurnosCortes.TiempoTotal = tiempoTotal;
-                        planillaDeTurnosCortes.Observaciones = balanzaManual.Observaciones;
-                        planillaDeTurnosCortes.idBalanzaCorte = balanzaManual.Id;
+                        planillaDeTurnosCortes.Observaciones = registroBalanzaCorte.Observaciones;
+                        planillaDeTurnosCortes.idBalanzaCorte = registroBalanzaCorte.Id;
                         this.repositorio.GuardarCambios();
                     }
                     else
                     {
                         var planillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes();
                         planillaDeTurnosCortes.ModuloDeCargaPlanillaDeTurnos = turnos;
-                        planillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x=> x.Id == balanzaManual.MotivosFallasBalanza.Id);
-                        planillaDeTurnosCortes.HoraInicio = balanzaManual.HoraInicio;
-                        planillaDeTurnosCortes.HoraFin = balanzaManual.HoraCorte;
+                        planillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x=> x.Id == registroBalanzaCorte.MotivosFallasBalanza_id);
+                        planillaDeTurnosCortes.HoraInicio = horaInicio;
+                        planillaDeTurnosCortes.HoraFin = horaFin;
                         planillaDeTurnosCortes.TiempoTotal = tiempoTotal;
-                        planillaDeTurnosCortes.Observaciones = balanzaManual.Observaciones;
-                        planillaDeTurnosCortes.idBalanzaCorte = balanzaManual.Id;
+                        planillaDeTurnosCortes.Observaciones = registroBalanzaCorte.Observaciones;
+                        planillaDeTurnosCortes.idBalanzaCorte = registroBalanzaCorte.Id;
                         this.repositorio.Agregar(planillaDeTurnosCortes);
                         this.repositorio.GuardarCambios();
                     }
