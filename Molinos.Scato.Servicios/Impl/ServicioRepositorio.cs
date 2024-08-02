@@ -12658,12 +12658,22 @@ namespace Molinos.Scato.Servicios.Impl
             balanzaManualDto.Toneladas = balanzasCorte.Tn;
             balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
             balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
+            var turnos = Listar<TurnoPuerto, TurnoPuertoDto>();
+            TurnoPuertoDto turnoPuertoDto;
+            var horas = balanzaManualDto.HoraInicio.Split(':');
+            int horaInicio = Convert.ToInt32(horas[0]);
+            turnoPuertoDto = turnos.Where(item => horaInicio >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaInicio < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+            balanzaManualDto.TurnoPuerto = turnoPuertoDto;
+
             return balanzaManualDto;
         }        
         public bool EliminarBalanzaManual(int id)
         {
             bool bResultado = true;
             var balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == id);
+            var moduloDeCargaPlanillaDeTurnosCortes = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.idBalanzaCorte == balanzaCortes.Id);
+            if (moduloDeCargaPlanillaDeTurnosCortes != null)
+                this.repositorio.Remover(moduloDeCargaPlanillaDeTurnosCortes);
             this.repositorio.Remover(balanzaCortes);
             this.repositorio.GuardarCambios();
             return bResultado;
@@ -12718,6 +12728,72 @@ namespace Molinos.Scato.Servicios.Impl
                     dto.Id = balanzaCortes.Id;
                 }
                 var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
+               
+                string tiempoTotal = "";                
+                DateTime fechaInicio = Convert.ToDateTime($"{balanzaManual.FechaInicio} {balanzaManual.HoraInicio}");
+                DateTime fechaCorte = Convert.ToDateTime($"{balanzaManual.FechaCorte} {balanzaManual.HoraCorte}");
+                var minutos = Math.Round(((fechaCorte - fechaInicio).TotalMinutes / 60), 2);
+                var tiempo = minutos.ToString().Split('.');
+                if (tiempo.Length > 1)
+                {
+                    var hora = "00" + tiempo[0];
+                    var minuto = "00" + tiempo[1];
+                    tiempoTotal = hora.Substring(hora.Length - 2);
+                    tiempoTotal += ":" + minuto.Substring(minuto.Length - 2);
+                }
+                else
+                {
+                    tiempoTotal = "00" + tiempo[0];
+                    tiempoTotal = tiempoTotal.Substring(tiempoTotal.Length - 2) + ":00";
+                }
+
+                var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == dto.ModuloDeCarga_id);
+                var moduloDeCargaPlanillaDeTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date.ToString("yyyy-MM-dd") == balanzaManual.FechaInicio && x.TurnoPuerto.Orden == balanzaManual.TurnoPuerto.Orden).ToList();
+
+                var turnos = (moduloDeCargaPlanillaDeTurnos != null && moduloDeCargaPlanillaDeTurnos.Count > 0) ? moduloDeCargaPlanillaDeTurnos[0] : null;
+                if (turnos == null)
+                {
+                    turnos = new ModuloDeCargaPlanillaDeTurnos
+                    {
+                        ModuloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == dto.ModuloDeCarga_id),
+                        EsLiquido = false,
+                        Fecha = fechaInicio,
+                        Enviado = false,
+                        Cerrado = false,
+                        TurnoPuerto = repositorio.Obtener<TurnoPuerto>(x => x.Id == balanzaManual.TurnoPuerto.Id)
+                    };
+                    repositorio.Agregar(turnos);
+                    repositorio.GuardarCambios();
+                }
+                if (turnos != null)
+                {
+                    var corte = turnos.ModuloDeCargaPlanillaDeTurnosCortes.Where(x => x.idBalanzaCorte == balanzaCortes.Id).ToList();
+                    if (corte != null && corte.Count > 0)
+                    {
+                        var planillaDeTurnosCortes = corte[0];
+                        planillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x => x.Id == balanzaManual.MotivosFallasBalanza.Id);
+                        planillaDeTurnosCortes.HoraInicio = balanzaManual.HoraInicio;
+                        planillaDeTurnosCortes.HoraFin = balanzaManual.HoraCorte;
+                        planillaDeTurnosCortes.TiempoTotal = tiempoTotal;
+                        planillaDeTurnosCortes.Observaciones = balanzaManual.Observaciones;
+                        planillaDeTurnosCortes.idBalanzaCorte = balanzaManual.Id;
+                        this.repositorio.GuardarCambios();
+                    }
+                    else
+                    {
+                        var planillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes();
+                        planillaDeTurnosCortes.ModuloDeCargaPlanillaDeTurnos = turnos;
+                        planillaDeTurnosCortes.MotivosDeCorte = repositorio.Obtener<MotivosFallasBalanza>(x=> x.Id == balanzaManual.MotivosFallasBalanza.Id);
+                        planillaDeTurnosCortes.HoraInicio = balanzaManual.HoraInicio;
+                        planillaDeTurnosCortes.HoraFin = balanzaManual.HoraCorte;
+                        planillaDeTurnosCortes.TiempoTotal = tiempoTotal;
+                        planillaDeTurnosCortes.Observaciones = balanzaManual.Observaciones;
+                        planillaDeTurnosCortes.idBalanzaCorte = balanzaManual.Id;
+                        this.repositorio.Agregar(planillaDeTurnosCortes);
+                        this.repositorio.GuardarCambios();
+                    }
+                }
+                
                 return balanzaManual;
             }
             catch (Exception e)
