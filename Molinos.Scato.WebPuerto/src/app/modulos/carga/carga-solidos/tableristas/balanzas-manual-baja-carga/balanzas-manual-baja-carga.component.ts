@@ -162,7 +162,6 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       this.bajaCargaForm = this.crearFormularioBajaCarga();
       if (this.balanzaManualRegistro == null) {
         this.bajaCargaForm.controls['fechaInicio'].setValue(this.fechaComienzoCarga);
-        this.bajaCargaForm.controls['fechaCorte'].setValue(this.fechaFinalizacionCarga);
         this.horaInicioMinimo = this.horaComienzoCarga;
         this.horaCorteMinimo = this.horaFinalizacionCarga;
       }
