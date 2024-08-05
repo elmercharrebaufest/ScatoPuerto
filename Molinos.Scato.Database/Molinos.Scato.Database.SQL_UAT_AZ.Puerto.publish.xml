@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>MOAScatoPuertoUAT</TargetDatabaseName>
     <DeployScriptFileName>Molinos.Scato.Database.sql</DeployScriptFileName>
-	<TargetConnectionString>Data Source=SCATOAGLSQA.molinosagro.ad,1450;Integrated Security=False;User ID=scatopuertouatusr;Password=MoaUAT@2024;Pooling=False;Trust Server Certificate=True;</TargetConnectionString>
+	<TargetConnectionString>Data Source=SCATOAGLSQA.molinosagro.ad,1450;Integrated Security=False;User ID=scatopuertoqausr;Password=MoaQA@2024;Pooling=False;Trust Server Certificate=True;</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <ScriptDatabaseOptions>False</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
