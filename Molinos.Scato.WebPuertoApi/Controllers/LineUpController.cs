@@ -211,5 +211,37 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             servicioComandos.Ejecutar(new CrearEstadoPuerto { Dto = estadoPuerto });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/LineUp/OcultarEmbarqueLineUp")]
+        public HttpResponseMessage OcultarEmbarqueLineUp(int lineUpId)
+        {
+            try
+            {
+                servicio.OcultarEmbarqueLineUp(lineUpId);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/LineUp/RestaurarEmbarquesOcultosLineUp")]
+        public HttpResponseMessage RestaurarEmbarquesOcultosLineUp()
+        {
+            try
+            {
+                servicio.RestaurarEmbarquesOcultosLineUp();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

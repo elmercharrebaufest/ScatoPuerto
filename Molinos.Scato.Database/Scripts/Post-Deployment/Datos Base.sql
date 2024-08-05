@@ -1054,3 +1054,5 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Destinos_Eliminar'); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')); END
+
+UPDATE LineUp SET Ocultar = 0 WHERE Ocultar IS NULL

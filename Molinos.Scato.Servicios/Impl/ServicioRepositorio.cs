@@ -12452,6 +12452,30 @@ namespace Molinos.Scato.Servicios.Impl
 				throw e;
 			}
 		}
-		// </ ARMOA005-1965 Dylan Lopez>
-	}
+        // </ ARMOA005-1965 Dylan Lopez>
+        public void RestaurarEmbarquesOcultosLineUp()
+        {
+            var embarques = this.ListarEmbarques();
+            foreach (var embarque in embarques.Where(x => x.LineUp.Ocultar == true).ToList())
+            {
+                var lineUp = this.repositorio.Obtener<LineUp>(r => r.Id == embarque.LineUp.Id);
+                lineUp.Ocultar = false;
+                this.repositorio.GuardarCambios();
+            }
+        }
+        public void OcultarEmbarqueLineUp(int lineUpId)
+        {
+            try
+            {
+                var lineUp = this.repositorio.Obtener<LineUp>(r => r.Id == lineUpId);
+                lineUp.Ocultar = true;
+                this.repositorio.GuardarCambios();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error en metodo: OcultarEmbarqueLineUp", ex.Message);
+                throw ex;
+            }
+        }
+    }
 }

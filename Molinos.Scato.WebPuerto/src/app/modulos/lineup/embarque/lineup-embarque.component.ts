@@ -30,6 +30,8 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 // <ARMOA005-1421 Dylan Lopez>
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 // </ ARMOA005-1421 Dylan Lopez>
 @Component({
   selector: 'app-lineup-embarque',
@@ -45,7 +47,10 @@ export class LineupEmbarqueComponent implements OnInit {
   @Input() ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
   @Input() listadoEmbarques: InstanciaWorkflowPuerto[];
   @Input() listaErroresEmbarques: ErroresGeolocalizacion[];
+  @Input() esSanBenito: boolean = false;
+  @Input() primerEmbarqueSanBenito: number = 0;
   @ViewChild('periodoCarga') modalPeriodoCarga: ElementRef;
+  private destroy$ = new Subject();
 
   acciones: string[];
   listadoUbicacionDeBuquePuerto: string[];
@@ -413,6 +418,13 @@ export class LineupEmbarqueComponent implements OnInit {
 
         this.mostrarSpinnerCaptura = false;
       });
+  }
+
+  ocultarEmbarqueLineUp(){
+    let lineUpId = this.instanciaWorkflow.lineUp.id;
+    this.lineUpService.ocultarEmbarqueLineUp(lineUpId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+      this.lineUpService.sendRecargarListado(true);
+    });
   }
 
   private crearImagenLineUp(){
