@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BalanzasManualService } from "./balanzas-manual/balanzas-manual.service";
 import { formatDate } from "@angular/common";
+import { PlanillaDeTurnos } from "@ScatoModels/planilla-turnos/planilla-de-turnos";
 
 @Injectable({
     providedIn: 'root'
@@ -77,4 +78,37 @@ export class InicioFinalizacionCargaService {
         }
         return fecha;
     }
+
+    public obtenerFechaPrimeraCarga(listadoTurnos: PlanillaDeTurnos[]): string{
+        if(listadoTurnos == null || listadoTurnos.length == 0)
+            return ''; 
+        const primerCarga = this.ordenarLista(listadoTurnos, true)[0];
+        return primerCarga.fecha.split('T')[0] + ' ' + primerCarga.turnoPuerto.nombre.split('-')[0] + ':00';
+    }
+
+    public obtenerFechaUltimaCarga(listadoTurnos: PlanillaDeTurnos[]): string{
+        if(listadoTurnos == null || listadoTurnos.length == 0)
+            return ''; 
+        const ultimaCarga = this.ordenarLista(listadoTurnos, false)[0];
+        return ultimaCarga.fecha.split('T')[0] + ' ' + ultimaCarga.turnoPuerto.nombre.split('-')[1] + ':00';
+    }
+
+    private ordenarLista(lista: PlanillaDeTurnos[], asc: boolean): PlanillaDeTurnos[] {
+        lista.sort((a, b) => {
+            if (a.fecha < b.fecha) {
+                return asc ? -1 : 1;
+            }
+            if (a.fecha > b.fecha) {
+                return asc ? 1 : -1;
+            }
+            if (a.turnoPuerto.orden < b.turnoPuerto.orden) {
+                return asc ? -1 : 1;
+            }
+            if (a.turnoPuerto.orden > b.turnoPuerto.orden) {
+                return asc ? 1 : -1;
+            }
+            return 0; 
+        });
+        return lista;
+    } 
 }

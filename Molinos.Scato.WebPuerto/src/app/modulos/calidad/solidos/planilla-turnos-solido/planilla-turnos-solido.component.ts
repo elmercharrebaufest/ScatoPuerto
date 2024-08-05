@@ -37,6 +37,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   @Input() esSoloLectura: boolean = false;
   @Input() tablerista: boolean;
+  @Output() turnoCerrado = new EventEmitter<boolean>();
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
 
   formTurnos: FormGroup;
@@ -87,8 +88,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private workflowService: WorkflowService,
   ) {
     this.user = this.session.getUser();
-    console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
-
   }
 
   ngOnInit(): void {
@@ -257,13 +256,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return fechaFormato;
   }
   fillPlanilla() {
-    console.log('entroooo fillPlanilla')
     this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
-    console.log(this.planillaDeTurnos)
     this.diasTurno.clear();
     //Si la planilla tiene turnos
     if (this.planillaDeTurnos != undefined && this.planillaDeTurnos.length > 0) {
-
       //Agrego variable de milisegundos (fecha) para poder ordenar
       this.planillaDeTurnos.forEach(element => {
         const fechaFormateada = this.devolverFechaHoraTurno(element);
@@ -326,12 +322,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     }
 
     //Me obtengo la fecha del último día
-    //let diaUltimoTurno;
-    //let ultimoDiaIndex;
     if (this.diasTurno != undefined && this.diasTurno['controls'].length > 0) {
-      //diaUltimoTurno = this.diasTurno['controls'][this.diasTurno['controls'].length - 1]['controls']['diaTurno']['value'];
-      //ultimoDiaIndex = this.diasTurno['controls'].length - 1;
-
       const diasTurno = this.diasTurno['controls'];
       const ultimoDiaIndex = this.diasTurno['controls'].length - 1;
       const diaUltimoTurno = diasTurno[ultimoDiaIndex]['controls']['diaTurno']['value'];
@@ -421,7 +412,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.id != turnoSelId);
 
       planillaDeTurnosRecibidores.forEach(item => {
-        item.fechaMiliseconds = new Date(item.fecha).getTime()
+        const fechaFormateada = this.devolverFechaHoraTurno(item);
+        item.fechaMiliseconds = new Date(fechaFormateada).getTime()
       });
 
       planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x=> x.fechaMiliseconds<fechaMiliseconds);
@@ -442,6 +434,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       if (confirmed) {
         this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos)
           .subscribe(res => {
+            this.turnoCerrado.emit(true);
             this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
               if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
                 this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
@@ -466,7 +459,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       const existeTurno = resp;
       let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
       mensaje += " turnos anteriores que aun no se han sido cerrados.";
-      console.log('existeTurno--->>', existeTurno);
       if (existeTurno){
         this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
         return;
@@ -655,9 +647,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           };
 
           this.procesoCalidadService.guardarObservacionesDeCalidad(idPlanillaDeTurnos, [observacionCalidad]).subscribe(res => {
-            console.log("::::ObsDeCalidad RES:::::", res);
-
-
             this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
               if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
                 this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
@@ -666,8 +655,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
                 this.fillPlanilla();
               }
             });
-
-
           });
           this.obsCalidadForm.reset();
           this._modalService.dismissAll();

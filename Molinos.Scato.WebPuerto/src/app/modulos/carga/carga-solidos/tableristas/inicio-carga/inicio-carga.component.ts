@@ -16,6 +16,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { BalanzasManualService } from '../balanzas-manual/balanzas-manual.service';
 import { forkJoin, Subject } from 'rxjs';
 import { InicioFinalizacionCargaService } from '../inicio-finalizacion-carga.services';
+import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 // </ ARMOA005-1988 Dylan Lopez>
 
 @Component({
@@ -112,18 +113,23 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
   preguntarGuardarInicioCarga(){
     let fechaInicioCarga = '';
     fechaInicioCarga = formatDate(this.inicioCargaForm.controls.fechaInicioCarga.value, 'yyyy-MM-dd', 'en-US');
-    fechaInicioCarga = fechaInicioCarga + ' ' + this.inicioCargaForm.controls.horaInicioCarga;
+    fechaInicioCarga = fechaInicioCarga + ' ' + this.inicioCargaForm.controls.horaInicioCarga.value;
 
     forkJoin([
       this.balanzasManualService.listarBalanzaManual(this.embarqueSelected.moduloDeCargaId),
-      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
-    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual,moduloDeCarga]) => {
+      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId),
+      this.moduloCargaService.obtenerPlanillaTurnos(this.embarqueSelected.moduloDeCargaId)
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual,moduloDeCarga,planillaTurnos]) => {
       let fechaFinalizacionCargaPeriodo = '';
       let fechaInicioCorteBajaCarga = '';
       let fechaInicioCargaNormal = '';
+      let fechaPrimeraCarga = '';
 
       if (balanzaManual!=null){
         fechaInicioCorteBajaCarga = this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, false);
+      }
+      if(planillaTurnos != null){
+        fechaPrimeraCarga = this.inicioFinalizacionCargaService.obtenerFechaPrimeraCarga(planillaTurnos);
       }
       if (moduloDeCarga!=null){
         if (moduloDeCarga.moduloDeCargaPeriodoDeCarga!=null && moduloDeCarga.moduloDeCargaPeriodoDeCarga.length > 0){
@@ -148,6 +154,10 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
           this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga es mayor a las fechas de corte y baja carga registrados.', 'Aceptar', '', null, null, Tipoalerta.Warning);
           return;
         }
+      }
+      if (fechaPrimeraCarga != '' && fechaInicioCarga > fechaPrimeraCarga){
+        this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga es mayor a las fechas de carga registradas en la planilla de turnos.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+        return;
       }
       this.guardarFechaInicioCarga();
     });
@@ -191,5 +201,21 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
 
   hasPermisoIniciarCargaBalanzas() {
     return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_IniciarCargaBalanzas);
+  }
+
+  obtenerFechaInicioCarga(): Date {
+    if(this.inicioCargaForm.controls.fechaInicioCarga.value != null && this.inicioCargaForm.controls.fechaInicioCarga.value!= ''){
+      return new Date(this.inicioCargaForm.controls.fechaInicioCarga.value); 
+    }else{
+      return null;
+    }
+  }
+
+  obtenerHoraInicioCarga(): string {
+    if(this.inicioCargaForm.controls.horaInicioCarga.value != null && this.inicioCargaForm.controls.horaInicioCarga.value!= ''){
+      return this.inicioCargaForm.controls.horaInicioCarga.value; 
+    }else{
+      return null;
+    }
   }
 }

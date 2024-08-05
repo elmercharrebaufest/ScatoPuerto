@@ -80,7 +80,6 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       this.corteManualForm = this.crearFormularioCorte();
       if (this.balanzaManualRegistro == null) {
         this.corteManualForm.controls['fechaInicio'].setValue(this.fechaComienzoCarga);
-        this.corteManualForm.controls['fechaCorte'].setValue(this.fechaFinalizacionCarga);
         this.horaInicioMinimo = this.horaComienzoCarga;
         this.horaCorteMinimo = this.horaFinalizacionCarga;
       }

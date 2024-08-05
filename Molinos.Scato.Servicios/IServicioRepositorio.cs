@@ -2553,6 +2553,9 @@ namespace Molinos.Scato.Servicios
 		List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha);
 
 		[OperationContract]
+		List<BalanzasCortesDto> ConsultarBalanzasCortes(int idModuloDeCarga);
+
+		[OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
 
         [OperationContract]
@@ -2841,5 +2844,17 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void RestaurarEmbarquesOcultosLineUp();
+
+        [OperationContract]
+        decimal ObtenerCargaPorBalanza(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral, int numeroBalanza);
+
+        [OperationContract]
+        decimal ObtenerRitmoCargaPorBalanza(int moduloCargaId, int numeroBalanza);
+
+        [OperationContract]
+        decimal ObtenerRitmoCargaNeta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
+        
+        [OperationContract]
+        decimal ObtenerRitmoCargaBruta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
     }
 }

@@ -1,5 +1,5 @@
 <div class="forms row" *ngIf="mostrarFechas">
-  <div class="form-group col-md-6">
+  <div class="form-group col-md-4">
     <div class="row">
       <div class="form-group col-md-12">
         <app-fechas-puerto [registroFechas]="registroFechas"
@@ -10,29 +10,109 @@
     </div>
   </div>
 
-  <div class="form-group col-md-6">
-
-    <div class="row" *ngIf="!liquido">
+  <div class="form-group col-md-8">
+    <!-- <ARMOA005-1988 Dylan Lopez> -->
+    <!-- <div class="row" *ngIf="!liquido">
       <div class="form-group col-md-12">
         <app-balanzas-ritmos [enBuque]="true">
         </app-balanzas-ritmos>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="form-group col-md-12">
         <app-graficos-ritmos [enBuque]="true"
                              [liquido]="liquido">
         </app-graficos-ritmos>
       </div>
-    </div>
+    </div> -->
 
-    <div class="row" *ngIf="!liquido">
+    <!-- <div class="row" *ngIf="!liquido">
       <div class="form-group col-md-12">
         <app-info-adicional [enBuque]="enBuque">
         </app-info-adicional>
       </div>
-    </div>
+    </div> -->
+    <!-- </ ARMOA005-1988 Dylan Lopez> -->
 
+    <!-- <ARMOA005-1988 Dylan Lopez> -->
+    <div class="form-group col-md-7">
+      <!-- <Antigua Logica> -->
+      <div *ngIf="moduloDeCarga!=null && !ingresoManualSolido">
+        <div class="row" *ngIf="!liquido">
+          <div class="form-group col-md-12">
+            <app-balanzas-ritmos [enBuque]="true"></app-balanzas-ritmos>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <app-graficos-ritmos [enBuque]="true" [liquido]="liquido"></app-graficos-ritmos>
+          </div>
+        </div>
+        <div class="row" *ngIf="!liquido">
+          <div class="form-group col-md-12">
+            <app-info-adicional [enBuque]="enBuque"></app-info-adicional>
+          </div>
+        </div>
+      </div>
+      <!-- </ Antigua Logica> -->
+
+      <!-- <Nueva Logica> -->
+      <div *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados">
+        <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Ritmos de Carga y Ritmos por Balanza</h5>
+
+        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;">
+          <div class="col">
+            <div class="form-group">
+              <label>Día: </label>
+              <input type="date" [(ngModel)]="selectedDate" [attr.min]="dateMin" [attr.max]="dateMax" class="form-control fecha" (change)="updateDate($event)" />
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="turno">Turno: </label>
+                <select id="selectedTurn" class="form-control" [(ngModel)]="selectedTurn" (change)="updateTurn($event)">
+                  <option [value]="0">(Seleccionar)</option>
+                  <option *ngFor="let turno of turnos" [value]="turno.turno.id">
+                    {{turno.turno.nombre}}
+                  </option>
+                </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="html2pdf__page-break"></div>
+
+        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;">
+          <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Turno: Día {{selectedDate | date: 'dd-MMM-yyyy'}} en el Turno {{selectedTurn}}</h5>
+          <app-semaforo-ritmo-embarque
+              [valueRhythmGross]='valorRitmoBruto' 
+              [color1]='"#F0AD4E"' 
+              [valueLoaded]='valorCargando' 
+              [tonsTotal]='tnTotales' 
+              [color2]='"#5CB85C"' 
+              [valueRhythmNet]='valorRitmoNeto' 
+              [color3]='"#F0AD4E"'>
+            </app-semaforo-ritmo-embarque>
+        </div>
+
+        <div class="html2pdf__page-break"></div>
+
+        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;">
+          <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Ritmos Generales</h5>
+          <app-semaforo-ritmo-embarque
+              [valueRhythmGross]='valorRitmoBruto' 
+              [color1]='"#F0AD4E"' 
+              [valueLoaded]='valorCargando' 
+              [tonsTotal]='tnTotales' 
+              [color2]='"#5CB85C"' 
+              [valueRhythmNet]='valorRitmoNeto' 
+              [color3]='"#F0AD4E"'>
+            </app-semaforo-ritmo-embarque>
+        </div>
+      </div>
+      <!-- </ Nueva Logica> -->
+    </div>
+    <!-- </ ARMOA005-1988 Dylan Lopez> -->
   </div>
 </div>

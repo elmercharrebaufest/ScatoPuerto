@@ -260,6 +260,26 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			}
 		}
 
+		[HttpGet]
+		[Route("api/ModuloDeCarga/ConsultarBalanzasCortes")]
+		public HttpResponseMessage ConsultarBalanzasCortes(int idModuloDeCarga)
+		{
+			try
+			{
+				var request = new ConsultarBalanzasCortesRequest()
+				{
+					IdModuloDeCarga = idModuloDeCarga
+				};
+				var response = comandos.Ejecutar(request);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError);
+			}
+		}
+
+
 		[HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
@@ -1096,10 +1116,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     Content = new ByteArrayContent(archivo)
                 };
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "turnosMica.xlsx"
-                };
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
 
                 return response;
@@ -1110,6 +1126,58 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ModuloDeCarga/RitmosCargaSolidos")]
+        public HttpResponseMessage RitmosCargaSolidos(int idModuloDeCarga, string fechaTurno, int? turno, bool esCalculoGeneral)
+        {
+            DateTime? fechaTurnoSel = null;
+            bool existeCarga = true;
+            if (!string.IsNullOrEmpty(fechaTurno))
+            {
+                fechaTurnoSel = Convert.ToDateTime(fechaTurno);
+                var moduloDeCarga = servicio.ObtenerModuloDeCarga(idModuloDeCarga);
+                var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurnoSel.Value.Date && x.TurnoPuerto.Orden == turno).FirstOrDefault();
+                if (listaTurnos == null)
+                {
+                    existeCarga = false;
+                }
+            }
+            RitmoDeCargasBalanzasDto ritmoDeCargasBalanzasDto = new RitmoDeCargasBalanzasDto();
 
+            var cargaBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7);
+            var ritmoBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga,7);
+            var cargaBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8);
+            var ritmoBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 8);
+            var ritmoCargaBruto = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaBruta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral);
+            var llevasCargando  = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga , fechaTurnoSel, turno, esCalculoGeneral, 0);
+            var ritmoCargaNeto  = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaNeta(idModuloDeCarga  , fechaTurnoSel, turno, esCalculoGeneral);
+
+
+            ritmoDeCargasBalanzasDto.CargaBalanza7               = cargaBalanza7 ;
+            ritmoDeCargasBalanzasDto.RitmoBalanza7               = ritmoBalanza7 ;
+            ritmoDeCargasBalanzasDto.CargaBalanza8               = cargaBalanza8 ;
+            ritmoDeCargasBalanzasDto.RitmoBalanza8               = ritmoBalanza8 ;
+            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza7 = DateTime.Now;
+            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza8 = DateTime.Now;
+            ritmoDeCargasBalanzasDto.RitmoCargaBruto             = ritmoCargaBruto ;
+            ritmoDeCargasBalanzasDto.LLevasCargando              = llevasCargando  ;
+            ritmoDeCargasBalanzasDto.RitmoCargaNeto              = ritmoCargaNeto  ;
+
+            return Request.CreateResponse(HttpStatusCode.OK, ritmoDeCargasBalanzasDto);
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ListarPlanillaTurnos")]
+        public HttpResponseMessage ListarPlanillaTurnos(int moduloDeCargaId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

@@ -66,7 +66,6 @@ export class CargaSolidosComponent implements OnInit {
   finalizacionCarga: boolean = false;
     // </ ARMOA005-1988 Dylan Lopez>
   ingresoManualSolido: boolean = false;
-  existePeriodoDeCarga: boolean = false;
   existeFechasPeriodoDeCarga: boolean = false;
 
   mostrarTableristaOperando: boolean = false;
@@ -172,16 +171,12 @@ export class CargaSolidosComponent implements OnInit {
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
-          this.existePeriodoDeCarga = true;
           let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
           
           if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null && 
-              moduloDeCargaPeriodoDeCarga.fechaFinalizacionCarga !=null && 
-              moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null &&
-              moduloDeCargaPeriodoDeCarga.horaFinalizacionCarga !=null){
+              moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null){
             this.existeFechasPeriodoDeCarga = true;
           }
-          //existeFechasPeriodoDeCarga
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
@@ -303,6 +298,8 @@ export class CargaSolidosComponent implements OnInit {
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
       this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
+
+    this.actualizarFechaInicioFinCarga(moduloCarga);
 
     this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
@@ -427,6 +424,15 @@ export class CargaSolidosComponent implements OnInit {
       for (let i = 0; i < selector.length; i++) {
         selector[i].style.display = ocultarMostrar;
       }
+    }
+  }
+
+  actualizarFechaInicioFinCarga(modulo: ModuloDeCarga) {
+    if (modulo.moduloDeCargaPeriodoDeCarga != null && modulo.moduloDeCargaPeriodoDeCarga.length == 1) {
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.inicioCargaComponent.obtenerFechaInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.inicioCargaComponent.obtenerHoraInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.finalizacionCargaComponent.obtenerFechaFinCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.finalizacionCargaComponent.obtenerHoraFinCarga();
     }
   }
 }

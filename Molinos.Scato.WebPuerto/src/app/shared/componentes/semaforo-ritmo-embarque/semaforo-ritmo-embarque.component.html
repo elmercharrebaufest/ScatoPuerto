@@ -1,0 +1,29 @@
+<div class="row" style="justify-content: space-evenly">
+  <app-reloj-balanzas 
+    [titulo]='"Ritmo de carga"' 
+    [valor]='valueRhythmGross' 
+    [maximo]='valueRhythmGross' 
+    [color]='color1' 
+    [descripcion]='"por hora por mano"' 
+    [footer]='""' 
+    style="margin-right: 20px;">
+  </app-reloj-balanzas>
+  <app-reloj-balanzas 
+    [titulo]='"Llevas cargando"' 
+    [valor]='valueLoaded' 
+    [maximo]='tonsTotal > valueLoaded ? tonsTotal : valueLoaded' 
+    [color]='color2' 
+    [descripcion]= '"de " + tonsTotal + " Tn totales"' 
+    [footer]='"Balanza 7 + Balanza 8"' 
+    style="margin-right: 20px;">
+  </app-reloj-balanzas>
+  <app-reloj-balanzas 
+    [titulo]='"Ritmo carga neto"' 
+    [valor]='valueRhythmNet' 
+    [maximo]='valueRhythmNet' 
+    [color]='color3' 
+    [descripcion]='"por hora por mano"' 
+    [footer]='"Este ritmo no contempla fuleos ni bajas cargas a pedido del buque"' 
+    style="margin-right: 20px;">
+  </app-reloj-balanzas>
+</div>

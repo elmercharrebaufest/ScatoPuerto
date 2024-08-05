@@ -1,8 +1,12 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Orquestador;
 using Ninject.Extensions.Logging;
 using NPOI.SS.Formula.Functions;
 using System;
@@ -24,19 +28,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
-                foreach (var turnoDto in comando.Turnos)
-                {
-                    if (turnoDto.Id == 0)
-                    {
-                        AgregarNuevoTurno(moduloDeCarga, turnoDto);
-                    }
-                    else
-                    {
-                        var turnoDb = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(turnoDto.Id);
-                        ModificarDetallesSolidos(turnoDb, turnoDto);
-                        ModificarGravedades(turnoDb, turnoDto);
-                    }
-                }
+                AgregarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
+                ModificarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
+                EliminarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
 
                 Repositorio.GuardarCambios();
             }
@@ -69,36 +63,116 @@ namespace Molinos.Scato.Servicios.Procesamiento
             };
         }
 
-        private void AgregarNuevoTurno(ModuloDeCarga moduloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnoDto)
+        private void AgregarTurnos(ModuloDeCarga moduloDeCarga, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string usuario)
         {
-            var turnoPuerto = Repositorio.Obtener<TurnoPuerto>(turnoDto.TurnoPuerto.Id);
-            var turnoDb = new ModuloDeCargaPlanillaDeTurnos()
-            {
-                ModuloDeCarga = moduloDeCarga,
-                Fecha = turnoDto.Fecha,
-                TurnoPuerto = turnoPuerto,
-                ModuloDeCargaPlanillaDeTurnosDetallesSolido = new List<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(),
-                ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad = new List<ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad>()
-            };
+            var turnosAgregar = turnos.Where(t => t.Id == 0).ToList();
+            var turnosPuerto = Repositorio.Listar<TurnoPuerto>();
 
-            foreach (var detalleSolido in turnoDto.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+            foreach (var turnoDto in turnosAgregar)
             {
-                turnoDb.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Add(ConvertirDetalleSolido(detalleSolido));
-            }
+                var turnoPuerto = turnosPuerto.First(tp => tp.Id == turnoDto.TurnoPuerto.Id);
 
-            foreach (var gravedad in turnoDto.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad)
-            {
-                var material = Repositorio.Obtener<MaterialPuerto>(gravedad.MaterialPuerto.Id);
-                var gravedadDb = new ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad()
+                var turnoDb = new ModuloDeCargaPlanillaDeTurnos()
                 {
-                    MaterialPuerto = material,
-                    KgGravedad = gravedad.KgGravedad,
-                    TotalTurnoMaterial = gravedad.TotalTurnoMaterial,
+                    ModuloDeCarga = moduloDeCarga,
+                    Fecha = turnoDto.Fecha,
+                    TurnoPuerto = turnoPuerto,
+                    ModuloDeCargaPlanillaDeTurnosDetallesSolido = new List<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(),
+                    ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad = new List<ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad>()
                 };
-                turnoDb.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.Add(gravedadDb);
+
+                foreach (var detalleSolido in turnoDto.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                {
+                    turnoDb.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Add(ConvertirDetalleSolido(detalleSolido));
+                }
+
+                foreach (var gravedad in turnoDto.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad)
+                {
+                    var material = Repositorio.Obtener<MaterialPuerto>(gravedad.MaterialPuerto.Id);
+                    var gravedadDb = new ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad()
+                    {
+                        MaterialPuerto = material,
+                        KgGravedad = gravedad.KgGravedad,
+                        TotalTurnoMaterial = gravedad.TotalTurnoMaterial,
+                    };
+                    turnoDb.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.Add(gravedadDb);
+                }
+
+                Repositorio.Agregar(turnoDb);
             }
 
-            Repositorio.Agregar(turnoDb);
+            if (turnosAgregar.Count > 0)
+            {
+                var log = new LogABM
+                {
+                    Pantalla = "GuardarPlanillaCargaManualSolidos",
+                    Usuario = usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Alta,
+                    Entidad = turnosAgregar.ToJson(),
+                    ClaseId = moduloDeCarga.Id
+                };
+                Repositorio.Agregar(log);
+            }
+        }
+
+        private void ModificarTurnos(ModuloDeCarga moduloDeCarga, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string usuario)
+        {
+            var turnosModificar = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(tdb => turnos.Any(tdto => tdto.Id == tdb.Id)).ToList();
+            foreach (var turnoDb in turnosModificar)
+            {
+                var turnoDto = turnos.First(tdto => tdto.Id == turnoDb.Id);
+                ModificarDetallesSolidos(turnoDb, turnoDto);
+                ModificarGravedades(turnoDb, turnoDto);
+            }
+
+            var turnosLogs = turnos.Where(t => t.Id > 0).ToList();
+            if (turnosLogs.Count > 0)
+            {
+                var log = new LogABM
+                {
+                    Pantalla = "GuardarPlanillaCargaManualSolidos",
+                    Usuario = usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Modificacion,
+                    Entidad = turnosLogs.ToJson(),
+                    ClaseId = moduloDeCarga.Id
+                };
+                Repositorio.Agregar(log);
+            }
+        }
+
+        private void EliminarTurnos(ModuloDeCarga moduloDeCarga, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string usuario)
+        {
+            var turnosEliminar = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(tdb => !turnos.Any(tdto => tdto.Id == tdb.Id)).ToList();
+
+            foreach (var turno in turnosEliminar)
+            {
+                foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido.ToList())
+                {
+                    Repositorio.Remover(detalle);
+                }
+                foreach (var gravedad in turno.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.ToList())
+                {
+                    Repositorio.Remover(gravedad);
+                }
+                Repositorio.Remover(turno);
+            }
+
+            var json = Conversor.ConvertirList<ModuloDeCargaPlanillaDeTurnos,ModuloDeCargaPlanillaDeTurnosDto>(turnosEliminar).ToJson();
+            if (turnosEliminar.Count > 0)
+            {
+                var log = new LogABM
+                {
+                    Pantalla = "GuardarPlanillaCargaManualSolidos",
+                    Usuario = usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Baja,
+                    Entidad = json,
+                    ClaseId = moduloDeCarga.Id
+                };
+                Repositorio.Agregar(log);
+            }
         }
 
         private void ModificarDetallesSolidos(ModuloDeCargaPlanillaDeTurnos turnoDb, ModuloDeCargaPlanillaDeTurnosDto turnoDto)

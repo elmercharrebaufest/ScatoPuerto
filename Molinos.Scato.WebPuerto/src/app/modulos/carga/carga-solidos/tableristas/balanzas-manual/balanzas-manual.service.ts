@@ -278,8 +278,8 @@ export class BalanzasManualService {
     balanzaCortesManual.material_id = balanza.material ? balanza.material?.id : null;
     balanzaCortesManual.exportador_Id = balanza.exportador ? balanza.exportador?.id : null;
     balanzaCortesManual.destino_Id = balanza.destino ? balanza.destino?.id : null;
-    balanzaCortesManual.kg = balanza.kilogramos > 0 ? balanza.kilogramos : null;
-    balanzaCortesManual.tn = balanza.toneladas > 0 ? balanza.toneladas : null;
+    balanzaCortesManual.kg = balanza.kilogramos > 0 ? parseInt(balanza.kilogramos.toString()) : null;
+    balanzaCortesManual.tn = balanza.kilogramos > 0 ? parseInt((balanza.kilogramos/1000).toString()) : null;
     balanzaCortesManual.cerrado = false;
     balanzaCortesManual.corteManual = balanza.corteManual;
     return balanzaCortesManual;
