@@ -3,7 +3,6 @@ import { RitmoEmbarqueBalanzaComponent } from 'app/shared/componentes/ritmo-emba
 import { SemaforoRitmoEmbarqueComponent } from 'app/shared/componentes/semaforo-ritmo-embarque/semaforo-ritmo-embarque.component';
 import { BalanzasRitmosService } from '../../../../shared/servicios/calidad/balanzas-ritmos.service';
 import { FechaDto, TurnoDto } from '@ScatoModels/calidad/combos-fechas-y-turnos';
-import { BalanzaCorteFilledDto } from '@ScatoModels/calidad/balanzas-cortes';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 
@@ -53,7 +52,7 @@ export class NewBalanzasRitmosComponent {
     private procesoService: DatosEmbarquesProcesoService,
     private balanzasRitmosService: BalanzasRitmosService) {
     this.balanzasRitmosService.TurnosCalidad.subscribe(turno =>{
-      if (turno!=null){
+      if (turno != null){
         this.turnosModuloDeCarga = turno;
         this.inicializarCarga();
       }
@@ -61,11 +60,10 @@ export class NewBalanzasRitmosComponent {
   }
 
   ngOnInit() {
-    console.log('this.turnosModuloDeCarga----->>>', this.turnosModuloDeCarga);
     this.inicializarCarga();
-
   }
-  private inicializarCarga(){
+
+  inicializarCarga = () => {
     this.inicializarValores();
     if (this.turnosModuloDeCarga.cargaFinalizada){
       if (this.turnosModuloDeCarga.todosTurnosCerrados){
@@ -77,7 +75,8 @@ export class NewBalanzasRitmosComponent {
       this.toggleFechasYTurnos();
     }
   }
-  private inicializarValores(){
+
+  inicializarValores = () => {
     this.valorRitmoBruto = '0';
     this.valorCargando = '0';
     this.tnTotales = '0';
@@ -173,5 +172,4 @@ export class NewBalanzasRitmosComponent {
     }
     return "";
   }
-
 }

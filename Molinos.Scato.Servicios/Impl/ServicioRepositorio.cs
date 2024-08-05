@@ -11933,7 +11933,8 @@ namespace Molinos.Scato.Servicios.Impl
             string limpiezaHasta = "-";
             string comienzoCarga = "-";
             string desamarre = "-";
-            string motivoLimpieza = "-";
+            string finalizacionCarga = "";
+			string motivoLimpieza = "-";
             string obsLimpieza = "-";
             string hsEnPuerto = "-";
             #endregion
@@ -11996,10 +11997,24 @@ namespace Molinos.Scato.Servicios.Impl
                     var turno = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == lineUp.ModuloDeCarga.Id).OrderBy(x => x.Id).First();
                     comienzoCarga = turno.Fecha.ToString();
                 }
-                #endregion
+				#endregion
 
-                #region Desamarre
-                /*
+				// <ARMOA005-1988 Dylan Lopez>
+				#region finalizacionCarga
+				//solido
+				if (lineUp.Embarque.EsLiquido != true)
+				{
+					if (periodoDeCarga.FechaFinalizacionCarga != null && periodoDeCarga.HoraFinalizacionCarga != null)
+					{
+
+						finalizacionCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaFinalizacionCarga, periodoDeCarga.HoraFinalizacionCarga);
+					}
+				}
+				#endregion
+				// </ ARMOA005-1988 Dylan Lopez>
+
+				#region Desamarre
+				/*
                 if (periodoDeCarga.FechaDesamarro != null && periodoDeCarga.HoraDesamarro == null)
                 {
                     var arrFechaDesamarro = periodoDeCarga.FechaDesamarro.ToString().Split(' ');
@@ -12010,13 +12025,13 @@ namespace Molinos.Scato.Servicios.Impl
                     var arrFechaDesamarro = periodoDeCarga.FechaDesamarro.ToString().Split(' ');
                     desamarre = arrFechaDesamarro[0] +"-"+ periodoDeCarga.HoraDesamarro;
                 }*/
-                desamarre = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaDesamarro, periodoDeCarga.HoraDesamarro);
+				desamarre = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaDesamarro, periodoDeCarga.HoraDesamarro);
                 #endregion
 
                 #region TotalEnPuerto
-                if (amarro != "-" && desamarre != "-")
+                if (amarro != "-" && !string.IsNullOrEmpty(amarro) && 
+                    desamarre != "-" && !string.IsNullOrEmpty(desamarre))
                 {
-
                     DateTime dateAmarro = DateTime.Parse(amarro);
                     DateTime dateDesamarre = DateTime.Parse(desamarre);
                     hsEnPuerto = (dateDesamarre - dateAmarro).TotalHours.ToString();
@@ -12033,7 +12048,8 @@ namespace Molinos.Scato.Servicios.Impl
                 registrosFechas.Add("MotivoLimpieza", motivoLimpieza);
                 registrosFechas.Add("ObsLimpieza", obsLimpieza);
                 registrosFechas.Add("CominezoCarga", comienzoCarga);
-                registrosFechas.Add("Desamarre", desamarre);
+				registrosFechas.Add("FinalizacionCarga", finalizacionCarga);
+				registrosFechas.Add("Desamarre", desamarre);
                 registrosFechas.Add("hsEnPuerto", hsEnPuerto);
                 #endregion
 
