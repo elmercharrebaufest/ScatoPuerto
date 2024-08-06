@@ -47,7 +47,7 @@ export class TurnoDetalleLiquido {
 export class TurnoDetalleSolido {
     id?: number;
     exportador: Exportador;
-    bodega: { parcel: number, nombre: string };
+    bodega: { parcel: number, nombre: string, id?: number };
     materialPuerto: MaterialPuerto;
     destino: Destino;
     cantidad: number;
