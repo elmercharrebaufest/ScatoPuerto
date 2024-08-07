@@ -2856,5 +2856,12 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         decimal ObtenerRitmoCargaBruta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
+
+        [OperationContract]
+        MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId);
+
+        [OperationContract]
+        EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
+
     }
 }

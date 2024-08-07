@@ -13109,6 +13109,26 @@ namespace Molinos.Scato.Servicios.Impl
 
             return totalCargaToneladas;
         }
-        
+
+        public MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId)
+        {
+            var destinatarios = new List<string>();
+            destinatarios = repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "PlanillaDeTurnos").Direcciones.Split(';').ToList();
+
+            var mail = new MailDto
+            {
+                Destinatarios = destinatarios,
+            };
+            return mail;
+        }
+
+        public EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId)
+        {
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloDeCargaId);
+            var emb = Obtener<Embarque, EmbarqueDto>(e => e.Id == lineup.Embarque.Id);
+            return emb;
+        }
+
+
     }
 }
