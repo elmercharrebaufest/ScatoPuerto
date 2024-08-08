@@ -263,6 +263,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="iconMolinosChiquito.png" />
+    <Content Include="IconoMolinosExcel.png" />
     <Content Include="parameters.xml" />
     <Content Include="Plantilla\Email\template_planilla_solidos.html" />
     <Content Include="Plantilla\Email\template_surveyor_fumigador.html">
