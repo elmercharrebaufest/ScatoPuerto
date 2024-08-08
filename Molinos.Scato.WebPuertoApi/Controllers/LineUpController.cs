@@ -128,6 +128,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 // var embarques = workflows.ListarEmbarques();
                 var embarques = servicio.ListarEmbarques();
+                embarques = embarques.Where(x => x.LineUp.Ocultar == false).ToList();
                 var estado = servicio.ObtenerEstadoPuerto();
                 var resultado = new ResultadoPrevisualizar();
                 var generadorExcel = new ExcelLineUp();
