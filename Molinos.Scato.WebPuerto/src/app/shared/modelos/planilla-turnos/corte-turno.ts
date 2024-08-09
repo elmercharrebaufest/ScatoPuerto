@@ -7,4 +7,5 @@ export class CorteTurno{
     horaFin: string;
     tiempoTotal: string;
     observaciones: string;
+    idBalanzaCorte?: number;
 }

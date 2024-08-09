@@ -17,6 +17,8 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using System.Net.Http.Headers;
 using System.Web;
+using Molinos.Scato.WebPuertoApi.Helper;
+using NPOI.SS.Formula.Functions;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -1177,6 +1179,68 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaSolidos")]
+        public HttpResponseMessage ObtenerDatosMailPlanillaSolidos(int moduloDeCargaId)
+        {
+            try
+            {
+                var moduloCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var cargasPlano = servicio.ObtenerPlanoDeCargaBodega(moduloDeCargaId);
+                var notificacion = new NotificacionPlanillaSolidos(moduloCarga, embarque, cargasPlano);
+                var mail = servicio.ArmadoMailPlanillaSolidos(moduloDeCargaId);
+                mail.Body = notificacion.GenerarCuerpoEmail();
+                return Request.CreateResponse(HttpStatusCode.OK, mail);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EnviarPlanillaTurnoSolido")]
+        public HttpResponseMessage EnviarPlanillaTurnoSolido(int IdModuloDeCarga, ObjetoEnvioPlanillaTurno objetoEnvioPlanillaTurno)
+        {
+            try
+            {
+                var resultado = new ResultadoPrevisualizar();
+                var docFile = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+                if (objetoEnvioPlanillaTurno.mail.Destinatarios != null && objetoEnvioPlanillaTurno.mail.Destinatarios.Any())
+                {
+                    objetoEnvioPlanillaTurno.mail.Destinatarios.RemoveAll(item => item == null || item == "");
+                }
+                if (objetoEnvioPlanillaTurno.mail.Copia != null && objetoEnvioPlanillaTurno.mail.Copia.Any())
+                {
+                    objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
+                }
+                byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+                var res = comandos.Ejecutar(new EnvioMail
+                {
+                    Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
+                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                           .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),// "Planilla del dia " + planillaDeTurnosDto.Fecha,
+                    Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
+                    Copia = objetoEnvioPlanillaTurno.mail.Copia,
+                    Attachment = archivoPlanilla,
+                    AttachmentName = docFile
+                });
+
+                if (res.HayErrores)
+                {
+                    throw new Exception("Error al enviar mail: " + res.Errores[""]);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
     }

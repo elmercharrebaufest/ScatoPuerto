@@ -39,23 +39,21 @@
                     <tbody>
                         <ng-container formArrayName='diasTurno'>
                             <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
-                                <div class="html2pdf__page-break" *ngIf="d >0">
+                                <div class="html2pdf__page-break" *ngIf="d > 0">
                                 </div>
-                                <tr>
-                                    <td [attr.rowspan]='getRowSpan(dia)'>
-                                        <div class='column-center'>
-                                            <span><b>{{getDia(d)}}</b></span>
-                                            <span class='kilos'>{{ (getCantDia(dia)) | number: '1.0-0'  }} <span class='turno'>Kg</span></span>
-                                            <span class='turno'>por día</span>
-                                        </div>
-                                    </td>
-                                </tr>
                                 <ng-container formArrayName='turnos'>
                                     <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index' [formGroupName]='t'>
                                         <tr>
+                                            <td [attr.rowspan]='getRowSpan(dia)' *ngIf="t == 0">
+                                                <div class='column-center'>
+                                                    <span><b>{{getDia(d)}}</b></span>
+                                                    <span class='kilos'>{{ (getCantDia(dia)) | number: '1.0-0'  }} <span class='turno'>Kg</span></span>
+                                                    <span class='turno'>por día</span>
+                                                </div>
+                                            </td>
                                             <td [attr.rowspan]='getRowSpanTurno(turno)'>
                                                 <div class="column-center">
-                                                    <span><b>{{turno.value.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto ? turno.value.turnoPuerto.turnoPuerto.nombre : ' ' : ''}}</b></span>
+                                                    <span><b>{{turno.value.turnoPuerto?.turnoPuerto?.nombre || ''}}</b></span>
                                                     <span class='kilos'>{{ (getCantTurno(turno)) | number: '1.0-0' }} <span class='turno'>Kg</span></span>
                                                     <span class='turno'>por turno</span>
                                                     <button class='btn btn btn-success'
@@ -64,15 +62,15 @@
                                                             (click)='onCerrarTurno(turno)'>
                                                             Cerrar turno
                                                     </button>
-                                                    <img  *ngIf="turno.value.guardadoPorRecibidor"
-                                                            src="./assets/turno_cerrado.svg" />
+                                                    <img *ngIf="turno.value.guardadoPorRecibidor" src="./assets/turno_cerrado.svg" />
                                                 </div>
                                             </td>
                                         </tr>
+
                                         <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesSolido'>
                                             <ng-container *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
                                                 [formGroupName]='i'>
-                                                <tr [ngClass]="getTurnoDetallesBajasClass(d, t)">
+                                                <tr>
                                                     <!-- EXPORTADOR -->
                                                     <td [ngClass]="getBajaCargaColor(result)">
                                                         {{result.controls.exportador?.value.nombre}}

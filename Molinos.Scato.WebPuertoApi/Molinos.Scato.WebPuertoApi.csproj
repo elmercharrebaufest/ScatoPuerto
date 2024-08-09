@@ -246,6 +246,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper\EmbarqueComparer.cs" />
+    <Compile Include="Helper\NotificacionPlanillaSolidos.cs" />
     <Compile Include="Helper\NotificacionProgramaEmbarque.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Seguridad\ClaimsTransformationHttpModule.cs" />
@@ -262,7 +263,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="iconMolinosChiquito.png" />
+    <Content Include="IconoMolinosExcel.png" />
     <Content Include="parameters.xml" />
+    <Content Include="Plantilla\Email\template_planilla_solidos.html" />
     <Content Include="Plantilla\Email\template_surveyor_fumigador.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
