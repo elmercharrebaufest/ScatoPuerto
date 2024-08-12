@@ -1195,14 +1195,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaSolidos")]
-        public HttpResponseMessage ObtenerDatosMailPlanillaSolidos(int moduloDeCargaId)
+        public HttpResponseMessage ObtenerDatosMailPlanillaSolidos(int moduloDeCargaId, string idsOcultos)
         {
             try
             {
+                List<int> cortesOcultos = new List<int>{};
+                if (idsOcultos != null)
+                {
+                    cortesOcultos = idsOcultos.Split(',').Select(int.Parse).ToList();
+                }
                 var moduloCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
                 var cargasPlano = servicio.ObtenerPlanoDeCargaBodega(moduloDeCargaId);
-                var notificacion = new NotificacionPlanillaSolidos(moduloCarga, embarque, cargasPlano);
+                var notificacion = new NotificacionPlanillaSolidos(moduloCarga, embarque, cargasPlano, cortesOcultos);
                 var mail = servicio.ArmadoMailPlanillaSolidos(moduloDeCargaId);
                 mail.Body = notificacion.GenerarCuerpoEmail();
                 return Request.CreateResponse(HttpStatusCode.OK, mail);

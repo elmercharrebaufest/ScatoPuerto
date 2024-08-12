@@ -65,6 +65,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
   exportaPlanilla: boolean = false;
   totalABordo: number = 0;
+  cortesOcultos: number [] = [];
 
   public verObservacionesCalidad: boolean = false;
 
@@ -989,7 +990,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, esEnviarPlanilla, this.totalABordo, this.verObservacionesCalidad);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, esEnviarPlanilla, this.totalABordo, this.verObservacionesCalidad, this.cortesOcultos);
     this.exportaPlanilla = false;
   }
 
@@ -1009,4 +1010,14 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
   }
+
+  onCheckboxOcultarCorte(event: Event, id: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.cortesOcultos.push(id);
+    } else {
+      this.cortesOcultos = this.cortesOcultos.filter(x => x !== id);
+    }
+  }
+
 }

@@ -300,11 +300,11 @@ export class PlanillaTurnoSolidoExcelService {
 
     }
 
-  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: string) {
+  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: string, cortesOcultos: number[]) {
     const titulo = "Enviar Planilla de Turno Sólido";
     const asunto = "Turno " + ultimoTurno + " - " + nombreBuque + " - MUELLE SAN BENITO"
     let mail = new Mail();
-    this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga).subscribe((resp: Mail) => {
+    this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga, cortesOcultos).subscribe((resp: Mail) => {
       mail.body = resp.body;
       mail.destinatarios = resp.destinatarios;
       mail.copia = resp.copia;
@@ -340,12 +340,10 @@ export class PlanillaTurnoSolidoExcelService {
   }
 
 
-    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean = false, totalABordo: number = 0, verObservacionesCalidad: boolean = true) {
+    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean = false, totalABordo: number = 0, verObservacionesCalidad: boolean = true, cortesOcultos: number[]) {
       const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
-
-        planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-          turno.moduloDeCargaPlanillaDeTurnosCortes = [];
-        });
+      
+      this.eliminarCortesOcultos(planillaDeTurnos, cortesOcultos);
 
         const fname = this.getNombreArchivo();
         const imgMolinos = await this.getImgMolinos();
@@ -515,7 +513,7 @@ export class PlanillaTurnoSolidoExcelService {
           const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           if (esEnviarPlanilla){
             const ultimoTurno = planillaDeTurnos[0].turnoPuerto.nombre.toString().replace("-", " a ");;
-             this.enviarPlanillaSolido(blob, procesoService.getEmbarqueSelected().nombreBuque, procesoService.getModuloDeCargaId(), ultimoTurno)
+             this.enviarPlanillaSolido(blob, procesoService.getEmbarqueSelected().nombreBuque, procesoService.getModuloDeCargaId(), ultimoTurno, cortesOcultos)
           }else{
              saveAs(blob, archivo);
           }
@@ -527,6 +525,12 @@ export class PlanillaTurnoSolidoExcelService {
       const anioTurno = fechaDia.getFullYear();
       const fechaTurno = `${diaTurno}-${mesTurno}-${anioTurno}`;
       return fechaTurno;
+    }
+
+    private eliminarCortesOcultos(planillaDeTurnos: PlanillaDeTurnos[], ids: number[]){
+      planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
+       turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(t => !ids.includes(t.id));
+      });
     }
 
 }
