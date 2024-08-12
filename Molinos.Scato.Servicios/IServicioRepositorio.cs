@@ -2793,6 +2793,12 @@ namespace Molinos.Scato.Servicios
 
 		// <ARMOA005-1965 Dylan Lopez>
 		void GuardarLogAfipCpe(string service, string request, string response);
-		// </ ARMOA005-1965 Dylan Lopez>
-	}
+        // </ ARMOA005-1965 Dylan Lopez>
+
+        [OperationContract]
+        void RestaurarEmbarquesOcultosLineUp();
+
+        [OperationContract]
+        void OcultarEmbarqueLineUp(int lineUpId);
+    }
 }

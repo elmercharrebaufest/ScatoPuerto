@@ -23,5 +23,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool AgenciaContactada { get; set; }
         public virtual bool PlanoDeCargaEnviado { get; set; }
         public virtual decimal Orden { get; set; }
+        public virtual bool? Ocultar { get; set; }
     }
 }
