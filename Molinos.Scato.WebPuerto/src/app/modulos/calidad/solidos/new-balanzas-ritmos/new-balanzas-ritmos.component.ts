@@ -35,10 +35,14 @@ export class NewBalanzasRitmosComponent {
   dateMin: string;
   dateMax: string;
 
+  arranco7: string;
+  ultimaBalanzada7: string;
   toneladasCargadas7: string;
   ritmoEmbarque7: string;
   ultimaActualizacion7: string;
 
+  arranco8: string;
+  ultimaBalanzada8: string;
   toneladasCargadas8: string;
   ritmoEmbarque8: string;
   ultimaActualizacion8: string;
@@ -82,10 +86,14 @@ export class NewBalanzasRitmosComponent {
     this.tnTotales = '0';
     this.valorRitmoNeto = '0';
 
+    this.arranco7 = '';
+    this.ultimaBalanzada7 = '';
     this.toneladasCargadas7 = '0';
     this.ritmoEmbarque7 = '0';
     this.ultimaActualizacion7 = '';
   
+    this.arranco8 = '';
+    this.ultimaBalanzada8 = '';
     this.toneladasCargadas8 = '0';
     this.ritmoEmbarque8 = '0';
     this.ultimaActualizacion8 = '';
@@ -147,18 +155,66 @@ export class NewBalanzasRitmosComponent {
         selectedDate = this.selectedDate;
         selectedTurn = this.selectedTurn;
         esCalculoGeneral = false;
+        
+        const moduloDeCarga = this.procesoService.getModuloDeCarga();
+        const planillasDeTurnos = moduloDeCarga?.moduloDeCargaPlanillaDeTurnos;
+
+        // const fechaMayor = planillasDeTurnos
+        //   .filter(turno => turno.fechaCierreTurno)
+        //   .sort((a, b) => new Date(b.fechaCierreTurno).getTime() - new Date(a.fechaCierreTurno).getTime())[0];
+
+        let fechaMayor;
+        planillasDeTurnos.forEach(turno => {
+            if (turno.fechaCierreTurno) {
+              const currentFecha = new Date(turno.fechaCierreTurno).getTime();
+              if (!fechaMayor || currentFecha > new Date(fechaMayor.fechaCierreTurno).getTime()) {
+                fechaMayor = turno;
+              }
+            }
+          });
+
+        this.ultimaBalanzada7 = fechaMayor?.fechaCierreTurno;
+        this.ultimaBalanzada8 = fechaMayor?.fechaCierreTurno;
       }
+    } else {
+      const moduloDeCarga = this.procesoService.getModuloDeCarga();
+      const periodosDeCarga = moduloDeCarga?.moduloDeCargaPeriodoDeCarga;
+
+      // const fechaHoraMayor = periodosDeCarga.reduce((max, current) => {
+      //   const currentFechaHora = new Date(`${current.fechaFinalizacionCarga}T${current.horaFinalizacionCarga}`);
+      //   const maxFechaHora = max ? new Date(`${max.fechaFinalizacionCarga}T${max.horaFinalizacionCarga}`) : -Infinity;
+        
+      //   return currentFechaHora > maxFechaHora ? current : max;
+      // }, null);
+
+      let fechaHoraMayor;
+      periodosDeCarga.forEach(current => {
+        const currentFechaHora = new Date(`${current.fechaFinalizacionCarga}T${current.horaFinalizacionCarga}`).getTime();
+        if (!fechaHoraMayor || currentFechaHora > new Date(`${fechaHoraMayor.fechaFinalizacionCarga}T${fechaHoraMayor.horaFinalizacionCarga}`).getTime()) {
+          fechaHoraMayor = current;
+        }
+      });
+      
+      const fechaHoraMaxima = fechaHoraMayor ? new Date(`${fechaHoraMayor.fechaFinalizacionCarga}T${fechaHoraMayor.horaFinalizacionCarga}`) : null;
+
+      this.ultimaBalanzada7 = fechaHoraMaxima.toString();
+      this.ultimaBalanzada8 = fechaHoraMaxima.toString();
     }
+
     this.balanzasRitmosService.consultaRitmosCargaSolidos(this.procesoService.getModuloDeCargaId(), selectedDate, selectedTurn, esCalculoGeneral).subscribe(data => {
       this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
       this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
       this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
       this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
 
+      // this.arranco7 = '';
+      // this.ultimaBalanzada7 = ultimaBalanzada7;
       this.toneladasCargadas7  = data.ritmoBalanza7 != -1 ? data.cargaBalanza7.toString(): 'N.A';
       this.ritmoEmbarque7      = data.ritmoBalanza7 != -1 ? data.ritmoBalanza7.toString(): 'N.A';
       this.ultimaActualizacion7= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza7: 'N.A';
 
+      // this.arranco8 = '';
+      // this.ultimaBalanzada8 = '';
       this.toneladasCargadas8  = data.cargaBalanza8 != -1 ? data.cargaBalanza8.toString(): 'N.A';
       this.ritmoEmbarque8      = data.ritmoBalanza8 != -1 ? data.ritmoBalanza8.toString(): 'N.A';
       this.ultimaActualizacion8= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';

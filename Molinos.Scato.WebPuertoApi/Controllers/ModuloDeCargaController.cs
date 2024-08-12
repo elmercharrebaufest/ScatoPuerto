@@ -1146,21 +1146,32 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             RitmoDeCargasBalanzasDto ritmoDeCargasBalanzasDto = new RitmoDeCargasBalanzasDto();
 
-            var cargaBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7);
+            var arrancoBalanza7 = DateTime.Now;
+            var ultimaBalanzada7 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 7);
+			var cargaBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7);
             var ritmoBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga,7);
-            var cargaBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8);
+            var ultimaActualizacionBalanza7 = DateTime.Now;
+
+			var arrancoBalanza8 = DateTime.Now;
+			var ultimaBalanzada8 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 8);
+			var cargaBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8);
             var ritmoBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 8);
-            var ritmoCargaBruto = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaBruta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral);
+			var ultimaActualizacionBalanza8 = DateTime.Now;
+
+			var ritmoCargaBruto = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaBruta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral);
             var llevasCargando  = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga , fechaTurnoSel, turno, esCalculoGeneral, 0);
             var ritmoCargaNeto  = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaNeta(idModuloDeCarga  , fechaTurnoSel, turno, esCalculoGeneral);
 
-
-            ritmoDeCargasBalanzasDto.CargaBalanza7               = cargaBalanza7 ;
+			ritmoDeCargasBalanzasDto.ArrancoBalanza7 = arrancoBalanza7;
+			ritmoDeCargasBalanzasDto.ArrancoBalanza8 = arrancoBalanza8;
+			ritmoDeCargasBalanzasDto.UltimaBalanzada7 = ultimaBalanzada7;
+			ritmoDeCargasBalanzasDto.UltimaBalanzada8 = ultimaBalanzada8;
+			ritmoDeCargasBalanzasDto.CargaBalanza7               = cargaBalanza7 ;
             ritmoDeCargasBalanzasDto.RitmoBalanza7               = ritmoBalanza7 ;
             ritmoDeCargasBalanzasDto.CargaBalanza8               = cargaBalanza8 ;
             ritmoDeCargasBalanzasDto.RitmoBalanza8               = ritmoBalanza8 ;
-            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza7 = DateTime.Now;
-            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza8 = DateTime.Now;
+            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza7 = ultimaActualizacionBalanza7;
+            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza8 = ultimaActualizacionBalanza8;
             ritmoDeCargasBalanzasDto.RitmoCargaBruto             = ritmoCargaBruto ;
             ritmoDeCargasBalanzasDto.LLevasCargando              = llevasCargando  ;
             ritmoDeCargasBalanzasDto.RitmoCargaNeto              = ritmoCargaNeto  ;

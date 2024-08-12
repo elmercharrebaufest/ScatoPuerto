@@ -19,6 +19,7 @@ export class PlanillaDeTurnos {
     moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad: TurnoDetalleSolidoGravedad[];
     indexDia: number;
     esLiquido: boolean;
+    fechaCierreTurno?: any;
 }
 
 export class TurnoPuerto {

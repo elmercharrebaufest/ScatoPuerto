@@ -8,6 +8,8 @@ import { Component, Input, OnInit } from '@angular/core';
 export class RitmoEmbarqueCargaManualComponent implements OnInit {
 
   @Input() numeroBalanza: string;
+  @Input() arranco: string;
+  @Input() ultimaBalanzada: string;
   @Input() toneladasCargadas: number;
   @Input() ritmoEmbarque: string;
   @Input() ultimaActualizacion: string;
