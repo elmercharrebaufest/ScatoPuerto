@@ -2830,7 +2830,7 @@ namespace Molinos.Scato.Servicios
         ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
 
         [OperationContract]
-        DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza);
+        DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza, int? turno_Id);
 		// </ ARMOA005-1965 Dylan Lopez>
 
 		[OperationContract]

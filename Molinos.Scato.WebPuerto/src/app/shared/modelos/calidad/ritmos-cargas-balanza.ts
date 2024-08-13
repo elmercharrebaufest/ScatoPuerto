@@ -8,4 +8,6 @@ export interface RitmosCargasBalanzas {
     cargaBalanza8: number;
     ritmoBalanza8: number;
     ultimaActualizacionBalanza8: string;
+    ultimaBalanzada7: string;
+    ultimaBalanzada8: string;
 }

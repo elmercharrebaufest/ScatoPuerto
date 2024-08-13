@@ -149,58 +149,13 @@ export class NewBalanzasRitmosComponent {
     let selectedDate = '';
     let selectedTurn = null;
     let esCalculoGeneral: boolean = true;
-
     if (!esCargaFinalizada){
       if (this.selectedDate != '' && this.selectedTurn != 0) {
         selectedDate = this.selectedDate;
         selectedTurn = this.selectedTurn;
         esCalculoGeneral = false;
-        
-        const moduloDeCarga = this.procesoService.getModuloDeCarga();
-        const planillasDeTurnos = moduloDeCarga?.moduloDeCargaPlanillaDeTurnos;
-
-        // const fechaMayor = planillasDeTurnos
-        //   .filter(turno => turno.fechaCierreTurno)
-        //   .sort((a, b) => new Date(b.fechaCierreTurno).getTime() - new Date(a.fechaCierreTurno).getTime())[0];
-
-        let fechaMayor;
-        planillasDeTurnos.forEach(turno => {
-            if (turno.fechaCierreTurno) {
-              const currentFecha = new Date(turno.fechaCierreTurno).getTime();
-              if (!fechaMayor || currentFecha > new Date(fechaMayor.fechaCierreTurno).getTime()) {
-                fechaMayor = turno;
-              }
-            }
-          });
-
-        this.ultimaBalanzada7 = fechaMayor?.fechaCierreTurno;
-        this.ultimaBalanzada8 = fechaMayor?.fechaCierreTurno;
       }
-    } else {
-      const moduloDeCarga = this.procesoService.getModuloDeCarga();
-      const periodosDeCarga = moduloDeCarga?.moduloDeCargaPeriodoDeCarga;
-
-      // const fechaHoraMayor = periodosDeCarga.reduce((max, current) => {
-      //   const currentFechaHora = new Date(`${current.fechaFinalizacionCarga}T${current.horaFinalizacionCarga}`);
-      //   const maxFechaHora = max ? new Date(`${max.fechaFinalizacionCarga}T${max.horaFinalizacionCarga}`) : -Infinity;
-        
-      //   return currentFechaHora > maxFechaHora ? current : max;
-      // }, null);
-
-      let fechaHoraMayor;
-      periodosDeCarga.forEach(current => {
-        const currentFechaHora = new Date(`${current.fechaFinalizacionCarga}T${current.horaFinalizacionCarga}`).getTime();
-        if (!fechaHoraMayor || currentFechaHora > new Date(`${fechaHoraMayor.fechaFinalizacionCarga}T${fechaHoraMayor.horaFinalizacionCarga}`).getTime()) {
-          fechaHoraMayor = current;
-        }
-      });
-      
-      const fechaHoraMaxima = fechaHoraMayor ? new Date(`${fechaHoraMayor.fechaFinalizacionCarga}T${fechaHoraMayor.horaFinalizacionCarga}`) : null;
-
-      this.ultimaBalanzada7 = fechaHoraMaxima.toString();
-      this.ultimaBalanzada8 = fechaHoraMaxima.toString();
     }
-
     this.balanzasRitmosService.consultaRitmosCargaSolidos(this.procesoService.getModuloDeCargaId(), selectedDate, selectedTurn, esCalculoGeneral).subscribe(data => {
       this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
       this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
@@ -213,7 +168,9 @@ export class NewBalanzasRitmosComponent {
 
       this.toneladasCargadas8  = data.cargaBalanza8 != -1 ? data.cargaBalanza8.toString(): 'N.A';
       this.ritmoEmbarque8      = data.ritmoBalanza8 != -1 ? data.ritmoBalanza8.toString(): 'N.A';
-      this.ultimaActualizacion8= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
+      this.ultimaActualizacion8 = data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
+      this.ultimaBalanzada7 = data.ritmoBalanza7 != -1 ? data.ultimaBalanzada7 : 'N.A';
+      this.ultimaBalanzada8 = data.ritmoBalanza8 != -1 ? data.ultimaBalanzada8 : 'N.A';
     });
   }
 

@@ -1147,13 +1147,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             RitmoDeCargasBalanzasDto ritmoDeCargasBalanzasDto = new RitmoDeCargasBalanzasDto();
 
             var arrancoBalanza7 = DateTime.Now;
-            var ultimaBalanzada7 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 7);
+            var ultimaBalanzada7 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 7, turno);
 			var cargaBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7);
             var ritmoBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga,7);
             var ultimaActualizacionBalanza7 = DateTime.Now;
 
 			var arrancoBalanza8 = DateTime.Now;
-			var ultimaBalanzada8 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 8);
+			var ultimaBalanzada8 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 8, turno);
 			var cargaBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8);
             var ritmoBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 8);
 			var ultimaActualizacionBalanza8 = DateTime.Now;

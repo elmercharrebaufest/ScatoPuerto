@@ -12394,23 +12394,31 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                         if (item != null && !item.EsLiquido)
                         {
-                            Dictionary<string, int> resultado = ObtenerRitmos(item.ModuloDeCargaId);
-                            if (resultado != null)
+                            var moduloCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == item.ModuloDeCargaId);
+                            if (moduloCarga.IngresoManualSolido)
                             {
-                                if (resultado.Count > 0)
-                                {
-                                    int ritmoCargaNeto = 0;
-                                    resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
-                                    item.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
-                                }
+                                item.TotalRitmoNormal = ObtenerRitmoCargaNeta(item.ModuloDeCargaId, null, null, true); ;
                             }
+                            else
+                            {
+                                Dictionary<string, int> resultado = ObtenerRitmos(item.ModuloDeCargaId);
+                                if (resultado != null)
+                                {
+                                    if (resultado.Count > 0)
+                                    {
+                                        int ritmoCargaNeto = 0;
+                                        resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
+                                        item.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
+                                    }
+                                }
 
-                            #region Ritmos Baja Carga
-                            string[] listaBC = new string[] { "BCB", "BCP", "F" };
-                            var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
-                            int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
-                            item.TotalRitmoBaja = 0;
-                            item.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                                #region Ritmos Baja Carga
+                                string[] listaBC = new string[] { "BCB", "BCP", "F" };
+                                var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
+                                int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
+                                item.TotalRitmoBaja = 0;
+                                item.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                            }
                         }
                     }
                 }
@@ -12842,28 +12850,23 @@ namespace Molinos.Scato.Servicios.Impl
             var moduloDeCargaPeriodoDeCargaDto = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == moduloDeCargaId);
             return moduloDeCargaPeriodoDeCargaDto;
         }
-		public DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza)
+		public DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza, int? turno_Id)
 		{
-			DateTime result;
             var moduloDeCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == moduloDeCargaId);
 			if (!esCalculoGeneral)
             {
                 var planillaDeTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                    .Where(w => w.Cerrado == true)
+                    .Where(w => w.Cerrado == true && w.TurnoPuerto.Id == turno_Id)
                     .OrderByDescending(o => o.Fecha);
 				if (planillaDeTurnos != null)
 				{
 					foreach (var planillaDeTurno in planillaDeTurnos)
                     {
-                        foreach (var planillaDeTurnoDetalleSolido in planillaDeTurno.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                        {
-                            if (Convert.ToInt32(planillaDeTurnoDetalleSolido.BalanzaPuerto.CodigoBalanza) == numeroBalanza)
-                            {
-								return planillaDeTurno.FechaCierreTurno ?? DateTime.Now;
-							}
-						}
+                        var planillaDeTurnoDetalleSolido = planillaDeTurno.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(x => Convert.ToInt32(x.BalanzaPuerto.CodigoBalanza) == numeroBalanza).ToList();
+                        if (planillaDeTurnoDetalleSolido!=null && planillaDeTurnoDetalleSolido.Count > 0)
+                            return planillaDeTurno.FechaCierreTurno ?? DateTime.Now;
                     }
-				}
+                }
                 return DateTime.Now;
 			}
             else
