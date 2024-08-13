@@ -12,12 +12,14 @@ namespace Molinos.Scato.WebPuertoApi.Helper
         private ModuloDeCargaDto _modulo;
         private EmbarqueDto _embarque;
         private IList<PlanoDeCargaBodegaDto> _cargasPlano;
+        private List<int> _idsOcultos;
 
-        public NotificacionPlanillaSolidos(ModuloDeCargaDto modulo, EmbarqueDto embarque, IList<PlanoDeCargaBodegaDto> cargasPlano)
+        public NotificacionPlanillaSolidos(ModuloDeCargaDto modulo, EmbarqueDto embarque, IList<PlanoDeCargaBodegaDto> cargasPlano, List<int> idsOcultos)
         {
             _modulo = modulo;
             _embarque = embarque;
             _cargasPlano = cargasPlano;
+            _idsOcultos = idsOcultos;
         }
 
         public string GenerarCuerpoEmail()
@@ -37,9 +39,14 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
             var sbRecords = new StringBuilder();
             var planilla = _modulo.ModuloDeCargaPlanillaDeTurnos.OrderBy(x => x.Fecha).ThenBy(x => x.TurnoPuerto.Orden);
+
             foreach (ModuloDeCargaPlanillaDeTurnosDto turno in planilla)
             {
-                foreach (ModuloDeCargaPlanillaDeTurnosCortesDto corte in turno.ModuloDeCargaPlanillaDeTurnosCortes)
+                var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes;
+                if (_idsOcultos != null && _idsOcultos.Any())
+                    cortes = cortes.Where(x => !_idsOcultos.Contains(x.Id)).ToList();
+
+                foreach (ModuloDeCargaPlanillaDeTurnosCortesDto corte in cortes)
                 {
                     sbRecords.AppendFormat("<tr>");
                     sbRecords.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", turno.Fecha.Value.ToString("dd-MM-yyyy"));

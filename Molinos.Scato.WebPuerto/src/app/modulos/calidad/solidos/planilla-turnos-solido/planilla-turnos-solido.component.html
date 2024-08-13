@@ -111,6 +111,7 @@
                                                                     <th colspan="1">Fin</th>
                                                                     <th colspan="1">Tiempo total</th>
                                                                     <th colspan="5">Observaciones</th>
+                                                                    <th class="th-ocultar" colspan="2">Ocultar al exportar</th>
                                                                 </tr>
                                                             </thead>
                                                                 <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
@@ -130,6 +131,10 @@
                                                                             </td>
                                                                             <td colspan="5"  [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.observaciones.value}}
+                                                                            </td>
+                                                                            <td colspan="2"  [ngClass]="getCorteColor(corte)">
+                                                                                <input type="checkbox" class="small-checkbox"
+                                                                                (change)="onCheckboxOcultarCorte($event, corte.value.id)"/>                                                                                
                                                                             </td>
                                                                         </tr>
                                                                     </ng-container>

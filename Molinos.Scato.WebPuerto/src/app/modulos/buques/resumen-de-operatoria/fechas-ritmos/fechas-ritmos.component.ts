@@ -90,7 +90,6 @@ export class FechasRitmosComponent implements OnInit {
     });
 
     this.balanzasRitmosService.TurnosCalidad.subscribe(turno =>{
-      // console.log(' balanzasRitmosService turno: ', turno);
       if (turno != null){
         this.turnosModuloDeCarga = turno;
         this.inicializarCarga();

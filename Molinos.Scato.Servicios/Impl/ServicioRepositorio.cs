@@ -16,6 +16,7 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Data.Common.CommandTrees.ExpressionBuilder;
@@ -11340,9 +11341,9 @@ namespace Molinos.Scato.Servicios.Impl
             moduloDeCargaPlanillaDeTurnos.Enviado = true;
             moduloDeCargaPlanillaDeTurnos.GuardadoPorRecibidor = true;
             moduloDeCargaPlanillaDeTurnos.GuardadoPorTablerista = true;
+            moduloDeCargaPlanillaDeTurnos.FechaCierreTurno = DateTime.Now;
 
-
-            repositorio.GuardarCambios();
+			repositorio.GuardarCambios();
         }
 
         public void GenerarLogging(string service, string data, string tipo, string nombreUsuario = null)
@@ -11759,18 +11760,27 @@ namespace Molinos.Scato.Servicios.Impl
                                 }
                                 if (lineUp != null && !lineUp.Embarque.EsLiquido)
                                 {
-                                    Dictionary<string, int> resultado = ObtenerRitmos(lineUp.ModuloDeCarga.Id);
-                                    if (resultado != null)
+                                    decimal ritmoCargaNeto = 0;
+									if (lineUp.ModuloDeCarga.IngresoManualSolido)
                                     {
-                                        if (resultado.Count > 0)
-                                        {
-                                            int ritmoCargaNeto = 0;
-                                            resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
-                                            historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
-                                        }
-                                    }
-                                    #region Ritmos Baja Carga
-                                    string[] listaBC = new string[] { "BCB", "BCP", "F" };
+										ritmoCargaNeto = ObtenerRitmoCargaNeta(lineUp.ModuloDeCarga.Id, null, null, true);
+									}
+                                    else
+                                    {
+										Dictionary<string, int> resultado = ObtenerRitmos(lineUp.ModuloDeCarga.Id);
+										if (resultado != null)
+										{
+											if (resultado.Count > 0)
+											{
+                                                int ritmoCargaNetoInt = Convert.ToInt32(ritmoCargaNeto);
+												resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNetoInt);
+											}
+										}
+									}
+									historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
+
+									#region Ritmos Baja Carga
+									string[] listaBC = new string[] { "BCB", "BCP", "F" };
                                     var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
                                     int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == lineUp.ModuloDeCarga.Id);
                                     historialDeBusquesDto.TotalRitmoBaja = 0;
@@ -12383,23 +12393,31 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                         if (item != null && !item.EsLiquido)
                         {
-                            Dictionary<string, int> resultado = ObtenerRitmos(item.ModuloDeCargaId);
-                            if (resultado != null)
+                            var moduloCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == item.ModuloDeCargaId);
+                            if (moduloCarga.IngresoManualSolido)
                             {
-                                if (resultado.Count > 0)
-                                {
-                                    int ritmoCargaNeto = 0;
-                                    resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
-                                    item.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
-                                }
+                                item.TotalRitmoNormal = ObtenerRitmoCargaNeta(item.ModuloDeCargaId, null, null, true); ;
                             }
+                            else
+                            {
+                                Dictionary<string, int> resultado = ObtenerRitmos(item.ModuloDeCargaId);
+                                if (resultado != null)
+                                {
+                                    if (resultado.Count > 0)
+                                    {
+                                        int ritmoCargaNeto = 0;
+                                        resultado.TryGetValue("ritmoCargaNeto", out ritmoCargaNeto);
+                                        item.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
+                                    }
+                                }
 
-                            #region Ritmos Baja Carga
-                            string[] listaBC = new string[] { "BCB", "BCP", "F" };
-                            var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
-                            int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
-                            item.TotalRitmoBaja = 0;
-                            item.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                                #region Ritmos Baja Carga
+                                string[] listaBC = new string[] { "BCB", "BCP", "F" };
+                                var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
+                                int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
+                                item.TotalRitmoBaja = 0;
+                                item.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                            }
                         }
                     }
                 }
@@ -12831,9 +12849,38 @@ namespace Molinos.Scato.Servicios.Impl
             var moduloDeCargaPeriodoDeCargaDto = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == moduloDeCargaId);
             return moduloDeCargaPeriodoDeCargaDto;
         }
-        // </ ARMOA005-1965 Dylan Lopez>
+		public DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza, int? turno_Id)
+		{
+            var moduloDeCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == moduloDeCargaId);
+			if (!esCalculoGeneral)
+            {
+                var planillaDeTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                    .Where(w => w.Cerrado == true && w.TurnoPuerto.Id == turno_Id)
+                    .OrderByDescending(o => o.Fecha);
+				if (planillaDeTurnos != null)
+				{
+					foreach (var planillaDeTurno in planillaDeTurnos)
+                    {
+                        var planillaDeTurnoDetalleSolido = planillaDeTurno.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(x => Convert.ToInt32(x.BalanzaPuerto.CodigoBalanza) == numeroBalanza).ToList();
+                        if (planillaDeTurnoDetalleSolido!=null && planillaDeTurnoDetalleSolido.Count > 0)
+                            return planillaDeTurno.FechaCierreTurno ?? DateTime.Now;
+                    }
+                }
+                return DateTime.Now;
+			}
+            else
+            {
+                var periodoDeCarga = moduloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
+                if (periodoDeCarga.FechaFinalizacionCarga != null && periodoDeCarga.HoraFinalizacionCarga != null)
+                {
+					return periodoDeCarga.FechaFinalizacionCarga.Value.Add(TimeSpan.Parse(periodoDeCarga.HoraFinalizacionCarga));
+				}
+				return DateTime.Now;
+			}
+		}
+		// </ ARMOA005-1965 Dylan Lopez> 
 
-        public IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId)
+		public IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId)
         {
             var planoDeCarga = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloDeCargaId)?.PlanoDeCarga;
             return Listar<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(p => p.PlanoDeCarga.Id == planoDeCarga.Id).OrderBy(x => x.BodegaParcel).ToList();

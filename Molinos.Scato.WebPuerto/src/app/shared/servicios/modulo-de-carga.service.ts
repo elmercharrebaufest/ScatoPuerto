@@ -200,8 +200,9 @@ export class ModuloDeCargaService {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
   } 
 
-  obtenerDatosMailPlanillaSolidos(moduloDeCargaId: number){
-    return this.http.get(`${this.url}ModuloDeCarga/ObtenerDatosMailPlanillaSolidos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
+  obtenerDatosMailPlanillaSolidos(moduloDeCargaId: number, cortesOcultos: number[]){
+  let idsOcultos = cortesOcultos.join(',');
+  return this.http.get(`${this.url}ModuloDeCarga/ObtenerDatosMailPlanillaSolidos?moduloDeCargaId=${moduloDeCargaId}&idsOcultos=${idsOcultos}`, { 'withCredentials' : true});
   }
 
   enviarPlanillaTurnoSolido(idModuloDeCarga: number, mail:any, data: any): Observable<any>{

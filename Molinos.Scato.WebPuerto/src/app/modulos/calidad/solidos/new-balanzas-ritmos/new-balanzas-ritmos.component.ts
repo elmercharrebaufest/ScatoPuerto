@@ -35,10 +35,14 @@ export class NewBalanzasRitmosComponent {
   dateMin: string;
   dateMax: string;
 
+  arranco7: string;
+  ultimaBalanzada7: string;
   toneladasCargadas7: string;
   ritmoEmbarque7: string;
   ultimaActualizacion7: string;
 
+  arranco8: string;
+  ultimaBalanzada8: string;
   toneladasCargadas8: string;
   ritmoEmbarque8: string;
   ultimaActualizacion8: string;
@@ -82,10 +86,14 @@ export class NewBalanzasRitmosComponent {
     this.tnTotales = '0';
     this.valorRitmoNeto = '0';
 
+    this.arranco7 = '';
+    this.ultimaBalanzada7 = '';
     this.toneladasCargadas7 = '0';
     this.ritmoEmbarque7 = '0';
     this.ultimaActualizacion7 = '';
   
+    this.arranco8 = '';
+    this.ultimaBalanzada8 = '';
     this.toneladasCargadas8 = '0';
     this.ritmoEmbarque8 = '0';
     this.ultimaActualizacion8 = '';
@@ -141,7 +149,6 @@ export class NewBalanzasRitmosComponent {
     let selectedDate = '';
     let selectedTurn = null;
     let esCalculoGeneral: boolean = true;
-
     if (!esCargaFinalizada){
       if (this.selectedDate != '' && this.selectedTurn != 0) {
         selectedDate = this.selectedDate;
@@ -154,14 +161,16 @@ export class NewBalanzasRitmosComponent {
       this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
       this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
       this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
-
+      
       this.toneladasCargadas7  = data.ritmoBalanza7 != -1 ? data.cargaBalanza7.toString(): 'N.A';
       this.ritmoEmbarque7      = data.ritmoBalanza7 != -1 ? data.ritmoBalanza7.toString(): 'N.A';
       this.ultimaActualizacion7= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza7: 'N.A';
 
       this.toneladasCargadas8  = data.cargaBalanza8 != -1 ? data.cargaBalanza8.toString(): 'N.A';
       this.ritmoEmbarque8      = data.ritmoBalanza8 != -1 ? data.ritmoBalanza8.toString(): 'N.A';
-      this.ultimaActualizacion8= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
+      this.ultimaActualizacion8 = data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
+      this.ultimaBalanzada7 = data.ritmoBalanza7 != -1 ? data.ultimaBalanzada7 : 'N.A';
+      this.ultimaBalanzada8 = data.ritmoBalanza8 != -1 ? data.ultimaBalanzada8 : 'N.A';
     });
   }
 
