@@ -206,15 +206,11 @@ export class NewBalanzasRitmosComponent {
       this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
       this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
       this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
-
-      // this.arranco7 = '';
-      // this.ultimaBalanzada7 = ultimaBalanzada7;
+      
       this.toneladasCargadas7  = data.ritmoBalanza7 != -1 ? data.cargaBalanza7.toString(): 'N.A';
       this.ritmoEmbarque7      = data.ritmoBalanza7 != -1 ? data.ritmoBalanza7.toString(): 'N.A';
       this.ultimaActualizacion7= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza7: 'N.A';
 
-      // this.arranco8 = '';
-      // this.ultimaBalanzada8 = '';
       this.toneladasCargadas8  = data.cargaBalanza8 != -1 ? data.cargaBalanza8.toString(): 'N.A';
       this.ritmoEmbarque8      = data.ritmoBalanza8 != -1 ? data.ritmoBalanza8.toString(): 'N.A';
       this.ultimaActualizacion8= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
