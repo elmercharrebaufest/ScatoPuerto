@@ -12420,9 +12420,9 @@ namespace Molinos.Scato.Servicios.Impl
                                 #region Ritmos Baja Carga
                                 string[] listaBC = new string[] { "BCB", "BCP", "F" };
                                 var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
-                                int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
+                                var tnBc = repositorio.Sumar<BalanzasCortes>(y => (int)(y.Tn == null ? 0 : y.Tn), y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
                                 item.TotalRitmoBaja = 0;
-                                item.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+                                item.TotalRitmoBaja = tnBc != null ? Convert.ToDecimal(tnBc) : 0;
                             }
                         }
                     }
@@ -12443,7 +12443,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch(Exception e)
             {
-                log.Error("Hubo un error al intentar obtener historial de embarques: ", e);
+                log.Error("Hubo un error al intentar obtener historial de embarques: ", e.Message);
                 throw e;
             }
         }

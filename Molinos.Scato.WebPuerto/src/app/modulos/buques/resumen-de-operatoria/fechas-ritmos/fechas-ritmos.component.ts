@@ -11,6 +11,7 @@ import { FechaDto, TurnoDto } from '@ScatoModels/calidad/combos-fechas-y-turnos'
 import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
+import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 
 @Component({
   selector: 'app-fechas-ritmos',
@@ -29,6 +30,7 @@ export class FechasRitmosComponent implements OnInit {
   ];
 
   //#region variables
+  moduloDeCarga = null;
   moduloDeCargaId: number = 0;
   embarqueId: number;
   vaporId: number = 0;
@@ -46,26 +48,22 @@ export class FechasRitmosComponent implements OnInit {
   turnos: TurnoDto[] = [];
   availableDates: string[] = [];
 
-  habilitarFechasYTurnos: boolean = false;
-
   selectedDate: string;
   selectedTurn: number = 0;
   selectedTurnName: string = "";
   dateMin: string;
   dateMax: string;
 
-  toneladasCargadas7: string;
-  ritmoEmbarque7: string;
-  ultimaActualizacion7: string;
-
-  toneladasCargadas8: string;
-  ritmoEmbarque8: string;
-  ultimaActualizacion8: string;
-
   valorRitmoBruto: string ;
   valorCargando: string;
   tnTotales: string;
   valorRitmoNeto: string;
+
+  valorRitmoBrutoGeneral: string ;
+  valorCargandoGeneral: string;
+  tnTotalesGeneral: string;
+  valorRitmoNetoGeneral: string;
+
 //#endregion
 //#region constructor
   constructor(
@@ -75,8 +73,9 @@ export class FechasRitmosComponent implements OnInit {
     private buqueSharingService: BuqueSharingService,
     private embarqueSharingService: EmbarqueSharingService,
     private balanzasRitmosService: BalanzasRitmosService,
-    private procesoService: DatosEmbarquesProcesoService,
+    private moduloCargaService: ModuloDeCargaService
   ) {
+    console.log('entrooooo fechas ritmos');
     this.enBuque = true;
     this.cargarParametros();  
     
@@ -85,21 +84,35 @@ export class FechasRitmosComponent implements OnInit {
         this.moduloDeCargaId = data.moduloDeCarga_Id;
         this.embarqueId = data.embarque_Id;
         this.liquido = data.esLiquido;
-        this.ingresoManualSolido = data.ingresoManualSolido;
         if(!this.liquido && !this.ingresoManualSolido){
           this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
         }
         this.embarqueSharingService.setEmbarqueId(this.embarqueId); 
+
+        this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe(res=>{
+          this.moduloDeCarga = res;
+          this.ingresoManualSolido = res.ingresoManualSolido;
+          let turnosCerrados: boolean = false;
+          let cargaFinalizada: boolean = false;
+          let todosTurnosCerrados: boolean = false;
+          if (res.moduloDeCargaPlanillaDeTurnos.length > 0){
+            let turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == true);
+            if (turnos != null && turnos.length > 0)
+              turnosCerrados = true;
+          }
+          cargaFinalizada = res.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga!=null? true : false;
+          let turnosAbiertos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == false);
+          if (turnosAbiertos == null || turnosAbiertos.length == 0)
+            todosTurnosCerrados = true;
+          this.turnosModuloDeCarga = {
+            cargaFinalizada : cargaFinalizada,
+            todosTurnosCerrados: todosTurnosCerrados,
+            turnosCerrados: turnosCerrados
+          };
+          this.inicializarCarga();
+        });
       }
     });
-
-    this.balanzasRitmosService.TurnosCalidad.subscribe(turno =>{
-      if (turno != null){
-        this.turnosModuloDeCarga = turno;
-        this.inicializarCarga();
-      }
-    });
-
     this.vaporId = parseInt(this.route.snapshot.paramMap.get('vaporid'));      //consigo el vaporID que esta en la ruta y lo seteo
   }
   
@@ -116,7 +129,6 @@ export class FechasRitmosComponent implements OnInit {
   ngOnInit(): void {
     this.initRegistroFechas();
     this.initRitmos();
-    this.inicializarValores();
     this.inicializarCarga();
   }
 
@@ -126,13 +138,10 @@ export class FechasRitmosComponent implements OnInit {
     this.tnTotales = '0';
     this.valorRitmoNeto = '0';
 
-    this.toneladasCargadas7 = '0';
-    this.ritmoEmbarque7 = '0';
-    this.ultimaActualizacion7 = '';
-  
-    this.toneladasCargadas8 = '0';
-    this.ritmoEmbarque8 = '0';
-    this.ultimaActualizacion8 = '';
+    this.valorRitmoBrutoGeneral = '0';
+    this.valorCargandoGeneral = '0';
+    this.tnTotalesGeneral = '0';
+    this.valorRitmoNetoGeneral = '0';		
   }
 
   inicializarCarga = () => {
@@ -149,15 +158,7 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   toggleFechasYTurnos = () => {
-    if (this.habilitarFechasYTurnos) {
-      this.loadFechasYTurnos(this.procesoService.getModuloDeCargaId());
-    } else {
-      this.selectedDate = null;
-      this.fechas = [];
-      this.dateMin = '';
-      this.dateMax = '';
-      this.turnos = [];
-    }
+    this.loadFechasYTurnos(this.moduloDeCargaId);
   }
 
   initRegistroFechas() {
@@ -168,7 +169,6 @@ export class FechasRitmosComponent implements OnInit {
       if(this.registroFechas.obsLimpieza != "-") this.tieneObsLimpieza = true;
       this.horasPuerto= parseInt(this.registroFechas.hsEnPuerto);
       this.mostrarFechas = true;
-
     });
   }
 
@@ -189,6 +189,7 @@ export class FechasRitmosComponent implements OnInit {
       this.availableDates = this.fechas.map(f => f.fecha);
       if (this.fechas.length > 0) {
         this.turnos = this.fechas[0].turnos;
+        this.selectedTurn = this.turnos[0].turno.orden;
       }
     });
   }
@@ -215,28 +216,23 @@ export class FechasRitmosComponent implements OnInit {
   updateData = (esCargaFinalizada = false) => {
     let selectedDate = '';
     let selectedTurn = null;
-    let esCalculoGeneral: boolean = true;
 
-    if (!esCargaFinalizada){
-      if (this.selectedDate != '' && this.selectedTurn != 0) {
-        selectedDate = this.selectedDate;
-        selectedTurn = this.selectedTurn;
-        esCalculoGeneral = false;
-      }
+    if (this.selectedDate != '' && this.selectedTurn != 0) {
+      selectedDate = this.selectedDate;
+      selectedTurn = this.selectedTurn;
+      this.balanzasRitmosService.consultaRitmosCargaSolidos(this.moduloDeCargaId, selectedDate, selectedTurn, false).subscribe(data => {
+        this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
+        this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
+        this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
+        this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
+      });
     }
-    this.balanzasRitmosService.consultaRitmosCargaSolidos(this.procesoService.getModuloDeCargaId(), selectedDate, selectedTurn, esCalculoGeneral).subscribe(data => {
-      this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
-      this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-      this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-      this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
 
-      this.toneladasCargadas7  = data.ritmoBalanza7 != -1 ? data.cargaBalanza7.toString(): 'N.A';
-      this.ritmoEmbarque7      = data.ritmoBalanza7 != -1 ? data.ritmoBalanza7.toString(): 'N.A';
-      this.ultimaActualizacion7= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza7: 'N.A';
-
-      this.toneladasCargadas8  = data.cargaBalanza8 != -1 ? data.cargaBalanza8.toString(): 'N.A';
-      this.ritmoEmbarque8      = data.ritmoBalanza8 != -1 ? data.ritmoBalanza8.toString(): 'N.A';
-      this.ultimaActualizacion8= data.ritmoBalanza7 != -1 ? data.ultimaActualizacionBalanza8: 'N.A';
+    this.balanzasRitmosService.consultaRitmosCargaSolidos(this.moduloDeCargaId, '', null, true).subscribe(data => {
+      this.valorRitmoBrutoGeneral = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
+      this.valorCargandoGeneral = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
+      this.tnTotalesGeneral = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
+      this.valorRitmoNetoGeneral = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
     });
   }
 

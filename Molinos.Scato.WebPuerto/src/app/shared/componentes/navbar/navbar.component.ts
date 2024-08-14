@@ -45,9 +45,7 @@ export class NavbarComponent implements OnInit {
   }
 
   obtenerNotificaciones = () => {
-    console.log('obtenerNotificaciones');
       this._notificacionService.obtenerNotificaciones().subscribe((res: NotificacionProgramaDeEmbarque[]) => {
-        // console.log(' res: ', res);
         this.notificaciones = res;
       })
   }

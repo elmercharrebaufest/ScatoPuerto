@@ -11,6 +11,8 @@
   </div>
 
   <div class="form-group col-md-8">
+    <div class="row">
+      <div class="form-group col-md-12">
     <!-- <ARMOA005-1988 Dylan Lopez> -->
     <!-- <div class="row" *ngIf="!liquido">
       <div class="form-group col-md-12">
@@ -36,9 +38,8 @@
     <!-- </ ARMOA005-1988 Dylan Lopez> -->
 
     <!-- <ARMOA005-1988 Dylan Lopez> -->
-    <div class="form-group col-md-7">
       <!-- <Antigua Logica> -->
-      <div *ngIf="moduloDeCarga!=null && !ingresoManualSolido">
+      <div *ngIf="moduloDeCarga && !ingresoManualSolido">
         <div class="row" *ngIf="!liquido">
           <div class="form-group col-md-12">
             <app-balanzas-ritmos [enBuque]="true"></app-balanzas-ritmos>
@@ -58,7 +59,7 @@
       <!-- </ Antigua Logica> -->
 
       <!-- <Nueva Logica> -->
-      <div *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados">
+      <div *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados" class="mt-4 px-4 pb-4" style="background-color: #fff;">
         <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Ritmos de Carga y Ritmos por Balanza</h5>
 
         <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;">
@@ -83,7 +84,7 @@
 
         <div class="html2pdf__page-break"></div>
 
-        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;">
+        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;display: flex;justify-content: center;">
           <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Turno: Día {{selectedDate | date: 'dd-MMM-yyyy'}} en el Turno {{selectedTurn}}</h5>
           <app-semaforo-ritmo-embarque
               [valueRhythmGross]='valorRitmoBruto' 
@@ -98,21 +99,24 @@
 
         <div class="html2pdf__page-break"></div>
 
-        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;">
+        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;display: flex;justify-content: center;">
           <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Ritmos Generales</h5>
           <app-semaforo-ritmo-embarque
-              [valueRhythmGross]='valorRitmoBruto' 
+              [valueRhythmGross]='valorRitmoBrutoGeneral' 
               [color1]='"#F0AD4E"' 
-              [valueLoaded]='valorCargando' 
-              [tonsTotal]='tnTotales' 
+              [valueLoaded]='valorCargandoGeneral' 
+              [tonsTotal]='tnTotalesGeneral' 
               [color2]='"#5CB85C"' 
-              [valueRhythmNet]='valorRitmoNeto' 
+              [valueRhythmNet]='valorRitmoNetoGeneral' 
               [color3]='"#F0AD4E"'>
             </app-semaforo-ritmo-embarque>
         </div>
+
       </div>
       <!-- </ Nueva Logica> -->
-    </div>
     <!-- </ ARMOA005-1988 Dylan Lopez> -->
+
+    </div>
+  </div>
   </div>
 </div>
