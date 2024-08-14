@@ -259,3 +259,12 @@ div.totalizadores {
     flex: 1;
   }
 }
+
+div.solo-lectura {
+  pointer-events: none; 
+  cursor: default;    
+}
+
+tr.boton-disabled, td.boton-disabled {
+  filter: brightness(0.7);
+}

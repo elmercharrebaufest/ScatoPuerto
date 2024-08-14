@@ -99,8 +99,8 @@
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div *ngIf="balanza.value.bodega" class="alinearJustificado">{{balanza.value.bodega.nombre}}</div>
                 </td>
-                <td class="noBorder alinearCentro centradoHorizontal">
-                  <div class="alinearJustificado" style="display: flex;;justify-content: space-between;">
+                <td *ngIf="!esSoloLectura" class="noBorder alinearCentro centradoHorizontal">
+                  <div *ngIf="!esSoloLectura" class="alinearJustificado" style="display: flex;;justify-content: space-between;">
                     <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
@@ -257,7 +257,7 @@
 </div>
 
 <div>
-  <app-planilla-carga></app-planilla-carga>
+  <app-planilla-carga [esSoloLectura]="esSoloLectura"></app-planilla-carga>
 </div>
 
 <div class="col text-center">

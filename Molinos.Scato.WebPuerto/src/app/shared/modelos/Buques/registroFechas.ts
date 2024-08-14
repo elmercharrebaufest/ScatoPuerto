@@ -8,7 +8,7 @@ limpiezaDesde:string;
 limpiezaHasta:string;
 motivoLimpieza:string;
 obsLimpieza:string;
-cominezoCarga:string;
+comienzoCarga:string;
 desamarre:string;
 hsEnPuerto:string;
 }

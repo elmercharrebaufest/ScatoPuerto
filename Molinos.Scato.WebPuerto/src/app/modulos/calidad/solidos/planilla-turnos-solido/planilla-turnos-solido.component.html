@@ -133,7 +133,7 @@
                                                                                 {{corte.controls.observaciones.value}}
                                                                             </td>
                                                                             <td colspan="2"  [ngClass]="getCorteColor(corte)">
-                                                                                <input type="checkbox" class="small-checkbox"
+                                                                                <input type="checkbox" class="small-checkbox" [disabled]="esSoloLectura" 
                                                                                 (change)="onCheckboxOcultarCorte($event, corte.value.id)"/>                                                                                
                                                                             </td>
                                                                         </tr>
