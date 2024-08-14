@@ -11996,9 +11996,10 @@ namespace Molinos.Scato.Servicios.Impl
                 //solido
                 if (lineUp.Embarque.EsLiquido != true)
                 {
-                    if (lineUp.Embarque.FechaHoraInicioCarga != null)
+                    if (periodoDeCarga.FechaComienzoCarga != null && periodoDeCarga.HoraComienzoCarga != null)
                     {
-                        comienzoCarga = lineUp.Embarque.FechaHoraInicioCarga.ToString();
+
+                        comienzoCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaComienzoCarga, periodoDeCarga.HoraComienzoCarga);
                     }
                 }
                 //liqudio
@@ -12057,7 +12058,7 @@ namespace Molinos.Scato.Servicios.Impl
                 registrosFechas.Add("LimpiezaHasta", limpiezaHasta);
                 registrosFechas.Add("MotivoLimpieza", motivoLimpieza);
                 registrosFechas.Add("ObsLimpieza", obsLimpieza);
-                registrosFechas.Add("CominezoCarga", comienzoCarga);
+                registrosFechas.Add("ComienzoCarga", comienzoCarga);
 				registrosFechas.Add("FinalizacionCarga", finalizacionCarga);
 				registrosFechas.Add("Desamarre", desamarre);
                 registrosFechas.Add("hsEnPuerto", hsEnPuerto);
@@ -12078,6 +12079,7 @@ namespace Molinos.Scato.Servicios.Impl
             int idPlanoDeCarga = 0;
             int idVapor = 0;
             int esLiquido = 0;
+            int ingresoManualSolido = 0;
             Dictionary<string, int> idsUsuales = new Dictionary<string, int>();
             try
             {
@@ -12095,13 +12097,17 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     idVapor = lineUp.Embarque.Vapor.Id;
                 }
-                if (lineUp.Embarque.EsLiquido != null)
-                    esLiquido = lineUp.Embarque.EsLiquido ? 1 : 0;
+                if (lineUp.Embarque.EsLiquido)
+                    esLiquido = 1;
+
+                if (lineUp.ModuloDeCarga.IngresoManualSolido)
+                    ingresoManualSolido = 1;
 
                 idsUsuales.Add("moduloDeCargaId", idModuloDeCarga);
                 idsUsuales.Add("planoDeCargaId", idPlanoDeCarga);
                 idsUsuales.Add("vaporId", idVapor);
                 idsUsuales.Add("esLiquido", esLiquido);
+                idsUsuales.Add("ingresoManualSolido", ingresoManualSolido);
 
                 return idsUsuales;
             }

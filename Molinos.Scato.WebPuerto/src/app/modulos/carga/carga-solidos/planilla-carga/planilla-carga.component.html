@@ -1,5 +1,5 @@
 <div class="bg-white shadow mt-4 p-4">
-  <div>
+  <div [ngClass]="{'solo-lectura': esSoloLectura}">
     <div class="silos-celdas-container">
       <button *ngFor="let siloCelda of silosCeldas" [style.background]="siloCelda.color"
         (click)="seleccionarSiloCelda(siloCelda)">
@@ -38,6 +38,7 @@
     </div>
   </div>
   <div class="overflow-auto">
+    <div [ngClass]="{'solo-lectura': esSoloLectura}">
     <table class="tabla-cargas">
       <div class="table-overlay" *ngIf="siloCeldaSeleccionado || destinoSeleccionado || exportadorSeleccionado"></div>
       <thead>
@@ -148,7 +149,7 @@
               </td>
               <!-- #endregion Gravedad -->
             </tr>
-            <tr>
+            <tr [ngClass]="{'boton-disabled': esSoloLectura}">
               <td class="celda-nueva-fila" [colSpan]="bodegas.length * 2">
                 <button (click)="agregarFila(turno)">Añadir fila</button>
                 <button (click)="eliminarFila(turno)">
@@ -156,7 +157,7 @@
                 </button>
               </td>
             </tr>
-            <tr *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
+            <tr [ngClass]="{'boton-disabled': esSoloLectura}" *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
               <td [colSpan]="(bodegas.length * 2) + 2" class="celda-nueva-fila">
                 <button (click)="agregarTurno()">Añadir turno</button>
                 <button (click)="eliminarTurno(turno)">
@@ -167,7 +168,7 @@
           </ng-container>
           <ng-container *ngIf="h == (dias.length - 1)">
             <tr class="tr-nuevo-dia">
-              <td class="celda-nuevo-dia" [colSpan]="(bodegas.length * 2) + 4">
+              <td [ngClass]="{'boton-disabled': esSoloLectura}" class="celda-nuevo-dia" [colSpan]="(bodegas.length * 2) + 4">
                 <button (click)="agregarDia()">Añadir dia</button>
               </td>
               <td class="celda-separadora"></td>
@@ -288,8 +289,9 @@
     </table>
     <!-- #endregion TOTAL USO DE PALA POR PRODUCTO -->
   </div>
-  <div class="d-flex justify-content-center" style="gap: 1rem;">
+  <div *ngIf="!esSoloLectura" class="d-flex justify-content-center" style="gap: 1rem;">
     <button class="btn btn-success" (click)="guardar()">Guardar</button>
     <button class="btn btn-danger" (click)="cancelar()">Cancelar</button>
   </div>
+</div>
 </div>

@@ -38,6 +38,7 @@ export class FechasRitmosComponent implements OnInit {
   tieneLimpieza: boolean;
   enBuque: boolean = false;
   liquido: boolean;
+  ingresoManualSolido: boolean;
   tieneMotivoLimpieza: boolean;
   tieneObsLimpieza: boolean;
 
@@ -84,7 +85,10 @@ export class FechasRitmosComponent implements OnInit {
         this.moduloDeCargaId = data.moduloDeCarga_Id;
         this.embarqueId = data.embarque_Id;
         this.liquido = data.esLiquido;
-        this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
+        this.ingresoManualSolido = data.ingresoManualSolido;
+        if(!this.liquido && !this.ingresoManualSolido){
+          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
+        }
         this.embarqueSharingService.setEmbarqueId(this.embarqueId); 
       }
     });
@@ -133,7 +137,7 @@ export class FechasRitmosComponent implements OnInit {
 
   inicializarCarga = () => {
     this.inicializarValores();
-    if (this.turnosModuloDeCarga.cargaFinalizada){
+    if (this.turnosModuloDeCarga != null && this.turnosModuloDeCarga.cargaFinalizada){
       if (this.turnosModuloDeCarga.todosTurnosCerrados){
         this.updateData(true);
       }else{

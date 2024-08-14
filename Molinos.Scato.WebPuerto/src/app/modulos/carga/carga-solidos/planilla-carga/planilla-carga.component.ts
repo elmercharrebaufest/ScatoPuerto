@@ -10,7 +10,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 
@@ -37,6 +37,7 @@ interface TotalExportadorProducto {
 })
 export class PlanillaCargaComponent implements OnInit {
 
+  @Input() esSoloLectura: boolean = false;
   public bodegas: PlanoDeCargaBodega[] = [];
   public silosCeldas: SiloCelda[] = [];
   public destinos: DestinoColor[] = [];

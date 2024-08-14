@@ -111,7 +111,8 @@ export class NavtabsBuqueComponent implements OnInit {
         }
     });
     
-    if (!this.paramEmbarqueSel.esLiquido){
+    if (!this.paramEmbarqueSel.esLiquido && !this.paramEmbarqueSel.ingresoManualSolido){
+      // console.log(' paramEmbarqueSel.moduloDeCarga_Id: ', this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
     }
