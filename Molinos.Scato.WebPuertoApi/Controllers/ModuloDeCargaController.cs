@@ -1148,21 +1148,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             var arrancoBalanza7 = DateTime.Now;
             var ultimaBalanzada7 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 7, turno);
-			var cargaBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7);
-            var ritmoBalanza7   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga,7);
+			var cargaBalanza7   = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7) / 1000,2);
+            var ritmoBalanza7   = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga,7) / 1000,2);
             var ultimaActualizacionBalanza7 = DateTime.Now;
 
 			var arrancoBalanza8 = DateTime.Now;
 			var ultimaBalanzada8 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 8, turno);
-			var cargaBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8);
-            var ritmoBalanza8   = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 8);
-			var ultimaActualizacionBalanza8 = DateTime.Now;
+			var cargaBalanza8   = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8) / 1000,2);
+            var ritmoBalanza8   = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 8) / 1000,2);
+            var ultimaActualizacionBalanza8 = DateTime.Now;
 
-			var ritmoCargaBruto = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaBruta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral);
-            var llevasCargando  = !existeCarga ? -1 : this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga , fechaTurnoSel, turno, esCalculoGeneral, 0);
-            var ritmoCargaNeto  = !existeCarga ? -1 : this.servicio.ObtenerRitmoCargaNeta(idModuloDeCarga  , fechaTurnoSel, turno, esCalculoGeneral);
+			var ritmoCargaBruto = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaBruta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral) / 1000,2);
+            var llevasCargando  = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga , fechaTurnoSel, turno, esCalculoGeneral, 0) / 1000, 2);
+            var ritmoCargaNeto  = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaNeta(idModuloDeCarga  , fechaTurnoSel, turno, esCalculoGeneral) / 1000, 2);
 
-			ritmoDeCargasBalanzasDto.ArrancoBalanza7 = arrancoBalanza7;
+            ritmoDeCargasBalanzasDto.ArrancoBalanza7 = arrancoBalanza7;
 			ritmoDeCargasBalanzasDto.ArrancoBalanza8 = arrancoBalanza8;
 			ritmoDeCargasBalanzasDto.UltimaBalanzada7 = ultimaBalanzada7;
 			ritmoDeCargasBalanzasDto.UltimaBalanzada8 = ultimaBalanzada8;
