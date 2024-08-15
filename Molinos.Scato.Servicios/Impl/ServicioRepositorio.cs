@@ -12400,7 +12400,7 @@ namespace Molinos.Scato.Servicios.Impl
                         if (item != null && !item.EsLiquido)
                         {
                             var moduloCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == item.ModuloDeCargaId);
-                            if (moduloCarga.IngresoManualSolido)
+                            if (moduloCarga.IngresoManualSolido && moduloCarga.ModuloDeCargaPlanillaDeTurnos.Count > 0)
                             {
                                 item.TotalRitmoNormal = ObtenerRitmoCargaNeta(item.ModuloDeCargaId, null, null, true); ;
                             }
@@ -12438,7 +12438,7 @@ namespace Molinos.Scato.Servicios.Impl
                 if(producto != null && producto.Count() > 0)
                     producto = producto.Select(s => s.Trim()).ToList();
                 var historial = repositorio.ListarConsultaPaginada(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto, paginacion)).ToList();
-                //CompletarDatosHistorialDeEmbarque(historial);
+                CompletarDatosHistorialDeEmbarque(historial);
                 return historial;
             }
             catch(Exception e)
