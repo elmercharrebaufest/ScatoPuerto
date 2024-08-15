@@ -679,6 +679,9 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 var nominacion = repositorio.Obtener<Nominacion>(x => x.Id == mail.Id);
+                string htmlConfirma = ObtenerHtmlConfirmarRecepcion(nominacion, mail);
+                mail.Body = htmlConfirma + mail.Body;
+
                 if (mail.TipoDeMail == "Surveyor")
                 {
                     nominacion.EnviadoSurveyor = true;
@@ -698,6 +701,23 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
+        }
+
+        private string ObtenerHtmlConfirmarRecepcion(Nominacion nominacion, MailDto mail)
+        {
+            string destinatarios = this.repositorio.Obtener<ConfiguracionMail>(m => m.TemplateMail == "AvisoLecturaProgramaEmbarque").Direcciones.Replace("; ", ",");
+            string htmlRecepcion = $@"
+               <div style=""font-family: Arial, Helvetica, sans-serif;"">
+                 <p>Atención, por favor confirme la recepción de este correo haciendo clic en el siguiente botón:</p>
+                 <a href=""mailto:{destinatarios}?subject=Confirmaci%C3%B3n%20de%20recepci%C3%B3n%20-%20{mail.Titulo}
+                    &body=Confirmo%20recepci%C3%B3n%20del%20correo%20sobre%20la%20nominaci%C3%B3n%20del%20buque:%20{nominacion.Embarque.Vapor.Nombre}.""
+                 style=""display: inline-block; padding: 10px 20px; background-color: #0273d4; color: white; text-decoration: none; border-radius: 5px; text-align: center;"">
+                CONFIRMAR RECEPCIÓN
+                 </a>
+               </div>
+               <br/>";
+
+            return htmlRecepcion;
         }
 
         public void EnviarMail(MailDto mail)

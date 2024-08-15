@@ -169,16 +169,16 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
         .then((confirmed) => {
           this.actualizarFechasPeriodoDeCarga();
           if (confirmed){
-            this.inicioCarga.emit(true);
+            this.initInicioCarga();
           }else {
             this.initInicioCarga();
             return;
           }
+          this.editandoFecha = false;
         });
     } else {
       this.actualizarFechasPeriodoDeCarga();
-      this.inicioCarga.emit(true);
-      this.cargaIniciada = true;
+      this.initInicioCarga();
       this.editandoFecha = false;
     }
   }
@@ -196,6 +196,7 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
       this.cargaIniciada = true;
       this.editandoFecha = false;
       document.getElementById("FIC").setAttribute("disabled", "true");
+      this.inicioCarga.emit(true);
     });
   }
 
