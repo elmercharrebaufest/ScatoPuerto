@@ -102,20 +102,6 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
   }
 
   preguntarGuardarFinalizacionCarga = () => {
-    /*
-    if (this.periodoDeCarga.fechaComienzoCarga==null){
-      this.confirmationDialogService.confirm('¡Atención!', 'Debe guardar una fecha inicio de carga antes de la finalización de la carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-      return;
-    }
-    if (this.periodoDeCarga.fechaComienzoCarga!=null){
-      let fechaComienzoCargaPeriodo = formatDate(this.periodoDeCarga.fechaComienzoCarga, 'yyyy-MM-dd', 'en-US');
-      let fechaFinalizacionCarga = formatDate(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value, 'yyyy-MM-dd', 'en-US');
-      if (fechaComienzoCargaPeriodo> fechaFinalizacionCarga){
-        this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga no puede ser menor a la fecha de inicio de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-        return;
-      }
-    }
-    */
     if (this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value == '' || this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value == undefined) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar una fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
       return;
@@ -183,15 +169,9 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
           this.guardarFinalizacionPeriodoDeCarga();
-          if (confirmed){
-            this.finalizacionCarga.emit(true);
-          } else {
-            this.initFinalizacionCarga();
-          }
         });
     }else{
         this.guardarFinalizacionPeriodoDeCarga();
-        this.initFinalizacionCarga();
     }  
   }
   guardarFinalizacionPeriodoDeCarga = () => {
@@ -210,7 +190,10 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
         texto = "Se finalizó la carga correctamente";
         this.cargaFinalizada = true;
       }
+      this.finalizacionCarga.emit(true);
       this.toggleEditarFecha();
+      this.editandoFecha = false;
+      this.cargaFinalizada = true;
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     });
   }

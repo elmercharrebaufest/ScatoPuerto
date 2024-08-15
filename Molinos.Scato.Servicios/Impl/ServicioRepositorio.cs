@@ -12401,7 +12401,7 @@ namespace Molinos.Scato.Servicios.Impl
                         if (item != null && !item.EsLiquido)
                         {
                             var moduloCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == item.ModuloDeCargaId);
-                            if (moduloCarga.IngresoManualSolido)
+                            if (moduloCarga.IngresoManualSolido && moduloCarga.ModuloDeCargaPlanillaDeTurnos.Count > 0)
                             {
                                 item.TotalRitmoNormal = ObtenerRitmoCargaNeta(item.ModuloDeCargaId, null, null, true); ;
                             }
