@@ -10,9 +10,10 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -35,13 +36,14 @@ interface TotalExportadorProducto {
   templateUrl: './planilla-carga.component.html',
   styleUrls: ['./planilla-carga.component.scss']
 })
-export class PlanillaCargaComponent implements OnInit {
+export class PlanillaCargaComponent implements OnInit,OnDestroy {
 
   @Input() esSoloLectura: boolean = false;
   public bodegas: PlanoDeCargaBodega[] = [];
   public silosCeldas: SiloCelda[] = [];
   public destinos: DestinoColor[] = [];
   public exportadores: ExportadorColor[] = [];
+  private destroy$ = new Subject();
 
   private coloresEsquinas = ['#83bc08', '#08a7f0', '#dc3545', 'orange', '#bc3aa5']
   private ultimoColorUsado: number = 0;
@@ -75,6 +77,10 @@ export class PlanillaCargaComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.inicializarForm();
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -850,6 +856,10 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   public cancelar() {
-    this.inicializarDatos();
+    this.moduloDecargaService.obtenerModuloDeCarga(this._procesoService.getModuloDeCargaId())
+    .pipe(takeUntil(this.destroy$)).subscribe(moduloDeCarga => {
+      this.inicializarForm();
+      this.cargarDatosEdicion(moduloDeCarga.moduloDeCargaPlanillaDeTurnos)
+    });
   }
 }
