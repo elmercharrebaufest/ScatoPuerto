@@ -931,7 +931,25 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
                 Embarque embarque = repositorio.Obtener<Embarque>(embarque_Id);
-                nominacion.Embarque = embarque;
+				LineUp lineUp = repositorio.Listar<LineUp>(e => e.Embarque.Id == embarque_Id).FirstOrDefault();
+                PlanoDeCarga planoDeCarga = repositorio.Obtener<PlanoDeCarga>(lineUp.PlanoDeCarga.Id);
+
+				var senasa = nominacion.NominacionDetalleIntervencion.Senasa?.FirstOrDefault();
+                embarque.Senasa = false;
+				if (senasa != null)
+				{
+					embarque.Senasa = senasa.TieneSenasa;
+				}
+
+				bool isFumigado = string.Equals(nominacion.NominacionDetalleIntervencion.Fumigacion?.ToUpper(), "SI");
+				planoDeCarga.Fumigacion = isFumigado;
+
+				if (isFumigado)
+				{
+					planoDeCarga.EmpresaFumigadora = nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion?.Descripcion;
+				}
+
+				nominacion.Embarque = embarque;
                 nominacion.FechaEnvioLineUp = DateTime.Now;
                 nominacion.ObservacionEnvioLineUp = observacion;
                 repositorio.GuardarCambios();
