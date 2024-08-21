@@ -23,6 +23,7 @@ import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service'
 import { Subject } from 'rxjs';
 import { BalanzasManualService } from 'app/modulos/carga/carga-solidos/tableristas/balanzas-manual/balanzas-manual.service';
 import { BalanzaManual } from '@ScatoModels/balanza-manual/balanza-manual';
+import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -65,9 +66,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
   exportaPlanilla: boolean = false;
   totalABordo: number = 0;
-  cortesOcultos: number [] = [];
+  cortesOcultos: number[] = [];
 
   public verObservacionesCalidad: boolean = false;
+  private balanzasCortes: BalanzaManual[] = [];
+  private esCargaManual: boolean = false;
 
   constructor(
     private _builder: FormBuilder,
@@ -80,7 +83,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private balanzasManualService: BalanzasManualService,
     private session: SessionService,
     private confirmationDialogService: ConfirmationDialogService,
-    private planillaTurnoExcelService: PlanillaTurnoSolidoExcelService,
+    private excelNuevoService: PanillaTurnoSolidoExcelNuevoService,
     private embarqueSharingService: EmbarqueSharingService,
   ) {
     this.user = this.session.getUser();
@@ -265,9 +268,9 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     }
     this.ordenarTurnos();
 
-    let balanzasCortes: BalanzaManual[] = [];
-    if (moduloDeCarga.ingresoManualSolido) {
-      balanzasCortes = await this.balanzasManualService.listarBalanzaManual(moduloDeCarga.id).toPromise();
+    this.esCargaManual = moduloDeCarga.ingresoManualSolido;
+    if (this.esCargaManual) {
+      this.balanzasCortes = await this.balanzasManualService.listarBalanzaManual(moduloDeCarga.id).toPromise();
     }
 
     this.turnoPuerto = [];
@@ -294,7 +297,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
       //Agrego cortes
       if (planillaTurno.moduloDeCargaPlanillaDeTurnosCortes?.length) {
-        this.initTurnoCortes(turno, planillaTurno.moduloDeCargaPlanillaDeTurnosCortes, balanzasCortes);
+        this.initTurnoCortes(turno, planillaTurno.moduloDeCargaPlanillaDeTurnosCortes);
       }
 
       //Agrego observaciones
@@ -662,7 +665,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length + 1; // tamaño del detalle de cada turno
     const registroCorte = 1; // tamaño del corte
     const registroCalidad = 1; // tamaño de la observacion
-    const numeroRegistros = registroSolido + registroCorte + registroCalidad;
+    let numeroRegistros = registroSolido + registroCorte + registroCalidad;
+    if (this.verObservacionesCalidad && turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length) {
+      numeroRegistros++;
+    }
     return numeroRegistros;
   }
 
@@ -764,50 +770,56 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return undefined;
   }
 
-  private initTurnoCortes(turno: AbstractControl, cortes: CorteTurno[], balanzasCortes: BalanzaManual[]) {
+  private initTurnoCortes(turno: AbstractControl, cortes: CorteTurno[]) {
     const planillaTurnoCortes = turno.get('moduloDeCargaPlanillaDeTurnosCortes') as FormArray;
     for (const corte of cortes) {
       const corteForm = this.initCorte(corte);
       planillaTurnoCortes.push(corteForm);
-      // Sólo para ingreso manual
-      if (balanzasCortes.length) {
-        this.descontarBajasCargasDeTurno(turno, corte, balanzasCortes);
+      if (this.esCargaManual) {
+        this.descontarBajasCargasDeTurno(turno, corte);
       }
     }
   }
 
-  private descontarBajasCargasDeTurno(turno: AbstractControl, corte: CorteTurno, balanzasCortes: BalanzaManual[]) {
+  private descontarBajasCargasDeTurno(turno: AbstractControl, corte: CorteTurno) {
     const planillaTurnoDetalles = turno.get('moduloDeCargaPlanillaDeTurnosDetallesSolido') as FormArray;
-    const balanzaCorte = balanzasCortes.find(c => c.id == corte.idBalanzaCorte);
-    if (balanzaCorte && !balanzaCorte.corteManual) {
-      let detalle: AbstractControl;
-      for (const detalleForm of planillaTurnoDetalles.controls) {
-        const materialPuertoId = detalleForm.get('materialPuerto').value?.id;
-        const nombreDestino = detalleForm.get('destino').value;
-        const bodegaId = detalleForm.get('bodega').value?.id;
-        if (bodegaId == balanzaCorte.bodega.id && nombreDestino == balanzaCorte.destino.nombre && materialPuertoId == balanzaCorte.material.id) {
-          detalle = detalleForm;
-          break;
-        }
-      }
-      if (detalle) {
-        const cantidadControl = detalle.get('cantidad');
-        cantidadControl.setValue(cantidadControl.value - balanzaCorte.kilogramos);
-        // Se añade la baja carga como un detalle más
-        const detalleIndex = planillaTurnoDetalles.controls.indexOf(detalle);
-        const nuevoDetalle = this._builder.group({
-          linea: [{ value: detalle.get('linea').value, disabled: true }],
-          idBalanzaCorte: [{ value: 0, disabled: true }],
-          exportador: [{ value: detalle.get('exportador').value || '', disabled: true }],
-          bodega: [{ value: detalle.get('bodega').value, disabled: true }],
-          materialPuerto: [{ value: detalle.get('materialPuerto').value, disabled: true }],
-          destino: [{ value: detalle.get('destino').value, disabled: true }],
-          cantidad: [{ value: balanzaCorte.kilogramos, disabled: true }],
-          id: [{ value: detalle.get('id').value, disabled: true }]
-        });
-        planillaTurnoDetalles.insert(detalleIndex + 1, nuevoDetalle);
+    const balanzaCorte = this.balanzasCortes.find(c => c.id == corte.idBalanzaCorte);
+    if (!balanzaCorte || balanzaCorte.corteManual) {
+      return;
+    }
+
+    let detalle: AbstractControl;
+    for (const detalleForm of planillaTurnoDetalles.controls) {
+      const materialPuertoId = detalleForm.get('materialPuerto').value?.id;
+      const nombreDestino = detalleForm.get('destino').value;
+      const bodegaId = detalleForm.get('bodega').value?.id;
+      if (bodegaId == balanzaCorte.bodega.id && nombreDestino == balanzaCorte.destino.nombre && materialPuertoId == balanzaCorte.material.id) {
+        detalle = detalleForm;
+        break;
       }
     }
+
+    if (!detalle) {
+      return;
+    }
+
+    const cantidadControl = detalle.get('cantidad');
+    cantidadControl.setValue(cantidadControl.value - balanzaCorte.kilogramos);
+
+    // Se añade la baja carga como un detalle más
+    const detalleIndex = planillaTurnoDetalles.controls.indexOf(detalle);
+    const nuevoDetalle = this._builder.group({
+      linea: [{ value: detalle.get('linea').value, disabled: true }],
+      idBalanzaCorte: [{ value: 0, disabled: true }],
+      exportador: [{ value: detalle.get('exportador').value || '', disabled: true }],
+      bodega: [{ value: detalle.get('bodega').value, disabled: true }],
+      materialPuerto: [{ value: detalle.get('materialPuerto').value, disabled: true }],
+      destino: [{ value: detalle.get('destino').value, disabled: true }],
+      cantidad: [{ value: balanzaCorte.kilogramos, disabled: true }],
+      id: [{ value: detalle.get('id').value, disabled: true }]
+    });
+    planillaTurnoDetalles.insert(detalleIndex + 1, nuevoDetalle);
+
   }
 
   private initTurnoObservaciones(turno: AbstractControl, observaciones: ObsCalidad[]) {
@@ -985,12 +997,12 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   async onExportarExcelSolido(esEnviarPlanilla: boolean = false) {
     const planillaTurnosCerrado = this.planillaDeTurnos.filter(x => x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
     if (planillaTurnosCerrado.length == 0) {
-      const mensaje = esEnviarPlanilla ? "No se encontraron turnos cerrados para enviar la planilla." : "No se encontraron turnos cerrados para exportar la planilla.";
+      const mensaje = `No se encontraron turnos cerrados para ${esEnviarPlanilla ? 'enviar' : 'exportar'} la planilla.`;
       this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
       return false;
     }
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, esEnviarPlanilla, this.totalABordo, this.verObservacionesCalidad, this.cortesOcultos);
+    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos);
     this.exportaPlanilla = false;
   }
 
