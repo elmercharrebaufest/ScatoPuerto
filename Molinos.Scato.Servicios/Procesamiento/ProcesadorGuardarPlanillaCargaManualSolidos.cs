@@ -118,7 +118,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private void ModificarTurnos(ModuloDeCarga moduloDeCarga, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string usuario)
         {
-            var turnosModificar = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(tdb => turnos.Any(tdto => tdto.Id == tdb.Id)).ToList();
+            var turnosModificar = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(tdb => tdb.Id != 0 && turnos.Any(tdto => tdto.Id == tdb.Id)).ToList();
             foreach (var turnoDb in turnosModificar)
             {
                 var turnoDto = turnos.First(tdto => tdto.Id == turnoDb.Id);
@@ -159,7 +159,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Repositorio.Remover(turno);
             }
 
-            var json = Conversor.ConvertirList<ModuloDeCargaPlanillaDeTurnos,ModuloDeCargaPlanillaDeTurnosDto>(turnosEliminar).ToJson();
+            var json = Conversor.ConvertirList<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turnosEliminar).ToJson();
             if (turnosEliminar.Count > 0)
             {
                 var log = new LogABM

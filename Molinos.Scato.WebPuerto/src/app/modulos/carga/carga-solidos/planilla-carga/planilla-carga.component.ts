@@ -1,7 +1,6 @@
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { BalanzaPuerto, PlanillaDeTurnos, SiloCelda, TurnoDetalleSolido, TurnoDetalleSolidoGravedad, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
@@ -10,10 +9,9 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -36,14 +34,13 @@ interface TotalExportadorProducto {
   templateUrl: './planilla-carga.component.html',
   styleUrls: ['./planilla-carga.component.scss']
 })
-export class PlanillaCargaComponent implements OnInit,OnDestroy {
+export class PlanillaCargaComponent implements OnInit {
 
   @Input() esSoloLectura: boolean = false;
   public bodegas: PlanoDeCargaBodega[] = [];
   public silosCeldas: SiloCelda[] = [];
   public destinos: DestinoColor[] = [];
   public exportadores: ExportadorColor[] = [];
-  private destroy$ = new Subject();
 
   private coloresEsquinas = ['#83bc08', '#08a7f0', '#dc3545', 'orange', '#bc3aa5']
   private ultimoColorUsado: number = 0;
@@ -68,6 +65,7 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
   public totalesPalaProducto: { material: MaterialPuerto, cantidad: number }[] = [];
 
   private periodoDeCarga: PeriodoDeCarga;
+  private planillasTurnos: PlanillaDeTurnos[];
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
@@ -77,10 +75,6 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
     private fb: FormBuilder
   ) {
     this.inicializarForm();
-  }
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -118,14 +112,14 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
     });
   }
 
-  private inicializarDatos(moduloDeCarga?: ModuloDeCarga) {
+  private inicializarDatos() {
     this.inicializarForm();
-    if (!moduloDeCarga) {
-      moduloDeCarga = this._procesoService.getModuloDeCarga();
+    if (!this.planillasTurnos) {
+      this.planillasTurnos = this._procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos;
     }
     const fechaHoraInicioCarga = this.fechaHoraInicioCarga;
-    if (moduloDeCarga.moduloDeCargaPlanillaDeTurnos.length) {
-      this.cargarDatosEdicion(moduloDeCarga.moduloDeCargaPlanillaDeTurnos)
+    if (this.planillasTurnos.length) {
+      this.cargarDatosEdicion(this.planillasTurnos);
     } else {
       this.agregarDia(fechaHoraInicioCarga);
     }
@@ -584,11 +578,11 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
     dia.get('totalDia').setValue(totalDia.toLocaleString('es-AR'));
     this.actualizarTotalesFinales();
     this.actualizarGravedad(dia);
+    this.actualizarTotalPalaProducto();
   }
 
   public actualizarGravedad(dia: AbstractControl) {
     let totalPala = 0;
-    this.totalesPalaProducto.forEach(t => t.cantidad = 0);
     for (const turno of (dia.get('turnos') as FormArray).controls) {
       for (const gravedad of (turno.get('gravedades') as FormArray).controls) {
         const total = gravedad.get('totalTurnoMaterial').value as number;
@@ -596,10 +590,6 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
         const cantidadPala = total - cantidadGravedad;
         gravedad.get('cantidadPala').setValue(cantidadPala);
         totalPala += cantidadPala;
-
-        const material = gravedad.get('materialPuerto').value as MaterialPuerto;
-        const totalPalaProducto = this.totalesPalaProducto.find(t => t.material.id == material.id);
-        totalPalaProducto.cantidad += cantidadPala;
       }
     }
     dia.get('palaDia').setValue(totalPala);
@@ -665,6 +655,22 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
       }
     }
     this.totalPala = this.totalCargado - this.totalGravedad;
+  }
+
+  private actualizarTotalPalaProducto() {
+    this.totalesPalaProducto.forEach(t => t.cantidad = 0);
+    for (const dia of (this.form.get('dias') as FormArray).controls) {
+      for (const turno of (dia.get('turnos') as FormArray).controls) {
+        for (const gravedad of (turno.get('gravedades') as FormArray).controls) {
+          const total = gravedad.get('totalTurnoMaterial').value as number;
+          const cantidadGravedad = this.parsearNumeros(gravedad.get('cantidadGravedad').value);
+          const cantidadPala = total - cantidadGravedad;
+          const material = gravedad.get('materialPuerto').value as MaterialPuerto;
+          const totalPalaProducto = this.totalesPalaProducto.find(t => t.material.id == material.id);
+          totalPalaProducto.cantidad += cantidadPala;
+        }
+      }
+    }
   }
   // #endregion
 
@@ -845,7 +851,7 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
       this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.inicializarDatos(m));
+        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.planillasTurnos = m.moduloDeCargaPlanillaDeTurnos);
       }, (err) => {
         console.error(err);
         this.confirmationDialogService.error('Ha ocurrido un error al guardar las cargas');
@@ -856,10 +862,6 @@ export class PlanillaCargaComponent implements OnInit,OnDestroy {
   }
 
   public cancelar() {
-    this.moduloDecargaService.obtenerModuloDeCarga(this._procesoService.getModuloDeCargaId())
-    .pipe(takeUntil(this.destroy$)).subscribe(moduloDeCarga => {
-      this.inicializarForm();
-      this.cargarDatosEdicion(moduloDeCarga.moduloDeCargaPlanillaDeTurnos)
-    });
+    this.inicializarDatos();
   }
 }
