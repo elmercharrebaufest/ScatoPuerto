@@ -171,9 +171,9 @@ export class PlanillaTurnoLiquidoExcelService {
     private setCabeceraPlanillaTurno(worksheet, offset, borders, esRecibidores: boolean = false){
         let headerDetallePlanilla = null;
         if (esRecibidores)
-            headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "Cant."];
+            headerDetallePlanilla = ["Exportador", "Línea", "Parcel", "Producto", "Tk", "Cant."];
             else
-            headerDetallePlanilla = ["Exportador", "Línea", "Partida", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Mm.", "Destino", "Cant."];
+            headerDetallePlanilla = ["Exportador", "Línea", "Parcel", "Producto", "Tk", "°C", "Med. Ini. Cm.", "Med. Ini. Mm.", "Med. fin. Cm.", "Med. fin. Mm.", "Destino", "Cant."];
 
         headerDetallePlanilla.forEach((text, index) => {
             let currentCell = worksheet.getRow(offset).getCell(index + 3);
@@ -535,7 +535,7 @@ export class PlanillaTurnoLiquidoExcelService {
         const imgMolinos = await this.getImgMolinos();
         let workbook = new Workbook();
         const headerObservaciones = ["Fecha", "Hora", "Observación de calidad"];
-        const headerPlanilla = ["Exportador", "Partida", "Tks de abordo", , "Destino", "Tks Tierra", , "TN", "Producto"];
+        const headerPlanilla = ["Exportador", "Parcel", "Tks de abordo", , "Destino", "Tks Tierra", , "TN", "Producto"];
         const headerCortes = ["Motivo", "Inicio", "Fin", "Tiempo total", "Observaciones"];
         const referencias = ["REFERENCIAS",
           "CSBO = ACTE CRUDO DE SOJA",
