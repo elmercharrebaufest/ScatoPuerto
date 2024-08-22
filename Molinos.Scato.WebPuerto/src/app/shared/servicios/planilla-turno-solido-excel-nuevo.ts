@@ -114,7 +114,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     if (enviar) {
-      const ultimoTurno = planillasDeTurnos[0].turnoPuerto.nombre.toString().replace("-", " a ");
+      const ultimoTurno = planillasDeTurnos[0];
       const moduloDeCargaId = this.procesoService.getModuloDeCargaId();
       await this.enviarPlanillaSolido(blob, nombreBuque, moduloDeCargaId, ultimoTurno, cortesOcultos);
     } else {
@@ -700,9 +700,9 @@ export class PanillaTurnoSolidoExcelNuevoService {
     celda.style.alignment = { horizontal: 'center', vertical: 'middle' };
   }
 
-  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: string, cortesOcultos: number[]) {
+  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: PlanillaDeTurnos, cortesOcultos: number[]) {
     const titulo = "Enviar Planilla de Turno Sólido";
-    const asunto = "Turno " + ultimoTurno + " - " + nombreBuque + " - MUELLE SAN BENITO"
+    const asunto = this.formatearAddMMyyyy(ultimoTurno?.fecha) + " - Turno " + ultimoTurno?.turnoPuerto?.nombre.replace("-", " a ") + " - " + nombreBuque + " - MUELLE SAN BENITO"
     let mail = new Mail();
     try {
       const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga, cortesOcultos).toPromise() as any;
@@ -742,5 +742,13 @@ export class PanillaTurnoSolidoExcelNuevoService {
         turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad = [];
       }
     }
+  }
+
+  private formatearAddMMyyyy(fecha: any){
+    const fechaFormateada = new Date(fecha); 
+    const year = fechaFormateada.getFullYear();
+    const month = String(fechaFormateada.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+    const day = String(fechaFormateada.getDate()).padStart(2, '0');
+    return `${day}-${month}-${year}`;
   }
 }
