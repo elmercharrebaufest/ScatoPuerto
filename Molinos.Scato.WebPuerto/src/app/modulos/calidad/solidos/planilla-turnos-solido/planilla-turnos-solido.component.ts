@@ -780,7 +780,38 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       }
     }
   }
+  private agregarBajarCargaDeTurno(turno: AbstractControl, corte: CorteTurno, tieneCargaNormal: boolean,detalle: AbstractControl){
+    const planillaTurnoDetalles = turno.get('moduloDeCargaPlanillaDeTurnosDetallesSolido') as FormArray;
+    const balanzaCorte = this.balanzasCortes.find(c => c.id == corte.idBalanzaCorte);
 
+    if (!tieneCargaNormal){
+      const nuevoDetalle = this._builder.group({
+        linea: [{ value: '', disabled: true }],
+        idBalanzaCorte: [{ value: 0, disabled: true }],
+        exportador: [{ value: balanzaCorte.exportador || '', disabled: true }],
+        bodega: [{ value: balanzaCorte.bodega, disabled: true }],
+        materialPuerto: [{ value: balanzaCorte.material, disabled: true }],
+        destino: [{ value: balanzaCorte.destino.nombre, disabled: true }],
+        cantidad: [{ value: balanzaCorte.kilogramos * -1, disabled: true }],
+        id: [{ value: 0, disabled: true }]
+      });
+      planillaTurnoDetalles.insert(0, nuevoDetalle);
+    }else{
+      // Se añade la baja carga como un detalle más
+      const detalleIndex = planillaTurnoDetalles.controls.indexOf(detalle);
+      const nuevoDetalle = this._builder.group({
+        linea: [{ value: detalle.get('linea').value, disabled: true }],
+        idBalanzaCorte: [{ value: 0, disabled: true }],
+        exportador: [{ value: detalle.get('exportador').value || '', disabled: true }],
+        bodega: [{ value: detalle.get('bodega').value, disabled: true }],
+        materialPuerto: [{ value: detalle.get('materialPuerto').value, disabled: true }],
+        destino: [{ value: detalle.get('destino').value, disabled: true }],
+        cantidad: [{ value: balanzaCorte.kilogramos, disabled: true }],
+        id: [{ value: detalle.get('id').value, disabled: true }]  
+      });
+      planillaTurnoDetalles.insert(detalleIndex + 1, nuevoDetalle);
+    }
+  }
   private descontarBajasCargasDeTurno(turno: AbstractControl, corte: CorteTurno) {
     const planillaTurnoDetalles = turno.get('moduloDeCargaPlanillaDeTurnosDetallesSolido') as FormArray;
     const balanzaCorte = this.balanzasCortes.find(c => c.id == corte.idBalanzaCorte);
@@ -798,28 +829,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         break;
       }
     }
-
     if (!detalle) {
+      this.agregarBajarCargaDeTurno(turno,corte,false,detalle)
       return;
     }
-
     const cantidadControl = detalle.get('cantidad');
     cantidadControl.setValue(cantidadControl.value - balanzaCorte.kilogramos);
-
-    // Se añade la baja carga como un detalle más
-    const detalleIndex = planillaTurnoDetalles.controls.indexOf(detalle);
-    const nuevoDetalle = this._builder.group({
-      linea: [{ value: detalle.get('linea').value, disabled: true }],
-      idBalanzaCorte: [{ value: 0, disabled: true }],
-      exportador: [{ value: detalle.get('exportador').value || '', disabled: true }],
-      bodega: [{ value: detalle.get('bodega').value, disabled: true }],
-      materialPuerto: [{ value: detalle.get('materialPuerto').value, disabled: true }],
-      destino: [{ value: detalle.get('destino').value, disabled: true }],
-      cantidad: [{ value: balanzaCorte.kilogramos, disabled: true }],
-      id: [{ value: detalle.get('id').value, disabled: true }]
-    });
-    planillaTurnoDetalles.insert(detalleIndex + 1, nuevoDetalle);
-
+    this.agregarBajarCargaDeTurno(turno,corte,true,detalle)
   }
 
   private initTurnoObservaciones(turno: AbstractControl, observaciones: ObsCalidad[]) {

@@ -12647,7 +12647,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.FechaCorte = balanzasCorte.Fecha_Corte.Value.ToString("yyyy-MM-dd");
                     balanzaManualDto.HoraCorte = balanzasCorte.Fecha_Corte.Value.ToString("HH:mm");
                     balanzaManualDto.Material = balanzasCorte.Material_id != null ? Obtener<MaterialPuerto, MaterialPuertoDto>(x => x.Id == balanzasCorte.Material_id) : null;
-                    balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? Obtener<Bodega, BodegaDto>(x => x.Id == balanzasCorte.Bodega_id) : null;
+                    balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? new BodegaDto() { Id = (int)balanzasCorte.Bodega_id, Nombre = string.Format("Bodega {0}", balanzasCorte.Bodega_id) } : null;
                     balanzaManualDto.Destino = balanzasCorte.Destino_Id != null ? Obtener<Destino, DestinoDto>(x => x.Id == balanzasCorte.Destino_Id) : null;
                     balanzaManualDto.Exportador = balanzasCorte.Exportador_Id != null ? Obtener<Exportador, ExportadorDto>(x => x.Id == balanzasCorte.Exportador_Id) : null;
                     balanzaManualDto.MotivosFallasBalanza = balanzasCorte.MotivosFallasBalanza_id != null ? Obtener<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Id == balanzasCorte.MotivosFallasBalanza_id) : null;
@@ -12689,7 +12689,7 @@ namespace Molinos.Scato.Servicios.Impl
             balanzaManualDto.FechaCorte = balanzasCorte.Fecha_Corte.Value.ToString("yyyy-MM-dd");
             balanzaManualDto.HoraCorte = balanzasCorte.Fecha_Corte.Value.ToString("HH:mm");
             balanzaManualDto.Material = balanzasCorte.Material_id !=null ? Obtener<MaterialPuerto, MaterialPuertoDto>(x => x.Id == balanzasCorte.Material_id) : null;
-            balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? Obtener<Bodega, BodegaDto>(x => x.Id == balanzasCorte.Bodega_id) : null;
+            balanzaManualDto.Bodega = balanzasCorte.Bodega_id != null ? new BodegaDto() { Id = (int)balanzasCorte.Bodega_id, Nombre = string.Format("Bodega {0}", balanzasCorte.Bodega_id) } : null;
             balanzaManualDto.Destino = balanzasCorte.Destino_Id != null ? Obtener<Destino, DestinoDto>(x => x.Id == balanzasCorte.Destino_Id) : null;
             balanzaManualDto.Exportador = balanzasCorte.Exportador_Id != null ? Obtener<Exportador, ExportadorDto>(x => x.Id == balanzasCorte.Exportador_Id) : null;
             balanzaManualDto.MotivosFallasBalanza = balanzasCorte.MotivosFallasBalanza_id != null ? Obtener<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Id == balanzasCorte.MotivosFallasBalanza_id) : null;
