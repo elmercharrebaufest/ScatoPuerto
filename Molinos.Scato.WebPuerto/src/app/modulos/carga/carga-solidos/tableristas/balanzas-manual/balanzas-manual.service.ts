@@ -243,8 +243,8 @@ export class BalanzasManualService {
         this.asignarCorteBajaCarga(balanzas, registroBalanza, esCorteManual);
       });
     } else {
-      const tituloMensaje: string = esCorteManual ? 'Corte' : 'Baja Carga';
-      this.confirmationDialogService.confirm(tituloMensaje, `Ya existe un ${tituloMensaje} en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      const tituloMensaje: string = esCorteManual ? 'un Corte' : 'una Baja Carga';
+      this.confirmationDialogService.confirm(tituloMensaje, `Ya existe ${tituloMensaje} en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
   }
 
