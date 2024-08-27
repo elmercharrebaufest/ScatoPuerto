@@ -35,7 +35,7 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
   horaComienzoCarga: string;
   fechaFinalizacionCarga: string;
   horaFinalizacionCarga: string;
-
+  balanza: any;
   horaInicioMinimo: string = '00:00';
   horaInicioMaximo: string = '23:59';
   horaCorteMinimo: string = '00:00';
@@ -102,8 +102,16 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
         this.confirmationDialogService.confirm('Baja Carga', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
         return;
       } else {
-        this.balanzaManual.emit(balanzaManual);
-        this.onCerrarModal();
+        const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
+        const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
+        let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza,balanzaManual,fechaInicioRegistro,fechaFinRegistro);
+        console.log('esRegistroValido--->>>', esRegistroValido);
+        if (!esRegistroValido){
+          this.confirmationDialogService.confirm('Baja Carga', `Ya existe una Baja Carga en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
+        }else{
+          this.balanzaManual.emit(balanzaManual);
+          this.onCerrarModal();
+        }
       }
     }else{
       this.confirmationDialogService.confirm('Baja Carga', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -131,6 +139,11 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == false);
     });
+    this.balanzasManualBajaCargaService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
+      console.log('registroBalanza---->>',registrosBalanza);
+      this.balanza = registrosBalanza;
+    });
+
     this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega.pipe(takeUntil(this.destroy$)).subscribe(destinoPorMaterial => {
       this.destinosBodegaPorMaterial = destinoPorMaterial;
       destinoPorMaterial.forEach(filtro => {

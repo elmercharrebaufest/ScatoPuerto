@@ -28,7 +28,7 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
   horaComienzoCarga: string;
   fechaFinalizacionCarga: string;
   horaFinalizacionCarga: string;
-
+  balanza: any;
   horaInicioMinimo: string = '00:00';
   horaInicioMaximo: string = '23:59';
   horaCorteMinimo: string = '00:00';
@@ -72,6 +72,9 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true);
       this.cargarFormularioEditar();
     });
+    this.balanzasManualCorteService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
+      this.balanza = registrosBalanza;
+    });
   }
 
   cargarFormularioEditar() {
@@ -110,8 +113,15 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
         this.confirmationDialogService.confirm('Corte', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
         return;
       } else {
-        this.balanzaManual.emit(balanzaManual);
-        this.onCerrarModal();
+        const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
+        const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
+        let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza,balanzaManual,fechaInicioRegistro,fechaFinRegistro);
+        if (!esRegistroValido){
+          this.confirmationDialogService.confirm('Corte', `Ya existe un Corte en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
+        }else{
+          this.balanzaManual.emit(balanzaManual);
+          this.onCerrarModal();
+        }
       }
     }else{
       this.confirmationDialogService.confirm('Corte', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)

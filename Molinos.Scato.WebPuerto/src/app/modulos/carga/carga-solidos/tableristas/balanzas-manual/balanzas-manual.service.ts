@@ -231,21 +231,12 @@ export class BalanzasManualService {
   }
 
   agregarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean, numeroBalanza: number, moduloDeCargaId: number, usuario: string) {
-
-    const fechaInicioRegistro = this.convertirFecha(registroBalanza.fechaInicio, registroBalanza.horaInicio);
-    const fechaFinRegistro = this.convertirFecha(registroBalanza.fechaCorte, registroBalanza.horaCorte);
-    let esRegistroValido = this.validarCortesBajasCarga(balanzas,registroBalanza,fechaInicioRegistro, fechaFinRegistro);
-    if (esRegistroValido) {
-      let balanzaRegistro = this.crearBalanzaCorteManual(moduloDeCargaId, numeroBalanza, registroBalanza);
-      this.balanzaManualRegistroService.guardarCortesBajaCarga(balanzaRegistro).subscribe(res => {
-        if (balanzaRegistro.id == 0)
-          registroBalanza.id = res.id;
-        this.asignarCorteBajaCarga(balanzas, registroBalanza, esCorteManual);
-      });
-    } else {
-      const tituloMensaje: string = esCorteManual ? 'un Corte' : 'una Baja Carga';
-      this.confirmationDialogService.confirm(tituloMensaje, `Ya existe ${tituloMensaje} en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
-    }
+    let balanzaRegistro = this.crearBalanzaCorteManual(moduloDeCargaId, numeroBalanza, registroBalanza);
+    this.balanzaManualRegistroService.guardarCortesBajaCarga(balanzaRegistro).subscribe(res => {
+      if (balanzaRegistro.id == 0)
+        registroBalanza.id = res.id;
+      this.asignarCorteBajaCarga(balanzas, registroBalanza, esCorteManual);
+    });
   }
 
   private asignarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean) {
@@ -285,7 +276,7 @@ export class BalanzasManualService {
     return balanzaCortesManual;
   }
 
-  private validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
+  public validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
     let esRegistroValido: boolean = true;
     let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id); 
     if (filtroBalanzas!=null && filtroBalanzas.length > 0) {
@@ -296,7 +287,7 @@ export class BalanzasManualService {
         if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro <= fechaCorte) &&
             (fechaFinRegistro >= fechaInicio && fechaFinRegistro <= fechaCorte)){
               esRegistroValido = false;
-              return;
+              return esRegistroValido;
             }
       }
     }

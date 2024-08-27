@@ -9,6 +9,7 @@ import { BehaviorSubject } from "rxjs";
   providedIn: 'root'
 })
 export class BalanzasManualBajaCargaService {
+  private _registroBalanza: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private _balanzaManual: BehaviorSubject<BalanzaManual> = new BehaviorSubject<BalanzaManual>(null);
   private _destinosBodegaPorMaterial: BehaviorSubject<DestinosPorMaterialPuertoBodega[]> = new BehaviorSubject<DestinosPorMaterialPuertoBodega[]>(null);
   private _exportadoresPorMaterial: BehaviorSubject<ExportadorPorMaterialPuerto[]> = new BehaviorSubject<ExportadorPorMaterialPuerto[]>(null);
@@ -16,7 +17,13 @@ export class BalanzasManualBajaCargaService {
 
   constructor(private formBuilder: FormBuilder) {
   }
-  
+    
+  set RegistroBalanza(value: any) {
+    this._registroBalanza.next(value);
+  }
+  get RegistroBalanza() {
+      return this._registroBalanza.asObservable();
+  }
   set PeriodoDeCarga(value: any) {
     this._periodoDeCarga.next(value);
   }

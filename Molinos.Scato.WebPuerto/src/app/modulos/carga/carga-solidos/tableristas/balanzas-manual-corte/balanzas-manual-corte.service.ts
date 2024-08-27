@@ -13,10 +13,17 @@ export class BalanzasManualCorteService {
     private _destinosBodegaPorMaterial: BehaviorSubject<DestinosPorMaterialPuertoBodega[]> = new BehaviorSubject<DestinosPorMaterialPuertoBodega[]>(null);
     private _exportadoresPorMaterial: BehaviorSubject<ExportadorPorMaterialPuerto[]> = new BehaviorSubject<ExportadorPorMaterialPuerto[]>(null);
     private _periodoDeCarga: BehaviorSubject<PeriodoDeCarga> = new BehaviorSubject<PeriodoDeCarga>(null);
+    private _registroBalanza: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
     constructor(private formBuilder: FormBuilder) {
     }
 
+    set RegistroBalanza(value: any) {
+      this._registroBalanza.next(value);
+    }
+    get RegistroBalanza() {
+        return this._registroBalanza.asObservable();
+    }
     set PeriodoDeCarga(value: any) {
       this._periodoDeCarga.next(value);
     }
