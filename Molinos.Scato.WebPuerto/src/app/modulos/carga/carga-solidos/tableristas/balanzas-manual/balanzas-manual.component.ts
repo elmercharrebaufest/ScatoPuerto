@@ -213,7 +213,6 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           nombre : filtro.destino.nombre
         });
       });
-
       this.destinosBodegaPorMaterial.push(materialBodega);
     });
 
@@ -228,7 +227,17 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.balanzasManualCorteService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
       this.balanzasManualCorteService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
       this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
+      if (this.numeroBalanza == 7)
+        this.balanzasManualCorteService.RegistroBalanza = this.balanzas7;
+      else
+      this.balanzasManualCorteService.RegistroBalanza = this.balanzas8;
+
     }else{
+      if (this.numeroBalanza == 7)
+        this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas7;
+      else
+      this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas8;
+
       this.balanzasManualBajaCargaService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
       this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
       this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;
