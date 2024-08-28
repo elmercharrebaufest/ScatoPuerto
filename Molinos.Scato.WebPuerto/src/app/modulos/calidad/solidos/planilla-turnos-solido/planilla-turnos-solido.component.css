@@ -121,6 +121,10 @@ table.turnos th:nth-child(2) {
     width: 150px;
 }
 
+table.turnos>tbody>tr>td:nth-last-child(-n+5) {
+  vertical-align: middle;
+}
+
 table.turnos table.tabla-embebida th{
     width: auto;
 }
@@ -258,6 +262,6 @@ table.turnos table.tabla-embebida th{
 
 .small-checkbox {
     transform: scale(0.5);
-    transform-origin: center; 
-    margin: 0; 
+    transform-origin: center;
+    margin: 0;
 }
