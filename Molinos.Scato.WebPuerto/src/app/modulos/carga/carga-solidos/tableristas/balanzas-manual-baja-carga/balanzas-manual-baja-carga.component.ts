@@ -41,7 +41,6 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
   horaCorteMinimo: string = '00:00';
   horaCorteMaximo: string = '23:59';
 
-
   private destroy$ = new Subject();
 
   constructor(private formBuilder: FormBuilder,
@@ -64,8 +63,7 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
   }
 
   onCargarBodegas() {
-    const material = this.bajaCargaForm.controls['material'].value;
-    const filtroBodegas = this.destinosBodegaPorMaterial.filter(x => x.materiales.id == material.id);
+    const filtroBodegas = this.destinosBodegaPorMaterial.filter(x => x.materiales.id > 0);
     filtroBodegas.forEach(filtro => {
       const existe = this.bodegas.some(el => el.id === filtro.bodegas.id);
       if (!existe)
@@ -73,18 +71,16 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
     });
   }
 
-  onCargarDestinoPorBodegas() {
-    const material = this.bajaCargaForm.controls['material'].value;
+  onCargarMaterialPorBodegas() {
     const bodega = this.bajaCargaForm.controls['bodega'].value;
-    const filtros = this.destinosBodegaPorMaterial.filter(x => x.materiales.id == material.id);
-    const filtroDestinos = filtros.filter(x => x.bodegas.id == bodega.id);
-    this.destinos = [];
-    filtroDestinos.forEach(filtro => {
-      filtro.destinos.forEach(destino => {
-        const existe = this.destinos.some(el => el.id === destino.id);
-        if (!existe)
-          this.destinos.push(destino);
-      })
+    const filtrosMaterial = this.destinosBodegaPorMaterial.filter(x => x.bodegas.id == bodega.id);
+    this.materialesPuerto = [];
+    filtrosMaterial.forEach(filtro => {
+        const existe = this.materialesPuerto.some(el => el.id === filtro.materiales.id);
+        if (!existe){
+          this.materialesPuerto.push(filtro.materiales);
+          this.bajaCargaForm.controls['material'].setValue(filtro.materiales);
+        }
     });
   }
 
@@ -95,7 +91,6 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       if (balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
         balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '' ||
         balanzaManual.material == null || balanzaManual.bodega == null ||
-        balanzaManual.destino == null || balanzaManual.exportador == null ||
         balanzaManual.kilogramos == 0 ||
         balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0) {
         let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
@@ -105,7 +100,6 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
         const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
         const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
         let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza,balanzaManual,fechaInicioRegistro,fechaFinRegistro);
-        console.log('esRegistroValido--->>>', esRegistroValido);
         if (!esRegistroValido){
           this.confirmationDialogService.confirm('Baja Carga', `Ya existe una Baja Carga en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
         }else{
@@ -135,30 +129,15 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
   }
   cargarListas() {
     this.materialesPuerto = [];
-    this.exportadores = [];
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == false);
     });
     this.balanzasManualBajaCargaService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
-      console.log('registroBalanza---->>',registrosBalanza);
       this.balanza = registrosBalanza;
     });
 
     this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega.pipe(takeUntil(this.destroy$)).subscribe(destinoPorMaterial => {
       this.destinosBodegaPorMaterial = destinoPorMaterial;
-      destinoPorMaterial.forEach(filtro => {
-        const existe = this.materialesPuerto.some(el => el.id === filtro.materiales.id);
-        if (!existe)
-          this.materialesPuerto.push(filtro.materiales);
-      });
-
-    });
-    this.balanzasManualBajaCargaService.ExportadorPorMaterialPuerto.pipe(takeUntil(this.destroy$)).subscribe(exportadorPorMaterial => {
-      exportadorPorMaterial.forEach(filtro => {
-        const existe = this.exportadores.some(el => el.id === filtro.exportadores.id);
-        if (!existe)
-          this.exportadores.push(filtro.exportadores);
-      });
     });
     this.balanzasManualBajaCargaService.PeriodoDeCarga.pipe(takeUntil(this.destroy$)).subscribe(periodoDeCarga => {
       this.fechaComienzoCarga = formatDate(periodoDeCarga.fechaComienzoCarga, 'yyyy-MM-dd', 'es-ar');
@@ -177,10 +156,10 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
         this.bajaCargaForm.controls['fechaInicio'].setValue(this.fechaComienzoCarga);
         this.horaInicioMinimo = this.horaComienzoCarga;
         this.horaCorteMinimo = this.horaFinalizacionCarga;
-      }
-      if (this.balanzaManualRegistro != null) {
         this.onCargarBodegas();
-        this.onCargarDestinoPorBodegas();
+      }else{
+        this.onCargarBodegas();
+        this.onCargarMaterialPorBodegas();
       }
     });
   }
