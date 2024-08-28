@@ -133,7 +133,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     }
     if (numeroBalanza == 8){
       this.balanzasManualService.agregarCorteBajaCarga(this.balanzas8,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username);
-    }   
+    }
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }  
   public async enviarBuqueCalidad() {

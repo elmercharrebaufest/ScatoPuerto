@@ -12635,7 +12635,7 @@ namespace Molinos.Scato.Servicios.Impl
                 List<BalanzaManualDto> listaBalanzaManual = new List<BalanzaManualDto>();
                 BalanzaManualDto balanzaManualDto;
                 int correlativo = 0;
-                var listaBalanzasCorte = Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == moduloDeCargaId);
+                var listaBalanzasCorte = Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == moduloDeCargaId).OrderBy(x=> x.Fecha_Inicio).ToList();
                 foreach(var balanzasCorte in listaBalanzasCorte)
                 {
                     correlativo++;
