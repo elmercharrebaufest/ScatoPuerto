@@ -284,8 +284,8 @@ export class BalanzasManualService {
         const balanza = filtroBalanzas[index];
         const fechaInicio = this.convertirFecha(balanza.controls['fechaInicio'].value, balanza.controls['horaInicio'].value);
         const fechaCorte = this.convertirFecha(balanza.controls['fechaCorte'].value, balanza.controls['horaCorte'].value);
-        if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro <= fechaCorte) &&
-            (fechaFinRegistro >= fechaInicio && fechaFinRegistro <= fechaCorte)){
+        if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro < fechaCorte) ||
+            (fechaFinRegistro > fechaInicio && fechaFinRegistro <= fechaCorte)){
               esRegistroValido = false;
               return esRegistroValido;
             }
