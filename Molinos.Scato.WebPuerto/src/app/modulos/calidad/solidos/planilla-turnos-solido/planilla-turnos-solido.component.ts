@@ -649,7 +649,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   getRowSpanTurno(turnoForm: FormGroup) {
-    let rowSpan = 0;
+    let rowSpan = 1;
     const turno = turnoForm.getRawValue() as PlanillaDeTurnos;
     rowSpan += turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length;
     if (turno.moduloDeCargaPlanillaDeTurnosCortes.length) {
