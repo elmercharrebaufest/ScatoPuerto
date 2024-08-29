@@ -153,7 +153,7 @@ export class BalanzasManualService {
 
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      this.formData.append('file', blob, fname + ".xlsx");
+      this.formData.append('file', blob, fname);
       this.moduloDeCargaService.generarExcel(embarque.moduloDeCargaId, this.formData).subscribe(blob => {
         this.descargarArchivo(blob, fname);
       }, error => {

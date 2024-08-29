@@ -2872,5 +2872,10 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
+        
+        [OperationContract]
+        void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+
+
     }
 }

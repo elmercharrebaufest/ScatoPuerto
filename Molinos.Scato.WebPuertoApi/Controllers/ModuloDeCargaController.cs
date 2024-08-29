@@ -1095,6 +1095,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var nombreBuque = servicio.ObtenerBuqueDadoModCarga(moduloDeCargaId);
                 var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
                 var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, nombreBuque, excel).GenerarExcel();
+                servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, excel.FileName);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new ByteArrayContent(archivo)
