@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Filtros;
 using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -2821,10 +2822,10 @@ namespace Molinos.Scato.Servicios
         BalanzaManualDto ObtenerBalanzaManual(int id);
 
         [OperationContract]
-        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto);
+        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto, string nombreUsuario);
 
         [OperationContract]
-        bool EliminarBalanzaManual(int id);
+        bool EliminarBalanzaManual(int id, string nombreUsuario);
 
         [OperationContract]
         ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
@@ -2865,6 +2866,16 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
+
+        [OperationContract]
+        void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
+        
+        [OperationContract]
+        void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
+        
+        [OperationContract]
+        void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+
 
     }
 }

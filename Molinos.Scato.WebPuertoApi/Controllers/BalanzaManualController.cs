@@ -41,7 +41,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.GuardarBalanzaManual(balanzasCortes));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.GuardarBalanzaManual(balanzasCortes, balanzasCortes.Usuario));
             }
             catch
             {
@@ -51,11 +51,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpDelete]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/BalanzaManual/EliminarCortesBajaCarga")]
-        public HttpResponseMessage EliminarCortesBajaCarga(int id)
+        public HttpResponseMessage EliminarCortesBajaCarga(int id, string usuario)  
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.EliminarBalanzaManual(id));
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.EliminarBalanzaManual(id, usuario));
             }
             catch
             {

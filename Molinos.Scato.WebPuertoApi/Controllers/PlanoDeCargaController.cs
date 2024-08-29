@@ -2,17 +2,16 @@
 using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Enumeradores;
+using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
-using Molinos.Scato.Servicios.Procesamiento;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -20,7 +19,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     {
         private readonly IServicioComandos comandos;
 
-        public PlanoDeCargaController(IServicioActividadFactory<IIngresarEmbarqueService> factory, 
+        public PlanoDeCargaController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
             IServicioRepositorio servicio, IServicioComandos comandos) : base(servicio)
         {
             this.comandos = comandos;
@@ -75,11 +74,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Autorizacion(PermisosScato.PlanoDeCarga_Guardar)]
         [Route("api/PlanoDeCarga/GuardarPlanoDeCarga")]
         public HttpResponseMessage GuardarPlanoDeCarga(PlanoDeCargaDto planoDeCarga)
-        {           
-            comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga, nombreUsuario = base.nombreUsuario });
-            return Request.CreateResponse(HttpStatusCode.OK);                  
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarPlanoDeCarga { Dto = planoDeCarga, nombreUsuario = base.nombreUsuario });
+                if (!string.IsNullOrEmpty(planoDeCarga.UsuarioFinalizacion))
+                    servicio.EscribirLog($"El usuario {planoDeCarga.UsuarioFinalizacion} finaliza plano de carga con id: {planoDeCarga.Id}", TipoLog.Info, "PlanoDeCarga/GuardarPlanoDeCarga");
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                servicio.EscribirLog($"Hubo un error al intentar finalizar plano de carga con id: {planoDeCarga.Id}, intentó finalizar: {planoDeCarga.UsuarioFinalizacion}", TipoLog.Error, "PlanoDeCarga/GuardarPlanoDeCarga", ex.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
         }
-
 
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
@@ -102,6 +110,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerPlanoDeCarga(id)
             );
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_Estiba_Modificar)]
@@ -111,6 +120,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new CrearEstiba { Dto = estiba });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_Estiba_Modificar)]
@@ -120,6 +130,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new ModificarEstiba { Dto = estiba });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_Estiba_Modificar)]
@@ -139,6 +150,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new CrearAgenciaControlPrivado { Dto = agencia });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_AgenciaControlPrivado_Modificar)]
@@ -148,6 +160,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new ModificarAgenciaControlPrivado { Dto = agencia });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_AgenciaControlPrivado_Modificar)]
@@ -167,6 +180,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new CrearAgenteControlPrivado { Dto = agente });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_AgentesControlPrivado_Modificar)]
@@ -176,6 +190,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new ModificarAgenteControlPrivado { Dto = agente });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.PlanoDeCarga_AgentesControlPrivado_Modificar)]
@@ -196,11 +211,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.ObtenerUsuariosPlanoDeCarga()
             );
         }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUpExportar)]
         [Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/PlanoDeCarga/ObtenerBodyPlanoDeCarga")]
-        public HttpResponseMessage ObtenerBodyPlanoDeCarga([FromUri]int planoDeCargaId, [FromBody]EmbarqueDto embarque)
+        public HttpResponseMessage ObtenerBodyPlanoDeCarga([FromUri] int planoDeCargaId, [FromBody] EmbarqueDto embarque)
         {
             return Request.CreateResponse(HttpStatusCode.OK,
                 servicio.ObtenerBodyPlanoDeCarga(planoDeCargaId, embarque)
@@ -222,7 +238,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUpExportar)]
         [Autorizacion(PermisosScato.LineUp_Exportar)]
@@ -243,7 +258,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 // Negrita: (\f -> <b>) (\f\f -> </b>)
                 // Subrayado: (\0 -> <u>) (\0\0 -> </u>)
                 if (mail.Adjunto == null)
-                {                
+                {
                     comandos.Ejecutar(new EnvioMail
                     {
                         Cuerpo = mail.Body.Replace("\n", "<br/>").Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -252,13 +267,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         Titulo = mail.Titulo,
                         Attachment = plano.FilePathPlano == null ? null : Convert.FromBase64String(plano.FilePathPlano),
                         AttachmentName = plano.PlanoDeCargaArchivoPlanoNombre,
-                    
+
                         Attachment2 = plano.FilePathSecuencia == null ?
                             mail.Adjunto == null ? null : Convert.FromBase64String(mail.Adjunto) :
                             plano.FilePathSecuencia == null ? null : Convert.FromBase64String(plano.FilePathSecuencia),
                         AttachmentName2 = plano.FilePathSecuencia == null ?
                             mail.Nombre : plano.PlanoDeCargaArchivoSecuenciaNombre,
-                    
+
                         Attachment3 = plano.FilePathSecuencia == null ?
                             null : mail.Adjunto == null ? null : Convert.FromBase64String(mail.Adjunto),
                         AttachmentName3 = plano.FilePathSecuencia == null ? null : mail.Nombre
@@ -276,11 +291,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                         AttachmentName = mail.Nombre
                     });
                 }
+                servicio.EscribirLog($"El usuario {base.nombreUsuario} envia plano de carga por correo.", TipoLog.Info, "PlanoDeCarga/EnviarPorMail");
             }
             catch (Exception e)
             {
+                servicio.EscribirLog($"Hubo un error al intentar enviar plano de carga por correo. Ejecutado por: {base.nombreUsuario}", TipoLog.Error, "PlanoDeCarga/EnviarPorMail", e.Message);
                 response.StatusCode = HttpStatusCode.InternalServerError;
-                //response.ReasonPhrase = string.Format("File not found: {0} .", docFile);
                 throw new HttpResponseException(response);
             }
         }
@@ -292,6 +308,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new CrearExportador { Dto = exportador });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         [Route("api/PlanoDeCarga/ModificarExportador")]
         public HttpResponseMessage ModificarExportador(ExportadorDto exportador)
@@ -299,6 +316,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             comandos.Ejecutar(new ModificarExportador { Dto = exportador });
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         [HttpPost]
         [Route("api/PlanoDeCarga/EliminarExportador")]
         public HttpResponseMessage EliminarExportador(int exportadorId)
@@ -311,7 +329,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/PlanoDeCarga/ModificarCargadoPlanoDeCarga")]
         public HttpResponseMessage ModificarCargadoPlanoDeCarga(int planoDeCargaId)
         {
-
             comandos.Ejecutar(new ModificarCargadoPlanoDeCarga { Id = planoDeCargaId });
             Respuesta res = new Respuesta((int)HttpStatusCode.OK, "success");
             return Request.CreateResponse(HttpStatusCode.OK, res);
@@ -338,7 +355,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var balanzadas = servicio.BalanzadasBuque(IdModuloDeCarga);
-				return Request.CreateResponse(HttpStatusCode.OK, balanzadas);
+                return Request.CreateResponse(HttpStatusCode.OK, balanzadas);
             }
             catch (Exception ex)
             {
@@ -350,7 +367,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/PlanoDeCarga/listarCargaBalanza")]
         public HttpResponseMessage ListarCargaBalanzaPuerto()
         {
-  
             return Request.CreateResponse(HttpStatusCode.OK,
                             servicio.ListarCargaBalanzaPuerto()
                         );

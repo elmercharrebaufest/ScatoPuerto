@@ -17,7 +17,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private XSSFSheet _sheetTurnos;
         private const int NpoiUnitMultiplier = 256;
         private readonly string _path = System.Web.HttpContext.Current.Server.MapPath("~/IconoMolinosExcel.png");
-        private readonly string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaSolidos"];
         private readonly byte[] _imgMolinos;
         private readonly IList<ModuloDeCargaPlanillaDeTurnosDto> _planilla;
         private readonly IList<PlanoDeCargaBodegaDto> _listaCargaBodega;
@@ -58,8 +57,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
 
-                GuardarEnCarpetaMolinos(fileBytes, fileName);
-
                 return fileBytes;
             }
             catch (Exception ex)
@@ -73,35 +70,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     System.IO.File.Delete(filePath);
                 }
             }
-        }
-
-        private void GuardarEnCarpetaMolinos(byte[] archivo, string nombreArchivo)
-        {
-            DateTime fechaActual = DateTime.Now;
-            int año = fechaActual.Year;
-            int mes = fechaActual.Month;
-            string nombreMes = ObtenerNombreMes(mes);
-
-            string rutaBase = _pathPlanilla;
-            string rutaMes = Path.Combine(rutaBase, $"AÑO {año.ToString("0000")}", $"{mes:00}-{nombreMes}");
-
-            if (!Directory.Exists(rutaMes))
-            {
-                Directory.CreateDirectory(rutaMes);
-            }
-
-            string rutaArchivoDestino = Path.Combine(rutaMes, nombreArchivo);
-
-            using (FileStream file = File.Create(rutaArchivoDestino))
-            {
-                file.Write(archivo, 0, archivo.Length);
-            }
-        }
-
-        private string ObtenerNombreMes(int numeroMes)
-        {
-            string nombreMes = new DateTime(2024, numeroMes, 1).ToString("MMMM");
-            return char.ToUpper(nombreMes[0]) + nombreMes.Substring(1);
         }
 
         private void AgregarHojaTurnos()

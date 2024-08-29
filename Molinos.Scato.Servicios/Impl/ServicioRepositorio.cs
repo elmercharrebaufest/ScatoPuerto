@@ -12,6 +12,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
@@ -19,6 +20,7 @@ using Ninject.Extensions.Logging;
 using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Objects;
 using System.Data.Objects.SqlClient;
@@ -12718,19 +12720,22 @@ namespace Molinos.Scato.Servicios.Impl
 
             return balanzaManualDto;
         }        
-        public bool EliminarBalanzaManual(int id)
+        public bool EliminarBalanzaManual(int id, string nombreUsuario)
         {
             bool bResultado = true;
             var balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == id);
             var moduloDeCargaPlanillaDeTurnosCortes = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.idBalanzaCorte == balanzaCortes.Id);
+            var balanzasCortesDto = Obtener<BalanzasCortes, BalanzasCortesDto>(x => x.Id == id);
             if (moduloDeCargaPlanillaDeTurnosCortes != null)
                 this.repositorio.Remover(moduloDeCargaPlanillaDeTurnosCortes);
             this.repositorio.Remover(balanzaCortes);
             this.repositorio.GuardarCambios();
+            this.GuardarHistoricoBalanzaManual(balanzasCortesDto, nombreUsuario, (int)EventoABM.Baja);
+
             return bResultado;
         }
 
-        public BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto)
+        public BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto, string nombreUsuario)
         {
             try
             {
@@ -12753,6 +12758,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaCortes.Exportador_Id = dto.Exportador_Id;
                     balanzaCortes.Destino_Id = dto.Destino_Id;
                     this.repositorio.GuardarCambios();
+                    this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int) EventoABM.Modificacion);
                 }
                 else
                 {
@@ -12777,7 +12783,10 @@ namespace Molinos.Scato.Servicios.Impl
                     this.repositorio.Agregar(balanzaCortes);
                     this.repositorio.GuardarCambios();
                     dto.Id = balanzaCortes.Id;
+                    this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int) EventoABM.Alta);
                 }
+
+
                 var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                 var registroBalanzaCorte = repositorio.Obtener<BalanzasCortes>(x => x.Id == balanzaCortes.Id);
                 string tiempoTotal = "00:00";
@@ -13208,6 +13217,96 @@ namespace Molinos.Scato.Servicios.Impl
             return emb;
         }
 
+        public void EscribirLog(string mensaje, TipoLog tipoLog, string metodo, string error)
+        {
+            string texto = "";
+            if (!string.IsNullOrEmpty(mensaje))
+            {
+                texto += $"Msj: {mensaje} ";
+            }
+            if (!string.IsNullOrEmpty(metodo))
+            {
+                texto += $"Método: {metodo} ";
+            }
+            if (!string.IsNullOrEmpty(error))
+            {
+                texto += $"Error: {error} ";
+            }
+            switch (tipoLog)
+            {
+                case TipoLog.Info:
+                    log.Info(texto);
+                    break;
+                case TipoLog.Error:
+                    log.Error(texto);
+                    break;
+                case TipoLog.Debug:
+                    log.Debug(texto);
+                    break;
+                default: break;
+            }
+        }
+        
+        public void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento)
+        {
+            try
+            {
+                var logBaja = new LogABM
+                {
+                    Pantalla = "AltaBajaCargaCortesBalanzaManual",
+                    Usuario = nombreUsuario,
+                    Fecha = DateTime.Now,
+                    Evento = (EventoABM)evento,
+                    Entidad = dto.ToJson(),
+                    ClaseId = dto.Id
+                };
+                this.repositorio.Agregar(logBaja);
+                this.repositorio.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "No se pudo guardar el historico de Baja Carga y Cortes con id: {0}", dto.Id);
+                throw e;
+            }
+        }
+        public void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename)
+        {
+            try
+            {
+                log.Info($"Inicio metodo GuardarPlanillaSolidosEnCarpetaMolinos para archivo:{filename}");
+                string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaSolidos"];
+                DateTime fechaActual = DateTime.Now;
+                int año = fechaActual.Year;
+                int mes = fechaActual.Month;
+                string nombreMes = ObtenerNombreMes(mes);
+                string rutaBase = _pathPlanilla;
+                string rutaMes = Path.Combine(rutaBase, $"AÑO {año.ToString("0000")}", $"{mes:00}-{nombreMes}");
 
+                if (!Directory.Exists(rutaMes))
+                {
+                    log.Info($"Directorio {rutaMes} no existe, se procederá a crearlo.");
+                    Directory.CreateDirectory(rutaMes);
+                }
+                string rutaArchivoDestino = Path.Combine(rutaMes, filename);
+                log.Info($"Iniciando la escritura del archivo {filename} en {rutaArchivoDestino}.");
+         
+                using (FileStream file = File.Create(rutaArchivoDestino))
+                {
+                    file.Write(archivo, 0, archivo.Length);
+                }
+                log.Info($"Archivo {filename} guardado correctamente en {rutaArchivoDestino}.");
+            }
+            catch (Exception e)
+            {
+                log.Error($"Hubo un error al intentar guardar el archivo {filename}", e.Message);
+                log.Error($"Stack trace ->", e.StackTrace);
+                throw e;
+            }
+        }
+        private string ObtenerNombreMes(int numeroMes)
+        {
+            string nombreMes = new DateTime(DateTime.Now.Year, numeroMes, 1).ToString("MMMM");
+            return char.ToUpper(nombreMes[0]) + nombreMes.Substring(1);
+        }
     }
 }
