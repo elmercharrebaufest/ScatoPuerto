@@ -176,6 +176,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CompaniaDeFumigacionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Documentos\DocumentoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
@@ -384,6 +385,7 @@
     <Compile Include="IComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
+    <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="IServicioAfip.cs" />
     <Compile Include="Impl\ServicioAfip.cs" />
@@ -393,6 +395,7 @@
     <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioClientes.cs" />
+    <Compile Include="IServicioDocumento.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
     <Compile Include="IServicioRepositorioBase.cs" />

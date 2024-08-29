@@ -226,6 +226,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BuqueController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
+    <Compile Include="Controllers\DocumentoController.cs" />
     <Compile Include="Controllers\GeolocalizacionController.cs" />
     <Compile Include="Controllers\HistoricoEmbarqueLineupController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />

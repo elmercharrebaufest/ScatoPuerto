@@ -22,6 +22,7 @@ namespace Molinos.Scato.Dominio.Dto
         public ICollection<NominacionReciboDto> NominacionRecibo { get; set; }
         public string ObservacionEnvioLineUp { get; set; }
         public ICollection<NominacionEmbarqueDto> NominacionEmbarque { get; set; }
+        public ICollection<NominacionDocumentoDto> NominacionDocumentos { get; set; }
 
     }
 }

@@ -1072,3 +1072,10 @@ IF (SELECT COUNT(*) FROM SiloCelda) = 0 BEGIN
 			('CELDA 23', '#ffff99'),
 			('CELDA 30', '#e6b8b7')
 END
+
+--Estados de documentos
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Solicitado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Solicitado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Enviado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Modificado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Modificado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Aprobado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Aprobado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Enviado'); END
