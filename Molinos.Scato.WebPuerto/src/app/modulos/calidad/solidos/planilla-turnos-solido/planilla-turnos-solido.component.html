@@ -43,41 +43,42 @@
                                     </div>
                                     <ng-container formArrayName='turnos'>
                                         <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index' [formGroupName]='t'>
+
+                                            <tr>
+                                                <!-- DIA -->
+                                                <td [attr.rowspan]='getRowSpan(dia)' *ngIf="t == 0">
+                                                    <div class='column-center'>
+                                                        <span><b>{{getDia(d)}}</b></span>
+                                                        <span class='kilos'>
+                                                            {{ (getCantDia(dia)) | number: '1.0-0' }}
+                                                            <span class='turno'>Kg</span>
+                                                        </span>
+                                                        <span class='turno'>por día</span>
+                                                    </div>
+                                                </td>
+                                                <!-- TURNO -->
+                                                <td [attr.rowspan]='getRowSpanTurno(turno)'>
+                                                    <div class="column-center">
+                                                        <span>
+                                                            <b>{{turno.value.turnoPuerto?.turnoPuerto?.nombre || ''}}</b>
+                                                        </span>
+                                                        <span class='kilos'>
+                                                            {{ (getCantTurno(turno)) | number: '1.0-0' }}
+                                                            <span class='turno'>Kg</span>
+                                                        </span>
+                                                        <span class='turno'>por turno</span>
+                                                        <button class='btn btn btn-success' *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
+                                                            style="margin-top: 5px; margin-bottom: 5px" (click)='onCerrarTurno(turno)'>
+                                                            Cerrar turno
+                                                        </button>
+                                                        <img *ngIf="turno.value.guardadoPorRecibidor" src="./assets/turno_cerrado.svg" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+
                                             <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesSolido'>
                                                 <ng-container *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index' [formGroupName]='i'>
                                                     <tr>
-                                                        <!-- DIA -->
-                                                        <td [attr.rowspan]='getRowSpan(dia)' *ngIf="i == 0 && t == 0">
-                                                            <div class='column-center'>
-                                                                <span><b>{{getDia(d)}}</b></span>
-                                                                <span class='kilos'>
-                                                                    {{ (getCantDia(dia)) | number: '1.0-0' }}
-                                                                    <span class='turno'>Kg</span>
-                                                                </span>
-                                                                <span class='turno'>por día</span>
-                                                            </div>
-                                                        </td>
-                                                        <!-- TURNO -->
-                                                        <td [attr.rowspan]='getRowSpanTurno(turno)' *ngIf="i == 0">
-                                                            <div class="column-center">
-                                                                <span>
-                                                                    <b>{{turno.value.turnoPuerto?.turnoPuerto?.nombre || ''}}</b>
-                                                                </span>
-                                                                <span class='kilos'>
-                                                                    {{ (getCantTurno(turno)) | number: '1.0-0' }}
-                                                                    <span class='turno'>Kg</span>
-                                                                </span>
-                                                                <span class='turno'>por turno</span>
-                                                                <button class='btn btn btn-success'
-                                                                    *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
-                                                                    style="margin-top: 5px; margin-bottom: 5px"
-                                                                    (click)='onCerrarTurno(turno)'>
-                                                                    Cerrar turno
-                                                                </button>
-                                                                <img *ngIf="turno.value.guardadoPorRecibidor" src="./assets/turno_cerrado.svg" />
-                                                            </div>
-                                                        </td>
-
                                                         <!-- EXPORTADOR -->
                                                         <td>{{result.controls.exportador?.value.nombre}}</td>
                                                         <!-- BODEGA -->

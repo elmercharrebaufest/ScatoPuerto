@@ -4,6 +4,7 @@ using System.Linq;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Recursos;
+using Molinos.Scato.Servicios.Estrategias;
 using Molinos.Scato.Servicios.Orquestador;
 using Ninject.Extensions.Logging;
 
@@ -15,13 +16,15 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly ILogger log;
         private readonly IServicioRepositorio repositorio;
         private readonly IServicioEstadoPuesto estadoPuesto;
+        private readonly IBalanzadaContext balanzada;
 
-        public ServicioSuscriptor(IServicioComandos servicioComandos, ILogger log, IServicioRepositorio repositorio, IServicioEstadoPuesto estadoPuesto)
+        public ServicioSuscriptor(IServicioComandos servicioComandos, ILogger log, IServicioRepositorio repositorio, IServicioEstadoPuesto estadoPuesto, IBalanzadaContext balanzada)
         {
             this.servicioComandos = servicioComandos;
             this.log = log;
             this.repositorio = repositorio;
             this.estadoPuesto = estadoPuesto;
+            this.balanzada = balanzada;
         }
 
         public void Recibir(NotificacionEvento notificacion)
@@ -40,10 +43,8 @@ namespace Molinos.Scato.Servicios.Impl
                         EnviarMail(Textos.MailCierreBarrera, resultadoCierre, notificacion);
                         break;
                     case "BalanzadaRecibida":
-                        if (notificacion.Datos["tipoBalanzada"] == "fin")
-                        {
-                            servicioComandos.Ejecutar(new ValidarConsistenciaBalanzadas { Balanza = notificacion.CodigoDispositivo, CodigoDispositivo = notificacion.CodigoDispositivo, Hasta = Int32.Parse(notificacion.Datos["id"]) });
-                        }
+                        var balanzadaStrategy = balanzada.GetStrategy(notificacion.Datos["tipoBalanzada"]);
+                        balanzadaStrategy.RegistrarBalanzada(notificacion.Datos);
                         break;
                     case "CambioEstadoSensor":
                         estadoPuesto.NotificarCambioDeEstado(notificacion.CodigoDispositivo, notificacion.Datos["Mensaje"]);

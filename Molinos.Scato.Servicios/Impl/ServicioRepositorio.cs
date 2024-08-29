@@ -11389,13 +11389,26 @@ namespace Molinos.Scato.Servicios.Impl
                 var embar = new List<int>();
                 try
                 {
-                    embar = (from e in repositorio.Listar<Embarque>()
-                             join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
-                             // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
-                             join v in repositorio.Listar<Vapor>() on e.Vapor?.Id equals v.Id
-                             where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
-                             orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
-                             select (e.Id)).ToList();
+                    embar = repositorio.Listar<LineUp>(l => l.Embarque != null
+                                                         && l.Embarque.Vapor != null
+                                                         && l.ModuloDeCarga != null
+                                                         && l.Embarque.Ubicacion != 1
+                                                         && l.ModuloDeCarga.Id > 0)
+                                       .OrderBy(l => l.Embarque.OtrosMuelles)
+                                       .ThenBy(l => l.Embarque.Vicentin)
+                                       .ThenBy(l => l.Orden)
+                                       .Select(l => l.Embarque.Id)
+                                       .ToList();
+                    //var embarques = repositorio.Incluir<Embarque>();
+                    //var lineup = repositorio.Incluir<LineUp>();
+                    //var vapor = repositorio.Incluir<Vapor>();
+                    //embar = (from e in embarques
+                    //         join l in lineup on e.Id equals l.Embarque?.Id
+                    //         // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
+                    //         join v in vapor on e.Vapor?.Id equals v.Id
+                    //         where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
+                    //         orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
+                    //         select (e.Id)).ToList();
 
                 }
                 catch (Exception ex)
