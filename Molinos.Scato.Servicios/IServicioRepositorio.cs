@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Filtros;
 using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -2866,5 +2867,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
 
+        [OperationContract]
+        void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
     }
 }

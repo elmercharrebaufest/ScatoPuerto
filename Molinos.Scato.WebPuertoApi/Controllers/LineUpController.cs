@@ -1,10 +1,8 @@
-﻿using Molinos.Scato.Actividades.Interfaces;
-using Molinos.Scato.Actividades.Servicios;
-using Molinos.Scato.Dominio.Comandos;
+﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using System;
@@ -155,11 +153,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/LineUp/EnviarPorMail")]
         public void EnviarPorMail(MailDto mail)
         {
+            var usuarioSesion = base.nombreUsuario;
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
             var docFile = "Line Up " + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
             try
             {
-                //var embarques = workflows.ListarEmbarques();
                 var embarques = servicio.ListarEmbarques();
                 embarques = embarques.Where(x => x.LineUp.Ocultar == false).ToList();
                 var estado = servicio.ObtenerEstadoPuerto();
@@ -184,9 +182,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     Attachment = resultado.Archivo,
                     AttachmentName = docFile
                 });
+                servicio.EscribirLog($"El usuario {usuarioSesion} envia lineup por correo.", TipoLog.Info, "LineUp/EnviarPorMail");
             }
             catch (Exception e)
             {
+                servicio.EscribirLog($"Hubo un error al intentar enviar lineup por correo. Ejecutado por: {usuarioSesion}", TipoLog.Error, "LineUp/EnviarPorMail", e.Message);
                 response.StatusCode = HttpStatusCode.InternalServerError;
                 response.ReasonPhrase = string.Format("File not found: {0} .", docFile);
                 throw new HttpResponseException(response);
@@ -245,7 +245,5 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-
-
     }
 }

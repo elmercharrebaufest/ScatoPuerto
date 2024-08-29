@@ -12,6 +12,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
@@ -13207,6 +13208,36 @@ namespace Molinos.Scato.Servicios.Impl
             var lineup = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloDeCargaId);
             var emb = Obtener<Embarque, EmbarqueDto>(e => e.Id == lineup.Embarque.Id);
             return emb;
+        }
+
+        public void EscribirLog(string mensaje, TipoLog tipoLog, string metodo, string error)
+        {
+            string texto = "";
+            if (!string.IsNullOrEmpty(mensaje))
+            {
+                texto += $"Msj: {mensaje} ";
+            }
+            if (!string.IsNullOrEmpty(metodo))
+            {
+                texto += $"Método: {metodo} ";
+            }
+            if (!string.IsNullOrEmpty(error))
+            {
+                texto += $"Error: {error} ";
+            }
+            switch (tipoLog)
+            {
+                case TipoLog.Info:
+                    log.Info(texto);
+                    break;
+                case TipoLog.Error:
+                    log.Error(texto);
+                    break;
+                case TipoLog.Debug:
+                    log.Debug(texto);
+                    break;
+                default: break;
+            }
         }
 
 
