@@ -29,8 +29,8 @@ export class BalanzaManualRegistroService {
     return this.http.get<BalanzaManual[]>(`${this.url}BalanzaManual/ListarBalanzaManual?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
 
-  public eliminarCortesBajaCarga(id: number): Observable<boolean> {
-    return this.http.delete<boolean>(`${this.url}BalanzaManual/EliminarCortesBajaCarga?id=${id}`, { 'withCredentials': true });
+  public eliminarCortesBajaCarga(id: number, usuario: string): Observable<boolean> {
+    return this.http.delete<boolean>(`${this.url}BalanzaManual/EliminarCortesBajaCarga?id=${id}&usuario=${usuario}`, { 'withCredentials': true });
   }
 
   public guardarCortesBajaCarga(balanzasCortes: BalanzasCortesManual): Observable<BalanzaManual>{

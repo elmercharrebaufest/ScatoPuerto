@@ -2822,10 +2822,10 @@ namespace Molinos.Scato.Servicios
         BalanzaManualDto ObtenerBalanzaManual(int id);
 
         [OperationContract]
-        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto);
+        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto, string nombreUsuario);
 
         [OperationContract]
-        bool EliminarBalanzaManual(int id);
+        bool EliminarBalanzaManual(int id, string nombreUsuario);
 
         [OperationContract]
         ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
@@ -2869,5 +2869,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
+        
+        [OperationContract]
+        void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
     }
 }

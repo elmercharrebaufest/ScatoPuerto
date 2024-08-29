@@ -12720,19 +12720,22 @@ namespace Molinos.Scato.Servicios.Impl
 
             return balanzaManualDto;
         }        
-        public bool EliminarBalanzaManual(int id)
+        public bool EliminarBalanzaManual(int id, string nombreUsuario)
         {
             bool bResultado = true;
             var balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == id);
             var moduloDeCargaPlanillaDeTurnosCortes = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.idBalanzaCorte == balanzaCortes.Id);
+            var balanzasCortesDto = Obtener<BalanzasCortes, BalanzasCortesDto>(x => x.Id == id);
             if (moduloDeCargaPlanillaDeTurnosCortes != null)
                 this.repositorio.Remover(moduloDeCargaPlanillaDeTurnosCortes);
             this.repositorio.Remover(balanzaCortes);
             this.repositorio.GuardarCambios();
+            this.GuardarHistoricoBalanzaManual(balanzasCortesDto, nombreUsuario, (int)EventoABM.Baja);
+
             return bResultado;
         }
 
-        public BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto)
+        public BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto, string nombreUsuario)
         {
             try
             {
@@ -12755,6 +12758,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaCortes.Exportador_Id = dto.Exportador_Id;
                     balanzaCortes.Destino_Id = dto.Destino_Id;
                     this.repositorio.GuardarCambios();
+                    this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int) EventoABM.Modificacion);
                 }
                 else
                 {
@@ -12779,7 +12783,10 @@ namespace Molinos.Scato.Servicios.Impl
                     this.repositorio.Agregar(balanzaCortes);
                     this.repositorio.GuardarCambios();
                     dto.Id = balanzaCortes.Id;
+                    this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int) EventoABM.Alta);
                 }
+
+
                 var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                 var registroBalanzaCorte = repositorio.Obtener<BalanzasCortes>(x => x.Id == balanzaCortes.Id);
                 string tiempoTotal = "00:00";
@@ -13239,7 +13246,32 @@ namespace Molinos.Scato.Servicios.Impl
                 default: break;
             }
         }
+        
+        
+        
 
 
+        public void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento)
+        {
+            try
+            {
+                var logBaja = new LogABM
+                {
+                    Pantalla = "AltaBajaCargaCortesBalanzaManual",
+                    Usuario = nombreUsuario,
+                    Fecha = DateTime.Now,
+                    Evento = (EventoABM)evento,
+                    Entidad = dto.ToJson(),
+                    ClaseId = dto.Id
+                };
+                this.repositorio.Agregar(logBaja);
+                this.repositorio.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                log.Error(e, "No se pudo guardar el historico de Baja Carga y Cortes con id: {0}", dto.Id);
+                throw e;
+            }
+        }
     }
 }
