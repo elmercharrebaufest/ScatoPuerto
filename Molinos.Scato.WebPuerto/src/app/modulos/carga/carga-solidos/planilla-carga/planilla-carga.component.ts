@@ -67,6 +67,8 @@ export class PlanillaCargaComponent implements OnInit {
   private periodoDeCarga: PeriodoDeCarga;
   private planillasTurnos: PlanillaDeTurnos[];
 
+  private msjErrorExisteTurnosCortes: string = 'Existen cortes y/o bajas cargas en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.';
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private planoDeCargaService: PlanoDeCargaService,
@@ -854,12 +856,21 @@ export class PlanillaCargaComponent implements OnInit {
         this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.planillasTurnos = m.moduloDeCargaPlanillaDeTurnos);
       }, (err) => {
         console.error(err);
-        this.confirmationDialogService.error('Ha ocurrido un error al guardar las cargas');
+        this.mostrarError(err);
       });
     } catch (error) {
       this.confirmationDialogService.error(error.message);
     }
   }
+
+  private mostrarError(err: any) {
+    const msjError = (err.error == this.msjErrorExisteTurnosCortes) ? this.msjErrorExisteTurnosCortes
+      : 'Ha ocurrido un error al guardar las cargas';
+    if (err.error === this.msjErrorExisteTurnosCortes) {
+      this.inicializarDatos();
+    }
+    this.confirmationDialogService.error(msjError);
+  }  
 
   public cancelar() {
     this.inicializarDatos();

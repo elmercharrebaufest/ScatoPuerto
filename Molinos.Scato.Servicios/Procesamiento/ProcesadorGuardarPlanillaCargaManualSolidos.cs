@@ -148,6 +148,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             foreach (var turno in turnosEliminar)
             {
+                if(turno.ModuloDeCargaPlanillaDeTurnosCortes.Count() > 0)
+                {
+                    throw new Exception("Existen cortes y/o bajas cargas en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.");
+                }
                 foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido.ToList())
                 {
                     Repositorio.Remover(detalle);
