@@ -4,6 +4,7 @@
   max-width: 1000px;
   margin: auto;
   margin-bottom: 1rem;
+  page-break-inside: avoid;
 
   button {
     border: none;
@@ -16,6 +17,7 @@
   align-items: center;
   gap: 4rem;
   margin-bottom: 1rem;
+  page-break-inside: avoid;
 
   div {
     display: flex;
@@ -45,10 +47,27 @@
   }
 }
 
+.tabla-cargas-container {
+  >div:first-child {
+    overflow: auto;
+  }
+
+  &.carga-exportar>div:first-child {
+    margin-bottom: var(--mb-dif);
+
+    .tabla-cargas {
+      margin: 0;
+      transform-origin: top left;
+      transform: scale(var(--escalado));
+    }
+  }
+}
+
 .tabla-cargas {
   position: relative;
   z-index: 0;
   margin: auto;
+  overflow: auto;
 
   .table-overlay {
     position: absolute;
@@ -60,6 +79,7 @@
 
 table {
   text-align: center;
+  background: white;
 
   td,
   th {
@@ -261,10 +281,11 @@ div.totalizadores {
 }
 
 div.solo-lectura {
-  pointer-events: none; 
-  cursor: default;    
+  pointer-events: none;
+  cursor: default;
 }
 
-tr.boton-disabled, td.boton-disabled {
+tr.boton-disabled,
+td.boton-disabled {
   filter: brightness(0.7);
 }

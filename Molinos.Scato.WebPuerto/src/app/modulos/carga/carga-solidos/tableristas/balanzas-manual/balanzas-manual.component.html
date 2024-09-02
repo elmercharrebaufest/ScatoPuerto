@@ -14,7 +14,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col ocultarPdf" style="display: flex;justify-content: center;">
+          <div class="col ocultarPdf d-flex justify-content-center">
             <ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
                 (click)='onOpenModal(modalCorteManual,7, true)' style="margin-left: 5px;margin-right: 5px;">Alta de
@@ -26,7 +26,7 @@
           </div>
         </div>
 
-        <div style="overflow-x:auto; " class="table-responsive tableFixHead" id="divBalanza7">
+        <div style="overflow-x:auto; " class="table-responsive tableFixHead" id="divBalanza7" class='max-5vh'>
           <table class='table table-bordered lista-pe-table'
             style="border-spacing: 0px 0.5rem; border-collapse: separate;">
             <thead class="lista-pe-header tamanioHeader">
@@ -104,9 +104,9 @@
                     <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
-                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                         
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
-                      aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>                    
+                      aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                   </div>
                 </td>
               </tr>
@@ -142,7 +142,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col ocultarPdf" style="display: flex;justify-content: center;">
+          <div class="col ocultarPdf d-flex justify-content-center">
             <ng-container *ngIf="hasPermisoCorteManualBalanzas() && !esSoloLectura">
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
                 (click)='onOpenModal(modalCorteManual ,8, true)' style="margin-left: 5px;margin-right: 5px;">Alta de
@@ -154,7 +154,7 @@
           </div>
         </div>
 
-        <div style="overflow-x:auto; " class="table-responsive tableFixHead" id="divBalanza8">
+        <div style="overflow-x:auto; " class="table-responsive tableFixHead" id="divBalanza8" class='max-5vh'>
           <table class='table table-bordered lista-pe-table'
             style="border-spacing: 0px 0.5rem; border-collapse: separate;">
             <thead class="lista-pe-header tamanioHeader">
@@ -233,9 +233,9 @@
                     <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
-                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                      
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
-                      aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>                    
+                      aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                   </div>
                 </td>
               </tr>

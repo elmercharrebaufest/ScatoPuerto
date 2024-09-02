@@ -265,3 +265,15 @@ table.turnos table.tabla-embebida th{
     transform-origin: center;
     margin: 0;
 }
+
+#scrollbar-planilla-recibidores-solido {
+  height: 800px;
+}
+
+#scrollbar-planilla-recibidores-solido.scrollbar-planilla-recibidores-solido-imprimir {
+  height: auto;
+}
+
+.td-turno {
+  page-break-inside: avoid;
+}

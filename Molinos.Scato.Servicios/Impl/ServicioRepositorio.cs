@@ -13248,6 +13248,10 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
         
+        
+        
+
+
         public void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento)
         {
             try
@@ -13259,7 +13263,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Fecha = DateTime.Now,
                     Evento = (EventoABM)evento,
                     Entidad = dto.ToJson(),
-                    ClaseId = dto.Id
+                    ClaseId = dto.ModuloDeCarga_id
                 };
                 this.repositorio.Agregar(logBaja);
                 this.repositorio.GuardarCambios();
@@ -13270,6 +13274,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
+
         public void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename)
         {
             try

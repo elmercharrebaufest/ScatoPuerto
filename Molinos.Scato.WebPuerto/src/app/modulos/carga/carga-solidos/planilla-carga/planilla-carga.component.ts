@@ -879,4 +879,18 @@ export class PlanillaCargaComponent implements OnInit {
   public cancelar() {
     this.inicializarDatos();
   }
+
+  public getEscalado(tabla: HTMLElement) {
+    let escalado = 1062.75 / tabla.offsetWidth;
+    if (escalado < 1) {
+      return escalado
+    }
+    return 1;
+  }
+
+  public getDiferenciaEscaladoPx(tabla: HTMLElement) {
+    const escalado = this.getEscalado(tabla);
+    const diferencia = (tabla.offsetHeight * escalado) - tabla.offsetHeight;
+    return diferencia + 'px';
+  }
 }
