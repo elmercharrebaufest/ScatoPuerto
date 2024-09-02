@@ -37,9 +37,9 @@
       </button>
     </div>
   </div>
-  <div class="overflow-auto">
+  <div class="tabla-cargas-container" [style.--escalado]="getEscalado(tablaCarga)" [style.--mb-dif]="getDiferenciaEscaladoPx(tablaCarga)">
     <div [ngClass]="{'solo-lectura': esSoloLectura}">
-    <table class="tabla-cargas">
+    <table class="tabla-cargas" #tablaCarga>
       <div class="table-overlay" *ngIf="siloCeldaSeleccionado || destinoSeleccionado || exportadorSeleccionado"></div>
       <thead>
         <tr>
@@ -151,16 +151,16 @@
             </tr>
             <tr [ngClass]="{'boton-disabled': esSoloLectura}">
               <td class="celda-nueva-fila" [colSpan]="bodegas.length * 2">
-                <button (click)="agregarFila(turno)">Añadir fila</button>
-                <button (click)="eliminarFila(turno)">
+                <button class="ocultarPdf" (click)="agregarFila(turno)">Añadir fila</button>
+                <button class="ocultarPdf" (click)="eliminarFila(turno)">
                   <i class="fa fa-trash-o fs-icon"></i>
                 </button>
               </td>
             </tr>
             <tr [ngClass]="{'boton-disabled': esSoloLectura}" *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
               <td [colSpan]="(bodegas.length * 2) + 2" class="celda-nueva-fila">
-                <button (click)="agregarTurno()">Añadir turno</button>
-                <button (click)="eliminarTurno(turno)">
+                <button class="ocultarPdf" (click)="agregarTurno()">Añadir turno</button>
+                <button class="ocultarPdf" (click)="eliminarTurno(turno)">
                   <i class="fa fa-trash-o fs-icon"></i>
                 </button>
               </td>
@@ -169,7 +169,7 @@
           <ng-container *ngIf="h == (dias.length - 1)">
             <tr class="tr-nuevo-dia">
               <td [ngClass]="{'boton-disabled': esSoloLectura}" class="celda-nuevo-dia" [colSpan]="(bodegas.length * 2) + 4">
-                <button (click)="agregarDia()">Añadir dia</button>
+                <button class="ocultarPdf" (click)="agregarDia()">Añadir dia</button>
               </td>
               <td class="celda-separadora"></td>
               <td rowspan="2">
@@ -291,7 +291,7 @@
   </div>
   <div *ngIf="!esSoloLectura" class="d-flex justify-content-center" style="gap: 1rem;">
     <button class="btn btn-success" (click)="guardar()">Guardar</button>
-    <button class="btn btn-danger" (click)="cancelar()">Cancelar</button>
+    <button class="btn btn-danger" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
   </div>
 </div>
 </div>

@@ -67,6 +67,9 @@ export class PlanillaCargaComponent implements OnInit {
   private periodoDeCarga: PeriodoDeCarga;
   private planillasTurnos: PlanillaDeTurnos[];
 
+  private msjErrorExisteTurnosCortes: string = 'Existen cortes y/o bajas cargas en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.';
+  public estaGuardando: boolean = false;
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private planoDeCargaService: PlanoDeCargaService,
@@ -846,22 +849,48 @@ export class PlanillaCargaComponent implements OnInit {
 
   public guardar() {
     try {
+      this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
       this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
+        this.estaGuardando = false;
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
         this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.planillasTurnos = m.moduloDeCargaPlanillaDeTurnos);
       }, (err) => {
+        this.estaGuardando = false;
         console.error(err);
-        this.confirmationDialogService.error('Ha ocurrido un error al guardar las cargas');
+        this.mostrarError(err);
       });
     } catch (error) {
       this.confirmationDialogService.error(error.message);
     }
   }
 
+  private mostrarError(err: any) {
+    const msjError = (err.error == this.msjErrorExisteTurnosCortes) ? this.msjErrorExisteTurnosCortes
+      : 'Ha ocurrido un error al guardar las cargas';
+    if (err.error === this.msjErrorExisteTurnosCortes) {
+      this.inicializarDatos();
+    }
+    this.confirmationDialogService.error(msjError);
+  }  
+
   public cancelar() {
     this.inicializarDatos();
+  }
+
+  public getEscalado(tabla: HTMLElement) {
+    let escalado = 1062.75 / tabla.offsetWidth;
+    if (escalado < 1) {
+      return escalado
+    }
+    return 1;
+  }
+
+  public getDiferenciaEscaladoPx(tabla: HTMLElement) {
+    const escalado = this.getEscalado(tabla);
+    const diferencia = (tabla.offsetHeight * escalado) - tabla.offsetHeight;
+    return diferencia + 'px';
   }
 }

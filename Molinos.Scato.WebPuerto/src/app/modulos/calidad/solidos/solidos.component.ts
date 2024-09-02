@@ -216,7 +216,8 @@ export class SolidosComponent implements OnInit {
     let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     this.ocultarCamposEnPDFListas(ocultarBotones, "none");
 
-
+    const scroll = document.getElementById('scrollbar-planilla-recibidores-solido');
+    scroll.classList.add('scrollbar-planilla-recibidores-solido-imprimir');
 
     this.RecibidoresPdf = true;
 
@@ -259,8 +260,11 @@ export class SolidosComponent implements OnInit {
     }
 
     html = html.then(() => {
-      if (!imprimir) this.RecibidoresPdf = false
+      if (!imprimir) {
+        this.RecibidoresPdf = false;
+      }
       this.ocultarCamposEnPDFListas(ocultarBotones, "block");
+      scroll.classList.remove('scrollbar-planilla-recibidores-solido-imprimir');
     }).save();
     // #endregion
   }
