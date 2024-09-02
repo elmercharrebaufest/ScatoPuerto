@@ -68,6 +68,7 @@ export class PlanillaCargaComponent implements OnInit {
   private planillasTurnos: PlanillaDeTurnos[];
 
   private msjErrorExisteTurnosCortes: string = 'Existen cortes y/o bajas cargas en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.';
+  public estaGuardando: boolean = false;
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
@@ -848,13 +849,16 @@ export class PlanillaCargaComponent implements OnInit {
 
   public guardar() {
     try {
+      this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
       this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
+        this.estaGuardando = false;
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
         this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.planillasTurnos = m.moduloDeCargaPlanillaDeTurnos);
       }, (err) => {
+        this.estaGuardando = false;
         console.error(err);
         this.mostrarError(err);
       });

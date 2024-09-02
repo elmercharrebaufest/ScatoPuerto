@@ -291,7 +291,7 @@
   </div>
   <div *ngIf="!esSoloLectura" class="d-flex justify-content-center" style="gap: 1rem;">
     <button class="btn btn-success" (click)="guardar()">Guardar</button>
-    <button class="btn btn-danger" (click)="cancelar()">Cancelar</button>
+    <button class="btn btn-danger" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
   </div>
 </div>
 </div>
