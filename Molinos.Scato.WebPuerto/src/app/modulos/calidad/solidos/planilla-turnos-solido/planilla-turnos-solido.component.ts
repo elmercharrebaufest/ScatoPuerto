@@ -661,6 +661,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return rowSpan;
   }
 
+  esTurnoVacio(turnoForm: FormGroup) {
+    return this.getRowSpanTurno(turnoForm) == 1;
+  }
+
   getTurnoHorario(dia, turno) {
     let fecha = new Date();
     let horario = fecha.getHours();
