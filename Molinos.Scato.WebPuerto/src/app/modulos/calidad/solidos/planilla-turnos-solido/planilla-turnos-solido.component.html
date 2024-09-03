@@ -74,6 +74,10 @@
                                                         <img *ngIf="turno.value.guardadoPorRecibidor" src="./assets/turno_cerrado.svg" />
                                                     </div>
                                                 </td>
+                                                <!-- A mostrar si el turno está vacío -->
+                                                <td *ngIf="esTurnoVacio(turno)" colspan="5" style="text-align: center;">
+                                                    <b>No existen cargas, cortes ni bajas cargas</b>
+                                                </td>
                                             </tr>
 
                                             <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesSolido'>
