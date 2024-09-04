@@ -856,7 +856,10 @@ export class PlanillaCargaComponent implements OnInit {
         this.estaGuardando = false;
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.planillasTurnos = m.moduloDeCargaPlanillaDeTurnos);
+        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(mod => {
+          this.planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
+          this._procesoService.setModuloDeCarga(mod);
+        });
       }, (err) => {
         this.estaGuardando = false;
         console.error(err);
