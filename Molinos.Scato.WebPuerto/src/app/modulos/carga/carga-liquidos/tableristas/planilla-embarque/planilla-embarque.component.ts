@@ -264,11 +264,11 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     console.log(planillaEmbarque);
     this.guardando = true;
 
-    // if(this.validarExportadorYPartida(planillaEmbarque) == false){
-    //   this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
-    //   this.guardando = false;
-    //   return;
-    // }
+    if (this.validarExportadorYPartida(planillaEmbarque) == false) {
+      this.confirmationDialogService.confirm('¡Atención!', 'La combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+      this.guardando = false;
+      return;
+    }
 
     this.moduloCargaService.guardarPlanillaDeEmbarque(planillaEmbarque, this.idModuloDeCarga).subscribe(
       res => {
@@ -276,8 +276,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
         console.log(res);
         const texto = "Se guardo la planilla de embarque correctamente";
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-
-
         console.log('termino');
       },
       err => {
@@ -285,7 +283,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
         console.log(err);
       },
       () => {
-
         this.guardando = false;
         this.cargarPlanilla();
       });
