@@ -12,6 +12,7 @@ import { Nir, NirManualPuerto } from '@ScatoModels/nir';
 import { FuncionesGeneralesService } from './funciones-generales.service';
 import { Umap } from '@ScatoModels/umap';
 import { PlanillaDeTurnos, SiloCelda, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { RitmosBalanzaManualSolido } from '@ScatoModels/balanzadas/ritmos';
 
 @Injectable({
   providedIn: 'root'
@@ -213,6 +214,10 @@ export class ModuloDeCargaService {
     }
 
     return this.http.post(`${this.url}ModuloDeCarga/enviarPlanillaTurnoSolido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
+  }
+
+  obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {
+    return this.http.get<RitmosBalanzaManualSolido>(`${this.url}ModuloDeCarga/ObtenerRitmosBalanzaManual?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
   }
 
 }

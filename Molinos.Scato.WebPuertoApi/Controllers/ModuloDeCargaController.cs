@@ -1161,6 +1161,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK, ritmoDeCargasBalanzasDto);
         }
+        [HttpGet]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ModuloDeCarga/ObtenerRitmosBalanzaManual")]
+        public HttpResponseMessage ObtenerRitmosBalanzaManual(int modulodecarga_id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerRitmosBalanzaManual(modulodecarga_id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         [HttpGet]
         [Route("api/ModuloDeCarga/ListarPlanillaTurnos")]

@@ -54,25 +54,35 @@ export class CargandoMuelleComponent implements OnInit {
       const moduloDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga'];
       const planoDeCargaBodegas = this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'];
       planoDeCargaBodegas.forEach(x => this.tnTotales += x.cantidad );
-      
       if(this.instanciaWorkflow.embarque.esLiquido){
         this.liquido = true;
         this.balanzaService.obtenerRitmosLiquidos(moduloDeCarga.id)
         .pipe(finalize( () => this.calcularPorcentaje() ))
         .subscribe( res => {
-          console.log('obtenerRitmosLiquidos: ', res);
           this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
           this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
         });
       }else{
         this.liquido = false;
-        this.balanzaService.obtenerRitmos( moduloDeCarga.id)
-        .pipe(finalize( () => this.calcularPorcentaje() ))
-        .subscribe( res => {
-          console.log('obtenerRitmos: ', res);
-          this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
-          this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
-        });
+        if (moduloDeCarga.ingresoManualSolido){
+          this.moduloCargaService.obtenerRitmosBalanzaManual(moduloDeCarga.id)
+          .subscribe( res => {
+            this.ritmoDeCarga = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
+            this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
+            this.valorRitmo = res?.porcentajeDeCarga;
+            if(this.valorCargando != null && this.valorCargando > 0){
+              if(this.valorRitmo > 100) this.valorRitmo = 100;
+            }
+          });          
+
+        }else{
+          this.balanzaService.obtenerRitmos( moduloDeCarga.id)
+          .pipe(finalize( () => this.calcularPorcentaje() ))
+          .subscribe( res => {
+            this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
+            this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
+          });
+        }
       }
 
       this.moduloCargaService.obtenerModuloDeCarga(moduloDeCarga.id)
