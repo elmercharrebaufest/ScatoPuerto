@@ -1,3 +1,4 @@
+<div class="page-break"></div>
 <div class="bg-white shadow mt-4 p-4">
   <div [ngClass]="{'solo-lectura': esSoloLectura}">
     <div class="silos-celdas-container">
@@ -290,8 +291,8 @@
     <!-- #endregion TOTAL USO DE PALA POR PRODUCTO -->
   </div>
   <div *ngIf="!esSoloLectura" class="d-flex justify-content-center" style="gap: 1rem;">
-    <button class="btn btn-success" (click)="guardar()">Guardar</button>
-    <button class="btn btn-danger" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
+    <button class="btn btn-success ocultarPdf" (click)="guardar()">Guardar</button>
+    <button class="btn btn-danger ocultarPdf" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
   </div>
 </div>
 </div>

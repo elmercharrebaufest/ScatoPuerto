@@ -1,10 +1,13 @@
+.page-break {
+  page-break-before: always;
+}
+
 .silos-celdas-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   max-width: 1000px;
   margin: auto;
   margin-bottom: 1rem;
-  page-break-inside: avoid;
 
   button {
     border: none;
@@ -17,7 +20,6 @@
   align-items: center;
   gap: 4rem;
   margin-bottom: 1rem;
-  page-break-inside: avoid;
 
   div {
     display: flex;

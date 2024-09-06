@@ -99,7 +99,7 @@
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div *ngIf="balanza.value.bodega" class="alinearJustificado">{{balanza.value.bodega.nombre}}</div>
                 </td>
-                <td *ngIf="!esSoloLectura" class="noBorder alinearCentro centradoHorizontal">
+                <td *ngIf="!esSoloLectura" class="noBorder alinearCentro centradoHorizontal ocultarPdf">
                   <div *ngIf="!esSoloLectura" class="alinearJustificado" style="display: flex;;justify-content: space-between;">
                     <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
@@ -228,7 +228,7 @@
                   <div *ngIf="balanza.value.bodega" class="alinearJustificado">
                     {{balanza.value.bodega.nombre}}</div>
                 </td>
-                <td class="noBorder alinearCentro centradoHorizontal">
+                <td class="noBorder alinearCentro centradoHorizontal ocultarPdf">
                   <div class="alinearJustificado" style="display: flex;;justify-content: space-between;">
                     <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
@@ -261,8 +261,8 @@
 </div>
 
 <div class="col text-center">
-  <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar() && !esSoloLectura">
-    <button id="btn-terminar-exportar-planillas" class=" btn btn-primary m-4" (click)='enviarBuqueCalidad()'>TERMINAR
+  <ng-container *ngIf="hasPermisoTableroSolido_TerminarCarga_Exportar() && !esSoloLectura" class="ocultarPdf">
+    <button class=" btn btn-primary m-4 ocultarPdf" (click)='enviarBuqueCalidad()'>TERMINAR
       CARGA Y EXPORTAR PLANILLAS</button>
   </ng-container>
 </div>
