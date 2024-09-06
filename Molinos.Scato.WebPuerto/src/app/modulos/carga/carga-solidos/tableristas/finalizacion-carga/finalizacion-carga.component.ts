@@ -102,72 +102,65 @@ export class FinalizacionCargaComponent implements OnInit, OnDestroy {
   }
 
   preguntarGuardarFinalizacionCarga = () => {
-    if (this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value == '' || this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value == undefined) {
-      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar una fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+    const fechaControl = this.finalizacionCargaForm.controls.fechaFinalizacionCarga;
+    const horaControl = this.finalizacionCargaForm.controls.horaFinalizacionCarga;
+
+    if (!fechaControl.value || !horaControl.value) {
+      const mensaje = !fechaControl.value
+        ? 'Debe ingresar una fecha de finalización de carga.'
+        : 'Debe ingresar una hora de finalización de carga.';
+      this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Aceptar', '', null, null, Tipoalerta.Warning);
       return;
     }
 
-    if (this.finalizacionCargaForm.controls.horaFinalizacionCarga.value == '' || this.finalizacionCargaForm.controls.horaFinalizacionCarga.value == undefined) {
-      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar una hora de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-      return;
-    }
-
-    let fechaFinalizacionCarga = '';
-    fechaFinalizacionCarga = formatDate(this.finalizacionCargaForm.controls.fechaFinalizacionCarga.value, 'yyyy-MM-dd', 'en-US');
-    fechaFinalizacionCarga = fechaFinalizacionCarga + ' ' + this.finalizacionCargaForm.controls.horaFinalizacionCarga.value;
+    const fechaString = formatDate(fechaControl.value, 'yyyy-MM-dd', 'en-US') + ' ' + horaControl.value;
+    const fechaFinalizacionCarga = new Date(fechaString);
 
     forkJoin([
       this.balanzasManualService.listarBalanzaManual(this.embarqueSelected.moduloDeCargaId),
       this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId),
       this.moduloCargaService.obtenerPlanillaTurnos(this.embarqueSelected.moduloDeCargaId)
-    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual,moduloDeCarga,planillaTurnos]) => {
-      let fechaInicioCargaPeriodo = '';
-      let fechaFinCorteBajaCarga = '';
-      let fechaFinCargaNormal = '';
-      let fechaUltimaCarga = '';
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([balanzaManual, moduloDeCarga, planillaTurnos]) => {
+      const fechaFinCorteBajaCarga = balanzaManual
+        ? new Date(this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, true)) 
+        : null;
+      const fechaUltimaCarga = planillaTurnos
+        ? new Date(this.inicioFinalizacionCargaService.obtenerFechaUltimaCarga(planillaTurnos)) 
+        : null;
+      const fechaInicioCargaPeriodo = moduloDeCarga?.moduloDeCargaPeriodoDeCarga?.length > 0
+        ? new Date(this.inicioFinalizacionCargaService.obtenerFechaPeriodoCarga(moduloDeCarga.moduloDeCargaPeriodoDeCarga, false)) 
+        : null;
+      const fechaFinCargaNormal = moduloDeCarga
+        ? new Date(this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(moduloDeCarga.moduloDeCargaPlanillaDeTurnos, true)) 
+        : null;
 
-      if (balanzaManual!=null){
-        fechaFinCorteBajaCarga = this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, true);
-      }
-      if(planillaTurnos != null){
-        fechaUltimaCarga = this.inicioFinalizacionCargaService.obtenerFechaUltimaCarga(planillaTurnos);
-      }
-      if (moduloDeCarga!=null){
-        if (moduloDeCarga.moduloDeCargaPeriodoDeCarga!=null && moduloDeCarga.moduloDeCargaPeriodoDeCarga.length > 0){
-          fechaInicioCargaPeriodo = this.inicioFinalizacionCargaService.obtenerFechaPeriodoCarga(moduloDeCarga.moduloDeCargaPeriodoDeCarga, false);
-        }
-        fechaFinCargaNormal = this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(moduloDeCarga.moduloDeCargaPlanillaDeTurnos,true);
-      }
-      if (fechaInicioCargaPeriodo>''){
-        if (fechaInicioCargaPeriodo > fechaFinalizacionCarga){
-          this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-          return;
-        }
-      }
-      if (fechaFinCargaNormal>''){
-        if (fechaFinalizacionCarga < fechaFinCargaNormal){
-          this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga es menor a las fechas de los turnos registrados.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-          return;
-        }
-      }
-      if (fechaFinCorteBajaCarga>''){
-        if (fechaFinalizacionCarga < fechaFinCorteBajaCarga){
-          this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga es menor a las fechas de corte y baja carga registrados.', 'Aceptar', '', null, null, Tipoalerta.Warning);
-          return;
-        }
-      }
-      if (fechaUltimaCarga != '' && fechaFinalizacionCarga < fechaUltimaCarga){
-        this.confirmationDialogService.confirm('¡Atención!', 'La fecha de finalización de carga es menor a las fechas de cargas registradas en la planilla de turnos.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      if (
+        this.verificarFechas(fechaInicioCargaPeriodo, fechaFinalizacionCarga, 'La fecha de inicio de carga no puede ser mayor a la fecha de finalización de carga.') ||
+        this.verificarFechas(fechaFinCargaNormal, fechaFinalizacionCarga, 'La fecha de finalización de carga es menor a las fechas de los turnos registrados.') ||
+        this.verificarFechas(fechaFinCorteBajaCarga, fechaFinalizacionCarga, 'La fecha de finalización de carga es menor a las fechas de corte y baja carga registrados.') ||
+        this.verificarFechas(fechaUltimaCarga, fechaFinalizacionCarga, 'La fecha de finalización de carga es menor a las fechas de cargas registradas en la planilla de turnos.')
+      ) {
         return;
       }
       this.guardarFechaFinalizacionCarga();
     });
-  }
+  };
+
+  verificarFechas(fecha1: Date | null, fecha2: Date, mensaje: string): boolean {
+    if (fecha2 && fecha1 > fecha2) {
+      this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return true;
+    }else{
+      return false;
+    }
+  };
+  
   private guardarFechaFinalizacionCarga(){
     if (this.cargaFinalizada){
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
+          if(confirmed)
           this.guardarFinalizacionPeriodoDeCarga();
         });
     }else{
