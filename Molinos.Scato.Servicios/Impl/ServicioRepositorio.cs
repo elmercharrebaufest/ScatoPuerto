@@ -13646,5 +13646,50 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public Dictionary<string, decimal> ObtenerRitmosBalanzaManual(int modulodecarga_id)
+        {
+            Dictionary<string, decimal> ritmosDeCargaManual = new Dictionary<string, decimal>
+                {
+                    { "totalCargado", 0 },
+                    { "porcentajeDeCarga", 0 },
+                    { "ritmoCargaNeto", 0 }
+                };
+
+            try
+            {
+                decimal toneladasPlanilla = 0;
+                decimal toneladasPlanoDeCarga = 0;
+                decimal porcentajeDeCarga = 0;
+                decimal tiempoRestanteEnHoras = 0;
+                decimal tiempoTurnosEnHoras = 0;
+                decimal ritmoCargaNeto = 0;
+                var moduloDeCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == modulodecarga_id);
+                var lineUp = Obtener<LineUp, LineUpDto>(x => x.ModuloDeCarga.Id == modulodecarga_id);
+                foreach (var planoDeCargaBodegas in lineUp.PlanoDeCarga.PlanoDeCargaBodegas)
+                    toneladasPlanoDeCarga += Convert.ToDecimal(planoDeCargaBodegas.Cantidad);
+                
+                foreach (var turno in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
+                    toneladasPlanilla += turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(x => x.Cantidad);
+                
+                toneladasPlanilla = toneladasPlanilla / 1000;
+                porcentajeDeCarga = toneladasPlanilla > 0 ? (toneladasPlanilla / toneladasPlanoDeCarga) * 100 : 0;
+
+                tiempoTurnosEnHoras = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count * 6;
+                tiempoRestanteEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(modulodecarga_id, null, null, true);
+                tiempoTurnosEnHoras = tiempoTurnosEnHoras - tiempoRestanteEnHoras;
+                ritmoCargaNeto = tiempoTurnosEnHoras > 0 ? toneladasPlanilla / tiempoTurnosEnHoras : tiempoTurnosEnHoras;
+                ritmosDeCargaManual["totalCargado"] = (int)toneladasPlanilla;
+                ritmosDeCargaManual["porcentajeDeCarga"] = (int)porcentajeDeCarga;
+                ritmosDeCargaManual["ritmoCargaNeto"] = (int)ritmoCargaNeto;
+
+                return ritmosDeCargaManual;
+            }
+            catch (Exception e)
+            {
+                log.Error($"Hubo un error en el metodo ObtenerRitmosCargaManual", e.Message);
+                log.Error($"Stack trace ->", e.StackTrace);
+                throw e;
+            }
+        }
     }
 }
