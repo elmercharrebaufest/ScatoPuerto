@@ -1,5 +1,6 @@
 <div class="page-break"></div>
 <div class="bg-white shadow mt-4 p-4">
+  <h4 class='colorTitle py-4' style="margin-bottom: -2px;">Planilla Embarque de Sólidos</h4>
   <div [ngClass]="{'solo-lectura': esSoloLectura}">
     <div class="silos-celdas-container">
       <button *ngFor="let siloCelda of silosCeldas" [style.background]="siloCelda.color"
