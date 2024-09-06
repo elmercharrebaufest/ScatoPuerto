@@ -239,9 +239,6 @@ export class CargaSolidosComponent implements OnInit {
   ocultarBotonesImpresion(){
     let valueBotonTerminarYExportarPLanillasSolidos = '';
     let botonCorteManualBalanzasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementsByName('ocultarImpresionTableristaSolido') : null;
-    let botonTerminarYExportarPLanillasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementById('btn-terminar-exportar-planillas') : null;
-    if(botonTerminarYExportarPLanillasSolidos != null) valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display;
-    if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
     if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
     let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     let ocultarCollapse= this.elem.nativeElement.querySelectorAll(".ocultarCollapse");
@@ -254,10 +251,8 @@ export class CargaSolidosComponent implements OnInit {
     setTimeout(() => {
       if(this.mostrarTableristaOperando == true && this.inicioCarga == true) {
         if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'block');
-        if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
       }
 
-      if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
       this.restaurarExportacion(ocultarBotones);
       this.restaurarExportacion(ocultarCollapse);
       this.ocultarCamposEnPDFListas(mostrarPdf, "none");
