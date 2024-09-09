@@ -12932,8 +12932,9 @@ namespace Molinos.Scato.Servicios.Impl
         public decimal ObtenerCargaPorBalanza(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral, int numeroBalanza)
         {
             decimal totalCargaNormales = 0;
-            ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
-            
+            decimal totalBC = 0;
+            var moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
+            var balanzasCortes = ListarBalanzaManual(moduloCargaId);
             if (esCalculoGeneral) {
                 if (numeroBalanza == 0)
                 {
@@ -12942,6 +12943,11 @@ namespace Molinos.Scato.Servicios.Impl
                         decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(x => x.Cantidad);
                         totalCargaNormales += kilos;
                     }
+                    foreach(var cortes in balanzasCortes)
+                    {
+                        if (!cortes.CorteManual)
+                            totalBC += Convert.ToDecimal(cortes.Kilogramos);
+                    }
                 }
                 else
                 {
@@ -12949,6 +12955,11 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(x => Convert.ToInt32(x.BalanzaPuerto.CodigoBalanza) == numeroBalanza).Sum(x => x.Cantidad);
                         totalCargaNormales += kilos;
+                    }
+                    foreach (var cortes in balanzasCortes)
+                    {
+                        if (!cortes.CorteManual && Convert.ToInt32(cortes.NumeroBalanza) == numeroBalanza)
+                            totalBC += Convert.ToDecimal(cortes.Kilogramos);
                     }
                 }
             }
@@ -12962,6 +12973,11 @@ namespace Molinos.Scato.Servicios.Impl
                         decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(x => x.Cantidad);
                         totalCargaNormales += kilos;
                     }
+                    var balanzasCortesPorTurnos = balanzasCortes.Where(x => !x.CorteManual && Convert.ToDateTime(x.FechaInicio).Date == fechaTurno.Value.Date && x.TurnoPuerto.Orden == turno_Id).ToList();
+                    foreach (var cortes in balanzasCortesPorTurnos)
+                    {
+                       totalBC += Convert.ToDecimal(cortes.Kilogramos);
+                    }
                 }
                 else
                 {
@@ -12970,6 +12986,11 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         decimal kilos = turnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(x => Convert.ToInt32(x.BalanzaPuerto.CodigoBalanza) == numeroBalanza).Sum(x => x.Cantidad);
                         totalCargaNormales += kilos;
+                    }
+                    var balanzasCortesPorTurnos = balanzasCortes.Where(x => !x.CorteManual && Convert.ToDateTime(x.FechaInicio).Date == fechaTurno.Value.Date && x.TurnoPuerto.Orden == turno_Id && Convert.ToInt32(x.NumeroBalanza) == numeroBalanza).ToList();
+                    foreach (var cortes in balanzasCortesPorTurnos)
+                    {
+                        totalBC += Convert.ToDecimal(cortes.Kilogramos);
                     }
                 }
             }
@@ -13005,9 +13026,12 @@ namespace Molinos.Scato.Servicios.Impl
                 var turnoMaximo = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.ToString("yyyy-MM-dd") == filtroUltimoTurno.Fecha.Value.ToString("yyyy-MM-dd")).OrderByDescending(x => x.TurnoPuerto.Orden).FirstOrDefault();
                 foreach (var horas in listaBajaCargaCortesPorBalanza)
                 {
-                    DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
-                    DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
-                    horaBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                    if (horas.CorteManual)
+                    {
+                        DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
+                        DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
+                        horaBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                    }
                 }
                 if (moduloDeCarga.ModuloDeCargaPeriodoDeCarga != null && moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
                 {
@@ -13063,9 +13087,12 @@ namespace Molinos.Scato.Servicios.Impl
 
                 foreach (var horas in listaBajaCargaCortesPorBalanza)
                 {
-                    DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
-                    DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
-                    horaBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                    if (horas.CorteManual)
+                    {
+                        DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
+                        DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
+                        horaBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                    }
                 }
                 
                 horasPorTurno = horasPorTurno > 0 ? 6 : horasPorTurno;
@@ -13143,9 +13170,9 @@ namespace Molinos.Scato.Servicios.Impl
                             DateTime fechaFinTurno = Convert.ToDateTime(turnoMinimo.Fecha.Value.ToString("yyyy-MM-dd") + ' ' + (turno.Orden == 4 ? "23:59" : $"{turno.Nombre.Substring(3, 2)}:00"));
                             DateTime fechaInicioTurno = Convert.ToDateTime(turnoMinimo.Fecha.Value.ToString("yyyy-MM-dd") + ' ' + $"{turno.Nombre.Substring(0, 2)}:00");
 
-                            if (fechaComienzoCarga > turnoMinimo.Fecha)
+                            if (fechaComienzoCarga > fechaInicioTurno)
                             {
-                                tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60);
+                                tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - (Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60));
                             }
                         }
                     }
@@ -13166,7 +13193,8 @@ namespace Molinos.Scato.Servicios.Impl
 
                             if (fechaFinalizacionCarga < fechaFinTurno)
                             {
-                                tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60);
+                                fechaFinTurno = fechaFinTurno.AddMinutes(1);
+                                tiempoRestanteInicioFinCargaEnHoras += (Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60));
                             }
                         }
                     }
@@ -13195,10 +13223,6 @@ namespace Molinos.Scato.Servicios.Impl
                                 {
                                     tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60);
                                 }
-                                else
-                                {
-                                    tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Convert.ToDecimal(((fechaFinTurno - fechaInicioTurno).TotalMinutes) / 60);
-                                }
                             }
                         }
                     }
@@ -13215,11 +13239,8 @@ namespace Molinos.Scato.Servicios.Impl
                             {
                                 if (fechaFinalizacionCarga < fechaFinTurno)
                                 {
-                                    tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60);
-                                }
-                                else
-                                {
-                                    tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Convert.ToDecimal(((fechaFinTurno - fechaInicioTurno).TotalMinutes) / 60);
+                                    fechaFinTurno = fechaFinTurno.AddMinutes(1);
+                                    tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60);
                                 }
                             }
                         }
@@ -13259,25 +13280,24 @@ namespace Molinos.Scato.Servicios.Impl
             decimal tiempoTurnosEnHoras = 0;
             decimal tiempoBCCortesEnHoras = 0;
             decimal tiempoRestanteInicioFinCargaEnHoras = 0;
-
             decimal totalCargaToneladas = 0;
+            decimal totalBCToneladas = 0;
             decimal tiempoTotalDeCarga = 0;
 
-            totalCargaToneladas = this.ObtenerCargaPorBalanza(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral , 0);
+            totalCargaToneladas = this.ObtenerCargaPorBalanza(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral, 0);
             ModuloDeCarga moduloDeCarga = this.repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloCargaId);
-            var turnosPuerto = Listar<TurnoPuerto, TurnoPuertoDto>();
-
             if (esCalculoGeneral)
             {
                 var listaBajaCargaCortes = this.ListarBalanzaManual(moduloCargaId);
                 tiempoRestanteInicioFinCargaEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
                 tiempoTurnosEnHoras = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count * 6;
                 tiempoBCCortesEnHoras = 0;
-                foreach(var horas in listaBajaCargaCortes)
+                foreach (var horas in listaBajaCargaCortes)
                 {
                     DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
                     DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
                     tiempoBCCortesEnHoras += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                    if (!horas.CorteManual) totalBCToneladas += Convert.ToDecimal(horas.Kilogramos);
                 }
             }
             else
@@ -13293,10 +13313,12 @@ namespace Molinos.Scato.Servicios.Impl
                     DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
                     DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
                     tiempoBCCortesEnHoras += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                    if (!horas.CorteManual) totalBCToneladas += Convert.ToDecimal(horas.Kilogramos);
                 }
             }
+            totalBCToneladas = totalBCToneladas / 1000;
             tiempoTotalDeCarga = tiempoTurnosEnHoras - (tiempoBCCortesEnHoras + tiempoRestanteInicioFinCargaEnHoras);
-            totalCargaToneladas = Math.Round( (totalCargaToneladas / tiempoTotalDeCarga), 2);
+            totalCargaToneladas = Math.Round(((totalCargaToneladas - totalBCToneladas) / tiempoTotalDeCarga), 2);
 
             return totalCargaToneladas;
         }
@@ -13508,7 +13530,8 @@ namespace Molinos.Scato.Servicios.Impl
                 int horaInicio = Convert.ToInt32(horaInicioSel[0]);
                 int horaFin = Convert.ToInt32(horaFinSel[0]);
                 var turnoPuertoInicio = listaTurnosPuerto.Where(item => horaInicio >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaInicio < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
-                var turnoPuertoFin = listaTurnosPuerto.Where(item => horaFin >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaFin < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+                var turnoPuertoFin = listaTurnosPuerto.Where(item => horaFin <= Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+
                 if (turnoPuertoInicio.Orden == turnoPuertoFin.Orden)
                 {
                     balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
@@ -13523,13 +13546,14 @@ namespace Molinos.Scato.Servicios.Impl
                 else
                 {
                     int inicioTurno = turnoPuertoInicio.Orden;
-                    int finTurno = turnoPuertoFin.Orden + 1;
-                    while (finTurno > inicioTurno)
+                    int finTurno = turnoPuertoFin.Orden;
+
+                    while (finTurno >= inicioTurno)
                     {
                         var turnoSeleccionado = listaTurnosPuerto.Where(x => x.Orden == inicioTurno).FirstOrDefault();
                         var nombreTurno = turnoSeleccionado.Nombre.Split('-');
                         var horaInicioSeleccionado = string.Format("{0}:00", nombreTurno[0]);
-                        var horaFinSeleccionado = string.Format("{0}:59", (Convert.ToInt32(nombreTurno[1]) - 1).ToString());
+                        var horaFinSeleccionado = turnoSeleccionado.Orden == 4 ? string.Format("{0}:59", (Convert.ToInt32(nombreTurno[1]) - 1).ToString()) : string.Format("{0}:00", (Convert.ToInt32(nombreTurno[1])).ToString());
                         if (turnoSeleccionado.Orden == turnoPuertoInicio.Orden && fechaCortePuerto.FechaInicio.Date == dto.Fecha_Inicio.Value.Date)
                         {
                             balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
@@ -13549,7 +13573,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 FechaInicio = fechaCortePuerto.FechaFin.ToString("yyyy-MM-dd"),
                                 HoraInicio = horaInicioSeleccionado,
                                 FechaCorte = fechaCortePuerto.FechaFin.ToString("yyyy-MM-dd"),
-                                HoraCorte = string.Format("{0}:00", horaFin),
+                                HoraCorte = horaFinSeleccionado,
                             });
                         }
                         else
