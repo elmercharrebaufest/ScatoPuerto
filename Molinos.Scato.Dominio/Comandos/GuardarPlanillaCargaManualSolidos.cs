@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Comandos
     {
         public List<ModuloDeCargaPlanillaDeTurnosDto> Turnos { get; set; }
         public int IdModuloDeCarga { get; set; }
+        public bool DesdeHistorial { get; set; }
     }
 }

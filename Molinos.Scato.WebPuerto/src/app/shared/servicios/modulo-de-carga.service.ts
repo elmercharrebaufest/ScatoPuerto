@@ -189,8 +189,8 @@ export class ModuloDeCargaService {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
   }
 
-  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[]) {
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}`, turnos, { withCredentials: true });
+  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[], desdeHistorial: boolean) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}`, turnos, { withCredentials: true });
   }
 
   generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
@@ -199,7 +199,7 @@ export class ModuloDeCargaService {
 
   obtenerPlanillaTurnos(moduloDeCargaId: number) : Observable<PlanillaDeTurnos[]> {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
-  } 
+  }
 
   obtenerDatosMailPlanillaSolidos(moduloDeCargaId: number, cortesOcultos: number[]){
   let idsOcultos = cortesOcultos.join(',');

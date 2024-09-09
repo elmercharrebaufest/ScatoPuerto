@@ -1,7 +1,7 @@
 <div class="page-break"></div>
 <div class="bg-white shadow mt-4 p-4">
   <h4 class='colorTitle py-4' style="margin-bottom: -2px;">Planilla Embarque de Sólidos</h4>
-  <div [ngClass]="{'solo-lectura': esSoloLectura}">
+  <div [ngClass]="{'solo-lectura': !puedeEditar}">
     <div class="silos-celdas-container">
       <button *ngFor="let siloCelda of silosCeldas" [style.background]="siloCelda.color"
         (click)="seleccionarSiloCelda(siloCelda)">
@@ -40,7 +40,7 @@
     </div>
   </div>
   <div class="tabla-cargas-container" [style.--escalado]="getEscalado(tablaCarga)" [style.--mb-dif]="getDiferenciaEscaladoPx(tablaCarga)">
-    <div [ngClass]="{'solo-lectura': esSoloLectura}">
+    <div [ngClass]="{'solo-lectura': !puedeEditar}">
     <table class="tabla-cargas" #tablaCarga>
       <div class="table-overlay" *ngIf="siloCeldaSeleccionado || destinoSeleccionado || exportadorSeleccionado"></div>
       <thead>
@@ -151,7 +151,7 @@
               </td>
               <!-- #endregion Gravedad -->
             </tr>
-            <tr [ngClass]="{'boton-disabled': esSoloLectura}">
+            <tr [ngClass]="{'boton-disabled': !puedeEditar}">
               <td class="celda-nueva-fila" [colSpan]="bodegas.length * 2">
                 <button class="ocultarPdf" (click)="agregarFila(turno)">Añadir fila</button>
                 <button class="ocultarPdf" (click)="eliminarFila(turno)">
@@ -159,7 +159,7 @@
                 </button>
               </td>
             </tr>
-            <tr [ngClass]="{'boton-disabled': esSoloLectura}" *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
+            <tr [ngClass]="{'boton-disabled': !puedeEditar}" *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
               <td [colSpan]="(bodegas.length * 2) + 2" class="celda-nueva-fila">
                 <button class="ocultarPdf" (click)="agregarTurno()">Añadir turno</button>
                 <button class="ocultarPdf" (click)="eliminarTurno(turno)">
@@ -170,7 +170,7 @@
           </ng-container>
           <ng-container *ngIf="h == (dias.length - 1)">
             <tr class="tr-nuevo-dia">
-              <td [ngClass]="{'boton-disabled': esSoloLectura}" class="celda-nuevo-dia" [colSpan]="(bodegas.length * 2) + 4">
+              <td [ngClass]="{'boton-disabled': !puedeEditar}" class="celda-nuevo-dia" [colSpan]="(bodegas.length * 2) + 4">
                 <button class="ocultarPdf" (click)="agregarDia()">Añadir dia</button>
               </td>
               <td class="celda-separadora"></td>
@@ -291,7 +291,7 @@
     </table>
     <!-- #endregion TOTAL USO DE PALA POR PRODUCTO -->
   </div>
-  <div *ngIf="!esSoloLectura" class="d-flex justify-content-center" style="gap: 1rem;">
+  <div *ngIf="puedeEditar" class="d-flex justify-content-center" style="gap: 1rem;">
     <button class="btn btn-success ocultarPdf" (click)="guardar()">Guardar</button>
     <button class="btn btn-danger ocultarPdf" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
   </div>
