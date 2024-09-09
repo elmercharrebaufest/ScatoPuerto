@@ -75,13 +75,6 @@ export class CargandoMuelleComponent implements OnInit {
             }
           });          
 
-        }else{
-          this.balanzaService.obtenerRitmos( moduloDeCarga.id)
-          .pipe(finalize( () => this.calcularPorcentaje() ))
-          .subscribe( res => {
-            this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
-            this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
-          });
         }
       }
 

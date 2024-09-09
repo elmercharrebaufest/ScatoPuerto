@@ -1,3 +1,5 @@
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
@@ -9,6 +11,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+import { SessionService } from '@ScatoServicios/session.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
@@ -67,20 +70,25 @@ export class PlanillaCargaComponent implements OnInit {
   private periodoDeCarga: PeriodoDeCarga;
   private planillasTurnos: PlanillaDeTurnos[];
 
-  private msjErrorExisteTurnosCortes: string = 'Existen cortes y/o bajas cargas en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.';
   public estaGuardando: boolean = false;
+
+  public puedeEditar: boolean;
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private planoDeCargaService: PlanoDeCargaService,
     private moduloDecargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private session: SessionService
   ) {
     this.inicializarForm();
   }
 
   ngOnInit(): void {
+    const user = this.session.getUser() as Usuario;
+    this.puedeEditar = !this.esSoloLectura || user.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+
     const embarque = this._procesoService.getEmbarqueSelected();
     this.form.get('embarqueId').setValue(embarque.id);
     forkJoin([
@@ -852,7 +860,7 @@ export class PlanillaCargaComponent implements OnInit {
       this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
-      this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
+      this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura).subscribe(() => {
         this.estaGuardando = false;
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
@@ -871,13 +879,13 @@ export class PlanillaCargaComponent implements OnInit {
   }
 
   private mostrarError(err: any) {
-    const msjError = (err.error == this.msjErrorExisteTurnosCortes) ? this.msjErrorExisteTurnosCortes
-      : 'Ha ocurrido un error al guardar las cargas';
-    if (err.error === this.msjErrorExisteTurnosCortes) {
+    let msjError = 'Ha ocurrido un error al guardar las cargas';
+    if (typeof err.error == 'string' && err.error.startsWith('Existen')) {
+      msjError = err.error;
       this.inicializarDatos();
     }
     this.confirmationDialogService.error(msjError);
-  }  
+  }
 
   public cancelar() {
     this.inicializarDatos();

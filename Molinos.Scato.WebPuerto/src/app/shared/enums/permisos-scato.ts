@@ -59,6 +59,9 @@ export enum PermisosScato {
   TableroSolido_VerRitmos = 'TableroSolido_VerRitmos',
   TableroSolido_VerInformacionAdicional = 'TableroSolido_VerInformacionAdicional',
 
+  // Supervisor Operaciones
+  TableroSolido_EditarCargaHistorial = "TableroSolido_EditarCargaHistorial",
+
   // Liquido
   Liquido_VerPeriodoDeCarga = 'Liquido_VerPeriodoDeCarga',
   Liquido_EditarPeriodoDeCarga = 'Liquido_EditarPeriodoDeCarga',

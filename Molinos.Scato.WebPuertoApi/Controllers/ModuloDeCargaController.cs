@@ -1063,9 +1063,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarCargaManualSolidos")]
-        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, List<ModuloDeCargaPlanillaDeTurnosDto> turnos)
+        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, bool desdeHistorial, List<ModuloDeCargaPlanillaDeTurnosDto> turnos)
         {
-            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, Usuario = base.nombreUsuario });
+            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, DesdeHistorial = desdeHistorial, Usuario = base.nombreUsuario });
             if (resultado.HayErrores)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
