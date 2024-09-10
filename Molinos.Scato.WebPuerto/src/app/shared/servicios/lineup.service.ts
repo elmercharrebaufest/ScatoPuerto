@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'environments/environment';
 import { EstadoPuerto } from '@ScatoModels/estado-puerto';
 import { Mail } from '@ScatoModels/mail';
@@ -15,8 +15,16 @@ export class LineupService {
   url: string = environment.apiUrl;
   private recargarListado = new Subject<any>();
   dataRecargarListado$ = this.recargarListado.asObservable();
+  private _actualizarRitmos: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(private http: HttpClient) {
+  }
+
+  set actualizarRitmos(value: any){
+    this._actualizarRitmos.next(value);
+  }
+  get actualizarRitmos(){
+    return this._actualizarRitmos.asObservable();
   }
 
   sendRecargarListado(data: any) {
