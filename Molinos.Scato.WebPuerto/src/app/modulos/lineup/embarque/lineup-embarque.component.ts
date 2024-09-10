@@ -491,6 +491,7 @@ export class LineupEmbarqueComponent implements OnInit {
         this.instanciaWorkflow.lineUp.orden = posicion;
         this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
           if (this.observador) this.observador.Actualizar();
+          this.lineUpService.actualizarRitmos = true;
         });
     }
   }

@@ -13029,7 +13029,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
                         DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
-                        horaBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                        horaBCCortesMinutos += Math.Round(Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60), 2);
                     }
                 }
                 if (moduloDeCarga.ModuloDeCargaPeriodoDeCarga != null && moduloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
@@ -13045,7 +13045,7 @@ namespace Molinos.Scato.Servicios.Impl
                         DateTime fechaInicioTurno = Convert.ToDateTime(turnoMinimo.Fecha.Value.ToString("yyyy-MM-dd") + ' ' + $"{turno.Nombre.Substring(0, 2)}:00");
                         if (fechaComienzoCarga > fechaInicioTurno)
                         {
-                            tiempoRestanteInicioFinCargaEnHoras += horasPorCadaTurno - Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60);
+                            tiempoRestanteInicioFinCargaEnHoras += Math.Round((horasPorCadaTurno - Math.Round(Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60),2)), 2);
                         }
                     }
                     if (periodoDeCarga.FechaFinalizacionCarga != null)
@@ -13059,11 +13059,11 @@ namespace Molinos.Scato.Servicios.Impl
                             DateTime fechaFinTurno = Convert.ToDateTime(turnoMaximo.Fecha.Value.ToString("yyyy-MM-dd") + ' ' + (turno.Orden == 4 ? "23:59" : $"{turno.Nombre.Substring(3, 2)}:00"));
                             if (fechaFinalizacionCarga < fechaFinTurno)
                             {
-                                tiempoRestanteInicioFinCargaEnHoras += horasPorCadaTurno - Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60);
+                                tiempoRestanteInicioFinCargaEnHoras += Math.Round((horasPorCadaTurno - Math.Round(Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60), 2)), 2);
                             }
                         }
                     }
-                    horasPorTurno = horasPorTurno - (tiempoRestanteInicioFinCargaEnHoras + horaBCCortesMinutos);
+                    horasPorTurno = Math.Round((horasPorTurno - (tiempoRestanteInicioFinCargaEnHoras + horaBCCortesMinutos)), 2);
                 }
             }
             else
@@ -13090,13 +13090,13 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
                         DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
-                        horaBCCortesMinutos += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
+                        horaBCCortesMinutos += Math.Round(Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60),2);
                     }
                 }
                 
                 horasPorTurno = horasPorTurno > 0 ? 6 : horasPorTurno;
 
-                if (periodoDeCarga.FechaComienzoCarga != null)
+                if(periodoDeCarga.FechaComienzoCarga != null)
                 {
                     DateTime fechaComienzoCarga = Convert.ToDateTime($"{periodoDeCarga.FechaComienzoCarga.Value.ToString("yyyy-MM-dd")} {periodoDeCarga.HoraComienzoCarga}");
                     if (fechaTurno.Value.ToString("yyyy-MM-dd") == fechaComienzoCarga.ToString("yyyy-MM-dd"))
@@ -13106,9 +13106,9 @@ namespace Molinos.Scato.Servicios.Impl
                         if (fechaComienzoCarga >= fechaInicioTurno && fechaComienzoCarga < fechaFinTurno)
                         {
                             if (fechaComienzoCarga > fechaInicioTurno)
-                                horasPorTurno = Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60);
+                                horasPorTurno = Math.Round(Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60),2);
                             else
-                                horasPorTurno = Convert.ToDecimal(((fechaFinTurno - fechaInicioTurno).TotalMinutes) / 60);
+                                horasPorTurno = Math.Round(Convert.ToDecimal(((fechaFinTurno - fechaInicioTurno).TotalMinutes) / 60),2);
                         }
                     }
                 }
@@ -13122,13 +13122,13 @@ namespace Molinos.Scato.Servicios.Impl
                         if (fechaFinalizacionCarga >= fechaInicioTurno && fechaFinalizacionCarga < fechaFinTurno)
                         {
                             if (fechaFinalizacionCarga < fechaFinTurno)
-                                horasPorTurno = Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60);
+                                horasPorTurno = Math.Round(Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60), 2);
                             else
-                                horasPorTurno = Convert.ToDecimal(((fechaFinTurno - fechaInicioTurno).TotalMinutes) / 60);
+                                horasPorTurno = Math.Round(Convert.ToDecimal(((fechaFinTurno - fechaInicioTurno).TotalMinutes) / 60), 2);
                         }
                     }
                 }
-                horasPorTurno = horasPorTurno - horaBCCortesMinutos;
+                horasPorTurno = Math.Round(horasPorTurno, 2) - Math.Round(horaBCCortesMinutos, 2);
             }
             return horasPorTurno;
         }
@@ -13171,7 +13171,8 @@ namespace Molinos.Scato.Servicios.Impl
 
                             if (fechaComienzoCarga > fechaInicioTurno)
                             {
-                                tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - (Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60));
+                                tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Math.Round((Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60)),2);
+                                tiempoRestanteInicioFinCargaEnHoras = Math.Round(tiempoRestanteInicioFinCargaEnHoras, 2);
                             }
                         }
                     }
@@ -13193,7 +13194,8 @@ namespace Molinos.Scato.Servicios.Impl
                             if (fechaFinalizacionCarga < fechaFinTurno)
                             {
                                 fechaFinTurno = fechaFinTurno.AddMinutes(1);
-                                tiempoRestanteInicioFinCargaEnHoras += (Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60));
+                                tiempoRestanteInicioFinCargaEnHoras += Math.Round((Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60)),2);
+                                tiempoRestanteInicioFinCargaEnHoras = Math.Round(tiempoRestanteInicioFinCargaEnHoras, 2);
                             }
                         }
                     }
@@ -13220,7 +13222,8 @@ namespace Molinos.Scato.Servicios.Impl
                             {
                                 if (fechaComienzoCarga > fechaInicioTurno)
                                 {
-                                    tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60);
+                                    tiempoRestanteInicioFinCargaEnHoras += horasTrabajaBalanza - Math.Round((Convert.ToDecimal(((fechaFinTurno - fechaComienzoCarga).TotalMinutes) / 60)), 2);
+                                    tiempoRestanteInicioFinCargaEnHoras = Math.Round(tiempoRestanteInicioFinCargaEnHoras, 2);
                                 }
                             }
                         }
@@ -13239,7 +13242,8 @@ namespace Molinos.Scato.Servicios.Impl
                                 if (fechaFinalizacionCarga < fechaFinTurno)
                                 {
                                     fechaFinTurno = fechaFinTurno.AddMinutes(1);
-                                    tiempoRestanteInicioFinCargaEnHoras += Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60);
+                                    tiempoRestanteInicioFinCargaEnHoras += Math.Round((Convert.ToDecimal(((fechaFinTurno - fechaFinalizacionCarga).TotalMinutes) / 60)), 2);
+                                    tiempoRestanteInicioFinCargaEnHoras = Math.Round(tiempoRestanteInicioFinCargaEnHoras, 2);
                                 }
                             }
                         }
@@ -13270,6 +13274,7 @@ namespace Molinos.Scato.Servicios.Impl
                 tiempoRestanteInicioFinCargaEnHoras = this.CalcularTiempoRestanteInicioFinTurnos(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
                 tiempoDeCarga = tiempoTurnosHoras - (tiempoBCCortesMinutos + tiempoRestanteInicioFinCargaEnHoras);
             }
+            tiempoDeCarga = Math.Round(tiempoDeCarga, 2);
             totalCargaBruta = Math.Round((totalCargaBruta / tiempoDeCarga), 2);
             return totalCargaBruta;
         }
@@ -13295,8 +13300,8 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
                     DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
-                    tiempoBCCortesEnHoras += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
-                    if (!horas.CorteManual) totalBCToneladas += Convert.ToDecimal(horas.Kilogramos);
+                    tiempoBCCortesEnHoras += Math.Round(Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60),2);
+                    if (!horas.CorteManual) totalBCToneladas += Math.Round((Convert.ToDecimal(horas.Kilogramos)), 2);
                 }
             }
             else
@@ -13311,14 +13316,17 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     DateTime fechaInicio = Convert.ToDateTime(horas.FechaInicio + ' ' + horas.HoraInicio);
                     DateTime fechaCorte = Convert.ToDateTime(horas.FechaCorte + ' ' + horas.HoraCorte);
-                    tiempoBCCortesEnHoras += Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60);
-                    if (!horas.CorteManual) totalBCToneladas += Convert.ToDecimal(horas.Kilogramos);
+                    tiempoBCCortesEnHoras += Math.Round(Convert.ToDecimal(((fechaCorte - fechaInicio).TotalMinutes) / 60), 2);
+                    if (!horas.CorteManual) totalBCToneladas += Math.Round((Convert.ToDecimal(horas.Kilogramos)), 2);
                 }
             }
             totalBCToneladas = totalBCToneladas / 1000;
-            tiempoTotalDeCarga = tiempoTurnosEnHoras - (tiempoBCCortesEnHoras + tiempoRestanteInicioFinCargaEnHoras);
-            totalCargaToneladas = Math.Round(((totalCargaToneladas - totalBCToneladas) / tiempoTotalDeCarga), 2);
+            totalBCToneladas = Math.Round(totalBCToneladas, 2);
 
+            tiempoTotalDeCarga = tiempoTurnosEnHoras - (tiempoBCCortesEnHoras + tiempoRestanteInicioFinCargaEnHoras);
+            tiempoTotalDeCarga = Math.Round(tiempoTotalDeCarga, 2);
+
+            totalCargaToneladas = Math.Round(((totalCargaToneladas - totalBCToneladas) / tiempoTotalDeCarga), 2);
             return totalCargaToneladas;
         }
 
