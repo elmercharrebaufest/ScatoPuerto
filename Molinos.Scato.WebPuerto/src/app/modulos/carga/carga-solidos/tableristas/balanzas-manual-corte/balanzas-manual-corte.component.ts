@@ -69,7 +69,7 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       }
     });
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
-      this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true);
+      this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != 'Normal');
       this.cargarFormularioEditar();
     });
     this.balanzasManualCorteService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
