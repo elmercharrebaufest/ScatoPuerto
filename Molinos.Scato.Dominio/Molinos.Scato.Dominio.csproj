@@ -124,6 +124,7 @@
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
     <Compile Include="Dto\RitmoDeCargasBalanzasDto.cs" />
     <Compile Include="Dto\SiloCeldaDto.cs" />
+    <Compile Include="Dto\ValidacionTraslapeFechasBalanzaManualDto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordo.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordoDeclaracion.cs" />

@@ -1122,7 +1122,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 fechaTurnoSel = Convert.ToDateTime(fechaTurno);
                 var moduloDeCarga = servicio.ObtenerModuloDeCarga(idModuloDeCarga);
                 var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurnoSel.Value.Date && x.TurnoPuerto.Orden == turno).FirstOrDefault();
-                if (listaTurnos == null)
+                if (listaTurnos == null || listaTurnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Count < 1)
                 {
                     existeCarga = false;
                 }
