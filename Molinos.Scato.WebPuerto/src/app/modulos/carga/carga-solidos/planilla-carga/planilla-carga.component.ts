@@ -25,7 +25,7 @@ interface ExportadorColor extends Exportador {
 }
 
 interface TotalExportadorProducto {
-  material: MaterialPuerto,
+  material: MaterialPuerto;
   cantidadesExportadores: {
     exportador: Exportador,
     cantidad: number
@@ -64,6 +64,7 @@ export class PlanillaCargaComponent implements OnInit {
   public totalPala: number = 0;
 
   public totalesSiloCeldaProducto: { material: MaterialPuerto, siloCelda: SiloCelda, cantidad: number }[] = [];
+  public totalesDestinoProducto: { material: MaterialPuerto, destino: DestinoColor, cantidad: number }[] = [];
   public totalesExportadorProducto: TotalExportadorProducto[] = [];
   public totalesPalaProducto: { material: MaterialPuerto, cantidad: number }[] = [];
 
@@ -612,6 +613,7 @@ export class PlanillaCargaComponent implements OnInit {
     this.totalesBodegas.forEach(tb => tb.totalCargado = 0);
     this.totalesSiloCeldaProducto = [];
     this.totalesExportadorProducto = [];
+    this.totalesDestinoProducto = [];
 
     for (const dia of (this.form.get('dias') as FormArray).controls) {
       for (const turno of (dia.get('turnos') as FormArray).controls) {
@@ -626,6 +628,17 @@ export class PlanillaCargaComponent implements OnInit {
             } else {
               totalSiloCelda = { siloCelda: carga.siloCelda, material: carga.materialPuerto, cantidad: carga.cantidad };
               this.totalesSiloCeldaProducto.push(totalSiloCelda);
+            }
+          }
+
+          if (carga.destino) {
+            let totalDestino = this.totalesDestinoProducto.find(t => t.destino.id == carga.destino.id && t.material.id == carga.materialPuerto.id);
+            if (totalDestino) {
+              totalDestino.cantidad += carga.cantidad;
+            } else {
+              const destino = this.destinos.find(d => d.id == carga.destino.id);
+              totalDestino = { destino, material: carga.materialPuerto, cantidad: carga.cantidad };
+              this.totalesDestinoProducto.push(totalDestino);
             }
           }
 

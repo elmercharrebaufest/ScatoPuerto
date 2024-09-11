@@ -93,7 +93,9 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             foreach (PlanoDeCargaBodegaDto carga in _cargasPlano)
             {
                 if (carga.Cantidad != null)
-                    total += (decimal)carga.Cantidad / 1000;
+                {
+                    total += ((int)carga.Cantidad*1000) / 1000;
+                }
             }
             return total;
         }

@@ -981,4 +981,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     }
   }
 
+  estaOculto(id: number): boolean {
+    return this.cortesOcultos.includes(id);
+  }
+
 }

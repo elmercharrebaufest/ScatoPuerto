@@ -251,6 +251,36 @@
       </tbody>
     </table>
     <!-- #endregion TOTALES POR CELDA/SILO Y PRODUCTO -->
+     <!-- #region TOTALES POR DESTINO Y PRODUCTO -->
+     <table>
+      <thead>
+        <tr>
+          <th colspan="3">TOTALES POR DESTINO Y PRODUCTO</th>
+        </tr>
+        <tr>
+          <th>Destino</th>
+          <th>Cantidad</th>
+          <th>Producto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let total of totalesDestinoProducto">
+          <td [style.background]="total.destino.color">
+            {{total.destino.nombre}}
+          </td>
+          <td [style.background]="total.destino.color">
+            {{total.cantidad.toLocaleString('es-AR')}}
+          </td>
+          <td [style.background]="total.material.color">
+            {{total.material.descripcionCorta}}
+          </td>
+        </tr>
+        <tr *ngIf="!totalesSiloCeldaProducto.length">
+          <td colspan="3">Aún no hay valores para mostrar</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- #endregion TOTALES POR DESTINO Y PRODUCTO -->
     <!-- #region TOTALES POR EXPORTADOR Y PRODUCTO -->
     <table>
       <thead>

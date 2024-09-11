@@ -151,6 +151,7 @@
                                                                                 <input type="checkbox"
                                                                                     class="small-checkbox"
                                                                                     [disabled]="esSoloLectura"
+                                                                                    [checked]="estaOculto(corte.value.id)"
                                                                                     (change)="onCheckboxOcultarCorte($event, corte.value.id)" />
                                                                             </td>
                                                                         </tr>

@@ -274,11 +274,17 @@ tr.totales {
 
 div.totalizadores {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   margin-top: 1rem;
   gap: 1rem;
 
   table {
-    flex: 1;
+    min-width: 300px;
+
+    td {
+      padding-inline: .5rem;
+    }
   }
 }
 
