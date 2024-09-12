@@ -41,8 +41,8 @@ export class CargandoMuelleComponent implements OnInit {
       this.user = this.session.getUser()
       this.lineupService.actualizarRitmos.subscribe(data => {
         console.log('actualizar ritmos', data);
-        if (data!=null && data) {
-          this.calcularRitmos();
+        if (data!=null && data.actualizarRitmos) {
+          this.calcularRitmos(data.moduloDeCargaId);
         }
       });
   }
@@ -59,7 +59,7 @@ export class CargandoMuelleComponent implements OnInit {
       const moduloDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga'];
       const planoDeCargaBodegas = this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'];
       planoDeCargaBodegas.forEach(x => this.tnTotales += x.cantidad );
-      this.calcularRitmos();
+      this.calcularRitmos(moduloDeCarga.id);
       this.moduloCargaService.obtenerModuloDeCarga(moduloDeCarga.id)
       .subscribe(res => {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
@@ -76,13 +76,10 @@ export class CargandoMuelleComponent implements OnInit {
     }
   }
 
-  calcularRitmos(){
-    console.log('actualizar calcularRitmos');
-
-    const moduloDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga'];
+  calcularRitmos(moduloDeCargaId){
     if(this.instanciaWorkflow.embarque.esLiquido){
       this.liquido = true;
-      this.balanzaService.obtenerRitmosLiquidos(moduloDeCarga.id)
+      this.balanzaService.obtenerRitmosLiquidos(moduloDeCargaId)
       .pipe(finalize( () => this.calcularPorcentaje() ))
       .subscribe( res => {
         this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
@@ -90,10 +87,7 @@ export class CargandoMuelleComponent implements OnInit {
       });
     }else{
       this.liquido = false;
-      console.log('actualizar ingresoManualSolido');
-
-      if (moduloDeCarga.ingresoManualSolido){
-        this.moduloCargaService.obtenerRitmosBalanzaManual(moduloDeCarga.id)
+        this.moduloCargaService.obtenerRitmosBalanzaManual(moduloDeCargaId)
         .subscribe( res => {
           this.ritmoDeCarga = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
           this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
@@ -102,8 +96,6 @@ export class CargandoMuelleComponent implements OnInit {
             if(this.valorRitmo > 100) this.valorRitmo = 100;
           }
         });          
-
-      }
     }
   }
 

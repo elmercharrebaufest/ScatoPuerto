@@ -6,6 +6,7 @@ import { EstadoPuerto } from '@ScatoModels/estado-puerto';
 import { Mail } from '@ScatoModels/mail';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { LineUp } from '@ScatoModels/lineUp';
+import { EmbarqueRitmosLineup } from '@ScatoModels/embarque-ritmos-lineup';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class LineupService {
   url: string = environment.apiUrl;
   private recargarListado = new Subject<any>();
   dataRecargarListado$ = this.recargarListado.asObservable();
-  private _actualizarRitmos: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  private _actualizarRitmos: BehaviorSubject<EmbarqueRitmosLineup> = new BehaviorSubject<EmbarqueRitmosLineup>(null);
 
   constructor(private http: HttpClient) {
   }
