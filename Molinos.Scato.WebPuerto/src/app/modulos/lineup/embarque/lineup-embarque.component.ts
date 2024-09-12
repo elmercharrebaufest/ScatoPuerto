@@ -32,6 +32,7 @@ import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqu
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { EmbarqueRitmosLineup } from '@ScatoModels/embarque-ritmos-lineup';
 // </ ARMOA005-1421 Dylan Lopez>
 @Component({
   selector: 'app-lineup-embarque',
@@ -491,7 +492,10 @@ export class LineupEmbarqueComponent implements OnInit {
         this.instanciaWorkflow.lineUp.orden = posicion;
         this.lineUpService.modificarOrdenLineUp(idsYorden).subscribe(x => {
           if (this.observador) this.observador.Actualizar();
-          this.lineUpService.actualizarRitmos = true;
+          let ritmosLineup: EmbarqueRitmosLineup = new EmbarqueRitmosLineup();
+          ritmosLineup.moduloDeCargaId = this.instanciaWorkflow.lineUp.moduloDeCarga.id;
+          ritmosLineup.actualizarRitmos = true;
+          this.lineUpService.actualizarRitmos = ritmosLineup;
         });
     }
   }
