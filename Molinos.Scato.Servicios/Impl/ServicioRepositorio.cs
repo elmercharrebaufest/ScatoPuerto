@@ -13325,10 +13325,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             tiempoBCCortesEnHoras = ObtenerHorasCortesBajaCarga(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
-
-            totalBCToneladas = totalBCToneladas / 1000;
             totalBCToneladas = Math.Round(totalBCToneladas, 2);
-
             tiempoTotalDeCarga = tiempoTurnosEnHoras - (tiempoBCCortesEnHoras + tiempoRestanteInicioFinCargaEnHoras);
             tiempoTotalDeCarga = Math.Round(tiempoTotalDeCarga, 2);
 
