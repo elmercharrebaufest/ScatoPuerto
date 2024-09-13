@@ -12418,7 +12418,7 @@ namespace Molinos.Scato.Servicios.Impl
                             var moduloCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == item.ModuloDeCargaId);
                             if (moduloCarga.IngresoManualSolido && moduloCarga.ModuloDeCargaPlanillaDeTurnos.Count > 0)
                             {
-                                item.TotalRitmoNormal = 0;// ObtenerRitmoCargaNeta(item.ModuloDeCargaId, null, null, true); ;
+                                item.TotalRitmoNormal = ObtenerRitmoCargaNeta(item.ModuloDeCargaId, null, null, true); ;
                             }
                             else
                             {
@@ -13326,10 +13326,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             tiempoBCCortesEnHoras = ObtenerHorasCortesBajaCarga(moduloCargaId, fechaTurno, turno_Id, esCalculoGeneral);
-
-            totalBCToneladas = totalBCToneladas / 1000;
             totalBCToneladas = Math.Round(totalBCToneladas, 2);
-
             tiempoTotalDeCarga = tiempoTurnosEnHoras - (tiempoBCCortesEnHoras + tiempoRestanteInicioFinCargaEnHoras);
             tiempoTotalDeCarga = Math.Round(tiempoTotalDeCarga, 2);
 
