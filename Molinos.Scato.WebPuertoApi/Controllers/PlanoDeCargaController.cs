@@ -381,5 +381,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 );
             return response;
         }
+
+        [HttpGet]
+        [Route("api/PlanoDeCarga/BodegasTienenCarga")]
+        public HttpResponseMessage BodegasTienenCarga([FromUri] int moduloDeCargaId, [FromUri] string[] bodegas)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.BodegasTienenCarga(moduloDeCargaId, bodegas));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
     }
 }

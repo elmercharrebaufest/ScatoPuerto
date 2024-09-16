@@ -2879,5 +2879,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         Dictionary<string, decimal> ObtenerRitmosBalanzaManual(int modulodecarga_id);
 
+        [OperationContract]
+        bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas);
+
     }
 }

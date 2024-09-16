@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
@@ -21,7 +21,7 @@ export class PlanoDeCargaService {
 
   url: string = environment.apiUrl;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
 
   }
 
@@ -54,7 +54,7 @@ export class PlanoDeCargaService {
   obtenerListadoAgentesControlPrivado(): Observable<AgenteControlPrivado[]>{
     return this.http.get<AgenteControlPrivado[]>(`${this.url}PlanoDeCarga/ListarAgentesControlPrivado`, { 'withCredentials' : true});
   }
-  
+
   guardarPlanoDeCarga(planoDeCarga: PlanoDeCarga){
     return this.http.post(`${this.url}PlanoDeCarga/GuardarPlanoDeCarga`, planoDeCarga, { 'withCredentials' : true});
   }
@@ -110,6 +110,14 @@ export class PlanoDeCargaService {
 
   obtenerPlanoDeCargaId(idEmbarque: number): Observable<any>{
     return this.http.get<number>(`${this.url}PlanoDeCarga/obtenerPlanoDeCargaId?idEmbarque=${idEmbarque}`, { 'withCredentials' : true});
+  }
+
+  public bodegasTienenCarga(moduloDeCargaId: number, bodegas: PlanoDeCargaBodega[]) {
+    let params = new HttpParams().set('moduloDeCargaId', moduloDeCargaId.toString());
+    for (const bodega of bodegas) {
+      params = params.append('bodegas', bodega.bodegaParcel.toString());
+    }
+    return this.http.get<boolean>(`${this.url}PlanoDeCarga/BodegasTienenCarga`, { params, withCredentials: true });
   }
 
 }
