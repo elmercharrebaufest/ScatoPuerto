@@ -83,7 +83,7 @@ export class InicioFinalizacionCargaService {
         if(listadoTurnos == null || listadoTurnos.length == 0)
             return ''; 
         const primerCarga = this.ordenarLista(listadoTurnos, true)[0];
-        return primerCarga.fecha.split('T')[0] + ' ' + primerCarga.turnoPuerto.nombre.split('-')[0] + ':00';
+        return primerCarga.fecha.split('T')[0] + ' ' + primerCarga.turnoPuerto.nombre.split('-')[1] + ':00';
     }
 
     public obtenerFechaUltimaCarga(listadoTurnos: PlanillaDeTurnos[]): string{

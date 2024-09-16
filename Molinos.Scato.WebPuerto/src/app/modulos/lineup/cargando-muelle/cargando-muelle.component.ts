@@ -40,9 +40,10 @@ export class CargandoMuelleComponent implements OnInit {
     private session: SessionService,) { 
       this.user = this.session.getUser()
       this.lineupService.actualizarRitmos.subscribe(data => {
-        console.log('actualizar ritmos', data);
         if (data!=null && data.actualizarRitmos) {
-          this.calcularRitmos(data.moduloDeCargaId);
+            if(this.instanciaWorkflow){
+              this.calcularRitmos(data.moduloDeCargaId);
+            }
         }
       });
   }
