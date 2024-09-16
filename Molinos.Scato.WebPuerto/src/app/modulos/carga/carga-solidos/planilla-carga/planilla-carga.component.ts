@@ -11,10 +11,12 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { SessionService } from '@ScatoServicios/session.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -37,7 +39,7 @@ interface TotalExportadorProducto {
   templateUrl: './planilla-carga.component.html',
   styleUrls: ['./planilla-carga.component.scss']
 })
-export class PlanillaCargaComponent implements OnInit {
+export class PlanillaCargaComponent implements OnInit, OnDestroy {
 
   @Input() esSoloLectura: boolean = false;
   public bodegas: PlanoDeCargaBodega[] = [];
@@ -75,8 +77,11 @@ export class PlanillaCargaComponent implements OnInit {
 
   public puedeEditar: boolean;
 
+  private suscripcionGuardadoGeneral: Subscription;
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
+    private _procesoGuardar: ProcesoGuardarService,
     private planoDeCargaService: PlanoDeCargaService,
     private moduloDecargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -84,6 +89,7 @@ export class PlanillaCargaComponent implements OnInit {
     private session: SessionService
   ) {
     this.inicializarForm();
+    this.suscripcionGuardadoGeneral = this._procesoGuardar.sendGuardarCargas.subscribe(() => this.guardar(true));
   }
 
   ngOnInit(): void {
@@ -111,6 +117,10 @@ export class PlanillaCargaComponent implements OnInit {
 
       this.inicializarDatos();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcionGuardadoGeneral.unsubscribe();
   }
 
   private inicializarForm() {
@@ -868,26 +878,27 @@ export class PlanillaCargaComponent implements OnInit {
   }
   // #endregion
 
-  public guardar() {
+  public async guardar(guardadoGeneral: boolean = false) {
     try {
       this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
-      this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura).subscribe(() => {
-        this.estaGuardando = false;
+      await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura).pipe(take(1)).toPromise();
+      this.estaGuardando = false;
+      if (!guardadoGeneral) {
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(mod => {
-          this.planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
-          this._procesoService.setModuloDeCarga(mod);
-        });
-      }, (err) => {
-        this.estaGuardando = false;
-        console.error(err);
-        this.mostrarError(err);
-      });
-    } catch (error) {
-      this.confirmationDialogService.error(error.message);
+        const mod = await this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).pipe(take(1)).toPromise();
+        this.planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
+        this._procesoService.setModuloDeCarga(mod);
+      } else {
+        this._procesoGuardar.cargasManualesOk.next(true);
+      }
+    } catch (err) {
+      console.error(err);
+      this.estaGuardando = false;
+      this.mostrarError(err);
+      this._procesoGuardar.cargasManualesOk.next(false);
     }
   }
 
@@ -896,6 +907,8 @@ export class PlanillaCargaComponent implements OnInit {
     if (typeof err.error == 'string' && err.error.startsWith('Existen')) {
       msjError = err.error;
       this.inicializarDatos();
+    } else if (typeof err.message == 'string' && err.message.startsWith('Existen')) {
+      msjError = err.message;
     }
     this.confirmationDialogService.error(msjError);
   }

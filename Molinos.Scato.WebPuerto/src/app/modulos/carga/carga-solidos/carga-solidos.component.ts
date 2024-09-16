@@ -34,6 +34,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
 import { FinalizacionCargaComponent } from './tableristas/finalizacion-carga/finalizacion-carga.component';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -280,7 +281,7 @@ export class CargaSolidosComponent implements OnInit {
     }
   }
 
-  guardarContinuacion(finalizar: boolean) {
+  async guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
       this.enviado = finalizar;
 
@@ -297,28 +298,33 @@ export class CargaSolidosComponent implements OnInit {
 
     this.actualizarFechaInicioFinCarga(moduloCarga);
 
-    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+    try {
+      await this.moduloCargaService.guardarModuloDeCarga(moduloCarga).pipe(take(1)).toPromise();
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
-      if (finalizar)
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {
-            this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
-            this.cambiarEstado();
-            this.imprimir(true, finalizar)},
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
-      else {
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {},
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload());
-
-        this.cargaPdf = false;
+      let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
+      if (!ok) {
+        return;
       }
-
-    });
+      if (this.ingresoManualSolido) {
+        this._procesoGuardar.sendGuardarCargas.emit();
+        ok = await this._procesoGuardar.cargasManualesOk.pipe(take(1)).toPromise();
+        if (!ok) {
+          return;
+        }
+      }
+      await this.confirmationDialogService.exito('Ha cargado con éxito el modulo de Carga', '¡Felicitaciones!');
+      if (finalizar) {
+        this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+        this.cambiarEstado();
+        this.imprimir(true, finalizar);
+      }
+      else {
+        this.cargaPdf = false;
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   modificarEstadoBuque(estado: string){

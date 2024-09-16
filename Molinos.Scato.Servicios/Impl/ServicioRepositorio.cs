@@ -13818,5 +13818,14 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
+
+        public bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas)
+        {
+            var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(moduloDeCargaId);
+            return moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                .Any(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                .Select(detalle => detalle.Bodega.Nombre.Split(' ').Last())
+                .Any(parcel => bodegas.Contains(parcel)));
+        }
     }
 }
