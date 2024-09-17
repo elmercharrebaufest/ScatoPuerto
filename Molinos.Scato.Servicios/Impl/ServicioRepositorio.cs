@@ -1696,9 +1696,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         private Nominacion ObtenerNominacionFASPorIdEmbarque(int idEmbarque)
         {
-            return repositorio.Obtener<Nominacion>(n => n.Embarque.Id == idEmbarque);
+            return repositorio.ObtenerPrimero<Nominacion>(n => n.Embarque.Id == idEmbarque);
         }
-
 
         public OrdenCargaInternaFasonDto ObtenerOrdenCargaInternaFason(int id)
         {

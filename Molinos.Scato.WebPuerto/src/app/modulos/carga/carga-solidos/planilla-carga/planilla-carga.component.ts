@@ -863,6 +863,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     } else {
       carga.get('destino').setValue(this.destinoSeleccionado);
     }
+    this.actualizarTotalesFinales();
   }
 
   public onExportadorClick(carga: AbstractControl) {

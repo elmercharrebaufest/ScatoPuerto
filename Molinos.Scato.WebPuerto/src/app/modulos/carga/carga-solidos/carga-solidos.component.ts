@@ -306,7 +306,7 @@ export class CargaSolidosComponent implements OnInit {
       if (!ok) {
         return;
       }
-      if (this.ingresoManualSolido) {
+      if (this.ingresoManualSolido && this.inicioCarga) {
         this._procesoGuardar.sendGuardarCargas.emit();
         ok = await this._procesoGuardar.cargasManualesOk.pipe(take(1)).toPromise();
         if (!ok) {
