@@ -1115,52 +1115,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/ModuloDeCarga/RitmosCargaSolidos")]
         public HttpResponseMessage RitmosCargaSolidos(int idModuloDeCarga, string fechaTurno, int? turno, bool esCalculoGeneral)
         {
-            DateTime? fechaTurnoSel = null;
-            bool existeCarga = true;
-            if (!string.IsNullOrEmpty(fechaTurno))
+            try
             {
-                fechaTurnoSel = Convert.ToDateTime(fechaTurno);
-                var moduloDeCarga = servicio.ObtenerModuloDeCarga(idModuloDeCarga);
-                var listaTurnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(x => x.Fecha.Value.Date == fechaTurnoSel.Value.Date && x.TurnoPuerto.Orden == turno).FirstOrDefault();
-                if (listaTurnos == null || listaTurnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Count < 1)
+                DateTime? dtFechaTurno = null;
+                if (!string.IsNullOrEmpty(fechaTurno))
                 {
-                    existeCarga = false;
+                    dtFechaTurno = DateTime.Parse(fechaTurno);
                 }
+                var res = servicio.ObtenerRitmosCargaManual(idModuloDeCarga, esCalculoGeneral, dtFechaTurno, turno);
+                return Request.CreateResponse(HttpStatusCode.OK, res);
             }
-            RitmoDeCargasBalanzasDto ritmoDeCargasBalanzasDto = new RitmoDeCargasBalanzasDto();
-
-            var arrancoBalanza7 = DateTime.Now;
-            var ultimaBalanzada7 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 7, turno);
-            var cargaBalanza7 = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 7) / 1000, 2);
-            var ritmoBalanza7 = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 7, fechaTurnoSel, turno, esCalculoGeneral) / 1000, 2);
-            var ultimaActualizacionBalanza7 = DateTime.Now;
-
-            var arrancoBalanza8 = DateTime.Now;
-            var ultimaBalanzada8 = servicio.ObtenerUltimaBalanzada(idModuloDeCarga, esCalculoGeneral, 8, turno);
-            var cargaBalanza8 = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 8) / 1000, 2);
-            var ritmoBalanza8 = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaPorBalanza(idModuloDeCarga, 8, fechaTurnoSel, turno, esCalculoGeneral) / 1000, 2);
-            var ultimaActualizacionBalanza8 = DateTime.Now;
-
-            var ritmoCargaBruto = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaBruta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral) / 1000, 2);
-            var llevasCargando = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerCargaPorBalanza(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral, 0) / 1000, 2);
-            var ritmoCargaNeto = !existeCarga ? -1 : Math.Round(this.servicio.ObtenerRitmoCargaNeta(idModuloDeCarga, fechaTurnoSel, turno, esCalculoGeneral) / 1000, 2);
-
-            ritmoDeCargasBalanzasDto.ArrancoBalanza7 = arrancoBalanza7;
-            ritmoDeCargasBalanzasDto.ArrancoBalanza8 = arrancoBalanza8;
-            ritmoDeCargasBalanzasDto.UltimaBalanzada7 = ultimaBalanzada7;
-            ritmoDeCargasBalanzasDto.UltimaBalanzada8 = ultimaBalanzada8;
-            ritmoDeCargasBalanzasDto.CargaBalanza7 = cargaBalanza7;
-            ritmoDeCargasBalanzasDto.RitmoBalanza7 = ritmoBalanza7;
-            ritmoDeCargasBalanzasDto.CargaBalanza8 = cargaBalanza8;
-            ritmoDeCargasBalanzasDto.RitmoBalanza8 = ritmoBalanza8;
-            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza7 = ultimaActualizacionBalanza7;
-            ritmoDeCargasBalanzasDto.UltimaActualizacionBalanza8 = ultimaActualizacionBalanza8;
-            ritmoDeCargasBalanzasDto.RitmoCargaBruto = ritmoCargaBruto;
-            ritmoDeCargasBalanzasDto.LLevasCargando = llevasCargando;
-            ritmoDeCargasBalanzasDto.RitmoCargaNeto = ritmoCargaNeto;
-
-            return Request.CreateResponse(HttpStatusCode.OK, ritmoDeCargasBalanzasDto);
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
+
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
