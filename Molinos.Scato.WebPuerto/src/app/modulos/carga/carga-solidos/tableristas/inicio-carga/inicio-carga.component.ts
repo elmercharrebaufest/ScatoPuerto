@@ -167,23 +167,17 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
       let texto = "Se visualizarán los datos posteriores a la fecha ingresada, ¿desea continuar?";
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
-          this.actualizarFechasPeriodoDeCarga();
-          if (confirmed){
-            this.initInicioCarga();
-          }else {
-            this.initInicioCarga();
-            return;
-          }
+          if(confirmed)
+            this.actualizarFechasPeriodoDeCarga();
           this.editandoFecha = false;
+          return;
         });
     } else {
       this.actualizarFechasPeriodoDeCarga();
-      this.initInicioCarga();
       this.editandoFecha = false;
     }
   }
-
-
+  
   actualizarFechasPeriodoDeCarga = () => {
     let fechaInicioCarga = String(this.inicioCargaForm.controls.fechaInicioCarga.value);
     let horaInicioCarga = String(this.inicioCargaForm.controls.horaInicioCarga.value);
@@ -196,6 +190,7 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
       this.cargaIniciada = true;
       this.editandoFecha = false;
       document.getElementById("FIC").setAttribute("disabled", "true");
+      this.initInicioCarga();
       this.inicioCarga.emit(true);
     });
   }
