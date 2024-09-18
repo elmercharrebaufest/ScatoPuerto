@@ -2850,16 +2850,7 @@ namespace Molinos.Scato.Servicios
         void RestaurarEmbarquesOcultosLineUp();
 
         [OperationContract]
-        decimal ObtenerCargaPorBalanza(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral, int numeroBalanza);
-
-        [OperationContract]
-        decimal ObtenerRitmoCargaPorBalanza(int moduloCargaId, int numeroBalanza, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
-
-        [OperationContract]
-        decimal ObtenerRitmoCargaNeta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
-        
-        [OperationContract]
-        decimal ObtenerRitmoCargaBruta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
+        RitmoDeCargasBalanzasDto ObtenerRitmosCargaManual(int moduloCargaId, bool esCalculoGeneral, DateTime? fechaTurno, int? turnoId);
 
         [OperationContract]
         MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId);
