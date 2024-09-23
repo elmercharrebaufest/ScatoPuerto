@@ -5,6 +5,8 @@ import { BehaviorSubject, Subject } from "rxjs";
     providedIn: 'root'
 })
 export class ProcesoGuardarService {
-    @Output() sendGuardar = new EventEmitter<boolean[]>();   
+    @Output() sendGuardar = new EventEmitter<boolean[]>();
+    @Output() sendGuardarCargas = new EventEmitter<void>();
     public planoCargaOk = new Subject<boolean>();
+    public cargasManualesOk = new Subject<boolean>();
 }

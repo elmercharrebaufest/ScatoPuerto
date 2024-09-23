@@ -53,9 +53,20 @@
                 <div class="col">
                     <div class="row mt-3">
                         <div class="col">
+                            <label>Bodega</label>
+                            <select class="custom-select w-100" formControlName="bodega"
+                                [compareWith]="compareBodegasParcel" (change)="onCargarMaterialPorBodegas()">
+                                <option value="" selected disabled>Seleccione</option>
+                                <option *ngFor='let bodega of bodegas' [ngValue]='bodega'>
+                                    {{bodega.nombre}} </option>
+                            </select>                            
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
                             <label>Producto</label>
                             <select class="custom-select w-100" formControlName="material"
-                                [compareWith]="compareMaterialPuerto" (change)="onCargarBodegas()">
+                                [compareWith]="compareMaterialPuerto" disabled="true">
                                 <option value="" selected disabled>Seleccione</option>
                                 <option *ngFor='let material of materialesPuerto' [ngValue]='material'>
                                     {{material.descripcionCorta}} </option>
@@ -64,40 +75,8 @@
                         <div class="col">
                             <label>Kg</label>
                             <input type="number" class="form-control" 
-                                   formControlName="kilogramos" step="0.001" 
-                                   min="0" max="9999999.999"
-                                   (change)="onKilosChange($event)"/>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <label>Exportador</label>
-                            <select class="custom-select w-100" formControlName="exportador"
-                                [compareWith]="compareExportadores">
-                                <option value="" selected disabled>Seleccione</option>
-                                <option *ngFor='let exportador of exportadores' [ngValue]='exportador'>
-                                    {{exportador.nombre}} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <label>Bodega</label>
-                            <select class="custom-select w-100" formControlName="bodega"
-                                [compareWith]="compareBodegasParcel" (change)="onCargarDestinoPorBodegas()">
-                                <option value="" selected disabled>Seleccione</option>
-                                <option *ngFor='let bodega of bodegas' [ngValue]='bodega'>
-                                    {{bodega.nombre}} </option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label>Destino</label>
-                            <select class="custom-select w-100" formControlName="destino"
-                                [compareWith]="compareDestinos">
-                                <option value="" selected disabled>Seleccione</option>
-                                <option *ngFor='let destino of destinos' [ngValue]='destino'>
-                                    {{destino.nombre}} </option>
-                            </select>
+                                   formControlName="kilogramos" step="1" 
+                                   min="0" max="9999999"/>
                         </div>
                     </div>
                     <div class="row mt-3">

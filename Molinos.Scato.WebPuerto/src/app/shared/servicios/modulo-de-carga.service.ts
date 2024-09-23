@@ -12,6 +12,7 @@ import { Nir, NirManualPuerto } from '@ScatoModels/nir';
 import { FuncionesGeneralesService } from './funciones-generales.service';
 import { Umap } from '@ScatoModels/umap';
 import { PlanillaDeTurnos, SiloCelda, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { RitmosBalanzaManualSolido } from '@ScatoModels/balanzadas/ritmos';
 
 @Injectable({
   providedIn: 'root'
@@ -188,8 +189,8 @@ export class ModuloDeCargaService {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
   }
 
-  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[]) {
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}`, turnos, { withCredentials: true });
+  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[], desdeHistorial: boolean) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}`, turnos, { withCredentials: true });
   }
 
   generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
@@ -198,7 +199,7 @@ export class ModuloDeCargaService {
 
   obtenerPlanillaTurnos(moduloDeCargaId: number) : Observable<PlanillaDeTurnos[]> {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
-  } 
+  }
 
   obtenerDatosMailPlanillaSolidos(moduloDeCargaId: number, cortesOcultos: number[]){
   let idsOcultos = cortesOcultos.join(',');
@@ -213,6 +214,10 @@ export class ModuloDeCargaService {
     }
 
     return this.http.post(`${this.url}ModuloDeCarga/enviarPlanillaTurnoSolido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
+  }
+
+  obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {
+    return this.http.get<RitmosBalanzaManualSolido>(`${this.url}ModuloDeCarga/ObtenerRitmosBalanzaManual?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
   }
 
 }

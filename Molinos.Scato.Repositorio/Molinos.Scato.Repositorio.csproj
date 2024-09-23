@@ -67,12 +67,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComandosEF\ArchivarLogActividad.cs" />
-    <Compile Include="ComandosEF\AsignarBalanzadas.cs" />
+    <Compile Include="ComandosEF\BalanzasPuerto\AsignarBalanzadas.cs" />
+    <Compile Include="ComandosEF\BalanzasPuerto\ObtenerCargaFin.cs" />
+    <Compile Include="ComandosEF\BalanzasPuerto\ObtenerCargaInicio.cs" />
+    <Compile Include="ComandosEF\BalanzasPuerto\ObtenerSiguienteCargaInicio.cs" />
+    <Compile Include="ComandosEF\BalanzasPuerto\ObtenerIdFinAnterior.cs" />
+    <Compile Include="ComandosEF\BalanzasPuerto\ObtenerUltimoIdValidoBalanza.cs" />
     <Compile Include="ComandosEF\CrearArchivoDeMovimientos.cs" />
     <Compile Include="ComandosEF\CrearLoteAuditoria.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCoemConsulta.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCaratulaConsulta.cs" />
     <Compile Include="ConsultasEF\AgenciasMaritimasATA\ListarAgenciasATAConsulta.cs" />
+    <Compile Include="ConsultasEF\Balanzadas\ObtenerModuloDeCargaActivoPorVapor.cs" />
     <Compile Include="ConsultasEF\ConsultarEstadosWorkflows.cs" />
     <Compile Include="ConsultasEF\ControlRecorridoLogActividadConsulta.cs" />
     <Compile Include="ComandosEF\CrearLoteBiotecnologia.cs" />

@@ -1,3 +1,5 @@
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
@@ -9,9 +11,12 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
+import { SessionService } from '@ScatoServicios/session.service';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -22,7 +27,7 @@ interface ExportadorColor extends Exportador {
 }
 
 interface TotalExportadorProducto {
-  material: MaterialPuerto,
+  material: MaterialPuerto;
   cantidadesExportadores: {
     exportador: Exportador,
     cantidad: number
@@ -34,7 +39,7 @@ interface TotalExportadorProducto {
   templateUrl: './planilla-carga.component.html',
   styleUrls: ['./planilla-carga.component.scss']
 })
-export class PlanillaCargaComponent implements OnInit {
+export class PlanillaCargaComponent implements OnInit, OnDestroy {
 
   @Input() esSoloLectura: boolean = false;
   public bodegas: PlanoDeCargaBodega[] = [];
@@ -61,23 +66,36 @@ export class PlanillaCargaComponent implements OnInit {
   public totalPala: number = 0;
 
   public totalesSiloCeldaProducto: { material: MaterialPuerto, siloCelda: SiloCelda, cantidad: number }[] = [];
+  public totalesDestinoProducto: { material: MaterialPuerto, destino: DestinoColor, cantidad: number }[] = [];
   public totalesExportadorProducto: TotalExportadorProducto[] = [];
   public totalesPalaProducto: { material: MaterialPuerto, cantidad: number }[] = [];
 
   private periodoDeCarga: PeriodoDeCarga;
   private planillasTurnos: PlanillaDeTurnos[];
 
+  public estaGuardando: boolean = false;
+
+  public puedeEditar: boolean;
+
+  private suscripcionGuardadoGeneral: Subscription;
+
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
+    private _procesoGuardar: ProcesoGuardarService,
     private planoDeCargaService: PlanoDeCargaService,
     private moduloDecargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private session: SessionService
   ) {
     this.inicializarForm();
+    this.suscripcionGuardadoGeneral = this._procesoGuardar.sendGuardarCargas.subscribe(() => this.guardar(true));
   }
 
   ngOnInit(): void {
+    const user = this.session.getUser() as Usuario;
+    this.puedeEditar = !this.esSoloLectura || user.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+
     const embarque = this._procesoService.getEmbarqueSelected();
     this.form.get('embarqueId').setValue(embarque.id);
     forkJoin([
@@ -99,6 +117,10 @@ export class PlanillaCargaComponent implements OnInit {
 
       this.inicializarDatos();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.suscripcionGuardadoGeneral.unsubscribe();
   }
 
   private inicializarForm() {
@@ -601,6 +623,7 @@ export class PlanillaCargaComponent implements OnInit {
     this.totalesBodegas.forEach(tb => tb.totalCargado = 0);
     this.totalesSiloCeldaProducto = [];
     this.totalesExportadorProducto = [];
+    this.totalesDestinoProducto = [];
 
     for (const dia of (this.form.get('dias') as FormArray).controls) {
       for (const turno of (dia.get('turnos') as FormArray).controls) {
@@ -615,6 +638,17 @@ export class PlanillaCargaComponent implements OnInit {
             } else {
               totalSiloCelda = { siloCelda: carga.siloCelda, material: carga.materialPuerto, cantidad: carga.cantidad };
               this.totalesSiloCeldaProducto.push(totalSiloCelda);
+            }
+          }
+
+          if (carga.destino) {
+            let totalDestino = this.totalesDestinoProducto.find(t => t.destino.id == carga.destino.id && t.material.id == carga.materialPuerto.id);
+            if (totalDestino) {
+              totalDestino.cantidad += carga.cantidad;
+            } else {
+              const destino = this.destinos.find(d => d.id == carga.destino.id);
+              totalDestino = { destino, material: carga.materialPuerto, cantidad: carga.cantidad };
+              this.totalesDestinoProducto.push(totalDestino);
             }
           }
 
@@ -829,6 +863,7 @@ export class PlanillaCargaComponent implements OnInit {
     } else {
       carga.get('destino').setValue(this.destinoSeleccionado);
     }
+    this.actualizarTotalesFinales();
   }
 
   public onExportadorClick(carga: AbstractControl) {
@@ -844,24 +879,56 @@ export class PlanillaCargaComponent implements OnInit {
   }
   // #endregion
 
-  public guardar() {
+  public async guardar(guardadoGeneral: boolean = false) {
     try {
+      this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
-      this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos).subscribe(() => {
+      await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura).pipe(take(1)).toPromise();
+      this.estaGuardando = false;
+      if (!guardadoGeneral) {
         this.confirmationDialogService.exito('Guardado con éxito');
         const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-        this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).subscribe(m => this.planillasTurnos = m.moduloDeCargaPlanillaDeTurnos);
-      }, (err) => {
-        console.error(err);
-        this.confirmationDialogService.error('Ha ocurrido un error al guardar las cargas');
-      });
-    } catch (error) {
-      this.confirmationDialogService.error(error.message);
+        const mod = await this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).pipe(take(1)).toPromise();
+        this.planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
+        this._procesoService.setModuloDeCarga(mod);
+      } else {
+        this._procesoGuardar.cargasManualesOk.next(true);
+      }
+    } catch (err) {
+      console.error(err);
+      this.estaGuardando = false;
+      this.mostrarError(err);
+      this._procesoGuardar.cargasManualesOk.next(false);
     }
+  }
+
+  private mostrarError(err: any) {
+    let msjError = 'Ha ocurrido un error al guardar las cargas';
+    if (typeof err.error == 'string' && err.error.startsWith('Existen')) {
+      msjError = err.error;
+      this.inicializarDatos();
+    } else if (typeof err.message == 'string' && err.message.startsWith('Existen')) {
+      msjError = err.message;
+    }
+    this.confirmationDialogService.error(msjError);
   }
 
   public cancelar() {
     this.inicializarDatos();
+  }
+
+  public getEscalado(tabla: HTMLElement) {
+    let escalado = 1062.75 / tabla.offsetWidth;
+    if (escalado < 1) {
+      return escalado
+    }
+    return 1;
+  }
+
+  public getDiferenciaEscaladoPx(tabla: HTMLElement) {
+    const escalado = this.getEscalado(tabla);
+    const diferencia = (tabla.offsetHeight * escalado) - tabla.offsetHeight;
+    return diferencia + 'px';
   }
 }

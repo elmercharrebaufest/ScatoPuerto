@@ -17,6 +17,7 @@ import { Estiba } from '@ScatoModels/estiba';
 import { Exportador } from '@ScatoModels/exportador';
 import { Mail } from '@ScatoModels/mail';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
 import { AlertService } from '@ScatoServicios/alert.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -30,7 +31,7 @@ import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
 import { forkJoin, Observable } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, pairwise, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, pairwise, startWith, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-op-tablero',
@@ -38,7 +39,7 @@ import { debounceTime, distinctUntilChanged, map, pairwise, startWith } from 'rx
   styleUrls: ['./op-tablero.component.css']
 })
 export class OpTableroComponent implements AfterViewInit,OnInit {
-  
+
   estadoAlturaValor: number;
   embarqueSelected: EmbarqueNav;
   @Output() showCargas = new EventEmitter<boolean>();
@@ -102,7 +103,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
               private alertService: AlertService,
               private _guardarService: ProcesoGuardarService,
               private _turnoService: TurnosService,
-              private session: SessionService) { 
+              private session: SessionService) {
     this.makeDraggable.bind(this);
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.initEventosManos();
@@ -125,7 +126,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
     this.getEmbarqueData();
     this.drawGraphic();
     this.initFormulario();
-    
+
     //Aqui se pondra el nombre de actor o tablerista obteniendo desde el api
     this.nombreTablerista="";
     this.manosYTabiquesForm.get('manosDeEmbarque')['controls'].forEach((mano, currentIndexMano) => {
@@ -216,7 +217,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
         .subscribe((current) => {
           let tabiqueVal = tabique.controls['tabique'].value;
           let columnaTemp
-          
+
           if (current < 0 || current > 0) {
             if(Number(current)  > 28 && index == 0){
               tabique.patchValue({ entreColumna: 28, yColumna: 29 });
@@ -242,7 +243,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
         });
     });
   }
- 
+
 
   buscarSilosRestantes(posicion: number): number{
     let cantSilosRestantes = 0;
@@ -335,7 +336,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
   compareSentidos(c1: SentidoManoDeEmbarque, c2: SentidoManoDeEmbarque) {
     return c1 && c2 ? c1.posicion === c2.posicion : c1 === c2;
   }
-  
+
   resetForm(){
     this.manosYTabiquesForm.reset(this.formInitialValues);
   }
@@ -369,7 +370,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
   ngAfterViewInit(){
     this.makeDraggable(document.getElementById('grafico-carga'));
   }
- 
+
   initEventosManos(){
     this._manosEmbarqueService.removerManoDeEmbarque.subscribe(
       res => this.removerManoDeEmbarque(res.celda, res.sentido)
@@ -390,7 +391,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       res => this.removerTabique(res)
     );
   }
-  
+
 
   makeDraggable(evt) {
     var svg: any = evt;
@@ -476,7 +477,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
             lastdx = lastResize.dx;
             lastdy = lastResize.dy;
           }
-          
+
           if(containerElement.tagName == "ellipse"){
             // let radiusChange = dx+dy > lastdx+lastdy ? 1.5 : -1.5;
             let radiusXChange = Number(containerElement.getAttribute('rx')) - lastdx + 20;
@@ -604,7 +605,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
           },
         }
 
-        let arrowTemplate = 
+        let arrowTemplate =
         `
           <g id="arrowCelda${celda}-${sentido}" transform="translate(${coordenadasPorCeldaYSentido[celda][sentido].x} ${coordenadasPorCeldaYSentido[celda][sentido].y}) rotate(${coordenadasPorCeldaYSentido[celda][sentido].z},33,16)">
             <use xlink:href="#myArrow"></use>
@@ -624,20 +625,20 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       } else if(elemento.forma == 'rect'){
         this.agregarRectangulo(coordenadas, elemento.materialPuerto?.color ?? '#D87621',null, elemento.width, elemento.height, elemento.rotacion, elemento.id);
       }
-    } 
+    }
   }
 
   agregarCirculo(mousePos, color, texto, tempId = null, radioX = null, radioY = null, id = null){
     let template = `
     <g id="${id ?? ''}" tempid="${tempId ?? ''}" class="draggable-group elementoGrafico" style="cursor: move;">
       <ellipse cx="${mousePos.x}" cy="${mousePos.y}" rx="${radioX ?? (texto == "Prod." ? 28 : 40)}" ry="${radioY ?? (texto == "Prod." ? 16 : 40)}" fill='${color}' opacity= "${texto == "Prod." ? 0.85: 0.95}"  ${texto == "Prod." ? `stroke="black" stroke-width="2"`:""} />
-      <text x="${mousePos.x}" y="${mousePos.y}" 
+      <text x="${mousePos.x}" y="${mousePos.y}"
       text-anchor="middle"
       fill="${color == '#555555' ? 'white' : 'black'}"
       alignment-baseline="middle"
       style="-webkit-touch-callout: none;-webkit-user-select: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;"
       >${texto}</text>
-      ${texto != "Prod." ? 
+      ${texto != "Prod." ?
       `<circle class="resize-drag" cx="${mousePos.x + 50}" cy="${mousePos.y + 50}" r="5" fill='gray' style="cursor: pointer; visibility: hidden"/>`
       : ""}
     </g>
@@ -663,7 +664,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       if(thisComponent.lastSelectedElement.getAttribute('tempid') == (<HTMLElement>evt.target).getAttribute('tempid')
         || thisComponent.lastSelectedElement.id == (<HTMLElement>evt.target).id){
         thisComponent.lastSelectedElement = null;
-      } 
+      }
       this.remove();
     });
     let thisComponent = this;
@@ -721,7 +722,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
 
   obtenerElementosGraficos() : ElementoGrafico[]{
     let elementos: ElementoGrafico[] = [];
-    
+
     for(let item of document.querySelectorAll('.elementoGrafico')){
       let id = item.id ? item.id : null;
       let coordTransform = /translate\(\s*([^\s,)]+)[ ,]([^\s,)]+)/.exec(item.getAttribute('transform'));
@@ -748,7 +749,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       } else{
         materialPuerto = this.materialDictionary[id];
       }
-      
+
       let elementoGrafico = new ElementoGrafico(id, tipo, x, y, forma, width, height, radioX, radioY, materialPuerto, rotacion);
       elementos.push(elementoGrafico);
     }
@@ -767,16 +768,16 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
     if(silo) silo.classList.add('siloResaltado');
   }
 
-  
+
   removerResaltadoSilos(id, esPrevious?, cantidadEnSilo?){
     let silos = document.querySelectorAll('#siloId'+id);
 
     if(silos.length == 0) return;
-    
+
     let silo = document.querySelector('#siloId'+id);
     console.log('Se remueve resaltado Silo ', id);
     if(silo) silo.classList.remove('siloResaltado');
-    
+
     // let silos = document.querySelectorAll('.silo');
     // for (var i = 0; i < silos.length; ++i) {
     //   (<HTMLElement>silos[i]).classList.remove('siloResaltado');
@@ -799,7 +800,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
     return new Date().toLocaleDateString();
   }
 
-  
+
   getEmbarqueData() {
     this._procesoService.sendEmbarque.subscribe(res => {
       this.embarqueSelected = res;
@@ -1052,95 +1053,109 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
     }
   }
 
-  public guardarPlanoDeCarga(finalizar: boolean) {
-    if (this.planoDeCargaForm.invalid)
+  public async guardarPlanoDeCarga(finalizar: boolean) {
+    if (this.planoDeCargaForm.invalid) {
       return;
-    //SI EL PLANO DE CARGA YA ESTABA FINALIZADO, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
-    //CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
-    if (this.planoDeCargaForm.value.enviado && !finalizar) {
-      var texto = "Se ha modificado con éxito el plano de carga. Si desea informar los cambios, haga click en FINALIZAR.";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Success)
-        .then((confirmed) => {
-          if (confirmed)
-            this.guardarPlanoDeCargaContinuacion(finalizar);
-          else
-            return;
-        }).catch(() => window.location.reload());
     }
-    else
-      this.guardarPlanoDeCargaContinuacion(finalizar);
+
+    const ok = await this.guardarPlanoDeCargaContinuacion(finalizar);
+    // SI EL PLANO DE CARGA YA ESTABA FINALIZADO, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
+    // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
+    if (ok && this.planoDeCargaForm.value.enviado && !finalizar) {
+      this.confirmationDialogService.exito('Se ha modificado con éxito el plano de carga. Si desea informar los cambios, haga click en FINALIZAR.', '¡Atención!');
+    }
   }
 
-  public guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
-    
-    //Bodegas cargadas sin destino
-    var bodegasCargadas = this.planoDeCargaForm.value.planoDeCargaBodegas.filter(x => x.cantidad > 0 && x.destino == null);
-    
-    if (bodegasCargadas.length > 0) {
-      this.confirmationDialogService.confirm("Alerta", "No se ha ingresado el DESTINO para una o mas bodegas cargadas.", 'Cerrar', '', null, null, Tipoalerta.Warning)
-      .then((confirmed) => {
-        if(confirmed)
-          return;
-      }).catch(() => window.location.reload());
-    }else{        
-
-      this.hideSpinner.emit(true);
-      this.planoDeCargaForm.value.estiba =
-        this.planoDeCargaForm.value.estibasList != null && this.planoDeCargaForm.value.estibasList.length > 0 ?
-          this.estibasList.find(x => x.id == this.planoDeCargaForm.value.estibasList[0].id) : '';
-  
-      this.planoDeCargaForm.value.agenciaControlPrivado =
-        this.planoDeCargaForm.value.agenciasControlPrivadoList != null && this.planoDeCargaForm.value.agenciasControlPrivadoList.length > 0 ?
-          this.agenciasControlPrivadoList.find(x => x.id == this.planoDeCargaForm.value.agenciasControlPrivadoList[0].id) : '';
-  
-      this.planoDeCargaForm.value.agentesControlPrivado =
-        this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.length > 0 ?
-          this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido)) : '';
-  
-      if (!this.planoDeCargaForm.value.enviado)
-        this.planoDeCargaForm.value.enviado = finalizar;
-  
-      if (finalizar)
-        this.planoDeCargaForm.value.usuarioFinalizacion = this.user.username;
-      else
-        this.planoDeCargaForm.value.usuarioFinalizacion = null;
-  
-      this.planoDeCargaForm.value.filePathPlano = this.filePlano;
-      this.planoDeCargaForm.value.planoDeCargaArchivoPlanoNombre = this.fileNamePlano;
-      this.planoDeCargaForm.value.filePathSecuencia = this.fileSecuencia;
-      this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
-      this.planoDeCargaForm.value.usuario = this.user.username;
-      this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
-      try {
-        this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value)
-          .subscribe((res: any) => {
-            if (!moduloCarga) {
-              if (finalizar)
-                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-                  .then(() => { this.enviarMail(); },
-                    error => {
-                      this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-                    }
-                  ).catch(() => window.location.reload())
-              else {
-                this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Volver Line up', '', null, null, Tipoalerta.Success)
-                  .then((confirmed) => {
-                    if (confirmed) {
-                      this.router.navigate(['/lineup']);
-                    }
-                  }).catch(() => window.location.reload())
-              }
-            }
-            this.hideSpinner.emit(false);
-          },
-            errmess => {
-              console.log(errmess.error)
-              // this.confirmationDialogService.confirm('¡Error!', 'Error al crear el plano de carga: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            });
-      } catch (e) {
-        console.log(e);
-      }
+  public async guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
+    const bodegas = (this.planoDeCargaForm.value.planoDeCargaBodegas as PlanoDeCargaBodega[]);
+    // Verifico si existen bodegas cargadas sin destino
+    if (bodegas.some(x => x.cantidad > 0 && (x.destinos == null || x.destinos.length == 0))) {
+      this.confirmationDialogService.error("No se ha ingresado el DESTINO para una o mas bodegas cargadas.");
+      return false;
     }
+
+    // Verifico si se intenta vaciar una bodega que ya estuvo guardada
+    if (bodegas.some(b => b.id && !b.cantidad)) {
+      this.confirmationDialogService.error("No puede quitarse una bodega una vez que ésta ha sido guardada.");
+      return false;
+    }
+
+    this.hideSpinner.emit(true);
+
+    const msjErrorCarga = await this.intentaEliminarBodegaConCarga(bodegas);
+    if (msjErrorCarga) {
+      this.hideSpinner.emit(false);
+      console.error(msjErrorCarga);
+      this.confirmationDialogService.error(msjErrorCarga);
+      this._guardarService.planoCargaOk.next(false);
+      return false;
+    }
+
+    this.planoDeCargaForm.value.estiba =
+      this.planoDeCargaForm.value.estibasList != null && this.planoDeCargaForm.value.estibasList.length > 0 ?
+        this.estibasList.find(x => x.id == this.planoDeCargaForm.value.estibasList[0].id) : '';
+
+    this.planoDeCargaForm.value.agenciaControlPrivado =
+      this.planoDeCargaForm.value.agenciasControlPrivadoList != null && this.planoDeCargaForm.value.agenciasControlPrivadoList.length > 0 ?
+        this.agenciasControlPrivadoList.find(x => x.id == this.planoDeCargaForm.value.agenciasControlPrivadoList[0].id) : '';
+
+    this.planoDeCargaForm.value.agentesControlPrivado =
+      this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.length > 0 ?
+        this.planoDeCargaForm.get('agentesControlPrivadoSeleccionado').value.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido)) : '';
+
+    if (!this.planoDeCargaForm.value.enviado)
+      this.planoDeCargaForm.value.enviado = finalizar;
+
+    if (finalizar)
+      this.planoDeCargaForm.value.usuarioFinalizacion = this.user.username;
+    else
+      this.planoDeCargaForm.value.usuarioFinalizacion = null;
+
+    this.planoDeCargaForm.value.filePathPlano = this.filePlano;
+    this.planoDeCargaForm.value.planoDeCargaArchivoPlanoNombre = this.fileNamePlano;
+    this.planoDeCargaForm.value.filePathSecuencia = this.fileSecuencia;
+    this.planoDeCargaForm.value.planoDeCargaArchivoSecuenciaNombre = this.fileNameSecuencia;
+    this.planoDeCargaForm.value.usuario = this.user.username;
+    this.planoDeCargaForm.value.defensasMoviles = this.planoDeCargaForm.value.defensasMoviles || this.planoDeCargaForm.value.defensasMoviles === 'Si' ? true : false;
+    try {
+      await this.planoDeCargaService.guardarPlanoDeCarga(this.planoDeCargaForm.value).pipe(take(1)).toPromise();
+      // Si no proviene del guardado general de Operaciones entonces es el guardado específico de Plano de Carga
+      if (!moduloCarga) {
+        if (finalizar) {
+          await this.confirmationDialogService.exito('Ha cargado con éxito el plano de carga', '¡Felicitaciones!');
+          this.enviarMail();
+        } else {
+          const confirmed = await this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el plano de carga', 'Volver Line up', '', null, null, Tipoalerta.Success);
+          if (confirmed) {
+            this.router.navigate(['/lineup']);
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err)
+      await this.confirmationDialogService.error('Error al crear el plano de carga: ' + err?.error)
+      return false;
+    }
+    this.hideSpinner.emit(false);
+    return true;
+  }
+
+  private async intentaEliminarBodegaConCarga(bodegas: PlanoDeCargaBodega[]): Promise<string> {
+    const bodegasVacias = bodegas.filter(b => b.id && !b.cantidad);
+    if (!bodegasVacias.length) {
+      return;
+    }
+    let res = '';
+    try {
+      const bodegasTienenCarga = await this.planoDeCargaService.bodegasTienenCarga(this.embarqueSelected.moduloDeCargaId, bodegasVacias).pipe(take(1)).toPromise();
+      if (bodegasTienenCarga) {
+        res = 'No se pueden quitar la cantidad de una o más bodegas ya que contienen cargas asociadas';
+      }
+    } catch (error) {
+      console.error(error);
+      res = 'Ha ocurrido un error al intentar comprobar si las bodegas tienen cargas';
+    }
+    return res;
   }
 
   enviarMail() {
@@ -1282,7 +1297,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       var imageName = this.fileNamePlano;
     }
     const imageBlob = this.dataURItoBlob(base64);
-    
+
     if ((window.navigator as any).msSaveOrOpenBlob) {
       (window.navigator as any).msSaveBlob(imageBlob, imageName);
     }
@@ -1334,7 +1349,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
   calcularTotal() {
     if (this.esLiquido)
       this._turnoService.setTnTotales(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
-      
+
     this._procesoService.sendTotalPlanoDeEmbarque.emit(this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0))
     return this.planoDeCargaBodegasFormArray.value.reduce((prev, next) => prev + +next.cantidad, 0);
   }
@@ -1626,16 +1641,16 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
   verificarCargaComercial(){
     let cant = 0;
     for(let i=0; i<this.cargasComercialesFormArray.controls.length; i++ ){
-      if( (( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null || 
+      if( (( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null ||
           this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
           (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== null ||
             this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value !== '') ) ||
-          ((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== null || 
+          ((this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== null ||
           this.cargasComercialesFormArray.controls[i]['controls'].exportador.value !== '') &&
           (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
             this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === '') ))  &&
-          !( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null || 
-            this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') && 
+          !( (this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === null ||
+            this.cargasComercialesFormArray.controls[i]['controls'].exportador.value === '') &&
             (this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === null ||
             this.cargasComercialesFormArray.controls[i]['controls'].materialPuerto.value === '') ) )
       {
@@ -1643,7 +1658,7 @@ export class OpTableroComponent implements AfterViewInit,OnInit {
       }
     }
 
-    if(cant>0) 
+    if(cant>0)
       this.cargaComercialIncompleto = true;
     else
       this.cargaComercialIncompleto = false;

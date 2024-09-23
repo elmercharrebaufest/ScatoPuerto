@@ -400,9 +400,15 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
+    let planillaDeEmbarque = this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null;
+    if (!this.validarExportadorYPartida(planillaDeEmbarque)) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Revise la planilla de embarque, la combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+      return;
+    }
+
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
-      this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null, null);
+      planillaDeEmbarque, null);
 
     this._procesoGuardar.sendGuardar.emit([finalizar, true]);
 
@@ -526,5 +532,19 @@ export class CargaLiquidosComponent implements OnInit {
         selector[i].style.display = ocultarMostrar;
       }
     }
+  }
+
+  private validarExportadorYPartida(planilla: any[]): boolean {
+    for (let i = 0; i <= planilla.length - 1; i++) {
+      if (i < planilla.length - 1)
+        for (let j = i + 1; j <= planilla.length - 1; j++) {
+          if (planilla[i].exportador != null && planilla[i].bodegaParcel != null && planilla[j].exportador != null && planilla[j].bodegaParcel != null) {
+            if (planilla[i].exportador.nombre == planilla[j].exportador.nombre && planilla[i].bodegaParcel == planilla[j].bodegaParcel) {
+              return false;
+            }
+          }
+        }
+    }
+    return true;
   }
 }

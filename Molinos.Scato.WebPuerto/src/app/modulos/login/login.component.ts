@@ -45,10 +45,12 @@ export class LoginComponent implements OnInit {
   public permisosRoles = [
     { nombre: 'Coordinacion', permiso: 'LAD_MOAAPP_PUERTO_COORDINADORES', checked: false },
     { nombre: 'Operadores', permiso: 'LAD_MOAAPP_PUERTO_OPERADORES', checked: false },
+    { nombre: 'Supervisores', permiso: 'LAD_MOAAPP_PUERTO_OPERADORES_SUPERVISORES', checked: false },
     { nombre: 'Tableristas', permiso: 'LAD_MOAAPP_PUERTO_TABLERISTA', checked: false },
     { nombre: 'Recibidores', permiso: 'LAD_MOAAPP_PUERTO_RECIBIDORES', checked: false },
     { nombre: 'Geolocalizacion', permiso: 'LAD_MOAAPP_PUERTO_GEOLOCALIZACION', checked: false },
     { nombre: 'Comex', permiso: 'LAD_MOAAPP_PUERTO_COMEX', checked: false },
+    { nombre: 'Invitado', permiso: 'LAD_MOAAPP_PUERTO_INVITADO', checked: false },
     { nombre: 'Sistemas', permiso: 'LAD_MOAAPP_PUERTO_SISTEMA', checked: false },
   ];
   public loginBtnTxt = 'Iniciar sesión';

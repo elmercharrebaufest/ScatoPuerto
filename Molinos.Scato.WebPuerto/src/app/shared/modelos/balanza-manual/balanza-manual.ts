@@ -38,8 +38,8 @@ export class MotivosFallasBalanza {
 
 export class DestinosPorMaterialPuertoBodega {
   materiales     : MaterialPuerto;
-  bodegas      : BodegaParcel;
-  destinos      : Destino[]   ;
+  bodegas        : BodegaParcel  ;
+  destinos       : Destino[]     ;
 }
 
 export class ExportadorPorMaterialPuerto {

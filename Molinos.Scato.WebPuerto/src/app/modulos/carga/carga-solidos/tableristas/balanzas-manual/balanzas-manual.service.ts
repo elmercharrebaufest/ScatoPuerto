@@ -16,10 +16,12 @@ import { formatDate } from "@angular/common";
 import { Injectable } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { Workbook } from "exceljs";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 import { saveAs } from 'file-saver-es';
 import { EmbarqueNav } from "@ScatoModels/embarque-nav";
+import { SessionService } from "@ScatoServicios/session.service";
+import { Usuario } from "@ScatoInterfaces/usuario";
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +29,7 @@ export class BalanzasManualService {
   private _destinosBodegaPorMaterial: BehaviorSubject<DestinosPorMaterialPuertoBodega[]> = new BehaviorSubject<DestinosPorMaterialPuertoBodega[]>(null);
   private _exportadoresPorMaterial: BehaviorSubject<ExportadorPorMaterialPuerto[]> = new BehaviorSubject<ExportadorPorMaterialPuerto[]>(null);
   private _balanzaManual: BehaviorSubject<BalanzaManual> = new BehaviorSubject<BalanzaManual>(null);
-
+  private user: Usuario;
   motivosBalanzas78: MotivosFallasBalanza[] = null;
   materialesPuerto: MaterialPuerto[] = null;
   destinos: Destino[] = null;
@@ -44,7 +46,9 @@ export class BalanzasManualService {
     private planoDeCargaService: PlanoDeCargaService,
     private balanzaManualRegistroService: BalanzaManualRegistroService,
     private confirmationDialogService: ConfirmationDialogService,
+    private session: SessionService,
     private formBuilder: FormBuilder) {
+      this.user = this.session.getUser();
   }
 
   set BalanzaManual(value: any) {
@@ -83,7 +87,7 @@ export class BalanzasManualService {
     return this.balanzaManualRegistroService.listarBalanzaManual(moduloDeCargaId).pipe(map((data: BalanzaManual[]) => { return data; }));
   }
   eliminarCortesBajaCarga(id: number): Observable<boolean> {
-    return this.balanzaManualRegistroService.eliminarCortesBajaCarga(id).pipe(map((data: boolean) => { return data; }));
+    return this.balanzaManualRegistroService.eliminarCortesBajaCarga(id, this.user.username).pipe(map((data: boolean) => { return data; }));
   }
   obtenerPeriodoDeCarga(moduloDeCargaId: number): Observable<PeriodoDeCarga> {
     return this.balanzaManualRegistroService.obtenerPeriodoDeCarga(moduloDeCargaId).pipe(map((data: PeriodoDeCarga) => { return data; }));
@@ -149,7 +153,7 @@ export class BalanzasManualService {
 
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      this.formData.append('file', blob, fname + ".xlsx");
+      this.formData.append('file', blob, fname);
       this.moduloDeCargaService.generarExcel(embarque.moduloDeCargaId, this.formData).subscribe(blob => {
         this.descargarArchivo(blob, fname);
       }, error => {
@@ -230,22 +234,14 @@ export class BalanzasManualService {
     return cargas;
   }
 
-  agregarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean, numeroBalanza: number, moduloDeCargaId: number, usuario: string) {
+  agregarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean, numeroBalanza: number, moduloDeCargaId: number, usuario: string): Subject<boolean> {
+    let subjectRegistroCorteBajaCarga = new Subject<boolean>();
 
-    const fechaInicioRegistro = this.convertirFecha(registroBalanza.fechaInicio, registroBalanza.horaInicio);
-    const fechaFinRegistro = this.convertirFecha(registroBalanza.fechaCorte, registroBalanza.horaCorte);
-    let esRegistroValido = this.validarCortesBajasCarga(balanzas,registroBalanza,fechaInicioRegistro, fechaFinRegistro);
-    if (esRegistroValido) {
-      let balanzaRegistro = this.crearBalanzaCorteManual(moduloDeCargaId, numeroBalanza, registroBalanza);
-      this.balanzaManualRegistroService.guardarCortesBajaCarga(balanzaRegistro).subscribe(res => {
-        if (balanzaRegistro.id == 0)
-          registroBalanza.id = res.id;
-        this.asignarCorteBajaCarga(balanzas, registroBalanza, esCorteManual);
-      });
-    } else {
-      const tituloMensaje: string = esCorteManual ? 'Corte' : 'Baja Carga';
-      this.confirmationDialogService.confirm(tituloMensaje, `Ya existe un ${tituloMensaje} en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
-    }
+    let balanzaRegistro = this.crearBalanzaCorteManual(moduloDeCargaId, numeroBalanza, registroBalanza);
+    this.balanzaManualRegistroService.guardarCortesBajaCarga(balanzaRegistro).subscribe(res => {
+      subjectRegistroCorteBajaCarga.next(true);
+    });
+    return subjectRegistroCorteBajaCarga;
   }
 
   private asignarCorteBajaCarga(balanzas, registroBalanza, esCorteManual: boolean) {
@@ -282,10 +278,11 @@ export class BalanzasManualService {
     balanzaCortesManual.tn = balanza.kilogramos > 0 ? parseInt((balanza.kilogramos/1000).toString()) : null;
     balanzaCortesManual.cerrado = false;
     balanzaCortesManual.corteManual = balanza.corteManual;
+    balanzaCortesManual.usuario = this.user.username;
     return balanzaCortesManual;
   }
 
-  private validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
+  public validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
     let esRegistroValido: boolean = true;
     let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id); 
     if (filtroBalanzas!=null && filtroBalanzas.length > 0) {
@@ -293,10 +290,10 @@ export class BalanzasManualService {
         const balanza = filtroBalanzas[index];
         const fechaInicio = this.convertirFecha(balanza.controls['fechaInicio'].value, balanza.controls['horaInicio'].value);
         const fechaCorte = this.convertirFecha(balanza.controls['fechaCorte'].value, balanza.controls['horaCorte'].value);
-        if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro <= fechaCorte) &&
-            (fechaFinRegistro >= fechaInicio && fechaFinRegistro <= fechaCorte)){
+        if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro < fechaCorte) ||
+            (fechaFinRegistro > fechaInicio && fechaFinRegistro <= fechaCorte)){
               esRegistroValido = false;
-              return;
+              return esRegistroValido;
             }
       }
     }

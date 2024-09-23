@@ -113,6 +113,7 @@
     <Compile Include="Dto\AfipTablasReferencia\AfipMotivoNoAbordoDto.cs" />
     <Compile Include="Dto\AltaEmbarqueFASDto.cs" />
     <Compile Include="Dto\BalanzaManualDto.cs" />
+    <Compile Include="Dto\BalanzasFechasCortesPorTurnoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoDestinoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoMaterialPuertoDto.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
     <Compile Include="Dto\RitmoDeCargasBalanzasDto.cs" />
     <Compile Include="Dto\SiloCeldaDto.cs" />
+    <Compile Include="Dto\ValidacionTraslapeFechasBalanzaManualDto.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordo.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordoDeclaracion.cs" />

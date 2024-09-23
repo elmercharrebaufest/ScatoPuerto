@@ -1,3 +1,7 @@
+.page-break {
+  page-break-before: always;
+}
+
 .silos-celdas-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -45,10 +49,27 @@
   }
 }
 
+.tabla-cargas-container {
+  >div:first-child {
+    overflow: auto;
+  }
+
+  &.carga-exportar>div:first-child {
+    margin-bottom: var(--mb-dif);
+
+    .tabla-cargas {
+      margin: 0;
+      transform-origin: top left;
+      transform: scale(var(--escalado));
+    }
+  }
+}
+
 .tabla-cargas {
   position: relative;
   z-index: 0;
   margin: auto;
+  overflow: auto;
 
   .table-overlay {
     position: absolute;
@@ -60,6 +81,7 @@
 
 table {
   text-align: center;
+  background: white;
 
   td,
   th {
@@ -252,19 +274,26 @@ tr.totales {
 
 div.totalizadores {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   margin-top: 1rem;
   gap: 1rem;
 
   table {
-    flex: 1;
+    min-width: 300px;
+
+    td {
+      padding-inline: .5rem;
+    }
   }
 }
 
 div.solo-lectura {
-  pointer-events: none; 
-  cursor: default;    
+  pointer-events: none;
+  cursor: default;
 }
 
-tr.boton-disabled, td.boton-disabled {
+tr.boton-disabled,
+td.boton-disabled {
   filter: brightness(0.7);
 }

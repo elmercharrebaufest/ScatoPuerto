@@ -119,21 +119,21 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     }
   }
   public async onAgregarCortes(event, numeroBalanza) {
-    if (numeroBalanza == 7){
-      this.balanzasManualService.agregarCorteBajaCarga(this.balanzas7,event, true, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username);
-    }
-    if (numeroBalanza == 8){
-      this.balanzasManualService.agregarCorteBajaCarga(this.balanzas8,event, true,numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username);
-    } 
+    let balanzas = numeroBalanza == 8 ? this.balanzas8 : this.balanzas7;
+    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe((data) =>{
+      this.listarBalanzaManualPorBalanza(numeroBalanza);
+      let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
+      divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
+    });
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }
   public async onAgregarBajaCarga(event, numeroBalanza) {
-    if (numeroBalanza == 7){
-      this.balanzasManualService.agregarCorteBajaCarga(this.balanzas7,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username);
-    }
-    if (numeroBalanza == 8){
-      this.balanzasManualService.agregarCorteBajaCarga(this.balanzas8,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username);
-    }   
+    let balanzas = numeroBalanza == 8 ? this.balanzas8 : this.balanzas7;
+    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe((data) =>{
+      this.listarBalanzaManualPorBalanza(numeroBalanza);
+      let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
+      divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
+    });
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }  
   public async enviarBuqueCalidad() {
@@ -193,6 +193,24 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.calcularFechasCargaBalanzas();
     });
   }
+  private listarBalanzaManualPorBalanza(numeroBalanza: string){  
+
+    let registros = numeroBalanza == '8'? this.balanzas8.controls.length : this.balanzas7.controls.length;
+    let balanzas = numeroBalanza == '8'? this.balanzas8 : this.balanzas7;
+    for (let i = 0; i <= registros; i++) {
+      balanzas.removeAt(registros - i);
+    }
+    this.balanzasManualService.listarBalanzaManual(this.embarqueSelected.moduloDeCargaId).pipe(takeUntil(this.destroy$)).subscribe((data: BalanzaManual[]) =>{
+      data.forEach(item =>{
+        if (item.numeroBalanza == numeroBalanza){
+          this.balanzasManualService.cargarCorteBajaCarga((numeroBalanza == '8' ? this.balanzas8 : this.balanzas7),item);
+        }
+      })
+      
+    },error=>{},()=>{
+      this.calcularFechasCargaBalanzas();
+    });
+  }
   private calcularFechasCargaBalanzas(){
     this.balanza7Cargas = this.balanzasManualService.fechasMaximasYMinimas(this.balanzas7);
     this.balanza8Cargas = this.balanzasManualService.fechasMaximasYMinimas(this.balanzas8);
@@ -213,7 +231,6 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           nombre : filtro.destino.nombre
         });
       });
-
       this.destinosBodegaPorMaterial.push(materialBodega);
     });
 
@@ -228,7 +245,17 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.balanzasManualCorteService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
       this.balanzasManualCorteService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
       this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
+      if (this.numeroBalanza == 7)
+        this.balanzasManualCorteService.RegistroBalanza = this.balanzas7;
+      else
+      this.balanzasManualCorteService.RegistroBalanza = this.balanzas8;
+
     }else{
+      if (this.numeroBalanza == 7)
+        this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas7;
+      else
+      this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas8;
+
       this.balanzasManualBajaCargaService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
       this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
       this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;

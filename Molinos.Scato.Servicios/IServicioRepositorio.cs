@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Filtros;
 using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -2821,10 +2822,10 @@ namespace Molinos.Scato.Servicios
         BalanzaManualDto ObtenerBalanzaManual(int id);
 
         [OperationContract]
-        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto);
+        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto, string nombreUsuario);
 
         [OperationContract]
-        bool EliminarBalanzaManual(int id);
+        bool EliminarBalanzaManual(int id, string nombreUsuario);
 
         [OperationContract]
         ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
@@ -2849,22 +2850,28 @@ namespace Molinos.Scato.Servicios
         void RestaurarEmbarquesOcultosLineUp();
 
         [OperationContract]
-        decimal ObtenerCargaPorBalanza(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral, int numeroBalanza);
-
-        [OperationContract]
-        decimal ObtenerRitmoCargaPorBalanza(int moduloCargaId, int numeroBalanza);
-
-        [OperationContract]
-        decimal ObtenerRitmoCargaNeta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
-        
-        [OperationContract]
-        decimal ObtenerRitmoCargaBruta(int moduloCargaId, DateTime? fechaTurno, int? turno_Id, bool esCalculoGeneral);
+        RitmoDeCargasBalanzasDto ObtenerRitmosCargaManual(int moduloCargaId, bool esCalculoGeneral, DateTime? fechaTurno, int? turnoId);
 
         [OperationContract]
         MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId);
 
         [OperationContract]
         EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
+
+        [OperationContract]
+        void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
+        
+        [OperationContract]
+        void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
+        
+        [OperationContract]
+        void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+
+        [OperationContract]
+        Dictionary<string, decimal> ObtenerRitmosBalanzaManual(int modulodecarga_id);
+
+        [OperationContract]
+        bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas);
 
     }
 }

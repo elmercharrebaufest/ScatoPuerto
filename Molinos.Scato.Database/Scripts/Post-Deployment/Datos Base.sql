@@ -1073,6 +1073,18 @@ IF (SELECT COUNT(*) FROM SiloCelda) = 0 BEGIN
 			('CELDA 30', '#e6b8b7')
 END
 
+-- Permisos Supervisor Operaciones
+DECLARE @IdGrupoSupervisor INT = (SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD = 'LAD_MOAAPP_PUERTO_OPERADORES_SUPERVISORES')
+DECLARE @IdRolSupervisor INT = (SELECT Id FROM ADPuertoRoles WHERE NombreRol = 'Supervisores')
+IF NOT EXISTS (SELECT 1 FROM ADPuertoGruposRoles WHERE Id_Grupo = @IdGrupoSupervisor AND Id_Rol = @IdRolSupervisor) BEGIN
+    INSERT INTO ADPuertoGruposRoles (Id_Grupo, Id_Rol) VALUES (@IdGrupoSupervisor, @IdRolSupervisor)
+END
+IF NOT EXISTS (SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'TableroSolido_EditarCargaHistorial') BEGIN
+    INSERT INTO ADPuertoPermisos (NombrePermiso) VALUES ('TableroSolido_EditarCargaHistorial')
+END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
+
 --Estados de documentos
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Solicitado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Solicitado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Enviado'); END

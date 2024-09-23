@@ -19,6 +19,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarPlanillaCargaManualSolidos : ProcesadorComando<GuardarPlanillaCargaManualSolidos>
     {
+        private string NombrePantalla;
+
         public ProcesadorGuardarPlanillaCargaManualSolidos(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
 
         public override Resultado Ejecutar(GuardarPlanillaCargaManualSolidos comando)
@@ -26,6 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             var resultado = new ResultadoCrear();
             try
             {
+                this.NombrePantalla = comando.DesdeHistorial ? "GuardarPlanillaCargaManualSolidos_DesdeHistorialDeEmbarque" : "GuardarPlanillaCargaManualSolidos";
                 var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
                 AgregarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
@@ -105,7 +108,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var log = new LogABM
                 {
-                    Pantalla = "GuardarPlanillaCargaManualSolidos",
+                    Pantalla = NombrePantalla,
                     Usuario = usuario,
                     Fecha = DateTime.Now,
                     Evento = EventoABM.Alta,
@@ -131,7 +134,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var log = new LogABM
                 {
-                    Pantalla = "GuardarPlanillaCargaManualSolidos",
+                    Pantalla = NombrePantalla,
                     Usuario = usuario,
                     Fecha = DateTime.Now,
                     Evento = EventoABM.Modificacion,
@@ -148,6 +151,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             foreach (var turno in turnosEliminar)
             {
+                if (turno.ModuloDeCargaPlanillaDeTurnosCortes.Count > 0)
+                {
+                    throw new Exception("Existen cortes y/o bajas cargas en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.");
+                }
+                if (turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.Count > 0)
+                {
+                    throw new Exception("Existen observaciones de calidad en el turno eliminado, los cambios en pantalla serán revertidos, por favor verifique.");
+                }
                 foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido.ToList())
                 {
                     Repositorio.Remover(detalle);
@@ -164,7 +175,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var log = new LogABM
                 {
-                    Pantalla = "GuardarPlanillaCargaManualSolidos",
+                    Pantalla = NombrePantalla,
                     Usuario = usuario,
                     Fecha = DateTime.Now,
                     Evento = EventoABM.Baja,

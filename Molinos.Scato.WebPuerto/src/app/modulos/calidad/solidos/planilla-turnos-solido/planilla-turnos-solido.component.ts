@@ -493,18 +493,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return detallesBajasClass;
   }
 
-  getBajaCargaColor(result) {
-    const idBalanzaCorte = result.controls.idBalanzaCorte.value;
-    let colorBajaCargaClass = '';
-    if (idBalanzaCorte == 1)
-      colorBajaCargaClass = 'fila-turno-normal';
-    else if (idBalanzaCorte == 0)
-      colorBajaCargaClass = 'fila-turno-baja-carga';
-    else
-      colorBajaCargaClass = 'fila-turno-corte';
-    return colorBajaCargaClass;
-  }
-
   getCorteColor(result) {
     const idBalanzaCorte = result.controls.idBalanzaCorte;
     let colorBajaCargaClass = '';
@@ -657,19 +645,24 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (let turnos of dia.controls.turnos.controls) {
       contador += this.getRowSpanTurno(turnos);
     }
-    contador += 1;
     return contador;
   }
 
-  getRowSpanTurno(turno: any) {
-    let registroSolido = turno.controls['moduloDeCargaPlanillaDeTurnosDetallesSolido'].controls.length + 1; // tamaño del detalle de cada turno
-    const registroCorte = 1; // tamaño del corte
-    const registroCalidad = 1; // tamaño de la observacion
-    let numeroRegistros = registroSolido + registroCorte + registroCalidad;
-    if (this.verObservacionesCalidad && turno.controls['moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'].controls.length) {
-      numeroRegistros++;
+  getRowSpanTurno(turnoForm: FormGroup) {
+    let rowSpan = 1;
+    const turno = turnoForm.getRawValue() as PlanillaDeTurnos;
+    rowSpan += turno.moduloDeCargaPlanillaDeTurnosDetallesSolido.length;
+    if (turno.moduloDeCargaPlanillaDeTurnosCortes.length) {
+      rowSpan++;
     }
-    return numeroRegistros;
+    if (this.verObservacionesCalidad && turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad.length) {
+      rowSpan++;
+    }
+    return rowSpan;
+  }
+
+  esTurnoVacio(turnoForm: FormGroup) {
+    return this.getRowSpanTurno(turnoForm) == 1;
   }
 
   getTurnoHorario(dia, turno) {
@@ -775,51 +768,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (const corte of cortes) {
       const corteForm = this.initCorte(corte);
       planillaTurnoCortes.push(corteForm);
-      if (this.esCargaManual) {
-        this.descontarBajasCargasDeTurno(turno, corte);
-      }
     }
-  }
-
-  private descontarBajasCargasDeTurno(turno: AbstractControl, corte: CorteTurno) {
-    const planillaTurnoDetalles = turno.get('moduloDeCargaPlanillaDeTurnosDetallesSolido') as FormArray;
-    const balanzaCorte = this.balanzasCortes.find(c => c.id == corte.idBalanzaCorte);
-    if (!balanzaCorte || balanzaCorte.corteManual) {
-      return;
-    }
-
-    let detalle: AbstractControl;
-    for (const detalleForm of planillaTurnoDetalles.controls) {
-      const materialPuertoId = detalleForm.get('materialPuerto').value?.id;
-      const nombreDestino = detalleForm.get('destino').value;
-      const bodegaId = detalleForm.get('bodega').value?.id;
-      if (bodegaId == balanzaCorte.bodega.id && nombreDestino == balanzaCorte.destino.nombre && materialPuertoId == balanzaCorte.material.id) {
-        detalle = detalleForm;
-        break;
-      }
-    }
-
-    if (!detalle) {
-      return;
-    }
-
-    const cantidadControl = detalle.get('cantidad');
-    cantidadControl.setValue(cantidadControl.value - balanzaCorte.kilogramos);
-
-    // Se añade la baja carga como un detalle más
-    const detalleIndex = planillaTurnoDetalles.controls.indexOf(detalle);
-    const nuevoDetalle = this._builder.group({
-      linea: [{ value: detalle.get('linea').value, disabled: true }],
-      idBalanzaCorte: [{ value: 0, disabled: true }],
-      exportador: [{ value: detalle.get('exportador').value || '', disabled: true }],
-      bodega: [{ value: detalle.get('bodega').value, disabled: true }],
-      materialPuerto: [{ value: detalle.get('materialPuerto').value, disabled: true }],
-      destino: [{ value: detalle.get('destino').value, disabled: true }],
-      cantidad: [{ value: balanzaCorte.kilogramos, disabled: true }],
-      id: [{ value: detalle.get('id').value, disabled: true }]
-    });
-    planillaTurnoDetalles.insert(detalleIndex + 1, nuevoDetalle);
-
   }
 
   private initTurnoObservaciones(turno: AbstractControl, observaciones: ObsCalidad[]) {
@@ -1030,6 +979,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     } else {
       this.cortesOcultos = this.cortesOcultos.filter(x => x !== id);
     }
+  }
+
+  estaOculto(id: number): boolean {
+    return this.cortesOcultos.includes(id);
   }
 
 }
