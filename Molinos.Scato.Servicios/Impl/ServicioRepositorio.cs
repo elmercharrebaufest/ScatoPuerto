@@ -13256,6 +13256,8 @@ namespace Molinos.Scato.Servicios.Impl
             var balanzasFechasCortesPorTurno = new List<BalanzasFechasCortesPorTurnoDto>();
             var listaTurnosPuerto = Listar<TurnoPuerto, TurnoPuertoDto>();
             var listaFechasCortePuerto = this.ObtenerFechasCorteRegistro((DateTime) dto.Fecha_Inicio, (DateTime) dto.Fecha_Corte);
+            var fechaInicioCorteSeleccionado = (DateTime)dto.Fecha_Inicio;
+            var fechaFinCorteSeleccionado = (DateTime)dto.Fecha_Corte;
             foreach (var fechaCortePuerto in listaFechasCortePuerto)
             {
                 var horaInicioSel = fechaCortePuerto.FechaInicio.ToString("HH:mm").Split(':');
@@ -13263,7 +13265,7 @@ namespace Molinos.Scato.Servicios.Impl
                 int horaInicio = Convert.ToInt32(horaInicioSel[0]);
                 int horaFin = Convert.ToInt32(horaFinSel[0]);
                 var turnoPuertoInicio = listaTurnosPuerto.Where(item => horaInicio >= Convert.ToInt32(item.Nombre.Substring(0, 2)) && horaInicio < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
-                var turnoPuertoFin = listaTurnosPuerto.Where(item => horaFin <= Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
+                var turnoPuertoFin = listaTurnosPuerto.Where(item => horaFin < Convert.ToInt32(item.Nombre.Substring(3, 2))).FirstOrDefault();
 
                 if (turnoPuertoInicio.Orden == turnoPuertoFin.Orden)
                 {
@@ -13287,18 +13289,25 @@ namespace Molinos.Scato.Servicios.Impl
                         var nombreTurno = turnoSeleccionado.Nombre.Split('-');
                         var horaInicioSeleccionado = string.Format("{0}:00", nombreTurno[0]);
                         var horaFinSeleccionado = turnoSeleccionado.Orden == 4 ? string.Format("{0}:59", (Convert.ToInt32(nombreTurno[1]) - 1).ToString()) : string.Format("{0}:00", (Convert.ToInt32(nombreTurno[1])).ToString());
+
+                        if (fechaInicioCorteSeleccionado == fechaCortePuerto.FechaInicio && turnoPuertoInicio.Orden == turnoSeleccionado.Orden)
+                            horaInicioSeleccionado = fechaCortePuerto.FechaInicio.ToString("HH:mm");
+                        
+                        if (fechaFinCorteSeleccionado == fechaCortePuerto.FechaFin && turnoPuertoFin.Orden == turnoSeleccionado.Orden)
+                            horaFinSeleccionado = fechaCortePuerto.FechaFin.ToString("HH:mm");
+
                         if (turnoSeleccionado.Orden == turnoPuertoInicio.Orden && fechaCortePuerto.FechaInicio.Date == dto.Fecha_Inicio.Value.Date)
                         {
                             balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
                             {
                                 TurnoPuerto = Obtener<TurnoPuerto, TurnoPuertoDto>(x => x.Orden == turnoSeleccionado.Orden),
                                 FechaInicio = fechaCortePuerto.FechaInicio.ToString("yyyy-MM-dd"),
-                                HoraInicio = string.Format("{0}:00", horaInicio),
+                                HoraInicio = horaInicioSeleccionado,
                                 FechaCorte = fechaCortePuerto.FechaInicio.ToString("yyyy-MM-dd"),
                                 HoraCorte = horaFinSeleccionado
                             });
                         }
-                        else if (turnoSeleccionado.Orden == turnoPuertoFin.Orden && fechaCortePuerto.FechaInicio.Date == dto.Fecha_Corte.Value.Date)
+                        else if (turnoSeleccionado.Orden == turnoPuertoFin.Orden && fechaCortePuerto.FechaInicio.Date == dto.Fecha_Corte.Value.Date && horaInicioSeleccionado != horaFinSeleccionado)
                         {
                             balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
                             {
@@ -13311,14 +13320,17 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                         else
                         {
-                            balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
+                            if (horaInicioSeleccionado != horaFinSeleccionado)
                             {
-                                TurnoPuerto = Obtener<TurnoPuerto, TurnoPuertoDto>(x => x.Orden == turnoSeleccionado.Orden),
-                                FechaInicio = fechaCortePuerto.FechaInicio.ToString("yyyy-MM-dd"),
-                                HoraInicio = horaInicioSeleccionado,
-                                FechaCorte = fechaCortePuerto.FechaFin.ToString("yyyy-MM-dd"),
-                                HoraCorte = horaFinSeleccionado
-                            });
+                                balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
+                                {
+                                    TurnoPuerto = Obtener<TurnoPuerto, TurnoPuertoDto>(x => x.Orden == turnoSeleccionado.Orden),
+                                    FechaInicio = fechaCortePuerto.FechaInicio.ToString("yyyy-MM-dd"),
+                                    HoraInicio = horaInicioSeleccionado,
+                                    FechaCorte = fechaCortePuerto.FechaFin.ToString("yyyy-MM-dd"),
+                                    HoraCorte = horaFinSeleccionado
+                                });
+                            }
                         }
                         inicioTurno++;
                     }
