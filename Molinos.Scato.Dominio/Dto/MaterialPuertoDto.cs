@@ -31,5 +31,6 @@ namespace Molinos.Scato.Dominio.Dto
 
         public bool EsLiquido { get; set; }
         public string Color { get; set; }
+        public bool Activo { get; set; }
     }
 }

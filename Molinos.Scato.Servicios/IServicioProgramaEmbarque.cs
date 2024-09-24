@@ -208,5 +208,25 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void CrearNominacionFAS(int embarqueId, List<NominacionReciboDto> recibos);
+
+        #region ABM Productos
+        [OperationContract]
+        ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina);
+
+        [OperationContract]
+        IList<ProductoDto> ListarProductosConCalidades(string nombre);
+
+        [OperationContract]
+        RegistroProductoDto ObtenerProducto(int id);
+
+        [OperationContract]
+        void CrearProducto(RegistroProductoDto producto, string usuario);
+
+        [OperationContract]
+        void EditarProducto(RegistroProductoDto producto, string usuario);
+
+        [OperationContract]
+        void EliminarProducto(int id, string usuario);
+        #endregion
     }
 }

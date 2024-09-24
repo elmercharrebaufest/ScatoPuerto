@@ -156,4 +156,9 @@ export enum PermisosScato {
   Destinos_Crear = "Destinos_Crear",
   Destinos_Eliminar = "Destinos_Eliminar",
 
+  //Productos
+  Productos_Visualizar = "Productos_Visualizar",
+  Productos_Editar = "Productos_Editar",
+  Productos_Crear = "Productos_Crear",
+  Productos_Eliminar = "Productos_Eliminar"
 }

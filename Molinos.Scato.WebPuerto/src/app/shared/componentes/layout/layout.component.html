@@ -75,6 +75,13 @@
           </div>
         </a>
 
+        <a routerLink='/embarque/productos' *ngIf='tienePermiso("Productos_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/productos"'>
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Productos</span>
+          </div>
+        </a>
+
       </div>
       <!-- #endregion SubMenu Datos de Embarque -->
 

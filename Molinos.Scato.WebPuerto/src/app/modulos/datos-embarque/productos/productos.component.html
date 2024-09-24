@@ -1,0 +1,74 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <label class="titulo">Productos</label>
+        </div>
+        <div class="col-md-3 nuevo">
+            <button *ngIf="tienePermisoCrearProducto()" class="btn btn-success" (click)="onAgregarProducto()">CREAR PRODUCTO</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ship-spinner [message]="mensaje" *ngIf="estaCargando"></ship-spinner>
+            <form [formGroup]="filtro" id="filtroId">
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <input type="text" class="form-control" placeholder="Nombre del producto"
+                            formControlName="nombre">
+                    </div>
+                    <div class="form-group col-md-8">
+                        <button class="btn btn-buscar mr-4" (click)="onBuscar()">BUSCAR
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-limpiar mr-4" (click)="onLimpiar()">LIMPIAR
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-exportar" (click)="onExportar()">EXCEL
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Líquido / Sólido</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let producto of productos">
+                            <td>{{producto.descripcion}}</td>
+                            <td>{{producto.esLiquido? 'Líquido' : 'Sólido'}}</td>
+                            <td>
+                                <button *ngIf="tienePermisoModificarProducto()" class="btn" (click)="onEditarProducto(producto.id)">
+                                    <i class="fa fa-pencil fs-icon text-warning icono-edit" aria-hidden="true"
+                                        title="MODIFICAR"></i>
+                                </button>
+                                <button *ngIf="tienePermisoEliminarProducto()" class="btn" (click)="onEliminarProducto(producto.id)">
+                                    <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true"
+                                        title="ELIMINAR"></i>
+                                </button>
+                            </td>
+                        </tr> 
+                    </tbody>
+                </table>
+                <div class="sin-registros" *ngIf="itemsTotales == 0">
+                    No se encontraron registros para los filtros ingresados.
+                </div> 
+                <mat-paginator (page)="onBuscar($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+                    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #modalProducto let-modal>
+    <app-modal-producto [id]="id"></app-modal-producto>
+</ng-template>

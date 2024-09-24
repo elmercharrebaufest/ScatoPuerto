@@ -7,32 +7,31 @@ using System.Linq;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {
-    public class ListarExportadoresConsulta : IConsultaPaginada<ExportadorDto>
+    public class ListarProductosConsulta : IConsultaPaginada<MaterialPuertoDto>
     {
         private readonly string nombre;
         private readonly Paginacion paginacion;
 
-        public ListarExportadoresConsulta(Paginacion paginacion, string nombre)
+        public ListarProductosConsulta(Paginacion paginacion, string nombre)
         {
             this.paginacion = paginacion;
             this.nombre = nombre;
         }
 
-        public ListaPaginada<ExportadorDto> Ejecutar(DbContext contexto)
+        public ListaPaginada<MaterialPuertoDto> Ejecutar(DbContext contexto)
         {
             ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
 
-            var query = contexto.Set<Exportador>()
-                .Where(e => e.Habilitado &&
-                    (string.IsNullOrEmpty(nombre) || e.Nombre.Contains(nombre))).OrderBy(e => e.Nombre)
-                .Select(e => new ExportadorDto { Id = e.Id, Nombre = e.Nombre });
+            var query = contexto.Set<MaterialPuerto>()
+                .Where(e => e.Activo &&
+                    (string.IsNullOrEmpty(nombre) || e.Descripcion.ToUpper().Contains(nombre.ToUpper()))).OrderBy(e => e.Descripcion)
+                .Select(e => new MaterialPuertoDto { Id = e.Id, Descripcion = e.Descripcion });
 
             var itemsTotales = query.Count();
-            
             var resultados = query.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
                     .Take(paginacion.ItemsPorPagina).ToList();
 
-            return new ListaPaginada<ExportadorDto>(resultados.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+            return new ListaPaginada<MaterialPuertoDto>(resultados.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }
     }
 }

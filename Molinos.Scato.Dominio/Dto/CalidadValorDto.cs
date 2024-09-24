@@ -12,5 +12,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string Valor { get; set; }
         public string Parametro { get; set; }
         public TipoDeCalidadDto TipoDeCalidad { get; set; }
+        public bool Activo { get; set; }
     }
 }

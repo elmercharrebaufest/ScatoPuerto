@@ -98,6 +98,9 @@
     <Compile Include="Comandos\Exportadores\CrearExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\EliminarExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
+    <Compile Include="Comandos\Productos\CrearProducto.cs" />
+    <Compile Include="Comandos\Productos\EditarProducto.cs" />
+    <Compile Include="Comandos\Productos\EliminarProducto.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarBalanzasCortesRequest.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarBalanzasCortesResponse.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarCombosFechasYTurnosResponse.cs" />
@@ -130,6 +133,8 @@
     <Compile Include="Dto\NominacionEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoDto.cs" />
+    <Compile Include="Dto\ProductoDto.cs" />
+    <Compile Include="Dto\RegistroProductoDto.cs" />
     <Compile Include="Dto\RitmoDeCargasBalanzasDto.cs" />
     <Compile Include="Dto\SiloCeldaDto.cs" />
     <Compile Include="Dto\ValidacionTraslapeFechasBalanzaManualDto.cs" />
