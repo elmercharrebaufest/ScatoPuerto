@@ -10,19 +10,19 @@ namespace Molinos.Scato.Servicios
     public interface IServicioDocumento
     {
         [OperationContract]
-        ListaPaginada<DocumentoDto> ListarDocumentos(Paginacion paginacion, string filtro = null);
+        ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0);
 
         [OperationContract]
         DocumentoDto ObtenerDocumento(int documentoId);
 
         [OperationContract]
-        void CrearDocumento(DocumentoDto documento);
+        void CrearDocumento(DocumentoDto documento, string usuario);
 
         [OperationContract]
-        void ModificarDocumento(DocumentoDto documento);
+        void ModificarDocumento(DocumentoDto documento, string usuario);
 
         [OperationContract]
-        void EliminarDocumento(int documentoId);
+        void EliminarDocumento(int documentoId, string usuario);
 
         [OperationContract]
         IList<DocumentoTipoDto> ListarDocumentoTipos();

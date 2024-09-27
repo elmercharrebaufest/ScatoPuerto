@@ -1,9 +1,11 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
+using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,19 +57,48 @@ namespace Molinos.Scato.Servicios.Impl
         }
         #endregion
 
-        public void CrearDocumento(DocumentoDto documento)
+        public void CrearDocumento(DocumentoDto documento, string usuario)
         {
-            throw new NotImplementedException();
+            var res = _servicioComandos.Ejecutar(new CrearDocumento { Documento = documento, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
         }
 
-        public void EliminarDocumento(int documentoId)
+        public void ModificarDocumento(DocumentoDto documento, string usuario)
         {
-            throw new NotImplementedException();
+            // Al eliminar, se da de baja el original y se crea uno nuevo. De esta forma no se modifica en aquellos donde ya está asociado.
+            var res = _servicioComandos.Ejecutar(new ModificarDocumento { Documento = documento, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
         }
 
-        public ListaPaginada<DocumentoDto> ListarDocumentos(Paginacion paginacion, string filtro = null)
+        public void EliminarDocumento(int documentoId, string usuario)
         {
-            throw new NotImplementedException();
+            var res = _servicioComandos.Ejecutar(new EliminarDocumentoPuerto { Id = documentoId, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0)
+        {
+            IQueryable<Documento> query = _repositorio.Incluir<Documento>()
+                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
+                .OrderBy(d => d.Nombre);
+            var itemsTotales = query.Count();
+            if (pagina > 0 && itemsPorPagina > 0)
+            {
+                var saltear = (pagina - 1) * itemsPorPagina;
+                query = query.Skip(saltear).Take(itemsPorPagina);
+            }
+            var documentosDb = query.ToList();
+            var documentos = _conversor.ConvertirList<Documento, DocumentoDto>(documentosDb);
+            return new ListaPaginada<DocumentoDto>(documentos, pagina, itemsPorPagina, itemsTotales);
         }
 
         public IList<DocumentoTipoDto> ListarDocumentoTipos()
@@ -78,11 +109,6 @@ namespace Molinos.Scato.Servicios.Impl
         public IList<NominacionDocumentoEstadoDto> ListarNominacionDocumentoEstados()
         {
             return Listar<NominacionDocumentoEstado, NominacionDocumentoEstadoDto>();
-        }
-
-        public void ModificarDocumento(DocumentoDto documento)
-        {
-            throw new NotImplementedException();
         }
 
         public DocumentoDto ObtenerDocumento(int documentoId)

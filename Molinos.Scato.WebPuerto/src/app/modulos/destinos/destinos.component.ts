@@ -82,7 +82,7 @@ export class DestinosComponent implements OnInit {
   }
 
   public async onEliminar(destino: Destino) {
-    const confirmacion = await this.confirmationDialogService.confirmar('Atención', `Esta seguro de anular al destino ${destino.nombre}?`);
+    const confirmacion = await this.confirmationDialogService.confirmar('Atención', `Esta seguro de anular el destino ${destino.nombre}?`);
     if (!confirmacion) {
       return;
     }
@@ -91,7 +91,7 @@ export class DestinosComponent implements OnInit {
 
     this.destinosService.eliminarDestino(destino.id).subscribe(() => {
       this.loading = false;
-      this.confirmationDialogService.exito('Se ha eliminado el desitno');
+      this.confirmationDialogService.exito('Se ha eliminado el destino');
     }, (err) => {
       this.loading = false;
       console.error(err);
@@ -99,7 +99,7 @@ export class DestinosComponent implements OnInit {
       if (typeof err.error == 'string') {
         msj = err.error;
       } else {
-        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al anular la COEM';
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al anular el destino';
       }
       this.confirmationDialogService.error(msj);
     });
@@ -134,7 +134,7 @@ export class DestinosComponent implements OnInit {
       if (typeof err.error == 'string') {
         msj = err.error;
       } else {
-        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al anular la COEM';
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al guardar el destino';
       }
       this.confirmationDialogService.error(msj);
     });

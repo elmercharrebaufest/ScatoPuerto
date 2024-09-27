@@ -75,6 +75,13 @@
           </div>
         </a>
 
+        <a routerLink='/documentos' *ngIf='tienePermiso("Documentos_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "documentos"'>
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Documentos</span>
+          </div>
+        </a>
+
         <a routerLink='/embarque/productos' *ngIf='tienePermiso("Productos_Visualizar")'>
           <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/productos"'>
             <div class='icon-pe'></div>

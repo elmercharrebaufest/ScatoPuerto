@@ -1075,6 +1075,16 @@ if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Productos_Elim
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')); END
 
+--Permisos Documentos
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Visualizar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Visualizar')) BEGIN  insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Visualizar')); END
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Crear'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Crear')); END
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Editar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Editar')); END
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Eliminar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Eliminar')); END
+
 
 UPDATE LineUp SET Ocultar = 0 WHERE Ocultar IS NULL
 
@@ -1109,3 +1119,8 @@ if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador E
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Modificado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Modificado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Aprobado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Aprobado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Enviado'); END
+
+--Tipos de documentos
+if not exists(select 1 from DocumentoTipo where Nombre = 'A solicitar en la nominación') BEGIN insert into DocumentoTipo(Nombre) values ('A solicitar en la nominación'); END
+if not exists(select 1 from DocumentoTipo where Nombre = 'Interno') BEGIN insert into DocumentoTipo(Nombre) values ('Interno'); END
+if not exists(select 1 from DocumentoTipo where Nombre = 'A compartir') BEGIN insert into DocumentoTipo(Nombre) values ('A compartir'); END
