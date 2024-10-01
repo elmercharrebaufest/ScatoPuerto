@@ -13381,10 +13381,21 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             // Obtengo el corte sin importar el turno, ya que pudo haber cambiado. Si no existe, se crea.
+            //ModuloDeCargaPlanillaDeTurnosCortes planillaDeTurnosCortes = null;          
+            //foreach(var turnos in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
+            //{
+            //    if (turnos.ModuloDeCargaPlanillaDeTurnosCortes != null)
+            //    {
+            //        planillaDeTurnosCortes = turnos.ModuloDeCargaPlanillaDeTurnosCortes.Where(x => x?.idBalanzaCorte == balanzaCortes.Id).FirstOrDefault();
+            //        return;
+            //    }
+            //}
             var planillaDeTurnosCortes = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos?
+                .Where(t => t.ModuloDeCargaPlanillaDeTurnosCortes != null)
                 .SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes)
                 .Where(x => x.idBalanzaCorte == balanzaCortes.Id)?
                 .FirstOrDefault();
+
             if (planillaDeTurnosCortes == null)
             {
                 planillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes();
