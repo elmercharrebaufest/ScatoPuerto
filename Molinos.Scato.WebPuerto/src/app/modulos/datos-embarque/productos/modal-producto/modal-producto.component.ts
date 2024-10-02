@@ -1,32 +1,44 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Documento } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { DocumentoService } from '@ScatoServicios/documento.service';
 import { ProductosService } from '@ScatoServicios/productos.service';
+
+export interface DocumentosProducto {
+  documento: Documento;
+  seleccionado: boolean;
+}
 
 @Component({
   selector: 'app-modal-producto',
   templateUrl: './modal-producto.component.html',
   styleUrls: ['./modal-producto.component.css']
 })
+
 export class ModalProductoComponent implements OnInit {
 
   @ViewChild('colorPicker') colorPicker!: ElementRef;
 
   @Input() id: number = 0;
+  indiceTc: number = 0;
   formProducto: FormGroup;
   formCalidad: FormGroup;
+  documentos: DocumentosProducto[];
   tabSeleccionado: string = "info-gral";
-  indiceTc: number = 0;
   errorExisteProducto: string = "La descripción ingresada ya existe en otro producto.";
   errorProductoEnUso: string = "No puede modificar el estado liquido/solido del producto, porque él mismo esta utilizándose en una nominación/embarque.";
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly modalService: NgbModal,
     private readonly confirmationDialogService: ConfirmationDialogService,
     private readonly productosService: ProductosService,
+    private readonly documentosService: DocumentoService
   ) {
     this.inicializarForm();
+    this.obtenerDocumentos();
   }
 
   ngOnInit(): void {
@@ -80,11 +92,8 @@ export class ModalProductoComponent implements OnInit {
 
   private inicializarDocumento(): FormGroup {
     return this.fb.group({
-      id: [''],
-      id_documento: ['', [Validators.required]],
-      descripcion_documento: ['', [Validators.required]],
-      activo: [false, [Validators.required]],
-      doc_activo: [false, [Validators.required]]
+      id: [0],
+      documento: [null, [Validators.required]],
     });
   }
 
@@ -123,6 +132,79 @@ export class ModalProductoComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const color = input.value.toLowerCase();
     this.colorPicker.nativeElement.value = color;
+  }
+
+  private obtenerDocumentos() {
+    try {
+      this.documentosService.listarDocumentosNominacion().subscribe(docs => {
+        this.documentos = docs.map(doc => {
+          return {
+            documento: doc,
+            seleccionado: false
+          };
+        });
+      }, (error: any) => {
+        console.error(error);
+        this.mostrarError("Hubo un error al intentar obtener los documentos.");
+      });
+    } catch (error) {
+      console.error(error);
+      this.mostrarError("Hubo un error al intentar obtener los documentos.");
+    }
+  }
+
+  public getDocumentosMaterial(): DocumentosProducto[] {
+    const tipoFiltro = this.formProducto.value.materialPuerto.esLiquido ? 'liquido' : 'solido';
+    return this.documentos?.filter(d => d.documento[tipoFiltro]) || [];
+  }
+
+  public onCheckDocumento(doc: DocumentosProducto, event: any) {
+    const input = event.target as HTMLInputElement;
+    const documentosArray = this.formProducto.get('documentos') as FormArray;
+    if (input.checked) {
+      const existeDocumento = documentosArray.value.some((d: any) => d.documento.id == doc.documento.id);
+      if (!existeDocumento) {
+        const documentoFormGroup = this.inicializarDocumento();
+        documentoFormGroup.patchValue({
+          documento: doc.documento,
+        });
+        documentosArray.push(documentoFormGroup);
+      }
+    } else {
+      const indice = documentosArray.value.findIndex((d: any) => d.documento.id == doc.documento.id);
+      if (indice !== -1) {
+        documentosArray.value.splice(indice, 1);
+      }
+    }
+  }
+
+  public onChangeLiquidoSolido(esLiquido: boolean): void {
+    const tipoFiltro = esLiquido ? 'liquido' : 'solido';
+
+    const documentosFiltrados = this.documentosArray?.value?.filter((d: any) => d?.documento?.[tipoFiltro]);
+
+    if (this.documentosArray?.length) {
+      this.documentosArray.clear();
+    }
+
+    documentosFiltrados?.forEach((doc: any) => {
+      const documentoFormGroup = this.inicializarDocumento();
+      documentoFormGroup.patchValue({
+        id: doc.id,
+        documento: doc.documento
+      });
+      this.documentosArray.push(documentoFormGroup);
+    });
+
+    this.documentosArray?.value?.forEach((doc: any) => {
+      this.seleccionarDocumento(doc.documento.id);
+    });
+  }
+
+  private seleccionarDocumento(id: number) {
+    let doc = this.documentos.find(d => d.documento.id == id);
+    if (doc)
+      doc.seleccionado = true;
   }
 
   //endregion AUXILIARES
@@ -227,10 +309,7 @@ export class ModalProductoComponent implements OnInit {
       const documentoFormGroup = this.inicializarDocumento();
       documentoFormGroup.patchValue({
         id: doc.id,
-        id_documento: doc.documento.id,
-        descripcion_documento: doc.documento.nombre,
-        doc_activo: doc.documento.activo,
-        activo: doc.activo
+        documento: doc.documento,
       });
       documentosArray.push(documentoFormGroup);
     });
@@ -243,6 +322,10 @@ export class ModalProductoComponent implements OnInit {
       this.colorPicker.nativeElement.value = producto.materialPuerto.color;
     }
 
+    //Marcamos los documentos del prod a editar
+    this.documentosArray.value.forEach(doc => {
+      this.seleccionarDocumento(doc.documento.id);
+    });
   }
 
   //endregion FUNCIONES EDICION

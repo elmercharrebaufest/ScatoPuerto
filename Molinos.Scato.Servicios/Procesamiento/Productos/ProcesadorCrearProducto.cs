@@ -9,6 +9,7 @@ using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento.Productos
 {
@@ -47,6 +48,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
         {
             var materialPuerto = Repositorio.Agregar(Conversor.Convertir<MaterialPuertoDto, MaterialPuerto>(comando.Dto.MaterialPuerto));
             AgregarCalidades(comando.Dto.TiposDeCalidad, materialPuerto);
+            AgregarDocumentos(comando.Dto.Documentos, materialPuerto);
             AgregarLogAlta(comando, materialPuerto.Id);
         }
 
@@ -76,6 +78,23 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
             return Repositorio.Existe<MaterialPuerto>(x => (x.Descripcion.ToLower() == material.Descripcion.ToLower()
             || x.DescripcionCorta.ToLower() == material.DescripcionCorta.ToLower() ||
             x.DescripcionCortaIngles.ToLower() == material.DescripcionCortaIngles.ToLower()) && x.Activo);
+        }
+
+        private void AgregarDocumentos(List<DocumentoMaterialPuertoDto> documentos, MaterialPuerto material)
+        {
+            if (documentos == null || !documentos.Any()) return;
+
+            var documentosMaterialPuerto = documentos
+                .Select(docDto => new DocumentoMaterialPuerto
+                {
+                    Documento = this.Repositorio.Obtener<Documento>(d => d.Id == docDto.Documento.Id),
+                    MaterialPuerto = material,
+                });
+
+            foreach (var documentoMaterial in documentosMaterialPuerto)
+            {
+                this.Repositorio.Agregar(documentoMaterial);
+            }
         }
 
         private void AgregarLogAlta(CrearProducto comando, int id)

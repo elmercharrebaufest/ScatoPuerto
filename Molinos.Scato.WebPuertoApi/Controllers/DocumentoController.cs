@@ -117,5 +117,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/documento/ListarDocumentosNominacion")]
+        public HttpResponseMessage ListarDocumentosNominacion()
+        {
+            try
+            {
+                var docsNominacion = servicioDocumento.ListarDocumentosNominacion();
+                return Request.CreateResponse(HttpStatusCode.OK, docsNominacion);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
     }
 }

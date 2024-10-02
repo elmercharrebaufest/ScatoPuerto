@@ -29,5 +29,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<NominacionDocumentoEstadoDto> ListarNominacionDocumentoEstados();
+
+        [OperationContract]
+        IList<DocumentoDto> ListarDocumentosNominacion();
     }
 }

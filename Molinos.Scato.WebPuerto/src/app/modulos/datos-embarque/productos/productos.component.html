@@ -44,8 +44,8 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let producto of productos">
-                            <td>{{producto.descripcion}}</td>
-                            <td>{{producto.esLiquido? 'Líquido' : 'Sólido'}}</td>
+                            <td>{{producto?.descripcion}}</td>
+                            <td>{{ producto?.esLiquido ? "Líquido" : "Sólido" }}</td>
                             <td>
                                 <button *ngIf="tienePermisoModificarProducto()" class="btn" (click)="onEditarProducto(producto.id)">
                                     <i class="fa fa-pencil fs-icon text-warning icono-edit" aria-hidden="true"

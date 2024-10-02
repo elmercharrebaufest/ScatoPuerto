@@ -34,4 +34,8 @@ export class DocumentoService {
     return this.http.delete(`${this.url}/EliminarDocumento?id=${id}`, { withCredentials: true });
   }
 
+  public listarDocumentosNominacion() {
+    return this.http.get<Documento[]>(`${this.url}/ListarDocumentosNominacion`, { withCredentials: true });
+  }
+
 }

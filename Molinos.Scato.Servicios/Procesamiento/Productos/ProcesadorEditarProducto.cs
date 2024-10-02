@@ -73,7 +73,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
             materialBd.EsLiquido = materialDto.EsLiquido;
             materialBd.Color = materialDto.Color;
             EditarCalidades(comando.Dto.TiposDeCalidad, materialBd);
-            EditarDocumentos(comando.Dto.Documentos);
+            EditarDocumentos(comando.Dto.Documentos, materialBd);
             AgregarLogEdicion(comando);
         }
 
@@ -81,7 +81,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
         {
             //Edito las calidades existentes
             foreach (RegistroTipoDeCalidadDto tcDto in tiposDeCalidad)
-            { 
+            {
                 var tcBd = Repositorio.Obtener<TipoDeCalidad>(tc => tc.Id == tcDto.TipoDeCalidad.Id);
                 if (tcBd != null)
                 {
@@ -143,14 +143,26 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
             }
         }
 
-        private void EditarDocumentos(List<DocumentoMaterialPuertoDto> documentos)
+        private void EditarDocumentos(List<DocumentoMaterialPuertoDto> documentos, MaterialPuerto material)
         {
-            foreach(DocumentoMaterialPuertoDto doc in documentos)
+            foreach (DocumentoMaterialPuertoDto docDto in documentos)
             {
-                var docBd = this.Repositorio.Obtener<DocumentoMaterialPuerto>(d => d.Id == doc.Id);
-                if(docBd != null)
-                    docBd.Activo = doc.Activo;
+                //Alta de documentos marcados
+                var docBd = this.Repositorio.Obtener<DocumentoMaterialPuerto>(d => d.Documento.Id == docDto.Documento.Id && d.MaterialPuerto.Id == material.Id);
+                if (docBd == null)
+                {
+                    var documento = this.Repositorio.Obtener<Documento>(d => d.Id == docDto.Documento.Id);
+                    var docMaterial = new DocumentoMaterialPuerto();
+                    docMaterial.Documento = documento;
+                    docMaterial.MaterialPuerto = material;
+                    this.Repositorio.Agregar(docMaterial);
+                }
             }
+            //Borrado de documentos desmarcados
+            var documentoIds = documentos.Select(d => d.Documento.Id).ToList();
+            var docsABorrar = this.Repositorio.Listar<DocumentoMaterialPuerto>(dm => dm.MaterialPuerto.Id == material.Id &&
+            !documentoIds.Contains(dm.Documento.Id));
+            this.Repositorio.RemoverTodos(docsABorrar);
         }
 
         private void AgregarLogEdicion(EditarProducto comando)

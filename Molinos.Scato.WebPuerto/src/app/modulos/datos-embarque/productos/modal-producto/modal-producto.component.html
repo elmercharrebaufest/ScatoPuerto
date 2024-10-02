@@ -40,14 +40,14 @@
             <div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" formControlName="esLiquido" name="esLiquido" id="opcion1"
-                  [value]="true">
+                  [value]="true" (click)="onChangeLiquidoSolido(true)">
                 <label class="form-check-label" for="esLiquido">
                   Líquido
                 </label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" formControlName="esLiquido" name="esLiquido" id="opcion2"
-                  [value]="false">
+                  [value]="false" (click)="onChangeLiquidoSolido(false)">
                 <label class="form-check-label" for="esLiquido">
                   Sólido
                 </label>
@@ -181,17 +181,18 @@
     <!-----------------------------------------DOCUMENTOS------------------------------------------>
     <div [hidden]="tabSeleccionado !== 'documentos'">
       <label class="mt-2 ml-2"><strong>Documentos asociados:</strong></label>
-      <div class="row margen" formArrayName="documentos">
-        <ng-container *ngFor="let doc of documentosArray?.controls; let i = index" [formGroupName]="i">
+      <div class="row margen">
+        <ng-container *ngFor="let doc of getDocumentosMaterial()">
           <div class="col-md-3">
             <div class="d-flex align-items-center">
-              <input type="checkbox" class="form-check-input me-2" formControlName="activo" />
+              <input id="doc-{{doc?.id}}" type="checkbox" class="form-check-input me-2" 
+              [checked]="doc.seleccionado" (click)="onCheckDocumento(doc, $event)"/>
               <input class="form-control border-0 custom-disabled" type="text"
-                formControlName="descripcion_documento" />
+              [value]="doc?.documento?.nombre"/>
             </div>
           </div>
         </ng-container>
-        <div *ngIf="documentosArray?.length === 0" class="col-md-12">
+        <div *ngIf="getDocumentosMaterial()?.length === 0" class="col-md-12">
           <p class="red">No existen documentos configurados para el producto.</p>
         </div>
       </div>

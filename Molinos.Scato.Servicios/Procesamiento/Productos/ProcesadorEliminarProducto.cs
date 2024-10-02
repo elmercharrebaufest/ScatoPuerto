@@ -66,7 +66,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
             var documentos = this.Repositorio.Listar<DocumentoMaterialPuerto>(d => d.MaterialPuerto.Id == materialBd.Id);
             foreach(DocumentoMaterialPuerto doc in documentos)
             {
-                doc.Activo = false;
+                this.Repositorio.Remover(doc);
             }
             this.AgregarLogBaja(comando, json);
         }

@@ -25,7 +25,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             var query = contexto.Set<MaterialPuerto>()
                 .Where(e => e.Activo &&
                     (string.IsNullOrEmpty(nombre) || e.Descripcion.ToUpper().Contains(nombre.ToUpper()))).OrderBy(e => e.Descripcion)
-                .Select(e => new MaterialPuertoDto { Id = e.Id, Descripcion = e.Descripcion });
+                .Select(e => new MaterialPuertoDto { Id = e.Id, Descripcion = e.Descripcion, EsLiquido = e.EsLiquido });
 
             var itemsTotales = query.Count();
             var resultados = query.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
