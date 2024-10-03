@@ -13279,14 +13279,18 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (turnoPuertoInicio.Orden == turnoPuertoFin.Orden)
                 {
-                    balanzasFechasCortesPorTurno.Add(new BalanzasFechasCortesPorTurnoDto()
-                    {
+                    var balanzasFechasCortesPorTurnoDto = new BalanzasFechasCortesPorTurnoDto() {
                         TurnoPuerto = Obtener<TurnoPuerto, TurnoPuertoDto>(x => x.Orden == turnoPuertoInicio.Orden),
                         FechaInicio = fechaCortePuerto.FechaInicio.ToString("yyyy-MM-dd"),
                         HoraInicio = fechaCortePuerto.FechaInicio.ToString("HH:mm"),
                         FechaCorte = fechaCortePuerto.FechaFin.ToString("yyyy-MM-dd"),
                         HoraCorte = fechaCortePuerto.FechaFin.ToString("HH:mm")
-                    });
+                    };
+                    if (balanzasFechasCortesPorTurnoDto.FechaInicio == balanzasFechasCortesPorTurnoDto.FechaCorte && 
+                        balanzasFechasCortesPorTurnoDto.HoraInicio != balanzasFechasCortesPorTurnoDto.HoraCorte)
+                    {
+                        balanzasFechasCortesPorTurno.Add(balanzasFechasCortesPorTurnoDto);
+                    }
                 }
                 else
                 {
