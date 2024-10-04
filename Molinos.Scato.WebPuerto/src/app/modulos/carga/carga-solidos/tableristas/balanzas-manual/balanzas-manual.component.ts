@@ -38,7 +38,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   balanza8Cargas: BalanzaManualCargas=new BalanzaManualCargas();
   balanza7Cargas: BalanzaManualCargas=new BalanzaManualCargas();
   private destroy$ = new Subject();
-  private planoCargaSeleccionado:PlanoDeCarga; 
+  private planoCargaSeleccionado:PlanoDeCarga;
   private paramSoloLectura: any;
   public periodoDeCarga: PeriodoDeCarga;
   private user: Usuario;
@@ -100,7 +100,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   }
   async onEliminarCorteBajaCarga(numeroBalanza: number ,index: number, balanzaId: number, corteManual:boolean){
     const titulo = corteManual ? `Eliminación de Corte Balanza ${numeroBalanza}` :  `Eliminación de Baja Carga Balanza ${numeroBalanza}`;
-    const mensaje = `¿Está seguro de eliminar ${corteManual? 'el Corte seleccionado' : 'la Baja Carga seleccionada'}?`; 
+    const mensaje = `¿Está seguro de eliminar ${corteManual? 'el Corte seleccionado' : 'la Baja Carga seleccionada'}?`;
     const confirm = await this.confirmationDialogService.confirm(titulo, mensaje, ' Sí ', ' No ', null, null, Tipoalerta.Warning);
     if (!confirm) {
       return;
@@ -109,7 +109,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
         if (resultado){
           if (numeroBalanza == 7)
             this.balanzas7.removeAt(index);
-      
+
           if (numeroBalanza == 8)
             this.balanzas8.removeAt(index);
 
@@ -124,6 +124,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.listarBalanzaManualPorBalanza(numeroBalanza);
       let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
       divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
+      this.balanzasManualService.guardoCorteBajaCarga$.next();
     });
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }
@@ -133,9 +134,10 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.listarBalanzaManualPorBalanza(numeroBalanza);
       let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
       divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
+      this.balanzasManualService.guardoCorteBajaCarga$.next();
     });
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
-  }  
+  }
   public async enviarBuqueCalidad() {
     const mensaje: string = "¿Desea terminar la carga y exportar planillas?";
     this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success).then((confirmed) => {
@@ -193,7 +195,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.calcularFechasCargaBalanzas();
     });
   }
-  private listarBalanzaManualPorBalanza(numeroBalanza: string){  
+  private listarBalanzaManualPorBalanza(numeroBalanza: string){
 
     let registros = numeroBalanza == '8'? this.balanzas8.controls.length : this.balanzas7.controls.length;
     let balanzas = numeroBalanza == '8'? this.balanzas8 : this.balanzas7;
@@ -206,7 +208,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           this.balanzasManualService.cargarCorteBajaCarga((numeroBalanza == '8' ? this.balanzas8 : this.balanzas7),item);
         }
       })
-      
+
     },error=>{},()=>{
       this.calcularFechasCargaBalanzas();
     });

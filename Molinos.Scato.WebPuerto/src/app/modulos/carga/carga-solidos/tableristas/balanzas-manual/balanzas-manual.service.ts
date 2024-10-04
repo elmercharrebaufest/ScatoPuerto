@@ -41,6 +41,8 @@ export class BalanzasManualService {
   { id: 3, descripcion: 'ControlCalidad' },
   { id: 4, descripcion: 'PostOperativo' }];
 
+  public guardoCorteBajaCarga$ = new Subject();
+
   constructor(private moduloDeCargaService: ModuloDeCargaService,
     private embarqueService: EmbarqueService,
     private planoDeCargaService: PlanoDeCargaService,
@@ -179,7 +181,7 @@ export class BalanzasManualService {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   }
-    
+
   cargarBodegasParcel(): BodegaParcel[] {
     this.bodegas = [];
     for (let index = 1; index < 10; index++) {
@@ -284,7 +286,7 @@ export class BalanzasManualService {
 
   public validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
     let esRegistroValido: boolean = true;
-    let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id); 
+    let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id);
     if (filtroBalanzas!=null && filtroBalanzas.length > 0) {
       for (let index = 0; index < filtroBalanzas.length; index++) {
         const balanza = filtroBalanzas[index];
