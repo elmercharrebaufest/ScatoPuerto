@@ -1,12 +1,24 @@
 import { Destino } from '@ScatoModels/destino';
+import { Documento, DocumentoDestino } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DestinosService } from '@ScatoServicios/destinos.service';
+import { DocumentoService } from '@ScatoServicios/documento.service';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver';
+
+export interface DocumentosDestino {
+  documento: Documento;
+  seleccionado: boolean;
+}
+
+export interface AltaEdicionDestino {
+  documentos: DocumentoDestino[];
+  destino: Destino
+}
 
 @Component({
   selector: 'app-destinos',
@@ -19,26 +31,36 @@ export class DestinosComponent implements OnInit {
   public loading: boolean;
   public filtros: FormGroup;
   public destinoForm: FormGroup;
-
+  public documentos: DocumentosDestino[] = [];
   public destinos: Destino[] = [];
   public itemsTotales: number = 0; // Total de elementos
 
   @ViewChild('modalDestino') modalDestino: TemplateRef<any>;
 
   constructor(
-    fb: FormBuilder,
+    private fb: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
     private destinosService: DestinosService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private documentosService: DocumentoService
   ) {
-    this.filtros = fb.group({ nombre: '' });
-    this.destinoForm = fb.group({
+    this.filtros = this.fb.group({ nombre: '' });
+    this.destinoForm = this.fb.group({
       id: 0,
-      nombre: ['', [Validators.required, Validators.pattern(/[\S]/g)]]
+      nombre: ['', [Validators.required, Validators.pattern(/[\S]/g)]],
+      documentos: this.fb.array([])
     });
+    this.obtenerDocumentos();
   }
 
   ngOnInit(): void { this.onBuscar(); }
+
+  private inicializarDocumento(): FormGroup {
+    return this.fb.group({
+      id: [0],
+      documento: [null, Validators.required],
+    });
+  }
 
   public onBuscar(page?: PageEvent) {
     let pagina = 1, itemsPorPagina = 10;
@@ -66,7 +88,7 @@ export class DestinosComponent implements OnInit {
   }
 
   private abrirModal() {
-    this.modalService.open(this.modalDestino, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
+    this.modalService.open(this.modalDestino, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
   }
 
   public onCrear() {
@@ -78,7 +100,7 @@ export class DestinosComponent implements OnInit {
     this.titulo = 'Editar Destino';
     this.destinoForm.get('id').setValue(destino.id);
     this.destinoForm.get('nombre').setValue(destino.nombre);
-    this.abrirModal();
+    this.obtenerDocumentosAsociados(destino.id);
   }
 
   public async onEliminar(destino: Destino) {
@@ -108,6 +130,17 @@ export class DestinosComponent implements OnInit {
   public closeModal() {
     this.modalService.dismissAll();
     this.destinoForm.reset();
+    this.limpiarFormArrayDocumentos();
+  }
+
+  private limpiarFormArrayDocumentos() {
+    const documentosArray = this.destinoForm.get('documentos') as FormArray;
+    while (documentosArray.length !== 0) {
+      documentosArray.removeAt(0);
+    }
+    this.documentos.forEach(d=> {
+      d.seleccionado = false;
+    });
   }
 
   public async onGuardar() {
@@ -119,16 +152,45 @@ export class DestinosComponent implements OnInit {
 
     const id = +this.destinoForm.get('id').value || 0;
     const nombre = this.destinoForm.get('nombre').value as string;
-    const observable = id ? this.destinosService.editarDestino({ id, nombre }) : this.destinosService.crearDestino(nombre);
+    const documentos = this.destinoForm.get('documentos').value as DocumentoDestino[];
 
+    const altaEdicionDestino: AltaEdicionDestino = {
+      destino: { id, nombre },
+      documentos
+    };
+
+    id ? this.editarDestino(altaEdicionDestino) : this.crearDestino(altaEdicionDestino);
+  }
+
+  private editarDestino(objDestino: AltaEdicionDestino){
+    this.loading = true;
     this.mensaje = 'Guardando destino';
-    observable.subscribe(() => {
+    this.destinosService.editarDestino(objDestino).subscribe(async () =>{
       this.loading = false;
-      this.confirmationDialogService.exito('Destino guardado correctamente');
-      this.closeModal();
+      await this.confirmationDialogService.exito('Destino guardado correctamente');
+      this.closeModal(); 
       this.onBuscar();
     }, (err) => {
+      console.error(err);
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al guardar el destino';
+      }
+      this.confirmationDialogService.error(msj);
+    });
+  }
+
+  private crearDestino(objDestino: AltaEdicionDestino){
+    this.loading = true;
+    this.mensaje = 'Guardando destino';
+    this.destinosService.crearDestino(objDestino).subscribe(async ()=>{
       this.loading = false;
+      this.confirmationDialogService.exito('Destino guardado correctamente');
+      this.closeModal(); 
+      this.onBuscar();
+    }, (err) => {
       console.error(err);
       let msj: string;
       if (typeof err.error == 'string') {
@@ -160,4 +222,71 @@ export class DestinosComponent implements OnInit {
     });
   }
 
+  private obtenerDocumentos() {
+    try {
+      this.documentosService.listarDocumentosNominacion().subscribe(docs => {
+        this.documentos = docs.map(doc => {
+          return {
+            documento: doc,
+            seleccionado: false
+          };
+        });
+      }, (error: any) => {
+        console.error(error);
+        this.mostrarError("Hubo un error al intentar obtener los documentos.");
+      });
+    } catch (error) {
+      console.error(error);
+      this.mostrarError("Hubo un error al intentar obtener los documentos.");
+    }
+  }
+
+  private mostrarError(msj: string) {
+    this.confirmationDialogService.error(msj);
+  }
+
+  public onCheckDocumento(doc: DocumentosDestino, event: any) {
+    const input = event.target as HTMLInputElement;
+    const documentosArray = this.destinoForm.get('documentos') as FormArray;
+    const existeDocumento = documentosArray.controls.some(control => control.value.documento?.id === doc.documento.id);
+    
+    if (input.checked && !existeDocumento) {
+      const documentoFormGroup = this.inicializarDocumento();
+      documentoFormGroup.patchValue({
+        id: 0,
+        documento: doc.documento,
+      });
+      documentosArray.push(documentoFormGroup);
+    } else if (!input.checked && existeDocumento) {
+      const indice = documentosArray.controls.findIndex(control => control.value.documento?.id === doc.documento.id);
+      if (indice !== -1) {
+        documentosArray.removeAt(indice);
+      }
+    }
+  }  
+
+  private seleccionarDocumento(id: number) {
+    let doc = this.documentos.find(d => d.documento.id == id);
+    if (doc)
+      doc.seleccionado = true;
+  }
+
+  private obtenerDocumentosAsociados(idDestino: number): void {
+    this.documentosService.listarDocumentosDestino(idDestino).subscribe(docs => {
+      const documentosArray = this.destinoForm.get('documentos') as FormArray;
+      docs.forEach(doc => {
+        const documentoFormGroup = this.inicializarDocumento();
+        documentoFormGroup.patchValue({
+          documento: doc.documento,
+        });
+        documentosArray.push(documentoFormGroup);
+        this.seleccionarDocumento(doc.documento.id);
+      });
+      this.abrirModal();
+    }, (error: any) => {
+      console.error(error);
+      this.mostrarError("Hubo un error al intentar obtener los documentos asociados al destino.");
+    });
+ } 
+  
 }

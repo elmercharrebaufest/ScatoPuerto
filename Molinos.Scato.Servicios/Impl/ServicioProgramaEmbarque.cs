@@ -4,6 +4,7 @@ using Molinos.Scato.Dominio.Comandos.Exportadores;
 using Molinos.Scato.Dominio.Comandos.Productos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
@@ -1081,16 +1082,16 @@ namespace Molinos.Scato.Servicios.Impl
             return new ListaPaginada<DestinoDto>(destinos, pagina, itemsPorPagina, itemsTotales);
         }
 
-        public void CrearDestino(string nombre, string usuario)
+        public void CrearDestino(AltaEdicionDestinoDto destino, string usuario)
         {
-            var res = comandos.Ejecutar(new CrearDestinoPuerto { Nombre = nombre, Usuario = usuario });
+            var res = comandos.Ejecutar(new CrearDestinoPuerto { Destino = destino, Usuario = usuario });
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
             }
         }
 
-        public void ModificarDestino(DestinoDto destino, string usuario)
+        public void ModificarDestino(AltaEdicionDestinoDto destino, string usuario)
         {
             var res = comandos.Ejecutar(new ModificarDestinoPuerto { Destino = destino, Usuario = usuario });
             if (res.HayErrores)

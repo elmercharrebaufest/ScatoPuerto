@@ -121,5 +121,10 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<Documento, DocumentoDto>(d => d.Activo && d.DocumentoTipo.Nombre == "A solicitar en la nominación");
         }
 
+        public IList<DocumentoDestinoDto> ListarDocumentosDestino(int idDestino)
+        {
+            return Listar<DocumentoDestino, DocumentoDestinoDto>(d => d.Destino.Id == idDestino);
+        }
+
     }
 }

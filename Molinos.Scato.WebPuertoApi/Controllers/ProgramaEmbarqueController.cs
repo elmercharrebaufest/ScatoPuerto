@@ -2,6 +2,7 @@
 using Molinos.Scato.Dominio.Comandos.Productos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
@@ -854,11 +855,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ProgramaEmbarque/CrearDestino")]
-        public HttpResponseMessage CrearDestino(DestinoDto destino)
+        public HttpResponseMessage CrearDestino(AltaEdicionDestinoDto destino)
         {
             try
             {
-                servicioProgramaEmbarque.CrearDestino(destino.Nombre, this.nombreUsuario);
+                servicioProgramaEmbarque.CrearDestino(destino, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -869,7 +870,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPut]
         [Route("api/ProgramaEmbarque/ModificarDestino")]
-        public HttpResponseMessage EditarDestino(DestinoDto destino)
+        public HttpResponseMessage EditarDestino(AltaEdicionDestinoDto destino)
         {
             try
             {

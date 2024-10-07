@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Documento, DocumentoTipo } from '@ScatoModels/digitalizacion-documentos/documento';
+import { Documento, DocumentoDestino, DocumentoTipo } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { environment } from 'environments/environment';
 
@@ -38,4 +38,7 @@ export class DocumentoService {
     return this.http.get<Documento[]>(`${this.url}/ListarDocumentosNominacion`, { withCredentials: true });
   }
 
+  public listarDocumentosDestino(destinoId: number) {
+    return this.http.get<DocumentoDestino[]>(`${this.url}/ListarDocumentosDestino?destinoId=${destinoId}`, { withCredentials: true });
+  }
 }

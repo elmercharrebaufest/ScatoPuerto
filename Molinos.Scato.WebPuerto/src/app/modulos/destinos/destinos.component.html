@@ -69,6 +69,24 @@
                         El nombre es obligatorio
                     </small>
                 </div>
+                <div class="form-group">
+                    <label><strong>Documentos asociados:</strong></label>
+                </div>
+                <div class="row margen">
+                    <ng-container *ngFor="let doc of documentos">
+                      <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <input id="doc-{{doc?.id}}" type="checkbox" class="form-check-input me-2" 
+                          [checked]="doc?.seleccionado" (click)="onCheckDocumento(doc, $event)"/>
+                          <input class="form-control border-0 custom-disabled" type="text"
+                          [value]="doc?.documento?.nombre"/>
+                        </div>
+                      </div>
+                    </ng-container>
+                    <div *ngIf="documentos?.length === 0" class="col-md-12">
+                      <p>No existen documentos configurados para el destino.</p>
+                    </div>
+                  </div>
             </form>
         </div>
         <div class="modal-footer justify-content-center">

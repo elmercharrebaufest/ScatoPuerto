@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -174,10 +175,10 @@ namespace Molinos.Scato.Servicios
         ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0);
 
         [OperationContract]
-        void CrearDestino(string nombre, string usuario);
+        void CrearDestino(AltaEdicionDestinoDto destino, string usuario);
 
         [OperationContract]
-        void ModificarDestino(DestinoDto destino, string usuario);
+        void ModificarDestino(AltaEdicionDestinoDto destino, string usuario);
 
         [OperationContract]
         void EliminarDestino(int id, string usuario);
@@ -210,6 +211,7 @@ namespace Molinos.Scato.Servicios
         void CrearNominacionFAS(int embarqueId, List<NominacionReciboDto> recibos);
 
         #region ABM Productos
+
         [OperationContract]
         ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina);
 
@@ -227,6 +229,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarProducto(int id, string usuario);
-        #endregion
+
+        #endregion ABM Productos
     }
 }
