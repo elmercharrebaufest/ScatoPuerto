@@ -608,6 +608,9 @@
     <Build Include="dbo\Tables\Documentos\NominacionDocumentoEstado.sql" />
     <Build Include="dbo\Tables\Documentos\NominacionDocumentoArchivo.sql" />
     <Build Include="dbo\Tables\Documentos\NominacionDocumentoComentario.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CargaDocumento.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CargaDocumentoDestino.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CargaDocumentoProducto.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

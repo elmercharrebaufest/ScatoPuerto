@@ -1124,3 +1124,10 @@ if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento 
 if not exists(select 1 from DocumentoTipo where Nombre = 'A solicitar en la nominación') BEGIN insert into DocumentoTipo(Nombre) values ('A solicitar en la nominación'); END
 if not exists(select 1 from DocumentoTipo where Nombre = 'Interno') BEGIN insert into DocumentoTipo(Nombre) values ('Interno'); END
 if not exists(select 1 from DocumentoTipo where Nombre = 'A compartir') BEGIN insert into DocumentoTipo(Nombre) values ('A compartir'); END
+
+
+--Carga de Configuración de Documentos, Destino y Productos
+
+if not exists(select 1 from Documento       )        BEGIN exec sp_CargaDocumento END
+if not exists(select 1 from DocumentoDestino)        BEGIN exec sp_CargaDocumentoDestino END
+if not exists(select 1 from DocumentoMaterialPuerto) BEGIN exec sp_CargaDocumentoProducto END
