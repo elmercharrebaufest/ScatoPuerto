@@ -69,7 +69,9 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       }
     });
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
-      this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != 'Normal');
+      ///this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != 'Normal');
+      this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != '');
+      this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
       this.cargarFormularioEditar();
     });
     this.balanzasManualCorteService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
@@ -104,6 +106,11 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
   onGuardarModalCorteManual() {
     let balanzaManual: BalanzaManual = new BalanzaManual(this.corteManualForm.value);
+    let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
+    if (!validaFechasInicioFin){
+      this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
     if (validaFechas) {
       if (balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
