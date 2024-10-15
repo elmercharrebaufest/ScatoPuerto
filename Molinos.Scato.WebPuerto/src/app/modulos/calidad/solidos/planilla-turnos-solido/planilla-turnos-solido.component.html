@@ -121,8 +121,7 @@
                                                                     <ng-container
                                                                         *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
                                                                         [formGroupName]='y'>
-                                                                        <tr
-                                                                            *ngIf='corte.controls.observaciones.value != null && corte.controls.observaciones.value != ""'>
+                                                                        <tr>
                                                                             <td colspan="4"
                                                                                 [ngClass]="getCorteColor(corte)">
                                                                                 {{corte.controls.motivosDeCorte.value.siglas}}

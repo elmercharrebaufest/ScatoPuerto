@@ -205,7 +205,7 @@ export class BalanzasManualService {
       exportador: x?.exportador ?? null,
       motivosFallasBalanza: x?.motivosFallasBalanza ?? 0,
       kilogramos: x?.kilogramos ?? 0,
-      toneladas: x?.kilogramos / 1000 ?? 0,
+      toneladas: x?.kilogramos ?  x?.kilogramos/ 1000 : 0,
       corteManual: x?.corteManual ?? esCorteManual,
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
@@ -313,6 +313,16 @@ export class BalanzasManualService {
 
     return esFechaValida;
   }
+  public validarFechasInicioFin(fechaInicioIng,horaInicioIng, fechaFinIng,horaFinIng): boolean {
+    let esFechaValida: boolean = true;
+    const fechaInicio = this.convertirFecha(fechaInicioIng,horaInicioIng);
+    const fechaFin = this.convertirFecha(fechaFinIng,horaFinIng)
+    if (fechaInicio >=fechaFin)
+      esFechaValida = false;
+
+    return esFechaValida;
+  }
+  
   public convertirFecha(valorFecha: string, valorHora: string = null): Date {
     const fechaSplit = valorFecha.split('-');
     const anio = parseInt(fechaSplit[0]);
