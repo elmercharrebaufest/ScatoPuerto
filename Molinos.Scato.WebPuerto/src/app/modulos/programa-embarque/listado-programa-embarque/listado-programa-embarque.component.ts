@@ -296,4 +296,8 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onAdministrarDocumentosNominacion(nominacionId: number) {
+    this.route.navigate([`documentos/administracion/${nominacionId}`]);
+  }
+
 }
