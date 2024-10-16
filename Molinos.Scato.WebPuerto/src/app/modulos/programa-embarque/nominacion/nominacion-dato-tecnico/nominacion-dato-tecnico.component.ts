@@ -87,6 +87,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public cargandoDatoTecnico: boolean = true;
   public mostrarParametroCalidad: boolean = false;
   public grabarNominacion: boolean = false;
+  public zarpo: boolean = null;
   public mensajeDatoTecnico = '';
   public fechaMinimaEtaRecalada = '';
   public fechaMinimaObligacionCarga = '';
@@ -183,6 +184,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         };
         this.nominacionParametros = nominacionParametos;
         this.nominacionId = this.nominacionParametros.nominacion_Id;
+        this.zarpo = this.nominacionParametros.nominacion.zarpo;
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null){
             this.inicializarForm();

@@ -89,3 +89,8 @@ input.largerCheckbox {
 .inputCalidadValor:disabled {
     background-color: #f2f2f2ec;
 }
+
+.zarpado-disabled {
+    pointer-events: none; 
+    opacity: 0.6;
+  }

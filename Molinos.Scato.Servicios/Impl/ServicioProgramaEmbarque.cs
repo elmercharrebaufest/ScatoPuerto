@@ -35,10 +35,10 @@ namespace Molinos.Scato.Servicios.Impl
             this.comandos = comandos;
         }
 
-        public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null)
+        public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null)
         {
             var fechaHasta = fecha.HasValue ? new DateTime(fecha.Value.Year, fecha.Value.Month, DateTime.DaysInMonth(fecha.Value.Year, fecha.Value.Month)) : (DateTime?)null;
-            return repositorio.ListarConsultaPaginada(new ListarProgramaEmbarqueConsulta(paginacion, fecha, buque, muelle, producto));
+            return repositorio.ListarConsultaPaginada(new ListarProgramaEmbarqueConsulta(paginacion, fecha, buque, muelle, producto, zarpo));
         }
 
         public ProgramaEmbarqueDto ListarDatosCombo()
@@ -122,22 +122,38 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var nominacion = Obtener<Nominacion, NominacionDto>(id);
-                if (nominacion != null)
+                var nominacion = this.repositorio.Obtener<Nominacion>(nom => nom.Id == id);
+                var nominacionDto = conversor.Convertir<Nominacion, NominacionDto>(nominacion);
+                bool zarpo = false;
+
+                if(nominacion != null)
                 {
-                    if (nominacion.Embarque != null)
-                    {
-                        if (nominacion.Embarque.Ubicacion == 2)
-                            nominacion.EnMuelleDeCarga = true;
-                    }
-                    nominacion.Embarque = null;
+                    zarpo = TieneTodosLosEmbarquesZarpados(nominacion);
                 }
-                return nominacion;
+
+                if (nominacionDto != null)
+                {
+                    if (nominacionDto.Embarque != null)
+                    {
+                        if (nominacionDto.Embarque.Ubicacion == 2)
+                            nominacionDto.EnMuelleDeCarga = true;
+                    }
+                    nominacionDto.Embarque = null;
+                    nominacionDto.Zarpo = zarpo;
+                }
+                return nominacionDto;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
+
+        private bool TieneTodosLosEmbarquesZarpados(Nominacion nominacion)
+        {
+            return nominacion.Embarque != null && nominacion.Embarque.Ubicacion == 1 && !nominacion.Embarques.Any() ||
+                  (nominacion.Embarque != null && nominacion.Embarque.Ubicacion == 1 &&
+                  nominacion.Embarques.Any() && nominacion.Embarques.All(e => e.Embarque.Ubicacion == 1));
         }
 
         public IList<VaporInformacionDto> listarVaporInformacion()

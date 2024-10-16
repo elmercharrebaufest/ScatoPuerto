@@ -64,7 +64,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ProgramaEmbarque/ListarProgramaEmbarque")]
-        public HttpResponseMessage ListarProgramaEmbarque(int? pagina = null, int? itemsPorPagina = null, DateTime? fecha = null, string muelle = null, string buque = null, string producto = null)
+        public HttpResponseMessage ListarProgramaEmbarque(int? pagina = null, int? itemsPorPagina = null, DateTime? fecha = null, string muelle = null, string buque = null, string producto = null, bool? zarpo = null)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var response = servicioProgramaEmbarque.ListarProgramaDeEmbarque(paginacion, fecha,
                     (!string.IsNullOrEmpty(muelle) ? muelle.Split(',').ToList() : null),
                     (!string.IsNullOrEmpty(buque) ? buque.Split(',').ToList() : null),
-                    (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null));
+                    (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null), zarpo);
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)

@@ -14,5 +14,6 @@ export class Nominacion {
     embarque_Id : number;
     nominacionDatoTecnico:NominacionDatoTecnico;
     nominacionDetalleIntervencion: NominacionDetalleIntervencion;
-    nominacionRecibo: NominacionRecibo[]
+    nominacionRecibo: NominacionRecibo[];
+    zarpo: boolean;
 }
