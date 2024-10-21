@@ -8069,12 +8069,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MaterialPuertoDto> ListaMaterialesPuerto()
         {
-            return Listar<MaterialPuerto, MaterialPuertoDto>();
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x=> x.Activo);
         }
 
         public IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta()
         {
-            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null);
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo);
         }
 
         public IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas()
@@ -8095,6 +8095,7 @@ namespace Molinos.Scato.Servicios.Impl
                 filtro = filtro.Trim();
                 expresionFiltro =
                     x =>
+                    x.Activo &&
                     x.Descripcion.Contains(filtro);
             }
 
@@ -8324,12 +8325,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MaterialPuertoDto> BuscarMaterialesPuerto(string criteria)
         {
-            return Listar<MaterialPuerto, MaterialPuertoDto>(f => f.Descripcion.Contains(criteria), 20);
+            return Listar<MaterialPuerto, MaterialPuertoDto>(f => f.Descripcion.Contains(criteria) && f.Activo, 20);
         }
 
         public MaterialPuertoDto BuscarMaterialPuerto(string criteria)
         {
-            return Obtener<MaterialPuerto, MaterialPuertoDto>(f => f.Descripcion.Contains(criteria));
+            return Obtener<MaterialPuerto, MaterialPuertoDto>(f => f.Descripcion.Contains(criteria) && f.Activo);
         }
 
         public IList<AlmacenDto> BuscarAlmacenesPuerto(string criteria)

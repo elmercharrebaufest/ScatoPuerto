@@ -13,5 +13,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual string Descripcion { get; set; }
         public virtual MaterialPuerto MaterialPuerto { get; set; }
+        public virtual bool Activo { get; set; }
     }
 }

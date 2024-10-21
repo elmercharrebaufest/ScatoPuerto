@@ -79,3 +79,12 @@ input.ng-invalid:not(.ng-untouched):not(:focus-within)+small.text-danger {
 input:not(:placeholder-shown) {
   text-transform: uppercase;
 }
+
+.margen {
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: bold;
+}

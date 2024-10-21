@@ -94,6 +94,7 @@
     <Folder Include="dbo\Tables\AfipPuerto" />
     <Folder Include="dbo\Tables\AfipTablasReferencia" />
     <Folder Include="dbo\Tables\AgenciaMaritimaATA" />
+    <Folder Include="dbo\Tables\Documentos" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -599,6 +600,18 @@
     <Build Include="dbo\Tables\NominacionEmbarque.sql" />
     <Build Include="dbo\Tables\SiloCelda.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.sql" />
+    <Build Include="dbo\Tables\Documentos\DocumentoTipo.sql" />
+    <Build Include="dbo\Tables\Documentos\Documento.sql" />
+    <Build Include="dbo\Tables\Documentos\DocumentoDestino.sql" />
+    <Build Include="dbo\Tables\Documentos\DocumentoMaterialPuerto.sql" />
+    <Build Include="dbo\Tables\Documentos\NominacionDocumento.sql" />
+    <Build Include="dbo\Tables\Documentos\NominacionDocumentoEstado.sql" />
+    <Build Include="dbo\Tables\Documentos\NominacionDocumentoArchivo.sql" />
+    <Build Include="dbo\Tables\Documentos\NominacionDocumentoComentario.sql" />
+    <Build Include="dbo\Tables\Documentos\ConfiguracionDocumento.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CargaDocumento.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CargaDocumentoDestino.sql" />
+    <Build Include="dbo\Stored Procedures\sp_CargaDocumentoProducto.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

@@ -30,6 +30,7 @@ export class NominacionRecibosComponent implements OnInit {
   public nominacionId: number = 0;
   public mensajeRecibos: string = '';
   public cargandoRecibos: boolean = false;
+  public zarpo: boolean = null;
 
   constructor(
     private nominacionService: NominacionService,
@@ -194,7 +195,7 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   private asignarNominacionParametros() {
-    this.nominacionService.NominacionParametros.subscribe((parametro) => {
+    this.nominacionService.NominacionParametros.pipe(takeUntil(this.destroy$)).subscribe((parametro) => {
       if (parametro != null) {
         const nominacionParametos: NominacionParametros = {
           nominacion_Id: parametro.nominacion_Id,
@@ -205,6 +206,7 @@ export class NominacionRecibosComponent implements OnInit {
         };
         this.nominacionParametros = nominacionParametos;
         this.nominacionId = this.nominacionParametros.nominacion_Id;
+        this.zarpo = this.nominacionParametros.nominacion.zarpo;
         if (nominacionParametos.actualizarDatoTecnico) {
           if (nominacionParametos.nominacion != null)
             this.inicializarFormEdicion(

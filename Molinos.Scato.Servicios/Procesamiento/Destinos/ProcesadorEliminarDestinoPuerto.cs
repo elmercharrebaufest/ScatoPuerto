@@ -7,16 +7,15 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorEliminarDestinoPuerto : ProcesadorComando<EliminarDestinoPuerto>
     {
-        public ProcesadorEliminarDestinoPuerto(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
+        public ProcesadorEliminarDestinoPuerto(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log)
+        {
+        }
 
         /// <summary>
         /// Verifica si el destino a eliminar se encuentra en una Nominacion activa.
@@ -57,6 +56,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var destinoJson = Conversor.Convertir<Destino, DestinoDto>(destinoDb).ToJson();
                 logABM.Entidad = destinoJson;
 
+                EliminarDocumentos(comando.Id);
+
                 Repositorio.Agregar(logABM);
                 Repositorio.GuardarCambios();
             }
@@ -66,6 +67,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Log.Error("Error al modificar destino {0}", e);
             }
             return resultado;
+        }
+
+        private void EliminarDocumentos(int destinoId)
+        {
+            var documentos = this.Repositorio.Listar<DocumentoDestino>(d => d.Destino.Id == destinoId);
+            foreach (DocumentoDestino doc in documentos)
+            {
+                this.Repositorio.Remover(doc);
+            }
         }
     }
 }

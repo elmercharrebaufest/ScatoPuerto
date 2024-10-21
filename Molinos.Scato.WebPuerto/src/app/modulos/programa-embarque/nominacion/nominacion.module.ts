@@ -8,13 +8,15 @@ import { NominacionRecibosComponent } from './nominacion-recibos/nominacion-reci
 import { NominacionIntervencionesComponent } from './nominacion-intervenciones/nominacion-intervenciones.component';
 import { SharedModule } from 'app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
+import { NominacionDocumentosComponent } from './nominacion-documentos/nominacion-documentos.component';
 
 @NgModule({
   declarations: [
     NominacionRegistroComponent,
     NominacionDatoTecnicoComponent,
     NominacionRecibosComponent,
-    NominacionIntervencionesComponent
+    NominacionIntervencionesComponent,
+    NominacionDocumentosComponent
   ],
   imports: [
     CommonModule,

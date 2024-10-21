@@ -28,7 +28,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 .Select(e => new ExportadorDto { Id = e.Id, Nombre = e.Nombre });
 
             var itemsTotales = query.Count();
-            var resultados = query.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)
+            
+            var resultados = query.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
                     .Take(paginacion.ItemsPorPagina).ToList();
 
             return new ListaPaginada<ExportadorDto>(resultados.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);

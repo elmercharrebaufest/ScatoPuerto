@@ -1,8 +1,10 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.Exportador;
 using Molinos.Scato.Dominio.Comandos.Exportadores;
+using Molinos.Scato.Dominio.Comandos.Productos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
@@ -12,9 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.DirectoryServices;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -33,10 +35,10 @@ namespace Molinos.Scato.Servicios.Impl
             this.comandos = comandos;
         }
 
-        public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null)
+        public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null)
         {
             var fechaHasta = fecha.HasValue ? new DateTime(fecha.Value.Year, fecha.Value.Month, DateTime.DaysInMonth(fecha.Value.Year, fecha.Value.Month)) : (DateTime?)null;
-            return repositorio.ListarConsultaPaginada(new ListarProgramaEmbarqueConsulta(paginacion, fecha, buque, muelle, producto));
+            return repositorio.ListarConsultaPaginada(new ListarProgramaEmbarqueConsulta(paginacion, fecha, buque, muelle, producto, zarpo));
         }
 
         public ProgramaEmbarqueDto ListarDatosCombo()
@@ -120,22 +122,38 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var nominacion = Obtener<Nominacion, NominacionDto>(id);
-                if (nominacion != null)
+                var nominacion = this.repositorio.Obtener<Nominacion>(nom => nom.Id == id);
+                var nominacionDto = conversor.Convertir<Nominacion, NominacionDto>(nominacion);
+                bool zarpo = false;
+
+                if(nominacion != null)
                 {
-                    if (nominacion.Embarque != null)
-                    {
-                        if (nominacion.Embarque.Ubicacion == 2)
-                            nominacion.EnMuelleDeCarga = true;
-                    }
-                    nominacion.Embarque = null;
+                    zarpo = TieneTodosLosEmbarquesZarpados(nominacion);
                 }
-                return nominacion;
+
+                if (nominacionDto != null)
+                {
+                    if (nominacionDto.Embarque != null)
+                    {
+                        if (nominacionDto.Embarque.Ubicacion == 2)
+                            nominacionDto.EnMuelleDeCarga = true;
+                    }
+                    nominacionDto.Embarque = null;
+                    nominacionDto.Zarpo = zarpo;
+                }
+                return nominacionDto;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
+
+        private bool TieneTodosLosEmbarquesZarpados(Nominacion nominacion)
+        {
+            return nominacion.Embarque != null && nominacion.Embarque.Ubicacion == 1 && !nominacion.Embarques.Any() ||
+                  (nominacion.Embarque != null && nominacion.Embarque.Ubicacion == 1 &&
+                  nominacion.Embarques.Any() && nominacion.Embarques.All(e => e.Embarque.Ubicacion == 1));
         }
 
         public IList<VaporInformacionDto> listarVaporInformacion()
@@ -178,7 +196,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null);
+                return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo);
             }
             catch (Exception ex)
             {
@@ -364,7 +382,7 @@ namespace Molinos.Scato.Servicios.Impl
                                                                       x.NominacionDatoTecnico.VaporInformacion.Id == nominacion.VaporInformacion.Id &&
                                                                       x.NominacionDatoTecnico.MuelleDeCarga.Id == nominacion.MuelleDeCarga.Id &&
                                                                       x.FechaEliminacion == null &&
-                                                                      x.Embarque.Ubicacion != 1 && 
+                                                                      x.Embarque.Ubicacion != 1 &&
                                                                       x.Id != nominacion.Id);
             if (listaNominaciones.Count > 0) bValidacion = false;
             return bValidacion;
@@ -461,6 +479,7 @@ namespace Molinos.Scato.Servicios.Impl
                     nominacion_BD.NominacionDatoTecnico = null;
                     nominacion_BD.NominacionRecibo = null;
                     nominacion_BD.NominacionDetalleIntervencion = null;
+                    nominacion_BD.ConfiguracionDocumentos = null;
                     repositorio.Agregar(nominacion_BD);
                     repositorio.GuardarCambios();
                     nominacion.Id = nominacion_BD.Id;
@@ -644,9 +663,9 @@ namespace Molinos.Scato.Servicios.Impl
             copia = repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "PlanillaProgramaEmbarqueCopia").Direcciones.Split(';').ToList();
 
             string campoMail = "";
-            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico!=null && nominacion.NominacionDatoTecnico.Surveyor != null)
+            if (tipoDeMail == "Surveyor" && nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.Surveyor != null)
                 campoMail = nominacion.NominacionDatoTecnico.Surveyor.Mail;
-            else if (tipoDeMail == "Fumigador" && nominacion.NominacionDetalleIntervencion!=null && nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null)
+            else if (tipoDeMail == "Fumigador" && nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion != null)
                 campoMail = nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion.Mail;
 
             var direccionesExtra = campoMail.Split(';').Select(x => x.Trim());
@@ -1080,16 +1099,16 @@ namespace Molinos.Scato.Servicios.Impl
             return new ListaPaginada<DestinoDto>(destinos, pagina, itemsPorPagina, itemsTotales);
         }
 
-        public void CrearDestino(string nombre, string usuario)
+        public void CrearDestino(AltaEdicionDestinoDto destino, string usuario)
         {
-            var res = comandos.Ejecutar(new CrearDestinoPuerto { Nombre = nombre, Usuario = usuario });
+            var res = comandos.Ejecutar(new CrearDestinoPuerto { Destino = destino, Usuario = usuario });
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
             }
         }
 
-        public void ModificarDestino(DestinoDto destino, string usuario)
+        public void ModificarDestino(AltaEdicionDestinoDto destino, string usuario)
         {
             var res = comandos.Ejecutar(new ModificarDestinoPuerto { Destino = destino, Usuario = usuario });
             if (res.HayErrores)
@@ -1191,5 +1210,112 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(resultado.Errores[""]);
             }
         }
+
+        #region ABM Producto
+
+        public ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina)
+        {
+            var paginacion = new Paginacion(null, DirOrden.Asc, pagina, itemsPorPagina == 0 ? 10 : itemsPorPagina);
+            return repositorio.ListarConsultaPaginada(new ListarProductosConsulta(paginacion, nombre));
+        }
+
+        public IList<ProductoDto> ListarProductosConCalidades(string nombre)
+        {
+            var lista = new List<ProductoDto>();
+
+            var productos = this.repositorio.ListarTodos<MaterialPuerto>().AsQueryable();
+            var tipoCalidades = this.repositorio.ListarTodos<TipoDeCalidad>().AsQueryable();
+            var valores = this.repositorio.ListarTodos<CalidadValor>().AsQueryable();
+
+            var query = from p in productos
+                        join tc in tipoCalidades on p.Id equals tc.MaterialPuerto.Id into tcGroup
+                        from tc in tcGroup.DefaultIfEmpty()  // LEFT JOIN
+                        join v in valores on tc.Id equals v.TipoDeCalidad.Id into vGroup
+                        from v in vGroup.DefaultIfEmpty()
+                        where p.Activo && tc.Activo && v.Activo
+                        select new
+                        {
+                            p.Id,
+                            p.Descripcion,
+                            p.DescripcionCorta,
+                            p.EsLiquido,
+                            TipoCalidad = tc != null ? tc.Descripcion : null,
+                            Parametro = v != null ? v.Parametro : null,
+                            Valor = v != null ? v.Valor : null
+                        };
+
+            var resultados = query.ToList();
+
+            var productosDto = resultados
+                .GroupBy(x => new { x.Id, x.Descripcion, x.DescripcionCorta, x.EsLiquido })
+                .Select(g => new ProductoDto
+                {
+                    Descripcion = g.Key.Descripcion,
+                    DescripcionCorta = g.Key.DescripcionCorta,
+                    FormatoMaterial = g.Key.EsLiquido ? "Líquido" : "Sólido",
+                    Calidades = g.Where(x => x.TipoCalidad != null)
+                                 .GroupBy(x => x.TipoCalidad)
+                                 .Select(cg => new CalidadProductoDto
+                                 {
+                                     TipoCalidad = cg.Key,
+                                     Valores = cg.Select(x => new ParametroValorDto
+                                     {
+                                         Parametro = x.Parametro,
+                                         Valor = x.Valor
+                                     }).ToList()
+                                 }).ToList()
+                }).ToList();
+
+            lista = productosDto;
+            return lista;
+        }
+
+        public RegistroProductoDto ObtenerProducto(int id)
+        {
+            var material = Obtener<MaterialPuerto, MaterialPuertoDto>(id);
+            var tiposDeCalidad = Listar<TipoDeCalidad, TipoDeCalidadDto>(tc => tc.MaterialPuerto.Id == id && tc.Activo);
+            var documentos = Listar<DocumentoMaterialPuerto, DocumentoMaterialPuertoDto>(d => d.MaterialPuerto.Id == id).ToList();
+            var listaTc = tiposDeCalidad.Select(tc => new RegistroTipoDeCalidadDto
+            {
+                TipoDeCalidad = tc,
+                CalidadValores = Listar<CalidadValor, CalidadValorDto>(cv => cv.TipoDeCalidad.Id == tc.Id && cv.Activo).ToList()
+            }).ToList();
+
+            return new RegistroProductoDto
+            {
+                MaterialPuerto = material,
+                TiposDeCalidad = listaTc,
+                Documentos = documentos
+            };
+        }
+
+        public void CrearProducto(RegistroProductoDto producto, string usuario)
+        {
+            var resultado = comandos.Ejecutar(new CrearProducto { Dto = producto, Usuario = usuario });
+            if (resultado.HayErrores)
+            {
+                throw new Exception(resultado.Errores[""]);
+            }
+        }
+
+        public void EditarProducto(RegistroProductoDto producto, string usuario)
+        {
+            var resultado = comandos.Ejecutar(new EditarProducto { Dto = producto, Usuario = usuario });
+            if (resultado.HayErrores)
+            {
+                throw new Exception(resultado.Errores[""]);
+            }
+        }
+
+        public void EliminarProducto(int id, string usuario)
+        {
+            var resultado = comandos.Ejecutar(new EliminarProducto { Id = id, Usuario = usuario });
+            if (resultado.HayErrores)
+            {
+                throw new Exception(resultado.Errores[""]);
+            }
+        }
+
+        #endregion ABM Producto
     }
 }

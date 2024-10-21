@@ -1,0 +1,65 @@
+.margen {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.custom-width-input {
+    max-width: 150px;
+}
+
+.agregar {
+    color: #4d60a8;
+    cursor: pointer;
+    text-align: center;
+}
+
+th {
+    border: 0;
+    background-color: #4d60a8;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+}
+
+.header {
+    background-color: #4d60a8;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.header-li {
+    background-color: #4d60a8;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+}
+
+.centrado {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.input-error {
+    border-color: red;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.custom-disabled:disabled {
+    background-color: white;
+    color: black;
+    opacity: 1;
+}

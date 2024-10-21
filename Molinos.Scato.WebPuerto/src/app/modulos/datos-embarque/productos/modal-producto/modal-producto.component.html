@@ -1,0 +1,206 @@
+<div class='modal-header'>
+  <h4 class="modal-title">Alta de Producto</h4>
+</div>
+<div class='modal-body '>
+  <form [formGroup]="formProducto">
+    <ul class="nav nav-tabs" id="tabproductos" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" id="info-gral" data-bs-toggle="tab" data-bs-target="#info-gral" type="button"
+          role="tab" aria-controls="info-gral" aria-selected="false" (click)="onSelectTab('info-gral')">Información
+          general
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link active" id="calidad-tab" data-bs-toggle="tab" data-bs-target="#calidad" type="button"
+          role="tab" aria-controls="calidad" aria-selected="false" (click)="onSelectTab('calidad')">Calidad
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link active" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos"
+          type="button" role="tab" aria-controls="documentos" aria-selected="false"
+          (click)="onSelectTab('documentos')">Documentos
+        </button>
+      </li>
+    </ul>
+    <!-----------------------------------INFORMACION GENERAL--------------------------------->
+    <div [hidden]="tabSeleccionado !== 'info-gral'">
+      <div formGroupName="materialPuerto">
+        <div class="row margen">
+          <div class="col-md-4">
+            <label for="descripcion" class="form-label">Descripción Producto:</label>
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion"
+              [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcion').invalid && formProducto.get('materialPuerto.descripcion').touched}">
+          </div>
+          <div class="col-md-4">
+            <label for="descripcionCorta" class="form-label">Desc. Corta Producto:</label>
+            <input type="text" class="form-control" id="descripcionCorta" formControlName="descripcionCorta"
+              [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCorta').invalid && formProducto.get('materialPuerto.descripcionCorta').touched && formProducto.get('materialPuerto.descripcionCorta').dirty}">
+          </div>
+          <div class="col-md-4">
+            <div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" formControlName="esLiquido" name="esLiquido" id="opcion1"
+                  [value]="true" (click)="onChangeLiquidoSolido(true)">
+                <label class="form-check-label" for="esLiquido">
+                  Líquido
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" formControlName="esLiquido" name="esLiquido" id="opcion2"
+                  [value]="false" (click)="onChangeLiquidoSolido(false)">
+                <label class="form-check-label" for="esLiquido">
+                  Sólido
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margen">
+          <div class="col-md-4">
+            <label for="descripcionCortaIngles" class="form-label">Desc. Corta Producto en inglés:</label>
+            <input type="text" class="form-control" id="descripcionCortaIngles" formControlName="descripcionCortaIngles"
+              [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCortaIngles').invalid && formProducto.get('materialPuerto.descripcionCortaIngles').touched}">
+          </div>
+          <div class="col-md-4">
+            <label for="codigoSAP" class="form-label">Código SAP:</label>
+            <input type="text" class="form-control custom-width-input" id="codigoSAP" formControlName="codigoSAP"
+              [ngClass]="{'input-error': formProducto.get('materialPuerto.codigoSAP').invalid && formProducto.get('materialPuerto.codigoSAP').touched}">
+          </div>
+          <div class="md-4">
+            <label for="color" class="form-label">Color(HEX):</label>
+            <div class="input-container">
+              <input type="text" (change)="onEscribirColor($event)" class="form-control custom-width-input" id="color"
+                formControlName="color"
+                [ngClass]="{'input-error': formProducto.get('materialPuerto.color').invalid && formProducto.get('materialPuerto.color').touched}">
+              <input type="color" #colorPicker (change)="onSeleccionarColor($event)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-----------------------------------------CALIDAD------------------------------------------>
+    <div [hidden]="tabSeleccionado !== 'calidad'">
+      <div class="row mt-2" formArrayName="tiposDeCalidad">
+        <div class="col-md-4">
+          <label class="form-label"><strong>Tipo de calidad:</strong></label>
+          <table class="table table-bordered table-sm">
+            <thead class="th-tc">
+              <tr>
+                <th>DESCRIPCIÓN</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tipoCalidad of tiposDeCalidadArray?.controls; let i = index" [formGroupName]="i">
+                <td>
+                  <div formGroupName="tipoDeCalidad">
+                    <input type="text" class="form-control border-0" id="tipoDeCalidadDescripcion-{{i}}"
+                      formControlName="descripcion" />
+                  </div>
+                </td>
+                <td>
+                  <div formGroupName="tipoDeCalidad">
+                    <input type="checkbox" class="centrado ml-2 mt-2" formControlName="seleccionado"
+                      [checked]="tipoCalidad?.get('seleccionado')?.value" (change)="seleccionarTipoCalidad(i)">
+                  </div>
+                </td>
+                <td>
+                  <button class="btn" (click)="eliminarTipoCalidad(i)">
+                    <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ELIMINAR"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3" class="agregar" (click)="agregarTipoCalidad()">
+                  Agregar
+                  <i class="fa fa-plus fs-icon" aria-hidden="true" title="AGREGAR"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label"><strong>Parámetros de calidad:</strong></label>
+          <ul class="list-group">
+            <li class="list-group-item header-li">
+              <div class="row align-items-center">
+                <div class="col-4 d-flex justify-content-center">
+                  <label>PARÁMETRO</label>
+                </div>
+                <div class="col-6 d-flex justify-content-center">
+                  <label>VALOR</label>
+                </div>
+                <div class="col-2">
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div>
+            <ng-container *ngFor="let tc of tiposDeCalidadArray?.controls; let i = index" [formGroupName]="i">
+              <ng-container formArrayName="calidadValores">
+                <div *ngIf="tc?.get('tipoDeCalidad')?.get('seleccionado')?.value">
+                  <ng-container *ngFor="let calidadValor of tc?.get('calidadValores')?.controls; let j = index"
+                    [formGroupName]="j">
+                    <ul class="list-group">
+                      <li class="list-group-item">
+                        <div clasS="row">
+                          <div class="col-sm-4">
+                            <input type="text" class="form-control border-0" formControlName="parametro"
+                              placeholder="Ingrese un parametro">
+                          </div>
+                          <div class="col-sm-6">
+                            <input type="text" class="form-control border-0" formControlName="valor"
+                              placeholder="Ingrese un parametro">
+                          </div>
+                          <div class="col-sm-2">
+                            <button class="btn" (click)="eliminarCalidadValor(j)">
+                              <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ELIMINAR"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </ng-container>
+            <ul class="list-group">
+              <li class="list-group-item agregar">
+                <div (click)="agregarCalidadValor(indiceTc)">
+                  Agregar
+                  <i class="fa fa-plus fs-icon" aria-hidden="true" title="AGREGAR"></i>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <br>
+        </div>
+      </div>
+    </div>
+    <!-----------------------------------------DOCUMENTOS------------------------------------------>
+    <div [hidden]="tabSeleccionado !== 'documentos'">
+      <label class="mt-2 ml-2"><strong>Documentos asociados:</strong></label>
+      <div class="row margen">
+        <ng-container *ngFor="let doc of getDocumentosMaterial()">
+          <div class="col-md-3">
+            <div class="d-flex align-items-center">
+              <input id="doc-{{doc?.id}}" type="checkbox" class="form-check-input me-2" 
+              [checked]="doc.seleccionado" (click)="onCheckDocumento(doc, $event)"/>
+              <input class="form-control border-0 custom-disabled" type="text"
+              [value]="doc?.documento?.nombre"/>
+            </div>
+          </div>
+        </ng-container>
+        <div *ngIf="getDocumentosMaterial()?.length === 0" class="col-md-12">
+          <p class="red">No existen documentos configurados para el producto.</p>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class='modal-footer justify-content-center'>
+    <div class="">
+      <button type="button" class="btn btn-danger mx-5" (click)="cancelar()">Cancelar</button>
+      <button type="button" class="btn btn-success mx-5" (click)="guardar()">Guardar</button>
+    </div>
+  </div>

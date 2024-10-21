@@ -12,6 +12,7 @@ import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
 import { TipoDeFumigacion } from '@ScatoModels/programa-embarque/tipo-de-fumigacion';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -69,17 +70,17 @@ export class NominacionService {
     public registrarCompaniaDeFumigacion(companiaDeFumigacion: CompaniaDeFumigacion) {
         return this.http.post<boolean>(`${this.url}ProgramaEmbarque/RegistrarCompaniaDeFumigacion`, companiaDeFumigacion, { 'withCredentials': true });
     }
-    public listarBuquesNominacion():Observable<VaporInformacion[]> {
+    public listarBuquesNominacion(): Observable<VaporInformacion[]> {
         return this.http.get<VaporInformacion[]>(`${this.url}ProgramaEmbarque/ListarBuquesNominacion`, { 'withCredentials': true });
     }
-    public listarNominacionPorBuque(vaporInformacion_Id: number):Observable<NominacionLineUp[]> {
+    public listarNominacionPorBuque(vaporInformacion_Id: number): Observable<NominacionLineUp[]> {
         return this.http.get<NominacionLineUp[]>(`${this.url}ProgramaEmbarque/ListarNominacionPorBuque?vaporInformacion_Id=${vaporInformacion_Id}`, { 'withCredentials': true });
     }
-    public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp):Observable<ProgramaEmbarqueResultadoResultado> {
-        return this.http.post<ProgramaEmbarqueResultadoResultado>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`,nominacionesEnvioLineUp, { 'withCredentials': true });
+    public enviarNominacionLineUp(nominacionesEnvioLineUp: ProgramaEmbarqueNominacionesEnvioLineUp): Observable<ProgramaEmbarqueResultadoResultado> {
+        return this.http.post<ProgramaEmbarqueResultadoResultado>(`${this.url}ProgramaEmbarque/EnviarNominacionLineUp`, nominacionesEnvioLineUp, { 'withCredentials': true });
     }
     public validarPuedeCambiarBuque(nominacionId: number) {
-      return this.http.get<boolean>(`${this.url}ProgramaEmbarque/ValidarPuedeCambiarBuque?id=${nominacionId}`, { withCredentials: true });
+        return this.http.get<boolean>(`${this.url}ProgramaEmbarque/ValidarPuedeCambiarBuque?id=${nominacionId}`, { withCredentials: true });
     }
     // #endregion
 

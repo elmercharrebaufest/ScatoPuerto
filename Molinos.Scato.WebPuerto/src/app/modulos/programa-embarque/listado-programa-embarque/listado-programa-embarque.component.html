@@ -95,6 +95,19 @@
                         </span>
                     </div>
                 </th>
+                <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('zarpo')">
+                    <div class="head">
+                        Zarpó
+                        <span>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'zarpo' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'zarpo' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder"></th>
+                <th class="noBorder"></th>
                 <th class="noBorder"></th>
                 <th class="noBorder"></th>
                 <th class="noBorder"></th>
@@ -113,8 +126,8 @@
                 </td>
                 <td class="noBorder centradoHorizontal">
                     <i style="font-size: 25px;cursor:pointer"
-                        [ngbTooltip]="devolverMensajeDeEstados(historial.estado)"
-                        [ngStyle]="{ 'color': devolverColorEstado(historial.estado) }"
+                        [ngbTooltip]="devolverMensajeDeEstados(historial.estado, historial.zarpo)"
+                        [ngStyle]="{ 'color': devolverColorEstado(historial.estado, historial.zarpo) }"
                         class="fa fa-duotone fa-circle">
                     </i>
                     <i style="font-size: 12px;cursor:pointer; position: relative; color: rgb(216, 15, 15); visibility: hidden;"                        
@@ -139,6 +152,7 @@
                     {{historial.contrato}}</td>
                 <td class="lista-buque-row-item noBorder-rigth centradoHorizontal">{{historial.etaRecalada |
                     date:'dd/MM/yyyy'}}</td>
+                <td class="centradoHorizontal">{{historial.zarpo? "Sí" : "No"}}</td>
                 <td style="text-align: center;" class="noBorder centradoHorizontal">
                   <!-- <ARMOA005-1658 Dylan Lopez> -->
                   <!-- <div class='icon-fumigador'
@@ -156,7 +170,7 @@
                   <!-- </ ARMOA005-1658 Dylan Lopez> -->
                 </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoParaNominar()'>
-                    <div class="btn-group" *ngIf="!historial.fechaEliminacion">
+                    <div class="btn-group" *ngIf="!historial.fechaEliminacion && !historial.zarpo">
                         <button type="button" class="btn dropdown-toggle estiloBoton" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
                             <strong>Nominar</strong>
@@ -176,12 +190,20 @@
                         </div>
                     </div>
                 </td>
+                <td class="noBorder centradoHorizontal">
+                    <img src="assets/clipboard_data.svg"
+                    style="cursor: pointer; filter: grayscale(100%);">
+                </td>
+                <td class="noBorder centradoHorizontal">
+                    <img src="assets/folder_check.svg"
+                    style="cursor: pointer">
+                </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarNominacion()'>
                     <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor'
                         (click)="onEditarNominacion(historial.id)"></div>
                 </td>
                 <td class="noBorder-left centradoHorizontal" *ngIf='tienePermisoEliminarNominacion()'>
-                    <img *ngIf="!historial.fechaEliminacion" (click)="eliminarNominacion(historial.id)"
+                    <img *ngIf="!historial.fechaEliminacion && !historial.zarpo" (click)="eliminarNominacion(historial.id)"
                         src="assets/trashIcon-no-border.svg" class="eliminar cursor">
                 </td>
 

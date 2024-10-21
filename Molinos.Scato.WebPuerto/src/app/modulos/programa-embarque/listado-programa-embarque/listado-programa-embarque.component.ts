@@ -75,7 +75,7 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
         this.pageIndex = this.programa.length > 0 ? this.programa[0].pagina : 1;
         this.estaCargando = false;
         let idsNominacion: number[] = [];
-
+        console.log(data);
         this.programa.forEach(element => {
           idsNominacion.push(element.id)
         })
@@ -163,16 +163,16 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     }
   }
 
-  public devolverColorEstado(estado) {
+  public devolverColorEstado(estado, zarpo: boolean) {
     //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs,
     //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
-    return estado == 1 ? "#53b229" : estado == 2 ? "#1c7cd5" : estado == 3 ? "#dddddd" : "#d9534f"
+    return zarpo ? "#a56751" : estado == 1 ? "#53b229" : estado == 2 ? "#1c7cd5" : estado == 3 ? "#dddddd" : "#d9534f"
   }
-  public devolverMensajeDeEstados(estado) {
+  public devolverMensajeDeEstados(estado, zarpo: boolean) {
     //1 = enviado a line, 2 = la nominacion se creó y aun no pasaron las 24hs,
     //3 = la nominacion paso las 24hs desde que se creó, 4 = esta eliminada
-    return estado == 1 ? "Enviado a Line up" : estado == 2 ?
-      "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : "Eliminado"
+    return zarpo ? "Zarpó" : estado == 1 ? "Enviado a Line up" : estado == 2 ?
+      "Creado dentro de las 24hs" : estado == 3 ? "Pasaron las 24hs de creación" : estado == 5? "Zarpó" : "Eliminado"
   }
 
   public seleccionarNominacion(id: number, modal) {

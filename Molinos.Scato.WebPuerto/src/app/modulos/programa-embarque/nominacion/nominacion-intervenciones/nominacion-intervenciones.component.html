@@ -1,6 +1,6 @@
 <ship-spinner [message]="mensajeIntervencion" *ngIf="cargandoDatoIntervencion"></ship-spinner>
 
-<div *ngIf="formIntervenciones" [formGroup]="formIntervenciones">
+<div *ngIf="formIntervenciones" [formGroup]="formIntervenciones" [ngClass]="{ 'zarpado-disabled': zarpo }">
     <!-- Bodegas -->
     <div class="row form-row center">
         <!-- Precintado de bodegas -->
@@ -345,7 +345,7 @@
     <!-- Senasa -->
 </div>
 <!-- BOTONES -->
-<div class="form">
+<div class="form" [ngClass]="{ 'zarpado-disabled': zarpo }">
     <div class="row">
         <div class="col-md-12 botones-registro-centrado" *ngIf="nominacionId > 0">
             <button class="btn btn-danger botones-registro-custom" (click)="onCancelarIntervencion()">Cancelar</button>

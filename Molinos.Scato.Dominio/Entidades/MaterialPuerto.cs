@@ -13,5 +13,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual Almacen Almacen { get; set; }
         public virtual bool EsLiquido { get; set; }
         public virtual string Color { get; set; }
+        public virtual bool Activo { get; set; }
+
     }
 }

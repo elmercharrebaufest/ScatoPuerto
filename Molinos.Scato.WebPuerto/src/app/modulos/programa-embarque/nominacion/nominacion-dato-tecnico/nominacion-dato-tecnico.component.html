@@ -1,6 +1,6 @@
 <ship-spinner [message]="mensajeDatoTecnico" *ngIf='cargandoDatoTecnico'></ship-spinner>
 
-<div class="margenes-nominacion">
+<div class="margenes-nominacion" [ngClass]="{ 'zarpado-disabled': zarpo }">
     <form [formGroup]="datoTecnicoForm" class="mt-4">
         <div class="row form-row">
             <div class="form-group col-md-6">

@@ -1058,6 +1058,34 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')); END
 if exists(select 1 from ModuloDeCarga where IngresoManualSolido is null) BEGIN update ModuloDeCarga set IngresoManualSolido = 0 where IngresoManualSolido is null END
 
+-- Permisos Productos
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Productos_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Productos_Visualizar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso ='Productos_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Visualizar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Visualizar')); END
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Productos_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Productos_Editar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Editar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Editar')); END
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Productos_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Productos_Crear'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Crear')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Crear')); END
+
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Productos_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Productos_Eliminar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Productos_Eliminar')); END
+
+--Permisos Documentos
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Visualizar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Visualizar')) BEGIN  insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Visualizar')); END
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Crear'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Crear')); END
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Editar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Editar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Editar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Editar')); END
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Documentos_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Documentos_Eliminar'); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Documentos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Documentos_Eliminar')); END
+
+
 UPDATE LineUp SET Ocultar = 0 WHERE Ocultar IS NULL
 
 --Silos y Celdas
@@ -1094,3 +1122,21 @@ IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'M'   and Corte
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OP'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de puerto MOA','OP',0,1) END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OC'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de MOA comercial','OC',0,1) END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OB'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de buque','OB',0,1) END
+--Estados de documentos
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Solicitado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Solicitado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Enviado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Modificado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Modificado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Aprobado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Aprobado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Enviado'); END
+
+--Tipos de documentos
+if not exists(select 1 from DocumentoTipo where Nombre = 'A solicitar en la nominación') BEGIN insert into DocumentoTipo(Nombre) values ('A solicitar en la nominación'); END
+if not exists(select 1 from DocumentoTipo where Nombre = 'Interno') BEGIN insert into DocumentoTipo(Nombre) values ('Interno'); END
+if not exists(select 1 from DocumentoTipo where Nombre = 'A compartir') BEGIN insert into DocumentoTipo(Nombre) values ('A compartir'); END
+
+
+--Carga de Configuración de Documentos, Destino y Productos
+
+if not exists(select 1 from Documento       )        BEGIN exec sp_CargaDocumento END
+if not exists(select 1 from DocumentoDestino)        BEGIN exec sp_CargaDocumentoDestino END
+if not exists(select 1 from DocumentoMaterialPuerto) BEGIN exec sp_CargaDocumentoProducto END

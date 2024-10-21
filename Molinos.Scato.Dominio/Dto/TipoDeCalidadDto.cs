@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Dto
         public int Id { get; set; }
         public string Descripcion { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
+        public bool Activo { get; set; }
     }
 }

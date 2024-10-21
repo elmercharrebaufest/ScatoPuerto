@@ -1,6 +1,8 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Productos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
@@ -14,12 +16,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Permissions;
 using System.Web;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
-	public class ProgramaEmbarqueController : BaseController
+    public class ProgramaEmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;
         private readonly IServicioRepositorio servicioRepositorio;
@@ -61,7 +64,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         [Route("api/ProgramaEmbarque/ListarProgramaEmbarque")]
-        public HttpResponseMessage ListarProgramaEmbarque(int? pagina = null, int? itemsPorPagina = null, DateTime? fecha = null, string muelle = null, string buque = null, string producto = null)
+        public HttpResponseMessage ListarProgramaEmbarque(int? pagina = null, int? itemsPorPagina = null, DateTime? fecha = null, string muelle = null, string buque = null, string producto = null, bool? zarpo = null)
         {
             try
             {
@@ -69,7 +72,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var response = servicioProgramaEmbarque.ListarProgramaDeEmbarque(paginacion, fecha,
                     (!string.IsNullOrEmpty(muelle) ? muelle.Split(',').ToList() : null),
                     (!string.IsNullOrEmpty(buque) ? buque.Split(',').ToList() : null),
-                    (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null));
+                    (!string.IsNullOrEmpty(producto) ? producto.Split(',').ToList() : null), zarpo);
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
@@ -339,6 +342,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     });
 
                     #endregion Registro de intervencion
+
+                    #region Configuracion de documentos
+
+                    resultado = comandos.Ejecutar(new GuardarConfiguracionDocumento
+                    {
+                        Configuraciones = nominacion.ConfiguracionDocumentos,
+                        NominacionId = nominacion.Id,
+                        Usuario = this.nombreUsuario
+                    });
+
+                    #endregion Configuracion de documentos
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
@@ -525,7 +539,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-
                 var notificacion = new NotificacionProgramaEmbarque();
                 var nominacionDto = servicioProgramaEmbarque.ObtenerNominacion(nominacionId);
                 var mailProgramacionEmbarque = servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(nominacionDto, tipoDeMail);
@@ -853,11 +866,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ProgramaEmbarque/CrearDestino")]
-        public HttpResponseMessage CrearDestino(DestinoDto destino)
+        public HttpResponseMessage CrearDestino(AltaEdicionDestinoDto destino)
         {
             try
             {
-                servicioProgramaEmbarque.CrearDestino(destino.Nombre, this.nombreUsuario);
+                servicioProgramaEmbarque.CrearDestino(destino, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -868,7 +881,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPut]
         [Route("api/ProgramaEmbarque/ModificarDestino")]
-        public HttpResponseMessage EditarDestino(DestinoDto destino)
+        public HttpResponseMessage EditarDestino(AltaEdicionDestinoDto destino)
         {
             try
             {
@@ -1223,5 +1236,107 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+        #region ABM Producto
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ListarProductos")]
+        public HttpResponseMessage ListarProductos(int pagina = 1, int itemsPorPagina = 10, string nombre = null)
+        {
+            try
+            {
+                var listaPaginada = servicioProgramaEmbarque.ListarProductosPaginado(nombre, pagina, itemsPorPagina);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ExportarExcelProductos")]
+        public HttpResponseMessage ExportarExcelProductos(string nombre = null)
+        {
+            try
+            {
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+                var productos = servicioProgramaEmbarque.ListarProductosConCalidades(nombre);
+                var excel = new ExcelProductos(productos).GenerarExcel();
+                response.Content = new ByteArrayContent(excel);
+                response.Content.Headers.ContentLength = excel.LongLength;
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                response.Content.Headers.ContentDisposition.FileName = "listado_productos" + ".xls";
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("listado_exportadores.xls"));
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/CrearProducto")]
+        public HttpResponseMessage CrearProducto(RegistroProductoDto producto)
+        {
+            try
+            {
+                servicioProgramaEmbarque.CrearProducto(producto, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ObtenerProducto")]
+        public HttpResponseMessage ObtenerProducto(int id)
+        {
+            try
+            {
+                var producto = this.servicioProgramaEmbarque.ObtenerProducto(id);
+                return Request.CreateResponse(HttpStatusCode.OK, producto);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/EditarProducto")]
+        public HttpResponseMessage EditarProducto(RegistroProductoDto producto)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EditarProducto(producto, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProgramaEmbarque/EliminarProducto")]
+        public HttpResponseMessage EliminarProducto(int id)
+        {
+            try
+            {
+                servicioProgramaEmbarque.EliminarProducto(id, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        #endregion ABM Producto
     }
 }
