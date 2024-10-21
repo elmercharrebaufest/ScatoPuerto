@@ -117,6 +117,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("api/documento/GuardarConfiguracionDocumento")]
+        public HttpResponseMessage GuardarConfiguracionDocumento(GuardarConfiguracionesDto body)
+        {
+            try
+            {
+                servicioDocumento.GuardarConfiguracionDocumento(body.nominacionId, body.configuraciones, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                throw;
+            }
+        }
+
         [HttpGet]
         [Route("api/documento/ListarDocumentosNominacion")]
         public HttpResponseMessage ListarDocumentosNominacion()
@@ -134,12 +150,27 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/documento/ListarDocumentosDestino")]
-        public HttpResponseMessage ListarDocumentosDestino(int destinoId)
+        public HttpResponseMessage ListarDocumentosDestino(int destinoId = 0)
         {
             try
             {
                 var docsDestino = servicioDocumento.ListarDocumentosDestino(destinoId);
                 return Request.CreateResponse(HttpStatusCode.OK, docsDestino);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/documento/ListarDocumentosProducto")]
+        public HttpResponseMessage ListarDocumentosProducto(int productoId = 0)
+        {
+            try
+            {
+                var docsProducto = servicioDocumento.ListarDocumentosProducto(productoId);
+                return Request.CreateResponse(HttpStatusCode.OK, docsProducto);
             }
             catch (Exception e)
             {

@@ -1,3 +1,4 @@
+import { CoordinadorPuerto } from "@ScatoModels/coordinador-puerto";
 import { Destino } from "@ScatoModels/destino";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 
@@ -24,4 +25,39 @@ export interface DocumentoMaterialPuerto {
   id: number;
   documento: Documento;
   materialPuerto: MaterialPuerto;
+}
+
+export interface NominacionDocumentoArchivo {
+  id: string;
+  usuario: string;
+  ubicacion: string;
+  fechaSubida: string;
+}
+
+export interface NominacionDocumentoComentario {
+  id: number;
+  usuario: string;
+  comentario: string;
+  fecha: string;
+}
+
+export interface NominacionDocumentoEstado {
+  id: number;
+  estado: string;
+}
+
+export interface NominacionDocumento {
+  id: number;
+  documento: Documento;
+  estado?: NominacionDocumentoEstado;
+  archivos?: NominacionDocumentoArchivo[];
+  comentarios?: NominacionDocumentoComentario[];
+}
+
+export interface ConfiguracionDocumento {
+  id: number;
+  coordinadorPuerto: CoordinadorPuerto;
+  destino: Destino;
+  cantidadDeJuegos: number;
+  nominacionDocumentos: NominacionDocumento[];
 }

@@ -606,6 +606,7 @@
     <Compile Include="Procesamiento\Destinos\ProcesadorCrearDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorEliminarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorModificarDestinoPuerto.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorGuardarConfiguracionDocumento.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorEliminarDocumentoPuerto.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorModificarDocumento.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorCrearDocumento.cs" />

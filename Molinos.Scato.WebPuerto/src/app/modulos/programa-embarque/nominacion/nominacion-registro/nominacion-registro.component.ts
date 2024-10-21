@@ -17,6 +17,8 @@ import { NominacionDatoTecnicoComponent } from '../nominacion-dato-tecnico/nomin
 import { NominacionIntervencionesComponent } from '../nominacion-intervenciones/nominacion-intervenciones.component';
 import { NominacionRecibosComponent } from '../nominacion-recibos/nominacion-recibos.component';
 import { NominacionRegistroService } from './nominacion-registro.services';
+import { NominacionDocumentosComponent } from '../nominacion-documentos/nominacion-documentos.component';
+import { ConfiguracionDocumento } from '@ScatoModels/digitalizacion-documentos/documento';
 
 
 @Component({
@@ -29,6 +31,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
   @ViewChild(NominacionDatoTecnicoComponent) datoTecnico!: NominacionDatoTecnicoComponent;
   @ViewChild(NominacionRecibosComponent) datoRecibos!: NominacionRecibosComponent;
   @ViewChild(NominacionIntervencionesComponent) datoIntervencion!: NominacionIntervencionesComponent;
+  @ViewChild(NominacionDocumentosComponent) configuracionDocumento!: NominacionDocumentosComponent;
 
   public titulo: string = "Nueva Nominación"
   public nominacionId: number = 0;
@@ -55,9 +58,9 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
   }
-  private actualizarAuditoria(){
-    this.nominacionService.ActualizarAuditoria.subscribe(auditoria =>{
-      if (auditoria!=null && auditoria == true)
+  private actualizarAuditoria() {
+    this.nominacionService.ActualizarAuditoria.subscribe(auditoria => {
+      if (auditoria != null && auditoria == true)
         this.obtenerAuditorias();
     });
   }
@@ -80,6 +83,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     let validacionDatoTecnico: boolean = true;
     let validacionIntervencion: boolean = true;
     let validacionRecibo: boolean = true;
+    let validacionDocumentos: boolean = true;
     this.cargandoRegistro = true;
 
     validacionDatoTecnico = this.datoTecnico.validarRegistroDatoTecnico();
@@ -92,7 +96,8 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
       if (validacion) {
         const nominacionRecibo: NominacionRecibo[] = this.datoRecibos.crearObjectoRecibos();
         const nominacionIntervencion: NominacionDetalleIntervencion = this.datoIntervencion.crearObjectoIntervencion();
-    
+        const configuracionDocumentos: ConfiguracionDocumento[] = this.configuracionDocumento.crearObjetoConfiguraciones();
+
         nominacion.fechaCreacion = new Date();
         nominacion.id = 0;
         nominacion.embarque_Id = 0;
@@ -100,25 +105,36 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
         nominacion.nominacionDetalleIntervencion = null;
         nominacion.nominacionRecibo = null;
 
-        if (nominacionRecibo.length > 0)
+        if (nominacionRecibo.length > 0) {
           validacionRecibo = this.datoRecibos.validarCreacionRecibo();
-          if (!validacionRecibo) {
-            this.cargandoRegistro = false;
-            return validacionRecibo;
-          }
+        }
+        if (!validacionRecibo) {
+          this.cargandoRegistro = false;
+          return validacionRecibo;
+        }
 
-        if (nominacionIntervencion != null)
+        if (nominacionIntervencion != null) {
           validacionIntervencion = this.datoIntervencion.validacionIntervencion();
-          if (!validacionIntervencion) {
-            this.cargandoRegistro = false;
-            return validacionIntervencion;
-          }
+        }
+        if (!validacionIntervencion) {
+          this.cargandoRegistro = false;
+          return validacionIntervencion;
+        }
 
-        if (validacionRecibo && validacionIntervencion) {
+        if (configuracionDocumentos.length) {
+          validacionDocumentos = this.configuracionDocumento.validarConfiguraciones();
+        }
+        if (!validacionDocumentos) {
+          this.cargandoRegistro = false;
+          return validacionDocumentos;
+        }
+
+        if (validacionRecibo && validacionIntervencion && validacionDocumentos) {
           const nominacionDatoTecnico: NominacionDatoTecnico = this.datoTecnico.crearObjectoDatoTecnico().nominacionDatoTecnico;
           nominacion.nominacionDatoTecnico = nominacionDatoTecnico;
           nominacion.nominacionDetalleIntervencion = nominacionIntervencion;
           nominacion.nominacionRecibo = nominacionRecibo;
+          nominacion.configuracionDocumentos = configuracionDocumentos;
           this.nominacionRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data => {
             this.cargandoRegistro = false;
             this.confirmationDialogService.confirm('Registro Nominación', 'Se registro la nominacion correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
@@ -140,7 +156,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
   }
 
   obtenerAuditorias() {
-     this.programaEmbarqueService.obtenerAuditoria(this.nominacionId).subscribe((res: Auditoria[]) => {
+    this.programaEmbarqueService.obtenerAuditoria(this.nominacionId).subscribe((res: Auditoria[]) => {
       res.forEach(element => {
         let fecha: Date;
         switch (element.entidadNombre) {

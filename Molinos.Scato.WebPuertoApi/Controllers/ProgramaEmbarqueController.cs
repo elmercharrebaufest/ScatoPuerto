@@ -342,6 +342,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     });
 
                     #endregion Registro de intervencion
+
+                    #region Configuracion de documentos
+
+                    resultado = comandos.Ejecutar(new GuardarConfiguracionDocumento
+                    {
+                        Configuraciones = nominacion.ConfiguracionDocumentos,
+                        NominacionId = nominacion.Id,
+                        Usuario = this.nombreUsuario
+                    });
+
+                    #endregion Configuracion de documentos
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
@@ -1275,7 +1286,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicioProgramaEmbarque.CrearProducto(producto, base.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
@@ -1290,7 +1301,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var producto = this.servicioProgramaEmbarque.ObtenerProducto(id);
                 return Request.CreateResponse(HttpStatusCode.OK, producto);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
@@ -1307,7 +1319,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }            
+            }
         }
 
         [HttpPost]

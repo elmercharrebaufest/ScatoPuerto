@@ -68,7 +68,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void ModificarDocumento(DocumentoDto documento, string usuario)
         {
-            // Al eliminar, se da de baja el original y se crea uno nuevo. De esta forma no se modifica en aquellos donde ya está asociado.
+            // Al modificar, se da de baja el original y se crea uno nuevo. De esta forma no se modifica en aquellos donde ya está asociado.
             var res = _servicioComandos.Ejecutar(new ModificarDocumento { Documento = documento, Usuario = usuario });
             if (res.HayErrores)
             {
@@ -79,6 +79,15 @@ namespace Molinos.Scato.Servicios.Impl
         public void EliminarDocumento(int documentoId, string usuario)
         {
             var res = _servicioComandos.Ejecutar(new EliminarDocumentoPuerto { Id = documentoId, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void GuardarConfiguracionDocumento(int nominacionId, List<ConfiguracionDocumentoDto> configuraciones, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new GuardarConfiguracionDocumento { NominacionId = nominacionId, Configuraciones = configuraciones, Usuario = usuario });
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
@@ -123,7 +132,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<DocumentoDestinoDto> ListarDocumentosDestino(int idDestino)
         {
-            return Listar<DocumentoDestino, DocumentoDestinoDto>(d => d.Destino.Id == idDestino);
+            return Listar<DocumentoDestino, DocumentoDestinoDto>(d => idDestino == 0 || d.Destino.Id == idDestino);
+        }
+
+        public IList<DocumentoMaterialPuertoDto> ListarDocumentosProducto(int idProducto)
+        {
+            return Listar<DocumentoMaterialPuerto, DocumentoMaterialPuertoDto>(dm => idProducto == 0 || dm.MaterialPuerto.Id == idProducto);
         }
 
     }

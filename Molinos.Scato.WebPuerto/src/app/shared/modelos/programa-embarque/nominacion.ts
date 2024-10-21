@@ -1,3 +1,4 @@
+import { ConfiguracionDocumento } from "@ScatoModels/digitalizacion-documentos/documento";
 import { NominacionDatoTecnico } from "./nominacion-dato-tecnico";
 import { NominacionDetalleIntervencion } from "./nominacion-detalle-intervencion";
 import { NominacionRecibo } from "./nominacion-recibo";
@@ -15,5 +16,6 @@ export class Nominacion {
     nominacionDatoTecnico:NominacionDatoTecnico;
     nominacionDetalleIntervencion: NominacionDetalleIntervencion;
     nominacionRecibo: NominacionRecibo[];
+    configuracionDocumentos: ConfiguracionDocumento[];;
     zarpo: boolean;
 }

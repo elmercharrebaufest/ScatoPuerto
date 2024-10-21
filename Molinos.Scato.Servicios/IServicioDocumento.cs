@@ -25,6 +25,9 @@ namespace Molinos.Scato.Servicios
         void EliminarDocumento(int documentoId, string usuario);
 
         [OperationContract]
+        void GuardarConfiguracionDocumento(int nominacionId, List<ConfiguracionDocumentoDto> configuraciones, string usuario);
+
+        [OperationContract]
         IList<DocumentoTipoDto> ListarDocumentoTipos();
 
         [OperationContract]
@@ -32,8 +35,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<DocumentoDto> ListarDocumentosNominacion();
-        
-        [OperationContract] 
+
+        [OperationContract]
         IList<DocumentoDestinoDto> ListarDocumentosDestino(int idDestino);
+
+        [OperationContract]
+        IList<DocumentoMaterialPuertoDto> ListarDocumentosProducto(int idProducto);
     }
 }

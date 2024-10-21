@@ -187,12 +187,13 @@ declare @Documentos table (
 
 insert into @Documentos 
 select doc.Id,
-       Liquido = (select top 1 mpu.EsLiquido 
+       Liquido = (select top 1 Liquido = 1
 	                    from DocumentoMaterialPuerto dma (nolock) 
 				  inner join MaterialPuerto mpu (nolock) on mpu.Id = dma.MaterialPuerto_Id and mpu.EsLiquido = 1
 	                   where dma.Documento_Id = doc.Id 
                  ),
-	   Solido = (select top 1 mpu.EsLiquido from DocumentoMaterialPuerto dma (nolock) 
+	   Solido = (select top 1 Solido = 1 
+	                    from DocumentoMaterialPuerto dma (nolock) 
 				  inner join MaterialPuerto mpu (nolock) on mpu.Id = dma.MaterialPuerto_Id and mpu.EsLiquido = 0
 	                   where dma.Documento_Id = doc.Id )
   from Documento doc

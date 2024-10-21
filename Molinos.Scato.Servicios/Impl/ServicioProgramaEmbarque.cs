@@ -479,6 +479,7 @@ namespace Molinos.Scato.Servicios.Impl
                     nominacion_BD.NominacionDatoTecnico = null;
                     nominacion_BD.NominacionRecibo = null;
                     nominacion_BD.NominacionDetalleIntervencion = null;
+                    nominacion_BD.ConfiguracionDocumentos = null;
                     repositorio.Agregar(nominacion_BD);
                     repositorio.GuardarCambios();
                     nominacion.Id = nominacion_BD.Id;
