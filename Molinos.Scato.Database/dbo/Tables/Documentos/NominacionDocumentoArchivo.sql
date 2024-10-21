@@ -2,6 +2,7 @@
 (
 	Id INT IDENTITY(1,1) NOT NULL,
     NominacionDocumento_Id INT NOT NULL,
+    Usuario NVARCHAR(50) NOT NULL,
     Nombre NVARCHAR(255) NOT NULL,
     Ubicacion NVARCHAR(255) NOT NULL,
     FechaSubida DATETIME NOT NULL,

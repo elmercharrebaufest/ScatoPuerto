@@ -21,7 +21,7 @@ namespace Molinos.Scato.Dominio.Dto
         public NominacionDetalleIntervencionDto NominacionDetalleIntervencion { get; set; }
         public ICollection<NominacionReciboDto> NominacionRecibo { get; set; }
         public string ObservacionEnvioLineUp { get; set; }
-        public ICollection<NominacionDocumentoDto> NominacionDocumento { get; set; } = null;
+        public ICollection<ConfiguracionDocumentoDto> ConfiguracionDocumento { get; set; } = null;
         public bool? Zarpo { get; set; } = false;
     }
 }

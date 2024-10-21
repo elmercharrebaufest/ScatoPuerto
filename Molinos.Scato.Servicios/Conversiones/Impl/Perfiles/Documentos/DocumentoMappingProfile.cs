@@ -35,8 +35,12 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<NominacionDocumento, NominacionDocumentoDto>()
                 .ForMember(dest => dest.Archivos, opt => opt.MapFrom(src => src.Archivos))
                 .ForMember(dest => dest.Comentarios, opt => opt.MapFrom(src => src.Comentarios))
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado));
+                .ForMember(dest => dest.NominacionDocumentoEstado, opt => opt.MapFrom(src => src.NominacionDocumentoEstado));
             Mapper.CreateMap<NominacionDocumentoDto, NominacionDocumento>();
+
+            Mapper.CreateMap<ConfiguracionDocumento, ConfiguracionDocumentoDto>()
+                .ForMember(dest => dest.NominacionDocumentos, opt => opt.MapFrom(src => src.NominacionDocumentos));
+            Mapper.CreateMap<ConfiguracionDocumentoDto, ConfiguracionDocumento>();
         }
     }
 }

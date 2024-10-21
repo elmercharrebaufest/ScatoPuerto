@@ -195,7 +195,7 @@ export class NominacionRecibosComponent implements OnInit {
   }
 
   private asignarNominacionParametros() {
-    this.nominacionService.NominacionParametros.subscribe((parametro) => {
+    this.nominacionService.NominacionParametros.pipe(takeUntil(this.destroy$)).subscribe((parametro) => {
       if (parametro != null) {
         const nominacionParametos: NominacionParametros = {
           nominacion_Id: parametro.nominacion_Id,

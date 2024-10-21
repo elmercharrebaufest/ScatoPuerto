@@ -1,0 +1,71 @@
+<ship-spinner message="Guardando configuraciones de documentos" *ngIf="guardando"></ship-spinner>
+<div [formGroup]="form" *ngIf="configuracionesForm.length">
+  <div formArrayName="configuraciones">
+    <ng-container *ngFor="let configuracion of configuracionesForm.controls; let i = index">
+      <div class="configuraciones-separador" *ngIf="i > 0">
+        <button class="btn btn-danger" *ngIf="puedeEliminarConfig(i)" (click)="eliminarConfiguracion(i)">
+          <i class="fa fa-trash-o fs-icon"></i>
+        </button>
+      </div>
+      <div class="configuracion" [formGroupName]="i">
+        <div class="selectores input-group">
+          <div class="form-group">
+            <label>Destino</label>
+            <select class="custom-select" formControlName="destino">
+              <option value="">Seleccione</option>
+              <option *ngFor="let destino of destinos$ | async" [ngValue]="destino">
+                {{destino.nombre}}
+              </option>
+            </select>
+            <small class="text-danger">El Destino es obligatorio</small>
+          </div>
+          <div class="form-group">
+            <label>Cliente</label>
+            <select class="custom-select" formControlName="cliente">
+              <option value="">Seleccione</option>
+              <option *ngFor="let cliente of clientes$ | async" [ngValue]="cliente">
+                {{cliente.nombre}}
+              </option>
+            </select>
+            <small class="text-danger">El Cliente es obligatorio</small>
+          </div>
+          <div class="form-group">
+            <label>Cantidad de juegos</label>
+            <input type="text" class="form-control" formControlName="juegos" />
+            <small class="text-danger">El número debe ser mayor a 0</small>
+          </div>
+        </div>
+        <!-- Tipos -->
+        <div class="documentos-grupos-container" formArrayName="grupos">
+          <div class="documentos-grupo" *ngFor="let grupo of configuracion.get('grupos').controls; let j = index"
+            [formGroupName]="j">
+            <div class="documento-grupo-nombre">
+              <hr />
+              <label>{{grupo.get('nombre').value}}</label>
+              <hr />
+            </div>
+            <!-- Documentos -->
+            <div class="documentos-container" formArrayName="documentos">
+              <div class="documento" *ngFor="let documento of grupo.get('documentos').controls; let k = index"
+                [formGroupName]="k">
+                <label>
+                  <input type="checkbox" formControlName="seleccionado">
+                  {{documento.get('documento').value.nombre}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+<div class="d-flex justify-content-center mb-4" *ngIf="multiplesConfPosibles">
+  <button class="btn btn-primary" (click)="agregarConfiguracion()">
+    Añadir configuración
+  </button>
+</div>
+<div class="d-flex justify-content-center" *ngIf="nominacionId > 0">
+  <button class="btn btn-danger botones-registro-custom" (click)="cancelar()">Cancelar</button>
+  <button class="btn btn-primary botones-registro-custom" (click)="guardar()">Guardar</button>
+</div>

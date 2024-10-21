@@ -36,6 +36,7 @@ import { AltaBajaMantenimientoComponent } from 'app/shared/componentes/alta-baja
 import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
 import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
 import { ToastrService } from 'ngx-toastr';
+import { NominacionProcesoService } from '../nominacion-proceso.service';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -106,7 +107,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     private confirmationDialogService: ConfirmationDialogService,
     private modalService: NgbModal,
     private datoTecnicoRegistroService: NominacionDatoTecnicoRegistroService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private nominacionProcesoService: NominacionProcesoService
     ) {
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.cargando;
@@ -173,7 +175,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
   //#region Metodos Privados
   private asignarNominacionParametros() {
-    this.nominacionService.NominacionParametros.subscribe(parametro => {
+    this.nominacionService.NominacionParametros.pipe(takeUntil(this.destroy$)).subscribe(parametro => {
       if (parametro!=null){
         const nominacionParametos: NominacionParametros = {
           nominacion_Id: parametro.nominacion_Id,
@@ -202,6 +204,19 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   private inicializarForm() {
     this.datoTecnicoForm = null;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
+    // Suscripciones para mantener los mismos destinos y clientes en la parte de documentos
+    this.nominacionProcesoService.inicializar();
+    this.datoTecnicoDestinoFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      const destinos = this.datoTecnicoDestinoFormArray.controls.map(g => (g.value as NominacionDatoTecnicoDestino).destino).filter(d => d);
+      this.nominacionProcesoService.actualizarDestinos(destinos);
+    });
+    this.datoTecnicoCoordinadorFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      const clientes = this.datoTecnicoCoordinadorFormArray.controls.map(g => (g.value as NominacionDatoTecnicoCoordinador).coordinadorPuerto).filter(c => c);
+      this.nominacionProcesoService.actualizarClientes(clientes);
+    });
+    this.datoTecnicoForm.get('materialPuerto').valueChanges.pipe(takeUntil(this.destroy$)).subscribe((material: MaterialPuerto) => {
+      this.nominacionProcesoService.actualizarMaterialPuerto(material);
+    });
   }
 
   private deshabilitarEnvioLineUp(){
@@ -741,11 +756,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     if(calidad.calidadValor.valor !== event.target.value){
       calidad.calidadValorEditado = event.target.value;
     }
-    
+
   }
   //#endregion
 
-  //#region ARMOA005-1771 -> Permitir cantidades con max: tres decimales 
+  //#region ARMOA005-1771 -> Permitir cantidades con max: tres decimales
   onCantidadNominacionDatoTecnicoChange(event: any){
     const valorInput = parseFloat(event.target.value);
     this.datoTecnicoForm.controls.cantidadTotal.setValue(valorInput.toFixed(3));

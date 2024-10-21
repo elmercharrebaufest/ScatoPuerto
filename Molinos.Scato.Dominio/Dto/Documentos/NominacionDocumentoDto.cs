@@ -7,11 +7,8 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public DocumentoDto Documento { get; set; }
-        public ClienteDto Cliente { get; set; }
-        public DestinoDto Destino { get; set; }
-        public NominacionDocumentoEstadoDto Estado { get; set; }
+        public NominacionDocumentoEstadoDto NominacionDocumentoEstado { get; set; }
         public IList<NominacionDocumentoArchivoDto> Archivos { get; set; }
-        public ICollection<NominacionDocumentoComentarioDto> Comentarios { get; set; }
-        public int CantidadDeJuegos { get; set; }
+        public IList<NominacionDocumentoComentarioDto> Comentarios { get; set; }
     }
 }

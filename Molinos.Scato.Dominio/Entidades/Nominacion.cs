@@ -23,6 +23,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<NominacionRecibo> NominacionRecibo { get; set; } = null;
         public virtual string ObservacionEnvioLineUp { get; set; }
         public virtual ICollection<NominacionEmbarque> Embarques { get; set; } = null;
-        public virtual ICollection<NominacionDocumento> NominacionDocumentos { get; set; }
+        public virtual ICollection<ConfiguracionDocumento> ConfiguracionDocumentos { get; set; }
     }
 }
