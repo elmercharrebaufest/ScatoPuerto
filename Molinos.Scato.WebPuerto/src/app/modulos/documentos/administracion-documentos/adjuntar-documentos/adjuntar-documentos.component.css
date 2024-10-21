@@ -1,0 +1,60 @@
+.tab-menu {
+    color: black;
+    text-decoration: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+}
+
+.action-btn:hover {
+    color: #1C7CD5;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.tab-seleccionado {
+    border-bottom: solid 2px #1C7CD5;
+    color: #1C7CD5 !important;
+    box-sizing: border-box;
+}
+
+thead {
+    background-color: #d2e5f7;
+    color: #666666;
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 18px;
+    text-align: left;
+}
+
+tbody {
+    background-color: white;
+    color: #4D60A8;
+}
+
+img {
+    margin-left: 12px;
+}
+
+ul {
+    padding-left: 20px;
+    list-style-type: disc;
+  }

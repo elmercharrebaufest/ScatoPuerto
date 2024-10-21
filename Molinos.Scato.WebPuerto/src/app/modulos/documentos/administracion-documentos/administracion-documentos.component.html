@@ -15,7 +15,7 @@
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="buque" class=""><strong>Buque:</strong></label>
-                    <input type="text" class="form-control" id="buque" placeholder="Placeholder">
+                    <input type="text" class="form-control" id="buque" placeholder="Buque" [(ngModel)]="buque" [readonly]="true">
                 </div>
             </div>
 
@@ -23,7 +23,7 @@
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="fechaNominacion"><strong>Fecha de nominación:</strong></label>
-                    <input type="text" class="form-control" id="fechaNominacion" placeholder="Entidad de embarque">
+                    <input type="date" class="form-control" id="fechaNominacion" placeholder="Fecha de registro" [(ngModel)]="fechaNominacion" [readonly]="true">
                 </div>
             </div>
 
@@ -31,29 +31,23 @@
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="producto"><strong>Producto:</strong></label>
-                    <input type="text" class="form-control" id="producto" placeholder="Placeholder">
+                    <input type="text" class="form-control" id="producto" placeholder="Placeholder" [(ngModel)]="producto" [readonly]="true">
                 </div>
             </div>
 
             <!-- Destino -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
-                    <label for="destino"><strong>Destino:</strong></label>
+                    <label for="destino"><strong>Destino/Cliente:</strong></label>
                     <select class="form-control" id="destino">
                         <option>Placeholder</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Cliente -->
-            <div class="col-12 col-md-6 col-lg">
-                <div class="form-group">
-                    <label for="cliente"><strong>Cliente:</strong></label>
-                    <select class="form-control" id="cliente">
-                        <option>Placeholder</option>
-                    </select>
-                </div>
-            </div>
         </div>
     </div>
+    <ng-container>
+        <app-adjuntar-documentos></app-adjuntar-documentos>
+    </ng-container> 
 </div>

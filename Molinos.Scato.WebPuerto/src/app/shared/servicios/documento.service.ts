@@ -50,4 +50,8 @@ export class DocumentoService {
     const body = { nominacionId, configuraciones };
     return this.http.put(`${this.url}/GuardarConfiguracionDocumento`, body, { withCredentials: true });
   }
+
+  public listarDocumentosPorConfiguracion(configuracionId: number) {
+    return this.http.get<any[]>(`${this.url}/ListarDocumentosPorConfiguracion?configuracionId=${0}`, { withCredentials: true });
+  }
 }

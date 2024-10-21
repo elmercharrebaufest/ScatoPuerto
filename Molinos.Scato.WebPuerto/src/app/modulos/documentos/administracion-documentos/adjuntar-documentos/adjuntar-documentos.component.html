@@ -1,0 +1,51 @@
+<div class="container-fluid mt-2 p-0">
+        <div class="container-fluid bg-white p-2 mb-2">
+            <div class="row">
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'DeEmbarque'}">
+                <a class="nav-link tab-menu" (click)="onSelectTab('DeEmbarque')">Documentación de Embarque</a>
+            </div>
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'Compartidos'}">
+                <a class="nav-link tab-menu" (click)="onSelectTab('Compartidos')">Documentos Compartidos</a>
+            </div>
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'Internos'}">
+                <a class="nav-link tab-menu" (click)="onSelectTab('Internos')">Documentos Internos</a>
+            </div>
+        </div>
+        </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Documento</th>
+                <th style="text-align: right;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let doc of lista; let i = index">
+                <td>{{ doc.nombre }}&nbsp;<i class="fas fa-chevron-down" (click)="toggleSublista(i)" style="cursor: pointer;"></i>
+                </td>
+                <td style="text-align: right;">                    
+                    <img src="assets/file_plus.svg"
+                    style="cursor: pointer;">
+                    <img src="assets/file_arrow_down.svg"
+                    style="cursor: pointer;">
+                    <img src="assets/chat_square.svg"
+                    style="cursor: pointer;" (click)="onOpenComentarios(addComentario)">
+                    <img src="assets/trash_file.svg"
+                    style="cursor: pointer;">
+                </td>
+            </tr>
+            <tr *ngIf="true"><!--*ngIf="sublistaVisible[i]"-->
+                <td colspan="3">
+                  <ul>
+                    <li *ngFor="let archivo of lista">Item archivo</li>
+                  </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="file" id="fileInput" (change)="onSeleccionarArchivo($event)" hidden />
+</div>
+
+<ng-template #addComentario let-modal>
+    <app-modal-comentarios (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
+</ng-template>
