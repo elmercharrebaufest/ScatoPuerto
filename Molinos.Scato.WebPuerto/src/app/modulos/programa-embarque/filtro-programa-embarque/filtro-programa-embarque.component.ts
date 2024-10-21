@@ -70,6 +70,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       buque: '',
       muelle: '',
       fecha: '',
+      zarpo: null
     });
     
     this.SetearAnioMesActual();
@@ -81,6 +82,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
     this.filtroBuquedaForm.controls.buque.setValue('');
     this.filtroBuquedaForm.controls.muelle.setValue('');
     this.filtroBuquedaForm.controls.fecha.setValue('');
+    this.filtroBuquedaForm.controls.zarpo.setValue(null);
     this.onBuscar();    
   }
   onBuscar() {
@@ -91,7 +93,8 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       this.filtroBuquedaForm.controls.fecha.value,
       this.filtroBuquedaForm.controls.buque.value,
       this.filtroBuquedaForm.controls.muelle.value,
-      this.filtroBuquedaForm.controls.producto.value)
+      this.filtroBuquedaForm.controls.producto.value, 
+      this.filtroBuquedaForm.controls.zarpo.value)
     this.estaCargando = false;
   }
 

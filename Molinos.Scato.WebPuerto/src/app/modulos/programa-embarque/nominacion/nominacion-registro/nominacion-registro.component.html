@@ -86,6 +86,25 @@
             </div>
           </div>
           <br />
+          <div class="card">
+            <div class="card-header acordion-header-fondo" id="datoDocumentos">
+              <div class="auditoria-actualizacion">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed acordion-header-titulo" type="button" data-toggle="collapse"
+                    data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    Documentación a solicitar
+                  </button>
+                </h5>
+                <label *ngIf="fechaActualizacionNominacionDetalleIntervencion!= undefined"  class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionDetalleIntervencion | date: 'dd/MM/yyyy HH:mm'}}</label>
+              </div>
+            </div>
+            <div id="collapseFour" class="collapse" aria-labelledby="datoDocumentos" data-parent="#accordionExample">
+              <div class="card-body acordion-card-body">
+                <app-nominacion-documentos></app-nominacion-documentos>
+              </div>
+            </div>
+          </div>
+          <br />
         </div>
       </div>
     </div>

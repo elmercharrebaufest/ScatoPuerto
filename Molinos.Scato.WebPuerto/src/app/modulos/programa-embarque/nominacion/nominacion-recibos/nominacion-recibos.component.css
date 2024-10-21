@@ -43,3 +43,8 @@
 .color-linea-division{ 
     background-color: #ebe8e8;
 }
+
+.zarpado-disabled {
+    pointer-events: none; 
+    opacity: 0.6; 
+  }

@@ -138,6 +138,7 @@
     <Content Include="SCATOPUERTOUAT.DeployParameters.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ServicioDocumento.svc" />
     <Content Include="ServicioEstadoPuesto.svc" />
     <Content Include="FirmaProvider.svc" />
     <Content Include="ServicioAfip.svc" />

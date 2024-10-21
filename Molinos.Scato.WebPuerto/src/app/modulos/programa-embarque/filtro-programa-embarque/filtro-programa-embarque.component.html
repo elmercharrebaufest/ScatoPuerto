@@ -27,7 +27,14 @@
       </ng-multiselect-dropdown>
 
     </div>
-    <div class="form-group col-md-2">
+    <div class="form-group col-md-1 colorGris">
+      <select class="custom-select" formControlName="zarpo">
+        <option [ngValue]="null" selected>Todos</option>
+        <option [ngValue]="true">Zarpó</option>
+        <option [ngValue]="false">No Zarpó</option>
+      </select>
+    </div>
+    <div class="form-group col-md-1">
       <button class="btn buscar" (click)="onBuscar()">Buscar</button>
     </div>
     <div class="form-group col-md-2">

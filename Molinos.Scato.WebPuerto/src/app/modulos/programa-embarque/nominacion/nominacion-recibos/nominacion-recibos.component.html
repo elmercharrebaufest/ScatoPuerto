@@ -1,3 +1,4 @@
+<div [ngClass]="{ 'zarpado-disabled': zarpo }">
 <div class="row form-row">
     <div class="form-group col-md-10">
         <h5>
@@ -173,5 +174,5 @@
         <button class="btn btn-primary botones-registro-custom" (click)="onGuardarRecibos()" [disabled]="guardando">Guardar</button>
     </div>
 </div>
-
 <ship-spinner [message]="mensajeRecibos" *ngIf='cargandoRecibos'></ship-spinner>
+</div>

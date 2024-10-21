@@ -1,7 +1,9 @@
 import { Destino } from '@ScatoModels/destino';
+import { Documento, DocumentoDestino } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AltaEdicionDestino } from 'app/modulos/destinos/destinos.component';
 import { environment } from 'environments/environment';
 
 @Injectable({
@@ -23,11 +25,11 @@ export class DestinosService {
     return this.http.get<Destino[]>(`${this.url}ProgramaEmbarque/ListarDestinosSinPaginar`, { withCredentials: true, params });
   }
 
-  public crearDestino(nombre: string) {
-    return this.http.post(`${this.url}ProgramaEmbarque/CrearDestino`, { nombre }, { withCredentials: true });
+  public crearDestino(destino: AltaEdicionDestino) {
+    return this.http.post(`${this.url}ProgramaEmbarque/CrearDestino`, destino, { withCredentials: true });
   }
 
-  public editarDestino(destino: Destino) {
+  public editarDestino(destino: AltaEdicionDestino) {
     return this.http.put(`${this.url}ProgramaEmbarque/ModificarDestino`, destino, { withCredentials: true });
   }
 

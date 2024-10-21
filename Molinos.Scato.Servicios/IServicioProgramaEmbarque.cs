@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace Molinos.Scato.Servicios
         IList<MuelleDeCargaDto> listarMuelleDeCarga();
 
         [OperationContract]
-        ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null);
+        ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null);
 
         [OperationContract]
         ProgramaEmbarqueDto ListarDatosCombo();
@@ -174,10 +175,10 @@ namespace Molinos.Scato.Servicios
         ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0);
 
         [OperationContract]
-        void CrearDestino(string nombre, string usuario);
+        void CrearDestino(AltaEdicionDestinoDto destino, string usuario);
 
         [OperationContract]
-        void ModificarDestino(DestinoDto destino, string usuario);
+        void ModificarDestino(AltaEdicionDestinoDto destino, string usuario);
 
         [OperationContract]
         void EliminarDestino(int id, string usuario);
@@ -208,5 +209,27 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void CrearNominacionFAS(int embarqueId, List<NominacionReciboDto> recibos);
+
+        #region ABM Productos
+
+        [OperationContract]
+        ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina);
+
+        [OperationContract]
+        IList<ProductoDto> ListarProductosConCalidades(string nombre);
+
+        [OperationContract]
+        RegistroProductoDto ObtenerProducto(int id);
+
+        [OperationContract]
+        void CrearProducto(RegistroProductoDto producto, string usuario);
+
+        [OperationContract]
+        void EditarProducto(RegistroProductoDto producto, string usuario);
+
+        [OperationContract]
+        void EliminarProducto(int id, string usuario);
+
+        #endregion ABM Productos
     }
 }

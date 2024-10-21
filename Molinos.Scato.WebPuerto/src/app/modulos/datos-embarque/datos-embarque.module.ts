@@ -11,11 +11,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { CargadoresComponent } from './cargadores/cargadores.component';
-
+import { ProductosComponent } from './productos/productos.component';
+import { ModalProductoComponent } from './productos/modal-producto/modal-producto.component';
+import { ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AgenciasMaritimasATAComponent,
-    CargadoresComponent
+    CargadoresComponent,
+    ProductosComponent,
+    ModalProductoComponent
   ],
   imports: [
     CommonModule,
@@ -26,7 +30,8 @@ import { CargadoresComponent } from './cargadores/cargadores.component';
     MatPaginatorModule,
     MatFormFieldModule,
     MatAutocompleteModule,
-    MatInputModule
+    MatInputModule,
+    ReactiveFormsModule 
   ]
 })
 export class DatosEmbarqueModule { }

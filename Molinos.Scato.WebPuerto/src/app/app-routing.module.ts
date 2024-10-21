@@ -12,7 +12,7 @@ export const routeConfig: Routes = [
     children: [
       {
         path: '',
-       redirectTo: '/lineup',
+        redirectTo: '/lineup',
         pathMatch: 'full'
       },
       {
@@ -66,7 +66,11 @@ export const routeConfig: Routes = [
       {
         path: 'afip',
         loadChildren: () => import('./modulos/afip/afip.module').then(m => m.AfipModule)
-      }
+      },
+      {
+        path: 'documentos',
+        loadChildren: () => import('./modulos/documentos/documentos.module').then(m => m.DocumentosModule)
+      },
     ]
   },
   {

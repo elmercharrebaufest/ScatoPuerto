@@ -92,6 +92,7 @@
     <Compile Include="ConsultasEF\ListarDatosDeWorkflowsPendientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarEstadoDeCalle.cs" />
     <Compile Include="ConsultasEF\ListarExportadoresConsulta.cs" />
+    <Compile Include="ConsultasEF\ListarProductosConsulta.cs" />
     <Compile Include="ConsultasEF\ListarProgramaEmbarqueCombos.cs" />
     <Compile Include="ConsultasEF\ListarProgramaEmbarqueConsulta.cs" />
     <Compile Include="ConsultasEF\ListarMuestraEnvioACamaraAuditoriaParaImpresionConsulta.cs" />

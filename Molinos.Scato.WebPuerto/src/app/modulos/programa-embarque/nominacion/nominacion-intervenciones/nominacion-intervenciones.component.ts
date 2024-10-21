@@ -40,6 +40,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
   companiasDeFumigacion: CompaniaDeFumigacion[] = [];
   tiposDeFumigacion: TipoDeFumigacion[] = [];
   cargandoDatoIntervencion: boolean = false;
+  zarpo: boolean = null;
   public mensajeIntervencion = '';
   public nominacionId: number = 0;
 
@@ -274,7 +275,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
   }
 
   private asignarNominacionParametros() {
-    this.nominacionService.NominacionParametros.subscribe(parametro => {
+    this.nominacionService.NominacionParametros.pipe(takeUntil(this.destroy$)).subscribe(parametro => {
       if (parametro != null) {
         const nominacionParametos: NominacionParametros = {
           nominacion_Id: parametro.nominacion_Id,
@@ -285,6 +286,7 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         };
         this.nominacionParametros = nominacionParametos;
         this.nominacionId = this.nominacionParametros.nominacion_Id;
+        this.zarpo = this.nominacionParametros.nominacion.zarpo;
         //Si tiene nominación ID cargo los datos de la base
         if (this.nominacionParametros.nominacion_Id > 0) {
           this.formIntervenciones = null;

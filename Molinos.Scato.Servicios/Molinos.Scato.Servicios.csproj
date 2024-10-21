@@ -176,6 +176,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CompaniaDeFumigacionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Documentos\DocumentoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
@@ -395,6 +396,7 @@
     <Compile Include="Impl\Balanzada\ServicioTurno.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
+    <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
@@ -407,6 +409,7 @@
     <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioClientes.cs" />
+    <Compile Include="IServicioDocumento.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
     <Compile Include="IServicioRepositorioBase.cs" />
@@ -603,6 +606,10 @@
     <Compile Include="Procesamiento\Destinos\ProcesadorCrearDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorEliminarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorModificarDestinoPuerto.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorGuardarConfiguracionDocumento.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorEliminarDocumentoPuerto.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorModificarDocumento.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorCrearDocumento.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorCrearExportadorPuerto.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorEliminarExportadorPuerto.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorModificarExportadorPuerto.cs" />
@@ -1173,6 +1180,9 @@
     <Compile Include="Procesamiento\ProcesadorRechazarCamion.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarValorCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorSuscribirEventos.cs" />
+    <Compile Include="Procesamiento\Productos\ProcesadorCrearProducto.cs" />
+    <Compile Include="Procesamiento\Productos\ProcesadorEditarProducto.cs" />
+    <Compile Include="Procesamiento\Productos\ProcesadorEliminarProducto.cs" />
     <Compile Include="Procesamiento\Respuesta.cs" />
     <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarBalanzasCortes.cs" />
     <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarCombosFechasYTurnos.cs" />

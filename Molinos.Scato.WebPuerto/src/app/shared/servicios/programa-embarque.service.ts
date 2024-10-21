@@ -28,7 +28,8 @@ export class ProgramaEmbarqueService {
     fecha: null,
     buque: "",
     muelle: "",
-    producto: ""
+    producto: "",
+    zarpo: false
   }
   // #endregion
 
@@ -45,14 +46,16 @@ export class ProgramaEmbarqueService {
     fecha: Date = this.filtros.fecha,
     buque: string = this.filtros.buque,
     muelle: string = this.filtros.muelle,
-    producto: string = this.filtros.producto) {
+    producto: string = this.filtros.producto,
+    zarpo: boolean = this.filtros.zarpo) {
     this.actualizarFiltros(pagina,
       itemsPorPagina,
       fecha,
       buque,
       muelle,
-      producto)
-    return this.http.get<any>(`${this.url}ProgramaEmbarque/ListarProgramaEmbarque?pagina=${this.filtros.pagina}&itemsPorPagina=${this.filtros.itemsPorPagina}&fecha=${this.filtros.fecha}&buque=${this.filtros.buque}&muelle=${this.filtros.muelle}&producto=${this.filtros.producto}`,
+      producto,
+      zarpo)
+    return this.http.get<any>(`${this.url}ProgramaEmbarque/ListarProgramaEmbarque?pagina=${this.filtros.pagina}&itemsPorPagina=${this.filtros.itemsPorPagina}&fecha=${this.filtros.fecha}&buque=${this.filtros.buque}&muelle=${this.filtros.muelle}&producto=${this.filtros.producto}&zarpo=${this.filtros.zarpo}`,
       {
         'withCredentials': true
       })
@@ -122,13 +125,15 @@ export class ProgramaEmbarqueService {
     fecha: Date,
     buque: string,
     muelle: string,
-    producto: string) {
+    producto: string,
+    zarpo: boolean) {
     this.filtros.buque = buque;
     this.filtros.muelle = muelle;
     this.filtros.producto = producto;
     this.filtros.itemsPorPagina = itemsPorPagina;
     this.filtros.pagina = pagina;
-    this.filtros.fecha = fecha
+    this.filtros.fecha = fecha;
+    this.filtros.zarpo = zarpo;
   }
 
 

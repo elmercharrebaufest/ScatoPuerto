@@ -1,0 +1,105 @@
+<ship-spinner *ngIf="loading" [message]="mensaje"></ship-spinner>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <h1>Documentos</h1>
+        </div>
+        <div class="col-md-2 ng-star-inserted">
+            <button class="btn btn-success" (click)="onCrear()">CREAR DOCUMENTO</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form [formGroup]="filtros" class="row">
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Nombre Documento" formControlName="nombre">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary" (click)="onBuscar()">Buscar</button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limpiar Búsqueda</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Documento</th>
+                    <th>Tipo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let documento of documentos">
+                    <td>{{documento.nombre}}</td>
+                    <td>{{documento.documentoTipo.nombre}}</td>
+                    <td>
+                        <button class="btn" (click)="onModificar(documento)">
+                            <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>
+                        </button>
+                        <button class="btn" (click)="onEliminar(documento)">
+                            <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true" title="ELIMINAR"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <mat-paginator (page)="onBuscar($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+        [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>
+
+<ng-template #modalDocumento let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">{{titulo}}</h5>
+            <button (click)="closeModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="documentoForm">
+                <div class="form-group">
+                    <input type="text" placeholder="Nombre" maxlength="255" class="form-control"
+                        formControlName="nombre">
+                    <small class="text-danger">
+                        El nombre es obligatorio
+                    </small>
+                </div>
+                <div class="grupo-checks">
+                    <div class="form-check" *ngFor="let tipo of documentosTipos">
+                        <label>
+                            <input type="radio" formControlName="documentoTipo" class="form-check-input" [value]="tipo">
+                            {{tipo.nombre}}
+                        </label>
+                    </div>
+                </div>
+                <div class="grupo-checks" [ngClass]="{'grupo-invalido': liquidoSolidoInvalido()}">
+                    <div class="form-check">
+                        <label>
+                            <input type="checkbox" formControlName="liquido">
+                            Líquido
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <label>
+                            <input type="checkbox" formControlName="solido">
+                            Sólido
+                        </label>
+                    </div>
+                </div>
+                <small class="text-danger" *ngIf="liquidoSolidoInvalido()">
+                    Al menos uno es obligatorio
+                </small>
+            </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onGuardar()">Guardar</button>
+            <button type="button" class="btn btn-danger" (click)="closeModal()">Cancelar</button>
+        </div>
+    </div>
+</ng-template>
