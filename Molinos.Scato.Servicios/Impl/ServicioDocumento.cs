@@ -142,15 +142,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<NominacionDocumentoDto> ListarDocumentosPorConfiguracion(int configuracionId)
         {
-            var documentosNom = this._repositorio.Listar<NominacionDocumento>();
-            var documentosDto = documentosNom.Select(doc => new NominacionDocumentoDto
-            {
-                Id = doc.Id,
-                CantidadDeJuegos = doc.CantidadDeJuegos
-                // Mapear otros campos si es necesario
-            }).ToList();
-            return documentosDto;
-            //return Listar<NominacionDocumento, NominacionDocumentoDto>(/* TODO d => d.configuracionId == configuracionId*/);
+            return Listar<NominacionDocumento, NominacionDocumentoDto>(d=> d.ConfiguracionDocumento.Id == configuracionId);
+        }
+
+        public NominacionDocumentoDto ObtenerNominacionDocumento(int id)
+        {
+            return Obtener<NominacionDocumento, NominacionDocumentoDto>(d => d.Id == id);
         }
     }
 }

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ConfiguracionDocumento, Documento, DocumentoDestino, DocumentoMaterialPuerto, DocumentoTipo } from '@ScatoModels/digitalizacion-documentos/documento';
+import { ConfiguracionDocumento, Documento, DocumentoDestino, DocumentoMaterialPuerto, DocumentoTipo, NominacionDocumento } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { environment } from 'environments/environment';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,14 @@ export class DocumentoService {
 
   private url: string = environment.apiUrl + 'documento';
 
+  private configSource = new BehaviorSubject<number>(null);  // Inicializa con null o un valor por defecto
+  config$ = this.configSource.asObservable();  // Observable al que los componentes se suscriben
+
   constructor(private http: HttpClient) { }
+
+  public actualizarConfiguracion(configId: number) {
+    this.configSource.next(configId);  // Actualiza el valor del destino
+  }
 
   public listarDocumentoTipos() {
     return this.http.get<DocumentoTipo[]>(`${this.url}/ListarDocumentoTipos`, { withCredentials: true });
@@ -52,6 +60,27 @@ export class DocumentoService {
   }
 
   public listarDocumentosPorConfiguracion(configuracionId: number) {
-    return this.http.get<any[]>(`${this.url}/ListarDocumentosPorConfiguracion?configuracionId=${0}`, { withCredentials: true });
+    return this.http.get<any[]>(`${this.url}/ListarDocumentosPorConfiguracion?configuracionId=${configuracionId}`, { withCredentials: true });
   }
+
+  public guardarArchivos(nomDocId: number, archivos: FormData) {
+    return this.http.post(`${this.url}/GuardarArchivos?nomDocId=${nomDocId}`, archivos, { withCredentials: true });
+  }
+
+  public eliminarArchivo(id: number) {
+    return this.http.delete(`${this.url}/EliminarArchivo?id=${id}`, { withCredentials: true });
+  }
+
+  public descargarArchivo(id: number): Observable<Blob> {
+    return this.http.get(`${this.url}/DescargarArchivo/${id}`, { responseType: 'blob' });
+  }
+
+  public obtenerNominacionDocumento(id: number) {
+    return this.http.get<NominacionDocumento>(`${this.url}/ObtenerNominacionDocumento?id=${id}`, { withCredentials: true });
+  }
+
+  public agregarComentario(nomDocId: number, texto: string) {
+    return this.http.post(`${this.url}/CrearComentario?nomDocId=${nomDocId}&texto=${texto}`, { withCredentials: true });
+  }
+
 }

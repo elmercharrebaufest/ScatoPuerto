@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { NominacionDocumento, NominacionDocumentoComentario } from '@ScatoModels/digitalizacion-documentos/documento';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { DocumentoService } from '@ScatoServicios/documento.service';
 
 @Component({
   selector: 'app-modal-comentarios',
@@ -7,9 +10,41 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ModalComentariosComponent implements OnInit {
 
-  constructor() { }
+  @Input() id: number = 0;
+  public comentarios: NominacionDocumentoComentario[] = [];
+  public texto: string = null;
+  public nombreDocumento: string = null;
+
+  constructor(
+    private documentosService: DocumentoService,
+    private confirmationDialogService: ConfirmationDialogService
+  ) {}
 
   ngOnInit(): void {
+    this.obtenerComentariosDocumentosNominacion();
+  }
+
+  private obtenerComentariosDocumentosNominacion() {
+    this.documentosService.obtenerNominacionDocumento(this.id).subscribe((data: NominacionDocumento) => {
+      this.comentarios = data.comentarios;
+      this.nombreDocumento = data.documento.nombre;
+    }, (error: Error) => {
+      console.error(error);
+      this.mostrarError("Hubo un error al intentar obtener los comentarios.");
+    });
+  }
+
+  public onAgregarComentario(){
+    this.documentosService.agregarComentario(this.id, this.texto).subscribe((data: any) => {
+      this.obtenerComentariosDocumentosNominacion();
+    }, (error: Error) => {
+      console.error(error);
+      this.mostrarError("Hubo un error al intentar agregar el comentario.");
+    });
+  }
+
+  private mostrarError(msj: string) {
+    this.confirmationDialogService.error(msj);
   }
 
 }

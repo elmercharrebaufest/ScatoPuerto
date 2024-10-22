@@ -1,6 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -44,5 +43,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<NominacionDocumentoDto> ListarDocumentosPorConfiguracion(int configuracionId);
+
+        [OperationContract]
+        NominacionDocumentoDto ObtenerNominacionDocumento(int id);
     }
 }

@@ -1,49 +1,55 @@
 <div class="container-fluid mt-2 p-0">
-        <div class="container-fluid bg-white p-2 mb-2">
-            <div class="row">
-            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'DeEmbarque'}">
-                <a class="nav-link tab-menu" (click)="onSelectTab('DeEmbarque')">Documentación de Embarque</a>
+    <div class="container-fluid bg-white p-2 mb-2">
+        <div class="row">
+            <div class="col text-center"
+                [ngClass]="{'tab-seleccionado': tabSeleccionado == 'A solicitar en la nominación'}">
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('A solicitar en la nominación')">Documentación de
+                    Embarque</a>
             </div>
-            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'Compartidos'}">
-                <a class="nav-link tab-menu" (click)="onSelectTab('Compartidos')">Documentos Compartidos</a>
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'A compartir'}">
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('A compartir')">Documentos Compartidos</a>
             </div>
-            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'Internos'}">
-                <a class="nav-link tab-menu" (click)="onSelectTab('Internos')">Documentos Internos</a>
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'Interno'}">
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('Interno')">Documentos Internos</a>
             </div>
         </div>
+    </div>
+    <div class="document-container">
+        <div class="document-header">
+            <span class="document-header-item">Documento</span>
+            <span class="document-header-item" style="text-align: right;">Acciones</span>
         </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Documento</th>
-                <th style="text-align: right;">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let doc of lista; let i = index">
-                <td>{{ doc.nombre }}&nbsp;<i class="fas fa-chevron-down" (click)="toggleSublista(i)" style="cursor: pointer;"></i>
-                </td>
-                <td style="text-align: right;">                    
-                    <img src="assets/file_plus.svg"
-                    style="cursor: pointer;">
-                    <img src="assets/file_arrow_down.svg"
-                    style="cursor: pointer;">
-                    <img src="assets/chat_square.svg"
-                    style="cursor: pointer;" (click)="onOpenComentarios(addComentario)">
-                    <img src="assets/trash_file.svg"
-                    style="cursor: pointer;">
-                </td>
-            </tr>
-            <tr *ngIf="true"><!--*ngIf="sublistaVisible[i]"-->
-                <td colspan="3">
-                  <ul>
-                    <li *ngFor="let archivo of lista">Item archivo</li>
-                  </ul>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <input type="file" id="fileInput" (change)="onSeleccionarArchivo($event)" hidden />
+        <ul class="document-list">
+            <li *ngFor="let elemento of elementos; let i = index" class="document-item">
+                <div class="document-content">
+                    <span>{{ elemento.documento.documento.nombre }} &nbsp;
+                        <i class="fas fa-chevron-down" (click)="onDesplegarArchivos(i)" style="cursor: pointer;"></i></span>
+                    <div class="document-actions">
+                        <img src="assets/file_plus.svg" style="cursor: pointer;" (click)="onAbrirSelectorArchivos()">
+                        <img src="assets/chat_square.svg" style="cursor: pointer;"
+                            (click)="onAbrirComentarios(addComentario)">
+                    </div>
+                </div>
+                <ul *ngIf="elemento.mostrarArchivos == true">
+                    <li *ngFor="let archivo of elemento.documento.archivos">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}}, {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                            <div class="document-actions">
+                                <i class="fa fa-eye icon-eye" aria-hidden="true" (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
+                                <img src="assets/file_arrow_down.svg" style="cursor: pointer;" (click)="onDescargarArchivo(archivo)">
+                                <img src="assets/trash_file.svg" style="cursor: pointer;" (click)="onBorrarArchivo(archivo.id)">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li *ngIf="configuracionId == 0 || elementos.length == 0" style="background-color: white; text-align: center;">
+                <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
+            </li>
+        </ul>
+    </div>
+    <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
+        accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
 </div>
 
 <ng-template #addComentario let-modal>

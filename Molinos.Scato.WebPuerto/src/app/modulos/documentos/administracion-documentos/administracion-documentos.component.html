@@ -15,39 +15,43 @@
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="buque" class=""><strong>Buque:</strong></label>
-                    <input type="text" class="form-control" id="buque" placeholder="Buque" [(ngModel)]="buque" [readonly]="true">
+                    <input type="text" class="form-control" id="buque" placeholder="Buque" [(ngModel)]="buque"
+                        [readonly]="true">
                 </div>
             </div>
-
             <!-- Fecha de nominación -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="fechaNominacion"><strong>Fecha de nominación:</strong></label>
-                    <input type="date" class="form-control" id="fechaNominacion" placeholder="Fecha de registro" [(ngModel)]="fechaNominacion" [readonly]="true">
+                    <input type="text" class="form-control" id="fechaNominacion" placeholder="Fecha de registro"
+                        [(ngModel)]="fechaNominacion" [readonly]="true">
                 </div>
             </div>
-
             <!-- Producto -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="producto"><strong>Producto:</strong></label>
-                    <input type="text" class="form-control" id="producto" placeholder="Placeholder" [(ngModel)]="producto" [readonly]="true">
+                    <input type="text" class="form-control" id="producto" placeholder="Placeholder"
+                        [(ngModel)]="producto" [readonly]="true">
                 </div>
             </div>
-
             <!-- Destino -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="destino"><strong>Destino/Cliente:</strong></label>
-                    <select class="form-control" id="destino">
-                        <option>Placeholder</option>
+                    <select class="form-control" id="configuracion" [(ngModel)]="configIdSeleccionada"
+                        (change)="onSeleccionarConfiguracion($event)">
+                        <option *ngFor="let config of configuraciones" [value]="config.id">{{
+                            config.destino?.nombre}}/{{config.coordinadorPuerto?.nombre }}</option>
                     </select>
                 </div>
             </div>
-
         </div>
     </div>
-    <ng-container>
+    <ng-container *ngIf="false">
         <app-adjuntar-documentos></app-adjuntar-documentos>
-    </ng-container> 
+    </ng-container>
+    <ng-container *ngIf="true">
+        <app-actualizar-estado-documentos></app-actualizar-estado-documentos>
+    </ng-container>
 </div>

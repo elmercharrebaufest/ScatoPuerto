@@ -8,11 +8,12 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { AdministracionDocumentosComponent } from './administracion-documentos/administracion-documentos.component';
 import { AdjuntarDocumentosComponent } from './administracion-documentos/adjuntar-documentos/adjuntar-documentos.component';
 import { ModalComentariosComponent } from './administracion-documentos/adjuntar-documentos/modal-comentarios/modal-comentarios.component';
+import { ActualizarEstadoDocumentosComponent } from './administracion-documentos/actualizar-estado-documentos/actualizar-estado-documentos.component';
 
 
 
 @NgModule({
-  declarations: [DocumentosComponent, AdministracionDocumentosComponent, AdjuntarDocumentosComponent, ModalComentariosComponent],
+  declarations: [DocumentosComponent, AdministracionDocumentosComponent, AdjuntarDocumentosComponent, ModalComentariosComponent, ActualizarEstadoDocumentosComponent],
   imports: [
     CommonModule,
     SharedModule,

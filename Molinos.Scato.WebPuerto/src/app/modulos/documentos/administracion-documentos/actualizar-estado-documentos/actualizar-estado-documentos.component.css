@@ -1,0 +1,31 @@
+.header {
+    text-align: center;
+    background-color: white;
+}
+
+.titulo {
+    background-color: #d2e5f7;
+    height: 50px;
+    vertical-align: middle;
+    border: 5px solid white; /* Borde solo en la parte superior */
+}
+
+.col-estado{
+    display: inline-block; /* Mantiene los elementos en línea, pero cada uno es bloque interno */
+    text-align: center; /* Alinea el texto centrado */
+    margin: 0 18px; /* Ajusta el espacio entre los span */
+    font-size: 14px; /* Ajusta el tamaño del texto */
+}
+
+.subrayado {
+    border-bottom: 1.5px solid rgb(194, 191, 191); /* Color y grosor del borde */
+}
+
+.item {
+    margin: 5px;
+    /*height: 40px;*/
+}
+
+input[type="radio"] {
+    margin: 2px 27px;
+}
