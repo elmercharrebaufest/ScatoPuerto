@@ -1,3 +1,4 @@
+
 .header {
     text-align: center;
     background-color: white;
@@ -6,26 +7,48 @@
 .titulo {
     background-color: #d2e5f7;
     height: 50px;
-    vertical-align: middle;
-    border: 5px solid white; /* Borde solo en la parte superior */
+    border: 5px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.col-estado{
-    display: inline-block; /* Mantiene los elementos en línea, pero cada uno es bloque interno */
-    text-align: center; /* Alinea el texto centrado */
-    margin: 0 18px; /* Ajusta el espacio entre los span */
-    font-size: 14px; /* Ajusta el tamaño del texto */
+.col-estado {
+    display: inline-block;
+    text-align: center;
+    margin: 5px 18px;
+    font-size: 14px;
 }
 
 .subrayado {
-    border-bottom: 1.5px solid rgb(194, 191, 191); /* Color y grosor del borde */
+    border-bottom: 1.5px solid rgb(194, 191, 191);
 }
 
 .item {
-    margin: 5px;
-    /*height: 40px;*/
+    height: 45px;
+    list-style-type: none; 
+    padding: 10px;
+    margin: 0; 
+    background-color: white;
+    color: #4D60A8;
 }
 
 input[type="radio"] {
     margin: 2px 27px;
+}
+
+img {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.icon-eye {
+    color: grey;
+    margin-right: 5px;
+}
+
+.item ul {
+    background-color: white; 
+    margin: 0;
+    list-style-type: none;
 }

@@ -30,7 +30,7 @@
                             (click)="onAbrirComentarios(addComentario)">
                     </div>
                 </div>
-                <ul *ngIf="elemento.mostrarArchivos == true">
+                <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
                     <li *ngFor="let archivo of elemento.documento.archivos">
                         <div class="document-content" style="margin-top: 10px;">
                             <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}}, {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;

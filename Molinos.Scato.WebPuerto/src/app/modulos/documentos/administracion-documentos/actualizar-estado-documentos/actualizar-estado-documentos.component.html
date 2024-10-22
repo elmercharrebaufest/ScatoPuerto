@@ -1,29 +1,28 @@
 <div class="container-fluid p-0 mt-2">
-    <!-- Header -->
     <div class="container-fluid bg-white">
         <div class="row header">
             <div class="col-3 titulo">DOCUMENTOS</div>
             <div class="col-6 titulo">ESTADO DE DOCUMENTACIÓN</div>
             <div class="col-3 titulo">ACCIONES</div>
         </div>
-        <div class="row header">
-            <div class="col-3 subrayado">
-            </div>
-            <div class="col-6 subrayado">
+        <div class="row header subrayado">
+            <div class="col-3"></div>
+            <div class="col-6">
                 <span class="col-estado">Borrador<br>Solicitado</span>
                 <span class="col-estado">Borrador<br>Enviado</span>
                 <span class="col-estado">Borrador<br>Modificado</span>
                 <span class="col-estado">Borrador<br>Aprobado</span>
                 <span class="col-estado">Documento<br>Enviado</span>
             </div>
-            <div class="col-3 subrayado">
-            </div>
+            <div class="col-3"></div>
         </div>
-        <ul class="document-list">
-            <li class="item">
-                <div class="row">
-                    <div class="col-3">BL</div>
-                    <div class="col-6" style="text-align: center; ">
+        <ul class="p-0">
+            <li class="item mt-2" *ngFor="let elemento of elementos; let i = index">
+                <div class="row subrayado">
+                    <div class="col-3"><span>{{ elemento.documento.documento.nombre }} &nbsp;
+                            <i class="fas fa-chevron-down" (click)="onDesplegarArchivos(i)"
+                                style="cursor: pointer;"></i></span></div>
+                    <div class="col-6" style="text-align: center;">
                         <span class="col-estado"><input type="radio" name="bl-status"></span>
                         <span class="col-estado"><input type="radio" name="bl-status"></span>
                         <span class="col-estado"><input type="radio" name="bl-status"></span>
@@ -31,11 +30,36 @@
                         <span class="col-estado"><input type="radio" name="bl-status"></span>
                     </div>
                     <div class="col-3">
-                        <img src="assets/file_plus.svg" style="cursor: pointer;">
-                        <img src="assets/chat_square.svg" style="cursor: pointer;">
+                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos()">
+                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario)">
                     </div>
                 </div>
+                <ul *ngIf="elemento.mostrarArchivos" class="p-0">
+                    <li class="item" *ngFor="let archivo of elemento.documento.archivos">
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-8">
+                                <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
+                                    {{archivo.fechaSubida | date:'dd-MM-yyyy HH:mm'}}</span>&nbsp;
+                            </div>
+                            <div class="col-4">
+                                <i class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
+                                <img src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
+                                <img src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
+                            </div>
+                        </div>
+                    </li>
+                    <li *ngIf="configuracionId == 0 || elementos.length == 0"
+                        style="background-color: white; text-align: center;">
+                        <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
+                    </li>
+                </ul>
             </li>
         </ul>
+        <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
+            accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
     </div>
 </div>
+<ng-template #addComentario let-modal>
+    <app-modal-comentarios (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
+</ng-template>
