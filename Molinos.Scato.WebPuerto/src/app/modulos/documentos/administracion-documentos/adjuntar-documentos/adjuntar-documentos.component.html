@@ -24,15 +24,14 @@
             <li *ngFor="let elemento of elementos; let i = index" class="document-item">
                 <div class="document-content">
                     <span>{{ elemento.documento.documento.nombre }} &nbsp;
-                        <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up" (click)="onDesplegarArchivos(i)"
-                            style="cursor: pointer;"></i>
+                        <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up"
+                            (click)="onDesplegarArchivos(i)"></i>
                         <i *ngIf="!elemento.mostrarArchivos" class="fas fa-chevron-down"
-                            (click)="onDesplegarArchivos(i)" style="cursor: pointer;"></i>
+                            (click)="onDesplegarArchivos(i)"></i>
                     </span>
                     <div class="document-actions">
-                        <img src="assets/file_plus.svg" style="cursor: pointer;" (click)="onAbrirSelectorArchivos()">
-                        <img src="assets/chat_square.svg" style="cursor: pointer;"
-                            (click)="onAbrirComentarios(addComentario)">
+                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos()">
+                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario)">
                     </div>
                 </div>
                 <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
@@ -43,10 +42,8 @@
                             <div class="document-actions">
                                 <i class="fa fa-eye icon-eye" aria-hidden="true"
                                     (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
-                                <img src="assets/file_arrow_down.svg" style="cursor: pointer;"
-                                    (click)="onDescargarArchivo(archivo)">
-                                <img src="assets/trash_file.svg" style="cursor: pointer;"
-                                    (click)="onBorrarArchivo(archivo.id)">
+                                <img src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
+                                <img src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
                             </div>
                         </div>
                     </li>

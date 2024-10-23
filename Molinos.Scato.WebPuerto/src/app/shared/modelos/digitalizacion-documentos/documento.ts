@@ -50,7 +50,7 @@ export interface NominacionDocumentoEstado {
 export interface NominacionDocumento {
   id: number;
   documento: Documento;
-  estado?: NominacionDocumentoEstado;
+  nominacionDocumentoEstado?: NominacionDocumentoEstado;
   archivos?: NominacionDocumentoArchivo[];
   comentarios?: NominacionDocumentoComentario[];
 }

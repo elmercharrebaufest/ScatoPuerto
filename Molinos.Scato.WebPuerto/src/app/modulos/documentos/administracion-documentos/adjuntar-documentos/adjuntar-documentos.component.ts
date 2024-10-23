@@ -45,7 +45,7 @@ export class AdjuntarDocumentosComponent implements OnInit {
     this.documentosService.listarDocumentosPorConfiguracion(configId).subscribe((data: any) => {
       this.documentos = data.map(doc => ({
         documento: doc,
-        mostrarArchivos: false
+        mostrarArchivos: false,
       }));
       this.elementos = this.documentos;
       this.filtrarDocumentos();

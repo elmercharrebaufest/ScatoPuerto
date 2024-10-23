@@ -1,4 +1,4 @@
-<div class="container-fluid p-0 mt-2">
+<div class="container-fluid mt-2 p-0">
     <div class="container-fluid bg-white">
         <div class="row header">
             <div class="col-3 titulo">DOCUMENTOS</div>
@@ -16,32 +16,35 @@
             </div>
             <div class="col-3"></div>
         </div>
-        <ul class="p-0">
-            <li class="item mt-2" *ngFor="let elemento of elementos; let i = index">
-                <div class="row subrayado">
-                    <div class="col-3"><span>{{ elemento.documento.documento.nombre }} &nbsp;
-                            <i class="fas fa-chevron-down" (click)="onDesplegarArchivos(i)"
-                                style="cursor: pointer;"></i></span></div>
-                    <div class="col-6" style="text-align: center;">
-                        <span class="col-estado"><input type="radio" name="bl-status"></span>
-                        <span class="col-estado"><input type="radio" name="bl-status"></span>
-                        <span class="col-estado"><input type="radio" name="bl-status"></span>
-                        <span class="col-estado"><input type="radio" name="bl-status"></span>
-                        <span class="col-estado"><input type="radio" name="bl-status"></span>
+    </div>
+    <div class="document-container">
+        <ul class="document-list">
+            <li *ngFor="let elemento of elementos; let i = index" class="document-item">
+                <div class="document-content">
+                    <span>{{ elemento.documento.documento.nombre }} &nbsp;
+                        <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up"
+                            (click)="onDesplegarArchivos(i)"></i>
+                        <i *ngIf="!elemento.mostrarArchivos" class="fas fa-chevron-down"
+                            (click)="onDesplegarArchivos(i)"></i>
+                    </span>
+                    <div style="text-align: center;">
+                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Solicitado'"></span>
+                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Enviado'"></span>
+                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Modificado'"></span>
+                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Aprobado'"></span>
+                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Documento Enviado'"></span>
                     </div>
-                    <div class="col-3">
+                    <div class="document-actions">
                         <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos()">
                         <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario)">
                     </div>
                 </div>
-                <ul *ngIf="elemento.mostrarArchivos" class="p-0">
-                    <li class="item" *ngFor="let archivo of elemento.documento.archivos">
-                        <div class="row" style="margin-top: 10px;">
-                            <div class="col-8">
-                                <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
-                                    {{archivo.fechaSubida | date:'dd-MM-yyyy HH:mm'}}</span>&nbsp;
-                            </div>
-                            <div class="col-4">
+                <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
+                    <li *ngFor="let archivo of elemento.documento.archivos">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                            <div class="document-actions">
                                 <i class="fa fa-eye icon-eye" aria-hidden="true"
                                     (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
                                 <img src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
@@ -49,17 +52,23 @@
                             </div>
                         </div>
                     </li>
-                    <li *ngIf="configuracionId == 0 || elementos.length == 0"
-                        style="background-color: white; text-align: center;">
-                        <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
+                    <li *ngIf="elemento?.documento?.archivos?.length ==0">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span>No hay archivos para este documento.</span>
+                        </div>
                     </li>
                 </ul>
             </li>
+            <li *ngIf="configuracionId == 0 || elementos.length == 0"
+                style="background-color: white; text-align: center;">
+                <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
+            </li>
         </ul>
-        <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
-            accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
     </div>
+    <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
+        accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
 </div>
+
 <ng-template #addComentario let-modal>
     <app-modal-comentarios (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
 </ng-template>

@@ -27,6 +27,7 @@
 
 img {
   margin-left: 12px;
+  cursor: pointer;
 }
 
 .document-container {
@@ -78,4 +79,9 @@ img {
 
 .icon-eye {
   color: #999999;
+  cursor: pointer;
+}
+
+i {
+  cursor: pointer;
 }

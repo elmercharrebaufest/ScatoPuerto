@@ -20,6 +20,11 @@
               <td>{{comentario.fecha}}</td>
               <td class="cursiva">{{comentario.comentario}}</td>
             </tr>
+            <tr *ngIf="comentarios?.length == 0">
+              <td colspan="3">
+                <span>Aún no hay comentarios para este documento.</span>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>

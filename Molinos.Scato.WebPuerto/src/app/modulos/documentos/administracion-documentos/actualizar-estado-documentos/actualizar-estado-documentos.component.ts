@@ -45,6 +45,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
         mostrarArchivos: false
       }));
       this.elementos = this.documentos;
+      console.log("elementos->", this.elementos)
       this.filtrarDocumentos();
     }, (error: Error) => {
       console.error(error);

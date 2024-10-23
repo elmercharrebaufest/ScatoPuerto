@@ -4,6 +4,10 @@
     background-color: white;
 }
 
+.subrayado {
+    border-bottom: 1.5px solid rgb(194, 191, 191);
+}
+
 .titulo {
     background-color: #d2e5f7;
     height: 50px;
@@ -20,35 +24,97 @@
     font-size: 14px;
 }
 
-.subrayado {
-    border-bottom: 1.5px solid rgb(194, 191, 191);
-}
-
-.item {
-    height: 45px;
-    list-style-type: none; 
+.tab-menu {
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
+  }
+  
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+  }
+  
+  .action-btn:hover {
+    color: #1C7CD5;
+  }
+  
+  .bg-white {
+    background-color: white;
+  }
+  
+  .tab-seleccionado {
+    border-bottom: solid 2px #1C7CD5;
+    color: #1C7CD5;
+    box-sizing: border-box;
+  }
+  
+  img {
+    margin-left: 12px;
+    cursor: pointer;
+  }
+  
+  .document-container {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .document-header {
+    background-color: #e7f1ff;
     padding: 10px;
-    margin: 0; 
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+  }
+  
+  .document-header-item {
+    width: 50%;
+  }
+  
+  .document-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 20px;
+  }
+  
+  .document-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
     background-color: white;
     color: #4D60A8;
-}
-
-input[type="radio"] {
-    margin: 2px 27px;
-}
-
-img {
-    margin-right: 5px;
-    cursor: pointer;
-}
-
-.icon-eye {
-    color: grey;
-    margin-right: 5px;
-}
-
-.item ul {
-    background-color: white; 
-    margin: 0;
+  }
+  
+  .document-item li {
     list-style-type: none;
+    padding-left: 10px;
+  }
+  
+  .document-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .document-actions img {
+    margin-left: 10px;
+  }
+  
+  .icon-eye {
+    color: #999999;
+    cursor: pointer;
+  }
+
+  i{
+    cursor: pointer;
+  }
+
+  .estado-radio {
+    display: inline-block;
+    text-align: center;
+    margin: 5px 45px;
+    font-size: 14px;
 }
