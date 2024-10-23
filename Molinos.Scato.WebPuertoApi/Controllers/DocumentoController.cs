@@ -214,7 +214,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/documento/GuardarArchivos")]
-        public HttpResponseMessage SubirArchivo(int nomDocId)
+        public HttpResponseMessage GuardarArchivos(int nomDocId)
         {
             try
             {
@@ -259,6 +259,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
                 response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
                 return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/documento/EliminarArchivo")]
+        public HttpResponseMessage EliminarArchivo(int id)
+        {
+            try
+            {
+                servicioDocumento.EliminarArchivo(id, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
             {

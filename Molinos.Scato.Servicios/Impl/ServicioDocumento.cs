@@ -156,5 +156,14 @@ namespace Molinos.Scato.Servicios.Impl
             var archivoDb = this._repositorio.Obtener<NominacionDocumentoArchivo>(id) ?? throw new Exception("No se encontró el archivo con el ID especificado");
             return new ArchivoDto(archivoDb.Ubicacion);
         }
+
+        public void EliminarArchivo(int id, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new EliminarDocumentoArchivo { Id = id, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
     }
 }
