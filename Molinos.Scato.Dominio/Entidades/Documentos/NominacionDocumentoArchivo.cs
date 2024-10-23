@@ -8,10 +8,10 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
+        public virtual NominacionDocumento NominacionDocumento { get; set; }
         public virtual string Usuario { get; set; }
         public virtual string Nombre { get; set; }
         public virtual string Ubicacion { get; set; }
         public virtual DateTime FechaSubida { get; set; }
     }
 }
- 

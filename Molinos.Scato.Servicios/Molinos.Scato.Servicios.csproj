@@ -610,6 +610,7 @@
     <Compile Include="Procesamiento\Documentos\ProcesadorEliminarDocumentoPuerto.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorModificarDocumento.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorCrearDocumento.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorSubirArchivoDocumento.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorCrearExportadorPuerto.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorEliminarExportadorPuerto.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorModificarExportadorPuerto.cs" />

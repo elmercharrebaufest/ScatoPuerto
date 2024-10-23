@@ -1,19 +1,23 @@
-﻿using Molinos.Scato.Dominio.Dto;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Servicios;
-using Molinos.Scato.Servicios.Conversiones;
-using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     public class DocumentoController : BaseController
     {
-        public DocumentoController(IServicioRepositorio servicio, IServicioDocumento servicioDocumento) : base(servicio, servicioDocumento: servicioDocumento) { }
+        private readonly IServicioComandos comandos;
+
+        public DocumentoController(IServicioRepositorio servicio, IServicioComandos comandos, IServicioDocumento servicioDocumento) : base(servicio, servicioDocumento: servicioDocumento)
+        {
+            this.comandos = comandos;
+        }
 
         [HttpGet]
         [Route("api/documento/ListarDocumentoTipos")]
@@ -200,6 +204,55 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicioDocumento.ObtenerNominacionDocumento(id));
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/documento/SubirArchivo")]
+        public HttpResponseMessage SubirArchivo(int nominacionDocumentoId)
+        {
+            try
+            {
+                // Es necesario encapsular los archivos en una lista ya que la clase HttpFileCollection no se puede pasar entre capas
+                var archivos = HttpContext.Current.Request.Files;
+                var listaArchivos = new List<ArchivoDto>();
+
+                for (int i = 0; i < archivos.Count; i++)
+                {
+                    var archivo = archivos[i];
+
+                    if (archivo != null && archivo.ContentLength > 0)
+                    {
+                        var archivoDto = new ArchivoDto(archivo);
+                        listaArchivos.Add(archivoDto);
+                    }
+                }
+
+                var res = comandos.Ejecutar(new SubirArchivoDocumento { NominacionDocumentoId = nominacionDocumentoId, Archivos = listaArchivos, Usuario = this.nombreUsuario });
+                if (res.HayErrores)
+                {
+                    throw new Exception(res.Errores[""]);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/documento/ObtenerArchivo")]
+        public HttpResponseMessage ObtenerArchivo(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioDocumento.ObtenerArchivo(id));
             }
             catch (Exception e)
             {
