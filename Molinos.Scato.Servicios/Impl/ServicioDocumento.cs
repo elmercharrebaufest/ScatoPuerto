@@ -12,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -142,12 +143,18 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<NominacionDocumentoDto> ListarDocumentosPorConfiguracion(int configuracionId)
         {
-            return Listar<NominacionDocumento, NominacionDocumentoDto>(d=> d.ConfiguracionDocumento.Id == configuracionId);
+            return Listar<NominacionDocumento, NominacionDocumentoDto>(nd => nd.ConfiguracionDocumento.Id == configuracionId);
         }
 
         public NominacionDocumentoDto ObtenerNominacionDocumento(int id)
         {
-            return Obtener<NominacionDocumento, NominacionDocumentoDto>(d => d.Id == id);
+            return Obtener<NominacionDocumento, NominacionDocumentoDto>(id);
+        }
+
+        public ArchivoDto ObtenerArchivo(int id)
+        {
+            var archivoDb = this._repositorio.Obtener<NominacionDocumentoArchivo>(id) ?? throw new Exception("No se encontró el archivo con el ID especificado");
+            return new ArchivoDto(archivoDb.Ubicacion);
         }
     }
 }

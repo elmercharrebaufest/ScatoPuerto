@@ -89,6 +89,7 @@
     <Compile Include="Comandos\Destinos\CrearDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\ModificarDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\EliminarDestinoPuerto.cs" />
+    <Compile Include="Comandos\Documentos\SubirArchivoDocumento.cs" />
     <Compile Include="Comandos\Documentos\GuardarConfiguracionDocumento.cs" />
     <Compile Include="Comandos\Documentos\EliminarDocumento.cs" />
     <Compile Include="Comandos\Documentos\ModificarDocumento.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Dto\BalanzasFechasCortesPorTurnoDto.cs" />
     <Compile Include="Dto\Destino\AltaEdicionDestinoDto.cs" />
     <Compile Include="Dto\Documentos\ConfiguracionDocumentoDto.cs" />
+    <Compile Include="Dto\ArchivoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoDestinoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoMaterialPuertoDto.cs" />

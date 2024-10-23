@@ -2,6 +2,7 @@
 using Molinos.Scato.Dominio.Dto;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Web;
 
 namespace Molinos.Scato.Servicios
 {
@@ -46,5 +47,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         NominacionDocumentoDto ObtenerNominacionDocumento(int id);
+
+        [OperationContract]
+        ArchivoDto ObtenerArchivo(int id);
     }
 }
