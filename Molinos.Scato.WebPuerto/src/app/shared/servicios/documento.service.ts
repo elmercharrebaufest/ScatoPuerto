@@ -72,7 +72,7 @@ export class DocumentoService {
   }
 
   public descargarArchivo(id: number): Observable<Blob> {
-    return this.http.get(`${this.url}/DescargarArchivo/${id}`, { responseType: 'blob' });
+    return this.http.get(`${this.url}/DescargarArchivo?id=${id}`, { responseType: 'blob' });
   }
 
   public obtenerNominacionDocumento(id: number) {
