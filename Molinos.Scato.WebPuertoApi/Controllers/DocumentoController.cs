@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
 
@@ -212,8 +213,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Route("api/documento/SubirArchivo")]
-        public HttpResponseMessage SubirArchivo(int nominacionDocumentoId)
+        [Route("api/documento/GuardarArchivos")]
+        public HttpResponseMessage SubirArchivo(int nomDocId)
         {
             try
             {
@@ -232,7 +233,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     }
                 }
 
-                var res = comandos.Ejecutar(new SubirArchivoDocumento { NominacionDocumentoId = nominacionDocumentoId, Archivos = listaArchivos, Usuario = this.nombreUsuario });
+                var res = comandos.Ejecutar(new SubirArchivoDocumento { NominacionDocumentoId = nomDocId, Archivos = listaArchivos, Usuario = this.nombreUsuario });
                 if (res.HayErrores)
                 {
                     throw new Exception(res.Errores[""]);
@@ -247,12 +248,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
-        [Route("api/documento/ObtenerArchivo")]
+        [Route("api/documento/DescargarArchivo")]
         public HttpResponseMessage ObtenerArchivo(int id)
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioDocumento.ObtenerArchivo(id));
+                var archivo = servicioDocumento.ObtenerArchivo(id);
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivo.Contenido);
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
+                return response;
             }
             catch (Exception e)
             {
