@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
@@ -23,8 +24,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var nominacionDocumento = Repositorio.Obtener<NominacionDocumento>(comando.NominacionDocumentoId) ?? throw new Exception("No se ha encontrado el id especificado");
+                var nominacion = nominacionDocumento.ConfiguracionDocumento.Nominacion;
+                var fecha = nominacion.NominacionDatoTecnico.ETARecalada.Value.ToString("dd-MM-yyyy");
+                var nombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.NombreBuque;
+                var nombreDestino = nominacionDocumento.ConfiguracionDocumento.Destino.Nombre;
+                var nombreCliente = nominacionDocumento.ConfiguracionDocumento.CoordinadorPuerto.Nombre;
+
                 var path = ConfigurationManager.AppSettings["ArchivosPath"];
-                DirectoryInfo di = new DirectoryInfo(path + (path.EndsWith("\\") ? "" : "\\") + "NominacionDocumentos\\" + comando.NominacionDocumentoId);
+                if (!path.EndsWith("\\"))
+                {
+                    path += "\\";
+                }
+
+                DirectoryInfo di = new DirectoryInfo($"{path}\\Nominaciones Documentos\\{nombreBuque} {fecha}\\{nombreDestino} + {nombreCliente}\\{nominacionDocumento.Documento.Nombre}");
 
                 if (!di.Exists)
                 {
@@ -50,6 +62,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Repositorio.GuardarCambios();
                     }
                 }
+
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Alta,
+                    Entidad = di.FullName + " -> " + string.Join(", ", comando.Archivos.Select(a => a.Nombre).ToArray()),
+                    ClaseId = comando.NominacionDocumentoId
+                };
+                Repositorio.Agregar(logABM);
+                Repositorio.GuardarCambios();
             }
             catch (Exception e)
             {

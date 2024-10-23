@@ -64,6 +64,8 @@ namespace Molinos.Scato.Dominio.Dto
                 case ".pdf": return "application/pdf";
                 case ".doc": return "application/msword";
                 case ".docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                case ".xls": return "vnd.ms-excel";
+                case ".xlsx": return "vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                 // Agregar más tipos MIME según sea necesario
                 default: return "application/octet-stream"; // Tipo por defecto
             }
