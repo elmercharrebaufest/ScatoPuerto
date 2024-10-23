@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NominacionDocumento, NominacionDocumentoComentario } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
@@ -17,8 +18,9 @@ export class ModalComentariosComponent implements OnInit {
 
   constructor(
     private documentosService: DocumentoService,
-    private confirmationDialogService: ConfirmationDialogService
-  ) {}
+    private confirmationDialogService: ConfirmationDialogService,
+    private modalService: NgbModal,
+  ) { }
 
   ngOnInit(): void {
     this.obtenerComentariosDocumentosNominacion();
@@ -34,7 +36,7 @@ export class ModalComentariosComponent implements OnInit {
     });
   }
 
-  public onAgregarComentario(){
+  public onAgregarComentario() {
     this.documentosService.agregarComentario(this.id, this.texto).subscribe((data: any) => {
       this.obtenerComentariosDocumentosNominacion();
     }, (error: Error) => {
@@ -45,6 +47,10 @@ export class ModalComentariosComponent implements OnInit {
 
   private mostrarError(msj: string) {
     this.confirmationDialogService.error(msj);
+  }
+
+  public onCerrarModal() {
+    this.modalService.dismissAll()
   }
 
 }

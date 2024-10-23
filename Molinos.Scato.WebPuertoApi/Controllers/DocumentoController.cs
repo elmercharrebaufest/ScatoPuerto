@@ -34,6 +34,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
         [Route("api/documento/ListarNominacionDocumentoEstados")]
         public HttpResponseMessage ListarNominacionDocumentoEstados()
         {

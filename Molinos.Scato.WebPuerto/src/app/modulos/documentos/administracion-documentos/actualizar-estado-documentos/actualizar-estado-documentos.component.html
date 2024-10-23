@@ -28,14 +28,17 @@
                             (click)="onDesplegarArchivos(i)"></i>
                     </span>
                     <div style="text-align: center;">
-                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Solicitado'"></span>
-                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Enviado'"></span>
-                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Modificado'"></span>
-                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Borrador Aprobado'"></span>
-                        <span class="estado-radio"><input type="radio" name="radio-{{elemento.documento.documento.id}}" [value]="elemento?.documento?.estado?.estado == 'Documento Enviado'"></span>
+                        <span *ngFor="let estado of estados" class="estado-radio">
+                            <input type="radio" 
+                                   name="radio-{{elemento.documento.documento.id}}" 
+                                   [value]="estado.estado" 
+                                   [(ngModel)]="elemento.documento.nominacionDocumentoEstado.estado" 
+                                   [checked]="estado.estado === elemento.documento.nominacionDocumentoEstado.estado"
+                                   (change)="onActualizarEstado(elemento.documento.id, estado.id)">
+                        </span>
                     </div>
                     <div class="document-actions">
-                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos()">
+                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
                         <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario)">
                     </div>
                 </div>
@@ -45,8 +48,8 @@
                             <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
                                 {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
                             <div class="document-actions">
-                                <i class="fa fa-eye icon-eye" aria-hidden="true"
-                                    (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
+                                <i *ngIf="puedeVisualizarArchivo(archivo)" class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo)"></i>
                                 <img src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
                                 <img src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
                             </div>

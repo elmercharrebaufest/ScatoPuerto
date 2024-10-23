@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ElementoNominacionDocumento } from '../adjuntar-documentos/adjuntar-documentos.component';
 import { DocumentoService } from '@ScatoServicios/documento.service';
-import { NominacionDocumentoArchivo } from '@ScatoModels/digitalizacion-documentos/documento';
+import { NominacionDocumento, NominacionDocumentoArchivo, NominacionDocumentoEstado } from '@ScatoModels/digitalizacion-documentos/documento';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -17,13 +17,19 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   public documentos: ElementoNominacionDocumento[] = [];
   public elementos: ElementoNominacionDocumento[] = [];
+  public estados: NominacionDocumentoEstado[] = [];
   public configuracionId: number = 0;
+  public nomDocId: number = 0;
+  private extensionesInvalidas: string[] = ['doc', 'docx', 'xls', 'xlsx'];
+
 
   constructor(
     private documentosService: DocumentoService,
     private modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService
-  ) { }
+  ) {
+    this.obtenerEstados();
+  }
 
   ngOnInit(): void {
     this.actualizarDocumentosNominacion();
@@ -40,24 +46,35 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   private obtenerDocumentosNominacion(configId: number) {
     this.documentosService.listarDocumentosPorConfiguracion(configId).subscribe((data: any) => {
-      this.documentos = data.map(doc => ({
+      this.documentos = data.map((doc: NominacionDocumento) => ({
         documento: doc,
         mostrarArchivos: false
       }));
       this.elementos = this.documentos;
-      console.log("elementos->", this.elementos)
+      console.log(this.elementos);
       this.filtrarDocumentos();
+      this.desplegarArchivosSubidos();
     }, (error: Error) => {
       console.error(error);
     });
+  }
+
+  private desplegarArchivosSubidos() {
+    if (this.nomDocId != null) {
+      const index = this.elementos.findIndex(e => e.documento.id == this.nomDocId);
+      if (index > -1) {
+        this.elementos[index].mostrarArchivos = true;
+      }
+    }
   }
 
   private filtrarDocumentos() {
     this.elementos = this.documentos.filter(doc => doc.documento.documento.documentoTipo.nombre === 'A solicitar en la nominación');
   }
 
-  onAbrirSelectorArchivos(): void {
+  onAbrirSelectorArchivos(nomDocId: number): void {
     this.fileInput.nativeElement.click();
+    this.nomDocId = nomDocId;
   }
 
   onSeleccionarArchivos(event: any): void {
@@ -94,7 +111,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     for (let i = 0; i < files.length; i++) {
       formData.append('files[]', files[i]);
     }
-    this.documentosService.guardarArchivos(this.configuracionId, formData).subscribe(blob => {
+    this.documentosService.guardarArchivos(this.nomDocId, formData).subscribe(blob => {
       this.obtenerDocumentosNominacion(this.configuracionId);
     }, error => {
       console.error('Error al intentar guardar los archivos:', error);
@@ -153,12 +170,65 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
       .catch((res) => { console.log(res) });
   }
 
-  public onVisualizarArchivo(url: string): void {
-    window.open(url, '_blank');
+  public onVisualizarArchivo(archivo: NominacionDocumentoArchivo): void {
+    this.documentosService.descargarArchivo(archivo.id).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const nuevaPestana = window.open(url);
+      if (nuevaPestana) {
+        nuevaPestana.onload = () => {
+          window.URL.revokeObjectURL(url);
+        };
+      } else {
+        console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
+      }
+
+      if (nuevaPestana) {
+        nuevaPestana.document.title = archivo.nombre; // Cambia el título de la pestaña
+      }
+    }, error => {
+      console.error('Error al descargar el archivo:', error);
+      this.mostrarError(`Hubo un error al intentar realizar la descarga del archivo: ${archivo.nombre}.`);
+    });
+  }
+
+  public puedeVisualizarArchivo(archivo: NominacionDocumentoArchivo) {
+    const partes = archivo.nombre.split('.');
+    const extension = partes.length > 1 ? partes.pop().toLowerCase() : '';
+    return !this.extensionesInvalidas.includes(extension);
   }
 
   private mostrarError(msj: string) {
     this.confirmationDialogService.error(msj);
   }
 
+  private obtenerEstados() {
+    this.documentosService.obtenerEstados().subscribe((data: NominacionDocumentoEstado[]) => {
+      this.estados = data;
+    }, (error: Error) => {
+      console.error(error);
+    });
+  }
+
+  public onActualizarEstado(docNomId: number, estadoId: number) {
+    try {
+      this.confirmationDialogService.confirm('Actualizar Estado', `¿Esta seguro de querer actualizar el estado del documento seleccionado?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+        .then((confirmed) => {
+          if (confirmed) {
+            this.documentosService.actualizarEstado(docNomId, estadoId).subscribe(res => {
+              this.modalService.dismissAll();
+              this.confirmationDialogService.exito('Estado actualizado con éxito.');
+            }, (error: any) => {
+              console.error('Error al enviar el formulario', error);
+              this.modalService.dismissAll();
+              this.mostrarError("Hubo un error al intentar actualizar el estado del documento.");
+            });
+          }
+          this.obtenerDocumentosNominacion(this.configuracionId);
+        })
+    } catch (error) {
+      console.error(error);
+      this.modalService.dismissAll();
+      this.mostrarError("Hubo un error al intentar actualizar el estado del documento.");
+    }
+  }
 }

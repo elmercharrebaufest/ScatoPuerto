@@ -30,7 +30,7 @@
                             (click)="onDesplegarArchivos(i)"></i>
                     </span>
                     <div class="document-actions">
-                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos()">
+                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
                         <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario)">
                     </div>
                 </div>
@@ -40,8 +40,8 @@
                             <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
                                 {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
                             <div class="document-actions">
-                                <i class="fa fa-eye icon-eye" aria-hidden="true"
-                                    (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
+                                <i *ngIf="puedeVisualizarArchivo(archivo)" class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo)"></i>
                                 <img src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
                                 <img src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
                             </div>

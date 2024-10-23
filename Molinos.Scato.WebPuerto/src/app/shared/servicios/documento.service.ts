@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ConfiguracionDocumento, Documento, DocumentoDestino, DocumentoMaterialPuerto, DocumentoTipo, NominacionDocumento } from '@ScatoModels/digitalizacion-documentos/documento';
+import { ConfiguracionDocumento, Documento, DocumentoDestino, DocumentoMaterialPuerto, DocumentoTipo, NominacionDocumento, NominacionDocumentoEstado } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -81,6 +81,15 @@ export class DocumentoService {
 
   public agregarComentario(nomDocId: number, texto: string) {
     return this.http.post(`${this.url}/CrearComentario?nomDocId=${nomDocId}&texto=${texto}`, { withCredentials: true });
+  }
+
+  public obtenerEstados() {
+    return this.http.get<NominacionDocumentoEstado[]>(`${this.url}/ListarNominacionDocumentoEstados`, { withCredentials: true });
+  }
+  
+  public actualizarEstado(nomDocId: number, estadoId: number) {
+    const body = { nomDocId, estadoId };
+    return this.http.put(`${this.url}/ActualizarEstado`, body, { withCredentials: true });
   }
 
 }
