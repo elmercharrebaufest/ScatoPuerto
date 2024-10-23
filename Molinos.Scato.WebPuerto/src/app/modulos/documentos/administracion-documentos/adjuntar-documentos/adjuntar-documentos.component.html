@@ -3,7 +3,8 @@
         <div class="row">
             <div class="col text-center"
                 [ngClass]="{'tab-seleccionado': tabSeleccionado == 'A solicitar en la nominación'}">
-                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('A solicitar en la nominación')">Documentación de
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('A solicitar en la nominación')">Documentación
+                    de
                     Embarque</a>
             </div>
             <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'A compartir'}">
@@ -23,7 +24,11 @@
             <li *ngFor="let elemento of elementos; let i = index" class="document-item">
                 <div class="document-content">
                     <span>{{ elemento.documento.documento.nombre }} &nbsp;
-                        <i class="fas fa-chevron-down" (click)="onDesplegarArchivos(i)" style="cursor: pointer;"></i></span>
+                        <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up" (click)="onDesplegarArchivos(i)"
+                            style="cursor: pointer;"></i>
+                        <i *ngIf="!elemento.mostrarArchivos" class="fas fa-chevron-down"
+                            (click)="onDesplegarArchivos(i)" style="cursor: pointer;"></i>
+                    </span>
                     <div class="document-actions">
                         <img src="assets/file_plus.svg" style="cursor: pointer;" (click)="onAbrirSelectorArchivos()">
                         <img src="assets/chat_square.svg" style="cursor: pointer;"
@@ -33,17 +38,27 @@
                 <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
                     <li *ngFor="let archivo of elemento.documento.archivos">
                         <div class="document-content" style="margin-top: 10px;">
-                            <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}}, {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                            <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
                             <div class="document-actions">
-                                <i class="fa fa-eye icon-eye" aria-hidden="true" (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
-                                <img src="assets/file_arrow_down.svg" style="cursor: pointer;" (click)="onDescargarArchivo(archivo)">
-                                <img src="assets/trash_file.svg" style="cursor: pointer;" (click)="onBorrarArchivo(archivo.id)">
+                                <i class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo.ubicacion)"></i>
+                                <img src="assets/file_arrow_down.svg" style="cursor: pointer;"
+                                    (click)="onDescargarArchivo(archivo)">
+                                <img src="assets/trash_file.svg" style="cursor: pointer;"
+                                    (click)="onBorrarArchivo(archivo.id)">
                             </div>
+                        </div>
+                    </li>
+                    <li *ngIf="elemento?.documento?.archivos?.length ==0">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span>No hay archivos para este documento.</span>
                         </div>
                     </li>
                 </ul>
             </li>
-            <li *ngIf="configuracionId == 0 || elementos.length == 0" style="background-color: white; text-align: center;">
+            <li *ngIf="configuracionId == 0 || elementos.length == 0"
+                style="background-color: white; text-align: center;">
                 <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
             </li>
         </ul>
