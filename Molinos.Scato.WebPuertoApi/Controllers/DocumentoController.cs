@@ -282,5 +282,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/documento/ActualizarEstado")]
+        public HttpResponseMessage ActualizarEstado(int nomDocId, int estadoId)
+        {
+            try
+            {
+                servicioDocumento.ActualizarEstado(nomDocId, estadoId, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
     }
 }

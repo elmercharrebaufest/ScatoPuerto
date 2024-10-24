@@ -165,5 +165,14 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
         }
+
+        public void ActualizarEstado(int nomDocId, int estadoId, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new ActualizarNominacionDocumentoEstado { NomDocId = nomDocId, EstadoId = estadoId, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
     }
 }

@@ -53,5 +53,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarArchivo(int id, string usuario);
+
+        [OperationContract]
+        void ActualizarEstado(int nomDocId, int estadoId, string usuario);
     }
 }
