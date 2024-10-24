@@ -48,10 +48,10 @@
             </div>
         </div>
     </div>
-    <ng-container *ngIf="true">
+    <ng-container *ngIf="tienePermisoVisualizarDocumentosMOC()">
         <app-adjuntar-documentos></app-adjuntar-documentos>
     </ng-container>
-    <ng-container *ngIf="false">
+    <ng-container *ngIf="tienePermisoVisualizarDocumentosComex()">
         <app-actualizar-estado-documentos></app-actualizar-estado-documentos>
     </ng-container>
 </div>

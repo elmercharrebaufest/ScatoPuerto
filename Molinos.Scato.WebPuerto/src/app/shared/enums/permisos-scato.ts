@@ -114,6 +114,17 @@ export enum PermisosScato {
   Comex_Nominacion_Guardar = "Comex_Nominacion_Guardar",
   Comex_Nominacion_Ver = "Comex_Nominacion_Ver",
   Comex_Nominacion_Enviar_LineUp = "Comex_Nominacion_Enviar_LineUp",
+  Comex_Documentos_Visualizar = "Comex_Documentos_Visualizar",
+  
+  //Digitalizacion MOC y COMEX
+  Digitalizacion_Visualizar = "Digitalizacion_Visualizar",
+  Archivo_Digitalizacion_Crear = "Archivo_Digitalizacion_Crear",
+  Archivo_Digitalizacion_Modificar = "Archivo_Digitalizacion_Modificar",
+  Archivo_Digitalizacion_Eliminar = "Archivo_Digitalizacion_Eliminar",
+  Archivo_Digitalizacion_Descargar = "Archivo_Digitalizacion_Descargar",
+
+  //MOC
+  Moc_Documentos_Visualizar = "Moc_Documentos_Visualizar",
 
   //Vapor
 

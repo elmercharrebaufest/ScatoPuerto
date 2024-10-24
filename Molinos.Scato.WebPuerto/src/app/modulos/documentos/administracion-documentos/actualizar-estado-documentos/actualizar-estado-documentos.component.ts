@@ -5,6 +5,8 @@ import { NominacionDocumento, NominacionDocumentoArchivo, NominacionDocumentoEst
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 
 @Component({
   selector: 'app-actualizar-estado-documentos',
@@ -21,7 +23,8 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
   public configuracionId: number = 0;
   public nomDocId: number = 0;
   private extensionesInvalidas: string[] = ['doc', 'docx', 'xls', 'xlsx'];
-
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(
     private documentosService: DocumentoService,
@@ -72,15 +75,23 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     this.elementos = this.documentos.filter(doc => doc.documento.documento.documentoTipo.nombre === 'A solicitar en la nominación');
   }
 
-  onAbrirSelectorArchivos(nomDocId: number): void {
+  public onAbrirSelectorArchivos(nomDocId: number): void {
     this.fileInput.nativeElement.click();
     this.nomDocId = nomDocId;
   }
 
-  onSeleccionarArchivos(event: any): void {
+  public async onSeleccionarArchivos(event: any) {
     const archivos: FileList = event.target.files;
-
+    
     if (archivos.length > 0) {
+      const archivosASobreescribir = this.existenArchivosASobreescribir(archivos);
+      if(archivosASobreescribir.length > 0){
+        const confirm = await this.confirmationDialogService.confirm('Advertencia', `Los siguientes archivos ya existen: ${archivosASobreescribir.join(', ')}, ¿Desea sobrescribirlos?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
+        if (!confirm) {
+          return;
+        }
+      }
+
       const formatosPermitidos = [
         'application/vnd.ms-excel', // .xls
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
@@ -91,6 +102,9 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
         'image/jpeg' // .jpg, .jpeg
       ];
 
+      const maxTamanioBytes = 28 * 1024 * 1024; 
+      let tamanioTotal = 0;
+
       for (let i = 0; i < archivos.length; i++) {
         const arch = archivos[i];
 
@@ -98,21 +112,47 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
           this.mostrarError("El formato del archivo: " + arch.name + " no es válido.");
           return;
         }
+
+        tamanioTotal += arch.size;
+
+        if (tamanioTotal > maxTamanioBytes) {
+          this.mostrarError("El tamaño total de los archivos supera el límite de 28 MB.");
+          return;
+        }
       }
+
+      if(archivos.length > 5){
+        this.mostrarError("El maximo permitido de archivos a subir es 5.");
+        return;
+      }
+
       this.guardarArchivos(archivos);
     } else {
       this.mostrarError("Ningun archivo fue seleccionado.");
     }
   }
 
+  private existenArchivosASobreescribir(archivos: FileList): string[]{
+    const archivosExistentes = this.elementos.find(e=> e.documento.id == this.nomDocId)?.documento?.archivos;
+    const archivosASobreescribir: string[] = [];
+    for (let i = 0; i < archivos.length; i++) {
+      const arch = archivos[i];
+      if(archivosExistentes.some(ae => ae.nombre == arch.name)){
+        archivosASobreescribir.push(arch.name);
+      }
+    }
+    return archivosASobreescribir;
+  }
+
   guardarArchivos(files: FileList): void {
     const formData = new FormData();
 
     for (let i = 0; i < files.length; i++) {
-      formData.append('files[]', files[i]);
+      formData.append('files', files[i]);
     }
     this.documentosService.guardarArchivos(this.nomDocId, formData).subscribe(blob => {
       this.obtenerDocumentosNominacion(this.configuracionId);
+      formData.delete('files');
     }, error => {
       console.error('Error al intentar guardar los archivos:', error);
       this.mostrarError("Hubo un error al intentar guardar los archivos.");
@@ -162,7 +202,8 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     });
   }
 
-  public onAbrirComentarios(modal: any) {
+  public onAbrirComentarios(modal: any, nomDocId: number) {
+    this.nomDocId = nomDocId;
     this.modalService.open(modal, { size: 'lg', windowClass: 'window-modal-pro', backdropClass: 'modal-pro' }).result
       .then(() => {
         console.log('_modalService.open');
@@ -231,4 +272,21 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
       this.mostrarError("Hubo un error al intentar actualizar el estado del documento.");
     }
   }
+
+  public onDeshabilitarEstado(estadoRadio: number, estadoActual: number){
+    return estadoRadio < estadoActual;
+  }
+
+  public tienePermisoDescargarArchivo(){
+    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Descargar);
+  }
+
+  public tienePermisoEliminarArchivo(){
+    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Eliminar);
+  }
+  
+  public tienePermisoCrearArchivo(){
+    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Crear);
+  }
+
 }
