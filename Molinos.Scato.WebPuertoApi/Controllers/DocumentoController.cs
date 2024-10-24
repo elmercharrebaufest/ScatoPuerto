@@ -282,7 +282,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("api/documento/ActualizarEstado")]
         public HttpResponseMessage ActualizarEstado(int nomDocId, int estadoId)
         {
