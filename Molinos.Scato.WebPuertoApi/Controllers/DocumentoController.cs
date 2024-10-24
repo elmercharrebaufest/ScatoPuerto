@@ -129,7 +129,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioDocumento.GuardarConfiguracionDocumento(body.nominacionId, body.configuraciones, this.nombreUsuario);
+                servicioDocumento.GuardarConfiguracionDocumento(body.NominacionId, body.Configuraciones, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -284,11 +284,30 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPut]
         [Route("api/documento/ActualizarEstado")]
-        public HttpResponseMessage ActualizarEstado(int nomDocId, int estadoId)
+        public HttpResponseMessage ActualizarEstado(ActualizarNominacionDocumentoEstadoDto dto)
         {
             try
             {
-                servicioDocumento.ActualizarEstado(nomDocId, estadoId, this.nombreUsuario);
+                servicioDocumento.ActualizarEstado(dto.NominacionDocumentoId, dto.EstadoId, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/documento/CrearComentario")]
+        public HttpResponseMessage CrearComentario(CrearComentarioDto dto)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(this.nombreUsuario))
+                {
+                    throw new Exception("No se ha podido identificar el usuario, por favor cierre la ventana y vuelva a ingresar");
+                }
+                servicioDocumento.CrearComentario(dto.NominacionDocumentoId, dto.Comentario, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

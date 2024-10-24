@@ -56,5 +56,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void ActualizarEstado(int nomDocId, int estadoId, string usuario);
+
+        [OperationContract]
+        void CrearComentario(int nomDocId, string texto, string usuario);
     }
 }

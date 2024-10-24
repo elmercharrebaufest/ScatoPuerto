@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public class GuardarConfiguracionesDto
+    public class ActualizarNominacionDocumentoEstadoDto
     {
-        public int NominacionId { get; set; }
-        public List<ConfiguracionDocumentoDto> Configuraciones { get; set; }
+        public int NominacionDocumentoId { get; set; }
+        public int EstadoId { get; set; }
     }
 }

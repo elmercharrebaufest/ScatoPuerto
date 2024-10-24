@@ -79,16 +79,17 @@ export class DocumentoService {
     return this.http.get<NominacionDocumento>(`${this.url}/ObtenerNominacionDocumento?id=${id}`, { withCredentials: true });
   }
 
-  public agregarComentario(nomDocId: number, texto: string) {
-    return this.http.post(`${this.url}/CrearComentario?nomDocId=${nomDocId}&texto=${texto}`, { withCredentials: true });
+  public agregarComentario(nominacionDocumentoId: number, comentario: string) {
+    const body = { nominacionDocumentoId, comentario };
+    return this.http.post(`${this.url}/CrearComentario`, body, { withCredentials: true });
   }
 
   public obtenerEstados() {
     return this.http.get<NominacionDocumentoEstado[]>(`${this.url}/ListarNominacionDocumentoEstados`, { withCredentials: true });
   }
-  
-  public actualizarEstado(nomDocId: number, estadoId: number) {
-    const body = { nomDocId, estadoId };
+
+  public actualizarEstado(nominacionDocumentoId: number, estadoId: number) {
+    const body = { nominacionDocumentoId, estadoId };
     return this.http.put(`${this.url}/ActualizarEstado`, body, { withCredentials: true });
   }
 

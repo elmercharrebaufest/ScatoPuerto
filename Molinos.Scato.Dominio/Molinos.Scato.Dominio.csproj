@@ -125,8 +125,10 @@
     <Compile Include="Dto\BalanzaManualDto.cs" />
     <Compile Include="Dto\BalanzasFechasCortesPorTurnoDto.cs" />
     <Compile Include="Dto\Destino\AltaEdicionDestinoDto.cs" />
+    <Compile Include="Dto\Documentos\ActualizarNominacionDocumentoEstadoDto.cs" />
     <Compile Include="Dto\Documentos\ConfiguracionDocumentoDto.cs" />
     <Compile Include="Dto\ArchivoDto.cs" />
+    <Compile Include="Dto\Documentos\CrearComentarioDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoDestinoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoDto.cs" />
     <Compile Include="Dto\Documentos\DocumentoMaterialPuertoDto.cs" />

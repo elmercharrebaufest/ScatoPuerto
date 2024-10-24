@@ -174,5 +174,27 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
         }
+
+        public void CrearComentario(int nomDocId, string texto, string usuario)
+        {
+            try
+            {
+                var nomDoc = _repositorio.Obtener<NominacionDocumento>(nomDocId) ?? throw new Exception($"No se ha encontrado el id {nomDocId}");
+                var comentario = new NominacionDocumentoComentario
+                {
+                    Comentario = texto,
+                    NominacionDocumento = nomDoc,
+                    Fecha = DateTime.Now,
+                    Usuario = usuario
+                };
+                _repositorio.Agregar(comentario);
+                _repositorio.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                _log.Error("Error al crear comentario de documento {0}", e);
+                throw e;
+            }
+        }
     }
 }
