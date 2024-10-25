@@ -2,8 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfiguracionDocumento, Documento, DocumentoDestino, DocumentoMaterialPuerto, DocumentoTipo, NominacionDocumento, NominacionDocumentoEstado } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
+import { Destino } from '@ScatoModels/destino';
+import { DocumentoEstado } from '@ScatoModels/digitalizacion-documentos/documento-estado';
+import { NominacionDocumentoEmbarque } from '@ScatoModels/digitalizacion-documentos/nominacion-documento-embarque';
+import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ConfiguracionDocumentoPorNominacion } from '@ScatoModels/digitalizacion-documentos/configuracion-documentos-por-nominacion';
+import { NominacionDocumentoEstadoPorEmbarque } from '@ScatoModels/digitalizacion-documentos/nominacion-documento-estado-por-embarque';
 
 @Injectable({
   providedIn: 'root'
@@ -93,4 +99,29 @@ export class DocumentoService {
     return this.http.put(`${this.url}/ActualizarEstado`, body, { withCredentials: true });
   }
 
+  public listarNominacionDocumentoEstadoPorEmbarque(nominacionId: number, configuracionDocumentoId:number, documento: string,documentoEstado:string) {
+    return this.http.get<NominacionDocumentoEstadoPorEmbarque[]>(`${this.url}/ListarNominacionDocumentoEstadoPorEmbarque?nominacionId=${nominacionId}&configuracionDocumentoId=${configuracionDocumentoId}&documento=${documento}&documentoEstado=${documentoEstado}`, { withCredentials: true });
+  }
+  public obtenerNominacionDocumentoEmbarque(nominacionId: number, embarqueId: number) {
+    return this.http.get<NominacionDocumentoEmbarque>(`${this.url}/ObtenerNominacionDocumentoEmbarque?nominacionId=${nominacionId}&embarqueId=${embarqueId}`, { withCredentials: true });
+  }
+
+  public listarNominacionDocumentoEstados() {
+    return this.http.get<DocumentoEstado[]>(`${this.url}/ListarNominacionDocumentoEstados`, { withCredentials: true });
+  }
+
+  public listarDocumentosPorNominacion(nominacionId: number) {
+    return this.http.get<Documento[]>(`${this.url}/ListarDocumentosPorNominacion?nominacionId=${nominacionId}`, { withCredentials: true });
+  }
+
+  public listarDestinoPorNominacion(nominacionId: number) {
+    return this.http.get<Destino[]>(`${this.url}/ListarDestinoPorNominacion?nominacionId=${nominacionId}`, { withCredentials: true });
+  }
+
+  public listarProductosPorNominacion(nominacionId: number) {
+    return this.http.get<MaterialPuerto[]>(`${this.url}/ListarProductosPorNominacion?nominacionId=${nominacionId}`, { withCredentials: true });
+  }
+  public listarConfiguracionDocumentoPorNominacion(nominacionId: number) {
+    return this.http.get<ConfiguracionDocumentoPorNominacion[]>(`${this.url}/ListarConfiguracionDocumentoPorNominacion?nominacionId=${nominacionId}`, { withCredentials: true });
+  }
 }

@@ -196,7 +196,7 @@
                 </td>
                 <td class="noBorder centradoHorizontal">
                     <img src="assets/folder_check.svg"
-                    style="cursor: pointer">
+                    style="cursor: pointer" (click)="onAdministrarDocumentosEstados(historial.id)">
                 </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarNominacion()'>
                     <div *ngIf="!historial.fechaEliminacion" class='icon-editar cursor'

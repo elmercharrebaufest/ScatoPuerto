@@ -1,0 +1,194 @@
+<div class="container-fluid">
+    <div class="bg-white p-3 mt-2">
+        <div class="row" [formGroup]="datosFiltroForm">
+            <!-- Configuracion -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="configuracionDocumento"><strong>Configuración:</strong></label>
+                    <select formControlName="configuracionDocumento" class="custom-select">
+                        <option value="0"  default selected>Seleccione</option>
+                        <option *ngFor="let configuracion of listarConfiguracionDocumento" [ngValue]="configuracion">
+                            {{configuracion.descripcion}}
+                        </option>
+                    </select>
+                </div>
+            </div>            
+            <!-- Documentos -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="documento" class=""><strong>Documento:</strong></label>
+                    <ng-multiselect-dropdown formControlName="documento" 
+                                            [placeholder]="'Documento'"
+                                            class="custom-with-dropdown"
+                                            [settings]="getConfigDocumentoMultiple()" 
+                                            [data]="getListadoDocumentos()">
+                  </ng-multiselect-dropdown> 
+                </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="documentoEstado"><strong>Estado:</strong></label>
+                    <ng-multiselect-dropdown formControlName="documentoEstado" 
+                                             [placeholder]="'Estado'"
+                                             class="custom-with-dropdown"
+                                             [settings]="getConfigEstadoMultiple()" 
+                                             [data]="getListadoDocumentoEstado()">
+                  </ng-multiselect-dropdown>                    
+                </div>
+            </div>
+
+            <!-- Filrar -->
+            <div class="col-12 col-md-6 col-lg" style="display: flex;align-self: center;margin-top: 15px;">
+                <button class="btn btn-primary" (click)="onFiltrarDocumentos()" style="margin-right: 10px;"><i class="fas fa-filter"></i> Filtrar Documentos</button>
+                <button class="btn btn-primary" (click)="onOpenModalAlerta(modalAlerta)"><i class="fas fa-bell"></i> Generar Alerta</button>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white p-3 mt-2">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row" *ngFor="let embarque of datosEmbarqueForm.get('embarque')['controls']; let i = index">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>{{embarque.value.nombreBuque}}</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6>Fecha de nominación:{{embarque.value.fechaNominacion}}</h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6>Fecha fin de carga:{{embarque.value.fechaFinalizacionCarga}}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="col-md-6 centrar-contenido">
+                            <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                        </div>
+                        <div class="col-md-6 centrar-contenido">
+                            <label class="texto-estado">Borrador</label>
+                            <label class="texto-estado">Seleccionado</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-6 centrar-contenido">
+                                <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-md-6 centrar-contenido">
+                                <label class="texto-estado">Borrador</label>
+                                <label class="texto-estado">Enviado</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-6 centrar-contenido">
+                                <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-md-6 centrar-contenido">
+                                <label class="texto-estado">Borrador</label>
+                                <label class="texto-estado">Modificado</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-6 centrar-contenido">
+                                <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-md-6 centrar-contenido">
+                                <label class="texto-estado">Borrador</label>
+                                <label class="texto-estado">Aprobado</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-6 centrar-contenido">
+                                <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-md-6 centrar-contenido">
+                                <label class="texto-estado">Documento</label>
+                                <label class="texto-estado">Enviado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white p-3 mt-2">
+        <div [formGroup]="documentosEstadoForm">
+            <div formArrayName="documentos">
+                <div class="row"
+                    *ngFor="let documento of documentosEstadoForm.get('documentos')['controls']; let i = index;trackBy:trackByFn">
+                    <div [formGroupName]="i" class="input-group">
+                        <div class="col-md-4">
+                            <p>{{documento.value.documento}}</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                                formControlName="esBorradorSolicitado" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                                formControlName="esBorradorEnviado" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                                formControlName="esBorradorModificado" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                                formControlName="esBorradorAprobado" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                                formControlName="esDocumentoEnviado" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #modalAlerta let-modal>
+    <app-administracion-documentos-estado-alerta (cerrar)="modal.dismiss()">
+    </app-administracion-documentos-estado-alerta>
+</ng-template>

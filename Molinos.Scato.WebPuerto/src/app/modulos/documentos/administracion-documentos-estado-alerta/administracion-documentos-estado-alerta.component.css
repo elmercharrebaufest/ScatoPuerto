@@ -1,0 +1,23 @@
+.titulo {
+    font-size: 16px;
+}
+.line {  
+    height: 7px;
+    width: 100%;
+    background-color: #4d60a8;
+}
+.separador {  
+    height: 1px;
+    width: 100%;
+    background-color: #bebebe;
+}
+.margenes {
+    margin: 10px;
+}
+.cierre{
+    margin-right: 10px;
+}
+.cuerpoMail{
+    overflow-y: scroll;
+    height: 450px;
+}

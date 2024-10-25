@@ -52,7 +52,7 @@ insert into @tbl_documentos(Id, Documento, Documento_Id)values(42,'Veterinary',0
 insert into @tbl_documentos(Id, Documento, Documento_Id)values(43,'Weight ',0)
   
    insert into Documento(DocumentoTipo_Id, Nombre)
-   select (select top 1 Id from DocumentoTipo where Nombre = 'Interno'), 
+   select (select top 1 Id from DocumentoTipo where Nombre = 'A solicitar en la nominación'), 
           Documento 
      from @tbl_documentos doc 
     where not exists(select 1 from Documento where Nombre = doc.Documento)

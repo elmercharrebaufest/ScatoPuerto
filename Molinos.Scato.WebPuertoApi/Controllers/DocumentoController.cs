@@ -3,6 +3,7 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Servicios;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -198,6 +199,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+        [HttpGet]
+        [Route("api/documento/ListarNominacionDocumentoEstadoPorEmbarque")]
+        public HttpResponseMessage ListarNominacionDocumentoEstadoPorEmbarque(int nominacionId, int configuracionDocumentoId, string documento = null, string documentoEstado = null)
+        {
+            try
+            {
+                List<string> listDocumento = null;
+                List<string> listDocumentoEstado = null;
+                listDocumento = (!string.IsNullOrEmpty(documento) ? documento.Split(',').ToList() : null);
+                listDocumentoEstado = (!string.IsNullOrEmpty(documentoEstado) ? documentoEstado.Split(',').ToList() : null);
+                var resultado = servicioDocumento.ListarNominacionDocumentoEstadoPorEmbarque(nominacionId, configuracionDocumentoId, listDocumento, listDocumentoEstado);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("api/documento/ObtenerNominacionDocumentoEmbarque")]
+        public HttpResponseMessage ObtenerNominacionDocumentoEmbarque(int nominacionId, int embarqueId)
+        {
+            try
+            {
+                var resultado = servicioDocumento.ObtenerNominacionDocumentoEmbarque(nominacionId, embarqueId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
 
         [HttpGet]
         [Route("api/documento/ObtenerNominacionDocumento")]
@@ -315,5 +348,65 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+        
+        [HttpGet]
+        [Route("api/documento/ListarProductosPorNominacion")]
+        public HttpResponseMessage ListarProductosPorNominacion(int nominacionId)
+        {
+            try
+            {
+                var resultado = servicioDocumento.ListarProductosPorNominacion(nominacionId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+		
+       
+        [HttpGet]
+        [Route("api/documento/ListarConfiguracionDocumentoPorNominacion")]
+        public HttpResponseMessage ListarConfiguracionDocumentoPorNominacion(int nominacionId)
+        {
+            try
+            {
+                var resultado = servicioDocumento.ListarConfiguracionDocumentoPorNominacion(nominacionId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("api/documento/ListarDestinoPorNominacion")]
+        public HttpResponseMessage ListarDestinoPorNominacion(int nominacionId)
+        {
+            try
+            {
+                var resultado = servicioDocumento.ListarDestinoPorNominacion(nominacionId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("api/documento/ListarDocumentosPorNominacion")]
+        public HttpResponseMessage ListarDocumentosPorNominacion(int nominacionId)
+        {
+            try
+            {
+                var resultado = servicioDocumento.ListarDocumentosPorNominacion(nominacionId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }		        
+        
     }
 }

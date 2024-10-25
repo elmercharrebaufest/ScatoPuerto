@@ -9,11 +9,22 @@ import { AdministracionDocumentosComponent } from './administracion-documentos/a
 import { AdjuntarDocumentosComponent } from './administracion-documentos/adjuntar-documentos/adjuntar-documentos.component';
 import { ModalComentariosComponent } from './administracion-documentos/adjuntar-documentos/modal-comentarios/modal-comentarios.component';
 import { ActualizarEstadoDocumentosComponent } from './administracion-documentos/actualizar-estado-documentos/actualizar-estado-documentos.component';
+import { AdministracionDocumentosEstadoComponent } from './administracion-documentos-estado/administracion-documentos-estado.component';
+import { AdministracionDocumentosEstadoAlertaComponent } from './administracion-documentos-estado-alerta/administracion-documentos-estado-alerta.component';
+import { AdministracionDocumentosEstadoListadoComponent } from './administracion-documentos-estado-listado/administracion-documentos-estado-listado.component';
 
 
 
 @NgModule({
-  declarations: [DocumentosComponent, AdministracionDocumentosComponent, AdjuntarDocumentosComponent, ModalComentariosComponent, ActualizarEstadoDocumentosComponent],
+  declarations: [DocumentosComponent, 
+                 AdministracionDocumentosComponent, 
+                 AdjuntarDocumentosComponent, 
+                 ModalComentariosComponent, 
+                 ActualizarEstadoDocumentosComponent,
+                 AdministracionDocumentosEstadoComponent, 
+                 AdministracionDocumentosEstadoAlertaComponent, 
+                 AdministracionDocumentosEstadoListadoComponent
+                 ],
   imports: [
     CommonModule,
     SharedModule,

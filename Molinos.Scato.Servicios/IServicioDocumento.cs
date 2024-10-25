@@ -1,5 +1,7 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Documentos;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Web;
@@ -59,5 +61,23 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void CrearComentario(int nomDocId, string texto, string usuario);
+        
+        [OperationContract]
+        NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId, int embarqueId);
+
+        [OperationContract]
+        IList<NominacionDocumentoEstadoPorEmbarqueDto> ListarNominacionDocumentoEstadoPorEmbarque(int nominacionId, int configuracionDocumentoId, List<string> documento = null, List<string> documentoEstado = null);
+
+        [OperationContract]
+        IList<DocumentoDto> ListarDocumentosPorNominacion(int nominacionId);
+
+        [OperationContract]
+        IList<DestinoDto> ListarDestinoPorNominacion(int nominacionId);
+
+        [OperationContract]
+        IList<MaterialPuertoDto> ListarProductosPorNominacion(int nominacionId);
+
+        [OperationContract]
+        IList<ConfiguracionDocumentoPorNominacionDto> ListarConfiguracionDocumentoPorNominacion(int nominacionId);
     }
 }

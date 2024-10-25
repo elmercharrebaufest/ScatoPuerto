@@ -1,0 +1,52 @@
+<ship-spinner [message]="'Enviando Mail. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+<div class="margenes cierre">
+    <button type="button" class="close" aria-label="Close" (click)="onCerraModal()">
+        <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+    </button>
+    <label><strong class="titulo">Generación de alerta</strong></label>
+</div>
+<div *ngIf="mail != null" class="line"></div>
+<div class="modal-body mb-4" [ngClass]="{'cuerpoMail': mail != null}" >
+    <div class="row" *ngIf="mail != null">
+        <div class="col-md-1" style="display: flex;align-items: center;">
+            <strong style="height: min-content;">Para:</strong>
+        </div>
+        <div class="col-md-11">
+            <tag-input *ngIf="mail != null" [(ngModel)]="mail.destinatarios" [modelAsStrings]="true"
+                [placeholder]="'Destinatarios'" [secondaryPlaceholder]="'Destinatarios'"
+                [validators]="validators"></tag-input>
+        </div>
+    </div>
+    <br *ngIf="mail != null">
+    <div *ngIf="mail != null" class="separador"></div>
+    <br *ngIf="mail != null">
+    <div class="row" *ngIf="mail != null">
+        <div class="col-md-1" style="display: flex;align-items: center;">
+            <strong style="height: min-content;">Copia</strong>
+        </div>
+        <div class="col-md-11">
+            <tag-input *ngIf="mail != null" [(ngModel)]="mail.copia" [modelAsStrings]="true" [placeholder]="'Copia'"
+                [secondaryPlaceholder]="'Copia'" [validators]="validators"></tag-input>
+        </div>
+    </div>
+    <br *ngIf="mail != null">
+    <div *ngIf="mail != null" class="separador"></div>
+    <br *ngIf="mail != null">
+    <div class="row" *ngIf="mail != null">
+        <div class="col-md-1">
+            <strong>Asunto:</strong>
+        </div>
+       <div class="col-md-11">
+        <div [innerHTML]="asunto"></div>
+       </div>   
+    </div>    
+    <br *ngIf="mail != null">
+    <div *ngIf="mail != null" class="separador"></div>
+    <br *ngIf="mail != null">
+    <strong><div [innerHTML]="message"></div></strong>
+    <br *ngIf="mail != null"> 
+    <ckeditor [editor]="Editor" *ngIf="mail != null" [(ngModel)]="mail.body" (ready)="onReady($event)" style="border: 1px solid #ccc!important;"></ckeditor>
+</div>
+<div class="modal-footer">
+    <button type="button" ngbAutofocus class="btn btn-primary" >Enviar Notificación</button>
+</div>
