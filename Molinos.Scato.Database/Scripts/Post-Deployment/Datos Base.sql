@@ -1113,6 +1113,16 @@ END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
 
+--Motivos Fallas de Balanzas Adicionales
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCB' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Buque','BCB',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCP' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Puerto','BCP',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'E'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas eléctricas de equipos MOA','E',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'F'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Por fuleo de bodegas','F',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'M'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas mecanicas de equipos de MOA','M',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OP'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de puerto MOA','OP',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OC'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de MOA comercial','OC',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OB'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de buque','OB',0,1) END
+
 --Estados de documentos
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Solicitado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Solicitado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Enviado'); END

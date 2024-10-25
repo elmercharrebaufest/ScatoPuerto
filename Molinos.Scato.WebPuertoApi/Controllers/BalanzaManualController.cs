@@ -3,6 +3,7 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -43,9 +44,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicio.GuardarBalanzaManual(balanzasCortes, balanzasCortes.Usuario));
             }
-            catch
+            catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
         [HttpDelete]
@@ -57,9 +58,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicio.EliminarBalanzaManual(id, usuario));
             }
-            catch
+            catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
     }

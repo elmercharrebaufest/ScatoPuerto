@@ -106,6 +106,36 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 Repositorio.Agregar(senasaDB);
                             }
                         }
+
+
+
+                        var nominacion = Repositorio.Obtener<Nominacion>(x => x.Id == comando.nominacion_id); 
+                        if (nominacion.FechaEnvioLineUp !=null && nominacion.Embarque.Id > 0)
+                        {
+                            var embarque = Repositorio.Obtener<Embarque>(x => x.Id == nominacion.Embarque.Id);
+                            var lineUp = Repositorio.Obtener<LineUp>(x => x.Embarque.Id == embarque.Id);
+                            if (nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
+                            {
+                                var senasa = nominacion.NominacionDetalleIntervencion.Senasa.ElementAt(0);
+                                embarque.Senasa = senasa.TieneSenasa;
+                            }
+                            else
+                            {
+                                embarque.Senasa = false;
+                            }
+
+                            if (nominacionDetalleIntervencion.Fumigacion.ToUpper().Equals("SI"))
+                            {
+                                lineUp.PlanoDeCarga.Fumigacion = true;
+                                lineUp.PlanoDeCarga.EmpresaFumigadora = nominacionDetalleIntervencion.CompaniaDeFumigacion.Descripcion;
+                            }
+                            else
+                            {
+                                lineUp.PlanoDeCarga.Fumigacion = false;
+                                lineUp.PlanoDeCarga.EmpresaFumigadora = string.Empty;
+                            }
+                        }
+
                         Repositorio.GuardarCambios();
                     }
                     else

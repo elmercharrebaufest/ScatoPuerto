@@ -15,8 +15,9 @@ import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { forkJoin, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import { BalanzasManualService } from '../tableristas/balanzas-manual/balanzas-manual.service';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -77,19 +78,20 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
 
   public puedeEditar: boolean;
 
-  private suscripcionGuardadoGeneral: Subscription;
+  private destroy$ = new Subject();
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
     private _procesoGuardar: ProcesoGuardarService,
     private planoDeCargaService: PlanoDeCargaService,
     private moduloDecargaService: ModuloDeCargaService,
+    private balanzasManualService: BalanzasManualService,
     private confirmationDialogService: ConfirmationDialogService,
     private fb: FormBuilder,
     private session: SessionService
   ) {
     this.inicializarForm();
-    this.suscripcionGuardadoGeneral = this._procesoGuardar.sendGuardarCargas.subscribe(() => this.guardar(true));
+    this._procesoGuardar.sendGuardarCargas.pipe(takeUntil(this.destroy$)).subscribe(() => this.guardar(true));
   }
 
   ngOnInit(): void {
@@ -117,10 +119,22 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
 
       this.inicializarDatos();
     });
+
+    // Esto es para añadir los turnos que se creen al guardar un corte o baja carga
+    this.balanzasManualService.guardoCorteBajaCarga$.pipe(takeUntil(this.destroy$)).subscribe(async () => {
+      const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
+      const mod = await this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).pipe(take(1)).toPromise();
+      const planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
+      const turnosNuevos = planillasTurnos.filter(t => !this.planillasTurnos.map(pt => pt.id).includes(t.id));
+      this.cargarDatosEdicion(turnosNuevos, false);
+      this.planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
+      this._procesoService.setModuloDeCarga(mod);
+    });
   }
 
   ngOnDestroy(): void {
-    this.suscripcionGuardadoGeneral.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   private inicializarForm() {
@@ -147,7 +161,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     }
   }
 
-  private cargarDatosEdicion(turnos: PlanillaDeTurnos[]) {
+  private cargarDatosEdicion(turnos: PlanillaDeTurnos[], primeraCarga: boolean = true) {
     const fechasTurnos: { fecha: Date, turnos: PlanillaDeTurnos[] }[] = [];
     for (const turno of turnos) {
       turno.fecha = new Date(turno.fecha);
@@ -162,6 +176,10 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
 
     for (const fechaTurno of fechasTurnos) {
       this.agregarDiaDatos(fechaTurno.fecha, fechaTurno.turnos);
+    }
+
+    if (!primeraCarga) {
+      return;
     }
 
     for (let i = turnos.length; i < 4; i++) {
@@ -738,8 +756,19 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
   private agregarDiaDatos(fecha: Date, turnosDb: PlanillaDeTurnos[]) {
     const nTurno = turnosDb[0].turnoPuerto.orden;
     const turnos = this.construirTurnosFormArray(fecha, nTurno, turnosDb);
-    const diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
-    this.dias.push(diaForm);
+
+    const fechaTurno = new Date(turnosDb[0].fecha);
+    fechaTurno.setHours(0, 0, 0, 0);
+    let diaForm = this.dias.controls.find(d => (d.get('fecha').value as Date).getTime() == fechaTurno.getTime());
+    if (diaForm) {
+      const turnosDia = diaForm.get('turnos') as FormArray;
+      for (const t of turnos.controls) {
+        turnosDia.push(t)
+      }
+    } else {
+      diaForm = this.fb.group({ fecha, turnos, totalDia: 0, palaDia: 0 });
+      this.dias.push(diaForm);
+    }
   }
 
   public agregarFila(turnoForm: FormGroup) {

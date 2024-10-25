@@ -1,4 +1,4 @@
-﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Servicios;
 using System;

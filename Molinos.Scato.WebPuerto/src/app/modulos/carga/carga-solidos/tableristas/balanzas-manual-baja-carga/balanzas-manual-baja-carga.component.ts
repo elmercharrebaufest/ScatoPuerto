@@ -86,6 +86,11 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
 
   onGuardarModalCorteManual() {
     let balanzaManual: BalanzaManual = new BalanzaManual(this.bajaCargaForm.value);
+    let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
+    if (!validaFechasInicioFin){
+      this.confirmationDialogService.confirm('Baja carga', 'No se puede crear una baja carga cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
     if (validaFechas) {
       if (balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
@@ -131,6 +136,7 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
     this.materialesPuerto = [];
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == false);
+      this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
     });
     this.balanzasManualBajaCargaService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;

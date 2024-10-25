@@ -41,6 +41,8 @@ export class BalanzasManualService {
   { id: 3, descripcion: 'ControlCalidad' },
   { id: 4, descripcion: 'PostOperativo' }];
 
+  public guardoCorteBajaCarga$ = new Subject();
+
   constructor(private moduloDeCargaService: ModuloDeCargaService,
     private embarqueService: EmbarqueService,
     private planoDeCargaService: PlanoDeCargaService,
@@ -179,7 +181,7 @@ export class BalanzasManualService {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   }
-    
+
   cargarBodegasParcel(): BodegaParcel[] {
     this.bodegas = [];
     for (let index = 1; index < 10; index++) {
@@ -203,7 +205,7 @@ export class BalanzasManualService {
       exportador: x?.exportador ?? null,
       motivosFallasBalanza: x?.motivosFallasBalanza ?? 0,
       kilogramos: x?.kilogramos ?? 0,
-      toneladas: x?.kilogramos / 1000 ?? 0,
+      toneladas: x?.kilogramos ?  x?.kilogramos/ 1000 : 0,
       corteManual: x?.corteManual ?? esCorteManual,
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
@@ -284,7 +286,7 @@ export class BalanzasManualService {
 
   public validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
     let esRegistroValido: boolean = true;
-    let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id); 
+    let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id);
     if (filtroBalanzas!=null && filtroBalanzas.length > 0) {
       for (let index = 0; index < filtroBalanzas.length; index++) {
         const balanza = filtroBalanzas[index];
@@ -311,6 +313,16 @@ export class BalanzasManualService {
 
     return esFechaValida;
   }
+  public validarFechasInicioFin(fechaInicioIng,horaInicioIng, fechaFinIng,horaFinIng): boolean {
+    let esFechaValida: boolean = true;
+    const fechaInicio = this.convertirFecha(fechaInicioIng,horaInicioIng);
+    const fechaFin = this.convertirFecha(fechaFinIng,horaFinIng)
+    if (fechaInicio >=fechaFin)
+      esFechaValida = false;
+
+    return esFechaValida;
+  }
+  
   public convertirFecha(valorFecha: string, valorHora: string = null): Date {
     const fechaSplit = valorFecha.split('-');
     const anio = parseInt(fechaSplit[0]);
