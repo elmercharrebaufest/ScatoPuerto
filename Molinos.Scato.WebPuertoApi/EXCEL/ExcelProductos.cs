@@ -95,10 +95,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 {
                     foreach (CalidadProductoDto calidad in prod.Calidades)
                     {
-                        int offsetTipoC = Math.Max(0, calidad.Valores.Count - 1);
+                        int offsetTipoC = Math.Max(0, calidad.Valores.Count-1);
                         int rowFinTipoC = rowIni + offsetTipoC;
 
-                        CrearCelda(row, rowIni, rowFinTipoC, 7, 8, calidad.TipoCalidad, estiloTd, 1);
+                        IRow rowTc = _sheet.GetRow(rowIni) ?? _sheet.CreateRow(rowIni);
+                        CrearCelda(rowTc, rowIni, rowFinTipoC, 7, 8, calidad.TipoCalidad, estiloTd, 1);
 
                         foreach (ParametroValorDto valor in calidad.Valores)
                         {

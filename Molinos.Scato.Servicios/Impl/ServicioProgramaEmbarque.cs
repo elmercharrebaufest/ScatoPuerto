@@ -1232,7 +1232,8 @@ namespace Molinos.Scato.Servicios.Impl
                         from tc in tcGroup.DefaultIfEmpty()  // LEFT JOIN
                         join v in valores on tc.Id equals v.TipoDeCalidad.Id into vGroup
                         from v in vGroup.DefaultIfEmpty()
-                        where p.Activo && tc.Activo && v.Activo
+                        where p.Activo && (tc == null || tc.Activo) && (v == null || v.Activo) &&
+                        (p.Descripcion.ToLower().Contains(nombre.ToLower()) || nombre == null)
                         select new
                         {
                             p.Id,
