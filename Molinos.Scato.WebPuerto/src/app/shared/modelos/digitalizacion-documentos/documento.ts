@@ -28,10 +28,11 @@ export interface DocumentoMaterialPuerto {
 }
 
 export interface NominacionDocumentoArchivo {
-  id: string;
+  id: number;
   usuario: string;
   ubicacion: string;
   fechaSubida: string;
+  nombre: string;
 }
 
 export interface NominacionDocumentoComentario {
@@ -49,7 +50,7 @@ export interface NominacionDocumentoEstado {
 export interface NominacionDocumento {
   id: number;
   documento: Documento;
-  estado?: NominacionDocumentoEstado;
+  nominacionDocumentoEstado?: NominacionDocumentoEstado;
   archivos?: NominacionDocumentoArchivo[];
   comentarios?: NominacionDocumentoComentario[];
 }

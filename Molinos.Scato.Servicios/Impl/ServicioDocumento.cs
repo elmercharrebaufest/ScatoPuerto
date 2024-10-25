@@ -12,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -140,5 +141,60 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<DocumentoMaterialPuerto, DocumentoMaterialPuertoDto>(dm => idProducto == 0 || dm.MaterialPuerto.Id == idProducto);
         }
 
+        public IList<NominacionDocumentoDto> ListarDocumentosPorConfiguracion(int configuracionId)
+        {
+            return Listar<NominacionDocumento, NominacionDocumentoDto>(nd => nd.ConfiguracionDocumento.Id == configuracionId);
+        }
+
+        public NominacionDocumentoDto ObtenerNominacionDocumento(int id)
+        {
+            return Obtener<NominacionDocumento, NominacionDocumentoDto>(id);
+        }
+
+        public ArchivoDto ObtenerArchivo(int id)
+        {
+            var archivoDb = this._repositorio.Obtener<NominacionDocumentoArchivo>(id) ?? throw new Exception("No se encontró el archivo con el ID especificado");
+            return new ArchivoDto(archivoDb.Ubicacion);
+        }
+
+        public void EliminarArchivo(int id, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new EliminarDocumentoArchivo { Id = id, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void ActualizarEstado(int nomDocId, int estadoId, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new ActualizarNominacionDocumentoEstado { NomDocId = nomDocId, EstadoId = estadoId, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void CrearComentario(int nomDocId, string texto, string usuario)
+        {
+            try
+            {
+                var nomDoc = _repositorio.Obtener<NominacionDocumento>(nomDocId) ?? throw new Exception($"No se ha encontrado el id {nomDocId}");
+                var comentario = new NominacionDocumentoComentario
+                {
+                    Comentario = texto,
+                    NominacionDocumento = nomDoc,
+                    Fecha = DateTime.Now,
+                    Usuario = usuario
+                };
+                _repositorio.Agregar(comentario);
+                _repositorio.GuardarCambios();
+            }
+            catch (Exception e)
+            {
+                _log.Error("Error al crear comentario de documento {0}", e);
+                throw e;
+            }
+        }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Web;
 
 namespace Molinos.Scato.Servicios
 {
@@ -41,5 +41,23 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<DocumentoMaterialPuertoDto> ListarDocumentosProducto(int idProducto);
+
+        [OperationContract]
+        IList<NominacionDocumentoDto> ListarDocumentosPorConfiguracion(int configuracionId);
+
+        [OperationContract]
+        NominacionDocumentoDto ObtenerNominacionDocumento(int id);
+
+        [OperationContract]
+        ArchivoDto ObtenerArchivo(int id);
+
+        [OperationContract]
+        void EliminarArchivo(int id, string usuario);
+
+        [OperationContract]
+        void ActualizarEstado(int nomDocId, int estadoId, string usuario);
+
+        [OperationContract]
+        void CrearComentario(int nomDocId, string texto, string usuario);
     }
 }

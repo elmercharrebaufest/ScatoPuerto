@@ -5,11 +5,15 @@ import { SharedComponentModule } from 'app/shared/componentes/shared-components.
 import { DocumentosRoutingModule } from './documentos-routing.module';
 import { DocumentosComponent } from './documentos.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { AdministracionDocumentosComponent } from './administracion-documentos/administracion-documentos.component';
+import { AdjuntarDocumentosComponent } from './administracion-documentos/adjuntar-documentos/adjuntar-documentos.component';
+import { ModalComentariosComponent } from './administracion-documentos/adjuntar-documentos/modal-comentarios/modal-comentarios.component';
+import { ActualizarEstadoDocumentosComponent } from './administracion-documentos/actualizar-estado-documentos/actualizar-estado-documentos.component';
 
 
 
 @NgModule({
-  declarations: [DocumentosComponent],
+  declarations: [DocumentosComponent, AdministracionDocumentosComponent, AdjuntarDocumentosComponent, ModalComentariosComponent, ActualizarEstadoDocumentosComponent],
   imports: [
     CommonModule,
     SharedModule,

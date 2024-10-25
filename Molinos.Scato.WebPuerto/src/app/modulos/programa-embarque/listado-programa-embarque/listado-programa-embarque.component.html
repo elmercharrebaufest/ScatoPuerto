@@ -130,7 +130,7 @@
                         [ngStyle]="{ 'color': devolverColorEstado(historial.estado, historial.zarpo) }"
                         class="fa fa-duotone fa-circle">
                     </i>
-                    <i style="font-size: 12px;cursor:pointer; position: relative; color: rgb(216, 15, 15); visibility: hidden;"                        
+                    <i style="font-size: 12px;cursor:pointer; position: relative; color: rgb(216, 15, 15); visibility: hidden;"
                         class="fa fa-duotone fa-circle auditoriaCheck"
                         >
                     </i>
@@ -176,7 +176,7 @@
                             <strong>Nominar</strong>
                         </button>
                         <div class="dropdown-menu">
-                          
+
                           <!-- <ARMOA005-1658 Dylan Lopez> -->
                           <!-- <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.companiaFumigador, 'Fumigador')">Fumigador</a> -->
                           <!-- <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, historial.producto, historial.surveyor, 'Surveyor')">Surveyor</a> -->
@@ -191,7 +191,7 @@
                     </div>
                 </td>
                 <td class="noBorder centradoHorizontal">
-                    <img src="assets/clipboard_data.svg"
+                    <img *ngIf="tienePermisoDigitalizacion()" src="assets/clipboard_data.svg" (click)="onAdministrarDocumentosNominacion(historial.id)"
                     style="cursor: pointer; filter: grayscale(100%);">
                 </td>
                 <td class="noBorder centradoHorizontal">

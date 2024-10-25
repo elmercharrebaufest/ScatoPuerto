@@ -1,0 +1,57 @@
+<div class="container-fluid">
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <p class="ruta-title">Nominación > Documentos</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Documentos</h1>
+        </div>
+    </div>
+    <div class="bg-white p-3 mt-2">
+        <div class="row">
+            <!-- Buque -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="buque" class=""><strong>Buque:</strong></label>
+                    <input type="text" class="form-control" id="buque" placeholder="Buque" [(ngModel)]="buque"
+                        [readonly]="true">
+                </div>
+            </div>
+            <!-- Fecha de nominación -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="fechaNominacion"><strong>Fecha de nominación:</strong></label>
+                    <input type="text" class="form-control" id="fechaNominacion" placeholder="Fecha de registro"
+                        [(ngModel)]="fechaNominacion" [readonly]="true">
+                </div>
+            </div>
+            <!-- Producto -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="producto"><strong>Producto:</strong></label>
+                    <input type="text" class="form-control" id="producto" placeholder="Placeholder"
+                        [(ngModel)]="producto" [readonly]="true">
+                </div>
+            </div>
+            <!-- Destino -->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="destino"><strong>Destino/Cliente:</strong></label>
+                    <select class="form-control" id="configuracion" [(ngModel)]="configIdSeleccionada"
+                        (change)="onSeleccionarConfiguracion($event)">
+                        <option *ngFor="let config of configuraciones" [value]="config.id">{{
+                            config.destino?.nombre}}/{{config.coordinadorPuerto?.nombre }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-container *ngIf="tienePermisoVisualizarDocumentosMOC()">
+        <app-adjuntar-documentos></app-adjuntar-documentos>
+    </ng-container>
+    <ng-container *ngIf="tienePermisoVisualizarDocumentosComex()">
+        <app-actualizar-estado-documentos></app-actualizar-estado-documentos>
+    </ng-container>
+</div>
