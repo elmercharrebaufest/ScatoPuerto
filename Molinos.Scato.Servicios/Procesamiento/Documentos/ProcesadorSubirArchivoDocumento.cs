@@ -47,18 +47,32 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     if (archivo != null && archivo.Contenido.Length > 0)
                     {
-                        string rutaArchivo = this.ObtenerRutaArchivo(di, archivo.Nombre);
-                        File.WriteAllBytes(rutaArchivo, archivo.Contenido);
+                        NominacionDocumentoArchivo documentoArchivo;
+                        //string rutaArchivo = this.ObtenerRutaArchivo(di, archivo.Nombre);
+                        string rutaArchivo = Path.Combine(di.FullName, archivo.Nombre);
 
-                        var DocumentoArchivo = new NominacionDocumentoArchivo
+
+                        if (File.Exists(rutaArchivo))
                         {
-                            NominacionDocumento = nominacionDocumento,
-                            Nombre = rutaArchivo.Split('\\').Last(),
-                            Ubicacion = rutaArchivo,
-                            FechaSubida = DateTime.Now,
-                            Usuario = comando.Usuario ?? ""
-                        };
-                        Repositorio.Agregar(DocumentoArchivo);
+                            documentoArchivo = Repositorio.Obtener<NominacionDocumentoArchivo>(da => da.Ubicacion == rutaArchivo);
+                            documentoArchivo.FechaSubida = DateTime.Now;
+                            documentoArchivo.Usuario = comando.Usuario ?? "";
+                            File.Delete(rutaArchivo);
+                        }
+                        else
+                        {
+                            documentoArchivo = new NominacionDocumentoArchivo
+                            {
+                                NominacionDocumento = nominacionDocumento,
+                                Nombre = rutaArchivo.Split('\\').Last(),
+                                Ubicacion = rutaArchivo,
+                                FechaSubida = DateTime.Now,
+                                Usuario = comando.Usuario ?? ""
+                            };
+                            Repositorio.Agregar(documentoArchivo);
+                        }
+
+                        File.WriteAllBytes(rutaArchivo, archivo.Contenido);
                         Repositorio.GuardarCambios();
                     }
                 }
@@ -69,7 +83,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Usuario = comando.Usuario,
                     Fecha = DateTime.Now,
                     Evento = EventoABM.Alta,
-                    Entidad = di.FullName + " -> " + string.Join(", ", comando.Archivos.Select(a => a.Nombre).ToArray()),
+                    Entidad = di.FullName + "\\" + string.Join(", ", comando.Archivos.Select(a => a.Nombre).ToArray()),
                     ClaseId = comando.NominacionDocumentoId
                 };
                 Repositorio.Agregar(logABM);
@@ -83,22 +97,23 @@ namespace Molinos.Scato.Servicios.Procesamiento
             return resultado;
         }
 
-        private string ObtenerRutaArchivo(DirectoryInfo di, string nombreArchivo)
-        {
-            string extension = Path.GetExtension(nombreArchivo);
-            string nombreSinExtension = Path.GetFileNameWithoutExtension(nombreArchivo);
-            string rutaCompleta = Path.Combine(di.FullName, nombreArchivo);
+        //Éste método servía para renombrar los archivos en caso de que ya existieran
+        //private string ObtenerRutaArchivo(DirectoryInfo di, string nombreArchivo)
+        //{
+        //    string extension = Path.GetExtension(nombreArchivo);
+        //    string nombreSinExtension = Path.GetFileNameWithoutExtension(nombreArchivo);
+        //    string rutaCompleta = Path.Combine(di.FullName, nombreArchivo);
 
-            int count = 1;
+        //    int count = 1;
 
-            while (File.Exists(rutaCompleta))
-            {
-                string nombreArchivo2 = $"{nombreSinExtension} ({count}){extension}";
-                rutaCompleta = Path.Combine(di.FullName, nombreArchivo2);
-                count++;
-            }
+        //    while (File.Exists(rutaCompleta))
+        //    {
+        //        string nombreArchivo2 = $"{nombreSinExtension} ({count}){extension}";
+        //        rutaCompleta = Path.Combine(di.FullName, nombreArchivo2);
+        //        count++;
+        //    }
 
-            return rutaCompleta;
-        }
+        //    return rutaCompleta;
+        //}
     }
 }
