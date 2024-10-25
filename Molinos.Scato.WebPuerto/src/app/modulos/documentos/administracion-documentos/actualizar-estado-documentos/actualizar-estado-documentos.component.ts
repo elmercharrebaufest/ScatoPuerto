@@ -7,6 +7,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-actualizar-estado-documentos',
@@ -29,8 +30,10 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
   constructor(
     private documentosService: DocumentoService,
     private modalService: NgbModal,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private session: SessionService
   ) {
+    this.user = this.session.getUser();
     this.obtenerEstados();
   }
 

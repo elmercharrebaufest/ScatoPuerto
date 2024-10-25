@@ -6,6 +6,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { ConfiguracionDocumento } from '@ScatoModels/digitalizacion-documentos/documento';
 import { DocumentoService } from '@ScatoServicios/documento.service';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
+import { SessionService } from '@ScatoServicios/session.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -30,8 +31,10 @@ export class AdministracionDocumentosComponent implements OnInit {
   constructor(private nominacionService: NominacionService,
               private documentoService: DocumentoService,
               private route: ActivatedRoute,
-              private datePipe: DatePipe
+              private datePipe: DatePipe,
+              private session: SessionService
   ) { 
+    this.user = this.session.getUser();
   }
 
   ngOnInit(): void {

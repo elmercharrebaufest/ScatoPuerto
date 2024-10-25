@@ -6,6 +6,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { NominacionDocumento, NominacionDocumentoArchivo } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
+import { SessionService } from '@ScatoServicios/session.service';
 
 export interface ElementoNominacionDocumento {
   documento: NominacionDocumento,
@@ -34,8 +35,10 @@ export class AdjuntarDocumentosComponent implements OnInit {
   constructor(
     private documentosService: DocumentoService,
     private modalService: NgbModal,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private session: SessionService
   ) {
+    this.user = this.session.getUser();
   }
 
   ngOnInit(): void {
