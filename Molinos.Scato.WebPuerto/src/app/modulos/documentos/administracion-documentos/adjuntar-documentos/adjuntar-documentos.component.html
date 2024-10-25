@@ -30,8 +30,8 @@
                             (click)="onDesplegarArchivos(i)"></i>
                     </span>
                     <div class="document-actions">
-                        <img src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
-                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario)">
+                        <img *ngIf="tienePermisoCrearArchivo()" src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
+                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario, elemento.documento.id)">
                     </div>
                 </div>
                 <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
@@ -40,10 +40,10 @@
                             <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
                                 {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
                             <div class="document-actions">
-                                <i *ngIf="puedeVisualizarArchivo(archivo)" class="fa fa-eye icon-eye" aria-hidden="true"
+                                <i *ngIf="puedeVisualizarArchivo(archivo) && tienePermisoDescargarArchivo()" class="fa fa-eye icon-eye" aria-hidden="true"
                                     (click)="onVisualizarArchivo(archivo)"></i>
-                                <img src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
-                                <img src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
+                                <img *ngIf="tienePermisoDescargarArchivo()" src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
+                                <img *ngIf="tienePermisoEliminarArchivo()" src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
                             </div>
                         </div>
                     </li>
@@ -65,5 +65,5 @@
 </div>
 
 <ng-template #addComentario let-modal>
-    <app-modal-comentarios (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
+    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
 </ng-template>

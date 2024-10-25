@@ -13,7 +13,7 @@ export class ModalComentariosComponent implements OnInit {
 
   @Input() id: number = 0;
   public comentarios: NominacionDocumentoComentario[] = [];
-  public texto: string = null;
+  public texto: string = '';
   public nombreDocumento: string = null;
 
   constructor(
@@ -37,8 +37,13 @@ export class ModalComentariosComponent implements OnInit {
   }
 
   public onAgregarComentario() {
+    if(this.texto == '' || this.texto == null){
+      this.mostrarError("Debe ingresar un comentario.");
+      return;
+    }
     this.documentosService.agregarComentario(this.id, this.texto).subscribe((data: any) => {
       this.obtenerComentariosDocumentosNominacion();
+      this.texto = '';
     }, (error: Error) => {
       console.error(error);
       this.mostrarError("Hubo un error al intentar agregar el comentario.");

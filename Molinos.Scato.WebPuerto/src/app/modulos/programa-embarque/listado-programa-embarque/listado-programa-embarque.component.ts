@@ -300,4 +300,8 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     this.route.navigate([`documentos/administracion/${nominacionId}`]);
   }
 
+  public tienePermisoDigitalizacion(){
+    return this.user.permisos.find(p => p === this.permisosScato.Digitalizacion_Visualizar);
+  }
+
 }
