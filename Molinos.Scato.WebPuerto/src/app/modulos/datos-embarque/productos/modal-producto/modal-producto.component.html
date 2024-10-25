@@ -1,5 +1,5 @@
 <div class='modal-header'>
-  <h4 class="modal-title">Alta de Producto</h4>
+  <h4 class="modal-title">{{titulo}}</h4>
 </div>
 <div class='modal-body '>
   <form [formGroup]="formProducto">
@@ -28,16 +28,16 @@
         <div class="row margen">
           <div class="col-md-4">
             <label for="descripcion" class="form-label">Descripción Producto:</label>
-            <input type="text" class="form-control" id="descripcion" formControlName="descripcion"
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion" maxlength="100"
               [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcion').invalid && formProducto.get('materialPuerto.descripcion').touched}">
           </div>
           <div class="col-md-4">
             <label for="descripcionCorta" class="form-label">Desc. Corta Producto:</label>
-            <input type="text" class="form-control" id="descripcionCorta" formControlName="descripcionCorta"
+            <input type="text" class="form-control" id="descripcionCorta" formControlName="descripcionCorta" maxlength="50"
               [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCorta').invalid && formProducto.get('materialPuerto.descripcionCorta').touched}">
           </div>
           <div class="col-md-4">
-            <div>
+            <div [ngClass]="{'input-error': formProducto.get('materialPuerto.esLiquido').invalid && formProducto.get('materialPuerto.esLiquido').touched}">
               <div class="form-check">
                 <input class="form-check-input" type="radio" formControlName="esLiquido" name="esLiquido" id="opcion1"
                   [value]="true" (click)="onChangeLiquidoSolido(true)">
@@ -58,7 +58,7 @@
         <div class="row margen">
           <div class="col-md-4">
             <label for="descripcionCortaIngles" class="form-label">Desc. Corta Producto en inglés:</label>
-            <input type="text" class="form-control" id="descripcionCortaIngles" formControlName="descripcionCortaIngles"
+            <input type="text" class="form-control" id="descripcionCortaIngles" formControlName="descripcionCortaIngles" maxlength="100"
               [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCortaIngles').invalid && formProducto.get('materialPuerto.descripcionCortaIngles').touched}">
           </div>
           <div class="col-md-4">
