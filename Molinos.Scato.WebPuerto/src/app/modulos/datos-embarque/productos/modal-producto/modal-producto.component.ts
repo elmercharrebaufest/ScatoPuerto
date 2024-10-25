@@ -337,6 +337,13 @@ export class ModalProductoComponent implements OnInit {
   }
 
   public guardar() {
+
+    this.formProducto.markAllAsTouched();
+    if (this.formProducto.invalid) {
+      this.mostrarError("¡Atención! Por favor verifique los campos marcados en rojo.");
+      return;
+    }
+
     if (this.hayTipoDeCalidadRepetida()) {
       this.mostrarError("¡Atención! No se puede usar la misma descripción para distintos tipos de calidad.");
       return;
