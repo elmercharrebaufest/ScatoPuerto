@@ -1,0 +1,87 @@
+.tab-menu {
+  text-decoration: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.action-btn:hover {
+  color: #1C7CD5;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.tab-seleccionado {
+  border-bottom: solid 2px #1C7CD5;
+  color: #1C7CD5;
+  box-sizing: border-box;
+}
+
+img {
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.document-container {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.document-header {
+  background-color: #e7f1ff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.document-header-item {
+  width: 50%;
+}
+
+.document-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+.document-item {
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+  background-color: white;
+  color: #4D60A8;
+}
+
+.document-item li {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+.document-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.document-actions img {
+  margin-left: 10px;
+}
+
+.icon-eye {
+  color: #999999;
+  cursor: pointer;
+}
+
+i {
+  cursor: pointer;
+}

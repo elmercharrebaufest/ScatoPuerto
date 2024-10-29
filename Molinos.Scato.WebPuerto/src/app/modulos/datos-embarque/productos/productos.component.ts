@@ -127,12 +127,12 @@ export class ProductosComponent implements OnInit {
     });
   }
 
-  public onEliminarProducto(id: number) {
+  public onEliminarProducto(producto: MaterialPuerto) {
     try {
-      this.confirmationDialogService.confirm('Eliminar Producto', `¿Esta seguro de querer eliminar el producto?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Eliminar Producto', `¿Esta seguro de querer eliminar el producto: ${producto.descripcion}?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
           if (confirmed) {
-            this.productosService.EliminarProducto(id).subscribe(res => {
+            this.productosService.EliminarProducto(producto.id).subscribe(res => {
               this.modalService.dismissAll();
               this.onBuscar();
               this.confirmationDialogService.exito('Eliminado con éxito.');
@@ -165,6 +165,10 @@ export class ProductosComponent implements OnInit {
 
   tienePermisoCrearProducto() {
     return this.user.permisos.find(p => p === this.permisosScato.Productos_Crear);
+  }
+
+  public refrescarListado(){
+    this.onBuscar();
   }
 
 }

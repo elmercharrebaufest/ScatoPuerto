@@ -1,0 +1,37 @@
+.texto-estado {
+    margin-bottom: 0px !important;
+}
+.radio-box-estado{
+    transform: scale(1.7);
+}
+.centrar-contenido {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+.custom-with-dropdown .multiselect-dropdown .dropdown-btn {
+    display: inline-block!important;
+    width: 100%!important;
+    padding: 6px 12px!important;
+    margin-bottom: 0!important;
+    font-size: 12px !important;
+    font-weight: 400!important;
+    line-height: 1.1 !important;
+    border: 1px solid blue !important;
+    text-align: left!important;
+    vertical-align: middle!important;
+    cursor: pointer!important;
+    background-image: none!important;
+    border-radius: 4px!important;
+}
+.margenes-administracion{
+    margin-top: 10px;
+    margin-left: 10px;
+    padding-left: 5px;
+    padding-right: 40px;
+}
+.cursor-pointer-button{
+    cursor: pointer;
+}

@@ -1,21 +1,21 @@
 <div class='modal-header'>
-  <h4 class="modal-title">Alta de Producto</h4>
+  <h4 class="modal-title">{{titulo}}</h4>
 </div>
 <div class='modal-body '>
   <form [formGroup]="formProducto">
     <ul class="nav nav-tabs" id="tabproductos" role="tablist">
-      <li class="nav-item">
+      <li class="nav-item" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'info-gral'}">
         <button class="nav-link active" id="info-gral" data-bs-toggle="tab" data-bs-target="#info-gral" type="button"
           role="tab" aria-controls="info-gral" aria-selected="false" (click)="onSelectTab('info-gral')">Información
           general
         </button>
       </li>
-      <li class="nav-item">
+      <li class="nav-item" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'calidad'}">
         <button class="nav-link active" id="calidad-tab" data-bs-toggle="tab" data-bs-target="#calidad" type="button"
           role="tab" aria-controls="calidad" aria-selected="false" (click)="onSelectTab('calidad')">Calidad
         </button>
       </li>
-      <li class="nav-item">
+      <li class="nav-item" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'documentos'}">
         <button class="nav-link active" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos"
           type="button" role="tab" aria-controls="documentos" aria-selected="false"
           (click)="onSelectTab('documentos')">Documentos
@@ -28,16 +28,16 @@
         <div class="row margen">
           <div class="col-md-4">
             <label for="descripcion" class="form-label">Descripción Producto:</label>
-            <input type="text" class="form-control" id="descripcion" formControlName="descripcion"
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion" maxlength="100"
               [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcion').invalid && formProducto.get('materialPuerto.descripcion').touched}">
           </div>
           <div class="col-md-4">
             <label for="descripcionCorta" class="form-label">Desc. Corta Producto:</label>
-            <input type="text" class="form-control" id="descripcionCorta" formControlName="descripcionCorta"
-              [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCorta').invalid && formProducto.get('materialPuerto.descripcionCorta').touched && formProducto.get('materialPuerto.descripcionCorta').dirty}">
+            <input type="text" class="form-control" id="descripcionCorta" formControlName="descripcionCorta" maxlength="50"
+              [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCorta').invalid && formProducto.get('materialPuerto.descripcionCorta').touched}">
           </div>
           <div class="col-md-4">
-            <div>
+            <div [ngClass]="{'input-error': formProducto.get('materialPuerto.esLiquido').invalid && formProducto.get('materialPuerto.esLiquido').touched}">
               <div class="form-check">
                 <input class="form-check-input" type="radio" formControlName="esLiquido" name="esLiquido" id="opcion1"
                   [value]="true" (click)="onChangeLiquidoSolido(true)">
@@ -58,7 +58,7 @@
         <div class="row margen">
           <div class="col-md-4">
             <label for="descripcionCortaIngles" class="form-label">Desc. Corta Producto en inglés:</label>
-            <input type="text" class="form-control" id="descripcionCortaIngles" formControlName="descripcionCortaIngles"
+            <input type="text" class="form-control" id="descripcionCortaIngles" formControlName="descripcionCortaIngles" maxlength="100"
               [ngClass]="{'input-error': formProducto.get('materialPuerto.descripcionCortaIngles').invalid && formProducto.get('materialPuerto.descripcionCortaIngles').touched}">
           </div>
           <div class="col-md-4">

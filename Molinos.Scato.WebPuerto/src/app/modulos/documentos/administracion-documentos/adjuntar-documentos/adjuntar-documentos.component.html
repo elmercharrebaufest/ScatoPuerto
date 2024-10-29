@@ -1,0 +1,69 @@
+<div class="container-fluid mt-2 p-0">
+    <div class="container-fluid bg-white p-2 mb-2">
+        <div class="row">
+            <div class="col text-center"
+                [ngClass]="{'tab-seleccionado': tabSeleccionado == 'A solicitar en la nominación'}">
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('A solicitar en la nominación')">Documentación
+                    de
+                    Embarque</a>
+            </div>
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'A compartir'}">
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('A compartir')">Documentos Compartidos</a>
+            </div>
+            <div class="col text-center" [ngClass]="{'tab-seleccionado': tabSeleccionado == 'Interno'}">
+                <a class="nav-link tab-menu" (click)="onSeleccionarTipo('Interno')">Documentos Internos</a>
+            </div>
+        </div>
+    </div>
+    <div class="document-container">
+        <div class="document-header">
+            <span class="document-header-item">Documento</span>
+            <span class="document-header-item" style="text-align: right;">Acciones</span>
+        </div>
+        <ul class="document-list">
+            <li *ngFor="let elemento of elementos; let i = index" class="document-item">
+                <div class="document-content">
+                    <span>{{ elemento.documento.documento.nombre }} &nbsp;
+                        <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up"
+                            (click)="onDesplegarArchivos(i)"></i>
+                        <i *ngIf="!elemento.mostrarArchivos" class="fas fa-chevron-down"
+                            (click)="onDesplegarArchivos(i)"></i>
+                    </span>
+                    <div class="document-actions">
+                        <img *ngIf="tienePermisoCrearArchivo()" src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
+                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario, elemento.documento.id)">
+                    </div>
+                </div>
+                <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
+                    <li *ngFor="let archivo of elemento.documento.archivos">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                            <div class="document-actions">
+                                <i *ngIf="puedeVisualizarArchivo(archivo) && tienePermisoDescargarArchivo()" class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo)"></i>
+                                <img *ngIf="tienePermisoDescargarArchivo()" src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
+                                <img *ngIf="tienePermisoEliminarArchivo()" src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
+                            </div>
+                        </div>
+                    </li>
+                    <li *ngIf="elemento?.documento?.archivos?.length ==0">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span>No hay archivos para este documento.</span>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li *ngIf="configuracionId == 0 || elementos.length == 0"
+                style="background-color: white; text-align: center;">
+                <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
+            </li>
+        </ul>
+    </div>
+    <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
+        accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
+</div>
+
+<ng-template #addComentario let-modal>
+    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
+</ng-template>

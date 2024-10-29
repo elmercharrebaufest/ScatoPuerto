@@ -63,3 +63,8 @@ th {
     color: black;
     opacity: 1;
 }
+
+.tab-seleccionado {
+    border-bottom: solid 3px #1C7CD5;
+    color: #1C7CD5;
+  }

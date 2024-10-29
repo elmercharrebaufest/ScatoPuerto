@@ -296,4 +296,15 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onAdministrarDocumentosNominacion(nominacionId: number) {
+    this.route.navigate([`documentos/administracion/${nominacionId}`]);
+  }
+
+  public tienePermisoDigitalizacion(){
+    return this.user.permisos.find(p => p === this.permisosScato.Digitalizacion_Visualizar);
+  }
+
+  public onAdministrarDocumentosEstados(nominacionId: number) {
+    this.route.navigate([`documentos/administracion/estado-documento/${nominacionId}`]);
+  }
 }

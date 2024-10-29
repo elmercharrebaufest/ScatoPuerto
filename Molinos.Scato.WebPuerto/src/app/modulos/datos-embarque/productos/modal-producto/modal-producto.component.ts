@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Documento } from '@ScatoModels/digitalizacion-documentos/documento';
@@ -22,6 +22,7 @@ export class ModalProductoComponent implements OnInit {
   @ViewChild('colorPicker') colorPicker!: ElementRef;
 
   @Input() id: number = 0;
+  @Output() refrescarListado = new EventEmitter();
   indiceTc: number = 0;
   formProducto: FormGroup;
   formCalidad: FormGroup;
@@ -29,7 +30,7 @@ export class ModalProductoComponent implements OnInit {
   tabSeleccionado: string = "info-gral";
   errorExisteProducto: string = "La descripción ingresada ya existe en otro producto.";
   errorProductoEnUso: string = "No puede modificar el estado liquido/solido del producto, porque él mismo esta utilizándose en una nominación/embarque.";
-
+  titulo: string = "Alta de Producto";
   constructor(
     private readonly fb: FormBuilder,
     private readonly modalService: NgbModal,
@@ -44,6 +45,7 @@ export class ModalProductoComponent implements OnInit {
   ngOnInit(): void {
     if (this.id > 0) {
       this.inicializarFormEdicion();
+      this.titulo = "Edición de Producto";
     }
   }
 
@@ -59,7 +61,7 @@ export class ModalProductoComponent implements OnInit {
         descripcionCortaIngles: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(100)]],
         almacenId: [''],
         almacenDesc: [''],
-        esLiquido: [false, [Validators.required]],
+        esLiquido: [null, [Validators.required]],
         color: ['', [Validators.required, Validators.pattern('^#([A-Fa-f0-9]{6})$'), Validators.maxLength(7)]],
         activo: [true]
       }),
@@ -337,6 +339,13 @@ export class ModalProductoComponent implements OnInit {
   }
 
   public guardar() {
+
+    this.formProducto.markAllAsTouched();
+    if (this.formProducto.invalid) {
+      this.mostrarError("¡Atención! Por favor verifique los campos marcados en rojo.");
+      return;
+    }
+
     if (this.hayTipoDeCalidadRepetida()) {
       this.mostrarError("¡Atención! No se puede usar la misma descripción para distintos tipos de calidad.");
       return;
@@ -365,6 +374,7 @@ export class ModalProductoComponent implements OnInit {
       this.productosService.CrearProducto(this.formProducto.value).subscribe(res => {
         this.modalService.dismissAll();
         this.confirmationDialogService.exito('Guardado con éxito.');
+        this.refrescarListado.emit(true);
       }, (error: any) => {
         const msj = error.error == this.errorExisteProducto ? this.errorExisteProducto : "Hubo un error al intentar guardar el producto.";
         console.error('Error al enviar el formulario', msj);
@@ -383,6 +393,7 @@ export class ModalProductoComponent implements OnInit {
       this.productosService.EditarProducto(this.formProducto.value).subscribe(res => {
         this.modalService.dismissAll();
         this.confirmationDialogService.exito('Guardado con éxito.');
+        this.refrescarListado.emit(true);
       }, (error: any) => {
         const msj = (error.error == this.errorExisteProducto || error.error == this.errorProductoEnUso) ? error.error : "Hubo un error al intentar editar el producto.";
         console.error('Error al enviar el formulario', msj);

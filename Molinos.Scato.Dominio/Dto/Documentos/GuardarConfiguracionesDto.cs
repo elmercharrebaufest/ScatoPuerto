@@ -8,7 +8,7 @@ namespace Molinos.Scato.Dominio.Dto
 {
     public class GuardarConfiguracionesDto
     {
-        public int nominacionId { get; set; }
-        public List<ConfiguracionDocumentoDto> configuraciones { get; set; }
+        public int NominacionId { get; set; }
+        public List<ConfiguracionDocumentoDto> Configuraciones { get; set; }
     }
 }

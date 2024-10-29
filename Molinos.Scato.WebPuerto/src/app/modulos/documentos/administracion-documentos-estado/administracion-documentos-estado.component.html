@@ -1,0 +1,27 @@
+<br />
+<div class="margenes-administracion">
+  <div class="form">
+    <div class="row">
+
+      <div class="col-4">
+        <button class="btn btn-outline-secondary cursor-pointer-button" (click)="onRegresarNominacion()">
+          Volver </button>
+      </div>
+      <div class="col-4">
+      </div>
+      <div class="col-4"></div>
+    </div>
+  </div>
+  <br /><br />
+  <!-- TITULO -->
+  <div class="form">
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Estado de Documentación</h2>
+      </div>
+    </div>
+  </div>
+  <br />
+</div>
+
+<app-administracion-documentos-estado-listado *ngIf="nominacionId > 0"></app-administracion-documentos-estado-listado>

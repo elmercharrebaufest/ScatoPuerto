@@ -1,0 +1,78 @@
+<div class="container-fluid mt-2 p-0">
+    <div class="container-fluid bg-white">
+        <div class="row header">
+            <div class="col-3 titulo">DOCUMENTOS</div>
+            <div class="col-6 titulo">ESTADO DE DOCUMENTACIÓN</div>
+            <div class="col-3 titulo">ACCIONES</div>
+        </div>
+        <div class="row header subrayado">
+            <div class="col-3"></div>
+            <div class="col-6">
+                <span class="col-estado">Borrador<br>Solicitado</span>
+                <span class="col-estado">Borrador<br>Enviado</span>
+                <span class="col-estado">Borrador<br>Modificado</span>
+                <span class="col-estado">Borrador<br>Aprobado</span>
+                <span class="col-estado">Documento<br>Enviado</span>
+            </div>
+            <div class="col-3"></div>
+        </div>
+    </div>
+    <div class="document-container">
+        <ul class="document-list">
+            <li *ngFor="let elemento of elementos; let i = index" class="document-item">
+                <div class="document-content">
+                    <span>{{ elemento.documento.documento.nombre }} &nbsp;
+                        <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up"
+                            (click)="onDesplegarArchivos(i)"></i>
+                        <i *ngIf="!elemento.mostrarArchivos" class="fas fa-chevron-down"
+                            (click)="onDesplegarArchivos(i)"></i>
+                    </span>
+                    <div style="text-align: center;">
+                        <span *ngFor="let estado of estados" class="estado-radio">
+                            <input type="radio" 
+                                   name="radio-{{elemento.documento.documento.id}}" 
+                                   [disabled]="onDeshabilitarEstado(estado.id, elemento.documento.nominacionDocumentoEstado.id)"
+                                   [value]="estado.estado" 
+                                   [(ngModel)]="elemento.documento.nominacionDocumentoEstado.estado" 
+                                   [checked]="estado.estado === elemento.documento.nominacionDocumentoEstado.estado"
+                                   (change)="onActualizarEstado(elemento.documento.id, estado.id)">
+                        </span>
+                    </div>
+                    <div class="document-actions">
+                        <img *ngIf="tienePermisoCrearArchivo()" src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
+                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario, elemento.documento.id)">
+                    </div>
+                </div>
+                <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
+                    <li *ngFor="let archivo of elemento.documento.archivos">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                            <div class="document-actions">
+                                <i *ngIf="puedeVisualizarArchivo(archivo) && tienePermisoDescargarArchivo()" class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo)"></i>
+                                <img *ngIf="tienePermisoDescargarArchivo()" src="assets/file_arrow_down.svg" (click)="onDescargarArchivo(archivo)">
+                                <img *ngIf="tienePermisoEliminarArchivo()" src="assets/trash_file.svg" (click)="onBorrarArchivo(archivo.id)">
+                            </div>
+                        </div>
+                    </li>
+                    <li *ngIf="elemento?.documento?.archivos?.length ==0">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span>No hay archivos para este documento.</span>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li *ngIf="configuracionId == 0 || elementos.length == 0"
+                style="background-color: white; text-align: center;">
+                <span>No existen documentos configurados para el destino/cliente seleccionado.</span>
+            </li>
+        </ul>
+    </div>
+    <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
+        accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
+</div>
+
+<ng-template #addComentario let-modal>
+    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
+</ng-template>

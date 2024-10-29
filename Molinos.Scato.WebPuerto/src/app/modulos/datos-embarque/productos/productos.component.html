@@ -51,7 +51,7 @@
                                     <i class="fa fa-pencil fs-icon text-warning icono-edit" aria-hidden="true"
                                         title="MODIFICAR"></i>
                                 </button>
-                                <button *ngIf="tienePermisoEliminarProducto()" class="btn" (click)="onEliminarProducto(producto.id)">
+                                <button *ngIf="tienePermisoEliminarProducto()" class="btn" (click)="onEliminarProducto(producto)">
                                     <i class="fa fa-trash-o fs-icon text-danger" aria-hidden="true"
                                         title="ELIMINAR"></i>
                                 </button>
@@ -70,5 +70,5 @@
 </div>
 
 <ng-template #modalProducto let-modal>
-    <app-modal-producto [id]="id"></app-modal-producto>
+    <app-modal-producto [id]="id" (refrescarListado)="refrescarListado($event)"></app-modal-producto>
 </ng-template>
