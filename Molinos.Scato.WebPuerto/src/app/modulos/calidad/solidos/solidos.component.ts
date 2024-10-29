@@ -29,6 +29,9 @@ import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
+import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
+import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
+import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
 // </ ARMOA005-1421 Dylan Lopez>
 
 @Component({
@@ -55,12 +58,15 @@ export class SolidosComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   errorMessage: boolean = false;
-  fechaAmarro: Date=new Date();
-  horaAmarro: string='';
-  fechaDesamarro: Date=new Date();
-  horaDesamarro: string='';
+  fechaAmarro: Date = new Date();
+  horaAmarro: string = '';
+  fechaDesamarro: Date = new Date();
+  horaDesamarro: string = '';
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
-  
+  ingresoManualSolido: boolean = false;
+  turnosCerradosSolido: boolean = false;
+  moduloDeCarga: ModuloDeCarga =null;
+  turnosModuloDeCarga: TurnosCerrados = null;
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -75,9 +81,10 @@ export class SolidosComponent implements OnInit {
     private session: SessionService,
     // <ARMOA005-1421 Dylan Lopez>
     private workflowService: WorkflowService,
-    private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
+    private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
+    private balanzasRitmosService: BalanzasRitmosService
     // </ ARMOA005-1421 Dylan Lopez>
-    ) {
+  ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
 
@@ -120,14 +127,8 @@ export class SolidosComponent implements OnInit {
       this.celdasManoDeEmbarque = res2;
       this._changeDetector.detectChanges();
 
-      if (this.embarqueSelected.moduloDeCargaId) this.cargarModuloCarga();
-
-      // TODO: Evangelino - Se asigna el Modulo de carga para cargar los ritmo de carga
-      this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
-      this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
-      this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
-      this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
-      this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
+      if (this.embarqueSelected.moduloDeCargaId)
+        this.cargarModuloCarga();
     });
 
     this.hideSpinner.emit(false);
@@ -145,24 +146,45 @@ export class SolidosComponent implements OnInit {
     this.cargarHorasDesamarro(this.amarreForm);
     this.errorMessage = false;
     this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
-
   }
 
+  recargarModuloDeCarga(event:any){
+    if (event)
+      this.cargarModuloCarga();
+  }
 
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
+        this.turnosModuloDeCarga = {
+          turnosCerrados : false,
+          todosTurnosCerrados: false,
+          cargaFinalizada : false
+        };
+        this.moduloDeCarga = res;
         this.enviado = res.enviado;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
+        this.ingresoManualSolido = res.ingresoManualSolido;
+        if (res.moduloDeCargaPlanillaDeTurnos.length > 0){
+          let turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == true);
+          if (turnos != null && turnos.length > 0)
+            this.turnosModuloDeCarga.turnosCerrados = true;
+          turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == false);
+          if (turnos == null || turnos.length == 0)
+            this.turnosModuloDeCarga.todosTurnosCerrados = true;
+        }
+
         if (res.moduloDeCargaPeriodoDeCarga.length > 0) {
           this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
           this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
           this.horaAmarro = res.moduloDeCargaPeriodoDeCarga[0].horaAmarro;
           this.fechaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].fechaDesamarro;
           this.horaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].horaDesamarro;
+          this.turnosModuloDeCarga.cargaFinalizada = res.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga!=null? true : false;
         }
+        this.balanzasRitmosService.TurnosCalidad = this.turnosModuloDeCarga;
         if (res.moduloDeCargaElementoGrafico) {
           this.graficoCarga.agregarElementosGraficos(res.moduloDeCargaElementoGrafico);
         }
@@ -172,6 +194,13 @@ export class SolidosComponent implements OnInit {
         }
         if (res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
+        }
+        if (!res.ingresoManualSolido) {
+          this.balanzas78Service.setEmbarqueBalanzaCalidad(this.embarqueSelected.moduloDeCargaId);
+          this.balanzas78Service.setBalanzadaAgrupada7(this.balanzas78Service.getBalanzada7());
+          this.balanzas78Service.setBalanzadaAgrupada8(this.balanzas78Service.getBalanzada8());
+          this.balanzas78Service.setBalanzada7Kilos(this.balanzas78Service.getBalanzada7());
+          this.balanzas78Service.setBalanzada8Kilos(this.balanzas78Service.getBalanzada8());
         }
       });
   }
@@ -187,52 +216,56 @@ export class SolidosComponent implements OnInit {
     let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     this.ocultarCamposEnPDFListas(ocultarBotones, "none");
 
-
+    const scroll = document.getElementById('scrollbar-planilla-recibidores-solido');
+    scroll.classList.add('scrollbar-planilla-recibidores-solido-imprimir');
 
     this.RecibidoresPdf = true;
 
 
     let element = document.getElementById('imprimirRecibidoresSolido');
     let opt = {
-      margin:       [0.3, 0],
-      filename:     'Pantalla Recibidores',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 3, letterRendering: true},                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
+      margin: [0.3, 0],
+      filename: 'Pantalla Recibidores',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 3, letterRendering: true },                         //IMPRIMO PANTALLA DE SOLIDOS USANDO LIBRERIA HTML2PDF, SETEANDO
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
       pagebreak: { after: '.page-break' }
     };
 
 
     let ele = Array.from(document.getElementsByClassName('break'));
 
-   // html2pdf().from(element).set(opt).outputPdf()
-     // .then(() => {
-       // if (!imprimir) this.RecibidoresPdf = false
-      //}).save();
+    // html2pdf().from(element).set(opt).outputPdf()
+    // .then(() => {
+    // if (!imprimir) this.RecibidoresPdf = false
+    //}).save();
 
-      let html = html2pdf()
+    let html = html2pdf()
       .set(opt)
       .from(ele[0]);
 
-      if (ele.length > 1) {
-        html = html.toPdf();
-        ele.slice(1).forEach((ele, index) => {
-          html = html
-            .get('pdf')
-            .then(pdf => {
-              pdf.addPage()
-            })
-            .from(ele)
-            .toContainer()
-            .toCanvas()
-            .toPdf()
-        })
-      }
+    if (ele.length > 1) {
+      html = html.toPdf();
+      ele.slice(1).forEach((ele, index) => {
+        html = html
+          .get('pdf')
+          .then(pdf => {
+            pdf.addPage()
+          })
+          .from(ele)
+          .toContainer()
+          .toCanvas()
+          .toPdf()
+      })
+    }
 
-      html = html.then(() => {
-        if (!imprimir) this.RecibidoresPdf = false
-        this.ocultarCamposEnPDFListas(ocultarBotones, "block");
-     }).save();
+    html = html.then(() => {
+      if (!imprimir) {
+        this.RecibidoresPdf = false;
+      }
+      this.ocultarCamposEnPDFListas(ocultarBotones, "block");
+      scroll.classList.remove('scrollbar-planilla-recibidores-solido-imprimir');
+    }).save();
     // #endregion
   }
 
@@ -257,12 +290,12 @@ export class SolidosComponent implements OnInit {
   }
 
   async guardarAmarre() {
-    if(
+    if (
       (this.amarreForm.value.fechaAmarro == '' || this.amarreForm.value.fechaAmarro == null || this.amarreForm.value.fechaAmarro == undefined) ||
       (this.amarreForm.value.fechaDesamarro == '' || this.amarreForm.value.fechaDesamarro == null || this.amarreForm.value.fechaDesamarro == undefined)
-    ){
-    this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
-    return false;
+    ) {
+      this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+      return false;
     }
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
@@ -290,13 +323,11 @@ export class SolidosComponent implements OnInit {
 
   // <ARMOA005-1421 Dylan Lopez>
   cargarLineUp = async () => {
-    // console.log(' cargarLineUp()');
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
     this.listadoEmbarques = listadoEmbarques;
   }
 
-  guardarHistoricoEmbarqueLineUp = async (embarqueId: number) =>{
-    // console.log(' guardarHistoricoEmbarqueLineUp()');
+  guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
     try {
       // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
       this.listadoEmbarques.forEach((embarquePuerto) => {
@@ -329,7 +360,7 @@ export class SolidosComponent implements OnInit {
           lineUpId: lineUpDto.id,
           embarqueId: embarqueId
         };
-        
+
         let materiales = '';
         embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
           if (planoDeCargaBodega.materialPuerto) {
@@ -352,7 +383,7 @@ export class SolidosComponent implements OnInit {
   }
 
   extraeNombre(objeto): string {
-    return objeto != null ? objeto?.nombre?.toString(): '';
+    return objeto != null ? objeto?.nombre?.toString() : '';
   }
   // </ ARMOA005-1421 Dylan Lopez>
 
@@ -367,7 +398,7 @@ export class SolidosComponent implements OnInit {
 
     this.amarreForm.patchValue(amarre);
   }
-  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string){
+  private ocultarCamposEnPDFListas(selector, ocultarMostrar: string) {
     if (selector != null) {
       for (let i = 0; i < selector.length; i++) {
         selector[i].style.display = ocultarMostrar;

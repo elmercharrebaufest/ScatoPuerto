@@ -9,6 +9,7 @@
     [GuardadoPorTablerista]                           BIT NOT NULL default 0,
     [GuardadoPorRecibidor]                           BIT NOT NULL default 0,
     [EsLiquido]                         BIT NOT NULL default 1,
+    [FechaCierreTurno] DATETIME NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnos] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnos_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade,
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnos_dbo.TurnoPuerto_TurnoPuerto_Id] FOREIGN KEY ([TurnoPuerto_Id]) REFERENCES [dbo].[TurnoPuerto] ([Id]),

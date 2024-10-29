@@ -14,10 +14,13 @@ namespace Molinos.Scato.Dominio.Dto
         public bool GuardadoPorTablerista { get; set; }
         public bool GuardadoPorRecibidor { get; set; }
         public bool EsLiquido { get; set; }
-        public IList<ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto> ModuloDeCargaPlanillaDeTurnosDetallesLiquido { get; set; }
+		public virtual DateTime? FechaCierreTurno { get; set; }
+
+		public IList<ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto> ModuloDeCargaPlanillaDeTurnosDetallesLiquido { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto> ModuloDeCargaPlanillaDeTurnosDetallesSolido { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosCortesDto> ModuloDeCargaPlanillaDeTurnosCortes { get; set; }
         public IList<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad { get; set; }
         //public ObservacionesDeCalidadDto ObservacionesDeCalidadDto { get; set; }
+        public IList<ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadDto> ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad { get; set; }
     }
 }

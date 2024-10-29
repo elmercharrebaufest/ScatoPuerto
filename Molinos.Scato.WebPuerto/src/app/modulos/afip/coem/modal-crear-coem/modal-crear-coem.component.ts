@@ -66,6 +66,7 @@ export class ModalCrearCoemComponent implements OnInit {
   }
 
   private cargarDatos() {
+    // console.log('cargarDatos');
     const obtenerCoem: Observable<COEM> = this.operacionNuevo ? of(null) : this.coemAfipService.obtenerCoemId(this.id);
     this.mensajeCarga = 'Cargando datos';
     this.cargando = true;
@@ -85,7 +86,11 @@ export class ModalCrearCoemComponent implements OnInit {
         control.disable();
       }
 
-      this.codigoEmbalajeGranel = embalajes.find(e => e.descripcion == 'A GRANEL').codigo;
+      // console.log(' embalajes: ', embalajes);
+      if (embalajes != null && embalajes.length > 0)
+      {
+        this.codigoEmbalajeGranel = embalajes?.find(e => e.descripcion == 'A GRANEL').codigo;
+      }
 
       if (coem) {
         this.setValoresFormEditar(coem);

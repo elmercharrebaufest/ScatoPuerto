@@ -129,6 +129,8 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'Nominacione
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZarpo') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('EmbarqueZarpo', 'ariel.pedrozo@molinosagro.com.ar; federico.romano@molinosagro.com.ar') END
 GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AvisoLecturaProgramaEmbarque') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('AvisoLecturaProgramaEmbarque', 'macarena.asqueri@molinosagro.com.ar; romina.escudero@molinosagro.com.ar') END
+GO
 
 -- Puntos de Interes para geolocalizacion.
 if not exists(select 1 from PuntosInteresGeolocalizacion where Latitud = '-35.61958  ' and Longitud='-55.88947') BEGIN insert into PuntosInteresGeolocalizacion (Nombre, TipoUbicacion, Imagen,Puerto, Pais, HorasSanBenito, Latitud, Longitud, DistanciaKM, TipoZona, AgrupadorZona, PosicionZona, RadioPunto, Estado, FechaRegistro) values('Recalada','Fondeadero','ancla','','AR','30','-35.61958  ','-55.88947',5,'','','',15000,1,getdate()) END
@@ -1054,5 +1056,41 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Destinos_Eliminar'); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Destinos_Eliminar')); END
+if exists(select 1 from ModuloDeCarga where IngresoManualSolido is null) BEGIN update ModuloDeCarga set IngresoManualSolido = 0 where IngresoManualSolido is null END
 
 UPDATE LineUp SET Ocultar = 0 WHERE Ocultar IS NULL
+
+--Silos y Celdas
+IF (SELECT COUNT(*) FROM SiloCelda) = 0 BEGIN
+    INSERT INTO SiloCelda (Nombre, Color) 
+	VALUES	('SILO 31', '#ccc0da'),
+			('SILO 32', '#92cddc'),
+			('Camiones', '#f33954'),
+			('Silos Logística / Celda 29', '#948a54'),
+			('CELDA 7', '#ffcc99'),
+			('CELDA 20', '#ccffcc'),
+			('CELDA 23', '#ffff99'),
+			('CELDA 30', '#e6b8b7')
+END
+
+-- Permisos Supervisor Operaciones
+DECLARE @IdGrupoSupervisor INT = (SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD = 'LAD_MOAAPP_PUERTO_OPERADORES_SUPERVISORES')
+DECLARE @IdRolSupervisor INT = (SELECT Id FROM ADPuertoRoles WHERE NombreRol = 'Supervisores')
+IF NOT EXISTS (SELECT 1 FROM ADPuertoGruposRoles WHERE Id_Grupo = @IdGrupoSupervisor AND Id_Rol = @IdRolSupervisor) BEGIN
+    INSERT INTO ADPuertoGruposRoles (Id_Grupo, Id_Rol) VALUES (@IdGrupoSupervisor, @IdRolSupervisor)
+END
+IF NOT EXISTS (SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'TableroSolido_EditarCargaHistorial') BEGIN
+    INSERT INTO ADPuertoPermisos (NombrePermiso) VALUES ('TableroSolido_EditarCargaHistorial')
+END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
+
+--Motivos Fallas de Balanzas Adicionales
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCB' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Buque','BCB',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCP' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Puerto','BCP',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'E'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas eléctricas de equipos MOA','E',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'F'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Por fuleo de bodegas','F',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'M'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas mecanicas de equipos de MOA','M',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OP'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de puerto MOA','OP',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OC'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de MOA comercial','OC',0,1) END
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OB'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de buque','OB',0,1) END

@@ -93,6 +93,7 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
   mostrarInfoBalanzadasEnCurso: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+  formData = new FormData();
 
   constructor(private _modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -1072,16 +1073,14 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
 
       //set downloadable file name
       let fname = "Balanzas_7y8"
-
       //add data and file name and download
       workbook.xlsx.writeBuffer().then((data) => {
         let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        // fs.saveAs(blob, fname + '-' + new Date().valueOf() + '.xlsx');
         saveAs(blob, fname + '-' + new Date().valueOf() + '.xlsx');
       });
     } catch (e) {
+      console.log("Error al exportar Planillas");
       console.log(e);
-      // console.log("Error al exportar Planillas");
       this.confirmationDialogService.confirm('¡Atención!', 'Se produjo un error al exportar la planilla.', 'Aceptar', '', null, null, Tipoalerta.Error)
         .then((confirmed) => {
           if (confirmed) 

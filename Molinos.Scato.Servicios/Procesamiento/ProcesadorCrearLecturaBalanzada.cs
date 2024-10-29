@@ -106,7 +106,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         if (fin != null)
                         {
                             fin.CargaOpuesta = carga;
-                            var balanzadasModificadas = Repositorio.EjecutarComando(new AsignarBalanzadas(id, numeroBalanza, id, fin.Id));
+                            var balanzadasModificadas = Repositorio.EjecutarComando(new AsignarBalanzadas(id, numeroBalanza, fin.Id));
                             EnviarASap(balanzadasModificadas);
                         }
                         else
@@ -116,7 +116,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             {
                                 //si la siguienteCarga es un fin y no er3a el fin de este inicio, se perdió otro inicio en el medio.
                                 //en ese caso preferimos no hacer nada
-                                var balanzadasModificadas = Repositorio.EjecutarComando(new AsignarBalanzadas(id, numeroBalanza, id, siguienteCarga != null ? siguienteCarga.Id : -1));
+                                var balanzadasModificadas = Repositorio.EjecutarComando(new AsignarBalanzadas(id, numeroBalanza, siguienteCarga != null ? siguienteCarga.Id : -1));
                                 EnviarASap(balanzadasModificadas);
                             }
                         }

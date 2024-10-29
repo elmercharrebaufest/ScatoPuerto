@@ -6,11 +6,12 @@ import { RouterModule } from "@angular/router";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { CalendarModule } from "angular-calendar";
 import { PlanoContentComponent } from "app/modulos/lineup/plano-de-carga/plano-content/plano-content.component";
-import { SidebarModule } from "ng-sidebar";
+import { SidebarModule } from "ng-sidebar";ConfirmationDialogComponent
 import { TagInputModule } from "ngx-chips";
 import { NgxMaterialTimepickerModule } from "ngx-material-timepicker";
 import { PerfectScrollbarModule } from "ngx-perfect-scrollbar";
 import { AlertComponent } from "./alert/alert.component";
+
 import { CollapseButtonComponent } from "./collapse-button/collapse-button.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { EstadosPuertoContentComponent } from "./estados-puerto/estados-puerto-content.component";
@@ -33,6 +34,8 @@ import { ModalCrearBuqueComponent } from "./modal-crear-buque/modal-crear-buque.
 import { RelojBalanzasComponent } from "./modulos/carga/reloj-balanzas/reloj-balanzas.component";
 import { AltaBajaMantenimientoComponent } from './alta-baja-mantenimiento/alta-baja-mantenimiento.component';
 import { NotificacionesComponent } from "./notificaciones/notificaciones.component";
+import { RitmoEmbarqueBalanzaComponent } from "./ritmo-embarque-balanza/ritmo-embarque-balanza.component";
+import { SemaforoRitmoEmbarqueComponent } from "./semaforo-ritmo-embarque/semaforo-ritmo-embarque.component";
 import { EnvioMailDialogComponent } from "./envio-mail-dialog/envio-mail-dialog.component";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
@@ -42,6 +45,7 @@ import { EditarCrearClienteComponent } from './editar-crear-cliente/editar-crear
 import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cliente.component';
 import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modificar-agenciamaritima-ata.component";
 import { EditarCrearCargadorComponent } from './editar-crear-cargador/editar-crear-cargador.component';
+import { RitmoEmbarqueCargaManualComponent } from './ritmo-embarque-carga-manual/ritmo-embarque-carga-manual.component';
 
 const components = [
     AlertComponent,
@@ -65,12 +69,15 @@ const components = [
     EditarCrearBuquesComponent,
     AltaBajaMantenimientoComponent,
     NotificacionesComponent,
+    RitmoEmbarqueBalanzaComponent,
+    SemaforoRitmoEmbarqueComponent,
     EnvioMailDialogComponent,
     ModalCrearBuqueComponent,
     EditarCrearClienteComponent,
     ModalCrearClienteComponent,
     ModalModificarAgenciasMaritimasAtaComponent,
     EditarCrearCargadorComponent,
+    RitmoEmbarqueCargaManualComponent,
 ]
 const libs = [
     CommonModule,
@@ -97,7 +104,7 @@ const libs = [
     ],
     declarations: [
         components,
-        IniciarSesionComponent,
+        IniciarSesionComponent
     ],
     exports: [
         components,

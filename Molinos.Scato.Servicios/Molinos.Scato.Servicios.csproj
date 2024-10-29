@@ -179,6 +179,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CargaComercialHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CeldaManoDeEmbarqueMappingProfile.cs" />
@@ -302,6 +303,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ReglaDeAnalisisObligatorioMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SenasaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SentidoManoDeEmbarqueMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\SiloCeldaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\SurveyorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TasaDeCargaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoArchivoPuertoMappingProfile.cs" />
@@ -371,6 +373,15 @@
     <Compile Include="Enumeradores\EstadosCoemAFIP.cs" />
     <Compile Include="Enumeradores\EstadosSolicitudesAFIP.cs" />
     <Compile Include="Enumeradores\ServiciosAFIP.cs" />
+    <Compile Include="Estrategias\DTO\BalanzadaRecibidaDTO.cs" />
+    <Compile Include="Estrategias\Implementacion\BalanzadaContext.cs" />
+    <Compile Include="Estrategias\Implementacion\BalanzadaErrorStrategy.cs" />
+    <Compile Include="Estrategias\Implementacion\BalanzadaFinStrategy.cs" />
+    <Compile Include="Estrategias\Implementacion\BalanzadaInicioStrategy.cs" />
+    <Compile Include="Estrategias\Implementacion\BalanzadaStrategy.cs" />
+    <Compile Include="Estrategias\Interface\IBalanzadaContext.cs" />
+    <Compile Include="Estrategias\Interface\IBalanzadaStrategy.cs" />
+    <Compile Include="Enumeradores\TipoLog.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
     <Compile Include="IFirmware.cs" />
@@ -380,9 +391,14 @@
     <Compile Include="Impl\AdministradorDeCalles.cs" />
     <Compile Include="IAccesoAFIP.cs" />
     <Compile Include="IComunicacionEmbarqueServicioHelper.cs" />
+    <Compile Include="Impl\Balanzada\ServicioCarga.cs" />
+    <Compile Include="Impl\Balanzada\ServicioTurno.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
+    <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
+    <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
+    <Compile Include="Interfaces\Balanzada\IServicioTurno.cs" />
     <Compile Include="IServicioAfip.cs" />
     <Compile Include="Impl\ServicioAfip.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
@@ -602,6 +618,7 @@
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNominacionDetalleIntervencion.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNominacionDatoTecnico.cs" />
+    <Compile Include="Procesamiento\ProcesadorGuardarPlanillaCargaManualSolidos.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarPlanillaDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarAsignacionDeCalle.cs" />
     <Compile Include="Procesamiento\ProcesadorAutomatizacionEtapas.cs" />
@@ -1157,6 +1174,9 @@
     <Compile Include="Procesamiento\ProcesadorModificarValorCalado.cs" />
     <Compile Include="Procesamiento\ProcesadorSuscribirEventos.cs" />
     <Compile Include="Procesamiento\Respuesta.cs" />
+    <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarBalanzasCortes.cs" />
+    <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarCombosFechasYTurnos.cs" />
+    <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarRitmosBrutos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\ServicioRepositorio.cs" />
     <Compile Include="IServicioComandos.cs" />

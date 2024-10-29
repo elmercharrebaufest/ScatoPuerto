@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'environments/environment';
 import { EstadoPuerto } from '@ScatoModels/estado-puerto';
 import { Mail } from '@ScatoModels/mail';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { LineUp } from '@ScatoModels/lineUp';
+import { EmbarqueRitmosLineup } from '@ScatoModels/embarque-ritmos-lineup';
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +16,22 @@ export class LineupService {
   url: string = environment.apiUrl;
   private recargarListado = new Subject<any>();
   dataRecargarListado$ = this.recargarListado.asObservable();
-  
+  private _actualizarRitmos: BehaviorSubject<EmbarqueRitmosLineup> = new BehaviorSubject<EmbarqueRitmosLineup>(null);
+
   constructor(private http: HttpClient) {
+  }
+
+  set actualizarRitmos(value: any){
+    this._actualizarRitmos.next(value);
+  }
+  get actualizarRitmos(){
+    return this._actualizarRitmos.asObservable();
   }
 
   sendRecargarListado(data: any) {
     this.recargarListado.next(data);
   }
+
   modificarOrdenLineUp(dcnIdsYOrden: any) {
     return this.http.post(`${this.url}LineUp/ModificarOrden`, dcnIdsYOrden, { 'withCredentials': true });
   }
@@ -51,7 +61,6 @@ export class LineupService {
   modificarEstadosPuerto(estadoPuerto: EstadoPuerto) {
     return this.http.post(`${this.url}LineUp/ModificarEstadosPuerto`, estadoPuerto, { 'withCredentials': true });
   }
-
   ocultarEmbarqueLineUp(lineUpId: number) {
     return this.http.post(`${this.url}LineUp/OcultarEmbarqueLineUp?lineUpId=` + lineUpId, { 'withCredentials': true });
   }

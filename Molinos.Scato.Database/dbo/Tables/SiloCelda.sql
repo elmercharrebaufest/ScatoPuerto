@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[SiloCelda]
+(
+	[Id] INT NOT NULL IDENTITY (1, 1),
+	[Nombre] NVARCHAR(50) NOT NULL,
+	[Color] NVARCHAR(50) NOT NULL,
+	CONSTRAINT [PK_dbo.SiloCelda] PRIMARY KEY CLUSTERED ([Id] ASC)
+)

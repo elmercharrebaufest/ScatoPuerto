@@ -125,7 +125,7 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
   }
 
   estadoSanBenito() {
-    let msje = `Buque #1 ${this.buqueSanBenito?.embarque.nombreBuque} / CARGANDO`
+    let msje = `Buque #${this.buqueSanBenito?.posicion} ${this.buqueSanBenito?.embarque.nombreBuque} / CARGANDO`
     return this.buqueSanBenito ? msje : "No hay ningún barco operando";
   }
   estadoVicentin() {

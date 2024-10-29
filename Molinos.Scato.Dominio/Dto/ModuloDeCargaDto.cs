@@ -14,7 +14,7 @@ namespace Molinos.Scato.Dominio.Dto
             public string Usuario { get; set; }
             public DateTime? FechaDeFinalizacion { get; set; }
             public string UsuarioFinalizacion { get; set; }
-        
+            public bool IngresoManualSolido { get; set; }
             // SÓLIDO //
                 public IList<ModuloDeCargaElementoGraficoDto> ModuloDeCargaElementoGrafico { get; set; }
                 public IList<ModuloDeCargaManosDeEmbarqueDto> ModuloDeCargaManosDeEmbarque { get; set; }

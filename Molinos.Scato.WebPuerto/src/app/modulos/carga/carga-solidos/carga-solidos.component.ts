@@ -32,6 +32,9 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
+import { FinalizacionCargaComponent } from './tableristas/finalizacion-carga/finalizacion-carga.component';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -47,6 +50,8 @@ export class CargaSolidosComponent implements OnInit {
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(NIRComponent) nirComponent: NIRComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
+  @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
+  @ViewChild(FinalizacionCargaComponent) finalizacionCargaComponent: FinalizacionCargaComponent;
 
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
@@ -58,6 +63,12 @@ export class CargaSolidosComponent implements OnInit {
   adjunto: any;
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
+    // <ARMOA005-1988 Dylan Lopez>
+  finalizacionCarga: boolean = false;
+    // </ ARMOA005-1988 Dylan Lopez>
+  ingresoManualSolido: boolean = false;
+  existeFechasPeriodoDeCarga: boolean = false;
+  moduloDeCarga = null;
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -136,15 +147,16 @@ export class CargaSolidosComponent implements OnInit {
     let { celda, sentido } = item;
     this.graficoCarga.agregarManoDeEmbarque(celda, sentido);
   }
-
+  recargarPeriodoDeCarga(event){
+    if (event)
+      this.cargarModuloCarga();
+  }
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
-
-        console.log('obtenerModuloDeCarga: ', res);
-
-
+        this.moduloDeCarga = res;
         this.enviado = res.enviado;
+        this.ingresoManualSolido = res.ingresoManualSolido;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
@@ -158,12 +170,15 @@ export class CargaSolidosComponent implements OnInit {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
         if (res.moduloDeCargaUmap.length > 0) {
-          console.log('this.manosComponent-->>', this.manosComponent)
-
-          console.log('this.umapComponent-->>', this.umapComponent)
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+          let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
+
+          if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null &&
+              moduloDeCargaPeriodoDeCarga.horaComienzoCarga !=null){
+            this.existeFechasPeriodoDeCarga = true;
+          }
           this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
@@ -171,14 +186,14 @@ export class CargaSolidosComponent implements OnInit {
 
   imprimir(imprimir: boolean = false, finalizado?: boolean){
 
+    this.cargaPdf = true;
+
     this.ocultarBotonesImpresion();
 
     if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
-      document.getElementById('balanza7-scroll').classList.remove('max-5vh');
-      document.getElementById('balanza8-scroll').classList.remove('max-5vh');
+      document.getElementById('divBalanza7').classList.remove('max-5vh');
+      document.getElementById('divBalanza8').classList.remove('max-5vh');
     }
-
-    this.cargaPdf = true;
 
     let element = document.getElementById('imprimirCargaSolidos');
     let opt = {
@@ -215,8 +230,8 @@ export class CargaSolidosComponent implements OnInit {
     if (!imprimir){
       this.cargaPdf = false;
       if ( this.mostrarTableristaOperando == true && this.inicioCarga == true) {
-          document.getElementById('balanza7-scroll').classList.add('max-5vh');
-          document.getElementById('balanza8-scroll').classList.add('max-5vh');
+          document.getElementById('divBalanza7').classList.add('max-5vh');
+          document.getElementById('divBalanza8').classList.add('max-5vh');
       }
       this.terminaImprimir = true;
     }
@@ -225,28 +240,24 @@ export class CargaSolidosComponent implements OnInit {
   ocultarBotonesImpresion(){
     let valueBotonTerminarYExportarPLanillasSolidos = '';
     let botonCorteManualBalanzasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementsByName('ocultarImpresionTableristaSolido') : null;
-    let botonTerminarYExportarPLanillasSolidos = this.mostrarTableristaOperando == true && this.inicioCarga == true ? document.getElementById('btn-terminar-exportar-planillas') : null;
-    if(botonTerminarYExportarPLanillasSolidos != null) valueBotonTerminarYExportarPLanillasSolidos = botonTerminarYExportarPLanillasSolidos.style.display;
-    if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
     if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'none');
     let ocultarBotones = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     let ocultarCollapse= this.elem.nativeElement.querySelectorAll(".ocultarCollapse");
     let mostrarPdf= this.elem.nativeElement.querySelectorAll(".mostrarPdf");
-    this.ocultarCamposEnPDFListas(ocultarBotones, "none");
-    this.ocultarCamposEnPDFListas(ocultarCollapse, "none");
+    this.ocultarExportacion(ocultarBotones);
+    this.ocultarExportacion(ocultarCollapse);
     this.ocultarCamposEnPDFListas(mostrarPdf, "block");
-    //
-    //
+    this.ajustarOverflowExportacion();
+
     setTimeout(() => {
       if(this.mostrarTableristaOperando == true && this.inicioCarga == true) {
         if(botonCorteManualBalanzasSolidos != null) botonCorteManualBalanzasSolidos.forEach(btns => btns.style.display = 'block');
-        if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = valueBotonTerminarYExportarPLanillasSolidos;
       }
 
-      if(botonTerminarYExportarPLanillasSolidos != null) botonTerminarYExportarPLanillasSolidos.style.display = 'none';
-      this.ocultarCamposEnPDFListas(ocultarBotones, "block");
-      this.ocultarCamposEnPDFListas(ocultarCollapse, "block");
+      this.restaurarExportacion(ocultarBotones);
+      this.restaurarExportacion(ocultarCollapse);
       this.ocultarCamposEnPDFListas(mostrarPdf, "none");
+      this.restaurarOverflowPdf();
     },6500);
   }
 
@@ -271,7 +282,7 @@ export class CargaSolidosComponent implements OnInit {
     }
   }
 
-  guardarContinuacion(finalizar: boolean) {
+  async guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
       this.enviado = finalizar;
 
@@ -286,46 +297,59 @@ export class CargaSolidosComponent implements OnInit {
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
       this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
 
-    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
+    this.actualizarFechaInicioFinCarga(moduloCarga);
+
+    try {
+      await this.moduloCargaService.guardarModuloDeCarga(moduloCarga).pipe(take(1)).toPromise();
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
-      if (finalizar)
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {
-            this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
-            this.cambiarEstado();
-            this.imprimir(true, finalizar)},
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
-      else {
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {},
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload());
-
-        this.cargaPdf = false;
+      let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
+      if (!ok) {
+        return;
       }
-
-    });
+      if (this.ingresoManualSolido && this.inicioCarga) {
+        this._procesoGuardar.sendGuardarCargas.emit();
+        ok = await this._procesoGuardar.cargasManualesOk.pipe(take(1)).toPromise();
+        if (!ok) {
+          return;
+        }
+      }
+      await this.confirmationDialogService.exito('Ha cargado con éxito el modulo de Carga', '¡Felicitaciones!');
+      if (finalizar) {
+        this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+        this.cambiarEstado();
+        this.imprimir(true, finalizar);
+      }
+      else {
+        this.cargaPdf = false;
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   modificarEstadoBuque(estado: string){
     let estadoBuque = this.estadosBuque.find( e => e.descripcion.includes(estado));
     this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe( res => {
-      console.log(res);
-
       let texto = "Se envió a Tableristas correctamente";
       this.mostrarTableristaOperando = true;
       this.cargarModuloCarga();
-
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
     } );
   }
 
   obtenerInicioCarga(inicioCarga){
+    console.log('entroooo obtenerInicioCarga');
     this.inicioCarga = inicioCarga;
+    this.cargarModuloCarga();
   }
+
+  // <ARMOA005-1988 Dylan Lopez>
+  obtenerFinalizacionCarga(finalizacionCarga){
+    this.finalizacionCarga = finalizacionCarga;
+    this.cargarModuloCarga();
+  }
+  // </ ARMOA005-1988 Dylan Lopez>
 
   enviarMail() {
     var titulo = "Enviar carga por mail";
@@ -361,7 +385,6 @@ export class CargaSolidosComponent implements OnInit {
           this.hideSpinner.emit(false);
       })
       .catch(() => {
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
         this.hideSpinner.emit(false);
       });
   }
@@ -405,6 +428,51 @@ export class CargaSolidosComponent implements OnInit {
       for (let i = 0; i < selector.length; i++) {
         selector[i].style.display = ocultarMostrar;
       }
+    }
+  }
+
+  private ocultarExportacion(elementos: HTMLElement[]) {
+    for (const elemento of elementos) {
+      elemento.classList.add('d-none');
+    }
+  }
+
+  private restaurarExportacion(elementos: HTMLElement[]) {
+    for (const elemento of elementos) {
+      elemento.classList.remove('d-none');
+    }
+  }
+
+  private ajustarOverflowExportacion() {
+    const elements: HTMLElement[] = this.elem.nativeElement.querySelectorAll('.overflow-pdf');
+    for (const element of elements) {
+      element.classList.add('overflow-pdf-exportar');
+    }
+
+    const contenedores: HTMLElement[] = this.elem.nativeElement.querySelectorAll('.tabla-cargas-container');
+    for (const contenedor of contenedores) {
+      contenedor.classList.add('carga-exportar');
+    }
+  }
+
+  private restaurarOverflowPdf() {
+    const elements: HTMLElement[] = this.elem.nativeElement.querySelectorAll('.overflow-pdf');
+    for (const element of elements) {
+      element.classList.remove('overflow-pdf-exportar');
+    }
+
+    const contenedores: HTMLElement[] = this.elem.nativeElement.querySelectorAll('.tabla-cargas-container');
+    for (const contenedor of contenedores) {
+      contenedor.classList.remove('carga-exportar');
+    }
+  }
+
+  actualizarFechaInicioFinCarga(modulo: ModuloDeCarga) {
+    if (modulo.moduloDeCargaPeriodoDeCarga != null && modulo.moduloDeCargaPeriodoDeCarga.length == 1) {
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.inicioCargaComponent.obtenerFechaInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.inicioCargaComponent.obtenerHoraInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.finalizacionCargaComponent.obtenerFechaFinCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.finalizacionCargaComponent.obtenerHoraFinCarga();
     }
   }
 }

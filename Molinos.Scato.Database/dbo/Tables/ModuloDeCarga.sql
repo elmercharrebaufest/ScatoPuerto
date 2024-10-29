@@ -4,10 +4,11 @@
     [Cargado]               BIT NOT NULL default 0,
     [FechaDeCreacion]       DATETIME NULL,
     [FechaDeModificacion]   DATETIME NULL,
-    [Usuario]               NVARCHAR(40) NULL,
+    [Usuario]               NVARCHAR(500) NULL,
     [FechaDeFinalizacion]   DATETIME NULL,
-    [UsuarioFinalizacion]   NVARCHAR(40) NULL,
+    [UsuarioFinalizacion]   NVARCHAR(500) NULL,
     [Enviado]               BIT NOT NULL default 0,
     [IniciarCarga]          BIT NOT NULL default 0,
+    [IngresoManualSolido] BIT NULL DEFAULT 0, 
     CONSTRAINT [PK_dbo.ModuloDeCarga] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

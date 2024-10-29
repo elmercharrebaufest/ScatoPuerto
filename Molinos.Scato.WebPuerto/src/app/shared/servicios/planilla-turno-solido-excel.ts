@@ -7,6 +7,7 @@ import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 import { ConfirmationDialogService } from './confirmation-dialog.service';
 import { ModuloDeCargaService } from './modulo-de-carga.service';
+import { EnvioMailDialogService } from './envio-mail-dialog.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +17,7 @@ export class PlanillaTurnoSolidoExcelService {
     constructor(
         private moduloCargaService: ModuloDeCargaService,
         private confirmationDialogService: ConfirmationDialogService,
-
+        private envioDialogService: EnvioMailDialogService,
       ) {
     }
 
@@ -299,44 +300,50 @@ export class PlanillaTurnoSolidoExcelService {
 
     }
 
-    private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number) {
-        const titulo = "Enviar Planilla de Turno Sólido";
-        const textoCuerpoMail = `Se enviara la planilla de turnos. \n
-            Buque: ${nombreBuque}`;
-        const inputTitle = "Destinatarios";
-        const mail = new Mail(`Planilla de turnos Solido - ${nombreBuque}`, `${textoCuerpoMail}`);
-        this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosSolido').subscribe(x => mail.destinatarios = x);
+  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: string, cortesOcultos: number[]) {
+    const titulo = "Enviar Planilla de Turno Sólido";
+    const asunto = "Turno " + ultimoTurno + " - " + nombreBuque + " - MUELLE SAN BENITO"
+    let mail = new Mail();
+    this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga, cortesOcultos).subscribe((resp: Mail) => {
+      mail.body = resp.body;
+      mail.destinatarios = resp.destinatarios;
+      mail.copia = resp.copia;
+      mail.titulo = asunto;
+    }, (err) => {
+      console.error(err);
+      const confirmError = this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error al intentar enviar el email.', 'Cerrar', '', null, null, Tipoalerta.Error);
+      if (confirmError)
+        return;
+    });
 
-        const confirm = await this.confirmationDialogService.confirm(titulo, 'Cuerpo del Mail:', 'Enviar', 'Cancelar', 'lg', mail, null, inputTitle, true);
-        if (!confirm) {
-            return;
-        }
-
-        const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
-            const reader = new FileReader;
-            reader.onerror = reject;
-            reader.onload = () => {
-                resolve(reader.result);
-            };
-            reader.readAsDataURL(blob);
-        });
-
-        const base64String = await convertBlobToBase64(blob);
-        this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
-            this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
-        }, (err) => {
-            console.error(err);
-            this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error a enviar el email', 'Cerrar', '', null, null, Tipoalerta.Error);
-        });
+    const confirm = await this.envioDialogService.confirm(titulo, 'Cuerpo del Mail:', asunto, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+    if (!confirm) {
+      return;
     }
 
+    const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
+      const reader = new FileReader;
+      reader.onerror = reject;
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(blob);
+    });
 
-    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean = false, totalABordo: number = 0, verObservacionesCalidad: boolean = true) {
+    const base64String = await convertBlobToBase64(blob);
+    this.moduloCargaService.enviarPlanillaTurnoSolido(idModuloDeCarga, mail, base64String).subscribe(resp => {
+      this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
+    }, (err) => {
+      console.error(err);
+      this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error a enviar el email', 'Cerrar', '', null, null, Tipoalerta.Error);
+    });
+  }
+
+
+    async generarExcelPorParcel(procesoService, planillaDeTurnosSinFiltrar, esEnviarPlanilla: boolean = false, totalABordo: number = 0, verObservacionesCalidad: boolean = true, cortesOcultos: number[]) {
       const planillaDeTurnos = planillaDeTurnosSinFiltrar.filter(x=> x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
-
-        planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-          turno.moduloDeCargaPlanillaDeTurnosCortes = [];
-        });
+      
+      this.eliminarCortesOcultos(planillaDeTurnos, cortesOcultos);
 
         const fname = this.getNombreArchivo();
         const imgMolinos = await this.getImgMolinos();
@@ -505,7 +512,8 @@ export class PlanillaTurnoSolidoExcelService {
           const archivo = fname + '.xlsx'
           const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           if (esEnviarPlanilla){
-             this.enviarPlanillaSolido(blob, procesoService.getEmbarqueSelected().nombreBuque,procesoService.getModuloDeCargaId())
+            const ultimoTurno = planillaDeTurnos[0].turnoPuerto.nombre.toString().replace("-", " a ");;
+             this.enviarPlanillaSolido(blob, procesoService.getEmbarqueSelected().nombreBuque, procesoService.getModuloDeCargaId(), ultimoTurno, cortesOcultos)
           }else{
              saveAs(blob, archivo);
           }
@@ -517,6 +525,12 @@ export class PlanillaTurnoSolidoExcelService {
       const anioTurno = fechaDia.getFullYear();
       const fechaTurno = `${diaTurno}-${mesTurno}-${anioTurno}`;
       return fechaTurno;
+    }
+
+    private eliminarCortesOcultos(planillaDeTurnos: PlanillaDeTurnos[], ids: number[]){
+      planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
+       turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(t => !ids.includes(t.id));
+      });
     }
 
 }

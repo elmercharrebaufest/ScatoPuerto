@@ -1,0 +1,329 @@
+<div class="page-break"></div>
+<div class="bg-white shadow mt-4 p-4">
+  <h4 class='colorTitle py-4' style="margin-bottom: -2px;">Planilla Embarque de Sólidos</h4>
+  <div [ngClass]="{'solo-lectura': !puedeEditar}">
+    <div class="silos-celdas-container">
+      <button *ngFor="let siloCelda of silosCeldas" [style.background]="siloCelda.color"
+        (click)="seleccionarSiloCelda(siloCelda)">
+        {{siloCelda.nombre}}
+      </button>
+    </div>
+    <div class="destinos-exportadores-container">
+      <div *ngIf="destinos.length > 1">
+        <span>Destinos:</span>
+        <button class="btn" *ngFor="let destino of destinos" [style.background]="destino.color"
+          (click)="seleccionarDestino(destino)">
+          {{destino.nombre}}
+        </button>
+      </div>
+      <div *ngIf="exportadores.length > 1">
+        <span>Exportadores:</span>
+        <button class="btn" *ngFor="let exportador of exportadores" [style.background]="exportador.color"
+          (click)="seleccionarExportador(exportador)">
+          {{exportador.nombre}}
+        </button>
+      </div>
+    </div>
+    <div class="terminar-seleccion">
+      <button class="btn" *ngIf="siloCeldaSeleccionado" [style.background]="siloCeldaSeleccionado.color"
+        (click)="siloCeldaSeleccionado = null">
+        Terminar selección
+      </button>
+      <button class="btn btn-primary btn-terminar-destino" *ngIf="destinoSeleccionado"
+        [style.--color]="destinoSeleccionado.color" (click)="destinoSeleccionado = null">
+        Terminar selección
+      </button>
+      <button class="btn btn-primary" *ngIf="exportadorSeleccionado" [style.--color]="exportadorSeleccionado.color"
+        (click)="exportadorSeleccionado = null">
+        Terminar selección
+      </button>
+    </div>
+  </div>
+  <div class="tabla-cargas-container" [style.--escalado]="getEscalado(tablaCarga)" [style.--mb-dif]="getDiferenciaEscaladoPx(tablaCarga)">
+    <div [ngClass]="{'solo-lectura': !puedeEditar}">
+    <table class="tabla-cargas" #tablaCarga>
+      <div class="table-overlay" *ngIf="siloCeldaSeleccionado || destinoSeleccionado || exportadorSeleccionado"></div>
+      <thead>
+        <tr>
+          <th colspan="2">Tipo de Mercadería</th>
+          <th *ngFor="let bodega of bodegas; let i = index" colspan="2"
+            [style.background]="bodega.materialPuerto?.color || 'white'">
+            {{bodega.materialPuerto?.descripcionCorta}}
+          </th>
+          <th rowspan="4" class="w100px">TOT TURNO</th>
+          <th rowspan="4" class="w100px">TOT DÍA</th>
+          <th class="celda-separadora" rowspan="2"></th>
+          <th colspan="3" rowspan="2">
+            Para confeccion de remitos de palas<br />(Sólo completar si va por gravedad)
+          </th>
+        </tr>
+        <tr>
+          <th rowspan="3" class="w100px">DÍA</th>
+          <th rowspan="3" class="w100px">TURNO</th>
+          <th [colSpan]="bodegas.length * 2">BODEGA</th>
+        </tr>
+        <tr>
+          <th *ngFor="let bodega of bodegas" colspan="2" [style.background]="bodega.materialPuerto?.color || 'white'">
+            {{bodega.bodegaParcel}}
+          </th>
+          <th class="celda-separadora"></th>
+          <th colspan="3">Toneladas por turno</th>
+        </tr>
+        <tr>
+          <ng-container *ngFor="let bodega of bodegas">
+            <th [style.background]="bodega.materialPuerto?.color || 'white'">BZ7</th>
+            <th [style.background]="bodega.materialPuerto?.color || 'white'">BZ8</th>
+          </ng-container>
+          <th class="celda-separadora"></th>
+          <th>Por gravedad</th>
+          <th>Con palas</th>
+          <th>Desglose por pala</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let dia of dias.controls; let h = index">
+          <ng-container *ngFor="let turno of dia.get('turnos').controls; let i = index">
+            <tr *ngFor="let fila of turno.get('filas').controls; let j = index">
+              <!-- #region Cargas -->
+              <td *ngIf="i == 0 && j == 0" [rowSpan]="getFechaRowSpan(dia)">
+                {{dia.get('fecha').value | date: 'dd/MM/yyyy'}}
+              </td>
+              <td *ngIf="j == 0" [rowSpan]="getTurnoRowSpan(turno)">
+                {{turno.get('turnoPuerto').value.nombre}}
+              </td>
+
+
+              <td *ngFor="let carga of fila.get('cargas').controls" class="carga" [formGroup]="carga"
+                [style.background]="getCargaColor(carga)" [ngClass]="{'vacio': !carga.get('cantidad').value}">
+                <ng-container *ngIf="carga.get('cantidad').value">
+                  <div class="celda-clickeable" *ngIf="siloCeldaSeleccionado" (click)="onSiloCeldaClick(carga)"></div>
+                  <div class="celda-clickeable" *ngIf="destinoSeleccionado" (click)="onDestinoClick(carga)"></div>
+                  <div class="celda-clickeable" *ngIf="exportadorSeleccionado" (click)="onExportadorClick(carga)"></div>
+                  <div class="color-destino" *ngIf="carga.get('destino').value && destinos.length > 1"
+                    [style.--color]="carga.get('destino').value.color"></div>
+                  <div class="color-exportador" *ngIf="carga.get('exportador').value && exportadores.length > 1"
+                    [style.--color]="carga.get('exportador').value.color"></div>
+                </ng-container>
+                <input type="text" formControlName="cantidad" (input)="onInput($event); actualizarTotal(dia)">
+                <div *ngIf="carga.get('cantidad').value" class="carga-info">
+                  <span *ngIf="carga.get('siloCelda').value">
+                    {{carga.get('siloCelda').value.nombre}}
+                  </span>
+                  <span *ngIf="carga.get('destino').value">
+                    Destino: {{carga.get('destino').value.nombre}}
+                  </span>
+                  <span *ngIf="carga.get('exportador').value">
+                    Exportador: {{carga.get('exportador').value.nombre}}
+                  </span>
+                </div>
+              </td>
+
+
+              <td *ngIf="j == 0" [rowSpan]="getTurnoRowSpan(turno)" class="p-2">
+                {{ turno.get('totalTurno').value }}
+              </td>
+              <td *ngIf="i == 0 && j == 0" [rowSpan]="getFechaRowSpan(dia)" class="p-2">
+                {{ dia.get('totalDia').value }}
+              </td>
+              <!-- #endregion Cargas -->
+              <td class="celda-separadora"></td>
+              <!-- #region Gravedad -->
+              <td class="gravedad" *ngIf="j == 0" colspan="3" [rowSpan]="getGravedadRowSpan(turno)">
+                <div>
+                  <table>
+                    <tbody>
+                      <tr *ngFor="let gravedad of turno.get('gravedades').controls; let k = index"
+                        [formGroup]="gravedad">
+                        <td [style.background]="gravedad.get('materialPuerto').value.color">
+                          <input formControlName="cantidadGravedad" (input)="onInput($event); actualizarGravedad(dia)">
+                        </td>
+                        <td></td>
+                        <td [style.background]="gravedad.get('materialPuerto').value.color" class="p-2">
+                          {{gravedad.get('cantidadPala').value.toLocaleString('es-AR')}}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+              <td class="gravedad-pala" *ngIf="i == 0 && j == 0" [rowSpan]="getFechaRowSpan(dia)">
+                <div class="p-2">{{ dia.get('palaDia').value.toLocaleString('es-AR') }}</div>
+              </td>
+              <!-- #endregion Gravedad -->
+            </tr>
+            <tr [ngClass]="{'boton-disabled': !puedeEditar}">
+              <td class="celda-nueva-fila" [colSpan]="bodegas.length * 2">
+                <button class="ocultarPdf" (click)="agregarFila(turno)">Añadir fila</button>
+                <button class="ocultarPdf" (click)="eliminarFila(turno)">
+                  <i class="fa fa-trash-o fs-icon"></i>
+                </button>
+              </td>
+            </tr>
+            <tr [ngClass]="{'boton-disabled': !puedeEditar}" *ngIf="esUltimoTurno(turno)" class="tr-nuevo-turno">
+              <td [colSpan]="(bodegas.length * 2) + 2" class="celda-nueva-fila">
+                <button class="ocultarPdf" (click)="agregarTurno()">Añadir turno</button>
+                <button class="ocultarPdf" (click)="eliminarTurno(turno)">
+                  <i class="fa fa-trash-o fs-icon"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+          <ng-container *ngIf="h == (dias.length - 1)">
+            <tr class="tr-nuevo-dia">
+              <td [ngClass]="{'boton-disabled': !puedeEditar}" class="celda-nuevo-dia" [colSpan]="(bodegas.length * 2) + 4">
+                <button class="ocultarPdf" (click)="agregarDia()">Añadir dia</button>
+              </td>
+              <td class="celda-separadora"></td>
+              <td rowspan="2">
+                Total {{totalGravedad.toLocaleString('es-AR')}} TN Gravedad
+              </td>
+              <td colspan="2" rowspan="2">
+                Total {{totalPala.toLocaleString('es-AR')}} con Palas
+              </td>
+            </tr>
+            <tr class="totales">
+              <td colspan="2">Totales por bodegas</td>
+              <ng-container *ngFor="let bodega of totalesBodegas">
+                <td colspan="2" [style.background]="bodega.color">
+                  {{bodega.totalCargado.toLocaleString('es-AR')}}
+                </td>
+              </ng-container>
+              <td>TOTAL A BORDO</td>
+              <td>{{totalCargado.toLocaleString('es-AR')}}</td>
+            </tr>
+            <tr class="totales">
+              <td colspan="2">S/ Plano de Carga por bodegas</td>
+              <ng-container *ngFor="let bodega of totalesBodegas">
+                <td colspan="2" [style.background]="bodega.color">
+                  {{bodega.totalPlano.toLocaleString('es-AR')}}
+                </td>
+              </ng-container>
+              <td>TOTAL S/ PLANO</td>
+              <td [style.background]="totalPlano > totalCargado ? '#92d050' : '#f33954'">
+                {{totalPlano.toLocaleString('es-AR')}}
+              </td>
+            </tr>
+            <tr class="totales">
+              <td colspan="2">Faltan embarcar por bodega</td>
+              <ng-container *ngFor="let bodega of totalesBodegas">
+                <td colspan="2" [style.background]="bodega.color">
+                  {{bodega.faltaCargar.toLocaleString('es-AR')}}
+                </td>
+              </ng-container>
+              <td>FALTAN EMB.</td>
+              <td [ngClass]="{'text-danger': faltaCargar > 0}">
+                {{faltaCargar.toLocaleString('es-AR')}}
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <div class="totalizadores mb-4">
+    <!-- #region TOTALES POR CELDA/SILO Y PRODUCTO -->
+    <table>
+      <thead>
+        <tr>
+          <th colspan="3">TOTALES POR CELDA/SILO Y PRODUCTO</th>
+        </tr>
+        <tr>
+          <th>Celda/Silo</th>
+          <th>Cantidad</th>
+          <th>Producto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let total of totalesSiloCeldaProducto">
+          <td [style.background]="total.siloCelda.color">
+            {{total.siloCelda.nombre}}
+          </td>
+          <td [style.background]="total.siloCelda.color">
+            {{total.cantidad.toLocaleString('es-AR')}}
+          </td>
+          <td [style.background]="total.material.color">
+            {{total.material.descripcionCorta}}
+          </td>
+        </tr>
+        <tr *ngIf="!totalesSiloCeldaProducto.length">
+          <td colspan="3">Aún no hay valores para mostrar</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- #endregion TOTALES POR CELDA/SILO Y PRODUCTO -->
+     <!-- #region TOTALES POR DESTINO Y PRODUCTO -->
+     <table>
+      <thead>
+        <tr>
+          <th colspan="3">TOTALES POR DESTINO Y PRODUCTO</th>
+        </tr>
+        <tr>
+          <th>Destino</th>
+          <th>Cantidad</th>
+          <th>Producto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let total of totalesDestinoProducto">
+          <td [style.background]="total.destino.color">
+            {{total.destino.nombre}}
+          </td>
+          <td [style.background]="total.destino.color">
+            {{total.cantidad.toLocaleString('es-AR')}}
+          </td>
+          <td [style.background]="total.material.color">
+            {{total.material.descripcionCorta}}
+          </td>
+        </tr>
+        <tr *ngIf="!totalesDestinoProducto.length">
+          <td colspan="3">Aún no hay valores para mostrar</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- #endregion TOTALES POR DESTINO Y PRODUCTO -->
+    <!-- #region TOTALES POR EXPORTADOR Y PRODUCTO -->
+    <table>
+      <thead>
+        <tr>
+          <th colspan="3">TOTALES POR EXPORTADOR Y PRODUCTO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let material of totalesExportadorProducto">
+          <tr *ngFor="let total of material.cantidadesExportadores; let i = index">
+            <td *ngIf="i == 0" [rowSpan]="material.cantidadesExportadores.length"
+              [style.background]="material.material.color">
+              {{material.material.descripcionCorta}}
+            </td>
+            <td>{{total.exportador.nombre}}</td>
+            <td>{{total.cantidad.toLocaleString('es-AR')}}</td>
+          </tr>
+        </ng-container>
+        <tr *ngIf="!totalesExportadorProducto.length">
+          <td colspan="3">Aún no hay valores para mostrar</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- #endregion TOTALES POR EXPORTADOR Y PRODUCTO -->
+    <!-- #region TOTAL USO DE PALA POR PRODUCTO -->
+    <table>
+      <thead>
+        <tr>
+          <th colspan="2">TOTAL USO DE PALA POR PRODUCTO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let material of totalesPalaProducto" [style.background]="material.material.color">
+          <td>{{material.material.descripcionCorta}}</td>
+          <td>{{material.cantidad.toLocaleString('es-AR')}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- #endregion TOTAL USO DE PALA POR PRODUCTO -->
+  </div>
+  <div *ngIf="puedeEditar" class="d-flex justify-content-center" style="gap: 1rem;">
+    <button class="btn btn-success ocultarPdf" (click)="guardar()">Guardar</button>
+    <button class="btn btn-danger ocultarPdf" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
+  </div>
+</div>
+</div>

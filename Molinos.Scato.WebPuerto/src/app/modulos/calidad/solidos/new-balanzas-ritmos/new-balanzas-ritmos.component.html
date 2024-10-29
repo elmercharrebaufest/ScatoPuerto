@@ -1,0 +1,84 @@
+<div class="mt-4 px-4 pb-4" style='background-color: white !important;' *ngIf="turnosModuloDeCarga">
+
+  <h4 class="info-header colorTitle pt-4">Ritmos de Carga</h4>
+  <!-- First Row -->
+<!--
+  <div class="row mt-3">
+    <div class="col-md-3">
+      <div class="form-group col-6" style="display: flex;align-items: baseline;">
+        <input type="checkbox" [(ngModel)]="habilitarFechasYTurnos" (change)="toggleFechasYTurnos()" style="transform: scale(1.50);"/>
+        <label style="margin-left: 10px;">Habilitar Día y Turno</label>
+      </div>
+    </div>
+  </div>
+-->
+  <!-- First Row -->
+
+  <!-- Second Row -->
+  <div class="row mt-3" *ngIf="!turnosModuloDeCarga.todosTurnosCerrados">
+    <div class="col-md-4" style="display:flex;">
+      <div class="form-group col-6" style="display: flex;align-items: baseline;">
+        <label style="margin-right: 10px;">Día: </label>
+        <input type="date" [(ngModel)]="selectedDate" [disabled]="!habilitarFechasYTurnos" [attr.min]="dateMin" [attr.max]="dateMax" class="form-control fecha" (change)="updateDate($event)" />
+      </div>
+      <div class="form-group col-6" style="display: flex;align-items: baseline;">
+        <label for="turno" style="margin-right: 10px;">Turno: </label>
+          <select id="selectedTurn" class="form-control" [(ngModel)]="selectedTurn" [disabled]="!habilitarFechasYTurnos" (change)="updateTurn($event)">
+            <option *ngFor="let turno of turnos" [value]="turno.turno.id">
+              {{turno.turno.nombre}}
+            </option>
+          </select>
+      </div>
+    </div>
+  </div>
+  <!-- Second Row -->
+
+  <!-- Third Row -->
+  <div class="row mt-3" *ngIf="!turnosModuloDeCarga.todosTurnosCerrados">
+    <div class="col-md-6">
+      <h6>Ritmos del turno: {{ selectedTurnName }} del día {{ selectedDate | date: 'dd-MMM-yyyy' }}</h6>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-6">
+      <div class='bg-white shadow'>
+        <app-semaforo-ritmo-embarque
+          [valueRhythmGross]='valorRitmoBruto' 
+          [color1]='"#F0AD4E"' 
+          [valueLoaded]='valorCargando' 
+          [tonsTotal]='tnTotales' 
+          [color2]='"#5CB85C"' 
+          [valueRhythmNet]='valorRitmoNeto' 
+          [color3]='"#F0AD4E"'>
+        </app-semaforo-ritmo-embarque>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-6">
+          <app-ritmo-embarque-carga-manual 
+            [numeroBalanza]='"7"' 
+            [arranco]='""' 
+            [ultimaBalanzada]='this.ultimaBalanzada7' 
+            [toneladasCargadas]='this.toneladasCargadas7' 
+            [ritmoEmbarque]='this.ritmoEmbarque7' 
+            [ultimaActualizacion]='this.ultimaActualizacion7'>
+          </app-ritmo-embarque-carga-manual>
+        </div>
+    
+        <div class="col-6">
+          <app-ritmo-embarque-carga-manual 
+            [numeroBalanza]='"8"' 
+            [arranco]='""' 
+            [ultimaBalanzada]='this.ultimaBalanzada8' 
+            [toneladasCargadas]='this.toneladasCargadas8' 
+            [ritmoEmbarque]='this.ritmoEmbarque8' 
+            [ultimaActualizacion]='this.ultimaActualizacion8'>
+          </app-ritmo-embarque-carga-manual>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

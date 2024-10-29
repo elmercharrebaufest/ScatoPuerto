@@ -75,7 +75,6 @@ export class LineupComponent implements OnInit, Observador {
     private datepipe: DatePipe,
     private embarqueService: EmbarqueService,
     private _messageService: MessageService,
-    private parametrosService: ParametrosService,
     private session: SessionService,
     private auth: AutenticadorService,
     private embarqueSharingService: EmbarqueSharingService,

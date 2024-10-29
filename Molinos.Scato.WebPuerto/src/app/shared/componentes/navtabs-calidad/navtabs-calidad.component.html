@@ -20,7 +20,7 @@
         <div class="row tituloMuelle mb-2">Muelle San Benito</div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
-                id="{{buqueSanBenito2.id}}" (click)="onClickHandlerClient(buqueSanBenito2)">
+                id="{{buqueSanBenito2?.id}}" (click)="onClickHandlerClient(buqueSanBenito2)">
                 <div class="icono-seleccionado" [ngClass]="imgSolidoLiquido(buqueSanBenito)"></div>
                 {{estadoSanBenito()}}
             </button>

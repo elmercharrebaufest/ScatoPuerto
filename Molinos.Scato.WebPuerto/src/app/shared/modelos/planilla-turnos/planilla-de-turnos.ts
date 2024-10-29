@@ -4,7 +4,7 @@ import { Destino } from "@ScatoModels/destino";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 
-export class PlanillaDeTurnos{
+export class PlanillaDeTurnos {
     fecha: any;
     fechaMiliseconds: any;
     id?: number;
@@ -16,17 +16,19 @@ export class PlanillaDeTurnos{
     moduloDeCargaPlanillaDeTurnosDetallesSolido: TurnoDetalleSolido[];
     moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[];
     moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: ObsCalidad[];
+    moduloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad: TurnoDetalleSolidoGravedad[];
     indexDia: number;
     esLiquido: boolean;
+    fechaCierreTurno?: any;
 }
 
-export class TurnoPuerto{
+export class TurnoPuerto {
     id: number;
-    nombre: string;
+    nombre: any;
     orden: number
 }
 
-export class TurnoDetalleLiquido{
+export class TurnoDetalleLiquido {
     id?: number;
     exportador: Exportador;
     linea: string;
@@ -43,12 +45,32 @@ export class TurnoDetalleLiquido{
 }
 
 
-export class TurnoDetalleSolido{
+export class TurnoDetalleSolido {
     id?: number;
     exportador: Exportador;
-    bodega: number;
+    bodega: { parcel: number, nombre: string, id?: number };
     materialPuerto: MaterialPuerto;
     destino: Destino;
     cantidad: number;
     idBalanzaCorte: number;
+    balanzaPuerto?: BalanzaPuerto;
+    siloCelda?: SiloCelda;
+    fila?: number
+}
+
+export class BalanzaPuerto {
+    codigoBalanza: string;
+}
+
+export class SiloCelda {
+    id: number;
+    nombre: string;
+    color: string;
+}
+
+export class TurnoDetalleSolidoGravedad {
+    id: number;
+    materialPuerto: MaterialPuerto;
+    totalTurnoMaterial: number;
+    kgGravedad: number;
 }

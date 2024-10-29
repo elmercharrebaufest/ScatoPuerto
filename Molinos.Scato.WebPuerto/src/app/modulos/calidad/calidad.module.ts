@@ -15,6 +15,7 @@ import { RegistroRecibosComponent } from './registro-recibos/registro-recibos.co
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { NirManoComponent } from "./solidos/nir/nir-mano/nir-mano.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NewBalanzasRitmosComponent } from "./solidos/new-balanzas-ritmos/new-balanzas-ritmos.component";
 
 const components = [
     CalidadComponent,
@@ -27,6 +28,7 @@ const components = [
     ModalReciboComponent,
     RegistroRecibosComponent,
     NirManoComponent,
+    NewBalanzasRitmosComponent,
 ]
 @NgModule({
     imports: [

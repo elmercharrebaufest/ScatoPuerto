@@ -17,7 +17,6 @@ import { OperacionesComponent } from './operaciones/operaciones.component';
 import { RecibidoresComponent } from './recibidores/recibidores.component';
 import { CalidadModule } from "../../calidad/calidad.module";
 import { FechasRitmosComponent } from "./fechas-ritmos/fechas-ritmos.component";
-import { ProgramaEmbarqueModule } from "app/modulos/programa-embarque/programa-embarque.module";
 
 @NgModule({
     imports: [

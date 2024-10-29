@@ -77,12 +77,17 @@
           <app-umap [esSoloLectura]="true"></app-umap>
         </div>
         <!-- balanzadas ==> pasar a shared o componente nuevo -->
-        <div *ngIf="!esEmbarqueLiquido && paramEmbarqueSel">
+        <div *ngIf="!esEmbarqueLiquido && paramEmbarqueSel && !paramEmbarqueSel.ingresoManualSolido">
           <app-balanzas [esSoloLectura]="true">
           </app-balanzas>
           <!-- bodegas =====> pasar a shared o componente nuevo -->
           <app-bodegas [esSoloLectura]="true">
           </app-bodegas>
+          <br/><br/>
+        </div>
+        <div *ngIf="!esEmbarqueLiquido && paramEmbarqueSel && paramEmbarqueSel.ingresoManualSolido">
+          <app-balanzas-manual [esSoloLectura]="true">
+          </app-balanzas-manual>
           <br/><br/>
         </div>
       </div>

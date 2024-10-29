@@ -44,8 +44,8 @@ export class ConfirmationDialogService {
     return this.confirm(titulo, mensaje, 'Cerrar', '', null, null, tipo);
   }
 
-  public exito(mensaje: string) {
-    return this.confirm('Resultado exitoso', mensaje, 'Cerrar', '', null, null, Tipoalerta.Success);
+  public exito(mensaje: string, titulo: string = 'Resultado exitoso') {
+    return this.confirm(titulo, mensaje, 'Cerrar', '', null, null, Tipoalerta.Success);
   }
 
   public error(mensaje: string, titulo: string = '¡Error!') {

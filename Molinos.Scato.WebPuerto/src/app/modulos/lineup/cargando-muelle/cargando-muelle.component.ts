@@ -39,11 +39,17 @@ export class CargandoMuelleComponent implements OnInit {
     private lineupService: LineupService,
     private session: SessionService,) { 
       this.user = this.session.getUser()
+      this.lineupService.actualizarRitmos.subscribe(data => {
+        if (data!=null && data.actualizarRitmos) {
+            if(this.instanciaWorkflow){
+              this.calcularRitmos(data.moduloDeCargaId);
+            }
+        }
+      });
   }
 
   ngOnInit(): void {
     const moduloDeCargaPeriodoDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga']['moduloDeCargaPeriodoDeCarga'];
-
     if (moduloDeCargaPeriodoDeCarga.length > 0)
       this.fechaAmarro = moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
     
@@ -54,35 +60,13 @@ export class CargandoMuelleComponent implements OnInit {
       const moduloDeCarga = this.instanciaWorkflow.lineUp['moduloDeCarga'];
       const planoDeCargaBodegas = this.instanciaWorkflow.lineUp['planoDeCarga']['planoDeCargaBodegas'];
       planoDeCargaBodegas.forEach(x => this.tnTotales += x.cantidad );
-      
-      if(this.instanciaWorkflow.embarque.esLiquido){
-        this.liquido = true;
-        this.balanzaService.obtenerRitmosLiquidos(moduloDeCarga.id)
-        .pipe(finalize( () => this.calcularPorcentaje() ))
-        .subscribe( res => {
-          console.log('obtenerRitmosLiquidos: ', res);
-          this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
-          this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
-        });
-      }else{
-        this.liquido = false;
-        this.balanzaService.obtenerRitmos( moduloDeCarga.id)
-        .pipe(finalize( () => this.calcularPorcentaje() ))
-        .subscribe( res => {
-          console.log('obtenerRitmos: ', res);
-          this.ritmoDeCarga = res?.ritmoDeCarga ? res.ritmoDeCarga : 0;
-          this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
-        });
-      }
-
+      this.calcularRitmos(moduloDeCarga.id);
       this.moduloCargaService.obtenerModuloDeCarga(moduloDeCarga.id)
       .subscribe(res => {
         if(res.moduloDeCargaPeriodoDeCarga.length > 0){
           this.fechaAmarro = res.moduloDeCargaPeriodoDeCarga[0].fechaAmarro;
         }
-      });
-  
-      // this.balanzaService.listarBalanzadaBuque(this.instanciaWorkflow.embarque.vapor.id).subscribe(res => this.balanzas = res.balanzadasBajaCarga);
+      });  
     }
   }
 
@@ -90,6 +74,29 @@ export class CargandoMuelleComponent implements OnInit {
     if(this.tnTotales != null && this.tnTotales>0){
       this.valorRitmo = Math.round(this.valorCargando * 100 / this.tnTotales);
       if(this.valorRitmo > 100) this.valorRitmo = 100;
+    }
+  }
+
+  calcularRitmos(moduloDeCargaId){
+    if(this.instanciaWorkflow.embarque.esLiquido){
+      this.liquido = true;
+      this.balanzaService.obtenerRitmosLiquidos(moduloDeCargaId)
+      .pipe(finalize( () => this.calcularPorcentaje() ))
+      .subscribe( res => {
+        this.ritmoDeCarga = res?.ritmoAcumulado ? res.ritmoAcumulado : 0;
+        this.valorCargando = res?.llevasCargado ? res.llevasCargado : 0;
+      });
+    }else{
+      this.liquido = false;
+        this.moduloCargaService.obtenerRitmosBalanzaManual(moduloDeCargaId)
+        .subscribe( res => {
+          this.ritmoDeCarga = res?.ritmoCargaNeto ? res.ritmoCargaNeto : 0;
+          this.valorCargando = res?.totalCargado ? res.totalCargado : 0;
+          this.valorRitmo = res?.porcentajeDeCarga;
+          if(this.valorCargando != null && this.valorCargando > 0){
+            if(this.valorRitmo > 100) this.valorRitmo = 100;
+          }
+        });          
     }
   }
 

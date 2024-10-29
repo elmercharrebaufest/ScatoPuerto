@@ -28,7 +28,8 @@
 	<setParameter name="MonsantoServicePassword Config" value="/kcpPHeKQI8DKpibwlX00g==" />
 
 	<setParameter name="FotosPath Config" value="\\GSLOFSPRD00\Scato\ScatoFotos\SLO\Testing\" />
-	<setParameter name="ArchivosPath Config" value="\\GSLOFSPRD00\Scato\ScatoPuerto\Testing\" />
+	<setParameter name="ArchivosPath Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\Testing\" />
+	<setParameter name="PathPlanillaSolidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuerto\Testing\Planilla Embarque Solidos\" />
 
 	<setParameter name="CuitRepresentada Config" value="30715118773" />
 	<setParameter name="UrlAfipApi Config" value="https://scatopuertouat.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />

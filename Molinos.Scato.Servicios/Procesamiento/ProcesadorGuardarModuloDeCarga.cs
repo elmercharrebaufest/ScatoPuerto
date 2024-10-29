@@ -42,7 +42,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Usuario = moduloDeCarga.Usuario,
                     FechaDeFinalizacion = moduloDeCarga.FechaDeFinalizacion,
                     UsuarioFinalizacion = moduloDeCarga.UsuarioFinalizacion,
-                    Enviado = moduloDeCarga.Enviado
+                    Enviado = moduloDeCarga.Enviado,
+                    IngresoManualSolido = moduloDeCarga.IngresoManualSolido
                 });
 
                 Repositorio.GuardarCambios();

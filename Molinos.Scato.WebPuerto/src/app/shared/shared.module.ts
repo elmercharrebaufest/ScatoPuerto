@@ -4,14 +4,15 @@ import { SharedComponentModule } from "./componentes/shared-components.module";
 import { RoleGuard } from "./seguridad/role.guard";
 
 @NgModule({
-    imports: [
-        CommonModule,
-        SharedComponentModule,
-    ],
-    exports: [
-        CommonModule,
-        SharedComponentModule,
-    ],
-    providers: [RoleGuard]
+  declarations: [],
+  imports: [
+    CommonModule,
+    SharedComponentModule,
+  ],
+  exports: [
+    CommonModule,
+    SharedComponentModule
+  ],
+  providers: [RoleGuard]
 })
 export class SharedModule { }

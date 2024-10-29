@@ -1,19 +1,20 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Filtros;
 using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceModel;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios
 {
-    [ServiceContract(Namespace = "http://scato.molinos.com.ar")]
+	[ServiceContract(Namespace = "http://scato.molinos.com.ar")]
     public interface IServicioRepositorio
     {
         [OperationContract]
@@ -2540,10 +2541,22 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id);
 
-        [OperationContract]
+		[OperationContract]
+		ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga);
+
+		[OperationContract]
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
 
-        [OperationContract]
+		[OperationContract]
+		List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga);
+
+		[OperationContract]
+		List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha);
+
+		[OperationContract]
+		List<BalanzasCortesDto> ConsultarBalanzasCortes(int idModuloDeCarga);
+
+		[OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
 
         [OperationContract]
@@ -2768,7 +2781,6 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);
 
-
         [OperationContract]
         List<LogABM> ObtenerInformacionLog(int claseId);
 
@@ -2796,9 +2808,70 @@ namespace Molinos.Scato.Servicios
         // </ ARMOA005-1965 Dylan Lopez>
 
         [OperationContract]
+        IList<SiloCeldaDto> ListarSiloCelda();
+		
+        // <ARMOA005-1896>
+        [OperationContract]
+        void OcultarEmbarqueLineUp(int lineUpId);
+        // <ARMOA005-1896>	
+        
+        [OperationContract]
+        IList<BalanzaManualDto> ListarBalanzaManual(int moduloDeCargaId);
+
+        [OperationContract]
+        BalanzaManualDto ObtenerBalanzaManual(int id);
+
+        [OperationContract]
+        BalanzaManualDto GuardarBalanzaManual(BalanzasCortesDto dto, string nombreUsuario);
+
+        [OperationContract]
+        bool EliminarBalanzaManual(int id, string nombreUsuario);
+
+        [OperationContract]
+        ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCarga(int moduloDeCargaId);
+
+        [OperationContract]
+        DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza, int? turno_Id);
+		// </ ARMOA005-1965 Dylan Lopez>
+
+		[OperationContract]
+        IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId);
+
+        [OperationContract]
+        IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId);
+       
+        [OperationContract]
+        string ObtenerBuqueDadoModCarga(int moduloCargaId);
+        
+ 		[OperationContract]
+        void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio);
+
+        [OperationContract]
         void RestaurarEmbarquesOcultosLineUp();
 
         [OperationContract]
-        void OcultarEmbarqueLineUp(int lineUpId);
+        RitmoDeCargasBalanzasDto ObtenerRitmosCargaManual(int moduloCargaId, bool esCalculoGeneral, DateTime? fechaTurno, int? turnoId);
+
+        [OperationContract]
+        MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId);
+
+        [OperationContract]
+        EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
+
+        [OperationContract]
+        void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
+        
+        [OperationContract]
+        void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
+        
+        [OperationContract]
+        void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+
+        [OperationContract]
+        Dictionary<string, decimal> ObtenerRitmosBalanzaManual(int modulodecarga_id);
+
+        [OperationContract]
+        bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas);
+
     }
 }

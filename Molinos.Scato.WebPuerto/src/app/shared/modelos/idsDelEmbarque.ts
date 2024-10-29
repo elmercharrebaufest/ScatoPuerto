@@ -3,4 +3,5 @@ export class IdsDelEmbarque {
     planoDeCargaId : number;
     vaporId : number;
     esLiquido : number;
+    ingresoManualSolido: number;
 }

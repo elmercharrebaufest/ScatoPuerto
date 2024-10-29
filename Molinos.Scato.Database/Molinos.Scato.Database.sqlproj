@@ -597,6 +597,8 @@
     <Build Include="dbo\Tables\AgenciaMaritimaATA\AgenciaMaritimaPuerto.sql" />
     <Build Include="dbo\Tables\AgenciaMaritimaATA\ATAPuerto.sql" />
     <Build Include="dbo\Tables\NominacionEmbarque.sql" />
+    <Build Include="dbo\Tables\SiloCelda.sql" />
+    <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

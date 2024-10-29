@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
+using Molinos.Scato.WebPuertoApi.Helper;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -18,7 +19,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
-    public class ProgramaEmbarqueController : BaseController
+	public class ProgramaEmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;
         private readonly IServicioRepositorio servicioRepositorio;
@@ -524,9 +525,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK,
-                    servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(servicioProgramaEmbarque.ObtenerNominacion(nominacionId), tipoDeMail)
-                );
+
+                var notificacion = new NotificacionProgramaEmbarque();
+                var nominacionDto = servicioProgramaEmbarque.ObtenerNominacion(nominacionId);
+                var mailProgramacionEmbarque = servicioProgramaEmbarque.ObtenerDatosMailProgramaEmbarque(nominacionDto, tipoDeMail);
+                mailProgramacionEmbarque.Body = notificacion.GenerarCuerpoEmail(nominacionDto);
+                return Request.CreateResponse(HttpStatusCode.OK, mailProgramacionEmbarque);
             }
             catch (Exception ex)
             {

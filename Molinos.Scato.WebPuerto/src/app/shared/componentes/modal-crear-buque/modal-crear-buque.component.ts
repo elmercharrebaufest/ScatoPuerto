@@ -154,7 +154,6 @@ export class ModalCrearBuqueComponent implements OnInit {
   )
 
   public selectedVapor(id) {
-    this.mostrarSpinner = true;
     this.mensajeBuque = 'Cargando información de buque...............';
     this.vaporSeleccionado = new Vapor();
     this.vaporSeleccionado.id = id;
@@ -162,7 +161,6 @@ export class ModalCrearBuqueComponent implements OnInit {
 
     this.buqueService.obtenerVaporInformacion(id).subscribe((res: VaporInformacion) => {
       this.vaporInfoBD = res;
-      // console.log(this.vaporInfoBD);
       if (this.vaporInfoBD != null) {
         let bandera;
         if (this.vaporInfoBD.bandera != null) {

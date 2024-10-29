@@ -9,10 +9,15 @@
     [Cantidad]                                  INT,
     [FechaCarga] DATETIME NULL, 
     [idBalanzaCorte] INT NULL, 
+    [BalanzaPuerto_Id] INT NULL, 
+    [SiloCelda_Id] INT NULL, 
+    [Fila] INT NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.Exportador_Exportador_Id] FOREIGN KEY ([Exportador_Id]) REFERENCES [dbo].[Exportador] ([Id]),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto] ([Id]),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.Destino_Destino_Id] FOREIGN KEY ([Destino_Id]) REFERENCES [dbo].[Destino] ([Id]),
-    CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.Bodega_Bodega_Id] FOREIGN KEY ([Bodega_Id]) REFERENCES [dbo].[Bodega] ([Id])
+    CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.Bodega_Bodega_Id] FOREIGN KEY ([Bodega_Id]) REFERENCES [dbo].[Bodega] ([Id]),
+    CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.BalanzaPuerto_BalanzaPuerto_Id] FOREIGN KEY ([BalanzaPuerto_Id]) REFERENCES [dbo].[BalanzaPuerto] ([Id]),
+    CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.SiloCeldas_Id] FOREIGN KEY ([SiloCelda_Id]) REFERENCES [dbo].[SiloCelda] ([Id])
 );

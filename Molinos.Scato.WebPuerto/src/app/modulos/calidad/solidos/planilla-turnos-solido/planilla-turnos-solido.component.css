@@ -121,6 +121,10 @@ table.turnos th:nth-child(2) {
     width: 150px;
 }
 
+table.turnos>tbody>tr>td:nth-last-child(-n+5) {
+  vertical-align: middle;
+}
+
 table.turnos table.tabla-embebida th{
     width: auto;
 }
@@ -248,4 +252,28 @@ table.turnos table.tabla-embebida th{
 .ver-obs-calidad input {
   transform: scale(1.5);
   margin-right: 5px;
+}
+
+.th-ocultar {
+    word-wrap: break-word;
+    word-break:keep-all;
+    font-size: 14px;
+}
+
+.small-checkbox {
+    transform: scale(0.5);
+    transform-origin: center;
+    margin: 0;
+}
+
+#scrollbar-planilla-recibidores-solido {
+  height: 800px;
+}
+
+#scrollbar-planilla-recibidores-solido.scrollbar-planilla-recibidores-solido-imprimir {
+  height: auto;
+}
+
+.td-turno {
+  page-break-inside: avoid;
 }
