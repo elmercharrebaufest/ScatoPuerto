@@ -13,6 +13,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentosEstadoService } from '../administracion-documentos-estado/documentos-estado-service';
+import { DocumentoService } from '@ScatoServicios/documento.service';
 
 @Component({
   selector: 'app-administracion-documentos-estado-listado',
@@ -32,13 +33,14 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
 
   private configDocumentoMultiple;
   private configEstadoMultiple;
-
+  public documentosACerrar: number[] = [];
 
   private destroy$ = new Subject();
   private nominacionId: number = 0;
   private embarqueId: number = 684;
   constructor(private _documentosEstadoListadoService: DocumentosEstadoListadoService,
               private _documentosEstadoService: DocumentosEstadoService,
+              private _documentosService: DocumentoService,
               private _confirmationDialogService: ConfirmationDialogService,
               private _modalService: NgbModal,
               private _router: Router,
@@ -183,6 +185,56 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
           this._documentosEstadoListadoService.cargarDocumentosEstado(this.documentos, documento);
         });
       }
+    });
+  }
+
+  public onMarcarParaCerrar(event: Event, id: number){
+    const checkbox = event.target as HTMLInputElement;
+    const value = checkbox.checked;
+    if(value){
+      this.documentosACerrar.push(id);
+    }else{
+      const index = this.documentosACerrar.indexOf(id);
+      if (index !== -1) {
+          this.documentosACerrar.splice(index, 1);
+      }    
+    }
+  }
+
+  public onMarcarTodosACerrar(event: Event){
+    const checkbox = event.target as HTMLInputElement;
+    const value = checkbox.checked;
+    if(value){
+      this.documentosACerrar = [];
+      this.documentos.controls.forEach(doc => {
+        const item = doc.value;
+        if(item.esDocumentoEnviado){
+          this.documentosACerrar.push(item.documentoId);
+        }
+        this.documentos.controls.forEach((docControl) => {
+          if(item.esDocumentoEnviado){
+            docControl.patchValue({ esDocumentoCerrado: true });
+          }
+      });
+      });    
+    }else{
+      this.documentosACerrar = [];
+      this.documentos.controls.forEach((docControl) => {
+        docControl.patchValue({ esDocumentoCerrado: false });
+    });
+    }
+  }
+
+  public onCerrarDocumentosMarcados(){
+    console.log(this.documentosACerrar);
+    this._documentosService.cerrarDocumentos(this.documentosACerrar).subscribe(() => {
+      this.documentosACerrar = [];
+      this._confirmationDialogService.confirm('Administración de documentos', 'Se cerraron los documentos con éxito.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }, (err) => {
+      console.error(err);
+      this._confirmationDialogService.confirm('Administración de documentos', 'Hubo un error al intentar cerrar los documentos seleccionados.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
     });
   }
 

@@ -90,6 +90,7 @@
     <Compile Include="Comandos\Destinos\ModificarDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\EliminarDestinoPuerto.cs" />
     <Compile Include="Comandos\Documentos\ActualizarNominacionDocumentoEstado.cs" />
+    <Compile Include="Comandos\Documentos\CerrarNominacionesDocumentos.cs" />
     <Compile Include="Comandos\Documentos\EliminarDocumentoArchivo.cs" />
     <Compile Include="Comandos\Documentos\SubirArchivoDocumento.cs" />
     <Compile Include="Comandos\Documentos\GuardarConfiguracionDocumento.cs" />

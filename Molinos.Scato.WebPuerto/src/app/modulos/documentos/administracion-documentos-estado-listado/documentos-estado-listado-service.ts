@@ -25,8 +25,10 @@ export class DocumentosEstadoListadoService {
     datosEmbarque.push(this.inicializaDatosEmbarque(registroEmbarque));
   }
   cargarDocumentosEstado(documentosEstado, registroDocumentos) {
-    documentosEstado.push(this.inicializaDocumentosEstado(registroDocumentos));
+    let docFg = this.inicializaDocumentosEstado(registroDocumentos);
+    documentosEstado.push(docFg);
   }
+
   listarNominacionDocumentoEstadoPorEmbarque(nominacionId: number, configuracionDocumentoId:number, documento: string,documentoEstado:string): Observable<NominacionDocumentoEstadoPorEmbarque[]> {
     return this.documentoService.listarNominacionDocumentoEstadoPorEmbarque(nominacionId, configuracionDocumentoId,documento,documentoEstado).pipe(map((data: NominacionDocumentoEstadoPorEmbarque[]) => { return data; }));
   }
@@ -61,7 +63,7 @@ export class DocumentosEstadoListadoService {
     });
   }
   private inicializaDocumentosEstado(x: NominacionDocumentoEstadoPorEmbarque = null) {
-    return this.formBuilder.group({
+    const fb = this.formBuilder.group({
       documentoId         : [{ value: x?.documentoId         , disabled: true }],
       documento           : [{ value: x?.documento           , disabled: true }],
       esBorradorAprobado  : [{ value: x?.esBorradorAprobado  , disabled: true }],
@@ -69,6 +71,8 @@ export class DocumentosEstadoListadoService {
       esBorradorModificado: [{ value: x?.esBorradorModificado, disabled: true }],
       esBorradorSolicitado: [{ value: x?.esBorradorSolicitado, disabled: true }],
       esDocumentoEnviado  : [{ value: x?.esDocumentoEnviado  , disabled: true }],
+      esDocumentoCerrado  : [{ value: x?.esDocumentoEnviado  , disabled: true }],
     });
+    return fb;
   }
 }

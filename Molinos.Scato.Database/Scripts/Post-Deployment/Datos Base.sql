@@ -1129,6 +1129,7 @@ if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador E
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Modificado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Modificado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Aprobado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Aprobado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Enviado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Cerrado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Cerrado'); END
 
 --Tipos de documentos
 if not exists(select 1 from DocumentoTipo where Nombre = 'A solicitar en la nominación') BEGIN insert into DocumentoTipo(Nombre) values ('A solicitar en la nominación'); END

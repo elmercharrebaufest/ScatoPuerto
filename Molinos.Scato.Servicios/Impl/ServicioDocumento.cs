@@ -1,10 +1,12 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Documentos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Documentos;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.GestionarCartasDePortePE;
 using Ninject.Extensions.Logging;
 using NPOI.Util;
 using System;
@@ -203,9 +205,9 @@ namespace Molinos.Scato.Servicios.Impl
             var nominacion = this._repositorio.Obtener<Nominacion>(x => x.Id == nominacionId);
             var lineUp = this._repositorio.Obtener<LineUp>(x => x.Embarque.Id == embarqueId);
             var nominacionDocumentoEmbarque = new NominacionDocumentoEmbarqueDto();
-            nominacionDocumentoEmbarque.NombreBuque = nominacion.Embarque.Vapor.Nombre;
-            nominacionDocumentoEmbarque.FechaNominacion = nominacion.FechaEnvioLineUp.Value.ToString("dd/MM/yyyy hh:mm");
-            if (lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga !=null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
+            nominacionDocumentoEmbarque.NombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Nombre;
+            nominacionDocumentoEmbarque.FechaNominacion = nominacion.FechaCreacion.Value.ToString("dd/MM/yyyy hh:mm");
+            if (lineUp != null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga !=null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
             {
                 var moduloDeCargaPeriodoDeCarga = lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
                 string fechaFinCarga = moduloDeCargaPeriodoDeCarga.FechaFinalizacionCarga.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
@@ -250,6 +252,7 @@ namespace Molinos.Scato.Servicios.Impl
                             EsBorradorModificado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Modificado" ? true : false,
                             EsBorradorSolicitado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Solicitado" ? true : false,
                             EsDocumentoEnviado = documentoNominacion.NominacionDocumentoEstado.Estado == "Documento Enviado" ? true : false,
+                            EsDocumentoCerrado = documentoNominacion.NominacionDocumentoEstado.Estado == "Documento Cerrado" ? true: false,
                         };
                         listarNominacionDocumentoEstadoPorEmbarque.Add(documentoEstadoPorEmbarque);
                     }
@@ -334,6 +337,14 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return resultado;
         }
-        
+
+        public void CerrarDocumentos(List<int> nomDocIds, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new CerrarNominacionesDocumentos { NomDocIds = nomDocIds, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
     }
 }

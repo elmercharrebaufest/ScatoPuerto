@@ -124,6 +124,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-6 centrar-contenido">
+                                <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-md-6 centrar-contenido">
+                                <label class="texto-estado">Documento</label>
+                                <label class="texto-estado">Cerrado</label>
+                                <input type="checkbox" class="radio-box-estado"
+                                (change)="onMarcarTodosACerrar($event)"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -179,12 +192,25 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                                formControlName="esDocumentoCerrado"
+                                                (change)="onMarcarParaCerrar($event, documento.value.documentoId)"
+                                                />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="div-cerrar-docs">
+        <button class="btn btn-primary btn-cerrar" (click)="onCerrarDocumentosMarcados()" [disabled]="documentosACerrar.length == 0">Cerrar documentos</button>
     </div>
 </div>
 

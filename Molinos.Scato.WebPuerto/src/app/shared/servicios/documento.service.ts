@@ -124,4 +124,8 @@ export class DocumentoService {
   public listarConfiguracionDocumentoPorNominacion(nominacionId: number) {
     return this.http.get<ConfiguracionDocumentoPorNominacion[]>(`${this.url}/ListarConfiguracionDocumentoPorNominacion?nominacionId=${nominacionId}`, { withCredentials: true });
   }
+
+  public cerrarDocumentos(ids: number[]) {
+    return this.http.put(`${this.url}/CerrarDocumentos`, ids, { withCredentials: true });
+  }
 }

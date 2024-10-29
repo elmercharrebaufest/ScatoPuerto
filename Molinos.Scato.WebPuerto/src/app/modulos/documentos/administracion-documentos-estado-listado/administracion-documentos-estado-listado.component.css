@@ -26,3 +26,21 @@
     background-image: none!important;
     border-radius: 4px!important;
 }
+
+.div-cerrar-docs {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px;
+}
+
+.btn-cerrar{
+    background-color: #4D60A8;
+    border-color:#4D60A8;
+}
+
+button:disabled {
+    background-color: #ccc;
+    color: #666;
+    border-color: #666;
+    cursor: not-allowed;
+}

@@ -79,5 +79,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ConfiguracionDocumentoPorNominacionDto> ListarConfiguracionDocumentoPorNominacion(int nominacionId);
+        
+        [OperationContract]
+        void CerrarDocumentos(List<int> nomDocIds, string usuario);
     }
 }

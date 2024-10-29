@@ -15,5 +15,7 @@ namespace Molinos.Scato.Dominio.Dto.Documentos
         public bool EsBorradorModificado { get; set; }
         public bool EsBorradorAprobado { get; set; }
         public bool EsDocumentoEnviado { get; set; }
+        public bool EsDocumentoCerrado { get; set; }
+
     }
 }
