@@ -738,6 +738,50 @@ IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BE
    (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
 END
 
+--Insercion de nuevo valor de calidad para algunos de los productos
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBMHP and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSBMHP, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBH and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSBH, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSB and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSB, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSFPMP and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSFPMP, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSFPLP and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSFPLP, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVCORN and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVCORN, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVWHEAT and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVWHEAT, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+--Finaliza insercion de nuevos valores.
+
+
+
+
+
+
 --Scripts Surveyor
 
 if not exists(select 1 from Surveyor where Descripcion = 'EUROAMERICA') begin insert into Surveyor (Descripcion,Mail) values ('EUROAMERICA','operations@eagsurveyor.com') end
