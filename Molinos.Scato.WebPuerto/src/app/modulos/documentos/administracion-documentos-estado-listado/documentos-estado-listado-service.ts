@@ -24,9 +24,8 @@ export class DocumentosEstadoListadoService {
   cargarDatosEmbarque(datosEmbarque, registroEmbarque) {
     datosEmbarque.push(this.inicializaDatosEmbarque(registroEmbarque));
   }
-  cargarDocumentosEstado(documentosEstado, registroDocumentos) {
-    let docFg = this.inicializaDocumentosEstado(registroDocumentos);
-    documentosEstado.push(docFg);
+  cargarDocumentosEstado(registroDocumentos) {
+    return this.inicializaDocumentosEstado(registroDocumentos);
   }
 
   listarNominacionDocumentoEstadoPorEmbarque(nominacionId: number, configuracionDocumentoId:number, documento: string,documentoEstado:string): Observable<NominacionDocumentoEstadoPorEmbarque[]> {
@@ -64,15 +63,17 @@ export class DocumentosEstadoListadoService {
   }
   private inicializaDocumentosEstado(x: NominacionDocumentoEstadoPorEmbarque = null) {
     const fb = this.formBuilder.group({
-      documentoId         : [{ value: x?.documentoId         , disabled: true }],
-      documento           : [{ value: x?.documento           , disabled: true }],
-      esBorradorAprobado  : [{ value: x?.esBorradorAprobado  , disabled: true }],
-      esBorradorEnviado   : [{ value: x?.esBorradorEnviado   , disabled: true }],
-      esBorradorModificado: [{ value: x?.esBorradorModificado, disabled: true }],
-      esBorradorSolicitado: [{ value: x?.esBorradorSolicitado, disabled: true }],
-      esDocumentoEnviado  : [{ value: x?.esDocumentoEnviado  , disabled: true }],
-      esDocumentoCerrado  : [{ value: x?.esDocumentoEnviado  , disabled: true }],
+      documentoId         : x?.documentoId,
+      documento           : x?.documento,
+      esBorradorAprobado  : x?.esBorradorAprobado,
+      esBorradorEnviado   : x?.esBorradorEnviado,
+      esBorradorModificado: x?.esBorradorModificado,
+      esBorradorSolicitado: x?.esBorradorSolicitado,
+      esDocumentoEnviado  : x?.esDocumentoEnviado,
+      esDocumentoCerrado  : x?.esDocumentoCerrado,
     });
+  
+    console.log("inicializaDocumentosEstado", x.esDocumentoCerrado);
     return fb;
   }
 }

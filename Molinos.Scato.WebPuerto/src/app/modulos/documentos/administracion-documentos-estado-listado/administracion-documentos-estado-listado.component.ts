@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DocumentosEstadoListadoService } from './documentos-estado-listado-service';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NominacionDocumentoEstadoPorEmbarque } from '@ScatoModels/digitalizacion-documentos/nominacion-documento-estado-por-embarque';
@@ -20,16 +20,16 @@ import { DocumentoService } from '@ScatoServicios/documento.service';
   templateUrl: './administracion-documentos-estado-listado.component.html',
   styleUrls: ['./administracion-documentos-estado-listado.component.css']
 })
-export class AdministracionDocumentosEstadoListadoComponent implements OnInit, OnDestroy  {
+export class AdministracionDocumentosEstadoListadoComponent implements OnInit, OnDestroy {
 
 
   public datosEmbarqueForm: FormGroup;
   public datosFiltroForm: FormGroup;
   public documentosEstadoForm: FormGroup;
-  
-  public listadoDocumentos:Documento[];
-  public listarConfiguracionDocumento:ConfiguracionDocumentoPorNominacion[];
-  public listadoDocumentoEstado:DocumentoEstado[];
+
+  public listadoDocumentos: Documento[];
+  public listarConfiguracionDocumento: ConfiguracionDocumentoPorNominacion[];
+  public listadoDocumentoEstado: DocumentoEstado[];
 
   private configDocumentoMultiple;
   private configEstadoMultiple;
@@ -39,13 +39,14 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
   private nominacionId: number = 0;
   private embarqueId: number = 684;
   constructor(private _documentosEstadoListadoService: DocumentosEstadoListadoService,
-              private _documentosEstadoService: DocumentosEstadoService,
-              private _documentosService: DocumentoService,
-              private _confirmationDialogService: ConfirmationDialogService,
-              private _modalService: NgbModal,
-              private _router: Router,
-              private _route: ActivatedRoute,
-              private _formBuilder: FormBuilder) { 
+    private _documentosEstadoService: DocumentosEstadoService,
+    private _documentosService: DocumentoService,
+    private _confirmationDialogService: ConfirmationDialogService,
+    private _modalService: NgbModal,
+    private _router: Router,
+    private _route: ActivatedRoute,
+    private _formBuilder: FormBuilder
+  ) {
     this.cargarDatosNominacion();
   }
 
@@ -53,11 +54,11 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
   ngOnInit(): void {
   }
 
-  onFiltrarDocumentos(){
+  onFiltrarDocumentos() {
     let configuracionDocumento = 0;
-    let documento='';
-    let documentoEstado='';
-    
+    let documento = '';
+    let documentoEstado = '';
+
     if (this.datosFiltroForm.controls.configuracionDocumento.value > '0')
       configuracionDocumento = this.datosFiltroForm.controls.configuracionDocumento.value.id;
 
@@ -67,12 +68,12 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     if (this.datosFiltroForm.controls.documentoEstado.value > '')
       documentoEstado = this.datosFiltroForm.controls.documentoEstado.value.map((item) => { return item.id }).join(',');
 
-    if (configuracionDocumento == 0){
+    if (configuracionDocumento == 0) {
       let mensaje: string = 'Debe seleccionar el documento.';
       this._confirmationDialogService.confirm('Administración de documentos', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
-    this.cargarDocumentosEstado(this.nominacionId, configuracionDocumento, documento,documentoEstado);
+    this.cargarDocumentosEstado(this.nominacionId, configuracionDocumento, documento, documentoEstado);
   }
 
   ngOnDestroy(): void {
@@ -127,12 +128,12 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
   }
 
   private cargarDatosNominacion() {
-    this._documentosEstadoService.NominacionSeleccionada.pipe(takeUntil(this.destroy$)).subscribe((resultado: number) =>{
+    this._documentosEstadoService.NominacionSeleccionada.pipe(takeUntil(this.destroy$)).subscribe((resultado: number) => {
       this.nominacionId = resultado != null ? resultado : 0;
       this.setConfigDocumentoMultiple();
       this.setConfigEstadoMultiple();
       this.construirFormularios();
-      this.cargarDatosEmbarque();   
+      this.cargarDatosEmbarque();
     });
   }
 
@@ -147,88 +148,87 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     this.cargarDocumentosPorNominacion();
     this.cargarNominacionDocumentoEstados();
   }
-  private inicializarDocumentosEstadoForm(){
+  private inicializarDocumentosEstadoForm() {
     this.documentosEstadoForm = this._formBuilder.group({
       documentos: this._formBuilder.array([])
     });
   }
-  private cargarConfiguracionDocumento(){
-    this._documentosEstadoListadoService.listarConfiguracionDocumentoPorNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe((data: ConfiguracionDocumentoPorNominacion[]) =>{
-      if (data!=null)
+  private cargarConfiguracionDocumento() {
+    this._documentosEstadoListadoService.listarConfiguracionDocumentoPorNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe((data: ConfiguracionDocumentoPorNominacion[]) => {
+      if (data != null)
         this.listarConfiguracionDocumento = data;
     });
   }
-  private cargarDocumentosPorNominacion(){
-    this._documentosEstadoListadoService.listarDocumentosPorNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe((data: Documento[]) =>{
-      if (data!=null)
+  private cargarDocumentosPorNominacion() {
+    this._documentosEstadoListadoService.listarDocumentosPorNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe((data: Documento[]) => {
+      if (data != null)
         this.listadoDocumentos = data;
     });
   }
-  private cargarNominacionDocumentoEstados(){
-    this._documentosEstadoListadoService.listarNominacionDocumentoEstados().pipe(takeUntil(this.destroy$)).subscribe((data: DocumentoEstado[]) =>{
-      if (data!=null)
+  private cargarNominacionDocumentoEstados() {
+    this._documentosEstadoListadoService.listarNominacionDocumentoEstados().pipe(takeUntil(this.destroy$)).subscribe((data: DocumentoEstado[]) => {
+      if (data != null)
         this.listadoDocumentoEstado = data;
     });
   }
-  private cargarDatosEmbarque(){
-    this._documentosEstadoListadoService.obtenerNominacionDocumentoEmbarque(this.nominacionId, this.embarqueId).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionDocumentoEmbarque) =>{
-      if (data!=null){
+  private cargarDatosEmbarque() {
+    this._documentosEstadoListadoService.obtenerNominacionDocumentoEmbarque(this.nominacionId, this.embarqueId).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionDocumentoEmbarque) => {
+      if (data != null) {
         this._documentosEstadoListadoService.cargarDatosEmbarque(this.embarques, data);
       }
     });
   }
-  private cargarDocumentosEstado(nominacionId: number, configuracionDocumentoId:number, documento: string,documentoEstado:string){
-    this._documentosEstadoListadoService.listarNominacionDocumentoEstadoPorEmbarque(this.nominacionId,configuracionDocumentoId,documento,documentoEstado).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionDocumentoEstadoPorEmbarque[]) =>{
-      this.inicializarDocumentosEstadoForm();
-      if (data!=null){
-        data.forEach(documento=>{
-          this._documentosEstadoListadoService.cargarDocumentosEstado(this.documentos, documento);
-        });
+  private cargarDocumentosEstado(nominacionId: number, configuracionDocumentoId: number, documento: string, documentoEstado: string) {
+    this._documentosEstadoListadoService.listarNominacionDocumentoEstadoPorEmbarque(this.nominacionId, configuracionDocumentoId, documento, documentoEstado).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionDocumentoEstadoPorEmbarque[]) => {
+      this.documentosEstadoForm.setControl('documentos', this._formBuilder.array([]));
+      const documentosFormArray = this._formBuilder.array(
+        data.map(doc => this._documentosEstadoListadoService.cargarDocumentosEstado(doc))
+      );
+      this.documentosEstadoForm.setControl('documentos', documentosFormArray);
+      this.modificarControles();
+      this.documentosACerrar = [];
+    });
+  }
+
+  public modificarControles() {
+    const documentosArray = this.documentosEstadoForm.get('documentos') as FormArray;
+
+    documentosArray?.controls?.forEach((documentoGroup: FormGroup) => {
+      let esDocumentoCerradoControl = documentoGroup.get('esDocumentoCerrado');
+      let esDocumentoEnviadoControl = documentoGroup.get('esDocumentoEnviado');
+      if (esDocumentoEnviadoControl?.value === true) {
+        esDocumentoCerradoControl?.enable();
+      } else {
+        esDocumentoCerradoControl?.disable();
       }
+      documentoGroup.get('esBorradorSolicitado').disable();
+      documentoGroup.get('esBorradorAprobado').disable();
+      documentoGroup.get('esBorradorModificado').disable();
+      documentoGroup.get('esBorradorEnviado').disable();
+      documentoGroup.get('esDocumentoEnviado').disable();
     });
   }
 
-  public onMarcarParaCerrar(event: Event, id: number){
-    const checkbox = event.target as HTMLInputElement;
-    const value = checkbox.checked;
-    if(value){
-      this.documentosACerrar.push(id);
-    }else{
-      const index = this.documentosACerrar.indexOf(id);
+  public marcarDocumentoCerrado(documento: AbstractControl) {
+    const documentoGroup = documento as FormGroup;
+
+    const esDocumentoCerradoControl = documentoGroup.get('esDocumentoCerrado');
+    const documentoId = documentoGroup.get('documentoId').value;
+    if (esDocumentoCerradoControl.value) {
+      this.documentosACerrar.push(documentoId);
+    } else {
+      const index = this.documentosACerrar.indexOf(documentoId);
       if (index !== -1) {
-          this.documentosACerrar.splice(index, 1);
-      }    
+        this.documentosACerrar.splice(index, 1);
+      }
+      this.desmarcarBotonCerrarTodos();
     }
   }
 
-  public onMarcarTodosACerrar(event: Event){
-    const checkbox = event.target as HTMLInputElement;
-    const value = checkbox.checked;
-    if(value){
-      this.documentosACerrar = [];
-      this.documentos.controls.forEach(doc => {
-        const item = doc.value;
-        if(item.esDocumentoEnviado){
-          this.documentosACerrar.push(item.documentoId);
-        }
-        this.documentos.controls.forEach((docControl) => {
-          if(item.esDocumentoEnviado){
-            docControl.patchValue({ esDocumentoCerrado: true });
-          }
-      });
-      });    
-    }else{
-      this.documentosACerrar = [];
-      this.documentos.controls.forEach((docControl) => {
-        docControl.patchValue({ esDocumentoCerrado: false });
-    });
-    }
-  }
-
-  public onCerrarDocumentosMarcados(){
-    console.log(this.documentosACerrar);
+  public onCerrarDocumentosMarcados() {
     this._documentosService.cerrarDocumentos(this.documentosACerrar).subscribe(() => {
       this.documentosACerrar = [];
+      this.onFiltrarDocumentos();
       this._confirmationDialogService.confirm('Administración de documentos', 'Se cerraron los documentos con éxito.', 'Aceptar', '', null, null, Tipoalerta.Warning);
       return;
     }, (err) => {
@@ -236,6 +236,35 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
       this._confirmationDialogService.confirm('Administración de documentos', 'Hubo un error al intentar cerrar los documentos seleccionados.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     });
+  }
+
+  public onMarcarTodosACerrar(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const value = checkbox.checked;
+    if (value) {
+      this.documentos.controls.forEach((documentoGroup: FormGroup) => {
+        const esDocumentoCerradoControl = documentoGroup.get('esDocumentoCerrado');
+        if (!esDocumentoCerradoControl.value && !esDocumentoCerradoControl.disabled) {
+          esDocumentoCerradoControl.setValue(true);
+          this.documentosACerrar.push(documentoGroup.get('documentoId').value);
+        }
+      });
+    } else {
+      this.documentos.controls.forEach((documentoGroup: FormGroup) => {
+        const esDocumentoCerradoControl = documentoGroup.get('esDocumentoCerrado');
+        if (esDocumentoCerradoControl.value && !esDocumentoCerradoControl.disabled) {
+          esDocumentoCerradoControl.setValue(false);
+        }
+      });
+      this.documentosACerrar = [];
+    }
+  }
+
+  private desmarcarBotonCerrarTodos() {
+    const checkbox = document.getElementById("closeall") as HTMLInputElement;
+    if (checkbox && checkbox.checked) {
+      checkbox.checked = false;
+    }
   }
 
 }
