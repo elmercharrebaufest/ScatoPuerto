@@ -12969,7 +12969,7 @@ namespace Molinos.Scato.Servicios.Impl
                         .ThenByDescending(t => t.TurnoPuerto.Orden)
                         .FirstOrDefault();
 
-                    fin = ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6);
+                    fin = ultimoTurno!=null? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
                 }
             }
             else
