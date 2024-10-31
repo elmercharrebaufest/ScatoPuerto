@@ -11,7 +11,7 @@
     [DefensasMoviles]   BIT                           NOT NULL default 0,
     [Enviado]   BIT                           NOT NULL default 0,
     [Fumigacion]   BIT                           NOT NULL default 0,
-    [EmpresaFumigadora]     NVARCHAR(100)           NULL,
+    [EmpresaFumigadora]     NVARCHAR(500)           NULL,
     [FechaDeCreacion] DATETIME NULL,
     [FechaDeModificacion] DATETIME NULL,
     [Usuario]    NVARCHAR(500)                          NULL,

@@ -3,8 +3,8 @@
 	[FechaCalado]       DATETIME NULL,
 	[FechaUbicacion]       DATETIME NULL,
 	[FechaAlturaRio]       DATETIME NULL,
-	[Calado]       nvarchar(20) NULL,
-	[Ubicacion]       nvarchar(20) NULL,
-	[AlturaDelRio]       nvarchar(20) NULL,
+	[Calado]       nvarchar(1000) NULL,
+	[Ubicacion]       nvarchar(1000) NULL,
+	[AlturaDelRio]       nvarchar(1000) NULL,
     CONSTRAINT [PK_dbo.EstadoPuerto] PRIMARY KEY CLUSTERED ([Id] ASC)
     );

@@ -11729,7 +11729,7 @@ namespace Molinos.Scato.Servicios.Impl
                                             if (moduloCargaPeriodoCarga.FechaDesamarro != null)
                                             {
                                                 string fechaDesamarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaDesamarro).ToString("yyyy-MM-dd");
-                                                if (moduloCargaPeriodoCarga.HoraDesamarro.Length > 0)
+                                                if (!string.IsNullOrEmpty(moduloCargaPeriodoCarga.HoraDesamarro) && moduloCargaPeriodoCarga.HoraDesamarro.Length > 0)
                                                 {
                                                     fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, moduloCargaPeriodoCarga.HoraDesamarro);
                                                 }
@@ -11740,7 +11740,7 @@ namespace Molinos.Scato.Servicios.Impl
                                             if (moduloCargaPeriodoCarga.FechaAmarro != null)
                                             {
                                                 string fechaAmarro = Convert.ToDateTime(moduloCargaPeriodoCarga.FechaAmarro).ToString("yyyy-MM-dd");
-                                                if (moduloCargaPeriodoCarga.HoraAmarro.Length > 0)
+                                                if (!string.IsNullOrEmpty(moduloCargaPeriodoCarga.HoraAmarro) && moduloCargaPeriodoCarga.HoraAmarro.Length > 0)
                                                 {
                                                     fechaAmarro = string.Format("{0} {1}", fechaAmarro, moduloCargaPeriodoCarga.HoraAmarro);
                                                 }
