@@ -12,3 +12,4 @@
 *.config
 !web.config
 Molinos.Scato.WebPuerto/dist
+Molinos.Scato.ServiciosWindows/Molinos.Scato.ServiciosWindows/publish/

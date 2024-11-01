@@ -61,7 +61,7 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void CrearComentario(int nomDocId, string texto, string usuario);
-        
+
         [OperationContract]
         NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId, int embarqueId);
 
@@ -79,8 +79,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ConfiguracionDocumentoPorNominacionDto> ListarConfiguracionDocumentoPorNominacion(int nominacionId);
-        
+
         [OperationContract]
         void CerrarDocumentos(List<int> nomDocIds, string usuario);
+
+        [OperationContract]
+        void EnviarMailsAlerta();
     }
 }

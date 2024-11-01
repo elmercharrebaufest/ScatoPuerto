@@ -348,7 +348,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
-        
+
         [HttpGet]
         [Route("api/documento/ListarProductosPorNominacion")]
         public HttpResponseMessage ListarProductosPorNominacion(int nominacionId)
@@ -363,8 +363,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
-		
-       
+
+
         [HttpGet]
         [Route("api/documento/ListarConfiguracionDocumentoPorNominacion")]
         public HttpResponseMessage ListarConfiguracionDocumentoPorNominacion(int nominacionId)
@@ -416,6 +416,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 servicioDocumento.CerrarDocumentos(ids, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/documento/EnviarMailsAlerta")]
+        public HttpResponseMessage EnviarMailsAlerta()
+        {
+            try
+            {
+                servicioDocumento.EnviarMailsAlerta();
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

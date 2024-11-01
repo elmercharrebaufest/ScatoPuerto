@@ -16,9 +16,12 @@ namespace Molinos.Scato.ServiciosWindows
 {
     public partial class EmailService : ServiceBase
     {
-        private Timer timer;
-        private List<TimeSpan> horariosEnvio = ConfigurationHelper.HorariosEjecucion;
+        private Timer timerProgramaEmbarque;
+        private Timer timerDocumentos;
+        private List<TimeSpan> horariosEnvioProgramaEmbarque = ConfigurationHelper.HorariosEjecucionProgramaEmbarque;
+        private TimeSpan horarioEnvioDocumento = ConfigurationHelper.HorarioEjecucionDocumentos;
         private static readonly ILog log = LogManager.GetLogger(typeof(EmailService));
+
         public EmailService()
         {
             InitializeComponent();
@@ -26,68 +29,75 @@ namespace Molinos.Scato.ServiciosWindows
 
         protected override void OnStart(string[] args)
         {
-            // Obtener la hora actual y calcular el tiempo hasta el próximo horario de envío
             DateTime ahora = DateTime.Now;
-            TimeSpan tiempoHastaProximoEnvio = ObtenerTiempoHastaProximoEnvio(ahora);
 
-            // Crear y configurar el temporizador
-            timer = new Timer(tiempoHastaProximoEnvio.TotalMilliseconds);
-            timer.Elapsed += EnviarCorreoElectronico;
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            // Configuración y inicio del temporizador para el programa de embarque
+            timerProgramaEmbarque = new Timer(CalcularTiempoHastaProximoEnvio(horariosEnvioProgramaEmbarque, ahora).TotalMilliseconds);
+            timerProgramaEmbarque.Elapsed += EnviarMailProgramaEmbarque;
+            timerProgramaEmbarque.AutoReset = true;
+            timerProgramaEmbarque.Enabled = true;
+
+            // Configuración y inicio del temporizador para documentos pendientes
+            timerDocumentos = new Timer(CalcularTiempoHastaProximoEnvio(new List<TimeSpan> { horarioEnvioDocumento }, ahora).TotalMilliseconds);
+            timerDocumentos.Elapsed += EnviarMailDocumentosPendientes;
+            timerDocumentos.AutoReset = true;
+            timerDocumentos.Enabled = true;
         }
 
         protected override void OnStop()
         {
-            timer.Stop();
-            timer.Dispose();
+            timerProgramaEmbarque?.Stop();
+            timerProgramaEmbarque?.Dispose();
+
+            timerDocumentos?.Stop();
+            timerDocumentos?.Dispose();
         }
 
-        private void EnviarCorreoElectronico(object sender, ElapsedEventArgs e)
+        private async void EnviarMailProgramaEmbarque(object sender, ElapsedEventArgs e)
+        {
+            string apiUrl = ConfigurationHelper.UrlApiProgramaEmbarque;
+            await EnviarEmail(apiUrl, "Programa de Embarque");
+
+            // Reiniciar el temporizador con el tiempo hasta el próximo horario
+            timerProgramaEmbarque.Interval = CalcularTiempoHastaProximoEnvio(horariosEnvioProgramaEmbarque, DateTime.Now).TotalMilliseconds;
+        }
+
+        private async void EnviarMailDocumentosPendientes(object sender, ElapsedEventArgs e)
+        {
+            string apiUrl = ConfigurationHelper.UrlApiDocumentos;
+            await EnviarEmail(apiUrl, "Documentos Pendientes");
+            timerDocumentos.Interval = CalcularTiempoHastaProximoEnvio(new List<TimeSpan> { horarioEnvioDocumento }, DateTime.Now).TotalMilliseconds;
+        }
+
+        private async Task EnviarEmail(string apiUrl, string descripcionLog)
         {
             using (HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true }))
             {
-                // Establecer la URL de tu API para enviar correos electrónicos
-                string apiUrl = ConfigurationHelper.UrlApi;
                 try
                 {
-                    // Ejecutar la solicitud GET en un contexto sincrónico utilizando Task.Run
-                    Task<HttpResponseMessage> responseTask = Task.Run(() => client.GetAsync(apiUrl));
+                    HttpResponseMessage response = await client.GetAsync(apiUrl);
 
-                    // Esperar a que se complete la tarea
-                    responseTask.Wait();
-
-                    // Obtener la respuesta de la tarea completada
-                    HttpResponseMessage response = responseTask.Result;
-
-                    // Verificar si la solicitud fue exitosa
                     if (response.IsSuccessStatusCode)
                     {
-                        log.Info("El E-Mail se ha enviado con exito");
+                        log.Info($"El E-Mail de {descripcionLog} se ha enviado con éxito.");
                     }
                     else
                     {
-                        log.Error("El E-Mail puede que no se haya enviado. Estado: " + response.StatusCode);
+                        log.Error($"El E-Mail de {descripcionLog} puede que no se haya enviado. Estado: {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Error al enviar el correo electrónico: " + ex.Message);
+                    log.Error($"Error al enviar el correo electrónico de {descripcionLog}: {ex.Message}");
                 }
             }
-
-           // Calcular el tiempo hasta el próximo horario de envío
-           TimeSpan tiempoHastaProximoEnvio = ObtenerTiempoHastaProximoEnvio(DateTime.Now);
-
-            // Reiniciar el temporizador para el próximo envío
-            timer.Interval = tiempoHastaProximoEnvio.TotalMilliseconds;
         }
 
-        private TimeSpan ObtenerTiempoHastaProximoEnvio(DateTime ahora)
+        private TimeSpan CalcularTiempoHastaProximoEnvio(List<TimeSpan> horarios, DateTime ahora)
         {
             TimeSpan tiempoHastaProximoEnvio = TimeSpan.MaxValue;
 
-            foreach (TimeSpan horario in horariosEnvio)
+            foreach (TimeSpan horario in horarios)
             {
                 DateTime proximoEnvio = new DateTime(ahora.Year, ahora.Month, ahora.Day, horario.Hours, horario.Minutes, horario.Seconds);
 
