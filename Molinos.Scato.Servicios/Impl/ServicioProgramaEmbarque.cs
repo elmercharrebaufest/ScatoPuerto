@@ -1265,7 +1265,7 @@ namespace Molinos.Scato.Servicios.Impl
                                          Valor = x.Valor
                                      }).ToList()
                                  }).ToList()
-                }).ToList();
+                }).OrderBy(p => p.Descripcion).ToList();
 
             lista = productosDto;
             return lista;

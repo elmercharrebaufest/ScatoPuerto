@@ -73,7 +73,6 @@ export class DocumentosEstadoListadoService {
       esDocumentoCerrado  : x?.esDocumentoCerrado,
     });
   
-    console.log("inicializaDocumentosEstado", x.esDocumentoCerrado);
     return fb;
   }
 }
