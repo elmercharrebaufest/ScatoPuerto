@@ -6,4 +6,5 @@ export interface NominacionDocumentoEstadoPorEmbarque {
     esBorradorModificado: boolean;
     esBorradorAprobado: boolean;
     esDocumentoEnviado: boolean;
+    esDocumentoCerrado: boolean;
 }

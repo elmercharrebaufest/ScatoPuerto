@@ -41,7 +41,7 @@
               </div>
             </div>
 
-            <div id="collapseOne" class="collapse show" aria-labelledby="datoTecnico" data-parent="#accordionExample">
+            <div id="collapseOne" class="collapse" [ngClass]="{'show': !zarpo}" aria-labelledby="datoTecnico" data-parent="#accordionExample">
               <div class="card-body acordion-card-body">
                 <app-nominacion-dato-tecnico *ngIf="nominacionId!=null"></app-nominacion-dato-tecnico>
               </div>
@@ -98,7 +98,7 @@
                 <label *ngIf="fechaActualizacionNominacionDetalleIntervencion!= undefined"  class="auditoria-fecha-actualizacion">Ultima Actualizacion: {{fechaActualizacionNominacionDetalleIntervencion | date: 'dd/MM/yyyy HH:mm'}}</label>
               </div>
             </div>
-            <div id="collapseFour" class="collapse" aria-labelledby="datoDocumentos" data-parent="#accordionExample">
+            <div id="collapseFour" class="collapse" [ngClass]="{'show': zarpo}" aria-labelledby="datoDocumentos" data-parent="#accordionExample">
               <div class="card-body acordion-card-body">
                 <app-nominacion-documentos></app-nominacion-documentos>
               </div>

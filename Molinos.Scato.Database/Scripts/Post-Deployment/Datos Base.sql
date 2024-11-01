@@ -131,6 +131,8 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZar
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AvisoLecturaProgramaEmbarque') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('AvisoLecturaProgramaEmbarque', 'macarena.asqueri@molinosagro.com.ar; romina.escudero@molinosagro.com.ar') END
 GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'DocumentacionPendiente') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('DocumentacionPendiente', 'ileana.rodriguez@mocommodities.com; melina.corio@mocommodities.com; romina.escudero@molinosagro.com.ar; macarena.asqueri@molinosagro.com.ar') END
+GO
 
 -- Puntos de Interes para geolocalizacion.
 if not exists(select 1 from PuntosInteresGeolocalizacion where Latitud = '-35.61958  ' and Longitud='-55.88947') BEGIN insert into PuntosInteresGeolocalizacion (Nombre, TipoUbicacion, Imagen,Puerto, Pais, HorasSanBenito, Latitud, Longitud, DistanciaKM, TipoZona, AgrupadorZona, PosicionZona, RadioPunto, Estado, FechaRegistro) values('Recalada','Fondeadero','ancla','','AR','30','-35.61958  ','-55.88947',5,'','','',15000,1,getdate()) END
@@ -738,6 +740,50 @@ IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBONEU) BE
    (@CVSBONEU, 'SOAP', '85 MAX. 100 ISO 10539')
 END
 
+--Insercion de nuevo valor de calidad para algunos de los productos
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBMHP and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSBMHP, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSBH and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSBH, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSB and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSB, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSFPMP and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSFPMP, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVSFPLP and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVSFPLP, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVCORN and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVCORN, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+IF NOT EXISTS (SELECT 1 FROM CalidadValor WHERE TipoDeCalidad_Id = @CVWHEAT and Valor = '' and Parametro = 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.')
+BEGIN
+INSERT INTO CalidadValor (TipoDeCalidad_Id, Parametro,Valor) VALUES(@CVWHEAT, 'La terminal necesita que el resultado de la inspección de las bodegas sea cargado inmediatamente en el sig bodegas a fin de evitar demoras/problemas.', '');
+END
+
+--Finaliza insercion de nuevos valores.
+
+
+
+
+
+
 --Scripts Surveyor
 
 if not exists(select 1 from Surveyor where Descripcion = 'EUROAMERICA') begin insert into Surveyor (Descripcion,Mail) values ('EUROAMERICA','operations@eagsurveyor.com') end
@@ -1129,6 +1175,7 @@ if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador E
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Modificado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Modificado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Aprobado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Aprobado'); END
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Enviado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Enviado'); END
+if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Documento Cerrado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Documento Cerrado'); END
 
 --Tipos de documentos
 if not exists(select 1 from DocumentoTipo where Nombre = 'A solicitar en la nominación') BEGIN insert into DocumentoTipo(Nombre) values ('A solicitar en la nominación'); END

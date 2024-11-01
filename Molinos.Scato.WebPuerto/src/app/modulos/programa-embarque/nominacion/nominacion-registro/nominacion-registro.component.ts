@@ -39,6 +39,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
   public mensajeRegistro: string = '';
   public cargandoRegistro: boolean = false;
   public fechaActualizacion: string;
+  public zarpo: boolean = false;
 
   public fechaActualizacionNominacionRecibo: Date;
   public fechaActualizacionNominacionDatoTecnico: Date;
@@ -200,6 +201,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
     if (nominacionId > 0) {
       this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data => {
         nominacionParametos.nominacion = data;
+        this.zarpo = data.zarpo;
         this.nominacionService.NominacionParametros = nominacionParametos;
         this.obtenerAuditorias();
       });

@@ -1,14 +1,17 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Documentos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Documentos;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.GestionarCartasDePortePE;
 using Ninject.Extensions.Logging;
 using NPOI.Util;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -203,9 +206,9 @@ namespace Molinos.Scato.Servicios.Impl
             var nominacion = this._repositorio.Obtener<Nominacion>(x => x.Id == nominacionId);
             var lineUp = this._repositorio.Obtener<LineUp>(x => x.Embarque.Id == embarqueId);
             var nominacionDocumentoEmbarque = new NominacionDocumentoEmbarqueDto();
-            nominacionDocumentoEmbarque.NombreBuque = nominacion.Embarque.Vapor.Nombre;
-            nominacionDocumentoEmbarque.FechaNominacion = nominacion.FechaEnvioLineUp.Value.ToString("dd/MM/yyyy hh:mm");
-            if (lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga !=null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
+            nominacionDocumentoEmbarque.NombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Nombre;
+            nominacionDocumentoEmbarque.FechaNominacion = nominacion.FechaCreacion.Value.ToString("dd/MM/yyyy hh:mm");
+            if (lineUp != null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga != null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
             {
                 var moduloDeCargaPeriodoDeCarga = lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
                 string fechaFinCarga = moduloDeCargaPeriodoDeCarga.FechaFinalizacionCarga.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
@@ -228,31 +231,32 @@ namespace Molinos.Scato.Servicios.Impl
                 var configuracionPorNominacion = nominacion.ConfiguracionDocumentos?
                                                 .Where(x => x.Id == configuracionDocumentoId)
                                                 .SelectMany(t => t.NominacionDocumentos).ToList();
-                    configuracionPorNominacion = configuracionPorNominacion
-                                                .Where(x =>
-                                                          (!string.IsNullOrEmpty(x.Documento.Id.ToString()) && 
-                                                            (!listaDocumentos.Any() || listaDocumentos.Any(y => y.Contains(x.Documento.Id.ToString())
-                                                          
-                                                          ))) &&
-                                                          (!string.IsNullOrEmpty(x.NominacionDocumentoEstado.Id.ToString()) && 
-                                                            (!listaDocumentoEstados.Any() || listaDocumentoEstados.Any(y => y.Contains(x.NominacionDocumentoEstado.Id.ToString())))
-                                                          )
-                                                      ).ToList();
+                configuracionPorNominacion = configuracionPorNominacion
+                                            .Where(x =>
+                                                      (!string.IsNullOrEmpty(x.Documento.Id.ToString()) &&
+                                                        (!listaDocumentos.Any() || listaDocumentos.Any(y => y.Contains(x.Documento.Id.ToString())
 
-                    foreach (var documentoNominacion in configuracionPorNominacion)
+                                                      ))) &&
+                                                      (!string.IsNullOrEmpty(x.NominacionDocumentoEstado.Id.ToString()) &&
+                                                        (!listaDocumentoEstados.Any() || listaDocumentoEstados.Any(y => y.Contains(x.NominacionDocumentoEstado.Id.ToString())))
+                                                      )
+                                                  ).ToList();
+
+                foreach (var documentoNominacion in configuracionPorNominacion)
+                {
+                    var documentoEstadoPorEmbarque = new NominacionDocumentoEstadoPorEmbarqueDto()
                     {
-                        var documentoEstadoPorEmbarque = new NominacionDocumentoEstadoPorEmbarqueDto()
-                        {
-                            DocumentoId = documentoNominacion.Id,
-                            Documento = documentoNominacion.Documento.Nombre,
-                            EsBorradorAprobado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Aprobado" ? true : false,
-                            EsBorradorEnviado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Enviado" ? true : false,
-                            EsBorradorModificado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Modificado" ? true : false,
-                            EsBorradorSolicitado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Solicitado" ? true : false,
-                            EsDocumentoEnviado = documentoNominacion.NominacionDocumentoEstado.Estado == "Documento Enviado" ? true : false,
-                        };
-                        listarNominacionDocumentoEstadoPorEmbarque.Add(documentoEstadoPorEmbarque);
-                    }
+                        DocumentoId = documentoNominacion.Id,
+                        Documento = documentoNominacion.Documento.Nombre,
+                        EsBorradorAprobado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Aprobado" ? true : false,
+                        EsBorradorEnviado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Enviado" ? true : false,
+                        EsBorradorModificado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Modificado" ? true : false,
+                        EsBorradorSolicitado = documentoNominacion.NominacionDocumentoEstado.Estado == "Borrador Solicitado" ? true : false,
+                        EsDocumentoEnviado = documentoNominacion.NominacionDocumentoEstado.Estado == "Documento Enviado" ? true : false,
+                        EsDocumentoCerrado = documentoNominacion.NominacionDocumentoEstado.Estado == "Documento Cerrado" ? true : false,
+                    };
+                    listarNominacionDocumentoEstadoPorEmbarque.Add(documentoEstadoPorEmbarque);
+                }
             }
             return listarNominacionDocumentoEstadoPorEmbarque;
         }
@@ -334,6 +338,46 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return resultado;
         }
-        
+
+        public void CerrarDocumentos(List<int> nomDocIds, string usuario)
+        {
+            var res = _servicioComandos.Ejecutar(new CerrarNominacionesDocumentos { NomDocIds = nomDocIds, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public void EnviarMailsAlerta()
+        {
+
+            var objDestinatarios = _repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "DocumentacionPendiente") ?? throw new Exception("No se encuentran los destinatarios en la base de datos");
+            var destinatarios = objDestinatarios.Direcciones.Split(';').ToList();
+            destinatarios.RemoveAll(d => String.IsNullOrEmpty(d));
+
+            if (destinatarios.Count == 0)
+            {
+                throw new Exception("No se encuentran los destinatarios en la base de datos");
+            }
+
+            var res = (ResultadoCrear)_servicioComandos.Ejecutar(new ArmarCuerpoMailDocumentos());
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+            var cuerpoMail = res.Mensaje;
+
+            var res2 = _servicioComandos.Ejecutar(new EnvioMail
+            {
+                Cuerpo = cuerpoMail,
+                Destinatarios = destinatarios,
+                Titulo = "Reporte día " + DateTime.Now.ToString("dd/MM/yyyy") + ", documentación pendiente en las nominaciones SCATOPUERTO"
+            });
+
+            if (res2.HayErrores)
+            {
+                throw new Exception(res2.Errores[""]);
+            }
+        }
     }
 }

@@ -607,6 +607,8 @@
     <Compile Include="Procesamiento\Destinos\ProcesadorEliminarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorModificarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorActualizarNominacionDocumentoEstado.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorArmarCuerpoMailDocumentos.cs" />
+    <Compile Include="Procesamiento\Documentos\ProcesadorCerrarNominacionesDocumentos.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorEliminarDocumentoArchivo.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorGuardarConfiguracionDocumento.cs" />
     <Compile Include="Procesamiento\Documentos\ProcesadorEliminarDocumentoPuerto.cs" />

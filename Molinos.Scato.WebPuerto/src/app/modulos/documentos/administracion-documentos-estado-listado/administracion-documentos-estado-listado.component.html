@@ -124,6 +124,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-6 centrar-contenido">
+                                <i class="fa fa-check-circle-o fa-2x" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-md-6 centrar-contenido">
+                                <label class="texto-estado">Documento</label>
+                                <label class="texto-estado">Cerrado</label>
+                                <input id="closeall" (change)="onMarcarTodosACerrar($event)" type="checkbox" class="radio-box-estado"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -135,7 +148,7 @@
                     *ngFor="let documento of documentosEstadoForm.get('documentos')['controls']; let i = index;trackBy:trackByFn">
                     <div [formGroupName]="i" class="input-group">
                         <div class="col-md-4">
-                            <p>{{documento.value.documento}}</p>
+                            <p>{{ documento?.get('documento')?.value}}</p>
                         </div>
                         <div class="col-md-8">
                             <div class="row">
@@ -179,12 +192,25 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class="col-md-6 centrar-contenido">
+                                            <input type="checkbox" class="radio-box-estado"
+                                            formControlName="esDocumentoCerrado"
+                                               (change)="marcarDocumentoCerrado(documento)"
+                                               />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="div-cerrar-docs">
+        <button class="btn btn-primary btn-cerrar" (click)="onCerrarDocumentosMarcados()" [disabled]="documentosACerrar.length == 0">Cerrar documentos</button>
     </div>
 </div>
 
