@@ -84,7 +84,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     Surveyor = pe.NominacionDatoTecnico.Surveyor != null ? pe.NominacionDatoTecnico.Surveyor.Descripcion : "",
                                     Zarpo = pe.Embarque != null && pe.Embarque.Ubicacion == 1 && !pe.Embarques.Any() ||
                                     (pe.Embarque != null && pe.Embarque.Ubicacion == 1 && 
-                                    pe.Embarques.Any() && pe.Embarques.All(e => e.Embarque.Ubicacion == 1))
+                                    pe.Embarques.Any() && pe.Embarques.All(e => e.Embarque.Ubicacion == 1)),
+                                    TieneConfiguracionDocumento = pe.ConfiguracionDocumentos.Count > 0 ? true : false
                                 }).OrderBy(r => r.FechaCreacion);
 
                 

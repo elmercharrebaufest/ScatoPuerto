@@ -1,52 +1,66 @@
-<ship-spinner [message]="'Enviando Mail. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
 <div class="margenes cierre">
     <button type="button" class="close" aria-label="Close" (click)="onCerraModal()">
         <span aria-hidden="true" style="font-size: 35px;">&times;</span>
     </button>
     <label><strong class="titulo">Generación de alerta</strong></label>
 </div>
-<div *ngIf="mail != null" class="line"></div>
-<div class="modal-body mb-4" [ngClass]="{'cuerpoMail': mail != null}" >
-    <div class="row" *ngIf="mail != null">
-        <div class="col-md-1" style="display: flex;align-items: center;">
-            <strong style="height: min-content;">Para:</strong>
+<div class="line"></div>
+<div class="modal-body cuerpoMail">
+    <div [formGroup]="documentoAlertaForm">
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong style="height: min-content;">Destinatarios:</strong>
+            </div>
+            <div class="col-md-10">
+                <tag-input formControlName="destinatarios" [modelAsStrings]="true" [placeholder]="'Destinatarios'"
+                    [secondaryPlaceholder]="'Destinatarios'" [validators]="validators"></tag-input>
+            </div>
         </div>
-        <div class="col-md-11">
-            <tag-input *ngIf="mail != null" [(ngModel)]="mail.destinatarios" [modelAsStrings]="true"
-                [placeholder]="'Destinatarios'" [secondaryPlaceholder]="'Destinatarios'"
-                [validators]="validators"></tag-input>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong style="height: min-content;">Motivo:</strong>
+            </div>
+            <div class="col-md-10">
+                <select formControlName="motivo" class="custom-select" (change)="onSeleccionaMotivo()">
+                    <option value="0" default selected>Seleccione</option>
+                    <option *ngFor="let motivoAlerta of listaMotivoAlerta" [ngValue]="motivoAlerta">
+                        {{motivoAlerta.motivo}}
+                    </option>
+                </select>
+            </div>
         </div>
+        <div class="row" *ngIf="mostrarSeccionOtros" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2" style="display: flex;align-items: center;">
+                <strong style="height: min-content;">Descripción</strong>
+            </div>
+            <div class="col-md-10">
+                <input type="text" maxlength="60" class="form-control" formControlName="motivoDescripcion" (change)="onCompletarAsunto()">
+            </div>
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong>Asunto:</strong>
+            </div>
+            <div class="col-md-10">
+                <input type="text" class="form-control" formControlName="asunto">
+            </div>
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong>Comentario:</strong>
+            </div>
+            <div class="col-md-10">
+            </div>            
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-12">
+                <ckeditor [editor]="Editor" formControlName="comentario" (ready)="onReady($event)"
+                style="border: 0px solid #ccc!important;"></ckeditor>
+            </div>            
+        </div>              
     </div>
-    <br *ngIf="mail != null">
-    <div *ngIf="mail != null" class="separador"></div>
-    <br *ngIf="mail != null">
-    <div class="row" *ngIf="mail != null">
-        <div class="col-md-1" style="display: flex;align-items: center;">
-            <strong style="height: min-content;">Copia</strong>
-        </div>
-        <div class="col-md-11">
-            <tag-input *ngIf="mail != null" [(ngModel)]="mail.copia" [modelAsStrings]="true" [placeholder]="'Copia'"
-                [secondaryPlaceholder]="'Copia'" [validators]="validators"></tag-input>
-        </div>
-    </div>
-    <br *ngIf="mail != null">
-    <div *ngIf="mail != null" class="separador"></div>
-    <br *ngIf="mail != null">
-    <div class="row" *ngIf="mail != null">
-        <div class="col-md-1">
-            <strong>Asunto:</strong>
-        </div>
-       <div class="col-md-11">
-        <div [innerHTML]="asunto"></div>
-       </div>   
-    </div>    
-    <br *ngIf="mail != null">
-    <div *ngIf="mail != null" class="separador"></div>
-    <br *ngIf="mail != null">
-    <strong><div [innerHTML]="message"></div></strong>
-    <br *ngIf="mail != null"> 
-    <ckeditor [editor]="Editor" *ngIf="mail != null" [(ngModel)]="mail.body" (ready)="onReady($event)" style="border: 1px solid #ccc!important;"></ckeditor>
 </div>
 <div class="modal-footer">
-    <button type="button" ngbAutofocus class="btn btn-primary" >Enviar Notificación</button>
+    <button type="button" ngbAutofocus class="btn btn-primary" (click)="onEnviarNotificacion()">Enviar
+        Notificación</button>
 </div>

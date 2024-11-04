@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Dto.Documentos;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
@@ -41,6 +42,10 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<ConfiguracionDocumento, ConfiguracionDocumentoDto>()
                 .ForMember(dest => dest.NominacionDocumentos, opt => opt.MapFrom(src => src.NominacionDocumentos));
             Mapper.CreateMap<ConfiguracionDocumentoDto, ConfiguracionDocumento>();
+
+            Mapper.CreateMap<DocumentoMotivoAlerta, DocumentoMotivoAlertaDto>();
+            Mapper.CreateMap<DocumentoMotivoAlertaDto, DocumentoMotivoAlerta>();
+            
         }
     }
 }

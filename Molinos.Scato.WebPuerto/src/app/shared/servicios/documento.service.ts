@@ -10,6 +10,8 @@ import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ConfiguracionDocumentoPorNominacion } from '@ScatoModels/digitalizacion-documentos/configuracion-documentos-por-nominacion';
 import { NominacionDocumentoEstadoPorEmbarque } from '@ScatoModels/digitalizacion-documentos/nominacion-documento-estado-por-embarque';
+import { DocumentoMotivoAlerta } from '@ScatoModels/digitalizacion-documentos/documento-motivo-alerta';
+import { DocumentoEnvioAlerta } from '@ScatoModels/digitalizacion-documentos/documentacion-envio-alerta';
 
 @Injectable({
   providedIn: 'root'
@@ -102,8 +104,8 @@ export class DocumentoService {
   public listarNominacionDocumentoEstadoPorEmbarque(nominacionId: number, configuracionDocumentoId:number, documento: string,documentoEstado:string) {
     return this.http.get<NominacionDocumentoEstadoPorEmbarque[]>(`${this.url}/ListarNominacionDocumentoEstadoPorEmbarque?nominacionId=${nominacionId}&configuracionDocumentoId=${configuracionDocumentoId}&documento=${documento}&documentoEstado=${documentoEstado}`, { withCredentials: true });
   }
-  public obtenerNominacionDocumentoEmbarque(nominacionId: number, embarqueId: number) {
-    return this.http.get<NominacionDocumentoEmbarque>(`${this.url}/ObtenerNominacionDocumentoEmbarque?nominacionId=${nominacionId}&embarqueId=${embarqueId}`, { withCredentials: true });
+  public obtenerNominacionDocumentoEmbarque(nominacionId: number) {
+    return this.http.get<NominacionDocumentoEmbarque>(`${this.url}/ObtenerNominacionDocumentoEmbarque?nominacionId=${nominacionId}`, { withCredentials: true });
   }
 
   public listarNominacionDocumentoEstados() {
@@ -124,8 +126,21 @@ export class DocumentoService {
   public listarConfiguracionDocumentoPorNominacion(nominacionId: number) {
     return this.http.get<ConfiguracionDocumentoPorNominacion[]>(`${this.url}/ListarConfiguracionDocumentoPorNominacion?nominacionId=${nominacionId}`, { withCredentials: true });
   }
-
+  public listarDocumentoMotivoAlerta() {
+    return this.http.get<DocumentoMotivoAlerta[]>(`${this.url}/ListarDocumentoMotivoAlerta`, { withCredentials: true });
+  }
+  public correoAlertaDocumentos() {
+    return this.http.get(`${this.url}/CorreoAlertaDocumentos`, { withCredentials: true });
+  }
+  public enviarCorreoAlertaDocumentos(documentoEnvioAlerta: DocumentoEnvioAlerta) {
+    return this.http.post(`${this.url}/EnviarCorreoAlertaDocumentos`, documentoEnvioAlerta, { withCredentials: true });
+  }
+  
   public cerrarDocumentos(ids: number[]) {
     return this.http.put(`${this.url}/CerrarDocumentos`, ids, { withCredentials: true });
   }
+  
+  
+  
+  
 }

@@ -14,6 +14,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentosEstadoService } from '../administracion-documentos-estado/documentos-estado-service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
+import { DocumentoAlertaDatosAsunto } from '@ScatoModels/digitalizacion-documentos/documento-alerta-datos-asunto';
 
 @Component({
   selector: 'app-administracion-documentos-estado-listado',
@@ -37,7 +38,6 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
 
   private destroy$ = new Subject();
   private nominacionId: number = 0;
-  private embarqueId: number = 684;
   constructor(private _documentosEstadoListadoService: DocumentosEstadoListadoService,
     private _documentosEstadoService: DocumentosEstadoService,
     private _documentosService: DocumentoService,
@@ -68,8 +68,8 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     if (this.datosFiltroForm.controls.documentoEstado.value > '')
       documentoEstado = this.datosFiltroForm.controls.documentoEstado.value.map((item) => { return item.id }).join(',');
 
-    if (configuracionDocumento == 0) {
-      let mensaje: string = 'Debe seleccionar el documento.';
+    if (configuracionDocumento == 0){
+      let mensaje: string = 'Debe seleccionar una configuración.';
       this._confirmationDialogService.confirm('Administración de documentos', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
@@ -124,6 +124,20 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     return index;
   }
   public onOpenModalAlerta(modal) {
+    const configuracionDocumento = this.datosFiltroForm.controls["configuracionDocumento"].value;
+    const nombreBuque = this.embarques.controls[0].get("nombreBuque").value;
+    const fechaNominacion = this.embarques.controls[0].get("fechaNominacion").value;
+    if (configuracionDocumento == 0){
+      let mensaje: string = 'Debe seleccionar una configuración para generar la alerta.';
+      this._confirmationDialogService.confirm('Administración de documentos', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    let documentoAlertaDatosAsunto = {
+      clienteDestino : configuracionDocumento.descripcion,
+      nombreBuque : nombreBuque,
+      fechaNominacion : fechaNominacion
+    };
+    this._documentosEstadoService.DocumentoAlertaDatosAsunto = documentoAlertaDatosAsunto;
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
@@ -171,9 +185,9 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
         this.listadoDocumentoEstado = data;
     });
   }
-  private cargarDatosEmbarque() {
-    this._documentosEstadoListadoService.obtenerNominacionDocumentoEmbarque(this.nominacionId, this.embarqueId).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionDocumentoEmbarque) => {
-      if (data != null) {
+  private cargarDatosEmbarque(){
+    this._documentosEstadoListadoService.obtenerNominacionDocumentoEmbarque(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe((data: NominacionDocumentoEmbarque) =>{
+      if (data!=null){
         this._documentosEstadoListadoService.cargarDatosEmbarque(this.embarques, data);
       }
     });

@@ -1236,3 +1236,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Moc_Documentos_Visualizar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')); end
+
+-- Motivos de Envio de alerta de documentacion
+if not exists(select 1 from DocumentoMotivoAlerta where Motivo='Borradores') BEGIN insert into DocumentoMotivoAlerta(Motivo)values('Borradores'); END
+if not exists(select 1 from DocumentoMotivoAlerta where Motivo='Documentos Fuera de término') BEGIN insert into DocumentoMotivoAlerta(Motivo)values('Documentos Fuera de término'); END
+if not exists(select 1 from DocumentoMotivoAlerta where Motivo='Documentos compartidos') BEGIN insert into DocumentoMotivoAlerta(Motivo)values('Documentos compartidos'); END
+if not exists(select 1 from DocumentoMotivoAlerta where Motivo='Otros') BEGIN insert into DocumentoMotivoAlerta(Motivo)values('Otros'); END
+
+--Correo de alerta de documentos
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaDocumentos') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('AlertaDocumentos','macarena.asqueri@molinosagro.com.ar; romina.escudero@molinosagro.com.ar'); END
+GO
