@@ -189,13 +189,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 							}
 
 							// Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
-							var planillaDeEmbarque = Repositorio.Obtener<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == bodegaDb.BodegaParcel);
-							if (planillaDeEmbarque != null)
-							{
+							var planillasDeEmbarque = Repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == bodegaDb.BodegaParcel);
+                            foreach (var planillaDeEmbarque in planillasDeEmbarque)
+                            {
 								planillaDeEmbarque.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
-								//planillaDeEmbarque.Destino = destino;
 								planillaDeEmbarque.MaterialPuerto = materialPuerto;
-							}
+                            }
 
 							// Elimino los destino que están en DB pero no en el DTO
 							var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => !bodegaDto.Destinos.Any(x => x.Destino.Id == d.Destino.Id)).ToList();

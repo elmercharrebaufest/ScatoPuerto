@@ -237,9 +237,9 @@ export class CargaLiquidosComponent implements OnInit {
     let lineas = document.getElementsByClassName('lineas-detalles')[0] as HTMLDivElement;
     if(lineas !== undefined){
       lineas.className = '';
-      lineas.style.marginTop = "-20px";   
+      lineas.style.marginTop = "-20px";
     }
-    
+
     //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
     // #region setValores
     setTimeout(() => {
@@ -400,8 +400,8 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let planillaDeEmbarque = this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null;
-    if (!this.validarExportadorYPartida(planillaDeEmbarque)) {
+    let planillaDeEmbarque = this.planillaEmbarqueComponent?.obtenerDatosPlanillaDeEmbarque();
+    if (planillaDeEmbarque && !this.validarExportadorYPartida(planillaDeEmbarque)) {
       this.confirmationDialogService.confirm('¡Atención!', 'Revise la planilla de embarque, la combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
       return;
     }
