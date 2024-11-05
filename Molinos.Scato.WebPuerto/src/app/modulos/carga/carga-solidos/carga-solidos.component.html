@@ -35,27 +35,27 @@
       <!-- </ ARMOA005-1988 Dylan Lopez> -->
       <div *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga && mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
     
-      <app-balanzas *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
+      <app-balanzas *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
     
-      <app-balanzas-manual *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga"></app-balanzas-manual>
-      <app-finalizacion-carga *ngIf="ingresoManualSolido && existeFechasPeriodoDeCarga"
+      <app-balanzas-manual *ngIf="moduloDeCarga && ingresoManualSolido && existeFechasPeriodoDeCarga"></app-balanzas-manual>
+      <app-finalizacion-carga *ngIf="moduloDeCarga && ingresoManualSolido && existeFechasPeriodoDeCarga"
         (finalizacionCarga)="obtenerFinalizacionCarga($event)"></app-finalizacion-carga>
     </div>
 
     <!-- <ARMOA005-1988 Dylan Lopez> -->
     <ng-container *ngIf="hasPermisoTableroSolido_VerRitmosEmbarqueBlzas78()">
-      <app-balanzas-ritmos *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga"></app-balanzas-ritmos>
+      <app-balanzas-ritmos *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga"></app-balanzas-ritmos>
     </ng-container>
     <!-- </ ARMOA005-1988 Dylan Lopez> -->
 
     <ng-container *ngIf="hasPermisoTableroSolido_VerCargasBodegas()">
-      <app-bodegas *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga"></app-bodegas>
+      <app-bodegas *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga"></app-bodegas>
     </ng-container>
 
     <div *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga && mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
     <!-- <ARMOA005-1988 Dylan Lopez> -->
-    <div class="row mt-3" *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga">
+    <div class="row mt-3" *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga">
       <div class="col espacio-izq">
         <ng-container *ngIf="hasPermisoTableroSolido_VerRitmos()">
           <app-graficos-ritmos></app-graficos-ritmos>

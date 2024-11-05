@@ -68,7 +68,7 @@ export class CargaSolidosComponent implements OnInit {
     // </ ARMOA005-1988 Dylan Lopez>
   ingresoManualSolido: boolean = false;
   existeFechasPeriodoDeCarga: boolean = false;
-
+  moduloDeCarga = null;
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -154,6 +154,7 @@ export class CargaSolidosComponent implements OnInit {
   cargarModuloCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
+        this.moduloDeCarga = res;
         this.enviado = res.enviado;
         this.ingresoManualSolido = res.ingresoManualSolido;
         this.usuarioFinalizacion = res.usuarioFinalizacion;
@@ -338,6 +339,7 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   obtenerInicioCarga(inicioCarga){
+    console.log('entroooo obtenerInicioCarga');
     this.inicioCarga = inicioCarga;
     this.cargarModuloCarga();
   }
