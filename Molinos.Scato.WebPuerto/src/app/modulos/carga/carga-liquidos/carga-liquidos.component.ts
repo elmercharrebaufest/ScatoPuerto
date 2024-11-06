@@ -81,6 +81,12 @@ export class CargaLiquidosComponent implements OnInit {
     private elem: ElementRef
   ) {
     this.user = this.session.getUser();
+    this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
+      if (data) {
+        this.obtenerModuloDeCarga();
+      }
+    });
+
   }
 
   ngOnInit(): void {
@@ -400,10 +406,23 @@ export class CargaLiquidosComponent implements OnInit {
     else
       this.usuarioFinalizacion = null;
 
-    let planillaDeEmbarque = this.planillaEmbarqueComponent?.obtenerDatosPlanillaDeEmbarque();
-    if (planillaDeEmbarque && !this.validarExportadorYPartida(planillaDeEmbarque)) {
-      this.confirmationDialogService.confirm('¡Atención!', 'Revise la planilla de embarque, la combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+    let planillaDeEmbarque = this.planillaEmbarqueComponent ? this.planillaEmbarqueComponent.obtenerDatosPlanillaDeEmbarque() : null;
+    let lineasEmbarque = this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null;
+
+    if (lineasEmbarque == null) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingrear lineas de embarque para enviar al tablerista.', 'Aceptar', '', null, null, Tipoalerta.Success);
       return;
+    }
+
+    if (planillaDeEmbarque!=null && planillaDeEmbarque!=undefined) {
+      if (planillaDeEmbarque.length == 0){
+        this.confirmationDialogService.confirm('¡Atención!', 'No se puede finalizar cuando no se ha ingresado datos a la planilla.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        return;
+      }
+      if (!this.validarExportadorYPartida(planillaDeEmbarque)) {
+        this.confirmationDialogService.confirm('¡Atención!', 'Revise la planilla de embarque, la combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        return;
+      }
     }
 
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,

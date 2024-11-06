@@ -276,7 +276,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
         console.log(res);
         const texto = "Se guardo la planilla de embarque correctamente";
         this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-        console.log('termino');
+        this.moduloCargaService.actualizarPlanillaLiquido = true;
       },
       err => {
         this.guardando = false;
