@@ -201,19 +201,22 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
-        public NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId, int embarqueId)
+        public NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId)
         {
             var nominacion = this._repositorio.Obtener<Nominacion>(x => x.Id == nominacionId);
-            var lineUp = this._repositorio.Obtener<LineUp>(x => x.Embarque.Id == embarqueId);
+            var lineUp = nominacion.Embarque!=null? this._repositorio.Obtener<LineUp>(x => x.Embarque.Id == nominacion.Embarque.Id) : null;
             var nominacionDocumentoEmbarque = new NominacionDocumentoEmbarqueDto();
             nominacionDocumentoEmbarque.NombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Nombre;
             nominacionDocumentoEmbarque.FechaNominacion = nominacion.FechaCreacion.Value.ToString("dd/MM/yyyy hh:mm");
             if (lineUp != null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga != null && lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
             {
-                var moduloDeCargaPeriodoDeCarga = lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
-                string fechaFinCarga = moduloDeCargaPeriodoDeCarga.FechaFinalizacionCarga.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
-                string horaFinCarga = moduloDeCargaPeriodoDeCarga.HoraFinalizacionCarga;
-                nominacionDocumentoEmbarque.FechaFinalizacionCarga = string.Format("{0} {1}", fechaFinCarga, horaFinCarga);
+                var moduloDeCargaPeriodoDeCarga = lineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga?.FirstOrDefault();
+                if (moduloDeCargaPeriodoDeCarga != null && moduloDeCargaPeriodoDeCarga.FechaFinalizacionCarga != null && moduloDeCargaPeriodoDeCarga.HoraFinalizacionCarga != null)
+                {
+                    string fechaFinCarga = moduloDeCargaPeriodoDeCarga.FechaFinalizacionCarga.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    string horaFinCarga = moduloDeCargaPeriodoDeCarga.HoraFinalizacionCarga != null ? moduloDeCargaPeriodoDeCarga.HoraFinalizacionCarga : string.Empty;
+                    nominacionDocumentoEmbarque.FechaFinalizacionCarga = string.Format("{0} {1}", fechaFinCarga, horaFinCarga);
+                }
             }
             return nominacionDocumentoEmbarque;
         }
@@ -346,6 +349,26 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw new Exception(res.Errores[""]);
             }
+        }
+
+        public IList<DocumentoMotivoAlertaDto> ListarDocumentoMotivoAlerta()
+        {
+            return Listar<DocumentoMotivoAlerta, DocumentoMotivoAlertaDto>();
+        }
+        public IList<string> CorreoAlertaDocumentos()
+        {
+            var correoAlertaDocumentos = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaDocumentos").Direcciones.Split(';').Select(x => x.Trim()).ToList();
+            return correoAlertaDocumentos;
+        }
+
+        public void EnviarCorreoAlertaDocumentos(DocumentoEnvioAlertaDto documentoEnvioAlerta)
+        {
+            _servicioComandos.Ejecutar(new EnvioMail
+            {
+                Cuerpo = documentoEnvioAlerta.Comentario,
+                Destinatarios = documentoEnvioAlerta.Destinatarios.Split(';').ToList(),
+                Titulo = documentoEnvioAlerta.Asunto
+            });
         }
 
         public void EnviarMailsAlerta()

@@ -248,6 +248,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
           //this.zarparEmbarque();
           //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
 
+          this.lineUpService.sendRecargarListado(true);
           InstanciaWorkflowPuerto
           this.router.navigate(['/lineup']);
         } else

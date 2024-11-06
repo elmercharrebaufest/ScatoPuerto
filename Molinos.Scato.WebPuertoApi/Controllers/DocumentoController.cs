@@ -1,5 +1,6 @@
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Documentos;
 using Molinos.Scato.Servicios;
 using System;
 using System.Collections.Generic;
@@ -219,11 +220,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
         [HttpGet]
         [Route("api/documento/ObtenerNominacionDocumentoEmbarque")]
-        public HttpResponseMessage ObtenerNominacionDocumentoEmbarque(int nominacionId, int embarqueId)
+        public HttpResponseMessage ObtenerNominacionDocumentoEmbarque(int nominacionId)
         {
             try
             {
-                var resultado = servicioDocumento.ObtenerNominacionDocumentoEmbarque(nominacionId, embarqueId);
+                var resultado = servicioDocumento.ObtenerNominacionDocumentoEmbarque(nominacionId);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -423,6 +424,49 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+        
+        [HttpGet]
+        [Route("api/documento/ListarDocumentoMotivoAlerta")]
+        public HttpResponseMessage ListarDocumentoMotivoAlerta()
+        {
+            try
+            {
+                var resultado = servicioDocumento.ListarDocumentoMotivoAlerta();
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        [HttpGet]
+        [Route("api/documento/CorreoAlertaDocumentos")]
+        public HttpResponseMessage CorreoAlertaDocumentos()
+        {
+            try
+            {
+                var resultado = servicioDocumento.CorreoAlertaDocumentos();
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        [HttpPost]
+        [Route("api/documento/EnviarCorreoAlertaDocumentos")]
+        public HttpResponseMessage EnviarCorreoAlertaDocumentos(DocumentoEnvioAlertaDto documentoEnvioAlerta)
+        {
+            try
+            {
+                servicioDocumento.EnviarCorreoAlertaDocumentos(documentoEnvioAlerta);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }        
 
         [HttpGet]
         [Route("api/documento/EnviarMailsAlerta")]

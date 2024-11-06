@@ -63,7 +63,7 @@ namespace Molinos.Scato.Servicios
         void CrearComentario(int nomDocId, string texto, string usuario);
 
         [OperationContract]
-        NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId, int embarqueId);
+        NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId);
 
         [OperationContract]
         IList<NominacionDocumentoEstadoPorEmbarqueDto> ListarNominacionDocumentoEstadoPorEmbarque(int nominacionId, int configuracionDocumentoId, List<string> documento = null, List<string> documentoEstado = null);
@@ -83,7 +83,18 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void CerrarDocumentos(List<int> nomDocIds, string usuario);
 
+
         [OperationContract]
-        void EnviarMailsAlerta();
-    }
+        IList<DocumentoMotivoAlertaDto> ListarDocumentoMotivoAlerta();
+
+        [OperationContract]
+        IList<string> CorreoAlertaDocumentos();
+
+        [OperationContract]
+        void EnviarCorreoAlertaDocumentos(DocumentoEnvioAlertaDto documentoEnvioAlerta);
+        
+        [OperationContract]
+        void EnviarMailsAlerta();        
+  
+  }
 }

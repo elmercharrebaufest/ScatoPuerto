@@ -234,6 +234,18 @@ export class NominacionDatoTecnicoRegistroService {
         }
       }
 
+      const etaRecalada = new Date(datoTecnicoForm.get('etaRecalada').value);
+      if (isNaN(etaRecalada.getTime()) || etaRecalada.getFullYear() < 2020 || etaRecalada.getFullYear() > 2099) {
+        mostrarError('La fecha ETA Recalada no es válida');
+        return false;
+      }
+
+      const obligacionDeCarga = new Date(datoTecnicoForm.get('obligacionDeCarga').value);
+      if (isNaN(obligacionDeCarga.getTime()) || obligacionDeCarga.getFullYear() < 2020 || obligacionDeCarga.getFullYear() > 2099) {
+        mostrarError('La fecha ETA Recalada no es válida');
+        return false;
+      }
+
       return true;
     }
 

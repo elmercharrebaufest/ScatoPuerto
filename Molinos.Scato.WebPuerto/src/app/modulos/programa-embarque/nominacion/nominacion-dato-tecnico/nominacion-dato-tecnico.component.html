@@ -18,7 +18,7 @@
                 <div class="input-group">
                     <input type="number" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadTotal"
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required                        
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required
                         step="0.001" min="0" max="9999999999.999"
                         (change)="onCantidadNominacionDatoTecnicoChange($event)">
                     <div class="input-group-append">
@@ -78,7 +78,7 @@
                                 {{calidad.calidadValor.parametro}}
                             </td>
                             <td>
-                                <input class="inputCalidadValor" type="text" value="{{calidad.calidadValorEditado && calidad.esSeleccionado? calidad.calidadValorEditado : calidad.calidadValor.valor}}" 
+                                <input class="inputCalidadValor" type="text" value="{{calidad.calidadValorEditado && calidad.esSeleccionado? calidad.calidadValorEditado : calidad.calidadValor.valor}}"
                                 (change)="onEditCalidadValor($event, calidad)" [disabled]="!calidad.esSeleccionado"/>
                             </td>
                         </tr>
@@ -288,7 +288,7 @@
             <div class="form-group col-md-3">
                 <label for="etaRecalada" class="font-weight-bold">ETA Recalada *</label>
                 <div class="input_img">
-                    <input type="date" max="3000-12-31" [min]="fechaMinimaEtaRecalada" class="form-control"
+                    <input type="date" max="2099-12-31" [min]="fechaMinimaEtaRecalada" class="form-control"
                         [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.etaRecalada.invalid}" required
                         formControlName="etaRecalada">
                 </div>
@@ -296,7 +296,7 @@
             <div class="form-group col-md-3">
                 <label for="obligacionDeCarga" class="font-weight-bold">Obligación de carga *</label>
                 <div class="input_img">
-                    <input type="date" max="3000-12-31" [min]="fechaMinimaObligacionCarga" class="form-control"
+                    <input type="date" max="2099-12-31" [min]="fechaMinimaObligacionCarga" class="form-control"
                         [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.obligacionDeCarga.invalid}"
                         required formControlName="obligacionDeCarga">
                 </div>
@@ -379,7 +379,7 @@
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
-                            
+
                             (click)="nuevaAgenciaMaritimaAta(2, editAgenciaAta)"
                             >
                     </div>
@@ -399,7 +399,7 @@
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
-                        
+
                           (click)="nuevaAgenciaMaritimaAta(1, editAgenciaAta)"
                         >
                     </div>
@@ -441,15 +441,15 @@
 </div>
 
 <ng-template #modalABM let-modal>
-  <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal" 
+  <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal"
     (actualizarTipoLista)="onActualizarTipoLista($event)">
   </app-alta-baja-mantenimiento>
 </ng-template>
 
 <ng-template #editAgenciaAta let-modal>
-  <app-modificar-agenciamaritima-ata (editOCrearFinish)="editFinish($event)" 
-    [id]="idAgencia" 
-    [tittle]="tittle" 
+  <app-modificar-agenciamaritima-ata (editOCrearFinish)="editFinish($event)"
+    [id]="idAgencia"
+    [tittle]="tittle"
     [tipo]="typeAgencia">
   </app-modificar-agenciamaritima-ata>
 </ng-template>

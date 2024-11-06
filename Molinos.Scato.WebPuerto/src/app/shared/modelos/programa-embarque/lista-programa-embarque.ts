@@ -20,4 +20,5 @@ export class Items{
     enviadoSurveyor: boolean;
     contrato: string;
     estado: number;
+    tieneConfiguracionDocumento: boolean;
  }

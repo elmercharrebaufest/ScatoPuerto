@@ -194,7 +194,7 @@
                     <img *ngIf="tienePermisoDigitalizacion()" src="assets/clipboard_data.svg" (click)="onAdministrarDocumentosNominacion(historial.id)"
                     style="cursor: pointer; filter: grayscale(100%);">
                 </td>
-                <td class="noBorder centradoHorizontal">
+                <td class="noBorder centradoHorizontal" *ngIf="historial.tieneConfiguracionDocumento">
                     <img src="assets/folder_check.svg"
                     style="cursor: pointer" (click)="onAdministrarDocumentosEstados(historial.id)">
                 </td>

@@ -31,8 +31,8 @@ export class DocumentosEstadoListadoService {
   listarNominacionDocumentoEstadoPorEmbarque(nominacionId: number, configuracionDocumentoId:number, documento: string,documentoEstado:string): Observable<NominacionDocumentoEstadoPorEmbarque[]> {
     return this.documentoService.listarNominacionDocumentoEstadoPorEmbarque(nominacionId, configuracionDocumentoId,documento,documentoEstado).pipe(map((data: NominacionDocumentoEstadoPorEmbarque[]) => { return data; }));
   }
-  obtenerNominacionDocumentoEmbarque(nominacionId: number, embarqueId: number): Observable<NominacionDocumentoEmbarque> {
-    return this.documentoService.obtenerNominacionDocumentoEmbarque(nominacionId, embarqueId).pipe(map((data: NominacionDocumentoEmbarque) => { return data; }));
+  obtenerNominacionDocumentoEmbarque(nominacionId: number): Observable<NominacionDocumentoEmbarque> {
+    return this.documentoService.obtenerNominacionDocumentoEmbarque(nominacionId).pipe(map((data: NominacionDocumentoEmbarque) => { return data; }));
   }
 
   listarDocumentosPorNominacion(nominacionId: number): Observable<Documento[]> {
