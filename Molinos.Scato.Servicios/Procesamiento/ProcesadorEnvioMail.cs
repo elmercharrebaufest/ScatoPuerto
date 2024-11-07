@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
@@ -57,6 +58,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 message.Subject = comando.Titulo;
                 message.Body = comando.Cuerpo;
                 message.IsBodyHtml = true;
+                Log.Info("Destinatarios:", String.Join(", ", message.To));
                 using (var smtpClient = new SmtpClient())
                 {
                     ServicePointManager.ServerCertificateValidationCallback =
