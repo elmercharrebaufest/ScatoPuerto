@@ -28,6 +28,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var message = new MailMessage();
 
+                Log.Info("comando.Destinatarios:", String.Join(";", comando.Destinatarios));
+
                 foreach (var email in comando.Destinatarios)
                 {
                     message.To.Add(new MailAddress(email));
