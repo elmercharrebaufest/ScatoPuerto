@@ -36,6 +36,8 @@
 	<setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
 	<setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
 
+	<setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
+
 	<setParameter name="MailSettings Smtp From" value="scatoQAMOA@molinosagro.com.ar" />
 	<setParameter name="MailSettings Smtp Host" value="10.254.20.101" />
 	<setParameter name="MailSettings Smtp Port" value="25" />

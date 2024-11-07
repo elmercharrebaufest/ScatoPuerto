@@ -18,7 +18,7 @@ export class LayoutComponent implements OnInit {
   private user: any;
   rutaActual: string;
   public envClass = 'env-' + environment.envName;
-  public verAfip = ['dev','qa'].includes(environment.envName);
+  public verAfip = ['dev','qa','uat'].includes(environment.envName);
 
   constructor(
     private router: Router,
