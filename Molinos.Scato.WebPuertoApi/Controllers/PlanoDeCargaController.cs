@@ -8,6 +8,7 @@ using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
+using System.Configuration;
 using System.Net;
 using System.Net.Http;
 using System.Web;
@@ -248,9 +249,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var plano = servicio.ObtenerPlanoDeCarga(planoDeCargaId);
+                var correoPuerto = ConfigurationManager.AppSettings["EmailPuerto"];
 
-                if (!HttpContext.Current.Request.IsLocal)
-                    mail.Destinatarios.Add("scatoprodMOA@molinosagro.com.ar");
+                mail.Destinatarios.Add(correoPuerto);
 
                 // CARACTERES NO IMPRIMIBLES:
                 // Enter: (\n -> <br/>)
