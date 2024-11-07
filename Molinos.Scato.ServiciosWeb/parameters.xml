@@ -170,4 +170,9 @@
 					match="/configuration/appSettings/add[@key='PathPlanillaSolidos']
                            /@value" />
   </parameter>
+	<parameter name="EmailPuerto Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='EmailPuerto']
+                           /@value" />
+	</parameter>
 </parameters>
