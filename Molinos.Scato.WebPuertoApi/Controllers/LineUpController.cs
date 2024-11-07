@@ -7,6 +7,7 @@ using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -158,6 +159,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var docFile = "Line Up " + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
             try
             {
+                var correoPuerto = ConfigurationManager.AppSettings["EmailPuerto"];
                 var embarques = servicio.ListarEmbarques();
                 embarques = embarques.Where(x => x.LineUp.Ocultar == false).ToList();
                 var estado = servicio.ObtenerEstadoPuerto();
@@ -165,8 +167,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var generadorExcel = new ExcelLineUp();
                 generadorExcel.GenerarArchivo(resultado, embarques, estado);
 
-                if (!HttpContext.Current.Request.IsLocal)
-                    mail.Destinatarios.Add("scatoprodMOA@molinosagro.com.ar");
+                mail.Destinatarios.Add(correoPuerto);
 
                 // CARACTERES NO IMPRIMIBLES:
                 // Enter: (\n -> <br/>)
