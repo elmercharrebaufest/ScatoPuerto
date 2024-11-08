@@ -2873,5 +2873,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas);
 
+        [OperationContract]
+        string ObtenerParamCorreo();
+
     }
 }

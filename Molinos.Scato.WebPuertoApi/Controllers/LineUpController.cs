@@ -159,7 +159,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             var docFile = "Line Up " + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
             try
             {
-                var correoPuerto = ConfigurationManager.AppSettings["EmailPuerto"];
+                var correoPuerto = servicio.ObtenerParamCorreo();
                 var embarques = servicio.ListarEmbarques();
                 embarques = embarques.Where(x => x.LineUp.Ocultar == false).ToList();
                 var estado = servicio.ObtenerEstadoPuerto();
