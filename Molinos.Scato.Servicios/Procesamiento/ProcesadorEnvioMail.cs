@@ -27,12 +27,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var message = new MailMessage();
+                Log.Info("DestinatariosComando:" + String.Join(", ", comando.Destinatarios));
 
-                foreach (var email in comando.Destinatarios)
+                var destinatarios = comando.Destinatarios.ToList();
+
+                foreach (var email in destinatarios)
                 {
                     message.To.Add(new MailAddress(email));
                 }
-                
+
                 if (comando.Origen != null)
                 {
                     message.From = new MailAddress(comando.Origen);
@@ -58,7 +61,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 message.Subject = comando.Titulo;
                 message.Body = comando.Cuerpo;
                 message.IsBodyHtml = true;
-                Log.Info("Destinatarios:", String.Join(", ", message.To));
+                Log.Info("DestinatariosMessage:" + String.Join(", ", message.To));
+
                 using (var smtpClient = new SmtpClient())
                 {
                     ServicePointManager.ServerCertificateValidationCallback =
