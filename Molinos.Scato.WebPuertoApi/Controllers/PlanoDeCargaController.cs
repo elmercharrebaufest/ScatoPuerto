@@ -9,6 +9,7 @@ using Molinos.Scato.Servicios.Procesamiento;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
 using System.Configuration;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web;
@@ -253,6 +254,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 mail.Destinatarios.Add(correoPuerto);
 
+                if (mail.Destinatarios != null && mail.Destinatarios.Any())
+                {
+                    mail.Destinatarios.RemoveAll(item => item == null || item == "");
+                }
+                
                 // CARACTERES NO IMPRIMIBLES:
                 // Enter: (\n -> <br/>)
                 // Tabulador: (\t -> &nbsp;&nbsp;&nbsp;&nbsp;)
