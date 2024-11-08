@@ -13444,5 +13444,11 @@ namespace Molinos.Scato.Servicios.Impl
                 .Select(detalle => detalle.Bodega.Nombre.Split(' ').Last())
                 .Any(parcel => bodegas.Contains(parcel)));
         }
+
+        public string ObtenerParamCorreo()
+        {
+            var correoPuerto = ConfigurationManager.AppSettings["EmailPuerto"];
+            return correoPuerto;
+        }
     }
 }

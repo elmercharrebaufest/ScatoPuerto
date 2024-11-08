@@ -250,7 +250,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var plano = servicio.ObtenerPlanoDeCarga(planoDeCargaId);
-                var correoPuerto = ConfigurationManager.AppSettings["EmailPuerto"];
+                var correoPuerto = servicio.ObtenerParamCorreo();
 
                 mail.Destinatarios.Add(correoPuerto);
 
