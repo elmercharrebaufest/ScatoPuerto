@@ -20,6 +20,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   public documentos: ElementoNominacionDocumento[] = [];
   public elementos: ElementoNominacionDocumento[] = [];
+  public elementosCompartidos: ElementoNominacionDocumento[] = [];
   public estados: NominacionDocumentoEstado[] = [];
   public configuracionId: number = 0;
   public nomDocId: number = 0;
@@ -38,7 +39,6 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.actualizarDocumentosNominacion();
   }
 
   private actualizarDocumentosNominacion() {
@@ -60,7 +60,6 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
         estaCerrado: doc.nominacionDocumentoEstado.estado == 'Documento Cerrado'
       }));
       this.elementos = this.documentos;
-      console.log(this.elementos);
       this.filtrarDocumentos();
       this.desplegarArchivosSubidos();
     }, (error: Error) => {
@@ -79,6 +78,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   private filtrarDocumentos() {
     this.elementos = this.documentos.filter(doc => doc.documento.documento.documentoTipo.nombre === 'A solicitar en la nominación');
+    this.elementosCompartidos = this.documentos.filter(doc => doc.documento.documento.documentoTipo.nombre === 'A compartir')
   }
 
   public onAbrirSelectorArchivos(nomDocId: number): void {
@@ -169,6 +169,10 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     this.elementos[index].mostrarArchivos = !this.elementos[index].mostrarArchivos;
   }
 
+  onDesplegarArchivosCompartidos(index: number): void {
+    this.elementosCompartidos[index].mostrarArchivos = !this.elementosCompartidos[index].mostrarArchivos;
+  }
+
   public onBorrarArchivo(archivo: NominacionDocumentoArchivo): void {
     try {
       this.confirmationDialogService.confirm('Eliminar Archivo', `¿Esta seguro de querer eliminar el archivo ${archivo.nombre}?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
@@ -251,6 +255,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
   private obtenerEstados() {
     this.documentosService.obtenerEstados().subscribe((data: NominacionDocumentoEstado[]) => {
       this.estados = data;
+      this.actualizarDocumentosNominacion();
     }, (error: Error) => {
       console.error(error);
     });
@@ -264,13 +269,13 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
             this.documentosService.actualizarEstado(docNomId, estadoId).subscribe(res => {
               this.modalService.dismissAll();
               this.confirmationDialogService.exito('Estado actualizado con éxito.');
+              this.obtenerDocumentosNominacion(this.configuracionId);
             }, (error: any) => {
               console.error('Error al enviar el formulario', error);
               this.modalService.dismissAll();
               this.mostrarError("Hubo un error al intentar actualizar el estado del documento.");
             });
           }
-          this.obtenerDocumentosNominacion(this.configuracionId);
         })
     } catch (error) {
       console.error(error);

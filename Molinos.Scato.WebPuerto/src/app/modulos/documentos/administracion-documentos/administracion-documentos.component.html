@@ -16,32 +16,29 @@
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="buque" class=""><strong>Buque:</strong></label>
-                    <input type="text" class="form-control" id="buque" placeholder="Buque" [(ngModel)]="buque"
-                        [readonly]="true">
+                    <label class="form-control border-0" id="buque">{{ buque }}</label>
                 </div>
             </div>
             <!-- Fecha de nominación -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="fechaNominacion"><strong>Fecha de nominación:</strong></label>
-                    <input type="text" class="form-control" id="fechaNominacion" placeholder="Fecha de registro"
-                        [(ngModel)]="fechaNominacion" [readonly]="true">
+                    <label class="form-control border-0" id="fechaNominacion">{{ fechaNominacion }}</label>                   
                 </div>
             </div>
             <!-- Producto -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="producto"><strong>Producto:</strong></label>
-                    <input type="text" class="form-control" id="producto" placeholder="Placeholder"
-                        [(ngModel)]="producto" [readonly]="true">
+                    <label class="form-control border-0" id="producto">{{ producto }}</label>
                 </div>
             </div>
+            
             <!--Juegos-->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="juegos"><strong>Cantidad de juegos:</strong></label>
-                    <input type="text" class="form-control" id="juegos"
-                        [(ngModel)]="cantJuegos" [readonly]="true">
+                    <label class="form-control border-0" id="cantJuegos">{{ cantJuegos }}</label>
                 </div>
             </div>
             <!-- Destino -->

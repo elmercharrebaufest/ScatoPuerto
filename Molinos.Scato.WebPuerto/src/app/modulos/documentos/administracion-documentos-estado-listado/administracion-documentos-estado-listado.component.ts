@@ -15,6 +15,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentosEstadoService } from '../administracion-documentos-estado/documentos-estado-service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
 import { DocumentoAlertaDatosAsunto } from '@ScatoModels/digitalizacion-documentos/documento-alerta-datos-asunto';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-administracion-documentos-estado-listado',
@@ -38,6 +41,10 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
 
   private destroy$ = new Subject();
   private nominacionId: number = 0;
+
+  private user: Usuario;
+  permisosScato: typeof PermisosScato = PermisosScato;
+
   constructor(private _documentosEstadoListadoService: DocumentosEstadoListadoService,
     private _documentosEstadoService: DocumentosEstadoService,
     private _documentosService: DocumentoService,
@@ -45,8 +52,10 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     private _modalService: NgbModal,
     private _router: Router,
     private _route: ActivatedRoute,
-    private _formBuilder: FormBuilder
+    private _formBuilder: FormBuilder,
+    private session: SessionService
   ) {
+    this.user = this.session.getUser();
     this.cargarDatosNominacion();
   }
 
@@ -210,7 +219,7 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     documentosArray?.controls?.forEach((documentoGroup: FormGroup) => {
       let esDocumentoCerradoControl = documentoGroup.get('esDocumentoCerrado');
       let esDocumentoEnviadoControl = documentoGroup.get('esDocumentoEnviado');
-      if (esDocumentoEnviadoControl?.value === true) {
+      if (esDocumentoEnviadoControl?.value === true && !this.visualizaComex()) {
         esDocumentoCerradoControl?.enable();
       } else {
         esDocumentoCerradoControl?.disable();
@@ -279,6 +288,10 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     if (checkbox && checkbox.checked) {
       checkbox.checked = false;
     }
+  }
+
+  public visualizaComex(){
+    return this.user.permisos.find(p => p === this.permisosScato.Comex_Documentos_Visualizar);
   }
 
 }

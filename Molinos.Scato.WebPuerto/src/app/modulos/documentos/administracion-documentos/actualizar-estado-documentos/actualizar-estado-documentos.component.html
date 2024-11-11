@@ -80,10 +80,65 @@
             </li>
         </ul>
     </div>
+    <div class="container-fluid bg-white">
+        <div class="row header">
+            <div class="col-9 tituloCompartido">DOCUMENTOS COMPARTIDOS</div>
+            <div class="col-3 tituloCompartido">ACCIONES</div>
+        </div>
+    </div>
+    <div class="document-container">
+        <ul class="document-list">
+            <li *ngFor="let elementoC of elementosCompartidos; let i = index" class="document-item">
+                <div class="document-content">
+                    <div class="col-9">
+                        <span [title]="elementoC.documento.documento.nombre">
+                            {{ elementoC.documento.documento.nombre }}
+                            <i *ngIf="elementoC.mostrarArchivos" class="fas fa-chevron-up"
+                                (click)="onDesplegarArchivosCompartidos(i)"></i>
+                            <i *ngIf="!elementoC.mostrarArchivos" class="fas fa-chevron-down"
+                                (click)="onDesplegarArchivosCompartidos(i)"></i>
+                        </span>
+                    </div>
+                    <div class="col-3 document-actions">
+                        <img [src]="elementoC.tieneComentarios ? 'assets/chat_square_green.svg' : 'assets/chat_square.svg'"
+                            (click)="onAbrirComentarios(addComentario, elementoC.documento.id)">
+                    </div>
+                </div>
+                <ul *ngIf="elementoC.mostrarArchivos == true" class="p-0 m-0">
+                    <li *ngFor="let archivo of elementoC.documento.archivos">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span>
+                                <strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                            <div class="document-actions">
+                                <i *ngIf="puedeVisualizarArchivo(archivo) && tienePermisoDescargarArchivo()"
+                                    class="fa fa-eye icon-eye" aria-hidden="true"
+                                    (click)="onVisualizarArchivo(archivo)"></i>
+                                <img *ngIf="tienePermisoDescargarArchivo()" src="assets/file_arrow_down.svg"
+                                    (click)="onDescargarArchivo(archivo)">
+                            </div>
+                        </div>
+                    </li>
+                    <li *ngIf="elementoC?.documento?.archivos?.length ==0">
+                        <div class="document-content" style="margin-top: 10px;">
+                            <span>No hay archivos para este
+                                documento.</span>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li *ngIf="configuracionId == 0 || elementosCompartidos.length == 0"
+                style="background-color: white; text-align: center;">
+                <span>No existen documentos compartidos para el destino/cliente seleccionado.</span>
+            </li>
+        </ul>
+    </div>
     <input type="file" #fileInput (change)="onSeleccionarArchivos($event)" hidden
         accept=".xls, .xlsx, .pdf, .doc, .docx, .png, .jpg, .jpeg" multiple />
+    <hr>
 </div>
 
 <ng-template #addComentario let-modal>
-    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()" (refrescarListado)="refrescarListado($event)"></app-modal-comentarios>
+    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()"
+        (refrescarListado)="refrescarListado($event)"></app-modal-comentarios>
 </ng-template>
