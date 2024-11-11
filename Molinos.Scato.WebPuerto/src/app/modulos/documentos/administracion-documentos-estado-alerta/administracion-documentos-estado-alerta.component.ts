@@ -11,6 +11,7 @@ import { takeUntil } from 'rxjs/operators';
 import { DocumentoEnvioAlerta } from '@ScatoModels/digitalizacion-documentos/documentacion-envio-alerta';
 import { DocumentosEstadoService } from '../administracion-documentos-estado/documentos-estado-service';
 import { DocumentoAlertaDatosAsunto } from '@ScatoModels/digitalizacion-documentos/documento-alerta-datos-asunto';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
 @Component({
   selector: 'app-administracion-documentos-estado-alerta',
@@ -29,6 +30,7 @@ export class AdministracionDocumentosEstadoAlertaComponent implements OnInit, On
   public documentoAlertaDatosAsunto: DocumentoAlertaDatosAsunto;
   constructor(private _formBuilder: FormBuilder,
               private _documentosEstadoService: DocumentosEstadoService,
+              private _confirmationDialogService: ConfirmationDialogService,
               private _documentoService: DocumentoService) { 
     this.documentoAlertaForm = this.inicializarForm();
     this.cargarConfiguracionDocumento();
@@ -79,6 +81,8 @@ export class AdministracionDocumentosEstadoAlertaComponent implements OnInit, On
     };
 
     this._documentoService.enviarCorreoAlertaDocumentos(documentoEnvioAlerta).subscribe(data=>{
+      this._confirmationDialogService.confirm('Administración de documentos', 'Se envio la alerta de documentos correctamente .', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      this.cerrar.emit();
     });
 
   }

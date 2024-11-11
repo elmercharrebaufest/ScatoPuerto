@@ -213,7 +213,7 @@ namespace Molinos.Scato.Servicios
         #region ABM Productos
 
         [OperationContract]
-        ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina);
+        ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina, List<string> listTipoDeProducto = null, List<string> listDocumentoTipo = null);
 
         [OperationContract]
         IList<ProductoDto> ListarProductosConCalidades(string nombre);
