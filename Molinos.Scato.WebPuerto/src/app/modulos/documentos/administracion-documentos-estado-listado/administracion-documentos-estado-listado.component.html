@@ -132,7 +132,7 @@
                             <div class="col-md-6 centrar-contenido">
                                 <label class="texto-estado">Documento</label>
                                 <label class="texto-estado">Cerrado</label>
-                                <input id="closeall" (change)="onMarcarTodosACerrar($event)" type="checkbox" class="radio-box-estado"
+                                <input id="closeall" [disabled]="visualizaComex()" (change)="onMarcarTodosACerrar($event)" type="checkbox" class="radio-box-estado"
                                 />
                             </div>
                         </div>

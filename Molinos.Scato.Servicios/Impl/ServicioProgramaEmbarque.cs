@@ -1213,10 +1213,10 @@ namespace Molinos.Scato.Servicios.Impl
 
         #region ABM Producto
 
-        public ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina)
+        public ListaPaginada<MaterialPuertoDto> ListarProductosPaginado(string nombre, int pagina, int itemsPorPagina, List<string> listTipoDeProducto = null, List<string> listDocumentoTipo = null)
         {
             var paginacion = new Paginacion(null, DirOrden.Asc, pagina, itemsPorPagina == 0 ? 10 : itemsPorPagina);
-            return repositorio.ListarConsultaPaginada(new ListarProductosConsulta(paginacion, nombre));
+            return repositorio.ListarConsultaPaginada(new ListarProductosConsulta(paginacion, nombre, listTipoDeProducto, listDocumentoTipo));
         }
 
         public IList<ProductoDto> ListarProductosConCalidades(string nombre)

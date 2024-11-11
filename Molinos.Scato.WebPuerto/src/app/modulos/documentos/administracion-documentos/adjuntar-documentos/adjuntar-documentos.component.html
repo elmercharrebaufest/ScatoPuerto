@@ -22,7 +22,7 @@
         </div>
         <ul class="document-list">
             <li *ngFor="let elemento of elementos; let i = index" class="document-item">
-                <div class="document-content">
+                <div class="document-content" [ngClass]="{'doc-cerrado': elemento.estaCerrado }">
                     <span>{{ elemento.documento.documento.nombre }} &nbsp;
                         <i *ngIf="elemento.mostrarArchivos" class="fas fa-chevron-up"
                             (click)="onDesplegarArchivos(i)"></i>
@@ -31,12 +31,12 @@
                     </span>
                     <div class="document-actions">
                         <img *ngIf="tienePermisoCrearArchivo()" src="assets/file_plus.svg" (click)="onAbrirSelectorArchivos(elemento.documento.id)">
-                        <img src="assets/chat_square.svg" (click)="onAbrirComentarios(addComentario, elemento.documento.id)">
+                        <img [src]="elemento.tieneComentarios ? 'assets/chat_square_green.svg' : 'assets/chat_square.svg'" (click)="onAbrirComentarios(addComentario, elemento.documento.id)">
                     </div>
                 </div>
                 <ul *ngIf="elemento.mostrarArchivos == true" class="p-0 m-0">
                     <li *ngFor="let archivo of elemento.documento.archivos">
-                        <div class="document-content" style="margin-top: 10px;">
+                        <div class="document-content" style="margin-top: 10px;" [ngClass]="{'doc-cerrado': elemento.estaCerrado }">
                             <span><strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
                                 {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
                             <div class="document-actions">
@@ -65,5 +65,5 @@
 </div>
 
 <ng-template #addComentario let-modal>
-    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()"></app-modal-comentarios>
+    <app-modal-comentarios [id]="nomDocId" (modalCerrar)="modal.dismiss()" (refrescarListado)="refrescarListado($event)"></app-modal-comentarios>
 </ng-template>

@@ -191,11 +191,11 @@
                     </div>
                 </td>
                 <td class="noBorder centradoHorizontal">
-                    <img *ngIf="tienePermisoDigitalizacion()" src="assets/clipboard_data.svg" (click)="onAdministrarDocumentosNominacion(historial.id)"
-                    style="cursor: pointer; filter: grayscale(100%);">
+                    <img *ngIf="tienePermisoDigitalizacion()" src="assets/folder_check.svg" (click)="onAdministrarDocumentosNominacion(historial.id)"
+                    style="cursor: pointer; filter: grayscale(100%);" title="Adjuntar Documentación">
                 </td>
-                <td class="noBorder centradoHorizontal" *ngIf="historial.tieneConfiguracionDocumento">
-                    <img src="assets/folder_check.svg"
+                <td class="noBorder centradoHorizontal">
+                    <img *ngIf="historial.tieneConfiguracionDocumento" src="assets/clipboard_data.svg" title="Ver Estado Documentacion"
                     style="cursor: pointer" (click)="onAdministrarDocumentosEstados(historial.id)">
                 </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarNominacion()'>

@@ -1,21 +1,26 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Usuario } from '@ScatoInterfaces/usuario';
+import { DocumentoTipo } from '@ScatoModels/digitalizacion-documentos/documento';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
+import { TipoDeProducto } from '@ScatoModels/tipo-de-producto';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { DocumentoService } from '@ScatoServicios/documento.service';
 import { ProductosService } from '@ScatoServicios/productos.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-productos',
   templateUrl: './productos.component.html',
   styleUrls: ['./productos.component.css']
 })
-export class ProductosComponent implements OnInit {
+export class ProductosComponent implements OnInit, OnDestroy  {
 
   @ViewChild('modalProducto') modalProducto: TemplateRef<any>;
   public estaCargando: boolean = false;
@@ -30,15 +35,25 @@ export class ProductosComponent implements OnInit {
   private errorExisteProducto: string = "No se puede anular al producto ya que esta siendo utilizado en una Nominación y / o embarque";
   private user: Usuario;
   private permisosScato: typeof PermisosScato = PermisosScato;
+  private destroy$ = new Subject();
+
+  public listaTipoDeProducto: TipoDeProducto[] = [];
+  private configTipoDeProductoMultiple;
+  public listaDocumentoTipo: DocumentoTipo[] = [];
+  private configDocumentoTipoMultiple;
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly productosService: ProductosService,
     private readonly confirmationDialogService: ConfirmationDialogService,
     private readonly modalService: NgbModal,
+    private readonly _documentoService: DocumentoService,
     private readonly session: SessionService,
   ){       
     this.inicializarForm();
+    this.listarTipoDocumento();
+    this.listarTipoProducto();
+    this.setConfigTipoDeProductoMultiple();
     this.user = this.session.getUser();
   }
   
@@ -49,6 +64,9 @@ export class ProductosComponent implements OnInit {
   public inicializarForm(): void {
     this.filtro = this.formBuilder.group({
       nombre: '',
+      tipoDeProducto: '',
+      documentoTipo: '',
+
     });
     this.productoForm = this.formBuilder.group({
       id: 0,
@@ -57,15 +75,27 @@ export class ProductosComponent implements OnInit {
   }
 
   public onBuscar(page?: PageEvent) {
+    let nombre: string = '';
+    let tipoDeProducto: string = '';
+    let documentoTipo: string = ''; 
+
     let pagina = 1, itemsPorPagina = 10;
     if (page) {
       pagina = page.pageIndex + 1;
       itemsPorPagina = page.pageSize;
     }
-    const nombre: string = this.filtro.get('nombre').value?.trim() || '';
+    
+    nombre = this.filtro.get('nombre').value?.trim() || '';    
+    
+    if (this.filtro.controls.tipoDeProducto.value > '')
+      tipoDeProducto = this.filtro.controls.tipoDeProducto.value.map((item) => { return item.id }).join(',');
+
+    if (this.filtro.controls.documentoTipo.value > '')
+      documentoTipo = this.filtro.controls.documentoTipo.value.map((item) => { return item.id }).join(',');
+
     this.mensaje = 'Cargando productos. Por favor, espere...';
     this.estaCargando = true;
-    this.productosService.ListarProductos(pagina, itemsPorPagina, nombre).subscribe(res => {
+    this.productosService.ListarProductos(pagina, itemsPorPagina, nombre,tipoDeProducto,documentoTipo).subscribe(res => {
       this.productos = res.items;
       this.itemsTotales = res.itemsTotales;
       this.estaCargando = false;
@@ -81,7 +111,6 @@ export class ProductosComponent implements OnInit {
     this.onBuscar();
   }
 
-  
   public onExportar() {
     this.mensaje = 'Exportando planilla de Excel...';
     this.estaCargando = true;
@@ -151,8 +180,70 @@ export class ProductosComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
+
+  public setConfigTipoDeProductoMultiple() {
+    this.configTipoDeProductoMultiple = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'nombre',
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
+    };
+  }
+  public getConfigTipoDeProductoMultiple() {
+    return this.configTipoDeProductoMultiple;
+  }
+  public getListadoTipoDeProducto() {
+    return this.listaTipoDeProducto;
+  }
+  
+  public setConfigDocumentoTipoMultiple() {
+    this.configDocumentoTipoMultiple = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'nombre',
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
+    };
+  }
+  public getConfigDocumentoTipoMultiple() {
+    return this.configDocumentoTipoMultiple;
+  }
+  public getListadoDocumentoTipo() {
+    return this.listaDocumentoTipo;
+  }
+
+
   private mostrarError(msj: string) {
     this.confirmationDialogService.error(msj);
+  }
+
+  private listarTipoProducto(){
+    let tipoDeProducto: TipoDeProducto = {
+      id : 1,
+      nombre : 'Liquido'
+    }
+    this.listaTipoDeProducto.push(tipoDeProducto);
+
+    tipoDeProducto = {
+      id : 2,
+      nombre : 'Solido'
+    }
+    this.listaTipoDeProducto.push(tipoDeProducto); 
+    console.log('this.listaTipoDeProducto--->>', this.listaTipoDeProducto)
+  }
+
+  private listarTipoDocumento(){
+    this._documentoService.listarDocumentoTipos().pipe(takeUntil(this.destroy$)).subscribe((data: DocumentoTipo[]) =>{
+      if (data!=null)
+        this.listaDocumentoTipo = data;
+        this.setConfigDocumentoTipoMultiple();
+    });
+
   }
 
   tienePermisoModificarProducto() {

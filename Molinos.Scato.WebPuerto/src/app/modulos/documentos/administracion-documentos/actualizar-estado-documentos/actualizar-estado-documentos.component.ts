@@ -20,6 +20,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   public documentos: ElementoNominacionDocumento[] = [];
   public elementos: ElementoNominacionDocumento[] = [];
+  public elementosCompartidos: ElementoNominacionDocumento[] = [];
   public estados: NominacionDocumentoEstado[] = [];
   public configuracionId: number = 0;
   public nomDocId: number = 0;
@@ -38,7 +39,6 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.actualizarDocumentosNominacion();
   }
 
   private actualizarDocumentosNominacion() {
@@ -54,10 +54,12 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     this.documentosService.listarDocumentosPorConfiguracion(configId).subscribe((data: any) => {
       this.documentos = data.map((doc: NominacionDocumento) => ({
         documento: doc,
-        mostrarArchivos: false
+        mostrarArchivos: false,
+        tieneComentarios: doc.comentarios.length > 0,
+        nombreAcortado: doc.documento.nombre.length > 25 ? doc.documento.nombre.substring(0, 24) + "..." : doc.documento.nombre,
+        estaCerrado: doc.nominacionDocumentoEstado.estado == 'Documento Cerrado'
       }));
       this.elementos = this.documentos;
-      console.log(this.elementos);
       this.filtrarDocumentos();
       this.desplegarArchivosSubidos();
     }, (error: Error) => {
@@ -76,6 +78,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   private filtrarDocumentos() {
     this.elementos = this.documentos.filter(doc => doc.documento.documento.documentoTipo.nombre === 'A solicitar en la nominación');
+    this.elementosCompartidos = this.documentos.filter(doc => doc.documento.documento.documentoTipo.nombre === 'A compartir')
   }
 
   public onAbrirSelectorArchivos(nomDocId: number): void {
@@ -85,10 +88,10 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
 
   public async onSeleccionarArchivos(event: any) {
     const archivos: FileList = event.target.files;
-    
+
     if (archivos.length > 0) {
       const archivosASobreescribir = this.existenArchivosASobreescribir(archivos);
-      if(archivosASobreescribir.length > 0){
+      if (archivosASobreescribir.length > 0) {
         const confirm = await this.confirmationDialogService.confirm('Advertencia', `Los siguientes archivos ya existen: ${archivosASobreescribir.join(', ')}, ¿Desea sobrescribirlos?`, 'Sí', 'Cancelar', null, null, Tipoalerta.Warning);
         if (!confirm) {
           return;
@@ -105,7 +108,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
         'image/jpeg' // .jpg, .jpeg
       ];
 
-      const maxTamanioBytes = 28 * 1024 * 1024; 
+      const maxTamanioBytes = 28 * 1024 * 1024;
       let tamanioTotal = 0;
 
       for (let i = 0; i < archivos.length; i++) {
@@ -124,7 +127,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
         }
       }
 
-      if(archivos.length > 5){
+      if (archivos.length > 5) {
         this.mostrarError("El maximo permitido de archivos a subir es 5.");
         return;
       }
@@ -135,12 +138,12 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     }
   }
 
-  private existenArchivosASobreescribir(archivos: FileList): string[]{
-    const archivosExistentes = this.elementos.find(e=> e.documento.id == this.nomDocId)?.documento?.archivos;
+  private existenArchivosASobreescribir(archivos: FileList): string[] {
+    const archivosExistentes = this.elementos.find(e => e.documento.id == this.nomDocId)?.documento?.archivos;
     const archivosASobreescribir: string[] = [];
     for (let i = 0; i < archivos.length; i++) {
       const arch = archivos[i];
-      if(archivosExistentes.some(ae => ae.nombre == arch.name)){
+      if (archivosExistentes.some(ae => ae.nombre == arch.name)) {
         archivosASobreescribir.push(arch.name);
       }
     }
@@ -166,12 +169,16 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     this.elementos[index].mostrarArchivos = !this.elementos[index].mostrarArchivos;
   }
 
-  public onBorrarArchivo(id: number): void {
+  onDesplegarArchivosCompartidos(index: number): void {
+    this.elementosCompartidos[index].mostrarArchivos = !this.elementosCompartidos[index].mostrarArchivos;
+  }
+
+  public onBorrarArchivo(archivo: NominacionDocumentoArchivo): void {
     try {
-      this.confirmationDialogService.confirm('Eliminar Archivo', `¿Esta seguro de querer eliminar el archivo seleccionado?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Eliminar Archivo', `¿Esta seguro de querer eliminar el archivo ${archivo.nombre}?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
         .then((confirmed) => {
           if (confirmed) {
-            this.documentosService.eliminarArchivo(id).subscribe(res => {
+            this.documentosService.eliminarArchivo(archivo.id).subscribe(res => {
               this.modalService.dismissAll();
               this.obtenerDocumentosNominacion(this.configuracionId);
               this.confirmationDialogService.exito('Archivo eliminado con éxito.');
@@ -248,6 +255,7 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
   private obtenerEstados() {
     this.documentosService.obtenerEstados().subscribe((data: NominacionDocumentoEstado[]) => {
       this.estados = data;
+      this.actualizarDocumentosNominacion();
     }, (error: Error) => {
       console.error(error);
     });
@@ -261,13 +269,13 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
             this.documentosService.actualizarEstado(docNomId, estadoId).subscribe(res => {
               this.modalService.dismissAll();
               this.confirmationDialogService.exito('Estado actualizado con éxito.');
+              this.obtenerDocumentosNominacion(this.configuracionId);
             }, (error: any) => {
               console.error('Error al enviar el formulario', error);
               this.modalService.dismissAll();
               this.mostrarError("Hubo un error al intentar actualizar el estado del documento.");
             });
           }
-          this.obtenerDocumentosNominacion(this.configuracionId);
         })
     } catch (error) {
       console.error(error);
@@ -276,20 +284,24 @@ export class ActualizarEstadoDocumentosComponent implements OnInit {
     }
   }
 
-  public onDeshabilitarEstado(estadoRadio: number, estadoActual: number){
-    return estadoRadio < estadoActual;
+  public onDeshabilitarEstado(estado: NominacionDocumentoEstado, estadoActual: number) {
+    return estado.id < estadoActual || estado.estado == 'Documento Cerrado';
   }
 
-  public tienePermisoDescargarArchivo(){
+  public tienePermisoDescargarArchivo() {
     return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Descargar);
   }
 
-  public tienePermisoEliminarArchivo(){
+  public tienePermisoEliminarArchivo() {
     return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Eliminar);
   }
-  
-  public tienePermisoCrearArchivo(){
+
+  public tienePermisoCrearArchivo() {
     return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Crear);
+  }
+
+  public refrescarListado(){
+    this.obtenerDocumentosNominacion(this.configuracionId);
   }
 
 }

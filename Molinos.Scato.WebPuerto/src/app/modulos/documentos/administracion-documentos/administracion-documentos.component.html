@@ -1,7 +1,8 @@
 <div class="container-fluid">
-    <div class="row mt-3">
+    <div class="row mt-3 mb-2">
         <div class="col-md-12">
-            <p class="ruta-title">Nominación > Documentos</p>
+            <button class="btn btn-outline-secondary" (click)="onVolverAtras()">
+                < Volver </button>
         </div>
     </div>
     <div class="row">
@@ -15,24 +16,29 @@
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="buque" class=""><strong>Buque:</strong></label>
-                    <input type="text" class="form-control" id="buque" placeholder="Buque" [(ngModel)]="buque"
-                        [readonly]="true">
+                    <label class="form-control border-0" id="buque">{{ buque }}</label>
                 </div>
             </div>
             <!-- Fecha de nominación -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="fechaNominacion"><strong>Fecha de nominación:</strong></label>
-                    <input type="text" class="form-control" id="fechaNominacion" placeholder="Fecha de registro"
-                        [(ngModel)]="fechaNominacion" [readonly]="true">
+                    <label class="form-control border-0" id="fechaNominacion">{{ fechaNominacion }}</label>                   
                 </div>
             </div>
             <!-- Producto -->
             <div class="col-12 col-md-6 col-lg">
                 <div class="form-group">
                     <label for="producto"><strong>Producto:</strong></label>
-                    <input type="text" class="form-control" id="producto" placeholder="Placeholder"
-                        [(ngModel)]="producto" [readonly]="true">
+                    <label class="form-control border-0" id="producto">{{ producto }}</label>
+                </div>
+            </div>
+            
+            <!--Juegos-->
+            <div class="col-12 col-md-6 col-lg">
+                <div class="form-group">
+                    <label for="juegos"><strong>Cantidad de juegos:</strong></label>
+                    <label class="form-control border-0" id="cantJuegos">{{ cantJuegos }}</label>
                 </div>
             </div>
             <!-- Destino -->
@@ -40,8 +46,8 @@
                 <div class="form-group">
                     <label for="destino"><strong>Destino/Cliente:</strong></label>
                     <select class="form-control" id="configuracion" [(ngModel)]="configIdSeleccionada"
-                        (change)="onSeleccionarConfiguracion($event)">
-                        <option *ngFor="let config of configuraciones" [value]="config.id">{{
+                        (change)="onSeleccionarConfiguracion(configIdSeleccionada)">
+                        <option *ngFor="let config of configuraciones" [ngValue]="config">{{
                             config.destino?.nombre}}/{{config.coordinadorPuerto?.nombre }}</option>
                     </select>
                 </div>

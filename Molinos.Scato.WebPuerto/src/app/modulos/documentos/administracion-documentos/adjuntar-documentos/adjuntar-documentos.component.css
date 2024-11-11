@@ -85,3 +85,7 @@ img {
 i {
   cursor: pointer;
 }
+
+.doc-cerrado {
+  color: gray;
+}

@@ -16,6 +16,22 @@
                         <input type="text" class="form-control" placeholder="Nombre del producto"
                             formControlName="nombre">
                     </div>
+                    <div class="form-group col-md-4">
+                        <ng-multiselect-dropdown formControlName="documentoTipo" 
+                                [placeholder]="'Tipo de documento'"
+                                class="custom-with-dropdown"
+                                [settings]="getConfigDocumentoTipoMultiple()" 
+                                [data]="getListadoDocumentoTipo()">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <ng-multiselect-dropdown formControlName="tipoDeProducto" 
+                                [placeholder]="'Tipo de producto'"
+                                class="custom-with-dropdown"
+                                [settings]="getConfigTipoDeProductoMultiple()" 
+                                [data]="getListadoTipoDeProducto()">
+                        </ng-multiselect-dropdown>
+                    </div>                    
                     <div class="form-group col-md-8">
                         <button class="btn btn-buscar mr-4" (click)="onBuscar()">BUSCAR
                             <i class="fa fa-search" aria-hidden="true"></i>
