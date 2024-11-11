@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { ConfiguracionDocumento } from '@ScatoModels/digitalizacion-documentos/documento';
@@ -20,7 +20,8 @@ import { takeUntil } from 'rxjs/operators';
 export class AdministracionDocumentosComponent implements OnInit {
 
   private destroy$ = new Subject();
-  public configIdSeleccionada: number;
+  public configIdSeleccionada: any;
+  public cantJuegos: number = 0;
   public buque: string;
   public producto: string;
   public fechaNominacion: string;
@@ -31,6 +32,7 @@ export class AdministracionDocumentosComponent implements OnInit {
   constructor(private nominacionService: NominacionService,
               private documentoService: DocumentoService,
               private route: ActivatedRoute,
+              private router: Router,
               private datePipe: DatePipe,
               private session: SessionService
   ) { 
@@ -48,13 +50,16 @@ export class AdministracionDocumentosComponent implements OnInit {
       this.buque = data.nominacionDatoTecnico.vaporInformacion.nombreBuque;
       this.producto = data.nominacionDatoTecnico.materialPuerto.descripcion;
       this.configuraciones = data.configuracionDocumentos;
-      this.configIdSeleccionada = this.configuraciones[0].id;
-      this.documentoService.actualizarConfiguracion(this.configIdSeleccionada);
+      this.configIdSeleccionada = this.configuraciones[0];
+      this.cantJuegos = this.configIdSeleccionada.cantidadDeJuegos;
+      this.documentoService.actualizarConfiguracion(this.configIdSeleccionada.id);
     });
   }
 
-  public onSeleccionarConfiguracion(event: any) {
-    const idConfig: number = Number(event.target.value);
+  public onSeleccionarConfiguracion(value: any) {
+    const config = value;
+    const idConfig = config.id;
+    this.cantJuegos = config.cantidadDeJuegos;
     this.documentoService.actualizarConfiguracion(idConfig);
   }
 
@@ -64,5 +69,9 @@ export class AdministracionDocumentosComponent implements OnInit {
 
   public tienePermisoVisualizarDocumentosComex() {
     return this.user.permisos.find(p => p === this.permisosScato.Comex_Documentos_Visualizar);
+  }
+
+  public onVolverAtras(){
+    this.router.navigate(['/programa']);
   }
 }

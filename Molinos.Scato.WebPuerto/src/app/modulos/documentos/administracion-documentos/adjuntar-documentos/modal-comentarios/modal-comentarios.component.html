@@ -5,7 +5,7 @@
   </button>
 </div>
 <div class='modal-body'>
-  <div class="table-responsive table-scroll">
+  <div class="table-responsive table-scroll" #tableContainer>
     <table class="table table-bordered table-sm">
       <thead>
         <tr>
@@ -17,7 +17,7 @@
       <tbody>
         <tr *ngFor="let comentario of comentarios">
           <td>{{comentario.usuario}}</td>
-          <td>{{comentario.fecha}}</td>
+          <td>{{comentario.fecha | date:'dd/MM/yyyy HH:MM:SS'}}</td>
           <td class="cursiva">{{comentario.comentario}}</td>
         </tr>
         <tr *ngIf="comentarios?.length == 0">

@@ -96,10 +96,15 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 30px;
 }
 
 .document-actions img {
   margin-left: 10px;
+}
+
+.document-actions {
+  text-align: right;
 }
 
 .icon-eye {
@@ -114,6 +119,10 @@ i {
 .estado-radio {
   display: inline-block;
   text-align: center;
-  margin: 5px 45px;
+  margin: 40px;
   font-size: 14px;
+}
+
+.doc-cerrado {
+  color: gray;
 }

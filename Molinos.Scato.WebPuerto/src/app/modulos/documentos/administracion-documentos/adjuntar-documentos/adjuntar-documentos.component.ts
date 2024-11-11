@@ -11,6 +11,9 @@ import { SessionService } from '@ScatoServicios/session.service';
 export interface ElementoNominacionDocumento {
   documento: NominacionDocumento,
   mostrarArchivos: boolean,
+  tieneComentarios: boolean,
+  nombreAcortado: string,
+  estaCerrado: boolean
 }
 
 @Component({
@@ -54,7 +57,9 @@ export class AdjuntarDocumentosComponent implements OnInit {
     this.documentosService.listarDocumentosPorConfiguracion(configId).subscribe((data: any) => {
       this.documentos = data.map((doc: NominacionDocumento) => ({
         documento: doc,
-        mostrarArchivos: false
+        mostrarArchivos: false,
+        tieneComentarios: doc.comentarios.length > 0,
+        estaCerrado: doc.nominacionDocumentoEstado.estado == 'Documento Cerrado'
       }));
       this.elementos = this.documentos;
       this.filtrarDocumentos();
@@ -264,4 +269,9 @@ export class AdjuntarDocumentosComponent implements OnInit {
   public tienePermisoCrearArchivo(){
     return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Crear);
   }
+
+  public refrescarListado(){
+    this.obtenerDocumentosNominacion(this.configuracionId);
+  }
+
 }
