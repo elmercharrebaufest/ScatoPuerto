@@ -19,6 +19,7 @@ import { NominacionRecibosComponent } from '../nominacion-recibos/nominacion-rec
 import { NominacionRegistroService } from './nominacion-registro.services';
 import { NominacionDocumentosComponent } from '../nominacion-documentos/nominacion-documentos.component';
 import { ConfiguracionDocumento } from '@ScatoModels/digitalizacion-documentos/documento';
+import { NominacionProcesoService } from '../nominacion-proceso.service';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
   constructor(private router: Router,
     private route: ActivatedRoute,
     private nominacionService: NominacionService,
+    private nominacionProcesoService: NominacionProcesoService,
     private confirmationDialogService: ConfirmationDialogService,
     private nominacionRegistroService: NominacionRegistroService,
     private programaEmbarqueService: ProgramaEmbarqueService
@@ -198,15 +200,18 @@ export class NominacionRegistroComponent implements OnInit, OnDestroy {
       actualizarIntervenciones: true,
       nominacion: null,
     };
+    this.nominacionProcesoService.inicializarServicio();
     if (nominacionId > 0) {
       this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data => {
         nominacionParametos.nominacion = data;
         this.zarpo = data.zarpo;
         this.nominacionService.NominacionParametros = nominacionParametos;
+        this.nominacionProcesoService.setNominacion(data);
         this.obtenerAuditorias();
       });
     } else {
       this.nominacionService.NominacionParametros = nominacionParametos;
+      this.nominacionProcesoService.setNominacion(undefined);
     }
   }
   ngOnDestroy(): void {
