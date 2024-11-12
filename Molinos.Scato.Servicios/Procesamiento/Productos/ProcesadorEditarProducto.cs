@@ -49,8 +49,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
 
         private bool ExisteProducto(MaterialPuertoDto material)
         {
-            return Repositorio.Existe<MaterialPuerto>(x => (x.Descripcion.ToLower() == material.Descripcion.ToLower()
-            || x.DescripcionCorta.ToLower() == material.DescripcionCorta.ToLower() || x.DescripcionCortaIngles == material.DescripcionCortaIngles.ToLower())
+            return Repositorio.Existe<MaterialPuerto>(x => (x.Descripcion.ToLower().Trim() == material.Descripcion.ToLower().Trim()
+            || x.DescripcionCorta.ToLower().Trim() == material.DescripcionCorta.ToLower().Trim() || x.DescripcionCortaIngles.ToLower().Trim() == material.DescripcionCortaIngles.ToLower().Trim())
             && x.Activo && x.Id != material.Id);
         }
 
