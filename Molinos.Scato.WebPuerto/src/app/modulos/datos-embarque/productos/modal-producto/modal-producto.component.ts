@@ -382,12 +382,10 @@ export class ModalProductoComponent implements OnInit {
       }, (error: any) => {
         const msj = error.error == this.errorExisteProducto ? this.errorExisteProducto : "Hubo un error al intentar guardar el producto.";
         console.error('Error al enviar el formulario', msj);
-        this.modalService.dismissAll();
         this.mostrarError(msj);
       });
     } catch (error) {
       console.error(error);
-      this.modalService.dismissAll();
       this.mostrarError("Hubo un error al intentar registrar el producto.");
     }
   }
@@ -401,12 +399,10 @@ export class ModalProductoComponent implements OnInit {
       }, (error: any) => {
         const msj = (error.error == this.errorExisteProducto || error.error == this.errorProductoEnUso) ? error.error : "Hubo un error al intentar editar el producto.";
         console.error('Error al enviar el formulario', msj);
-        this.modalService.dismissAll();
         this.mostrarError(msj);
       });
     } catch (error) {
       console.error(error);
-      this.modalService.dismissAll();
       this.mostrarError("Hubo un error al intentar editar el producto.");
     }
   }
