@@ -22,7 +22,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var documentosFiltrados = this.Repositorio.Incluir<NominacionDocumento>()
-                .Where(nd => nd.NominacionDocumentoEstado.Estado != "finalizado")
+                .Where(nd => nd.Documento.DocumentoTipo.Nombre == "A solicitar en la nominación" && nd.NominacionDocumentoEstado.Estado != "Documento Cerrado")
                 .Select(nd => new
                 {
                     nd.ConfiguracionDocumento.Nominacion,
