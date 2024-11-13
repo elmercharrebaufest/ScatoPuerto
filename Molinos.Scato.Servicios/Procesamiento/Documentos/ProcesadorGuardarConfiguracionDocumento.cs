@@ -34,8 +34,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     var cliente = Repositorio.Obtener<CoordinadorPuerto>(configDto.CoordinadorPuerto.Id);
                     var destino = Repositorio.Obtener<Destino>(configDto.Destino.Id);
-                    var configDb = configuracionesDb.FirstOrDefault(cd => cd.Id == configDto.Id);
-                    if (configDb == null) // Insert
+
+                    ConfiguracionDocumento configDb;
+
+                    if (configDto.Id == 0) // Insert
                     {
                         configDb = new ConfiguracionDocumento
                         {
@@ -44,6 +46,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         };
                         Repositorio.Agregar(configDb);
                     }
+                    else
+                    {
+                        configDb = configuracionesDb.FirstOrDefault(cd => cd.Id == configDto.Id);
+                    }
+
                     configDb.CoordinadorPuerto = cliente;
                     configDb.Destino = destino;
                     configDb.CantidadDeJuegos = configDto.CantidadDeJuegos;

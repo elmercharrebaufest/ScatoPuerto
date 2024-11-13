@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Documento } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -9,6 +9,13 @@ import { ProductosService } from '@ScatoServicios/productos.service';
 export interface DocumentosProducto {
   documento: Documento;
   seleccionado: boolean;
+}
+
+export function noSoloEspacios(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    return isWhitespace ? { 'soloEspacios': true } : null;
+  };
 }
 
 @Component({
@@ -31,6 +38,7 @@ export class ModalProductoComponent implements OnInit {
   errorExisteProducto: string = "La descripción ingresada ya existe en otro producto.";
   errorProductoEnUso: string = "No puede modificar el estado liquido/solido del producto, porque él mismo esta utilizándose en una nominación/embarque.";
   titulo: string = "Alta de Producto";
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly modalService: NgbModal,
@@ -56,9 +64,9 @@ export class ModalProductoComponent implements OnInit {
       materialPuerto: this.fb.group({
         id: [''],
         codigoSAP: ['', [Validators.pattern('^[0-9]{1,8}$'), Validators.maxLength(8)]],
-        descripcion: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(100)]],
-        descripcionCorta: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(50)]],
-        descripcionCortaIngles: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(100)]],
+        descripcion: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(100), noSoloEspacios()]],
+        descripcionCorta: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(50), noSoloEspacios()]],
+        descripcionCortaIngles: ['', [Validators.required, Validators.pattern('^[a-zA-Z0-9 ]*$'), Validators.maxLength(100), noSoloEspacios()]],
         almacenId: [''],
         almacenDesc: [''],
         esLiquido: [null, [Validators.required]],
@@ -75,7 +83,7 @@ export class ModalProductoComponent implements OnInit {
     return this.fb.group({
       tipoDeCalidad: this.fb.group({
         id: [''],
-        descripcion: ['', [Validators.required, Validators.maxLength(250)]],
+        descripcion: ['', [Validators.required, Validators.maxLength(250), noSoloEspacios()]],
         activo: [true],
         seleccionado: [false]
       }),
@@ -86,8 +94,8 @@ export class ModalProductoComponent implements OnInit {
   private inicializarCalidadValor(): FormGroup {
     return this.fb.group({
       id: [''],
-      valor: ['', [Validators.required, Validators.maxLength(250)]],
-      parametro: ['', [Validators.required, Validators.maxLength(250)]],
+      valor: ['', [Validators.required, Validators.maxLength(250), noSoloEspacios()]],
+      parametro: ['', [Validators.required, Validators.maxLength(250), noSoloEspacios()]],
       activo: [true]
     });
   }
@@ -343,6 +351,7 @@ export class ModalProductoComponent implements OnInit {
     this.formProducto.markAllAsTouched();
     if (this.formProducto.invalid) {
       this.mostrarError("¡Atención! Por favor verifique los campos marcados en rojo.");
+      this.verificarParametrosInvalidos();
       return;
     }
 
@@ -354,11 +363,6 @@ export class ModalProductoComponent implements OnInit {
     const tcConParametroRepetido = this.tcConParametroRepetido();
     if (tcConParametroRepetido !== '') {
       this.mostrarError(`¡Atención! El tipo de calidad ${tcConParametroRepetido} tiene parametros repetidos.`);
-      return;
-    }
-
-    if (this.formProducto.invalid) {
-      this.mostrarError("¡Atención! Por favor verifique los campos marcados en rojo.");
       return;
     }
 
@@ -439,5 +443,30 @@ export class ModalProductoComponent implements OnInit {
     return tieneDuplicados == true;
   }
 
+  public verificarParametrosInvalidos(): void {
+    const tipoCalidadArray = this.formProducto.get('tiposDeCalidad') as FormArray;
+
+    for (let i = 0; i < tipoCalidadArray.length; i++) {
+      const tipoCalidadGroup = tipoCalidadArray.at(i);
+      const nombreTc = tipoCalidadGroup.get('nombre')?.value?.toLowerCase().trim();
+
+      if (!nombreTc) {
+        this.onSelectTab('calidad');
+        return;
+      }
+
+      const calidadValoresArray = tipoCalidadGroup.get('calidadValores') as FormArray;
+      for (let j = 0; j < calidadValoresArray.length; j++) {
+        const calidadValorGroup = calidadValoresArray.at(j);
+        const parametro = calidadValorGroup.get('parametro')?.value?.toLowerCase().trim();
+        const valor = calidadValorGroup.get('valor')?.value?.toLowerCase().trim();
+
+        if (!parametro || !valor) {
+          this.onSelectTab('calidad');
+          return;
+        }
+      }
+    }
+  }
   //endregion VALIDACIONES
 }

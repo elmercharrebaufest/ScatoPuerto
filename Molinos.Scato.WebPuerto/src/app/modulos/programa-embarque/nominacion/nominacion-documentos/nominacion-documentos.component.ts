@@ -4,7 +4,7 @@ import { Destino } from '@ScatoModels/destino';
 import { ConfiguracionDocumento, Documento, DocumentoTipo } from '@ScatoModels/digitalizacion-documentos/documento';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
-import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin, Observable, Subject } from 'rxjs';
 import { NominacionProcesoService } from '../nominacion-proceso.service';
 import { delay, filter, take, takeUntil } from 'rxjs/operators';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
@@ -67,10 +67,14 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
   private docsProductos: DocumentoMaterialPuertoMini[] = [];
   private destroy$ = new Subject();
 
+  private nominacionCargada$ = new BehaviorSubject<boolean>(false);
+  private documentosCargados$ = new BehaviorSubject<boolean>(false);
+  private destinosCargados$ = new BehaviorSubject<boolean>(false);
+  private clientesCargados$ = new BehaviorSubject<boolean>(false);
+
   constructor(
     private documentoService: DocumentoService,
     private nominacionProcesoService: NominacionProcesoService,
-    private nominacionService: NominacionService,
     private fb: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
     private chRef: ChangeDetectorRef
@@ -81,10 +85,9 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.cargarDatosNominacion();
     this.cargarDocumentos();
-    this.initDestinos();
-    this.initClientes();
-    this.initProducto();
+    this.inicializarSuscripciones();
   }
 
   ngOnDestroy(): void {
@@ -117,11 +120,27 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
   // #endregion Getters
 
   // #region Acciones destino/producto
-  private initDestinos() {
+  private async inicializarSuscripciones() {
+    // Espero a que ya hayan cargado la nominación y los documentos
+    await combineLatest([this.nominacionCargada$, this.documentosCargados$]).pipe(
+      filter(([nomCargada, docsCargados]) => nomCargada && docsCargados), take(1)
+    ).toPromise();
+
+    this.initDestinos();
+    this.initClientes();
+    this.initProducto();
+
+    this.cargarConfiguraciones();
+  }
+
+  private async initDestinos() {
     this.destinos$ = this.nominacionProcesoService.destinosSeleccionados$;
 
     // Suscripción a los cambios del listado de destinos en Dato Tecnico
     this.destinos$.pipe(takeUntil(this.destroy$)).subscribe(destinos => {
+      if (this.nominacion && destinos.length) {
+        this.destinosCargados$.next(true);
+      }
       const destinoCtrls = this.configuracionesForm.controls.map(c => c.get('destino'));
       for (const ctrl of destinoCtrls) {
         if (destinos.length == 1) {
@@ -129,6 +148,9 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
           ctrl.disable();
         } else {
           ctrl.enable();
+          // Se debe actualizar la referencia al objeto de destino ya que el array de origen es completamente reemplazado
+          const destinoRef = destinos.find(d => d.id == ctrl.value?.id);
+          ctrl.setValue(destinoRef);
         }
       }
       this.actualizarMultiplesConfPosibles();
@@ -141,6 +163,9 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
 
     // Suscripción a los cambios del listado de clientes en Dato Tecnico
     this.clientes$.pipe(takeUntil(this.destroy$)).subscribe(clientes => {
+      if (this.nominacion && clientes.length) {
+        this.clientesCargados$.next(true);
+      }
       const clienteCtrls = this.configuracionesForm.controls.map(c => c.get('cliente'));
       for (const ctrl of clienteCtrls) {
         if (clientes.length == 1) {
@@ -148,6 +173,9 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
           ctrl.disable();
         } else {
           ctrl.enable();
+          // Se debe actualizar la referencia al objeto de cliente ya que el array de origen es completamente reemplazado
+          const clienteRef = clientes.find(c => c.id == ctrl.value?.id);
+          ctrl.setValue(clienteRef);
         }
       }
 
@@ -181,7 +209,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
    * que contengan el producto como default
    */
   private setDocsDefaultProducto(configForm: AbstractControl, producto: MaterialPuerto) {
-    if (!producto) {
+    if (!producto || configForm.get('id').value) {
       return;
     }
     const docsIds = this.docsProductos.filter(dp => dp.materialId == producto.id).map(dp => dp.docId);
@@ -196,7 +224,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
    * documentos que contengan el desitno como default
    */
   private setDocsDefaultDestino(destino: Destino, configForm: AbstractControl) {
-    if (!destino) {
+    if (!destino?.id || configForm.get('destino').value.id == destino.id) {
       return;
     }
     const docsIds = this.docsDestinos.filter(dd => dd.destinoId == destino.id).map(dp => dp.docId);
@@ -252,9 +280,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
       this.docsDestinos = docsDestinos.map(dd => ({ docId: dd.documento.id, destinoId: dd.destino.id }));
       this.docsProductos = docsProductos.map(dp => ({ docId: dp.documento.id, materialId: dp.materialPuerto.id }));
       this.agruparDocumentos(listaDocs.items);
-      const configuracion = this.initConfiguracionForm();
-      this.configuracionesForm.push(configuracion);
-      this.cargarDatosEdicion();
+      this.documentosCargados$.next(true);
     }, err => {
       console.error(err);
       this.confirmationDialogService.error('Ocurrió un error al cargar los documentos');
@@ -278,20 +304,30 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
   // #endregion Datos
 
   // #region EDITAR
-  private async cargarDatosEdicion() {
-    this.nominacionService.NominacionParametros.pipe(
-      takeUntil(this.destroy$),
-      delay(2000), // Espero a que hayan iniciado los productos antes de cargar los datos de nominación. Sino se pisaría lo cargado con lo default del producto
-      filter((parametro: NominacionParametros) => Boolean(parametro?.nominacion))
-    ).subscribe((parametro: NominacionParametros) => {
-      this.nominacion = parametro.nominacion;
-      this.nominacionId = parametro.nominacion.id;
-      this.configuracionesForm.clear();
-      for (const config of parametro.nominacion.configuracionDocumentos) {
-        const configuracionform = this.initConfiguracionForm(config);
-        this.configuracionesForm.push(configuracionform);
-      }
-    });
+  private async cargarDatosNominacion() {
+    const nominacion = await this.nominacionProcesoService.nominacionActual$.pipe(take(1)).toPromise();
+    this.nominacionCargada$.next(true);
+    if (nominacion) {
+      this.nominacion = nominacion;
+      this.nominacionId = nominacion.id;
+    }
+  }
+
+  private async cargarConfiguraciones() {
+    let configuraciones: ConfiguracionDocumento[] = [undefined];
+
+    if (this.nominacion) {
+      configuraciones = this.nominacion.configuracionDocumentos;
+      // Espero a que ya hayan cargado los listados de destinos y clientes
+      await combineLatest([this.destinosCargados$, this.clientesCargados$]).pipe(
+        filter(([destinosCargados, clientesCargados]) => destinosCargados && clientesCargados), take(1)
+      ).toPromise();
+    }
+
+    for (const config of configuraciones) {
+      const configuracionform = this.initConfiguracionForm(config);
+      this.configuracionesForm.push(configuracionform);
+    }
   }
 
   /**
@@ -348,6 +384,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
 
     // Edición
     if (configuracion) {
+      console.log('cargo configuracion');
       this.cargarDatosConfiguracion(configuracion, configForm);
     } else {
       this.setDocsDefaultProducto(configForm, this.nominacionProcesoService.materialPuertoActual);
@@ -403,7 +440,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
       const combinaciones = formArray.controls.map(fg => {
         const destino = fg.get('destino').value as Destino;
         const cliente = fg.get('cliente').value as CoordinadorPuerto;
-        return `${destino?.id}-${cliente.id}`;
+        return `${destino?.id}-${cliente?.id}`;
       });
 
       const hayDuplicados = combinaciones.some((item, i) => combinaciones.indexOf(item) != i);
@@ -493,7 +530,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
     this.guardando = true;
     this.documentoService.guardarConfiguraciones(configuraciones, this.nominacionId).subscribe(() => {
       this.guardando = false;
-      this.confirmationDialogService.exito('Registro Nominación - Configuración de documentos', 'Configuraciones de documetos guardadas correctamente.');
+      this.confirmationDialogService.exito('Configuraciones de documetos guardadas correctamente.', 'Registro Nominación - Configuración de documentos');
     }, err => {
       this.guardando = false;
       console.error(err);

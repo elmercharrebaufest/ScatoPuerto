@@ -15,7 +15,7 @@ import { ATAPuerto } from '@ScatoModels/ata-puerto';
 import { Vapor } from '@ScatoModels/embarque';
 import { CoordinadorPuerto } from '@ScatoModels/coordinador-puerto';
 import { Exportador } from '@ScatoModels/exportador';
-import { debounceTime, distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, take, takeUntil, tap } from 'rxjs/operators';
 import { Bandera } from '@ScatoModels/bandera';
 import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
 import { Surveyor } from '@ScatoModels/programa-embarque/surveyor';
@@ -117,6 +117,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.configurarListasDeNominacion();
     this.inicializarForm();
     this.obtenerListasDeNominacion();
+    this.crearSuscripcionesParaDocumentos();
   }
   //#endregion
 
@@ -191,6 +192,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
           if (nominacionParametos.nominacion!=null){
             this.inicializarForm();
             this.inicializarFormEdicion(this.datoTecnicoForm, nominacionParametos.nominacion.nominacionDatoTecnico);
+            this.actualizarValoresParaDocumentos(nominacionParametos.nominacion.nominacionDatoTecnico);
             const etaRecalada = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.etaRecalada);
             const obligacionDeCarga = new Date(nominacionParametos.nominacion.nominacionDatoTecnico.obligacionDeCarga);
             this.calcularFechaMinimaEtaRecalada(etaRecalada);
@@ -204,8 +206,21 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   private inicializarForm() {
     this.datoTecnicoForm = null;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
+  }
+
+  /**
+   * Cuando es una nueva nominación, se suscribe a los cambios en destinos, clientes y producto
+   * para que se reflejen de manera inmediata en los combos de documentos.
+   * Cuando es edición esto no ocurre ya que hay que esperar el guardado para hacerlo
+   */
+  private async crearSuscripcionesParaDocumentos() {
+    // Espero hasta que ya haya cargado la nominación. Si se trata de una edición entonces no suscribo a los cambios
+    const nominacion = await this.nominacionProcesoService.nominacionActual$.pipe(take(1)).toPromise();
+    if (nominacion) {
+      return;
+    }
+
     // Suscripciones para mantener los mismos destinos y clientes en la parte de documentos
-    this.nominacionProcesoService.inicializar();
     this.datoTecnicoDestinoFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       const destinos = this.datoTecnicoDestinoFormArray.controls.map(g => (g.value as NominacionDatoTecnicoDestino).destino).filter(d => d);
       this.nominacionProcesoService.actualizarDestinos(destinos);
@@ -217,6 +232,20 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.datoTecnicoForm.get('materialPuerto').valueChanges.pipe(takeUntil(this.destroy$)).subscribe((material: MaterialPuerto) => {
       this.nominacionProcesoService.actualizarMaterialPuerto(material);
     });
+  }
+
+  /**
+   * Actualiza los comvos de destinos, clientes y producto en la sección de documentación.
+   * Es necesario hacerlo en la carga y en el guardado, ya que en la edición no se suscribe a los cambios inmediatos.
+   */
+  private actualizarValoresParaDocumentos(datoTecnico: NominacionDatoTecnico) {
+    const destinos = datoTecnico.nominacionDatoTecnicoDestino.map(d => d.destino);
+    const clientes = datoTecnico.nominacionDatoTecnicoCoordinadorPuerto.map(c => c.coordinadorPuerto);
+    const producto = datoTecnico.materialPuerto;
+
+    this.nominacionProcesoService.actualizarDestinos(destinos);
+    this.nominacionProcesoService.actualizarClientes(clientes);
+    this.nominacionProcesoService.actualizarMaterialPuerto(producto);
   }
 
   private deshabilitarEnvioLineUp(){
@@ -348,6 +377,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
       this.cargandoDatoTecnico = false;
       this.inicializarFormEdicion(this.datoTecnicoForm, data.nominacionDatoTecnico);
+      this.actualizarValoresParaDocumentos(data.nominacionDatoTecnico);
     });
   }
   private inicializarFormExportador(exportador: NominacionDatoTecnicoExportador = null, nominacionDatoTecnico: number = 0){
