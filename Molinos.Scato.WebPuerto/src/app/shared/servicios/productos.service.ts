@@ -13,13 +13,12 @@ export class ProductosService {
 
   constructor(private http: HttpClient) { }
 
-  public ListarProductos(pagina: number = 0, itemsPorPagina: number = 10, nombre: string,tipoDeProducto: string,documentoTipo: string) {
+  public ListarProductos(pagina: number = 0, itemsPorPagina: number = 10, nombre: string,tipoDeProducto: string) {
     let params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('itemsPorPagina', itemsPorPagina.toString())
       .set('nombre', nombre)
-      .set('tipoDeProducto',tipoDeProducto)
-      .set('documentoTipo',documentoTipo);
+      .set('tipoDeProducto',tipoDeProducto);
     return this.http.get<ListaPaginada<MaterialPuerto>>(`${this.url}ProgramaEmbarque/ListarProductos`,
       {
         params: params,

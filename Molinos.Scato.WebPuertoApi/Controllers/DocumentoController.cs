@@ -52,11 +52,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/documento/ListarDocumentos")]
-        public HttpResponseMessage ListarDestinos(int pagina = 1, int itemsPorPagina = 10, string nombre = null)
+        public HttpResponseMessage ListarDestinos(int pagina = 1, int itemsPorPagina = 10, string nombre = null, string tipoDeProducto = null, string documentoTipo = null)
         {
+            List<string> listTipoDeProducto = null;
+            List<string> listDocumentoTipo = null;
+            listTipoDeProducto = (!string.IsNullOrEmpty(tipoDeProducto) ? tipoDeProducto.Split(',').ToList() : new List<string>());
+            listDocumentoTipo = (!string.IsNullOrEmpty(documentoTipo) ? documentoTipo.Split(',').ToList() : new List<string>());
+
             try
             {
-                var listaPaginada = servicioDocumento.ListarDocumentos(nombre, pagina, itemsPorPagina);
+                var listaPaginada = servicioDocumento.ListarDocumentos(nombre, pagina, itemsPorPagina, listTipoDeProducto, listDocumentoTipo);
                 var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }

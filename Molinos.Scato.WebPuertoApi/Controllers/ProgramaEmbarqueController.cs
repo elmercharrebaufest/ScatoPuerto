@@ -1241,16 +1241,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/ProgramaEmbarque/ListarProductos")]
-        public HttpResponseMessage ListarProductos(int pagina = 1, int itemsPorPagina = 10, string nombre = null, string tipoDeProducto = null, string documentoTipo = null)
+        public HttpResponseMessage ListarProductos(int pagina = 1, int itemsPorPagina = 10, string nombre = null, string tipoDeProducto = null)
         {
             try
             {
                 List<string> listTipoDeProducto = null;
-                List<string> listDocumentoTipo = null;
                 listTipoDeProducto = (!string.IsNullOrEmpty(tipoDeProducto) ? tipoDeProducto.Split(',').ToList() : null);
-                listDocumentoTipo = (!string.IsNullOrEmpty(documentoTipo) ? documentoTipo.Split(',').ToList() : null);
 
-                var listaPaginada = servicioProgramaEmbarque.ListarProductosPaginado(nombre, pagina, itemsPorPagina, listTipoDeProducto, listDocumentoTipo);
+                var listaPaginada = servicioProgramaEmbarque.ListarProductosPaginado(nombre, pagina, itemsPorPagina, listTipoDeProducto);
                 var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }

@@ -1,17 +1,20 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Documento, DocumentoTipo } from '@ScatoModels/digitalizacion-documentos/documento';
+import { TipoDeProducto } from '@ScatoModels/tipo-de-producto';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-documentos',
   templateUrl: './documentos.component.html',
   styleUrls: ['./documentos.component.css']
 })
-export class DocumentosComponent implements OnInit {
+export class DocumentosComponent implements OnInit, OnDestroy {
 
   public mensaje: string;
   public titulo: string;
@@ -23,6 +26,12 @@ export class DocumentosComponent implements OnInit {
   public documentosTipos: DocumentoTipo[] = [];
   public itemsTotales: number = 0; // Total de elementos
 
+  public listaTipoDeProducto: TipoDeProducto[] = [];
+  private configTipoDeProductoMultiple;
+  public listaDocumentoTipo: DocumentoTipo[] = [];
+  private configDocumentoTipoMultiple;
+  private destroy$ = new Subject();
+  
   @ViewChild('modalDocumento') modalDocumento: TemplateRef<any>;
 
   constructor(
@@ -31,7 +40,7 @@ export class DocumentosComponent implements OnInit {
     private documentosService: DocumentoService,
     private modalService: NgbModal
   ) {
-    this.filtros = fb.group({ nombre: '' });
+    this.filtros = fb.group({ nombre: '',documentoTipo: '',tipoDeProducto: '', });
     this.documentoForm = fb.group({
       id: 0,
       documentoTipo: [{}, Validators.required],
@@ -42,6 +51,8 @@ export class DocumentosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.listarTipoProducto();
+    this.listarTipoDocumento();
     this.listarTipos();
     this.onBuscar();
   }
@@ -61,10 +72,18 @@ export class DocumentosComponent implements OnInit {
       pagina = page.pageIndex + 1;
       itemsPorPagina = page.pageSize;
     }
+    let tipoDeProducto: string = '';
+    let documentoTipo: string = ''; 
     const nombre: string = this.filtros.get('nombre').value?.trim() || '';
+    if (this.filtros.controls.tipoDeProducto.value > '')
+      tipoDeProducto = this.filtros.controls.tipoDeProducto.value.map((item) => { return item.id }).join(',');
+
+    if (this.filtros.controls.documentoTipo.value > '')
+      documentoTipo = this.filtros.controls.documentoTipo.value.map((item) => { return item.id }).join(',');
+
     this.mensaje = 'Cargando datos';
     this.loading = true;
-    this.documentosService.listarDocumentos(pagina, itemsPorPagina, nombre).subscribe(res => {
+    this.documentosService.listarDocumentos(pagina, itemsPorPagina, nombre,tipoDeProducto,documentoTipo).subscribe(res => {
       this.documentos = res.items;
       this.itemsTotales = res.itemsTotales;
       this.loading = false;
@@ -120,6 +139,11 @@ export class DocumentosComponent implements OnInit {
     this.modalService.dismissAll();
     this.documentoForm.reset();
   }
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
 
   public async onGuardar() {
     this.documentoForm.markAllAsTouched();
@@ -170,6 +194,62 @@ export class DocumentosComponent implements OnInit {
       return !this.validadarLiquidoSolido();
     }
     return false;
+  }
+
+
+  public setConfigTipoDeProductoMultiple() {
+    this.configTipoDeProductoMultiple = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'nombre',
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
+    };
+  }
+  public getConfigTipoDeProductoMultiple() {
+    return this.configTipoDeProductoMultiple;
+  }
+  public getListadoTipoDeProducto() {
+    return this.listaTipoDeProducto;
+  }
+  
+  public setConfigDocumentoTipoMultiple() {
+    this.configDocumentoTipoMultiple = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'nombre',
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
+    };
+  }
+  public getConfigDocumentoTipoMultiple() {
+    return this.configDocumentoTipoMultiple;
+  }
+  public getListadoDocumentoTipo() {
+    return this.listaDocumentoTipo;
+  }
+
+  private listarTipoProducto(){
+    let tipoDeProducto: TipoDeProducto = {
+      id : 1,
+      nombre : 'Liquido'
+    }
+    this.listaTipoDeProducto.push(tipoDeProducto);
+
+    tipoDeProducto = {
+      id : 2,
+      nombre : 'Solido'
+    }
+    this.listaTipoDeProducto.push(tipoDeProducto); 
+    this.setConfigTipoDeProductoMultiple();
+  }
+
+  private listarTipoDocumento(){
+    this.documentosService.listarDocumentoTipos().pipe(takeUntil(this.destroy$)).subscribe((data: DocumentoTipo[]) =>{
+      if (data!=null)
+        this.listaDocumentoTipo = data;
+        this.setConfigDocumentoTipoMultiple();
+    });
   }
 
 }

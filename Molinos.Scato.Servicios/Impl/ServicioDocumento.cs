@@ -100,11 +100,43 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0)
+        public ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0, List<string> listTipoDeProducto = null, List<string> listDocumentoTipo = null)
         {
-            IQueryable<Documento> query = _repositorio.Incluir<Documento>()
-                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
-                .OrderBy(d => d.Nombre);
+            bool esSolido = false;
+            bool esLiquido = false;
+
+            var query = _repositorio.Listar<Documento>()
+                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)));
+                //.OrderBy(d => d.Nombre);
+
+            if (listDocumentoTipo.Count > 0)
+            {
+                query = query.Where(x => listDocumentoTipo.Any(y => y.Contains(Convert.ToString(x.DocumentoTipo.Id)))).ToList();
+            }
+
+            if (listTipoDeProducto.Count > 0)
+            {
+                var listarDocumentoMaterialPuerto = _repositorio.Listar<DocumentoMaterialPuerto>();
+                if (listTipoDeProducto.Count !=2)
+                {
+                    foreach (var tipoProducto in listTipoDeProducto)
+                    {
+                        if (tipoProducto.Equals("1")) esLiquido = true;
+                        if (tipoProducto.Equals("2")) esSolido = true;
+                    }
+
+                    if (esLiquido)
+                        listarDocumentoMaterialPuerto = listarDocumentoMaterialPuerto.Where(x => x.MaterialPuerto.EsLiquido == esLiquido).ToList();
+
+                    if (esSolido)
+                        listarDocumentoMaterialPuerto = listarDocumentoMaterialPuerto.Where(x => x.MaterialPuerto.EsLiquido == !esSolido).ToList();
+
+                    query = query.Where(x => listarDocumentoMaterialPuerto.Any(y => y.Documento.Id.ToString().Contains(Convert.ToString(x.Id)))).ToList();
+                }
+            }
+
+            query = query.OrderBy(d => d.Nombre).ToList();
+
             var itemsTotales = query.Count();
             if (pagina > 0 && itemsPorPagina > 0)
             {

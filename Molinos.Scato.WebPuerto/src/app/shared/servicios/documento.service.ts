@@ -33,8 +33,8 @@ export class DocumentoService {
     return this.http.get<DocumentoTipo[]>(`${this.url}/ListarDocumentoTipos`, { withCredentials: true });
   }
 
-  public listarDocumentos(pagina: number = 0, itemsPorPagina: number = 0, nombre: string = '') {
-    const params = { pagina, itemsPorPagina, nombre } as any;
+  public listarDocumentos(pagina: number = 0, itemsPorPagina: number = 0, nombre: string = '',tipoDeProducto: string='',documentoTipo: string='') {
+    const params = { pagina, itemsPorPagina, nombre,tipoDeProducto, documentoTipo} as any;
     return this.http.get<ListaPaginada<Documento>>(`${this.url}/ListarDocumentos`, { withCredentials: true, params });
   }
 
