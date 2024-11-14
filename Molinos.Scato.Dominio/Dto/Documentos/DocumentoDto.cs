@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Dto
         public bool Liquido { get; set; }
         public bool Solido { get; set; }
         public bool Activo { get; set; }
+        public int ConfiguracionId { get; set; }
     }
 }

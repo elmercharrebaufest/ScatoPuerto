@@ -269,12 +269,12 @@ namespace Molinos.Scato.Servicios.Impl
                 configuracionPorNominacion = configuracionPorNominacion
                                             .Where(x =>
                                                       (!string.IsNullOrEmpty(x.Documento.Id.ToString()) &&
-                                                        (!listaDocumentos.Any() || listaDocumentos.Any(y => y.Contains(x.Documento.Id.ToString())
-
+                                                        (!listaDocumentos.Any() || listaDocumentos.Any(y => y == x.Documento.Id.ToString()
                                                       ))) &&
                                                       (!string.IsNullOrEmpty(x.NominacionDocumentoEstado.Id.ToString()) &&
                                                         (!listaDocumentoEstados.Any() || listaDocumentoEstados.Any(y => y.Contains(x.NominacionDocumentoEstado.Id.ToString())))
-                                                      )
+                                                      ) &&
+                                                      (x.Documento.DocumentoTipo.Nombre == "A solicitar en la nominación")
                                                   ).ToList();
 
                 foreach (var documentoNominacion in configuracionPorNominacion)
@@ -302,7 +302,8 @@ namespace Molinos.Scato.Servicios.Impl
             var nominacion = this._repositorio.Obtener<Nominacion>(x => x.Id == nominacionId);
             foreach (var configuracion in nominacion.ConfiguracionDocumentos)
             {
-                foreach (var nominacionDocumento in configuracion.NominacionDocumentos)
+                var nominacionDocumentos = configuracion.NominacionDocumentos.Where(nd => nd.Documento.DocumentoTipo.Nombre == "A solicitar en la nominación");
+                foreach (var nominacionDocumento in nominacionDocumentos)
                 {
 
                     resultado.Add(new DocumentoDto()
@@ -316,7 +317,8 @@ namespace Molinos.Scato.Servicios.Impl
                         Nombre = nominacionDocumento.Documento.Nombre,
                         Liquido = nominacionDocumento.Documento.Liquido,
                         Solido = nominacionDocumento.Documento.Solido,
-                        Activo = nominacionDocumento.Documento.Activo
+                        Activo = nominacionDocumento.Documento.Activo,
+                        ConfiguracionId = nominacionDocumento.ConfiguracionDocumento.Id
                     });
                 }
             }

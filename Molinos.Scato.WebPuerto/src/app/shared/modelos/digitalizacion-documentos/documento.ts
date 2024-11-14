@@ -13,6 +13,7 @@ export interface Documento {
   nombre: string;
   liquido: boolean;
   solido: boolean;
+  configuracionId?: number;
 }
 
 export interface DocumentoDestino {
