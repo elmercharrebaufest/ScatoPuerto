@@ -32,6 +32,7 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
   public documentosEstadoForm: FormGroup;
 
   public listadoDocumentos: Documento[];
+  public listadoDocsxConfig: Documento [];
   public listarConfiguracionDocumento: ConfiguracionDocumentoPorNominacion[];
   public listadoDocumentoEstado: DocumentoEstado[];
 
@@ -127,7 +128,7 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     return this.listadoDocumentoEstado;
   }
   public getListadoDocumentos() {
-    return this.listadoDocumentos;
+    return this.listadoDocsxConfig;
   }
   public trackByFn(index: any, item: any) {
     return index;
@@ -186,6 +187,7 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
     this._documentosEstadoListadoService.listarDocumentosPorNominacion(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe((data: Documento[]) => {
       if (data != null)
         this.listadoDocumentos = data;
+        this.listadoDocsxConfig = this.listadoDocumentos;
     });
   }
   private cargarNominacionDocumentoEstados() {
@@ -292,6 +294,12 @@ export class AdministracionDocumentosEstadoListadoComponent implements OnInit, O
 
   public visualizaComex(){
     return this.user.permisos.find(p => p === this.permisosScato.Comex_Documentos_Visualizar);
+  }
+
+  public onConfiguracionChange(){
+    const id = this.datosFiltroForm.controls.configuracionDocumento.value.id;  
+    this.datosFiltroForm.controls.documento.setValue(null);
+    this.listadoDocsxConfig = this.listadoDocumentos.filter(d => d.configuracionId == id);
   }
 
 }

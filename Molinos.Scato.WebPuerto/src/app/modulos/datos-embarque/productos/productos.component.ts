@@ -39,8 +39,6 @@ export class ProductosComponent implements OnInit, OnDestroy  {
 
   public listaTipoDeProducto: TipoDeProducto[] = [];
   private configTipoDeProductoMultiple;
-  public listaDocumentoTipo: DocumentoTipo[] = [];
-  private configDocumentoTipoMultiple;
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -51,7 +49,6 @@ export class ProductosComponent implements OnInit, OnDestroy  {
     private readonly session: SessionService,
   ){       
     this.inicializarForm();
-    this.listarTipoDocumento();
     this.listarTipoProducto();
     this.setConfigTipoDeProductoMultiple();
     this.user = this.session.getUser();
@@ -77,7 +74,6 @@ export class ProductosComponent implements OnInit, OnDestroy  {
   public onBuscar(page?: PageEvent) {
     let nombre: string = '';
     let tipoDeProducto: string = '';
-    let documentoTipo: string = ''; 
 
     let pagina = 1, itemsPorPagina = 10;
     if (page) {
@@ -90,12 +86,9 @@ export class ProductosComponent implements OnInit, OnDestroy  {
     if (this.filtro.controls.tipoDeProducto.value > '')
       tipoDeProducto = this.filtro.controls.tipoDeProducto.value.map((item) => { return item.id }).join(',');
 
-    if (this.filtro.controls.documentoTipo.value > '')
-      documentoTipo = this.filtro.controls.documentoTipo.value.map((item) => { return item.id }).join(',');
-
     this.mensaje = 'Cargando productos. Por favor, espere...';
     this.estaCargando = true;
-    this.productosService.ListarProductos(pagina, itemsPorPagina, nombre,tipoDeProducto,documentoTipo).subscribe(res => {
+    this.productosService.ListarProductos(pagina, itemsPorPagina, nombre,tipoDeProducto).subscribe(res => {
       this.productos = res.items;
       this.itemsTotales = res.itemsTotales;
       this.estaCargando = false;
@@ -201,23 +194,6 @@ export class ProductosComponent implements OnInit, OnDestroy  {
     return this.listaTipoDeProducto;
   }
   
-  public setConfigDocumentoTipoMultiple() {
-    this.configDocumentoTipoMultiple = {
-      singleSelection: false,
-      primaryKey: 'id',
-      textField: 'nombre',
-      selectAllText: 'Marcar Todos',
-      unSelectAllText: 'Desmarcar Todos',
-    };
-  }
-  public getConfigDocumentoTipoMultiple() {
-    return this.configDocumentoTipoMultiple;
-  }
-  public getListadoDocumentoTipo() {
-    return this.listaDocumentoTipo;
-  }
-
-
   private mostrarError(msj: string) {
     this.confirmationDialogService.error(msj);
   }
@@ -234,16 +210,6 @@ export class ProductosComponent implements OnInit, OnDestroy  {
       nombre : 'Solido'
     }
     this.listaTipoDeProducto.push(tipoDeProducto); 
-    console.log('this.listaTipoDeProducto--->>', this.listaTipoDeProducto)
-  }
-
-  private listarTipoDocumento(){
-    this._documentoService.listarDocumentoTipos().pipe(takeUntil(this.destroy$)).subscribe((data: DocumentoTipo[]) =>{
-      if (data!=null)
-        this.listaDocumentoTipo = data;
-        this.setConfigDocumentoTipoMultiple();
-    });
-
   }
 
   tienePermisoModificarProducto() {

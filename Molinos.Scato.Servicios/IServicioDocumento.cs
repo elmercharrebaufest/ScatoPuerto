@@ -12,7 +12,7 @@ namespace Molinos.Scato.Servicios
     public interface IServicioDocumento
     {
         [OperationContract]
-        ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0);
+        ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0, List<string> listTipoDeProducto = null, List<string> listDocumentoTipo = null);
 
         [OperationContract]
         DocumentoDto ObtenerDocumento(int documentoId);

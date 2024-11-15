@@ -50,6 +50,7 @@ export class LoginComponent implements OnInit {
     { nombre: 'Recibidores', permiso: 'LAD_MOAAPP_PUERTO_RECIBIDORES', checked: false },
     { nombre: 'Geolocalizacion', permiso: 'LAD_MOAAPP_PUERTO_GEOLOCALIZACION', checked: false },
     { nombre: 'Comex', permiso: 'LAD_MOAAPP_PUERTO_COMEX', checked: false },
+    { nombre: 'MOC', permiso: 'LAD_MOAAPP_PUERTO_MOC', checked: false },
     { nombre: 'Invitado', permiso: 'LAD_MOAAPP_PUERTO_INVITADO', checked: false },
     { nombre: 'Sistemas', permiso: 'LAD_MOAAPP_PUERTO_SISTEMA', checked: false },
   ];
@@ -126,7 +127,6 @@ export class LoginComponent implements OnInit {
   }
 
   login = () => {
-    console.log('login');
 
     if (this.selectedCompany == '0') {
       console.error('Debe elegir una compañía para poder ingresar');
@@ -280,7 +280,8 @@ export class LoginComponent implements OnInit {
 
     this.autenticarAd.ObtenerGruposAD(res.permisos, usuario).subscribe(
       (respuesta: any) => {
-        // console.log(' respuesta: ', respuesta);
+        //
+         console.log(' respuesta: ', respuesta);
         if (respuesta.permisos.length > 0) {
           res.permisos = respuesta.permisos;
           this.session.setUser(res);
@@ -302,6 +303,7 @@ export class LoginComponent implements OnInit {
     console.log('navigate');
     let primerPermiso = permisos.find((p: string) =>
       p == 'Comex_Nominacion_Ver' ||
+      p == 'Moc_Nominacion_Ver' ||
       p == 'LineUp_Ver' ||
       p == 'Carga_Ver' ||
       p == 'Recibidores_Ver' ||
@@ -309,6 +311,7 @@ export class LoginComponent implements OnInit {
       p == 'Buque_Ver' ||
       p == 'Coem_Visualizar' ||
       p == 'Caratula_Visualizar');
+
     if (primerPermiso == undefined) {
       this.iniciandoSession = false;
       this.mensajeError = "No tiene permisos para ingresar";
@@ -341,6 +344,10 @@ export class LoginComponent implements OnInit {
         break;
       }
       case 'Comex_Nominacion_Ver': {
+        this.router.navigate(['/programa']);
+        break;
+      }
+      case 'Moc_Nominacion_Ver': {
         this.router.navigate(['/programa']);
         break;
       }

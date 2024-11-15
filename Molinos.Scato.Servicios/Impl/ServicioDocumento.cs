@@ -100,11 +100,43 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0)
+        public ListaPaginada<DocumentoDto> ListarDocumentos(string nombre, int pagina = 0, int itemsPorPagina = 0, List<string> listTipoDeProducto = null, List<string> listDocumentoTipo = null)
         {
-            IQueryable<Documento> query = _repositorio.Incluir<Documento>()
-                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
-                .OrderBy(d => d.Nombre);
+            bool esSolido = false;
+            bool esLiquido = false;
+
+            var query = _repositorio.Listar<Documento>()
+                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)));
+                //.OrderBy(d => d.Nombre);
+
+            if (listDocumentoTipo.Count > 0)
+            {
+                query = query.Where(x => listDocumentoTipo.Any(y => y.Contains(Convert.ToString(x.DocumentoTipo.Id)))).ToList();
+            }
+
+            if (listTipoDeProducto.Count > 0)
+            {
+                var listarDocumentoMaterialPuerto = _repositorio.Listar<DocumentoMaterialPuerto>();
+                if (listTipoDeProducto.Count !=2)
+                {
+                    foreach (var tipoProducto in listTipoDeProducto)
+                    {
+                        if (tipoProducto.Equals("1")) esLiquido = true;
+                        if (tipoProducto.Equals("2")) esSolido = true;
+                    }
+
+                    if (esLiquido)
+                        listarDocumentoMaterialPuerto = listarDocumentoMaterialPuerto.Where(x => x.MaterialPuerto.EsLiquido == esLiquido).ToList();
+
+                    if (esSolido)
+                        listarDocumentoMaterialPuerto = listarDocumentoMaterialPuerto.Where(x => x.MaterialPuerto.EsLiquido == !esSolido).ToList();
+
+                    query = query.Where(x => listarDocumentoMaterialPuerto.Any(y => y.Documento.Id.ToString().Contains(Convert.ToString(x.Id)))).ToList();
+                }
+            }
+
+            query = query.OrderBy(d => d.Nombre).ToList();
+
             var itemsTotales = query.Count();
             if (pagina > 0 && itemsPorPagina > 0)
             {
@@ -237,12 +269,12 @@ namespace Molinos.Scato.Servicios.Impl
                 configuracionPorNominacion = configuracionPorNominacion
                                             .Where(x =>
                                                       (!string.IsNullOrEmpty(x.Documento.Id.ToString()) &&
-                                                        (!listaDocumentos.Any() || listaDocumentos.Any(y => y.Contains(x.Documento.Id.ToString())
-
+                                                        (!listaDocumentos.Any() || listaDocumentos.Any(y => y == x.Documento.Id.ToString()
                                                       ))) &&
                                                       (!string.IsNullOrEmpty(x.NominacionDocumentoEstado.Id.ToString()) &&
                                                         (!listaDocumentoEstados.Any() || listaDocumentoEstados.Any(y => y.Contains(x.NominacionDocumentoEstado.Id.ToString())))
-                                                      )
+                                                      ) &&
+                                                      (x.Documento.DocumentoTipo.Nombre == "A solicitar en la nominación")
                                                   ).ToList();
 
                 foreach (var documentoNominacion in configuracionPorNominacion)
@@ -270,7 +302,8 @@ namespace Molinos.Scato.Servicios.Impl
             var nominacion = this._repositorio.Obtener<Nominacion>(x => x.Id == nominacionId);
             foreach (var configuracion in nominacion.ConfiguracionDocumentos)
             {
-                foreach (var nominacionDocumento in configuracion.NominacionDocumentos)
+                var nominacionDocumentos = configuracion.NominacionDocumentos.Where(nd => nd.Documento.DocumentoTipo.Nombre == "A solicitar en la nominación");
+                foreach (var nominacionDocumento in nominacionDocumentos)
                 {
 
                     resultado.Add(new DocumentoDto()
@@ -284,7 +317,8 @@ namespace Molinos.Scato.Servicios.Impl
                         Nombre = nominacionDocumento.Documento.Nombre,
                         Liquido = nominacionDocumento.Documento.Liquido,
                         Solido = nominacionDocumento.Documento.Solido,
-                        Activo = nominacionDocumento.Documento.Activo
+                        Activo = nominacionDocumento.Documento.Activo,
+                        ConfiguracionId = nominacionDocumento.ConfiguracionDocumento.Id
                     });
                 }
             }

@@ -75,7 +75,7 @@
           </div>
         </a>
 
-        <a routerLink='/documentos' *ngIf='tienePermiso("Documentos_Visualizar")'>
+        <a routerLink='/documentos' *ngIf='tienePermiso("Documentos_Visualizar") || tienePermiso("Moc_Documentos_Visualizar")'>
           <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "documentos"'>
             <div class='icon-pe'></div>
             <span *ngIf='opened'>Documentos</span>
@@ -108,8 +108,8 @@
         </div>
       </a>
 
-      <hr *ngIf='tienePermiso("Comex_Nominacion_Ver")'>
-      <a routerLink='/programa' *ngIf='tienePermiso("Comex_Nominacion_Ver")'>
+      <hr *ngIf='tienePermiso("Comex_Nominacion_Ver") || tienePermiso("Moc_Nominacion_Ver")'>
+      <a routerLink='/programa' *ngIf='tienePermiso("Comex_Nominacion_Ver") || tienePermiso("Moc_Nominacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "programa"'>
           <div class='icon-pe'></div>
           <span *ngIf='opened'>Programa Embarque</span>
