@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -7,6 +7,8 @@ import { NominacionDocumento, NominacionDocumentoArchivo } from '@ScatoModels/di
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DocumentoService } from '@ScatoServicios/documento.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export interface ElementoNominacionDocumento {
   documento: NominacionDocumento,
@@ -22,10 +24,11 @@ export interface ElementoNominacionDocumento {
   styleUrls: ['./adjuntar-documentos.component.css']
 })
 
-export class AdjuntarDocumentosComponent implements OnInit {
+export class AdjuntarDocumentosComponent implements OnInit, OnDestroy {
 
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
 
+  private destroy$ = new Subject();
   public tabSeleccionado: string = "A solicitar en la nominación";
   public documentos: ElementoNominacionDocumento[] = [];
   public elementos: ElementoNominacionDocumento[] = [];
@@ -46,6 +49,11 @@ export class AdjuntarDocumentosComponent implements OnInit {
 
   ngOnInit(): void {
     this.actualizarDocumentosNominacion();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   public onSeleccionarTipo(tab: string) {
@@ -74,7 +82,7 @@ export class AdjuntarDocumentosComponent implements OnInit {
   }
 
   private actualizarDocumentosNominacion() {
-    this.documentosService.config$.subscribe(configId => {
+    this.documentosService.config$.pipe(takeUntil(this.destroy$)).subscribe(configId => {
       if (configId) {
         this.configuracionId = configId;
         this.obtenerDocumentosNominacion(configId);
@@ -109,7 +117,7 @@ export class AdjuntarDocumentosComponent implements OnInit {
         'image/jpeg' // .jpg, .jpeg
       ];
 
-      const maxTamanioBytes = 28 * 1024 * 1024; 
+      const maxTamanioBytes = 28 * 1024 * 1024;
       let tamanioTotal = 0;
 
       for (let i = 0; i < archivos.length; i++) {
@@ -157,7 +165,7 @@ export class AdjuntarDocumentosComponent implements OnInit {
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i]);
     }
-   
+
     this.documentosService.guardarArchivos(this.nomDocId, formData).subscribe(blob => {
       this.obtenerDocumentosNominacion(this.configuracionId);
     }, error => {

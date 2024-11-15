@@ -29,6 +29,11 @@ export class DocumentoService {
     this.configSource.next(configId);  // Actualiza el valor del destino
   }
 
+  public inicializarConfiguracion() {
+    this.configSource = new BehaviorSubject<number>(null);
+    this.config$ = this.configSource.asObservable();
+  }
+
   public listarDocumentoTipos() {
     return this.http.get<DocumentoTipo[]>(`${this.url}/ListarDocumentoTipos`, { withCredentials: true });
   }
@@ -135,12 +140,12 @@ export class DocumentoService {
   public enviarCorreoAlertaDocumentos(documentoEnvioAlerta: DocumentoEnvioAlerta) {
     return this.http.post(`${this.url}/EnviarCorreoAlertaDocumentos`, documentoEnvioAlerta, { withCredentials: true });
   }
-  
+
   public cerrarDocumentos(ids: number[]) {
     return this.http.put(`${this.url}/CerrarDocumentos`, ids, { withCredentials: true });
   }
-  
-  
-  
-  
+
+
+
+
 }

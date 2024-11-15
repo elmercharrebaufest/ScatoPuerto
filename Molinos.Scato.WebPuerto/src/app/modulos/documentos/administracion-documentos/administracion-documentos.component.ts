@@ -8,7 +8,6 @@ import { DocumentoService } from '@ScatoServicios/documento.service';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -19,7 +18,6 @@ import { takeUntil } from 'rxjs/operators';
 
 export class AdministracionDocumentosComponent implements OnInit {
 
-  private destroy$ = new Subject();
   public configIdSeleccionada: any;
   public cantJuegos: number = 0;
   public buque: string;
@@ -30,22 +28,23 @@ export class AdministracionDocumentosComponent implements OnInit {
   permisosScato: typeof PermisosScato = PermisosScato;
 
   constructor(private nominacionService: NominacionService,
-              private documentoService: DocumentoService,
-              private route: ActivatedRoute,
-              private router: Router,
-              private datePipe: DatePipe,
-              private session: SessionService
-  ) { 
+    private documentoService: DocumentoService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private datePipe: DatePipe,
+    private session: SessionService
+  ) {
     this.user = this.session.getUser();
   }
 
   ngOnInit(): void {
+    this.documentoService.inicializarConfiguracion();
     this.obtenerNominacion();
   }
 
   private obtenerNominacion() {
     const nominacionId = Number(this.route.snapshot.paramMap.get('idnominacion'));
-    this.nominacionService.obtenerNominacion(nominacionId).pipe(takeUntil(this.destroy$)).subscribe(data => {
+    this.nominacionService.obtenerNominacion(nominacionId).subscribe(data => {
       this.fechaNominacion = this.datePipe.transform(data.fechaCreacion, 'dd/MM/yyyy');
       this.buque = data.nominacionDatoTecnico.vaporInformacion.nombreBuque;
       this.producto = data.nominacionDatoTecnico.materialPuerto.descripcion;
