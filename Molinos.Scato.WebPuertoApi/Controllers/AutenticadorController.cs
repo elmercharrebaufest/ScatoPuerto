@@ -86,7 +86,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 System.Web.HttpContext.Current.Session.Add("usuario", username);
                 var listadoPermisos = servicio.ObtenerGruposAD(grupos);
 
-                return Request.CreateResponse(HttpStatusCode.OK, new
+                    return Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     permisos = listadoPermisos
                 });
