@@ -6,16 +6,18 @@
             <div class="col-3 titulo">ACCIONES</div>
         </div>
         <div class="row header subrayado">
-            <div class="col-2"></div>
-            <div class="col-8">
-                <span class="col-estado">Borrador<br>Solicitado</span>
-                <span class="col-estado">Borrador<br>Enviado</span>
-                <span class="col-estado">Borrador<br>Modificado</span>
-                <span class="col-estado">Borrador<br>Aprobado</span>
-                <span class="col-estado">Documento<br>Enviado</span>
-                <span class="col-estado">Documento<br>Cerrado</span>
+            <div class="col-3"></div>
+            <div class="col-6">
+                <div class="row">
+                <div class="col-2"><span class="col-estado">Borrador<br>Solicitado</span></div>
+                <div class="col-2"><span class="col-estado">Borrador<br>Enviado</span></div>
+                <div class="col-2"><span class="col-estado">Borrador<br>Modificado</span></div>
+                <div class="col-2"><span class="col-estado">Borrador<br>Aprobado</span></div>
+                <div class="col-2"><span class="col-estado">Documento<br>Enviado</span></div>
+                <div class="col-2"><span class="col-estado">Documento<br>Cerrado</span></div>
+                </div>
             </div>
-            <div class="col-2"></div>
+            <div class="col-3"></div>
         </div>
     </div>
     <div class="document-container">
@@ -32,15 +34,19 @@
                                 (click)="onDesplegarArchivos(i)"></i>
                         </span>
                     </div>
-                    <div class="col-6" style="text-align: center; display: flex;">
-                        <span *ngFor="let estado of estados" class="estado-radio">
+                    <div class="col-6">
+                        <div class="row">
+                        <div *ngFor="let estado of estados" class="col-2" style="display: flex;justify-content: center;">
+                            <span class="col-estado">
                             <input type="radio" name="radio-{{elemento.documento.documento.id}}"
                                 [disabled]="onDeshabilitarEstado(estado, elemento.documento.nominacionDocumentoEstado.id)"
                                 [value]="estado.estado"
                                 [(ngModel)]="elemento.documento.nominacionDocumentoEstado.estado"
                                 [checked]="estado.estado === elemento.documento.nominacionDocumentoEstado.estado"
                                 (change)="onActualizarEstado(elemento.documento.id, estado.id)">
-                        </span>
+                            </span>
+                        </div>
+                    </div>
                     </div>
                     <div class="col-3 document-actions">
                         <img *ngIf="tienePermisoCrearArchivo() && !elemento.estaCerrado" src="assets/file_plus.svg"
