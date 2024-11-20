@@ -143,7 +143,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
       }
       const destinoCtrls = this.configuracionesForm.controls.map(c => c.get('destino'));
       for (const ctrl of destinoCtrls) {
-        if (destinos.length == 1) {
+        if (destinos.length == 1 && !this.nominacion) {
           ctrl.setValue(destinos[0]);
           ctrl.disable();
         } else {
@@ -168,7 +168,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
       }
       const clienteCtrls = this.configuracionesForm.controls.map(c => c.get('cliente'));
       for (const ctrl of clienteCtrls) {
-        if (clientes.length == 1) {
+        if (clientes.length == 1 && !this.nominacion) {
           ctrl.setValue(clientes[0]);
           ctrl.disable();
         } else {
@@ -375,10 +375,10 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
       grupos: gruposFormArray
     });
 
-    if (this.nominacionProcesoService.clientesActuales.length == 1) {
+    if (this.nominacionProcesoService.clientesActuales.length == 1 && !this.nominacion) {
       configForm.get('cliente').disable();
     }
-    if (this.nominacionProcesoService.destinosActuales.length == 1) {
+    if (this.nominacionProcesoService.destinosActuales.length == 1 && !this.nominacion) {
       configForm.get('destino').disable();
     }
 

@@ -11387,82 +11387,40 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                //var embarques = Listar<Embarque, EmbarqueDto>();
-                //
-                var embar = new List<int>();
-                try
-                {
-                    embar = repositorio.Listar<LineUp>(l => l.Embarque != null
+                var lineups = repositorio.Listar<LineUp>(l => l.Embarque != null
                                                          && l.Embarque.Vapor != null
                                                          && l.ModuloDeCarga != null
                                                          && l.Embarque.Ubicacion != 1
                                                          && l.ModuloDeCarga.Id > 0)
-                                       .OrderBy(l => l.Embarque.OtrosMuelles)
-                                       .ThenBy(l => l.Embarque.Vicentin)
-                                       .ThenBy(l => l.Orden)
-                                       .Select(l => l.Embarque.Id)
-                                       .ToList();
-                    //var embarques = repositorio.Incluir<Embarque>();
-                    //var lineup = repositorio.Incluir<LineUp>();
-                    //var vapor = repositorio.Incluir<Vapor>();
-                    //embar = (from e in embarques
-                    //         join l in lineup on e.Id equals l.Embarque?.Id
-                    //         // join r in repositorio.Listar<Recorrido>() on l.Recorrido.Id equals r.Id
-                    //         join v in vapor on e.Vapor?.Id equals v.Id
-                    //         where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
-                    //         orderby e.OtrosMuelles, e.Vicentin, l.Orden ascending
-                    //         select (e.Id)).ToList();
+                                         .OrderBy(l => l.Embarque.OtrosMuelles)
+                                         .ThenBy(l => l.Embarque.Vicentin)
+                                         .ThenBy(l => l.Orden)
+                                         .ToList();
 
-                }
-                catch (Exception ex)
-                {
-                    if (ex.InnerException != null)
-                    {
-                        log.Error(ex, "Error en joins con inner: Excepcion: {0} Trace: {1} inner: {2}", ex.Message, ex.StackTrace, ex.InnerException.Message + ex.InnerException.StackTrace);
-                    }
-                    else
-                    {
-                        log.Error(ex, "Error en joins: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
-                    }
-                    throw (new Exception("Error en joins: Excepcion " + ex.Message + ex.StackTrace, ex));
-                }
-                var embarques = new List<EmbarqueDto>();
-                try
-                {
-                    foreach (var em in embar)
-                    {
-                        var embarque = repositorio.Obtener<Embarque>(x => x.Id == em);
+                // Si uno de los embarques se encuentra "cargando", se mueve al principio de la lista
+                var cargando = lineups.FirstOrDefault(l => l.Ocultar != true
+                                                        && l.Embarque.EstadoBuque != null
+                                                        && l.Embarque.EstadoBuque.Descripcion != null
+                                                        && (l.Embarque.EstadoBuque.Descripcion.Contains("ControlCalidad") ||
+                                                            l.Embarque.EstadoBuque.Descripcion.Contains("Cargando")));
 
-                        embarques.Add(conversor.Convertir<Embarque, EmbarqueDto>(embarque));
-
-                    }
-                }
-                catch (Exception ex)
+                if (cargando != null)
                 {
-                    log.Error(ex, "Error en Conversion EbarqueDto: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
-                    throw (new Exception("Error en Conversion EbarqueDto Excepcion: " + ex.Message + ex.StackTrace, ex));
+                    lineups = new List<LineUp> { cargando }.Concat(lineups.Where(l => l != cargando)).ToList();
                 }
-                List<InstanciaWorkflowPuertoDto> InstanciaWorkflowPuertoDtos = new List<InstanciaWorkflowPuertoDto>();
 
-                try
-                {
-                    foreach (var embarque in embarques)
+                var InstanciaWorkflowPuertoDtos = lineups.Select(lineup =>
                     {
-                        var lineupDto = Obtener<LineUp, LineUpDto>(x => x.Embarque.Id == embarque.Id);
-                        lineupDto.Ubicacion = embarque.Ubicacion;
-                        InstanciaWorkflowPuertoDtos.Add(new InstanciaWorkflowPuertoDto
+                        var lineupDto = conversor.Convertir<LineUp, LineUpDto>(lineup);
+                        lineupDto.Ubicacion = lineup.Embarque.Ubicacion;
+                        return new InstanciaWorkflowPuertoDto
                         {
                             Id = lineupDto.InstanciaWorkflow,
-                            Embarque = embarque,
+                            Embarque = conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque),
                             LineUp = lineupDto
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex, "Error en Conversion InstanciaWorkflowPuertoDtos: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
-                    throw (new Exception("Error en Conversion InstanciaWorkflowPuertoDtos Excepcion: " + ex.Message + ex.StackTrace, ex));
-                }
+                        };
+                    }).ToList();
+
                 return InstanciaWorkflowPuertoDtos;
             }
             catch (Exception ex)
@@ -11470,7 +11428,6 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Error(ex, "Error en servicioListarEmbarque: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                 throw ex;
             }
-
         }
 
         public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
