@@ -21,7 +21,7 @@ export class CargadoresComponent implements OnInit {
   public paginator: any;
   public length = 0;
   public pageSize: number;
-  public pageIndex: number = 0;
+  public pageIndex: number = 1;
   public pageSizeOptions = [10, 20, 50, 100];
   public hidePageSize = false;
   public showPageSizeOptions = true;

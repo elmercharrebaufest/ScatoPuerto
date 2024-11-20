@@ -271,11 +271,11 @@ export class AdjuntarDocumentosComponent implements OnInit, OnDestroy {
   }
 
   public tienePermisoEliminarArchivo(){
-    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Eliminar);
+    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Eliminar) && this.tabSeleccionado !== 'A solicitar en la nominación';
   }
 
   public tienePermisoCrearArchivo(){
-    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Crear);
+    return this.user.permisos.find(p => p === this.permisosScato.Archivo_Digitalizacion_Crear) && this.tabSeleccionado !== 'A solicitar en la nominación';
   }
 
   public refrescarListado(){

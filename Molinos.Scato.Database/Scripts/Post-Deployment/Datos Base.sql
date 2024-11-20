@@ -1202,31 +1202,26 @@ if not exists(select 1 from ADPuertoGruposRoles where Id_Grupo=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Digitalizacion_Visualizar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar')); end
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Digitalizacion_Visualizar')); end
 
 --Archivo_Digitalizacion_Crear
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Archivo_Digitalizacion_Crear'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear')); end
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Crear')); end
 
 --Archivo_Digitalizacion_Modificar
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Archivo_Digitalizacion_Modificar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar')); end
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Modificar')); end
 
 --Archivo_Digitalizacion_Eliminar
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Archivo_Digitalizacion_Eliminar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar')); end
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Eliminar')); end
 
 --Archivo_Digitalizacion_Descargar
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Archivo_Digitalizacion_Descargar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar')); end
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Archivo_Digitalizacion_Descargar')); end
 
 --Comex_Documentos_Visualizar
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_Documentos_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_Documentos_Visualizar'); end
@@ -1235,7 +1230,6 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 --Moc_Documentos_Visualizar
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Moc_Documentos_Visualizar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')); end
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Moc_Documentos_Visualizar')); end
 
 -- Motivos de Envio de alerta de documentacion
 if not exists(select 1 from DocumentoMotivoAlerta where Motivo='Borradores') BEGIN insert into DocumentoMotivoAlerta(Motivo)values('Borradores'); END
@@ -1253,14 +1247,45 @@ declare @par_Id_Rol_Moc int
 declare @par_Id_Permiso_Moc_Nominacion int
 declare @par_Id_Documento_Visualizar int
 declare @par_Id_Vapor_Visualizar int 
+declare @par_Id_Vapor_Editar int 
+declare @par_Id_Vapor_Crear int 
+declare @par_Id_Vapor_Eliminar int 
+
+declare @par_Id_Comex_Nominacion_Modificar int 
+declare @par_Id_Comex_Nominacion_Eliminar int 
+declare @par_IdComex_Nominacion_Nominar int 
+declare @par_Id_Comex_Nominacion_Enviar_LineUp int 
+declare @par_Id_Comex_Nominacion_Guardar int 
+
  select @par_Id_Rol_Moc = Id from ADPuertoRoles where NombreRol = 'Moc'
  select @par_Id_Permiso_Moc_Nominacion = Id from ADPuertoPermisos where NombrePermiso = 'Moc_Nominacion_Ver'
  select @par_Id_Documento_Visualizar = Id from ADPuertoPermisos where NombrePermiso = 'Documentos_Visualizar'
+ 
  select @par_Id_Vapor_Visualizar = Id from ADPuertoPermisos where NombrePermiso = 'Vapor_Visualizar'
+ select @par_Id_Vapor_Editar = Id from ADPuertoPermisos where NombrePermiso = 'Vapor_Editar'
+ select @par_Id_Vapor_Crear = Id from ADPuertoPermisos where NombrePermiso = 'Vapor_Crear'
+ select @par_Id_Vapor_Eliminar = Id from ADPuertoPermisos where NombrePermiso = 'Vapor_Eliminar'
+
+ 
+ select @par_Id_Comex_Nominacion_Modificar = Id from ADPuertoPermisos where NombrePermiso = 'Comex_Nominacion_Modificar'
+ select @par_Id_Comex_Nominacion_Eliminar = Id from ADPuertoPermisos where NombrePermiso = 'Comex_Nominacion_Eliminar'
+ select @par_IdComex_Nominacion_Nominar = Id from ADPuertoPermisos where NombrePermiso = 'Comex_Nominacion_Nominar'
+ select @par_Id_Comex_Nominacion_Enviar_LineUp = Id from ADPuertoPermisos where NombrePermiso = 'Comex_Nominacion_Enviar_LineUp'
+ select @par_Id_Comex_Nominacion_Guardar = Id from ADPuertoPermisos where NombrePermiso = 'Comex_Nominacion_Guardar'
 
 
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Permiso_Moc_Nominacion) begin insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Permiso_Moc_Nominacion); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Documento_Visualizar) begin 	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Documento_Visualizar); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Vapor_Visualizar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Vapor_Visualizar); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Vapor_Editar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Vapor_Editar); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Vapor_Crear) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Vapor_Crear); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Vapor_Eliminar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Vapor_Eliminar); end
+
+--Permisos MOC - Acciones Programa Embarque - Comparte permisos con COMEX
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Comex_Nominacion_Modificar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Comex_Nominacion_Modificar); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Comex_Nominacion_Eliminar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Comex_Nominacion_Eliminar); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_IdComex_Nominacion_Nominar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_IdComex_Nominacion_Nominar); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Comex_Nominacion_Enviar_LineUp) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Comex_Nominacion_Enviar_LineUp); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Comex_Nominacion_Guardar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Comex_Nominacion_Guardar); end
 
 GO
