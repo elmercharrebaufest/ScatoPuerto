@@ -399,10 +399,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     nominacion= this.crearObjectoDatoTecnico();
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.grabando;
-    this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+    this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(async data => {
       this.cargandoDatoTecnico = false;
       if (data) {
-        this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Dato tecnico guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        await this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Dato tecnico guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        await this.confirmationDialogService.alertar('Recuerde que si modificó un Cliente y/o Destino, debe de modificar la información en la sección de Documentación a solicitar');
         this.inicializarForm();
         this.cargarFormulario(nominacion.id);
         this.nominacionService.ActualizarAuditoria = true;

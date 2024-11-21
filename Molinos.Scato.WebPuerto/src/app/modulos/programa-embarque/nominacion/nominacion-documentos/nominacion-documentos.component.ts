@@ -530,7 +530,7 @@ export class NominacionDocumentosComponent implements OnInit, OnDestroy {
     this.guardando = true;
     this.documentoService.guardarConfiguraciones(configuraciones, this.nominacionId).subscribe(() => {
       this.guardando = false;
-      this.confirmationDialogService.exito('Configuraciones de documetos guardadas correctamente.', 'Registro Nominación - Configuración de documentos');
+      this.confirmationDialogService.exito('Configuraciones de documentos guardadas correctamente.', 'Registro Nominación - Configuración de documentos');
     }, err => {
       this.guardando = false;
       console.error(err);
