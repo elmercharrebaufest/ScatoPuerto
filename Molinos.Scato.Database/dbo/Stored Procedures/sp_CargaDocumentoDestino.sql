@@ -233,11 +233,13 @@ BEGIN
       select @SelDocumento_Id = Documento_Id from @tbl_documentos where Id = @Documento_Id
 	  select @temp_destino_Id = REPLACE( (SUBSTRING(@Destino,  0, PATINDEX('%-%', @Destino))), 'D','')
 	  select @SelDestino_Id = Destino_Id from @tbl_destinos_temp where Id = @temp_destino_Id
-	  IF NOT EXISTS(SELECT 1 FROM DocumentoDestino WHERE Documento_Id = @SelDocumento_Id AND Destino_Id = @SelDestino_Id)
-	     BEGIN
-			insert into DocumentoDestino(Documento_Id,Destino_Id)values(@SelDocumento_Id,@SelDestino_Id)
-		 END
-
+	  IF @SelDestino_Id > 0 
+	    BEGIN
+		  IF NOT EXISTS(SELECT 1 FROM DocumentoDestino WHERE Documento_Id = @SelDocumento_Id AND Destino_Id = @SelDestino_Id)
+			 BEGIN
+				insert into DocumentoDestino(Documento_Id,Destino_Id)values(@SelDocumento_Id,@SelDestino_Id)
+			 END
+	    END
 FETCH NEXT FROM cursor_destino INTO @Documento_Id, @Destino
 END 
 
