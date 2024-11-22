@@ -199,6 +199,7 @@ export class BalanzasManualService {
       horaInicio: x?.horaInicio ?? '',
       fechaCorte: x?.fechaCorte ?? '',
       horaCorte: x?.horaCorte ?? '',
+      duracionCorte: this.calcularDiferenciaTiempo(x),
       material: x?.material ?? 0,
       bodega: x?.bodega ?? null,
       destino: x?.destino ?? null,
@@ -210,6 +211,21 @@ export class BalanzasManualService {
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
     });
+  }
+
+  private calcularDiferenciaTiempo(x: BalanzaManual) {
+    if (!x) {
+      return '';
+    }
+    const inicio = new Date(`${x.fechaInicio}T${x.horaInicio}`);
+    const corte = new Date(`${x.fechaCorte}T${x.horaCorte}`);
+
+    const diferenciaMilisegundos = corte.getTime() - inicio.getTime();
+    const diferenciaMinutos = Math.floor(diferenciaMilisegundos / (1000 * 60));
+
+    const horas = ('0' + Math.floor(diferenciaMinutos / 60).toString()).slice(-2);
+    const minutos = ('0' + (diferenciaMinutos % 60).toString()).slice(-2);
+    return `${horas}:${minutos}`;
   }
 
   cargarCorteBajaCarga(balanzas, registroBalanza) {
@@ -322,7 +338,7 @@ export class BalanzasManualService {
 
     return esFechaValida;
   }
-  
+
   public convertirFecha(valorFecha: string, valorHora: string = null): Date {
     const fechaSplit = valorFecha.split('-');
     const anio = parseInt(fechaSplit[0]);
