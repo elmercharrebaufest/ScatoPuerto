@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace Molinos.Scato.WebPuertoApi.EXCEL
@@ -362,24 +363,32 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 foreach (ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga in cargas)
                 {
                     if (carga.Bodega?.Nombre != null && carga.BalanzaPuerto?.CodigoBalanza != null && carga.SiloCelda?.Color != null && carga.Fila != null)
-                        PintarValorEnBodegaBlz(rowIni, rowFin, turno, carga.Bodega.Nombre, carga.BalanzaPuerto.CodigoBalanza, ((decimal)(carga.Cantidad)) / 1000, carga.Fila.Value, carga.SiloCelda.Color);
+                        PintarValorEnBodegaBlz(rowIni, turno, carga);
                 }
             }
         }
 
-        private void PintarValorEnBodegaBlz(int rowIni, int rowFin, int turno, string bodega, string codBalanza, decimal cantidad, int fila, string color)
+        private void PintarValorEnBodegaBlz(int rowIni, int turno, ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto carga)
         {
-            bool separador = false;
+            bool separador = turno == 4;
+            string bodega = carga.Bodega.Nombre;
+            string codBalanza = carga.BalanzaPuerto.CodigoBalanza;
+            decimal cantidad = ((decimal)(carga.Cantidad)) / 1000;
+            int fila = carga.Fila.Value;
+            string color = carga.SiloCelda.Color;
             int offsetBlz = codBalanza == "7" ? 0 : 1;
             int col = ((int)char.GetNumericValue(bodega.Last())) * 2 + offsetBlz;
+            var comentario = new StringBuilder();
+            comentario.AppendLine(carga.SiloCelda.Nombre);
+            comentario.AppendLine("Destino: " + carga.Destino.Nombre);
+            comentario.AppendLine("Exportador: " + carga.Exportador.Nombre);
+
             ICellStyle estiloCarga = CrearEstiloCelda("Calibri", 11, IndexedColors.Black.Index, false, ObtenerRGBProducto(color), BorderStyle.None);
             IRow row = _sheetTurnos.GetRow(rowIni + (fila)) ?? _sheetTurnos.CreateRow(rowIni + (fila));
-            if (turno == 4)
-                separador = true;
-            CrearCelda(row, rowIni + (fila), rowIni + (fila), col, col, ToCustomString(cantidad), estiloCarga, 0, separador);
+            CrearCelda(row, rowIni + (fila), rowIni + (fila), col, col, ToCustomString(cantidad), estiloCarga, 0, separador, comentario.ToString());
         }
 
-        private void CrearCelda(IRow row, int firstRow, int lastRow, int firstCol, int lastCol, string valorCelda, ICellStyle estilo, int bordeRegion, bool separador)
+        private void CrearCelda(IRow row, int firstRow, int lastRow, int firstCol, int lastCol, string valorCelda, ICellStyle estilo, int bordeRegion, bool separador, string comentario = null)
         {
             var regionCelda = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
             _sheetTurnos.AddMergedRegion(regionCelda);
@@ -397,6 +406,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             ICell celda = row.CreateCell(firstCol);
             celda.CellStyle = estilo;
             celda.SetCellValue(valorCelda);
+
+            if (!string.IsNullOrEmpty(comentario))
+            {
+                IDrawing drawing = _sheetTurnos.CreateDrawingPatriarch();
+                IComment cellComment = drawing.CreateCellComment(new XSSFClientAnchor());
+                cellComment.String = new XSSFRichTextString(comentario);
+                cellComment.Author = "Sistema";
+                celda.CellComment = cellComment;
+            }
         }
 
         private byte[] ObtenerRGBProducto(string hexa)
@@ -639,7 +657,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private string ToCustomString(decimal valor)
         {
-            return valor % 1 == 0 ? valor.ToString("0") : valor.ToString("0.##");
+            return valor % 1 == 0 ? valor.ToString("0") : valor.ToString("0.###");
         }
     }
 }
