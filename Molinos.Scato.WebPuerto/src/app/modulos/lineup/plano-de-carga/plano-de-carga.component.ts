@@ -20,6 +20,7 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
   mostrarSpinner: boolean = true;
   mostrarNavtabs: boolean = false;
   mostrarPlano: boolean = false;
+  estaGuardando: boolean;
   embarquesEnLineUp: EmbarqueNav[];
   embarqueId: number;
   estadoAlturaValor: string;
@@ -82,10 +83,19 @@ export class PlanoDeCargaComponent extends LoadScreen implements OnInit {
     this.mostrarSpinner = event;
   }
 
-  guardarPlanoDeCarga(finalizar: boolean) {
+  async guardarPlanoDeCarga(finalizar: boolean) {
+    this.estaGuardando = true;
     this._changeDet.detectChanges();
-    this.modificarEstadoBuque('PreOperativo');
-    this.planoContent.guardarPlanoDeCarga(finalizar);
+
+    try {
+      this.modificarEstadoBuque('PreOperativo'); // Llama sin esperar si es síncrono
+      await this.planoContent.guardarPlanoDeCarga(finalizar); // Espera esta llamada
+    } catch (error) {
+      console.error("Error al guardar plano de carga:", error);
+    } finally {
+      this.estaGuardando = false; // Restaurar estado
+      this._changeDet.detectChanges(); // Forzar actualización nuevamente
+    }
   }
 
   modificarEstadoBuque(estado: string){

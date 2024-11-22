@@ -13387,7 +13387,7 @@ namespace Molinos.Scato.Servicios.Impl
             var tnTotales = planoDeCarga.PlanoDeCargaBodega.Sum(b => b.Cantidad);
 
             ritmosDeCargaManual["totalCargado"] = ritmos.LLevasCargando;
-            ritmosDeCargaManual["porcentajeDeCarga"] = Math.Round((tnTotales / ritmos.LLevasCargando) * 100, 2);
+            ritmosDeCargaManual["porcentajeDeCarga"] = ritmos.LLevasCargando == 0 ? Decimal.Zero : Math.Round((tnTotales / ritmos.LLevasCargando) * 100, 2);
             ritmosDeCargaManual["ritmoCargaNeto"] = ritmos.RitmoCargaNeto;
 
             return ritmosDeCargaManual;

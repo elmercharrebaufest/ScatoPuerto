@@ -27,13 +27,13 @@
 	    <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
 	  </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
-    	<button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+    	<button type="button" class="btn btn-primary mx-5" [disabled]="estaGuardando" (click)="guardar(false)">GUARDAR</button>
     </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
 	    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;"/>
     </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
-    	<button type="button" class="btn btn-success mx-5" (click)='guardar(true)'>ENVIAR A TABLERISTA</button>
+    	<button type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)='guardar(true)'>ENVIAR A TABLERISTA</button>
 	  </ng-container>
   </div>
 
@@ -60,13 +60,13 @@
     	<button name="botonesTableristaLiquidos" id="btn-cancelar-tablerista" type="button" class="btn btn-danger ocultar" [routerLink]="['/lineup']">CANCELAR</button>
     </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
-    	<button name="botonesTableristaLiquidos" id="btn-guardar-tablerista" type="button" class="btn btn-primary mx-5 ocultar" (click)="guardar(false)">GUARDAR</button>
+    	<button name="botonesTableristaLiquidos" id="btn-guardar-tablerista" type="button" class="btn btn-primary mx-5 ocultar" [disabled]="estaGuardando" (click)="guardar(false)">GUARDAR</button>
     </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
 	    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;" name="botonesTableristaLiquidos" id="btn-imprimir-tablerista"/>
 	  </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
-    	<button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" (click)='guardar(true)'>FINALIZAR</button>
+    	<button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)='guardar(true)'>FINALIZAR</button>
 	  </ng-container>
   </div>
 </div>

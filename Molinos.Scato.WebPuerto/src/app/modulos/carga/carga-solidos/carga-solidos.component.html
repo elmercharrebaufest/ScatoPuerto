@@ -11,13 +11,13 @@
       <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
     </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
-      <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+      <button type="button" class="btn btn-primary mx-5" [disabled]="estaGuardando" (click)="guardar(false)">GUARDAR</button>
     </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
 	    <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
     </ng-container>
     <ng-container *ngIf="hasPermisoEnviarATablerista()">
-      <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
+      <button type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)="guardar(true)">ENVIAR A TABLERISTA</button>
 		</ng-container>
   </div>
 
@@ -74,13 +74,13 @@
         <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
       </ng-container>
       <ng-container *ngIf="hasPermisoPlanoDeCarga_Guardar()">
-        <button type="button" class="btn btn-primary mx-5" (click)="guardar(false)">GUARDAR</button>
+        <button type="button" class="btn btn-primary mx-5" [disabled]="estaGuardando" (click)="guardar(false)">GUARDAR</button>
       </ng-container>
       <ng-container *ngIf="hasPermisoPlanoDeCarga_Imprimir()">
 	      <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
       </ng-container>
       <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
-        <button type="button" class="btn btn-success mx-5" (click)="guardar(true)">FINALIZAR</button>
+        <button type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)="guardar(true)">FINALIZAR</button>
 			</ng-container>
     </div>
   </div>

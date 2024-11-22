@@ -71,6 +71,7 @@ export class CargaSolidosComponent implements OnInit {
   moduloDeCarga = null;
   mostrarTableristaOperando: boolean = false;
   terminaImprimir: boolean = false;
+  estaGuardando: boolean;
   permisosScato: typeof PermisosScato = PermisosScato;
   private user: Usuario;
   estadosBuque = [{id: 1, descripcion: 'PreOperativo'},
@@ -265,21 +266,36 @@ export class CargaSolidosComponent implements OnInit {
   guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
+    this.deshabilitarGuardado();
+
     if( this.cargaComercialIncompleto ){
       let texto = "Por favor, verificar que los datos de la Carga Comercial esten completos.";
 
       this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
         .then((confirmed) => {
-          if (confirmed) return;
+          if (confirmed) {
+            this.habilitarGuardado();
+            return;
+          }
         }).catch(() => window.location.reload());
     } else {
-
       if (this.enviado && !finalizar) {
               this.guardarContinuacion(finalizar);
       } else {
         this.guardarContinuacion(finalizar);
       }
     }
+    this.habilitarGuardado();
+  }
+
+  private habilitarGuardado() {
+    this.estaGuardando = false;
+    this._changeDetector.detectChanges();
+  }
+
+  private deshabilitarGuardado() {
+    this.estaGuardando = true;
+    this._changeDetector.detectChanges();
   }
 
   async guardarContinuacion(finalizar: boolean) {
@@ -301,15 +317,19 @@ export class CargaSolidosComponent implements OnInit {
 
     try {
       await this.moduloCargaService.guardarModuloDeCarga(moduloCarga).pipe(take(1)).toPromise();
+      console.log('Emitiendo sendGuardar:', finalizar);
+
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
       let ok = await this._procesoGuardar.planoCargaOk.pipe(take(1)).toPromise();
       if (!ok) {
+        this.habilitarGuardado();
         return;
       }
       if (this.ingresoManualSolido && this.inicioCarga) {
         this._procesoGuardar.sendGuardarCargas.emit();
         ok = await this._procesoGuardar.cargasManualesOk.pipe(take(1)).toPromise();
         if (!ok) {
+          this.habilitarGuardado();
           return;
         }
       }
@@ -323,8 +343,10 @@ export class CargaSolidosComponent implements OnInit {
         this.cargaPdf = false;
         window.location.reload();
       }
+      this.habilitarGuardado();
     } catch (error) {
       console.error(error);
+      this.habilitarGuardado();
     }
   }
 

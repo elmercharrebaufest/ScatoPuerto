@@ -571,7 +571,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
           }
         }
       }
-
+      console.log("Se guarda Plano de Carga Ok...");
       this._guardarService.planoCargaOk.next(true);
     } catch (err) {
       console.error(err)
