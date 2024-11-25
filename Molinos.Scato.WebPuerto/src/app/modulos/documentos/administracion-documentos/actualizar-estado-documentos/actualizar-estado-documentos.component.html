@@ -60,7 +60,7 @@
                         <div class="document-content" style="margin-top: 10px;">
                             <span [ngClass]="{'doc-cerrado': elemento.estaCerrado }">
                                 <strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
-                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:mm'}}</span>&nbsp;
                             <div class="document-actions">
                                 <i *ngIf="puedeVisualizarArchivo(archivo) && tienePermisoDescargarArchivo()"
                                     class="fa fa-eye icon-eye" aria-hidden="true"
@@ -115,7 +115,7 @@
                         <div class="document-content" style="margin-top: 10px;">
                             <span>
                                 <strong>{{ archivo.nombre }}</strong> &nbsp;&nbsp; {{archivo.usuario}},
-                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:MM'}}</span>&nbsp;
+                                {{archivo.fechaSubida | date:'dd-MM-yyyy HH:mm'}}</span>&nbsp;
                             <div class="document-actions">
                                 <i *ngIf="puedeVisualizarArchivo(archivo) && tienePermisoDescargarArchivo()"
                                     class="fa fa-eye icon-eye" aria-hidden="true"
