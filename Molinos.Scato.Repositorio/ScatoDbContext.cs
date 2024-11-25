@@ -80,6 +80,18 @@ namespace Molinos.Scato.Repositorio
             modelBuilder.Entity<NominacionRecibo>()
                .Property(n => n.Cantidad)
                .HasPrecision(20, 3);
+            modelBuilder.Entity<PlanoDeCargaBodega>()
+                .Property(n => n.Cantidad)
+                .HasPrecision(18, 3);
+            modelBuilder.Entity<PlanoDeCargaBodegaHistorico>()
+                .Property(n => n.Cantidad)
+                .HasPrecision(18, 3);
+            modelBuilder.Entity<CargaComercial>()
+                .Property(n => n.Cantidad)
+                .HasPrecision(18, 3);
+            modelBuilder.Entity<CargaComercialHistorico>()
+                .Property(n => n.Cantidad)
+                .HasPrecision(18, 3);
         }
 
         private void MapearAssemblyDe<TEntidad>(DbModelBuilder modelBuilder, Predicate<Type> incluir, Predicate<Type> excluir)

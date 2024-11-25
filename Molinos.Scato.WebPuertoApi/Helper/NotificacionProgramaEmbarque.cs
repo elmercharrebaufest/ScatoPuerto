@@ -85,6 +85,10 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                     plantillaDetalle.Append($"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {(item.TieneSenasa ? "SI" : "NO")} </td>");
                     plantillaDetalle.Append($"<td style=\"border: 1px solid #ddd;padding: 5px;\"> {(item.IP ? "SI" : "NO")} </td>");
                     plantillaDetalle.Append($"<td style=\"border: 1px solid #ddd;padding: 5px;\">{(item.MuestraOficial ? "SI" : "NO")} </td></tr>");
+                    plantillaDetalle.Append($"<tr style=\"border: text-align:center;\">");
+                    plantillaDetalle.Append($"<td style=\"border: 1px solid #ddd;padding: 5px;\"> Observaciones </td>");
+                    var observaciones = string.IsNullOrEmpty(item.Observaciones) ? "-" : item.Observaciones;
+                    plantillaDetalle.Append($"<td colspan=\"3\" style=\"border: 1px solid #ddd;padding: 5px;\"> {observaciones} </td></tr>");
                 }
                 plantillaEmail = plantillaEmail.Replace("#reqDetalleIntervencion", $"{plantillaDetalle.ToString()}");
                 plantillaDetalle.Clear();

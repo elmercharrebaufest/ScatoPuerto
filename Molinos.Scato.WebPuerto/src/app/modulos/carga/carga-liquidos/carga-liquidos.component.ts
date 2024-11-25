@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Mail } from '@ScatoModels/mail';
 import { Embarque } from '@ScatoModels/embarque';
@@ -59,6 +59,7 @@ export class CargaLiquidosComponent implements OnInit {
   lineasEmbarque: LineasDeEmbarque[];
   cargaPdf: boolean = false;
   mostrarTableristaOperando = true;
+  estaGuardando: boolean;
   tanquesSeleccionados: any;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -78,7 +79,8 @@ export class CargaLiquidosComponent implements OnInit {
     private alertService: AlertService,
     private _procesoGuardar: ProcesoGuardarService,
     private _buqueService: BuqueService,
-    private elem: ElementRef
+    private elem: ElementRef,
+    private _changeDetector: ChangeDetectorRef
   ) {
     this.user = this.session.getUser();
     this.moduloCargaService.actualizarPlanillaLiquido.subscribe(data => {
@@ -327,6 +329,9 @@ export class CargaLiquidosComponent implements OnInit {
   }
 
   guardar(finalizar: boolean) {
+
+    this.deshabilitarGuardado();
+
     if (finalizar) {
       if (this.planillaTurnoLiquidosComponent != undefined || this.planillaTurnoLiquidosComponent != null) {
         this.planillaTurnoLiquidosComponent.desabilitarTurno();
@@ -334,12 +339,25 @@ export class CargaLiquidosComponent implements OnInit {
     }
 
     let fechasHorasOK = this.mostrarTableristaOperando ? this.validarFechas() : false;
-    if (!fechasHorasOK && this.mostrarTableristaOperando)
+    if (!fechasHorasOK && this.mostrarTableristaOperando){
+      this.habilitarGuardado();
       return;
+    }
     //SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     //CAMBIOS, POR LO QUE DEBERIA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     this.guardarContinuacion(finalizar);
   }
+  
+  private habilitarGuardado() {
+    this.estaGuardando = false;
+    this._changeDetector.detectChanges();
+  }
+
+  private deshabilitarGuardado() {
+    this.estaGuardando = true;
+    this._changeDetector.detectChanges();
+  }
+
   cambiarEstado() {
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe((resp: Embarque) => {
       if (resp.estadoBuque.id < 2) this.modificarEstadoBuque('Cargando');
@@ -411,16 +429,19 @@ export class CargaLiquidosComponent implements OnInit {
 
     if (lineasEmbarque == null) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingrear lineas de embarque para enviar al tablerista.', 'Aceptar', '', null, null, Tipoalerta.Success);
+      this.habilitarGuardado();
       return;
     }
 
     if (planillaDeEmbarque!=null && planillaDeEmbarque!=undefined) {
       if (planillaDeEmbarque.length == 0){
         this.confirmationDialogService.confirm('¡Atención!', 'No se puede finalizar cuando no se ha ingresado datos a la planilla.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        this.habilitarGuardado();
         return;
       }
       if (!this.validarExportadorYPartida(planillaDeEmbarque)) {
         this.confirmationDialogService.confirm('¡Atención!', 'Revise la planilla de embarque, la combinación de Exportador y Partida no se puede repetir.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        this.habilitarGuardado();
         return;
       }
     }
@@ -435,7 +456,7 @@ export class CargaLiquidosComponent implements OnInit {
     if (ok) {
       this.guardarModuloDeCarga(finalizar, moduloCarga);
     }
-
+    this.habilitarGuardado();
   }
 
   guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga) {

@@ -17,7 +17,7 @@
       <tbody>
         <tr *ngFor="let comentario of comentarios">
           <td>{{comentario.usuario}}</td>
-          <td>{{comentario.fecha | date:'dd/MM/yyyy HH:MM:SS'}}</td>
+          <td>{{comentario.fecha | date:'dd/MM/yyyy hh:mm:ss'}}</td>
           <td class="cursiva">{{comentario.comentario}}</td>
         </tr>
         <tr *ngIf="comentarios?.length == 0">

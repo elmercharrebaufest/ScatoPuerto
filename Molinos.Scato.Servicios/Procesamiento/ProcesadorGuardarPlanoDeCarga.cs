@@ -165,8 +165,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					{
 						var materialPuerto = bodegaDto.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(bodegaDto.MaterialPuerto.Id) : null;
 						PlanoDeCargaBodega bodegaDb = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == bodegaDto.Id);
+                        IList<PlanoDeCargaBodega> existeCargaEnBodega = Repositorio.Listar<PlanoDeCargaBodega>(x => x.BodegaParcel == bodegaDto.BodegaParcel && x.PlanoDeCarga.Id == planoDeCarga.Id);
+                        Destino destino = null;
 
-						Destino destino = null;
 						if ((bodegaDto.Destinos == null || bodegaDto.Destinos.Count == 0) && bodegaDto.Destino != null)
 						{
 							destino = Repositorio.Obtener<Destino>(bodegaDto.Destino.Id);
@@ -175,7 +176,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						if (bodegaDb != null) // EDIT
 						{
 							bodegaDb.BodegaParcel = bodegaDto.BodegaParcel;
-							bodegaDb.Cantidad = (decimal)bodegaDto.Cantidad;
+							bodegaDb.Cantidad = bodegaDto.Cantidad ?? 0;
 							bodegaDb.Condicion = bodegaDto.Condicion;
 							bodegaDb.Destino = destino;
 							bodegaDb.PlanoDeCarga = planoDeCarga;
@@ -214,30 +215,35 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						}
 						else // NEW
 						{
-							bodegaDb = new PlanoDeCargaBodega
+							if(existeCargaEnBodega == null || existeCargaEnBodega.Count() == 0)
 							{
-								BodegaParcel = bodegaDto.BodegaParcel,
-								Cantidad = (decimal)bodegaDto.Cantidad,
-								Condicion = bodegaDto.Condicion,
-								Destino = destino,
-								PlanoDeCarga = planoDeCarga,
-								MaterialPuerto = materialPuerto,
-								SfFull = bodegaDto.SfFull,
-								TanqueDeAbordo = bodegaDto.TanqueDeAbordo,
-								PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>()
-							};
+                                bodegaDb = new PlanoDeCargaBodega
+                                {
+                                    BodegaParcel = bodegaDto.BodegaParcel,
+                                    Cantidad = bodegaDto.Cantidad ?? 0,
+                                    Condicion = bodegaDto.Condicion,
+                                    Destino = destino,
+                                    PlanoDeCarga = planoDeCarga,
+                                    MaterialPuerto = materialPuerto,
+                                    SfFull = bodegaDto.SfFull,
+                                    TanqueDeAbordo = bodegaDto.TanqueDeAbordo,
+                                    PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>()
+                                };
 
-							if (bodegaDto.Destinos != null)
-							{
-								foreach (var destinoDto in bodegaDto.Destinos)
-								{
-									var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
-									var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
-									bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
-								}
-							}
-							Repositorio.Agregar(bodegaDb);
+                                if (bodegaDto.Destinos != null)
+                                {
+                                    foreach (var destinoDto in bodegaDto.Destinos)
+                                    {
+                                        var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
+                                        var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
+                                        bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
+                                    }
+                                }
+                                Repositorio.Agregar(bodegaDb);
+
+                            }
 						}
+						
 					}
 				}
 
