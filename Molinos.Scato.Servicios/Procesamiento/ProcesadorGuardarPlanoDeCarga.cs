@@ -176,7 +176,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						if (bodegaDb != null) // EDIT
 						{
 							bodegaDb.BodegaParcel = bodegaDto.BodegaParcel;
-							bodegaDb.Cantidad = (decimal)bodegaDto.Cantidad;
+							bodegaDb.Cantidad = bodegaDto.Cantidad ?? 0;
 							bodegaDb.Condicion = bodegaDto.Condicion;
 							bodegaDb.Destino = destino;
 							bodegaDb.PlanoDeCarga = planoDeCarga;
@@ -220,7 +220,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 bodegaDb = new PlanoDeCargaBodega
                                 {
                                     BodegaParcel = bodegaDto.BodegaParcel,
-                                    Cantidad = (decimal)bodegaDto.Cantidad,
+                                    Cantidad = bodegaDto.Cantidad ?? 0,
                                     Condicion = bodegaDto.Condicion,
                                     Destino = destino,
                                     PlanoDeCarga = planoDeCarga,

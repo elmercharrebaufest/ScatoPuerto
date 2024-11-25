@@ -14,8 +14,8 @@ import { Estiba } from '@ScatoModels/estiba';
 import { Exportador } from '@ScatoModels/exportador';
 import { Mail } from '@ScatoModels/mail';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { Observable, Subscription, forkJoin } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, tap, switchMap, take } from 'rxjs/operators';
+import { Observable, Subject, Subscription, forkJoin } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, tap, switchMap, take, takeUntil } from 'rxjs/operators';
 import { AlertService } from '@ScatoServicios/alert.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -39,6 +39,7 @@ import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
   styleUrls: ['./plano-content.component.css']
 })
 export class PlanoContentComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject();
   estadoAlturaValor: number;
   embarqueSelected: EmbarqueNav;
   @Output() showCargas = new EventEmitter<boolean>();
@@ -73,7 +74,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   state: string;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  private suscripciones: Subscription[] = [];
   public checkMismosDestinos: boolean = false;
   private dropdownSettings;
 
@@ -93,19 +93,17 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   ) {
     this.user = this.session.getUser();
     this.setConfigListaMultiple();
-    const subs1 = this._guardarService.sendGuardar.subscribe(
+    this._guardarService.sendGuardar.pipe(takeUntil(this.destroy$)).subscribe(
       (([finalizar, moduloCarga]) => {
         this.guardarPlanoDeCargaContinuacion(finalizar, moduloCarga);
       })
     )
-    this.suscripciones.push(subs1);
-    const subs2 = this._procesoService.sendEstadoAltura.subscribe(
+    this._procesoService.sendEstadoAltura.pipe(takeUntil(this.destroy$)).subscribe(
       res => {
         this.estadoAlturaValor = res;
         this.calcularRecomendacionDefensas();
       }
     )
-    this.suscripciones.push(subs2);
     this.state = this.router.url.replace('/', '');
   }
 
@@ -114,7 +112,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.suscripciones.forEach(sub => sub.unsubscribe());
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   getEmbarqueData() {
@@ -271,23 +270,31 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   initCargaComercial(cargaComercial: CargaComercial = null) {
-    if (cargaComercial != null) {
-      return this.formBuilder.group({
-        id: cargaComercial.id,
-        exportador: cargaComercial.exportador,
-        nombre: cargaComercial.exportador.nombre,
-        cantidad: cargaComercial.cantidad,
-        materialPuerto: cargaComercial.materialPuerto
-      })
-    } else {
-      return this.formBuilder.group({
-        id: 0,
-        exportador: [],
-        nombre: '',
-        materialPuerto: [],
-        cantidad: '',
-      })
+    const cantidad = new FormControl(cargaComercial?.cantidad || '', { updateOn: 'blur' });
+    cantidad.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val: string) => {
+      if (typeof val == 'string') {
+        const valorNumerico = val ? Number(val.replace(',', '.')) : val;
+        cantidad.setValue(valorNumerico, { emitModelToViewChange: false, emitEvent: false });
+      }
+    });
+
+    const formGroup = this.formBuilder.group({
+      id: cargaComercial?.id || 0,
+      exportador: cargaComercial?.exportador || [],
+      nombre: cargaComercial?.exportador.nombre || '',
+      cantidad,
+      materialPuerto: cargaComercial?.materialPuerto || []
+    });
+
+    if (cargaComercial) { // necesario para mostrar los valores iniciales con "," en los decimales
+      const cantidadStr = cargaComercial.cantidad.toString().replace('.', ',');
+      cantidad.setValue(cantidadStr, { emitEvent: false });
+      setTimeout(() => {
+        cantidad.setValue(Number(cantidadStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
+      }, 200);
     }
+
+    return formGroup;
   }
 
   agregarCargaComercial() {
@@ -365,13 +372,12 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
     for (let index = 0; index < 9; index++) {
       const cantidad = new FormControl(null, { updateOn: 'blur' });
-      const suscCantidad = cantidad.valueChanges.subscribe((val: string) => {
+      cantidad.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val: string) => {
         if (typeof val == 'string') {
           const valorNumerico = val ? Number(val.replace(',', '.')) : val;
           cantidad.setValue(valorNumerico, { emitModelToViewChange: false, emitEvent: false });
         }
       });
-      this.suscripciones.push(suscCantidad);
 
       const bodegaGroup = this.formBuilder.group({
         id: [],
@@ -386,7 +392,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         destinosPaises: []
       });
       // Convierte los destinos seleccionados en la clase de relación
-      const susConvertirDestino = bodegaGroup.get('destinosPaises').valueChanges.subscribe((val: Destino[]) => {
+      bodegaGroup.get('destinosPaises').valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val: Destino[]) => {
         if (!val) {
           return;
         }
@@ -396,16 +402,14 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
           this.sendDataParcel();
         }
       });
-      this.suscripciones.push(susConvertirDestino);
       this.planoDeCargaBodegasFormArray.push(bodegaGroup);
     }
 
-    const suscDestino = this.planoDeCargaBodegasFormArray.valueChanges.pipe().subscribe(() => {
+    this.planoDeCargaBodegasFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.checkMismosDestinos) {
         this.setearMismoDestino();
       }
     });
-    this.suscripciones.push(suscDestino);
 
     this.obtenerPlanoDeCarga();
   }
@@ -456,10 +460,16 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   public numberOnly(event: KeyboardEvent, decimales?: boolean): boolean {
     var charCode = (event.which) ? event.which : event.keyCode;
     let esNumero = charCode >= 48 && charCode <= 57;
-    if (!esNumero && decimales) {
+    if (decimales) {
       const input = event.target as HTMLInputElement;
-      const char = String.fromCharCode(charCode);
-      return char == ',' && !input.value.includes(',');
+      const cantDecimales = input.value.split(',')[1]?.length || 0;
+      if (cantDecimales >= 3) {
+        return false;
+      }
+      if (!esNumero) {
+        const char = String.fromCharCode(charCode);
+        return char == ',' && !input.value.includes(',');
+      }
     }
     return esNumero;
   }

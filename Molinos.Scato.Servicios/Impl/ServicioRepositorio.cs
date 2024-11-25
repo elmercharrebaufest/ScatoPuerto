@@ -9180,7 +9180,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         }).ToList();
             foreach (var carga in cargasComerciales)
             {
-                body += $"- {carga.Exportador.Trim().PadRight(30, '.')} {carga.Cantidad} tn.\n";
+                body += $"- {carga.Exportador.Trim().PadRight(30, '.')} {carga.Cantidad.ToString().Replace('.', ',')} tn.\n";
                 body += "\t\f PRODUCTO(S): \f\f\n";
 
                 var cargasComercialesP = Listar<CargaComercial, CargaComercialDto>(x => x.PlanoDeCarga.Id == planoDeCargaId && x.Exportador.Nombre == carga.Exportador)
@@ -9191,7 +9191,7 @@ namespace Molinos.Scato.Servicios.Impl
                                         }).ToList();
                 foreach (var materiales in cargasComercialesP)
                 {
-                    body += $"\t {materiales.Producto.Trim().PadRight(10, '.')} {materiales.Cantidad} tn.\n";
+                    body += $"\t {materiales.Producto.Trim().PadRight(10, '.')} {materiales.Cantidad.ToString().Replace('.', ',')} tn.\n";
                 }
             }
 
