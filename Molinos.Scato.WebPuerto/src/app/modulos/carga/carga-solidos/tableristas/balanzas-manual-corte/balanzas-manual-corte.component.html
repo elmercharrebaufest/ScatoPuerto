@@ -27,12 +27,12 @@
                             <ngx-material-timepicker #horaInicio></ngx-material-timepicker>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                    <div class="row mt-3" *ngIf="!this.corteManualForm.controls.recordatorio.value || balanzaManualRegistro != null">
                         <div class="col">
                             <label>Corte</label>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" *ngIf="!this.corteManualForm.controls.recordatorio.value || balanzaManualRegistro != null">
                         <div class="col">
                             <input type="date" min="{{fechaComienzoCarga}}" class="form-control"
                             (change)="onCambiarHoras(true)" formControlName="fechaCorte" />
@@ -45,6 +45,16 @@
                                 <img src='assets/reloj.svg' class='imgClockInput1'>
                             </div>
                             <ngx-material-timepicker #horaCorte></ngx-material-timepicker>
+                        </div>
+                    </div>
+                    <div *ngIf="balanzaManualRegistro == null" class="row mt-3">
+                        <div class="col">
+                            <div class="form-check">
+                                <label>
+                                    <input type="checkbox" formControlName="recordatorio">
+                                    Recordatorio
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>

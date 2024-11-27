@@ -12629,6 +12629,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
+                    balanzaManualDto.Recordatorio = balanzasCorte.Recordatorio;
                     listaBalanzaManual.Add(balanzaManualDto);
                 }
 
@@ -12736,12 +12737,18 @@ namespace Molinos.Scato.Servicios.Impl
                         // Si en el momendo de editar el corte abarca más de un turno, se elimina y se vuelve a crear
                         if ((dto.Fecha_Corte.Value.Date != dto.Fecha_Inicio.Value.Date) || (ordenInicio != ordenFin))
                         {
-                            this.EliminarBalanzaManual(dto.Id, nombreUsuario);
+                            if (dto.Recordatorio)
+                                dto.Recordatorio = false;
+                            this.EliminarBalanzaManual(dto.Id, nombreUsuario);                           
                             this.CrearBalanzaManualCortes(dto, nombreUsuario);
                         }
                         else
                         {
                             balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == dto.Id);
+
+                            if (balanzaCortes.Recordatorio && dto.Fecha_Corte != balanzaCortes.Fecha_Corte)
+                                balanzaCortes.Recordatorio = false;
+
                             balanzaCortes.Cerrado = dto.Cerrado;
                             balanzaCortes.Fecha_Corte = dto.Fecha_Corte;
                             balanzaCortes.Fecha_Inicio = dto.Fecha_Inicio;
@@ -12755,6 +12762,7 @@ namespace Molinos.Scato.Servicios.Impl
                             balanzaCortes.Bodega_id = dto.Bodega_id;
                             balanzaCortes.Exportador_Id = dto.Exportador_Id;
                             balanzaCortes.Destino_Id = dto.Destino_Id;
+                 
                             this.repositorio.GuardarCambios();
                             var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                             this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
@@ -12782,7 +12790,7 @@ namespace Molinos.Scato.Servicios.Impl
                             Bodega_id = dto.Bodega_id,
                             Exportador_Id = dto.Exportador_Id,
                             Destino_Id = dto.Destino_Id,
-                            Id = dto.Id
+                            Id = dto.Id,
                         };
                         this.repositorio.Agregar(balanzaCortes);
                         this.repositorio.GuardarCambios();
@@ -13159,7 +13167,8 @@ namespace Molinos.Scato.Servicios.Impl
                     Bodega_id = dto.Bodega_id,
                     Exportador_Id = dto.Exportador_Id,
                     Destino_Id = dto.Destino_Id,
-                    Id = dto.Id
+                    Id = dto.Id,
+                    Recordatorio = dto.Recordatorio,
                 };
                 this.repositorio.Agregar(balanzaCortes);
                 this.repositorio.GuardarCambios();
@@ -13244,8 +13253,11 @@ namespace Molinos.Scato.Servicios.Impl
                         FechaCorte = fechaCortePuerto.FechaFin.ToString("yyyy-MM-dd"),
                         HoraCorte = fechaCortePuerto.FechaFin.ToString("HH:mm")
                     };
-                    if (balanzasFechasCortesPorTurnoDto.FechaInicio == balanzasFechasCortesPorTurnoDto.FechaCorte && 
-                        balanzasFechasCortesPorTurnoDto.HoraInicio != balanzasFechasCortesPorTurnoDto.HoraCorte)
+
+                    if ((balanzasFechasCortesPorTurnoDto.FechaInicio == balanzasFechasCortesPorTurnoDto.FechaCorte && 
+                        balanzasFechasCortesPorTurnoDto.HoraInicio != balanzasFechasCortesPorTurnoDto.HoraCorte) ||
+                        (dto.Recordatorio && balanzasFechasCortesPorTurnoDto.FechaInicio == balanzasFechasCortesPorTurnoDto.FechaCorte &&
+                        balanzasFechasCortesPorTurnoDto.HoraInicio == balanzasFechasCortesPorTurnoDto.HoraCorte))
                     {
                         balanzasFechasCortesPorTurno.Add(balanzasFechasCortesPorTurnoDto);
                     }

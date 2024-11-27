@@ -210,6 +210,7 @@ export class BalanzasManualService {
       corteManual: x?.corteManual ?? esCorteManual,
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
+      recordatorio: x?.recordatorio 
     });
   }
 
@@ -297,6 +298,7 @@ export class BalanzasManualService {
     balanzaCortesManual.cerrado = false;
     balanzaCortesManual.corteManual = balanza.corteManual;
     balanzaCortesManual.usuario = this.user.username;
+    balanzaCortesManual.recordatorio = balanza.recordatorio;
     return balanzaCortesManual;
   }
 

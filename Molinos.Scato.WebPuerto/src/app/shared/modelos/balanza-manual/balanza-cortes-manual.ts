@@ -15,4 +15,5 @@ export class BalanzasCortesManual {
     exportador_Id: number | null;
     destino_Id: number | null;
     usuario: string;
+    recordatorio: boolean;
 }

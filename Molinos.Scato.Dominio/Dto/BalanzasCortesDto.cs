@@ -24,6 +24,8 @@ namespace Molinos.Scato.Dominio.Dto
         public int? idInicio { get; set; }
         public int? idFin { get; set; }
         public string Usuario { get; set; }
+        public bool Recordatorio { get; set; }
+
         public object Clone()
         {
             return this.MemberwiseClone();

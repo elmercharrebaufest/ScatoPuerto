@@ -274,4 +274,13 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_TerminarCarga_Exportar);
   }
 
+  public existeCorteConRecordatorio(balanza: number): boolean {
+    const formKey = balanza === 7 ? 'balanza7Form' : balanza === 8 ? 'balanza8Form' : null;
+    if (!formKey) {
+      return false; 
+    }
+    const formArray = (this[formKey]?.get(`balanzas${balanza}`) as FormArray)?.value;
+    return Array.isArray(formArray) && formArray.some(b => b.recordatorio === true);
+  }
+
 }
