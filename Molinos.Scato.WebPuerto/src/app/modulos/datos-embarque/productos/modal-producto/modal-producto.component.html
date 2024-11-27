@@ -188,7 +188,7 @@
               <input id="doc-{{doc?.id}}" type="checkbox" class="form-check-input me-2" 
               [checked]="doc.seleccionado" (click)="onCheckDocumento(doc, $event)"/>
               <input class="form-control border-0 custom-disabled" type="text"
-              [value]="doc?.documento?.nombre"/>
+              [value]="doc?.documento?.nombre" disabled/>
             </div>
           </div>
         </ng-container>
