@@ -11,7 +11,8 @@ export class BalanzasCortesManual {
     kg: number | null;
     tn: number | null;
     cerrado: boolean;
-    corteManual: boolean;
+    corteManual: boolean | null;
+    cargaNormal: boolean | null;
     exportador_Id: number | null;
     destino_Id: number | null;
     usuario: string;

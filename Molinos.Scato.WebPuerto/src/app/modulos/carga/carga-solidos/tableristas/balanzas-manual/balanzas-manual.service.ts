@@ -208,6 +208,7 @@ export class BalanzasManualService {
       kilogramos: x?.kilogramos ?? 0,
       toneladas: x?.kilogramos ?  x?.kilogramos/ 1000 : 0,
       corteManual: x?.corteManual ?? esCorteManual,
+      cargaNormal: x?.cargaNormal? x?.cargaNormal: false,
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
       recordatorio: x?.recordatorio 
@@ -285,7 +286,7 @@ export class BalanzasManualService {
     balanzaCortesManual.id = balanza.id;
     balanzaCortesManual.numeroBalanza = numeroBalanza;
     balanzaCortesManual.moduloDeCarga_id = moduloDeCargaId;
-    balanzaCortesManual.motivosFallasBalanza_id = balanza.motivosFallasBalanza.id;
+    balanzaCortesManual.motivosFallasBalanza_id = (balanza.motivosFallasBalanza!=null && balanza.motivosFallasBalanza!=undefined) ? balanza.motivosFallasBalanza.id : null;
     balanzaCortesManual.observaciones = balanza.observaciones;
     balanzaCortesManual.fecha_Inicio = `${balanza.fechaInicio} ${balanza.horaInicio}`;
     balanzaCortesManual.fecha_Corte = `${balanza.fechaCorte} ${balanza.horaCorte}`;
@@ -297,6 +298,7 @@ export class BalanzasManualService {
     balanzaCortesManual.tn = balanza.kilogramos > 0 ? parseInt((balanza.kilogramos/1000).toString()) : null;
     balanzaCortesManual.cerrado = false;
     balanzaCortesManual.corteManual = balanza.corteManual;
+    balanzaCortesManual.cargaNormal = balanza.cargaNormal;
     balanzaCortesManual.usuario = this.user.username;
     balanzaCortesManual.recordatorio = balanza.recordatorio;
     return balanzaCortesManual;

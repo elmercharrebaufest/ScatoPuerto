@@ -12626,6 +12626,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Kilogramos = balanzasCorte.Kg;
                     balanzaManualDto.Toneladas = balanzasCorte.Tn;
                     balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
+                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal): false;
                     balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
@@ -12669,6 +12670,7 @@ namespace Molinos.Scato.Servicios.Impl
             balanzaManualDto.Kilogramos = balanzasCorte.Kg;
             balanzaManualDto.Toneladas = balanzasCorte.Tn;
             balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
+            balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal) : false;
             balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
             var turnos = Listar<TurnoPuerto, TurnoPuertoDto>();
             TurnoPuertoDto turnoPuertoDto;
@@ -12690,7 +12692,6 @@ namespace Molinos.Scato.Servicios.Impl
             this.repositorio.Remover(balanzaCortes);
             this.repositorio.GuardarCambios();
             this.GuardarHistoricoBalanzaManual(balanzasCortesDto, nombreUsuario, (int)EventoABM.Baja);
-
             return bResultado;
         }
 
@@ -12704,11 +12705,13 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
+                bool esCargaNormal = (bool)dto.CargaNormal ? true : false;
+
                 var balanzaCortes = new BalanzasCortes();
 
                 if (dto.Id > 0)
                 {
-                    if (!dto.CorteManual)
+                    if (esCargaNormal)
                     {
                         balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == dto.Id);
                         balanzaCortes.Cerrado = dto.Cerrado;
@@ -12720,10 +12723,12 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Material_id = dto.Material_id;
                         balanzaCortes.Tn = dto.Tn;
                         balanzaCortes.CorteManual = dto.CorteManual;
+                        balanzaCortes.CargaNormal = dto.CargaNormal;
                         balanzaCortes.MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id;
                         balanzaCortes.Bodega_id = dto.Bodega_id;
                         balanzaCortes.Exportador_Id = dto.Exportador_Id;
                         balanzaCortes.Destino_Id = dto.Destino_Id;
+                        balanzaCortes.CargaNormal = dto.CargaNormal;
                         this.repositorio.GuardarCambios();
                         var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                         this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
@@ -12731,24 +12736,9 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        int ordenInicio = (dto.Fecha_Inicio.Value.Hour / 6) + 1;
-                        int ordenFin = (dto.Fecha_Corte.Value.Hour / 6) + 1;
-
-                        // Si en el momendo de editar el corte abarca más de un turno, se elimina y se vuelve a crear
-                        if ((dto.Fecha_Corte.Value.Date != dto.Fecha_Inicio.Value.Date) || (ordenInicio != ordenFin))
-                        {
-                            if (dto.Recordatorio)
-                                dto.Recordatorio = false;
-                            this.EliminarBalanzaManual(dto.Id, nombreUsuario);                           
-                            this.CrearBalanzaManualCortes(dto, nombreUsuario);
-                        }
-                        else
+                        if (!dto.CorteManual)
                         {
                             balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == dto.Id);
-
-                            if (balanzaCortes.Recordatorio && dto.Fecha_Corte != balanzaCortes.Fecha_Corte)
-                                balanzaCortes.Recordatorio = false;
-
                             balanzaCortes.Cerrado = dto.Cerrado;
                             balanzaCortes.Fecha_Corte = dto.Fecha_Corte;
                             balanzaCortes.Fecha_Inicio = dto.Fecha_Inicio;
@@ -12758,52 +12748,99 @@ namespace Molinos.Scato.Servicios.Impl
                             balanzaCortes.Material_id = dto.Material_id;
                             balanzaCortes.Tn = dto.Tn;
                             balanzaCortes.CorteManual = dto.CorteManual;
+                            balanzaCortes.CargaNormal = dto.CargaNormal;
                             balanzaCortes.MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id;
                             balanzaCortes.Bodega_id = dto.Bodega_id;
                             balanzaCortes.Exportador_Id = dto.Exportador_Id;
                             balanzaCortes.Destino_Id = dto.Destino_Id;
-                 
                             this.repositorio.GuardarCambios();
                             var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                             this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
                             this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int)EventoABM.Modificacion);
                         }
+                        else
+                        {
+                            int ordenInicio = (dto.Fecha_Inicio.Value.Hour / 6) + 1;
+                            int ordenFin = (dto.Fecha_Corte.Value.Hour / 6) + 1;
+
+                            // Si en el momendo de editar el corte abarca más de un turno, se elimina y se vuelve a crear
+                            if ((dto.Fecha_Corte.Value.Date != dto.Fecha_Inicio.Value.Date) || (ordenInicio != ordenFin))
+                            {
+                                if (dto.Recordatorio)
+                                    dto.Recordatorio = false;
+                                this.EliminarBalanzaManual(dto.Id, nombreUsuario);
+                                this.CrearBalanzaManualCortes(dto, nombreUsuario);
+                            }
+                            else
+                            {
+                                balanzaCortes = this.repositorio.Obtener<BalanzasCortes>(x => x.Id == dto.Id);
+
+                                if (balanzaCortes.Recordatorio && dto.Fecha_Corte != balanzaCortes.Fecha_Corte)
+                                    balanzaCortes.Recordatorio = false;
+
+                                balanzaCortes.Cerrado = dto.Cerrado;
+                                balanzaCortes.Fecha_Corte = dto.Fecha_Corte;
+                                balanzaCortes.Fecha_Inicio = dto.Fecha_Inicio;
+                                balanzaCortes.Kg = dto.Kg;
+                                balanzaCortes.NumeroBalanza = dto.NumeroBalanza;
+                                balanzaCortes.Observaciones = dto.Observaciones;
+                                balanzaCortes.Material_id = dto.Material_id;
+                                balanzaCortes.Tn = dto.Tn;
+                                balanzaCortes.CorteManual = dto.CorteManual;
+                                balanzaCortes.MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id;
+                                balanzaCortes.Bodega_id = dto.Bodega_id;
+                                balanzaCortes.Exportador_Id = dto.Exportador_Id;
+                                balanzaCortes.Destino_Id = dto.Destino_Id;
+
+                                this.repositorio.GuardarCambios();
+                                var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
+                                this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
+                                this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int)EventoABM.Modificacion);
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    if (!dto.CorteManual)
-                    {
-                        balanzaCortes = new BalanzasCortes()
-                        {
-                            Cerrado = dto.Cerrado,
-                            Fecha_Corte = dto.Fecha_Corte,
-                            Fecha_Inicio = dto.Fecha_Inicio,
-                            Kg = dto.Kg,
-                            NumeroBalanza = dto.NumeroBalanza,
-                            Observaciones = dto.Observaciones,
-                            Material_id = dto.Material_id,
-                            Tn = dto.Tn,
-                            CorteManual = dto.CorteManual,
-                            MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
-                            ModuloDeCarga_id = dto.ModuloDeCarga_id,
-                            Bodega_id = dto.Bodega_id,
-                            Exportador_Id = dto.Exportador_Id,
-                            Destino_Id = dto.Destino_Id,
-                            Id = dto.Id,
-                        };
-                        this.repositorio.Agregar(balanzaCortes);
-                        this.repositorio.GuardarCambios();
-                        dto.Id = balanzaCortes.Id;
-                        var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
-                        this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
-                        this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int)EventoABM.Alta);
-                    }
-                    else
+                    if (esCargaNormal)
                     {
                         this.CrearBalanzaManualCortes(dto, nombreUsuario);
                     }
-
+                    else
+                    {
+                        if (!dto.CorteManual)
+                        {
+                            balanzaCortes = new BalanzasCortes()
+                            {
+                                Cerrado = dto.Cerrado,
+                                Fecha_Corte = dto.Fecha_Corte,
+                                Fecha_Inicio = dto.Fecha_Inicio,
+                                Kg = dto.Kg,
+                                NumeroBalanza = dto.NumeroBalanza,
+                                Observaciones = dto.Observaciones,
+                                Material_id = dto.Material_id,
+                                Tn = dto.Tn,
+                                CorteManual = dto.CorteManual,
+                                CargaNormal = dto.CargaNormal,
+                                MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
+                                ModuloDeCarga_id = dto.ModuloDeCarga_id,
+                                Bodega_id = dto.Bodega_id,
+                                Exportador_Id = dto.Exportador_Id,
+                                Destino_Id = dto.Destino_Id,
+                                Id = dto.Id
+                            };
+                            this.repositorio.Agregar(balanzaCortes);
+                            this.repositorio.GuardarCambios();
+                            dto.Id = balanzaCortes.Id;
+                            var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
+                            this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
+                            this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int)EventoABM.Alta);
+                        }
+                        else
+                        {
+                            this.CrearBalanzaManualCortes(dto, nombreUsuario);
+                        }
+                    }
                 }
                 return new BalanzaManualDto();
             }
@@ -13162,6 +13199,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Material_id = dto.Material_id,
                     Tn = dto.Tn,
                     CorteManual = dto.CorteManual,
+                    CargaNormal = (bool) dto.CargaNormal,
                     MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
                     ModuloDeCarga_id = dto.ModuloDeCarga_id,
                     Bodega_id = dto.Bodega_id,

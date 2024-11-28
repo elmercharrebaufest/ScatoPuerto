@@ -22,6 +22,9 @@
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
                 (click)='onOpenModal(modalBajaCarga  ,7)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(7)">Alta de Baja
                 Carga</button>
+              <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
+                (click)='onOpenModal(modalCargaNormal ,7, false, true)' style="margin-left: 5px;margin-right: 5px;">Alta de Carga
+                Normal</button>                
             </ng-container>
           </div>
         </div>
@@ -94,9 +97,11 @@
                 </td>
                 <td *ngIf="!esSoloLectura" class="noBorder alinearCentro centradoHorizontal ocultarPdf">
                   <div *ngIf="!esSoloLectura" class="alinearJustificado" style="display: flex;;justify-content: space-between;">
-                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
+                    <i *ngIf="balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCorteManual, 7, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
-                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
+                    <i *ngIf="!balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalBajaCarga, 7, balanza.value)"
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
+                    <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 7, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
@@ -143,6 +148,9 @@
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
                 (click)='onOpenModal(modalBajaCarga   ,8)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(8)">Alta de Baja
                 Carga</button>
+              <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
+                (click)='onOpenModal(modalCargaNormal ,8, false, true)' style="margin-left: 5px;margin-right: 5px;">Alta de Carga
+                Normal</button>                  
             </ng-container>
           </div>
         </div>
@@ -216,10 +224,12 @@
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal ocultarPdf">
                   <div class="alinearJustificado" style="display: flex;;justify-content: space-between;">
-                    <i *ngIf="balanza.value.corteManual" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
+                    <i *ngIf="balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
-                    <i *ngIf="!balanza.value.corteManual" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
+                    <i *ngIf="!balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
+                    <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 8, balanza.value)"
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                    
                     <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                   </div>
@@ -263,4 +273,10 @@
   <app-balanzas-manual-corte [numeroBalanza]="numeroBalanza" (balanzaManual)="onAgregarCortes($event, numeroBalanza)"
     (cerrar)="modal.dismiss()">
   </app-balanzas-manual-corte>
+</ng-template>
+
+<ng-template #modalCargaNormal let-modal>
+  <app-balanzas-manual-carga-normal [numeroBalanza]="numeroBalanza"
+    (balanzaManual)="onAgregarCargaNormal($event, numeroBalanza)" (cerrar)="modal.dismiss()">
+  </app-balanzas-manual-carga-normal>
 </ng-template>

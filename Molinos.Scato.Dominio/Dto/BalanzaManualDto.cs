@@ -23,6 +23,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int? Kilogramos { get; set; }
         public int? Toneladas { get; set; }
         public bool CorteManual { get; set; }
+        public bool CargaNormal { get; set; }
         public string Observaciones { get; set; }
         public int Correlativo { get; set; }
         public bool Recordatorio { get; set; }

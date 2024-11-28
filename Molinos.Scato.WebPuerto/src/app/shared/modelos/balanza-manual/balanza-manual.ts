@@ -23,6 +23,7 @@ export class BalanzaManual {
     correlativo  : number;
     numeroBalanza: string;
     recordatorio: boolean;
+    cargaNormal  : boolean;
     public constructor(init?: Partial<BalanzaManual>) {
       Object.assign(this, init);
   }
