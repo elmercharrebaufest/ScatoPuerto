@@ -106,7 +106,7 @@ namespace Molinos.Scato.Servicios.Impl
             bool esLiquido = false;
 
             var query = _repositorio.Listar<Documento>()
-                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)));
+                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Trim().ToLower().Contains(nombre.Trim().ToLower())));
                 //.OrderBy(d => d.Nombre);
 
             if (listDocumentoTipo.Count > 0)
