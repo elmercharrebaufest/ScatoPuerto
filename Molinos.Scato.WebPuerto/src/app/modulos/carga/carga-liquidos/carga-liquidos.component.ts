@@ -143,7 +143,8 @@ export class CargaLiquidosComponent implements OnInit {
       this.enviado = resp.enviado;
       localStorage.setItem("desabilitar", "");
       if (this.enviado) {
-        this.planillaTurnoLiquidosComponent.desabilitarTurno();
+        if (this.planillaTurnoLiquidosComponent!=null && this.planillaTurnoLiquidosComponent!=undefined)
+          this.planillaTurnoLiquidosComponent.desabilitarTurno();
         localStorage.setItem("desabilitar", "false");
       }
       if (resp.moduloDeCargaPeriodoDeCarga) {
@@ -151,8 +152,10 @@ export class CargaLiquidosComponent implements OnInit {
         if (!resp.moduloDeCargaPeriodoDeCarga[0])
           return
         else
-          if (this.mostrarTableristaOperando)
-            this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
+          if (this.mostrarTableristaOperando){
+            if (this.periodoDeCargaComponent!=null && this.periodoDeCargaComponent!=undefined)
+              this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
+          }
       }
     });
   }
@@ -445,7 +448,6 @@ export class CargaLiquidosComponent implements OnInit {
         return;
       }
     }
-
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
       this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
       planillaDeEmbarque, null);
