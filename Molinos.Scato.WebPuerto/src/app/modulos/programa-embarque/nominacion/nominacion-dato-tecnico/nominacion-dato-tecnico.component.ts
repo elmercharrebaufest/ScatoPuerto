@@ -819,6 +819,24 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const valorInput = parseFloat(event.target.value);
     this.datoTecnicoForm.controls.tasaDeCargaValor.setValue(valorInput.toFixed(3).toString());
   }
+  onValidaFechaObligacionCarga(event: any){
+    const fecha = event.target.value;
+    if (fecha<this.fechaMinimaObligacionCarga){
+      this.datoTecnicoForm.controls.obligacionDeCarga.setValue('');
+      let mensaje: string = 'La fecha obligación de carga no puede ser menor a ' + this.fechaMinimaObligacionCarga;
+      this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+  }
+  onValidaFechaETARecalada(event: any){
+    const fecha = event.target.value;
+    if (fecha<this.fechaMinimaEtaRecalada){
+      this.datoTecnicoForm.controls.etaRecalada.setValue('');
+      let mensaje: string = 'La fecha eta recalada puede ser menor a ' + this.fechaMinimaObligacionCarga;
+      this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+  }
   //#endregion
 
 }
