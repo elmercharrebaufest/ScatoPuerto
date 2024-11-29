@@ -92,9 +92,15 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EnviarCorreoAlertaDocumentos(DocumentoEnvioAlertaDto documentoEnvioAlerta);
-        
+
         [OperationContract]
-        void EnviarMailsAlerta();        
-  
-  }
+        void EnviarMailsAlerta();
+
+        [OperationContract]
+        IList<NotificacionDocumentoDto> ObtenerNotificaciones();
+
+        [OperationContract]
+        void EliminarNotificacion(int id, string usuario);
+
+    }
 }

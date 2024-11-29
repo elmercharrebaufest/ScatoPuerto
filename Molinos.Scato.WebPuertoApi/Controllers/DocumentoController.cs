@@ -429,7 +429,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
-        
+
         [HttpGet]
         [Route("api/documento/ListarDocumentoMotivoAlerta")]
         public HttpResponseMessage ListarDocumentoMotivoAlerta()
@@ -471,7 +471,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
-        }        
+        }
 
         [HttpGet]
         [Route("api/documento/EnviarMailsAlerta")]
@@ -480,6 +480,35 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 servicioDocumento.EnviarMailsAlerta();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/documento/ObtenerNotificaciones")]
+        public HttpResponseMessage ObtenerNotificaciones()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, this.servicioDocumento.ObtenerNotificaciones());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/documento/EliminarNotificacion")]
+        public HttpResponseMessage EliminarNotificacion(int id)
+        {
+            try
+            {
+                this.servicioDocumento.EliminarNotificacion(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

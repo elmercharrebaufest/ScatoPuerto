@@ -57,6 +57,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     this.ActualizarDocumentos(configDb, configDto);
                 }
 
+                var notificacion = new NotificacionDocumento()
+                {
+                    Fecha = DateTime.Now,
+                    Mensaje = $"Hay una solicitud de documentación en la nominación para el buque {nominacion.NominacionDatoTecnico.VaporInformacion.NombreBuque} pendiente de adjuntar"
+                };
+                Repositorio.Agregar(notificacion);
+
                 var logAMB = new LogABM
                 {
                     Pantalla = comando.GetType().Name,

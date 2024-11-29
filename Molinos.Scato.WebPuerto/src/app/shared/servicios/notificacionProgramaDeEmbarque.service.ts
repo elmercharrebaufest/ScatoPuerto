@@ -11,7 +11,7 @@ export class NotificacionService {
 
   url: string = environment.apiUrl;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
 
   }
 
@@ -19,7 +19,15 @@ export class NotificacionService {
     return this.http.get<NotificacionProgramaDeEmbarque[]>(`${this.url}ProgramaEmbarque/ObtenerNotificaciones`, { 'withCredentials': true });
   }
 
-  eliminarNotificacion(notificacion : NotificacionProgramaDeEmbarque) {
+  obtenerNotificacionesDocumentacion() {
+    return this.http.get<NotificacionProgramaDeEmbarque[]>(`${this.url}documento/ObtenerNotificaciones`, { withCredentials: true });
+  }
+
+  eliminarNotificacion(notificacion: NotificacionProgramaDeEmbarque) {
     return this.http.post(`${this.url}ProgramaEmbarque/EliminarNotificacion`, notificacion, { 'withCredentials': true });
+  }
+
+  eliminarNotificacionDocumentacion(id: number) {
+    return this.http.delete(`${this.url}documento/EliminarNotificacion?id=${id}`, { withCredentials: true });
   }
 }
