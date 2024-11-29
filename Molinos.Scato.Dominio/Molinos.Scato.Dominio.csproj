@@ -146,6 +146,7 @@
     <Compile Include="Dto\Documentos\NominacionDocumentoEmbarqueDto.cs" />
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoDto.cs" />
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoPorEmbarqueDto.cs" />
+    <Compile Include="Dto\Documentos\NotificacionDocumentoDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
@@ -1153,6 +1154,7 @@
     <Compile Include="Entidades\Documentos\NominacionDocumentoArchivo.cs" />
     <Compile Include="Entidades\Documentos\NominacionDocumentoComentario.cs" />
     <Compile Include="Entidades\Documentos\NominacionDocumentoEstado.cs" />
+    <Compile Include="Entidades\Documentos\NotificacionDocumento.cs" />
     <Compile Include="Entidades\EmbarqueCoordinador.cs" />
     <Compile Include="Entidades\Entidad.cs" />
     <Compile Include="Entidades\EntidadTipoDeActividad.cs" />

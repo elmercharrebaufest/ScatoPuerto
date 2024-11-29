@@ -45,7 +45,10 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<DocumentoMotivoAlerta, DocumentoMotivoAlertaDto>();
             Mapper.CreateMap<DocumentoMotivoAlertaDto, DocumentoMotivoAlerta>();
-            
+
+            Mapper.CreateMap<NotificacionDocumento, NotificacionDocumentoDto>();
+            Mapper.CreateMap<NotificacionDocumentoDto, NotificacionDocumento>();
+
         }
     }
 }

@@ -117,7 +117,7 @@ namespace Molinos.Scato.Servicios.Impl
             if (listTipoDeProducto.Count > 0)
             {
                 var listarDocumentoMaterialPuerto = _repositorio.Listar<DocumentoMaterialPuerto>();
-                if (listTipoDeProducto.Count !=2)
+                if (listTipoDeProducto.Count != 2)
                 {
                     foreach (var tipoProducto in listTipoDeProducto)
                     {
@@ -236,7 +236,7 @@ namespace Molinos.Scato.Servicios.Impl
         public NominacionDocumentoEmbarqueDto ObtenerNominacionDocumentoEmbarque(int nominacionId)
         {
             var nominacion = this._repositorio.Obtener<Nominacion>(x => x.Id == nominacionId);
-            var lineUp = nominacion.Embarque!=null? this._repositorio.Obtener<LineUp>(x => x.Embarque.Id == nominacion.Embarque.Id) : null;
+            var lineUp = nominacion.Embarque != null ? this._repositorio.Obtener<LineUp>(x => x.Embarque.Id == nominacion.Embarque.Id) : null;
             var nominacionDocumentoEmbarque = new NominacionDocumentoEmbarqueDto();
             nominacionDocumentoEmbarque.NombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.Vapor.Nombre;
             nominacionDocumentoEmbarque.FechaNominacion = nominacion.FechaCreacion.Value.ToString("dd/MM/yyyy hh:mm");
@@ -435,6 +435,19 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw new Exception(res2.Errores[""]);
             }
+        }
+
+        public IList<NotificacionDocumentoDto> ObtenerNotificaciones()
+        {
+            return Listar<NotificacionDocumento, NotificacionDocumentoDto>(n => n.FechaEliminacion == null);
+        }
+
+        public void EliminarNotificacion(int id, string usuario)
+        {
+            var notificacion = _repositorio.Obtener<NotificacionDocumento>(id);
+            notificacion.FechaEliminacion = DateTime.Now;
+            notificacion.UsuarioEliminacion = usuario;
+            _repositorio.GuardarCambios();
         }
     }
 }
