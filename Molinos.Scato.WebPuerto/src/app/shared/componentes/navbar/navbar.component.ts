@@ -40,7 +40,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.actualizarOrigenNotif(this.router.url);
     this.obtenerNotificaciones();
 
-    this.router.events.pipe(filter(ev => ev instanceof NavigationEnd), takeUntil(this.destroy$)).subscribe(ev => {
+    this.router.events.pipe(filter(ev => ev instanceof NavigationEnd), takeUntil(this.destroy$)).subscribe((ev: NavigationEnd) => {
       this.actualizarOrigenNotif(ev.urlAfterRedirects);
       this.obtenerNotificaciones();
     });
