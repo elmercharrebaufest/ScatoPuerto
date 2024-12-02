@@ -103,7 +103,7 @@
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 7, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
-                    <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                    <i *ngIf="IdUltimoRegistroBalanza7 == balanza.value.id" (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                   </div>
                 </td>
@@ -230,7 +230,7 @@
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 8, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                    
-                    <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                    <i *ngIf="IdUltimoRegistroBalanza8 == balanza.value.id" (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                   </div>
                 </td>

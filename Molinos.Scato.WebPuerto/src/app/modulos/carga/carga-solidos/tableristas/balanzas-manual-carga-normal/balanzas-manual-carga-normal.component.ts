@@ -72,7 +72,29 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
     this.cargarFormularioEditar();
     this.balanzasManualCargaNormalService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;
-    });
+      const idRegistro:string = this.cargaNormalForm.controls.id.value;
+      if (idRegistro == null || idRegistro <= '0')      
+        this.cargarFechaHoraInicioDefecto();
+    }); 
+  }
+
+  cargarFechaHoraInicioDefecto(){
+    let listaFechas = [];
+    for(var i = 0; i<=this.balanza.controls.length-1; i++) {
+      const controls = this.balanza.controls[i].controls;
+      const fecha = controls.fechaCorte.value;
+      const hora = controls.horaCorte.value;
+      const fechaHora = this.balanzasManualService.convertirFecha(fecha,hora);
+      listaFechas.push({
+        fechaCorte : fecha,
+        horaCorte : hora,
+        fechaHora: fechaHora
+      });
+    }
+    const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
+    const fechaMaxima = listas.reverse()[0];
+    this.cargaNormalForm.controls.fechaInicio.setValue(fechaMaxima.fechaCorte);
+    this.cargaNormalForm.controls.horaInicio.setValue(fechaMaxima.horaCorte);
   }
 
   cargarBodegas() {
@@ -113,7 +135,27 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
 
 
   onGuardarModalCargaNormal() {
-    let balanzaManual: BalanzaManual = new BalanzaManual(this.cargaNormalForm.value);
+    var objBalanza = {
+      id                  : this.cargaNormalForm.controls.id.value                  ,
+      fechaInicio         : this.cargaNormalForm.controls.fechaInicio.value         ,
+      horaInicio          : this.cargaNormalForm.controls.horaInicio.value          ,
+      fechaCorte          : this.cargaNormalForm.controls.fechaCorte.value          ,
+      horaCorte           : this.cargaNormalForm.controls.horaCorte.value           ,
+      material            : this.cargaNormalForm.controls.material.value            ,
+      bodega              : this.cargaNormalForm.controls.bodega.value              ,
+      destino             : this.cargaNormalForm.controls.destino.value             ,
+      exportador          : this.cargaNormalForm.controls.exportador.value          ,
+      motivosFallasBalanza: this.cargaNormalForm.controls.motivosFallasBalanza.value,
+      kilogramos          : this.cargaNormalForm.controls.kilogramos.value          ,
+      toneladas           : this.cargaNormalForm.controls.toneladas.value           ,
+      corteManual         : this.cargaNormalForm.controls.corteManual.value         ,
+      observaciones       : this.cargaNormalForm.controls.observaciones.value       ,
+      correlativo         : this.cargaNormalForm.controls.correlativo.value         ,
+      recordatorio        : false        ,
+      cargaNormal         : true
+    };
+
+    let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
     let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
       this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)

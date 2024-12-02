@@ -43,7 +43,8 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   private paramSoloLectura: any;
   public periodoDeCarga: PeriodoDeCarga;
   private user: Usuario;
-
+  IdUltimoRegistroBalanza8: number;
+  IdUltimoRegistroBalanza7: number;
   constructor(private embarqueSharingService: EmbarqueSharingService,
     private formBuilder: FormBuilder,
     private modalService: NgbModal,
@@ -80,6 +81,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     this.numeroBalanza = numeroBalanza;
     if (esCargaNormal){
       this.enviarMaterialExportador(esCorte,esCargaNormal);
+      this.balanzasManualCargaNormalService.BalanzaManual = null;
     }else{
       this.enviarMaterialExportador(esCorte);
       if (esCorte)
@@ -92,8 +94,6 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
 
   public onOpenEditarModal(modal, numeroBalanza, balanza: BalanzaManual) {
     this.numeroBalanza = numeroBalanza;
-    console.log('modal--->>>', modal)
-    console.log('balanza--->>>', balanza)
     if (balanza.cargaNormal){
       this.enviarMaterialExportador(balanza.corteManual, true);
       this.balanzasManualCargaNormalService.BalanzaManual = balanza;
@@ -121,12 +121,14 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     }else{
       this.balanzasManualService.eliminarCortesBajaCarga(balanzaId).pipe(takeUntil(this.destroy$)).subscribe((resultado: boolean) =>{
         if (resultado){
-          if (numeroBalanza == 7)
+          if (numeroBalanza == 7){
             this.balanzas7.removeAt(index);
-
-          if (numeroBalanza == 8)
+            this.calcularUltimoRegistroPorBalanza('7');
+          }
+          if (numeroBalanza == 8){
             this.balanzas8.removeAt(index);
-
+            this.calcularUltimoRegistroPorBalanza('8');
+          }
           this.calcularFechasCargaBalanzas();
         }
       });
@@ -216,8 +218,42 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           this.balanzasManualService.cargarCorteBajaCarga(this.balanzas8,item);
       })
     },error=>{},()=>{
+      this.calcularUltimoRegistroPorBalanza('7');
+      this.calcularUltimoRegistroPorBalanza('8');
       this.calcularFechasCargaBalanzas();
     });
+  }
+
+  private calcularUltimoRegistroPorBalanza(numeroBalanza: string){
+    let listaFechas = [];
+    let listaFiltrar;
+    if (numeroBalanza == "7")
+      listaFiltrar = this.balanzas7;
+    if (numeroBalanza == "8")
+      listaFiltrar = this.balanzas8;
+    
+
+    for(var i = 0; i<= listaFiltrar.controls.length-1; i++) {
+      const registro = listaFiltrar.controls[i].value;
+      const id = registro.id;
+      const fecha = registro.fechaCorte;
+      const hora = registro.horaCorte;
+      const fechaHora = this.balanzasManualService.convertirFecha(fecha,hora);
+      listaFechas.push({
+        id: id,
+        fechaCorte : fecha,
+        horaCorte : hora,
+        fechaHora: fechaHora
+      });
+    }
+    const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
+    const registroMaximo = listas.reverse()[0];
+
+    if (numeroBalanza == "7")
+      this.IdUltimoRegistroBalanza7 = registroMaximo.id;
+    if (numeroBalanza == "8")
+      this.IdUltimoRegistroBalanza8 = registroMaximo.id;
+   
   }
   private listarBalanzaManualPorBalanza(numeroBalanza: string){
 
@@ -235,6 +271,8 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
 
     },error=>{},()=>{
       this.calcularFechasCargaBalanzas();
+      if (numeroBalanza == '7') this.calcularUltimoRegistroPorBalanza('7');
+      if (numeroBalanza == '8') this.calcularUltimoRegistroPorBalanza('8');
     });
   }
   private calcularFechasCargaBalanzas(){
@@ -271,7 +309,6 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.balanzasManualCargaNormalService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
       this.balanzasManualCargaNormalService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
       this.balanzasManualCargaNormalService.PeriodoDeCarga = this.periodoDeCarga;
-      console.log('entrooooxxxx carga normal balanza-->>',this.numeroBalanza)
       if (this.numeroBalanza == 7)
         this.balanzasManualCargaNormalService.RegistroBalanza = this.balanzas7;
       else

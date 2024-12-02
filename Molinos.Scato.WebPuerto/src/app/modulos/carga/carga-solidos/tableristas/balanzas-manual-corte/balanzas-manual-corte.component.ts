@@ -72,11 +72,33 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       ///this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != 'Normal');
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != '');
       this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
-      this.cargarFormularioEditar();
     });
+    this.cargarFormularioEditar();
     this.balanzasManualCorteService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;
+      const idRegistro:string = this.corteManualForm.controls.id.value;
+      if (idRegistro == null || idRegistro <= '0')
+        this.cargarFechaHoraInicioDefecto();
     });
+  }
+
+  cargarFechaHoraInicioDefecto(){
+    let listaFechas = [];
+    for(var i = 0; i<=this.balanza.controls.length-1; i++) {
+      const controls = this.balanza.controls[i].controls;
+      const fecha = controls.fechaCorte.value;
+      const hora = controls.horaCorte.value;
+      const fechaHora = this.balanzasManualService.convertirFecha(fecha,hora);
+      listaFechas.push({
+        fechaCorte : fecha,
+        horaCorte : hora,
+        fechaHora: fechaHora
+      });
+    }
+    const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
+    const fechaMaxima = listas.reverse()[0];
+    this.corteManualForm.controls['fechaInicio'].setValue(fechaMaxima.fechaCorte);
+    this.corteManualForm.controls['horaInicio'].setValue(fechaMaxima.horaCorte);
   }
 
   cargarFormularioEditar() {
@@ -105,8 +127,27 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
 
   onGuardarModalCorteManual() {
-    let balanzaManual: BalanzaManual = new BalanzaManual(this.corteManualForm.value);
-    console.log("balanzaManual", balanzaManual);
+    var objBalanza = {
+      id                  : this.corteManualForm.controls.id.value                  ,
+      fechaInicio         : this.corteManualForm.controls.fechaInicio.value         ,
+      horaInicio          : this.corteManualForm.controls.horaInicio.value          ,
+      fechaCorte          : this.corteManualForm.controls.fechaCorte.value          ,
+      horaCorte           : this.corteManualForm.controls.horaCorte.value           ,
+      material            : this.corteManualForm.controls.material.value            ,
+      bodega              : this.corteManualForm.controls.bodega.value              ,
+      destino             : this.corteManualForm.controls.destino.value             ,
+      exportador          : this.corteManualForm.controls.exportador.value          ,
+      motivosFallasBalanza: this.corteManualForm.controls.motivosFallasBalanza.value,
+      kilogramos          : this.corteManualForm.controls.kilogramos.value          ,
+      toneladas           : this.corteManualForm.controls.toneladas.value           ,
+      corteManual         : this.corteManualForm.controls.corteManual.value         ,
+      observaciones       : this.corteManualForm.controls.observaciones.value       ,
+      correlativo         : this.corteManualForm.controls.correlativo.value         ,
+      recordatorio        : this.corteManualForm.controls.recordatorio.value        ,
+      cargaNormal         : false
+    };
+
+    let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
     
     //Si es alta con recordatorio se deja fecha corte igual a fecha inicio salteando algunas validaciones.
     if(balanzaManual.recordatorio && this.balanzaManualRegistro == null){
