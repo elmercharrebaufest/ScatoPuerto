@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Dto;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,13 +14,15 @@ namespace Molinos.Scato.WebPuertoApi.Helper
         private EmbarqueDto _embarque;
         private IList<PlanoDeCargaBodegaDto> _cargasPlano;
         private List<int> _idsOcultos;
+        private IList<HorariosExportadorDto> _horariosExportador;
 
-        public NotificacionPlanillaSolidos(ModuloDeCargaDto modulo, EmbarqueDto embarque, IList<PlanoDeCargaBodegaDto> cargasPlano, List<int> idsOcultos)
+        public NotificacionPlanillaSolidos(ModuloDeCargaDto modulo, EmbarqueDto embarque, IList<PlanoDeCargaBodegaDto> cargasPlano, List<int> idsOcultos, IList<HorariosExportadorDto> horarios)
         {
             _modulo = modulo;
             _embarque = embarque;
             _cargasPlano = cargasPlano;
             _idsOcultos = idsOcultos;
+            _horariosExportador = horarios; 
         }
 
         public string GenerarCuerpoEmail()
@@ -57,6 +60,20 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             }
 
             plantillaEmail = plantillaEmail.Replace("{Registros}", sbRecords.ToString());
+
+            var sbHorarios = new StringBuilder();
+
+            foreach (HorariosExportadorDto horario in _horariosExportador)
+            {
+                sbHorarios.AppendFormat("<tr>");
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Exportador?.Nombre);
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Inicio.HasValue? horario.Inicio.Value.ToString("dd/MM/yyyy HH:mm") + "hs" : "");
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Fin.HasValue ? horario.Fin.Value.ToString("dd/MM/yyyy HH:mm") + "hs": "");
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Cantidad.ToString() + "Kg");
+                sbHorarios.AppendFormat("</tr>");
+            }
+
+            plantillaEmail = plantillaEmail.Replace("{Horarios}", sbHorarios.ToString());
 
             return plantillaEmail;
         }

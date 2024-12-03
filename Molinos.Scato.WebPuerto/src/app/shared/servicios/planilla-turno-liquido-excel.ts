@@ -7,6 +7,8 @@ import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 import { ConfirmationDialogService } from './confirmation-dialog.service';
 import { ModuloDeCargaService } from './modulo-de-carga.service';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { EnvioMailDialogService } from './envio-mail-dialog.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +18,7 @@ export class PlanillaTurnoLiquidoExcelService {
     constructor(
         private moduloCargaService: ModuloDeCargaService,
         private confirmationDialogService: ConfirmationDialogService,
-
+        private envioDialogService: EnvioMailDialogService
       ) {
     }
 
@@ -491,45 +493,47 @@ export class PlanillaTurnoLiquidoExcelService {
             }
         }
     }
-    private async enviarPlanillaLiquido(blob: Blob, nombreBuque: string, idModuloDeCarga: number) {
+  private async enviarPlanillaLiquido(blob: Blob, nombreBuque: string, idModuloDeCarga: number) {
+    const titulo = "Enviar Planilla de Turno Líquido";
+    const text = "Cuerpo del Mail:";
+    let mail = new Mail();
+    try {
+      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga).toPromise() as any;
+      mail.body = resp.body;
+      mail.destinatarios = resp.destinatarios;
+      mail.copia = resp.copia;
+      mail.titulo = titulo;
 
-        const titulo = "Enviar Planilla de Turno Líquido";
-        const text = "Cuerpo del Mail:"
-        const textoCuerpoMail = `Se enviara la planilla de turnos. \n
-          Buque: ${nombreBuque}`;
-        const inputTitle = "Destinatarios";
-        const mail = new Mail(`Planilla de turnos Liquido - ${nombreBuque}`, `${textoCuerpoMail}`);
-        this.moduloCargaService.obtenerDestinatariosPlanillaTurnos('PlanillaDeTurnosLiquido').subscribe(x => mail.destinatarios = x);
+      const confirm = await this.envioDialogService.confirm(titulo, text, titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+      if (!confirm) {
+        return;
+      }
 
-        const confirm = await this.confirmationDialogService.confirm(titulo, 'Cuerpo del Mail:', 'Enviar', 'Cancelar', 'lg', mail, null, inputTitle, true);
-        if (!confirm) {
-            return;
-        }
+      const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader;
+        reader.onerror = reject;
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(blob);
+      });
 
-        const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
-            const reader = new FileReader;
-            reader.onerror = reject;
-            reader.onload = () => {
-                resolve(reader.result);
-            };
-            reader.readAsDataURL(blob);
-        });
+      const base64String = await convertBlobToBase64(blob);
 
-        const base64String = await convertBlobToBase64(blob);
-        this.moduloCargaService.guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga, mail, base64String).subscribe(resp => {
-            this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
-        }, (err) => {
-            console.error(err);
-            this.confirmationDialogService.confirm('¡Error!', 'Ocurrió un error a enviar el email', 'Cerrar', '', null, null, Tipoalerta.Error);
-        });    }
+      await this.moduloCargaService.enviarPlanillaTurnoLiquido(idModuloDeCarga, mail, base64String).toPromise();
+      this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
+    } catch (err) {
+      console.error(err);
+      this.confirmationDialogService.error('Ocurrió un error al enviar el email');
+    }
+  }
 
     // <ARMOA005-1659 - Dylan Lopez>
     // async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true) {    // </ ARMOA005-1659 - Dylan Lopez>
+    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = []) {    // </ ARMOA005-1659 - Dylan Lopez>
       planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
         turno.moduloDeCargaPlanillaDeTurnosCortes = [];
       });
-
 
       const fname = this.getNombreArchivo(esRecibidores);
         const imgMolinos = await this.getImgMolinos();
@@ -537,6 +541,7 @@ export class PlanillaTurnoLiquidoExcelService {
         const headerObservaciones = ["Fecha", "Hora", "Observación de calidad"];
         const headerPlanilla = ["Exportador", "Parcel", "Tks de abordo", , "Destino", "Tks Tierra", , "TN", "Producto"];
         const headerCortes = ["Motivo", "Inicio", "Fin", "Tiempo total", "Observaciones"];
+        const headerHorarios = ["Inicio", "Fin", "Exportador", "Producto", "Cantidad"];
         const referencias = ["REFERENCIAS",
           "CSBO = ACTE CRUDO DE SOJA",
           "CSFO = ACTE CRUDO DE GSOL.",
@@ -637,6 +642,7 @@ export class PlanillaTurnoLiquidoExcelService {
                 });
             }
           }
+          
         });
 
         //renderizo detalles
@@ -727,10 +733,13 @@ export class PlanillaTurnoLiquidoExcelService {
          // worksheet.getCell(`B${baseCell}`).fill   = {type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' }};
           worksheet.getCell(`B${baseCell}`).border = borders;
           worksheet.getCell(`B${baseCell}`).font   = {name: 'Arial',family: 2,size: 11,bold: true}
-
-
         });
 
+        if(esRecibidores && horarios.length > 0){
+          baseCell = baseCell + 2;
+          this.setCabeceraHorariosExportador(worksheet, baseCell, headerHorarios, borders);
+          this.setDetalleHorariosExportador(worksheet, baseCell +1, horarios);
+        }
 
         workbook.xlsx.writeBuffer().then((data) => {
           const archivo = fname + '.xlsx'
@@ -742,4 +751,54 @@ export class PlanillaTurnoLiquidoExcelService {
           }
         });
     }
+
+
+  private setCabeceraHorariosExportador(worksheet, rowOffset, headerHorarios, borders) {
+    headerHorarios.forEach((text, index) => {
+      let currentCell = worksheet.getRow(rowOffset).getCell(index + 1);
+      if (text) {
+        currentCell.value = text;
+        currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
+        currentCell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFCCFFCC' }
+        }
+        currentCell.border = borders;
+        currentCell.font = {
+          name: 'Arial',
+          family: 2,
+          size: 11,
+          bold: true
+        }
+      }
+    });
+  }
+
+  private setDetalleHorariosExportador(worksheet, rowOffset, horarios) {
+    horarios.forEach((horario, index) => {
+      const rowIndex = rowOffset + index;
+      const row = worksheet.getRow(rowIndex);
+      
+      // Asignar valores a la fila
+      row.values = [
+        horario.inicio ? new Date(horario.inicio).toLocaleString('es-ES') : "", 
+        horario.fin ? new Date(horario.fin).toLocaleString('es-ES') : "", 
+        horario.exportador?.nombre,
+        horario.materialPuerto?.descripcionCortaIngles?? '',
+        horario.cantidad
+      ];
+      
+      // Aplicar bordes a las celdas de la fila
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+    });
+  }
+  
 }

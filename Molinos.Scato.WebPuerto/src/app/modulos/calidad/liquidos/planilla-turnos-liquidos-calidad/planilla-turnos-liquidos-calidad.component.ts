@@ -36,6 +36,8 @@ import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service'
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { Subject, Subscription } from 'rxjs';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { HorariosExportadorComponent } from '../../horarios-exportador/horarios-exportador.component';
 
 
 @Component({
@@ -48,6 +50,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
   @Input() tablerista: boolean;
   @Input() esSoloLectura: boolean = false;
+  @ViewChild(HorariosExportadorComponent) horarioExportadorComponent: HorariosExportadorComponent;
 
   formTurnos: FormGroup;
   formCorte: FormGroup;
@@ -74,6 +77,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   planillaDeTurnos: PlanillaDeTurnos[];
   nuevoTurno: PlanillaDeTurnos;
   cortesTurno: CorteTurno[] = [];
+  horarios: HorariosExportador[] = [];
   private user: Usuario
   permisosScato: typeof PermisosScato = PermisosScato;
   mostrarBtn: boolean = true;
@@ -365,6 +369,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         }
       });
 
+      this.horarios = this.horarioExportadorComponent.getHorariosExportador();
     }
 
     //Me obtengo la fecha del último día
@@ -1064,10 +1069,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.toneladasLineas.push({ linea: 'biodiesel', total: this.getToneladasLinea('biodiesel') });
 
     this.exportaPlanilla = true;
-
     // <ARMOA005-1659 - Dylan Lopez>
     // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios);
     // </ ARMOA005-1659 - Dylan Lopez>
 
     this.exportaPlanilla = false;
@@ -1223,5 +1227,13 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
   }
+
+  private listarHorariosExportador(modCargaId: number) {
+    this.moduloCargaService.listarHorariosExportador(this.moduloCarga.id).subscribe(data => {
+      this.horarios = data;
+    }, err => {
+      console.error(err);
+    });
+  }  
 
 }

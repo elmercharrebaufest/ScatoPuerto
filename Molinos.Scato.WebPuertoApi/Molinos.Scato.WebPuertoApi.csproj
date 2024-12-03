@@ -248,6 +248,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper\EmbarqueComparer.cs" />
+    <Compile Include="Helper\NotificacionPlanillaLiquidos.cs" />
     <Compile Include="Helper\NotificacionPlanillaSolidos.cs" />
     <Compile Include="Helper\NotificacionProgramaEmbarque.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -271,6 +272,7 @@
     <Content Include="iconMolinosChiquito.png" />
     <Content Include="IconoMolinosExcel.png" />
     <Content Include="parameters.xml" />
+    <Content Include="Plantilla\Email\template_planilla_liquidos.html" />
     <Content Include="Plantilla\Email\template_planilla_solidos.html" />
     <Content Include="Plantilla\Email\template_surveyor_fumigador.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

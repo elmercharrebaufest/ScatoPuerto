@@ -1,8 +1,11 @@
 ﻿using Molinos.Scato.Actividades.Interfaces;
 using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.HorariosExportador;
 using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.HorariosExportador;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios;
@@ -403,16 +406,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ModuloDeCarga/ObtenerDestinatariosPlanillaTurnos")]
-        public HttpResponseMessage ObtenerDestinatariosPlanillaTurnos()
+        [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaLiquidos")]
+        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId)
         {
             try
             {
-                string destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
-                System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
-                foreach (string mail in destinatarios.Split(';'))
-                    dest.Add(mail);
-                return Request.CreateResponse(HttpStatusCode.OK, dest);
+                var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
+                var notificacion = new NotificacionPlanillaLiquidos(horarios);
+                string body = notificacion.GenerarCuerpoEmail();
+                var mailDto = servicio.ArmadoMailPlanillaLiquidos(body);
+                return Request.CreateResponse(HttpStatusCode.OK, mailDto);
             }
             catch (Exception ex)
             {
@@ -486,6 +489,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, nombreUsuario = base.nombreUsuario });
+                servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -548,23 +552,31 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
-        [Route("api/ModuloDeCarga/GuardarPlanillaDeTurnosEnviarMail")]
-        public HttpResponseMessage GuardarPlanillaDeTurnosEnviarMail(int IdModuloDeCarga, ObjetoEnvioPlanillaTurno objetoEnvioPlanillaTurno)
+        [Route("api/ModuloDeCarga/EnviarPlanillaTurnoLiquido")]
+        public HttpResponseMessage EnviarPlanillaTurnoLiquido(int IdModuloDeCarga, ObjetoEnvioPlanillaTurno objetoEnvioPlanillaTurno)
         {
             try
             {
                 var resultado = new ResultadoPrevisualizar();
-                var fechaTurno = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
-                var docFile = "Planilla de turnos" + fechaTurno + ".xls";
-                List<string> Emails = new List<string>();
-                Emails = objetoEnvioPlanillaTurno.mail.Destinatarios;
+                var docFile = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+                
+                if (objetoEnvioPlanillaTurno.mail.Destinatarios != null && objetoEnvioPlanillaTurno.mail.Destinatarios.Any())
+                {
+                    objetoEnvioPlanillaTurno.mail.Destinatarios.RemoveAll(item => item == null || item == "");
+                }
+
+                if (objetoEnvioPlanillaTurno.mail.Copia != null && objetoEnvioPlanillaTurno.mail.Copia.Any())
+                {
+                    objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
+                }
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
                 var res = comandos.Ejecutar(new EnvioMail
                 {
-                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body,// "Planilla del dia " + planillaDeTurnosDto.Fecha,
-                    Destinatarios = Emails,
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
+                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"),
+                    Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
+                    Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
                     AttachmentName = docFile
                 });
@@ -578,6 +590,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception e)
             {
+                servicio.EscribirLog($"Hubo un error al intentar enviar la planilla de liquidos recibidores, ejecutado por: {base.nombreUsuario}", TipoLog.Error, "Controller: ModuloDeCarga, EnviarPlanillaTurnoLiquido", e.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
@@ -1070,6 +1083,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
             }
+            servicio.ActualizarHorariosExportadorSolidos(idModuloDeCarga);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -1175,7 +1189,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var moduloCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
                 var cargasPlano = servicio.ObtenerPlanoDeCargaBodega(moduloDeCargaId);
-                var notificacion = new NotificacionPlanillaSolidos(moduloCarga, embarque, cargasPlano, cortesOcultos);
+                var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
+                var notificacion = new NotificacionPlanillaSolidos(moduloCarga, embarque, cargasPlano, cortesOcultos, horarios);
                 var mail = servicio.ArmadoMailPlanillaSolidos(moduloDeCargaId);
                 mail.Body = notificacion.GenerarCuerpoEmail();
                 return Request.CreateResponse(HttpStatusCode.OK, mail);
@@ -1227,6 +1242,48 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 servicio.EscribirLog($"Hubo un error al intentar enviar la planilla de solidos recibidores, ejecutado por: {base.nombreUsuario}", TipoLog.Error, "Controller: ModuloDeCarga, EnviarPlanillaTurnoSolido", e.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ListarHorariosExportador")]
+        public HttpResponseMessage ListarHorariosExportador(int moduloDeCargaId)
+        {
+            try
+            {
+                var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
+                return Request.CreateResponse(HttpStatusCode.OK, horarios);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerHorarioExportador")]
+        public HttpResponseMessage ObtenerHorarioExportador(int id)
+        {
+            try
+            {
+                var horario = servicio.ObtenerHorarioExportador(id);
+                return Request.CreateResponse(HttpStatusCode.OK, horario);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("api/ModuloDeCarga/EditarHorarioExportador")]
+        public HttpResponseMessage EditarHorarioExportador(EdicionHorarioExportador obj)
+        {
+            var resultado = comandos.Ejecutar(new EditarHorarioExportador { Obj = obj, Usuario = base.nombreUsuario });
+            if (resultado.HayErrores)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
 }

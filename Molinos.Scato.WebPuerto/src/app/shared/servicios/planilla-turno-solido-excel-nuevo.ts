@@ -9,6 +9,7 @@ import { Mail } from "@ScatoModels/mail";
 import { ConfirmationDialogService } from "./confirmation-dialog.service";
 import { ModuloDeCargaService } from "./modulo-de-carga.service";
 import { EnvioMailDialogService } from "./envio-mail-dialog.service";
+import { HorariosExportador } from "@ScatoModels/calidad/horarios-exportador";
 
 interface TurnoPorDia {
   dia: string;
@@ -76,7 +77,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  public async generarExcel(planillasDeTurnos: PlanillaDeTurnos[], enviar: boolean, verObsCalidad: boolean, cortesOcultos: number[]) {
+  public async generarExcel(planillasDeTurnos: PlanillaDeTurnos[], enviar: boolean, verObsCalidad: boolean, cortesOcultos: number[], horarios: HorariosExportador[]) {
     const planoDeCarga = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
 
     // Copio la planilla en un nuevo objeto para no modificarle los valores al original
@@ -98,7 +99,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setDraftAduana();
     this.setPlanoDeCarga();
     this.setSecuencia();
-    this.setHorarios();
+    this.setHorarios(horarios);
     this.setReferencias();
     this.setAnchoColumnas();
 
@@ -498,7 +499,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  private setHorarios() {
+  private setHorarios(horarios: HorariosExportador[]) {
     const nRowTitulos = this.filaUltimaCarga + 17;
 
     this.worksheet.mergeCells(nRowTitulos - 1, 1, nRowTitulos - 1, 2);
@@ -509,43 +510,56 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setBgColor(celdaHorarios, 'f2f2f2');
     this.centrar(celdaHorarios);
 
-    const cols = ['A', 'B', 'D', 'F'];
-    const titulos = ['Expo.', 'Comenzó', 'Finalizó', 'A bordo'];
-    for (let i = 0; i < 9; i++) {
+    const cols = ['A', 'B', 'D', 'F', 'G'];
+    const titulos = ['Expo.', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
+    
+    for (let i = 0; i <= horarios.length; i++) {
       const row = this.worksheet.getRow(nRowTitulos + i);
-
+  
       this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
       this.worksheet.mergeCells(nRowTitulos + i, 4, nRowTitulos + i, 5);
 
       if (i > 0) {
-        this.setDefaultBorders(nRowTitulos + i, 6);
+        this.setDefaultBorders(nRowTitulos + i, 7);
       }
-
-      for (let j = 0; j < 4; j++) {
+  
+      for (let j = 0; j < 5; j++) {
         const col = cols[j];
         const celda = row.getCell(col);
-        let fontSize = 10
-
-        if (i == 0) { // Fila de títulos
+        let fontSize = 10;
+  
+        if (i === 0) { // Fila de títulos
           celda.value = titulos[j];
           fontSize = 11;
           this.setBorders(celda, 'medium', 'medium', 'medium', 'medium');
           this.setBgColor(celda, 'f2f2f2');
-        } else if (i == 8) {
-          celda.style.border.bottom.style = 'medium';
+        } else {
+          const horario = horarios[i - 1]; // Obtenemos el objeto HorariosExportador correspondiente
+          switch (j) {
+            case 0: // Exportador
+              celda.value = horario.exportador?.nombre; // Asegúrate de que `exportador.nombre` sea el valor deseado
+              break;
+            case 1: // Comenzó
+              celda.value = horario.inicio ? this.formatFechaHora(new Date(horario.inicio)) : ''; // Formateo de fecha
+              break;
+            case 2: // Finalizó
+              celda.value = horario.fin ? this.formatFechaHora(new Date(horario.fin)) : ''; // Formateo de fecha
+              break;
+            case 3: // Cantidad
+              celda.value = horario.cantidad;
+              celda.numFmt = '0.00'; // Formato numérico
+              break;
+              case 4: // Material
+              celda.value = horario.materialPuerto?.descripcionCortaIngles;
+              break;  
+          }
         }
-
-        if (i > 0 && j == 3) { // A bordo
-          celda.numFmt = '0.00';
-          celda.style.font = { name: 'Arial', family: 2, size: 10 };
-        }
-
+  
         this.setFont(celda, fontSize);
         this.centrar(celda);
       }
     }
-
-  }
+}
 
   private setReferencias() {
     const nRow = this.filaUltimaCarga + 7;
@@ -750,5 +764,14 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const month = String(fechaFormateada.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
     const day = String(fechaFormateada.getDate()).padStart(2, '0');
     return `${day}-${month}-${year}`;
+  }
+
+  private formatFechaHora(fecha: Date): string {
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const anio = fecha.getFullYear();
+    const horas = String(fecha.getHours()).padStart(2, '0');
+    const minutos = String(fecha.getMinutes()).padStart(2, '0');
+    return `${dia}/${mes}/${anio} ${horas}:${minutos}`;
   }
 }

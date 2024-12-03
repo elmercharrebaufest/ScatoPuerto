@@ -16,6 +16,8 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { NirManoComponent } from "./solidos/nir/nir-mano/nir-mano.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NewBalanzasRitmosComponent } from "./solidos/new-balanzas-ritmos/new-balanzas-ritmos.component";
+import { HorariosExportadorComponent } from "./horarios-exportador/horarios-exportador.component";
+import { ModalHorarioExportadorComponent } from "./horarios-exportador/modal-horario-exportador/modal-horario-exportador.component";
 
 const components = [
     CalidadComponent,
@@ -42,6 +44,8 @@ const components = [
     ],
     declarations: [
         components,
+        HorariosExportadorComponent,
+        ModalHorarioExportadorComponent,
     ],
     exports: [
         components,

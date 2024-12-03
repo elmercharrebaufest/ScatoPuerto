@@ -8,6 +8,7 @@ import { PeriodoDeCarga } from "./periodo-carga";
 import { Umap } from "./umap";
 import { PlanillaDeEmbarque } from "./planilla-de-embarque";
 import { Nir } from './nir';
+import { HorariosExportador } from "./calidad/horarios-exportador";
 
 export class ModuloDeCarga{
     id: number;

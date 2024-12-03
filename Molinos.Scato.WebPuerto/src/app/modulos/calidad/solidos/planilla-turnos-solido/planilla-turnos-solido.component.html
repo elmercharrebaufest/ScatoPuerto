@@ -240,6 +240,11 @@
 
         <p-toast data-html2canvas-ignore="true" position='top-center' key='enviar-turno'></p-toast>
 
+        <div>
+            <app-horarios-exportador></app-horarios-exportador>
+        </div>
+
+        
         <div data-html2canvas-ignore="true" class="mt-4 text-center" *ngIf="!esSoloLectura">
             <button id="expPlanillaSolidoCalidad" *ngIf='turnoPuerto' class="btn btn-primary m-2"
                 (click)='onExportarExcelSolido(false)'> Exportar Planilla </button>
