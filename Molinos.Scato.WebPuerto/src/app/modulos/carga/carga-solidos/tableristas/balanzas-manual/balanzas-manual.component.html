@@ -23,7 +23,7 @@
                 (click)='onOpenModal(modalBajaCarga  ,7)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(7)">Alta de Baja
                 Carga</button>
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
-                (click)='onOpenModal(modalCargaNormal ,7, false, true)' style="margin-left: 5px;margin-right: 5px;">Alta de Carga
+                (click)='onOpenModal(modalCargaNormal ,7, false, true)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(7)">Alta de Carga
                 Normal</button>                
             </ng-container>
           </div>
@@ -149,7 +149,7 @@
                 (click)='onOpenModal(modalBajaCarga   ,8)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(8)">Alta de Baja
                 Carga</button>
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
-                (click)='onOpenModal(modalCargaNormal ,8, false, true)' style="margin-left: 5px;margin-right: 5px;">Alta de Carga
+                (click)='onOpenModal(modalCargaNormal ,8, false, true)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(8)">Alta de Carga
                 Normal</button>                  
             </ng-container>
           </div>

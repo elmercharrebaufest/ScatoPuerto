@@ -305,21 +305,32 @@ export class BalanzasManualService {
   }
 
   public validarCortesBajasCarga(balanzas, registroBalanza, fechaInicioRegistro, fechaFinRegistro): boolean {
-    let esRegistroValido: boolean = true;
-    let filtroBalanzas =balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id);
-    if (filtroBalanzas!=null && filtroBalanzas.length > 0) {
-      for (let index = 0; index < filtroBalanzas.length; index++) {
-        const balanza = filtroBalanzas[index];
+    let filtroBalanzas = balanzas.controls.filter(balanza => balanza.value.id != registroBalanza.id);
+    if (filtroBalanzas != null && filtroBalanzas.length > 0) {
+      for (const balanza of filtroBalanzas) {
         const fechaInicio = this.convertirFecha(balanza.controls['fechaInicio'].value, balanza.controls['horaInicio'].value);
         const fechaCorte = this.convertirFecha(balanza.controls['fechaCorte'].value, balanza.controls['horaCorte'].value);
-        if ((fechaInicioRegistro >= fechaInicio && fechaInicioRegistro < fechaCorte) ||
-            (fechaFinRegistro > fechaInicio && fechaFinRegistro <= fechaCorte)){
-              esRegistroValido = false;
-              return esRegistroValido;
-            }
+        if (!registroBalanza.recordatorio) {
+          if (this.fechaInicioEnRango(fechaInicioRegistro, fechaInicio, fechaCorte) ||
+            this.fechaFinEnRango(fechaFinRegistro, fechaInicio, fechaCorte)) {
+            return false;
+          }
+        } else {
+          if (this.fechaInicioEnRango(fechaInicioRegistro, fechaInicio, fechaCorte)) {
+            return false;
+          }
+        }
       }
     }
-    return esRegistroValido;
+    return true;
+  }
+
+  private fechaInicioEnRango(fechaIni: Date, inicio: Date, fin: Date): boolean {
+    return fechaIni >= inicio && fechaIni < fin;
+  }
+
+  private fechaFinEnRango(fechaFin: Date, inicio: Date, fin: Date): boolean {
+    return fechaFin > inicio && fechaFin <= fin;
   }
 
   public validarFechasIngresadas(fechaInicioIng, fechaFinIng): boolean {
