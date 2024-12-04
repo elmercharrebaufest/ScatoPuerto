@@ -823,7 +823,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const fecha = event.target.value;
     if (fecha<this.fechaMinimaObligacionCarga){
       this.datoTecnicoForm.controls.obligacionDeCarga.setValue('');
-      let mensaje: string = 'La fecha obligación de carga no puede ser menor a ' + this.fechaMinimaObligacionCarga;
+      let fechaObligacion = this.fechaMinimaObligacionCarga.split('-');
+      let fechaMinimaObligacionCarga = `${fechaObligacion[2]}/${fechaObligacion[1]}/${fechaObligacion[0]}`;
+      let mensaje: string = 'La fecha obligación de carga no puede ser menor a ' + fechaMinimaObligacionCarga;
       this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
@@ -832,7 +834,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const fecha = event.target.value;
     if (fecha<this.fechaMinimaEtaRecalada){
       this.datoTecnicoForm.controls.etaRecalada.setValue('');
-      let mensaje: string = 'La fecha eta recalada puede ser menor a ' + this.fechaMinimaObligacionCarga;
+      let fechaEtaRecalada = this.fechaMinimaEtaRecalada.split('-');
+      let fechaMinimaEtaRecalada = `${fechaEtaRecalada[2]}/${fechaEtaRecalada[1]}/${fechaEtaRecalada[0]}`;      
+      let mensaje: string = 'La fecha eta recalada puede ser menor a ' + fechaMinimaEtaRecalada;
       this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }

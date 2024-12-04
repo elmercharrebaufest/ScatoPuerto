@@ -474,37 +474,39 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 foreach (var linea in lineasDeEmbarqueInsertar) 
                 {
-                    var lineaEmbarque = new ModuloDeCargaLineasDeEmbarque();                                
-
-                    lineaEmbarque.ModuloDeCarga = moduloDeCargaDB;
-                    lineaEmbarque.Linea = linea.Linea;
-                    lineaEmbarque.TipoLineaEmbarque = new TipoLineaEmbarque { Linea = linea.TipoLineaEmbarque.Linea, Id = linea.TipoLineaEmbarque.Id };
-                    lineaEmbarque.MaterialPuerto = new MaterialPuerto
+                    if (linea.TipoLineaEmbarque != null && linea.MaterialPuerto != null)
                     {
-                        Id = linea.MaterialPuerto.Id,
-                        Descripcion = linea.MaterialPuerto.Descripcion,
-                        DescripcionCorta = linea.MaterialPuerto.DescripcionCorta,
-                        DescripcionCortaIngles = linea.MaterialPuerto.DescripcionCortaIngles,
-                        Almacen = linea.MaterialPuerto.Almacen_Id == null ? null : new Almacen { Id = (int)linea.MaterialPuerto.Almacen_Id, Descripcion = linea.MaterialPuerto.AlmacenDesc },
-                        CodigoSAP = linea.MaterialPuerto.CodigoSAP,
-                        Color = linea.MaterialPuerto.Color,
-                        EsLiquido = linea.MaterialPuerto.EsLiquido
-                    };
-                    lineaEmbarque.TkInicial = linea.TkInicial;
-                    lineaEmbarque.TkFinal = linea.TkFinal;
-                    lineaEmbarque.TemperaturaInicial = linea.TemperaturaInicial;
-                    lineaEmbarque.TemperaturaFinal = linea.TemperaturaFinal;
-                    lineaEmbarque.AlturaInicialCM = linea.AlturaInicialCM;
-                    lineaEmbarque.AlturaInicialMM = linea.AlturaInicialMM;
-                    lineaEmbarque.AlturaFinalCM = linea.AlturaFinalCM;
-                    lineaEmbarque.AlturaFinalMM = linea.AlturaFinalMM;
-                    lineaEmbarque.DensidadInicial = linea.DensidadInicial;
-                    lineaEmbarque.DensidadFinal = linea.DensidadFinal;
-                    lineaEmbarque.Litros = linea.Litros;
-                    lineaEmbarque.Kilos = linea.Kilos;
+                        var lineaEmbarque = new ModuloDeCargaLineasDeEmbarque();
 
-                    moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);                                 
-                     
+                        lineaEmbarque.ModuloDeCarga = moduloDeCargaDB;
+                        lineaEmbarque.Linea = linea.Linea;
+                        lineaEmbarque.TipoLineaEmbarque = new TipoLineaEmbarque { Linea = linea.TipoLineaEmbarque.Linea, Id = linea.TipoLineaEmbarque.Id };
+                        lineaEmbarque.MaterialPuerto = new MaterialPuerto
+                        {
+                            Id = linea.MaterialPuerto.Id,
+                            Descripcion = linea.MaterialPuerto.Descripcion,
+                            DescripcionCorta = linea.MaterialPuerto.DescripcionCorta,
+                            DescripcionCortaIngles = linea.MaterialPuerto.DescripcionCortaIngles,
+                            Almacen = linea.MaterialPuerto.Almacen_Id == null ? null : new Almacen { Id = (int)linea.MaterialPuerto.Almacen_Id, Descripcion = linea.MaterialPuerto.AlmacenDesc },
+                            CodigoSAP = linea.MaterialPuerto.CodigoSAP,
+                            Color = linea.MaterialPuerto.Color,
+                            EsLiquido = linea.MaterialPuerto.EsLiquido
+                        };
+                        lineaEmbarque.TkInicial = linea.TkInicial;
+                        lineaEmbarque.TkFinal = linea.TkFinal;
+                        lineaEmbarque.TemperaturaInicial = linea.TemperaturaInicial;
+                        lineaEmbarque.TemperaturaFinal = linea.TemperaturaFinal;
+                        lineaEmbarque.AlturaInicialCM = linea.AlturaInicialCM;
+                        lineaEmbarque.AlturaInicialMM = linea.AlturaInicialMM;
+                        lineaEmbarque.AlturaFinalCM = linea.AlturaFinalCM;
+                        lineaEmbarque.AlturaFinalMM = linea.AlturaFinalMM;
+                        lineaEmbarque.DensidadInicial = linea.DensidadInicial;
+                        lineaEmbarque.DensidadFinal = linea.DensidadFinal;
+                        lineaEmbarque.Litros = linea.Litros;
+                        lineaEmbarque.Kilos = linea.Kilos;
+
+                        moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);
+                    }
                 }
                 #endregion
 

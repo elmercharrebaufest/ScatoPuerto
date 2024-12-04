@@ -12749,7 +12749,7 @@ namespace Molinos.Scato.Servicios.Impl
                             balanzaCortes.Tn = dto.Tn;
                             balanzaCortes.CorteManual = dto.CorteManual;
                             balanzaCortes.CargaNormal = dto.CargaNormal;
-                            balanzaCortes.MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id;
+                            balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x => x.Siglas.Equals("N")).Id;
                             balanzaCortes.Bodega_id = dto.Bodega_id;
                             balanzaCortes.Exportador_Id = dto.Exportador_Id;
                             balanzaCortes.Destino_Id = dto.Destino_Id;
@@ -12804,6 +12804,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     if (esCargaNormal)
                     {
+                        dto.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x => x.Siglas.Equals("N")).Id;
                         this.CrearBalanzaManualCortes(dto, nombreUsuario);
                     }
                     else
