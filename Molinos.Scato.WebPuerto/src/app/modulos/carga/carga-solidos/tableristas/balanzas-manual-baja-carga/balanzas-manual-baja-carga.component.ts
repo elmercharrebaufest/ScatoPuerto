@@ -194,6 +194,8 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
     const fechaMaxima = listas.reverse()[0];
     this.bajaCargaForm.controls['fechaInicio'].setValue(fechaMaxima.fechaCorte);
     this.bajaCargaForm.controls['horaInicio'].setValue(fechaMaxima.horaCorte);
+    this.bajaCargaForm.controls.fechaInicio.disable()
+    this.bajaCargaForm.controls.horaInicio.disable()
   }
   cargarFormularioEditar() {
     this.balanzasManualBajaCargaService.BalanzaManual.pipe(takeUntil(this.destroy$)).subscribe(balanzaManual => {
