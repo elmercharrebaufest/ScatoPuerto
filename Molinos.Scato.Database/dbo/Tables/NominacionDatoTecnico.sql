@@ -17,8 +17,9 @@ CREATE TABLE NominacionDatoTecnico (
 	AgenciaMaritimaPuerto_Id INT NULL,
 	Surveyor_Id INT NULL,
 	ObservacionesSurveyor VARCHAR(500),
+	[OtroMuelleNombre] NVARCHAR(120) NULL, 
 
-	CONSTRAINT [PK_dbo.NominacionDatoTecnico] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [PK_dbo.NominacionDatoTecnico] PRIMARY KEY CLUSTERED ([Id] ASC),
 	CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto]([Id]),
 	CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.VaporInformacion_VaporInformacion_Id] FOREIGN KEY ([VaporInformacion_Id]) REFERENCES [dbo].[VaporInformacion]([Id]),
 	CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MuelleDeCarga_MuelleDeCarga_Id] FOREIGN KEY ([MuelleDeCarga_Id]) REFERENCES [dbo].[MuelleDeCarga]([Id]),

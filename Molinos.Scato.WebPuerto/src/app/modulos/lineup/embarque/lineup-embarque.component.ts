@@ -79,6 +79,7 @@ export class LineupEmbarqueComponent implements OnInit {
   private embarqueSeleccionado:number = 0;
 
   public formPeriodoCarga: FormGroup;
+  public mostrarOtroMuelle: boolean = false;
 
   constructor(
     private _sanitizer: DomSanitizer,
@@ -120,6 +121,10 @@ export class LineupEmbarqueComponent implements OnInit {
       [];
     this.posicionesDeLineUps = Array.from({ length: this.embarquesPuerto.length }, (v, k) => k + 1);
     this.listadoUbicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.map(u => u.nombre);
+
+    if (this.instanciaWorkflow.embarque.otrosMuelles && this.instanciaWorkflow.embarque.otroMuelleNombre) {
+      this.mostrarOtroMuelle = true;
+    }
   }
 
   private initForm() {
@@ -374,10 +379,11 @@ export class LineupEmbarqueComponent implements OnInit {
           obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
           agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
           ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+          otroMuelleNombre: embarquePuerto.embarque.otroMuelleNombre,
           lineUpId: lineUpDto.id,
           embarqueId: this.instanciaWorkflow.embarque.id,
         };
-        
+
         let materiales = '';
         embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach(
           (planoDeCargaBodega) => {
@@ -389,7 +395,7 @@ export class LineupEmbarqueComponent implements OnInit {
             // historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
           }
         );
-  
+
         historicoEmbarqueLineUp.materiales = materiales;
         // console.log(historicoEmbarqueLineUp);
         this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp)

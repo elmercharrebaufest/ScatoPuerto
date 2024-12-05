@@ -56,6 +56,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<EmbarqueInformacionViaje> EmbarqueInformacionViaje { get; set; }
         public virtual ICollection<EmbarquePosicion> EmbarquePosicion { get; set; }
         public virtual string FilePathImgLineUp { get; set; }
+        public virtual string OtroMuelleNombre { get; set; }
 
     }
 }

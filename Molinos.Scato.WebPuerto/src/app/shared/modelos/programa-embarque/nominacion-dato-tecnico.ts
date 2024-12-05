@@ -36,13 +36,16 @@ export class NominacionDatoTecnico {
     nominacionDatoTecnicoDestino: NominacionDatoTecnicoDestino[];
     nominacionDatoTecnicoExportador: NominacionDatoTecnicoExportador[];
     nominacionDatoTecnicoCoordinadorPuerto: NominacionDatoTecnicoCoordinador[];
+    otroMuelleNombre: string;
 
     constructor(id, materialPuerto, cantidadTotal,
         tolerancia, observaciones, vaporInformacion,
         etaRecalada, obligacionDeCarga, muelleDeCarga,
         tasaDeCarga, tasaDeCargaValor, dem,
         des, tipoDeContrato, ataPuerto,
-        agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad) {
+        agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad,
+        otroMuelleNombre: string = ''
+    ) {
         this.id = id;
         this.materialPuerto = materialPuerto;
         this.cantidadTotal = cantidadTotal;
@@ -62,5 +65,6 @@ export class NominacionDatoTecnico {
         this.surveyor = surveyor;
         this.observacionesSurveyor = observacionesSurveyor;
         this.nominacionDatoTecnicoCalidad = nominacionDatoTecnicoCalidad;
+        this.otroMuelleNombre = otroMuelleNombre;
     }
 }

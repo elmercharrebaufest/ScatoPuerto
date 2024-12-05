@@ -357,6 +357,7 @@ export class SolidosComponent implements OnInit {
           obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
           agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
           ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+          otroMuelleNombre: embarquePuerto.embarque.otroMuelleNombre,
           lineUpId: lineUpDto.id,
           embarqueId: embarqueId
         };

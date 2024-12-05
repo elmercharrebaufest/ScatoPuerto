@@ -316,6 +316,8 @@
                         <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [ngValue]="muelleDeCarga">
                             {{muelleDeCarga.descripcion}}</option>
                     </select>
+                    <input class="form-control mt-1" placeholder="Nombre de muelle" formControlName="otroMuelleNombre"
+                      *ngIf="frmDatosTecnicos.muelleDeCarga.value?.descripcion == 'Otros Muelles'" maxlength="120">
                 </div>
             </div>
             <div class="input-group col-md-5">

@@ -196,10 +196,11 @@ async guardarAmarre()
           obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
           agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
           ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+          otroMuelleNombre: embarquePuerto.embarque.otroMuelleNombre,
           lineUpId: lineUpDto.id,
           embarqueId: embarqueId
         };
-        
+
         let materiales = '';
         embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
           if (planoDeCargaBodega.materialPuerto) {
@@ -209,7 +210,7 @@ async guardarAmarre()
           }
           // historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
         });
-        
+
         historicoEmbarqueLineUp.materiales = materiales;
         // console.log(historicoEmbarqueLineUp);
         this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {

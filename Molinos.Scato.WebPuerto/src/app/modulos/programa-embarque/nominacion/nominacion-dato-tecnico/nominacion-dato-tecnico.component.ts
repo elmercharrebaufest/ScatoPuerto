@@ -332,6 +332,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['etaRecalada'].setValue(etaRecalada);
     datoTecnicoForm.controls['obligacionDeCarga'].setValue(obligacionDeCarga);
     datoTecnicoForm.controls['muelleDeCarga'].setValue(muelleDeCarga);
+    datoTecnicoForm.controls['otroMuelleNombre'].setValue(dataTecnico.otroMuelleNombre);
     datoTecnicoForm.controls['tasaDeCarga'].setValue(tasaDeCarga);
     datoTecnicoForm.controls['tasaDeCargaValor'].setValue(dataTecnico.tasaDeCargaValor);
     datoTecnicoForm.controls['tipoDeContrato'].setValue(tipoDeContrato);

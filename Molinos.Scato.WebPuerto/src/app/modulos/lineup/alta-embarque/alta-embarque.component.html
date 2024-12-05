@@ -257,6 +257,9 @@
                         Otros muelles
                       </label>
                     </div>
+                    <div *ngIf="embarqueForm.get('otrosMuelles').value">
+                      <input class="form-control" type="text" placeholder="Nombre de muelle" maxlength="120" formControlName="otroMuelleNombre">
+                    </div>
                   </div>
                 </div>
 
@@ -316,7 +319,7 @@
 
                 <div class="row">
                   <div class="form-group col">
-                    <label for="fechaHastaLimpieza" class="font-weight-bold">Total hs: {{totalHorasLimpieza | number: '1.2-2' || " "}}</label>
+                    <label for="fechaHastaLimpieza" class="font-weight-bold">Total hs: {{(totalHorasLimpieza | number: '1.2-2') || " "}}</label>
                   </div>
                   <div class="form-group col"></div>
                 </div>

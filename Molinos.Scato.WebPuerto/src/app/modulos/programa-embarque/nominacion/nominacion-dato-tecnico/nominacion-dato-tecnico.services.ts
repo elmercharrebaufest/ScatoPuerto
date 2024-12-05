@@ -56,6 +56,7 @@ export class NominacionDatoTecnicoRegistroService {
             etaRecalada: ['', Validators.required],
             obligacionDeCarga: ['', Validators.required],
             muelleDeCarga: ['', Validators.required],
+            otroMuelleNombre: [''],
             tasaDeCarga: [''],
             tasaDeCargaValor: [''],
             dem: [''],

@@ -251,7 +251,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 //celda.SetCellValue(muestra.Embarque.Ubicacion.ToString());
                 //celda.CellStyle = font;
                 //celda = row.CreateCell(8);
-                celda.SetCellValue(muestra.Embarque.Observaciones);
+                var observaciones = muestra.Embarque.Observaciones;
+                if (muestra.Embarque.OtrosMuelles && !string.IsNullOrEmpty(muestra.Embarque.OtroMuelleNombre))
+                {
+                    observaciones += "\n\nMuelle: " + muestra.Embarque.OtroMuelleNombre;
+                }
+                celda.SetCellValue(observaciones);
                 celda.CellStyle = font;
                 i++;
             }

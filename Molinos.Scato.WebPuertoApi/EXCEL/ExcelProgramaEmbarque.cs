@@ -152,8 +152,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 "Loading Rate", "DEM", "DES", "Tipo de contrato", "Surveyor", "Observaciones del Surveyor"
             };
             InsertarFilaConValores(valoresCeldas, true, true); // Negrita y borde sup
+
+            var nombreMuelle = datoTecnico.MuelleDeCarga?.Descripcion ?? "-";
+            if (nombreMuelle == "Otros Muelles" && !string.IsNullOrEmpty(datoTecnico.OtroMuelleNombre))
+            {
+                nombreMuelle = datoTecnico.OtroMuelleNombre;
+            }
             valoresCeldas = new string[] {
-                datoTecnico.MuelleDeCarga?.Descripcion ?? "-",
+                nombreMuelle,
                 datoTecnico.ETARecalada != null ? datoTecnico.ETARecalada.Value.ToString("dd/MM/yyyy") : "-",
                 datoTecnico.ObligacionDeCarga != null ? datoTecnico.ObligacionDeCarga.Value.ToString("dd/MM/yyyy") : "-",
                 datoTecnico.ATAPuerto?.Nombre ?? "-",

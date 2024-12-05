@@ -68,5 +68,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string FilePathImgLineUp { get; set; }
         public string TipoContratoNominacion { get; set; }
         public int NominacionId { get; set; }
+        public string OtroMuelleNombre { get; set; }
     }
 }

@@ -187,7 +187,7 @@ export class LineupComponent implements OnInit, Observador {
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     let primerEmbarque = this.sanBenito.filter(x=> x.lineUp.ocultar == false);
-    this.primerEmbarqueSanBenito = (primerEmbarque !=null && primerEmbarque.length >0) ? primerEmbarque[0].lineUp.id : 0; 
+    this.primerEmbarqueSanBenito = (primerEmbarque !=null && primerEmbarque.length >0) ? primerEmbarque[0].lineUp.id : 0;
     this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
     if (this.sanBenitoCargandoMuelle!=null){
       const esOculto = this.sanBenitoCargandoMuelle.lineUp.ocultar;
@@ -198,7 +198,7 @@ export class LineupComponent implements OnInit, Observador {
     this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
     this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
     let posicion = 0;
-    
+
     if (this.sanBenitoCargandoMuelle!=null || this.sanBenitoCargandoMuelle != undefined){
       let filtroSanBenito = this.sanBenito.filter(x => x.lineUp.id == this.sanBenitoCargandoMuelle.lineUp.id);
       if (filtroSanBenito!=null){
@@ -213,17 +213,17 @@ export class LineupComponent implements OnInit, Observador {
       }
     });
     posicion = 0;
-    this.noryon.forEach(item =>{ 
+    this.noryon.forEach(item =>{
       posicion++;
       item.posicion = posicion;
     });
     posicion = 0;
-    this.vicentin.forEach(item =>{ 
+    this.vicentin.forEach(item =>{
       posicion++;
       item.posicion = posicion;
     });
     posicion = 0;
-    this.otrosMuelles.forEach(item =>{ 
+    this.otrosMuelles.forEach(item =>{
       posicion++;
       item.posicion = posicion;
     });
@@ -335,7 +335,8 @@ export class LineupComponent implements OnInit, Observador {
     if (otrosM.length > 0) {
       body += `\n\f\0- Otros Muelles:\0\0\f\f\n`;
       otrosM.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
+        const otroMuelleNombre = x.embarque.otroMuelleNombre ? ` - Muelle: ${x.embarque.otroMuelleNombre}` : '';
+        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f${otroMuelleNombre} - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
       \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
       });
     }

@@ -20,7 +20,14 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
             plantillaEmail = plantillaEmail.Replace("#reqProducto", $"{nominacion.NominacionDatoTecnico?.MaterialPuerto.DescripcionCortaIngles} ({nominacion.NominacionDatoTecnico?.MaterialPuerto.Descripcion.Trim()})");
             plantillaEmail = plantillaEmail.Replace("#reqBuque", nominacion.NominacionDatoTecnico?.VaporInformacion?.NombreBuque);
-            plantillaEmail = plantillaEmail.Replace("#reqMuelle", $"{(nominacion.NominacionDatoTecnico?.MuelleDeCarga != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion : "-")}");
+
+            var nombreMuelle = nominacion.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "-";
+            if (nombreMuelle == "Otros Muelles" && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.OtroMuelleNombre))
+            {
+                nombreMuelle = nominacion.NominacionDatoTecnico.OtroMuelleNombre;
+            }
+
+            plantillaEmail = plantillaEmail.Replace("#reqMuelle", $"{nombreMuelle}");
             plantillaEmail = plantillaEmail.Replace("#reqBandera", $"{(nominacion.NominacionDatoTecnico?.VaporInformacion != null && nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.VaporInformacion.Bandera.Nombre) ? nominacion.NominacionDatoTecnico?.VaporInformacion?.Bandera.Nombre : "-")}");
             plantillaEmail = plantillaEmail.Replace("#reqLoadingRate", $"{(nominacion.NominacionDatoTecnico?.TasaDeCargaValor != null ? nominacion.NominacionDatoTecnico?.TasaDeCargaValor : 0)} {(nominacion.NominacionDatoTecnico?.TasaDeCarga != null && nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion) ? nominacion.NominacionDatoTecnico?.TasaDeCarga?.Descripcion : " - ")}");
             plantillaEmail = plantillaEmail.Replace("#reqAta", $"{(nominacion.NominacionDatoTecnico?.ATAPuerto != null && nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre) ? nominacion.NominacionDatoTecnico?.ATAPuerto?.Nombre : "-")}");

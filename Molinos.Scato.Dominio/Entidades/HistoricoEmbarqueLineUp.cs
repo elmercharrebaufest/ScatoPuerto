@@ -29,8 +29,9 @@ namespace Molinos.Scato.Dominio.Entidades
 		public virtual string AtaNombre { get; set; }
 		public virtual int LineUpId { get; set; }
 		public virtual int EmbarqueId { get; set; }
+        public virtual string OtroMuelleNombre { get; set; }
 
-		public virtual LineUp LineUp { get; set; }
+        public virtual LineUp LineUp { get; set; }
 		public virtual Embarque Embarque { get; set; }
 	}
 }
