@@ -196,8 +196,8 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}`, turnos, { withCredentials: true });
   }
 
-  generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}`, excel, {'withCredentials': true, responseType: 'blob'});
+  generarExcel(moduloDeCargaId: number, embarqueId: number) : Observable<Blob>{
+    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, {'withCredentials': true, responseType: 'blob'});
   }
 
   obtenerPlanillaTurnos(moduloDeCargaId: number) : Observable<PlanillaDeTurnos[]> {

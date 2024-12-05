@@ -98,80 +98,25 @@ export class BalanzasManualService {
     let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes('ControlCalidad'));
     return this.embarqueService.actualizarEstadoBuque(embarqueId, estadoBuque.id).pipe(map((data) => { return true; }));
   }
-  exportarBalanzasAExcel(balanza7, balanza8, embarque: EmbarqueNav) {
-    let header = [
-      { header: 'Balanza', key: 'Balanza' },
-      { header: 'Fecha', key: 'Fecha' },
-      { header: 'Hora', key: 'Hora' },
-      { header: 'Kilos', key: 'Kilos' },
-      { header: 'Toneladas', key: 'Toneladas' },
-      { header: 'Producto', key: 'Producto' },
-      { header: 'Bodega', key: 'Bodega' },
-      { header: 'Motivo', key: 'Motivo' },
-      { header: 'Observaciones', key: 'Observaciones' }
-    ];
-    let workbook = new Workbook();
-    // Planilla turnos solido
-    workbook.addWorksheet("Planilla");
-
-    // Balanza 7
-    let worksheetBalanza7 = workbook.addWorksheet("Balanza-7");
-    worksheetBalanza7.columns = header;
-    let columnas = [];
-    balanza7.controls.forEach(balanza => {
-      worksheetBalanza7.addRow({
-        Balanza: 7,
-        Fecha: balanza.controls['fechaInicio'].value,
-        Hora: balanza.controls['horaInicio'].value,
-        Kilos: balanza.controls['kilogramos'].value > 0 ? balanza.controls['kilogramos'].value : null,
-        Toneladas: balanza.controls['toneladas'].value > 0 ? balanza.controls['toneladas'].value : null,
-        Producto: balanza.controls['material'].value?.descripcionCorta,
-        Bodega: balanza.controls['bodega'].value?.nombre,
-        Motivo: balanza.controls['motivosFallasBalanza'].value?.siglas + '-' + balanza.controls['motivosFallasBalanza'].value?.nombre,
-        Observaciones: balanza.controls['observaciones'].value
-      });
-
-    });
-
-    // Balanza 8
-    let worksheetBalanza8 = workbook.addWorksheet("Balanza-8");
-    worksheetBalanza8.columns = header;
-    columnas = [];
-    balanza8.controls.forEach(balanza => {
-      worksheetBalanza8.addRow({
-        Balanza: 8,
-        Fecha: balanza.controls['fechaInicio'].value,
-        Hora: balanza.controls['horaInicio'].value,
-        Kilos: balanza.controls['kilogramos'].value > 0 ? balanza.controls['kilogramos'].value : null,
-        Toneladas: balanza.controls['toneladas'].value > 0 ? balanza.controls['toneladas'].value : null,
-        Producto: balanza.controls['material'].value?.descripcionCorta,
-        Bodega: balanza.controls['bodega'].value?.nombre,
-        Motivo: balanza.controls['motivosFallasBalanza'].value?.siglas + '-' + balanza.controls['motivosFallasBalanza'].value?.nombre,
-        Observaciones: balanza.controls['observaciones'].value
-      });
-    });
-
-    let fname = embarque.id + "-" + embarque.nombreBuque + ".xlsx";
-
-    workbook.xlsx.writeBuffer().then((data) => {
-      let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      this.formData.append('file', blob, fname);
-      this.moduloDeCargaService.generarExcel(embarque.moduloDeCargaId, this.formData).subscribe(blob => {
-        this.descargarArchivo(blob, fname);
-      }, error => {
-        console.error('Error al generar el archivo Excel:', error);
-        this.confirmationDialogService.confirm('¡Atención!', 'Se produjo un error al exportar la planilla.', 'Aceptar', '', null, null, Tipoalerta.Error)
-          .then((confirmed) => {
-            if (confirmed)
-              console.log('Se produjo un error al exportar la planilla');
-            else
-              return;
-          });
-      });
+  
+  exportarBalanzasAExcel(embarque: EmbarqueNav) {
+    let fname = embarque.id + "-" + embarque.nombreBuque + '.xlsx';
+    this.moduloDeCargaService.generarExcel(embarque.moduloDeCargaId, embarque.id).subscribe(blob => {
+      this.descargarArchivo(blob, fname);
+    }, error => {
+      console.error('Error al generar el archivo Excel:', error);
+      this.confirmationDialogService.confirm('¡Atención!', 'Se produjo un error al exportar la planilla.', 'Aceptar', '', null, null, Tipoalerta.Error)
+        .then((confirmed) => {
+          if (confirmed)
+            console.log('Se produjo un error al exportar la planilla');
+          else
+            return;
+        });
     });
   }
 
-  descargarArchivo(blob: Blob, filename: string): void {
+  descargarArchivo(data: Blob, filename: string): void {
+    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

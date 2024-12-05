@@ -1093,28 +1093,27 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public string FilePathImgLineUp { get; set; }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("api/ModuloDeCarga/GenerarExcelTurnos")]
-        public HttpResponseMessage GenerarExcelTurnos(int moduloDeCargaId)
+        public HttpResponseMessage GenerarExcelTurnos(int moduloDeCargaId, int embarqueId)
         {
             try
             {
-                var excel = HttpContext.Current.Request.Files.Count > 0 ?
-                HttpContext.Current.Request.Files[0] : null;
-                if (excel == null || excel.ContentLength == 0)
-                {
-                    throw new Exception("Hubo un error.");
-                }
                 var listaPlanoDeCargaBodega = servicio.ObtenerPlanoDeCargaBodega(moduloDeCargaId);
-                var nombreBuque = servicio.ObtenerBuqueDadoModCarga(moduloDeCargaId);
+                var balanzasManual = servicio.ListarBalanzaManual(moduloDeCargaId);
+                var embarque = servicio.ObtenerEmbarque(embarqueId);
                 var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
-                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, nombreBuque, excel).GenerarExcel();
-                servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, excel.FileName);
+                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque).GenerarExcel();
+                var filename = embarqueId + "-" + embarque.Patente + ".xlsx";
+                servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, filename);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new ByteArrayContent(archivo)
+
                 };
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
+                response.Content.Headers.ContentLength = archivo.LongLength;
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");   
                 servicio.EscribirLog($"Se guarda OK la planilla de solidos con ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}", TipoLog.Info, "ModuloDeCarga/GenerarExcelTurnos");
                 return response;
             }
