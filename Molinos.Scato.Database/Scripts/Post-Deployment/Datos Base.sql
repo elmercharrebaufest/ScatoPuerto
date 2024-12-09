@@ -1293,3 +1293,12 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @par_Id_Rol_Moc and Id_Permiso = @par_Id_Comex_Nominacion_Guardar) begin	insert into ADPuertoRolesPermisos(Id_Rol,Id_Permiso)values(@par_Id_Rol_Moc,@par_Id_Comex_Nominacion_Guardar); end
 
 GO
+
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'SILO 31') BEGIN UPDATE SiloCelda SET orden = 1 WHERE nombre = 'SILO 31'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'SILO 32') BEGIN UPDATE SiloCelda SET orden = 2 WHERE nombre = 'SILO 32'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 7') BEGIN UPDATE SiloCelda SET orden = 3 WHERE nombre = 'CELDA 7'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'Silos Logistica') BEGIN UPDATE SiloCelda SET orden = 4 WHERE nombre = 'Silos Logistica'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'Camiones') BEGIN UPDATE SiloCelda SET orden = 5 WHERE nombre = 'Camiones'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 20') BEGIN UPDATE SiloCelda SET orden = 6 WHERE nombre = 'CELDA 20'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 23') BEGIN UPDATE SiloCelda SET orden = 7 WHERE nombre = 'CELDA 23'; END
+IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 30') BEGIN UPDATE SiloCelda SET orden = 8 WHERE nombre = 'CELDA 30'; END
