@@ -281,7 +281,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
         detalle.cantidad = this.parsearNumeros(carga.get('cantidad').value);
         if (detalle.cantidad) {
           if (enKilos) {
-            detalle.cantidad = detalle.cantidad * 1000;
+            detalle.cantidad = Math.round(detalle.cantidad * 1000);
           }
           cargas.push(detalle);
         }
