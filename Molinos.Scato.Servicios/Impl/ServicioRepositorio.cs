@@ -13590,8 +13590,8 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var horarios = Listar<HorariosExportador, HorariosExportadorDto>(h => h.ModuloDeCarga_Id == moduloDeCargaId);
             var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
-            var esLiq = turnos.Any() ? (turnos[0].EsLiquido ? true : false) : false;
-            this.AsignarCantidadAHorarios(horarios, turnos, esLiq);
+            bool esLiquido = turnos.Any() && turnos.First().EsLiquido;
+            this.AsignarCantidadAHorarios(horarios, turnos, esLiquido);
             return horarios;
         }
 
@@ -13647,7 +13647,14 @@ namespace Molinos.Scato.Servicios.Impl
 
         public HorariosExportadorDto ObtenerHorarioExportador(int id)
         {
-            return Obtener<HorariosExportador, HorariosExportadorDto>(id);
+            var horario = Obtener<HorariosExportador, HorariosExportadorDto>(id);
+            if(horario != null)
+            {
+                var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == horario.ModuloDeCarga_Id);
+                bool esLiquido = turnos.Any() && turnos.First().EsLiquido;
+                AsignarCantidadAHorarios(new List<HorariosExportadorDto> { horario }, turnos, esLiquido);
+            }
+            return horario;
         }
     }
 }

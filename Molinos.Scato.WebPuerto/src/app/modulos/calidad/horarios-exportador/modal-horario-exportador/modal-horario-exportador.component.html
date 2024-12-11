@@ -66,7 +66,8 @@
                     </div>
                     <div class="col-6">
                         <label for="cantidad" class="form-label">Kg:</label>
-                        <input type="text" class="form-control" formControlName="cantidad" disabled>
+                        <input type="text" class="form-control" formControlName="cantidad" disabled 
+                          [value]="formHorario.get('cantidad')?.value | number">
                     </div>
                 </div>
             </div>
