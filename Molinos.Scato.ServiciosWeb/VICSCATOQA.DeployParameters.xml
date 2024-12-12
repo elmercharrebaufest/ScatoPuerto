@@ -28,8 +28,8 @@
   <setParameter name="MonsantoServicePassword Config" value="/kcpPHeKQI8DKpibwlX00g==" />
 
   <setParameter name="FotosPath Config" value="\\GSLOFSPRD00\Scato\ScatoFotos\SLO\Testing\" />
-  <setParameter name="ArchivosPath Config" value="\\GSLOFSPRD00\Scato\ScatoPuerto\Testing\" />
-  <setParameter name="PathPlanillaSolidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\Testing\Planilla Embarque Solidos\" />
+  <setParameter name="ArchivosPath Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA" />
+  <setParameter name="PathPlanillaSolidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\Share\Planilla Embarque Solidos\" />  
   <setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
 
   <setParameter name="CuitRepresentada Config" value="30715118773" />
