@@ -731,7 +731,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       omitirLinea = false;
 
       if (ingresoManualSolido) {
-        // Si existe un detalle con la misma combinación de destino, bodega y material; entonces se suman los valores de las cargas
+        // Si existe un detalle con la misma combinación de destino, bodega, material y exportador; entonces se suman los valores de las cargas
         const detallePrevio = this.getDetalleExistente(detalle, planillaTurnoDetalles);
         if (detallePrevio) {
           const cantidadControl = detallePrevio.get('cantidad');
@@ -755,7 +755,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       const materialPuertoId = detalleForm.get('materialPuerto').value?.id;
       const nombreDestino = detalleForm.get('destino').value;
       const bodegaId = detalleForm.get('bodega').value?.id;
-      if (detalle.bodega.id == bodegaId && nombreDestino == detalle.destino.nombre && materialPuertoId == detalle.materialPuerto.id) {
+      const exportadorId = detalleForm.get('exportador').value?.id;
+      if (detalle.bodega.id == bodegaId && nombreDestino == detalle.destino.nombre && materialPuertoId == detalle.materialPuerto.id && exportadorId == detalle.exportador.id) {
         return detalleForm as FormGroup;
       }
     }

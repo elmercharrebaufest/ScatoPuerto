@@ -22,7 +22,7 @@
                 <td>{{horario.fin | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>{{horario.tiempo}}</td>
                 <td>{{horario.materialPuerto?.descripcion}}</td>
-                <td>{{horario.cantidad}}</td>
+                <td>{{horario.cantidad | number }} Kg</td>
                 <td>{{horario.exportador?.nombre}}</td>
                 <td>
                     <button class="btn" (click)="onEditarHorario(horario.id)">

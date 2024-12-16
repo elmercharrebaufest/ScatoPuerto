@@ -175,4 +175,9 @@
 						match="/configuration/appSettings/add[@key='EmailPuerto']
                            /@value" />
 	</parameter>
+	<parameter name="ArchivosPath Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='ArchivosPath']
+                           /@value" />
+	</parameter>
 </parameters>
