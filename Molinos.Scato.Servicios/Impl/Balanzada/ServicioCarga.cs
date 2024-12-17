@@ -85,9 +85,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ResultadoCrear CrearCargaPendiente(BalanzadaRecibidaDTO balanzada)
         {
+            Log.Debug("Validando balanza {0} balanzada {1} {2}", balanzada.NumeroBalanza, balanzada.TipoBalanzada, balanzada.Id);
             var resultado = new ResultadoCrear();
-            ValidarCrearCargaPendiente(balanzada);
-
+            var ok = ValidarCrearCargaPendiente(balanzada);
+            if (!ok)
+            {
+                resultado.Error("", "No se han podido restaurar todos los pendientes");
+            }
             return resultado;
         }
 
@@ -96,18 +100,22 @@ namespace Molinos.Scato.Servicios.Impl
             return _repositorio.Existe<RegistroBalanzaPuerto>(e => e.Id == balanzada.IdOffset && e.NumeroBalanza == balanzada.NumeroBalanza);
         }
 
-        private void ValidarCrearCargaPendiente(BalanzadaRecibidaDTO balanzada, int? idEspecifico = null)
+        private bool ValidarCrearCargaPendiente(BalanzadaRecibidaDTO balanzada)
         {
-            var desde = idEspecifico != null ? idEspecifico.Value + balanzada.OffsetBalanza : balanzada.UltimaValidacion;
+            var desde = balanzada.UltimaValidacion;
             var cuantos = balanzada.IdOffset - balanzada.UltimaValidacion;
 
-            var registrosValidadosEnRango = _repositorio.Listar<RegistroBalanzaPuerto, int>(x => x.Id,
+            // Registros que ya están en la db por lo que no deben consultarse al orquestador
+            var idsAExcluir = _repositorio.Listar<RegistroBalanzaPuerto, int>(x => x.Id,
                 c => c.Id >= desde &&
                 c.Id < balanzada.IdOffset &&
                 (c.NumeroBalanza == balanzada.NumeroBalanza)
             ).OrderBy(x => x).ToList();
 
-            List<int> balanzadasPendientes = Enumerable.Range(desde, cuantos).Except(registrosValidadosEnRango).ToList();
+            idsAExcluir.Add(0); // Se añade el id 0 ya que no es un id válido en el orquestador
+
+            List<int> balanzadasPendientes = Enumerable.Range(desde, cuantos).Except(idsAExcluir).ToList();
+            Log.Debug("Faltan las siguientes balanzadas en la balanza {0}: {1}", balanzada.NumeroBalanza, string.Join(",", balanzadasPendientes));
 
             balanzadasPendientes = balanzadasPendientes.OrderBy(x => x).ToList();
 
@@ -148,7 +156,14 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     reintentos++;
                 }
+                // Si falla los 3 reintentos se aborta
+                if (!validado)
+                {
+                    Log.Info("No se pudo obtener la balanzada {0} de la balanza {1}", balanzadaId, balanzada.NumeroBalanza);
+                    return false;
+                }
             }
+            return true;
         }
 
         private Dictionary<string, string> ObtenerValoresBalanzada(ResultadoEjecutar resultadoEjecutar)
