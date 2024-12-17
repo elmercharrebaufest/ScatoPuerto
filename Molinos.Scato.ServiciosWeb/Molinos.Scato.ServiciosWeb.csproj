@@ -146,10 +146,7 @@
     <Content Include="ServicioVapor.svc" />
     <Content Include="ServicioProgramaEmbarque.svc" />
     <Content Include="ServicioSuscriptor.svc" />
-    <Content Include="SLOSCATOPROD.DeployParameters.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="VICSCATOPROD.DeployParameters.xml">
+    <Content Include="SCATOPUERTOPROD.DeployParameters.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="parameters.xml" />
@@ -159,7 +156,7 @@
     <Content Include="Global.asax" />
     <Content Include="ServicioSapAsincronico.svc" />
     <Content Include="ServicioSapAsincronicoPoison.svc" />
-    <Content Include="VICSCATOQA.DeployParameters.xml">
+    <Content Include="SCATOPUERTOQA.DeployParameters.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Web.config">
