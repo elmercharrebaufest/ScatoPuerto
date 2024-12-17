@@ -66,6 +66,7 @@ export class SiloCelda {
     id: number;
     nombre: string;
     color: string;
+    orden: number;
 }
 
 export class TurnoDetalleSolidoGravedad {

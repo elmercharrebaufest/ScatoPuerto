@@ -208,7 +208,7 @@ export class NIRComponent  implements OnInit {
     let incompleto = false;
     nir.forEach(linea => {
       if(!linea.fecha || linea.hd == null || linea.hd === '' || linea.bodega == null 
-      || linea.bodega == "0"){
+      || linea.bodega == "0" || linea.origen === ''){
         incompleto = true;
       }
     });
