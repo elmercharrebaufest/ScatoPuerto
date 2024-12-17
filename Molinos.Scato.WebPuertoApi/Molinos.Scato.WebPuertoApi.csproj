@@ -303,15 +303,15 @@
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="SLOSCATOPROD.DeployParameters.xml">
+    <Content Include="SCATOPUERTOPROD.DeployParameters.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="VICSCATOPROD.DeployParameters.xml">
+    <Content Include="SCATOPUERTOUAT.DeployParameters.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="VICSCATOQA.DeployParameters.xml">
+    <Content Include="SCATOPUERTOQA.DeployParameters.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
