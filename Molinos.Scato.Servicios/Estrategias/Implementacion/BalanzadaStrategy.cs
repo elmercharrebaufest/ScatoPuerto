@@ -18,8 +18,11 @@ namespace Molinos.Scato.Servicios.Estrategias
         public bool RegistrarBalanzada(Dictionary<string, string> datos)
         {
             var balanzada = _servicioCarga.ConvertirDatosABalanazadaRecibida(datos);
-            _servicioCarga.CrearCargaPendiente(balanzada);
-            _servicioCarga.CrearBalanzada(balanzada);
+            var resultado = _servicioCarga.CrearCargaPendiente(balanzada);
+            if (!resultado.HayErrores)
+            {
+                _servicioCarga.CrearBalanzada(balanzada);
+            }
             _servicioCarga.ActualizarUltimaValidacion(balanzada);
             return true;
         }
