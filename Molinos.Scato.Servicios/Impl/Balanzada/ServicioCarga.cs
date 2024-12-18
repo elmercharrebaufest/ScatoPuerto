@@ -47,38 +47,27 @@ namespace Molinos.Scato.Servicios.Impl
             balanzadaRecibida.UltimaValidacion = balanza.UltimaValidacion;
             balanzadaRecibida.IntentosValidacion = balanza.IntentosValidacion;
 
-            if (datos.ContainsKey("commodity"))
-                balanzadaRecibida.Commodity = datos["commodity"];
+            balanzadaRecibida.Commodity = datos.ContainsKey("commodity") ? datos["commodity"] : string.Empty;
 
-            if (datos.ContainsKey("bodega"))
-                balanzadaRecibida.Bodega = datos["bodega"];
+            balanzadaRecibida.Bodega = datos.ContainsKey("bodega") ? datos["bodega"] : string.Empty;
 
-            if (datos.ContainsKey("vapor"))
-                balanzadaRecibida.Vapor = datos["vapor"];
+            balanzadaRecibida.Vapor = datos.ContainsKey("vapor") ? datos["vapor"] : string.Empty;
 
-            if (datos.ContainsKey("exportador"))
-                balanzadaRecibida.Exportador = datos["exportador"];
+            balanzadaRecibida.Exportador = datos.ContainsKey("exportador") ? datos["exportador"] : string.Empty;
 
-            if (datos.ContainsKey("destino"))
-                balanzadaRecibida.Destino = datos["destino"];
+            balanzadaRecibida.Destino = datos.ContainsKey("destino") ? (datos["destino"]) : string.Empty;
 
-            if (datos.ContainsKey("pesoProgramado"))
-                balanzadaRecibida.PesoProgramado = int.Parse(datos["pesoProgramado"]);
+            balanzadaRecibida.PesoProgramado = datos.ContainsKey("pesoProgramado") ? int.Parse(datos["pesoProgramado"]) : 0;
 
-            if (datos.ContainsKey("toneladasaw"))
-                balanzadaRecibida.ToneladasAW = int.Parse(datos["toneladasaw"]);
+            balanzadaRecibida.ToneladasAW = datos.ContainsKey("toneladasaw") ? int.Parse(datos["toneladasaw"]) : 0;
 
-            if (datos.ContainsKey("pesoBruto"))
-                balanzadaRecibida.PesoBruto = int.Parse(datos["pesoBruto"]);
+            balanzadaRecibida.PesoBruto = datos.ContainsKey("pesoBruto") ? int.Parse(datos["pesoBruto"]) : 0;
 
-            if (datos.ContainsKey("pesoTara"))
-                balanzadaRecibida.PesoTara = int.Parse(datos["pesoTara"]);
+            balanzadaRecibida.PesoTara = datos.ContainsKey("pesoTara") ? int.Parse(datos["pesoTara"]) : 0;
 
-            if (datos.ContainsKey("pesoNeto"))
-                balanzadaRecibida.PesoNeto = int.Parse(datos["pesoNeto"]);
+            balanzadaRecibida.PesoNeto = datos.ContainsKey("pesoNeto") ? int.Parse(datos["pesoNeto"]) : 0;
 
-            if (datos.ContainsKey("capacidad"))
-                balanzadaRecibida.Capacidad = datos["capacidad"];
+            balanzadaRecibida.Capacidad = datos.ContainsKey("capacidad") ? datos["capacidad"] : string.Empty;
 
             return balanzadaRecibida;
         }
@@ -417,7 +406,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         private Vapor ObtenerVapor(string vapor)
         {
-            if (!string.IsNullOrEmpty(vapor))
+            if (vapor != null)
             {
                 Vapor registro;
 
@@ -447,7 +436,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         private Bodega ObtenerBodega(string bodega)
         {
-            if (!string.IsNullOrEmpty(bodega))
+            if (bodega != null)
             {
                 var registro = _repositorio.Obtener<Bodega>(e => e.Nombre == bodega);
 
@@ -468,7 +457,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         private Destino ObtenerDestino(string destino)
         {
-            if (!string.IsNullOrEmpty(destino))
+            if (destino != null)
             {
                 var registro = _repositorio.Obtener<Destino>(e => e.Nombre == destino);
                 if (registro == null)
@@ -488,7 +477,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         private Exportador ObtenerExportador(string exportador)
         {
-            if (!string.IsNullOrEmpty(exportador))
+            if (exportador != null)
             {
                 var registro = _repositorio.Obtener<Exportador>(e => e.Nombre == exportador);
                 if (registro == null)
@@ -508,7 +497,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         private MaterialPuerto ObtenerMaterial(string commodity)
         {
-            if (!string.IsNullOrEmpty(commodity))
+            if (commodity != null)
             {
                 var registro = _repositorio.Obtener<MaterialPuerto>(e => e.Descripcion == commodity);
                 if (registro == null)
