@@ -431,11 +431,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                string destinatarios = servicio.obtenerDireccionesDeMail("NirManual");
-                System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
-                foreach (string mail in destinatarios.Split(';'))
-                    dest.Add(mail);
-                return Request.CreateResponse(HttpStatusCode.OK, dest);
+                List<string> templates = new List<string> { "PlanillaDeTurnos", "NirManual" };
+                var destinatariosNir = servicio.ObtenerDireccionesDeMailPorTemplates(templates);
+                return Request.CreateResponse(HttpStatusCode.OK, destinatariosNir);
             }
             catch (Exception ex)
             {
@@ -1208,7 +1206,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var resultado = new ResultadoPrevisualizar();
-                var docFile = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+                var resultadoNir = new ResultadoPrevisualizar();
+                var docFileNir = "Nir.xls";
+                var docFilePlanilla = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+                var nirs = servicio.ObtenerModuloDeCargaNirManualPuerto(IdModuloDeCarga).ToList();
+                System.Collections.Generic.List<string> destNir = new System.Collections.Generic.List<string>();
+
+                if (nirs != null && nirs.Any())
+                {
+                    var path = System.Web.HttpContext.Current.Server.MapPath("~/iconMolinosChiquito.png");
+                    byte[] data = File.ReadAllBytes(path);
+                    var nombreBuque = servicio.ObtenerBuqueDadoModCarga(IdModuloDeCarga);
+                    var generadorExcel = new ExcelNirManual();
+                    generadorExcel.GenerarArchivo(resultadoNir, nirs, IdModuloDeCarga, nombreBuque, data);                
+                }
+                
                 if (objetoEnvioPlanillaTurno.mail.Destinatarios != null && objetoEnvioPlanillaTurno.mail.Destinatarios.Any())
                 {
                     objetoEnvioPlanillaTurno.mail.Destinatarios.RemoveAll(item => item == null || item == "");
@@ -1218,7 +1230,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
                 }
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                var res = comandos.Ejecutar(new EnvioMail
+
+                var envioMail = new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
                     Cuerpo = objetoEnvioPlanillaTurno.mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -1226,8 +1239,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
                     Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
-                    AttachmentName = docFile
-                });
+                    AttachmentName = docFilePlanilla,
+                };
+
+                if(nirs != null && resultadoNir.Archivo != null)
+                {
+                    envioMail.Attachment2 = resultadoNir.Archivo;
+                    envioMail.AttachmentName2 = docFileNir;
+                }
+
+                var res = comandos.Ejecutar(envioMail);
 
                 if (res.HayErrores)
                 {

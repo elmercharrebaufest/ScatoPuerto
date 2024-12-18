@@ -10035,6 +10035,26 @@ namespace Molinos.Scato.Servicios.Impl
             return direcciones;
         }
 
+        public List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates)
+        {
+            var destinatarios = new HashSet<string>(); 
+
+            foreach (string template in templates)
+            {
+                var direcciones = Obtener<ConfiguracionMail, ConfiguracionMailDto>(x => x.TemplateMail == template)?.Direcciones;
+
+                if (!string.IsNullOrEmpty(direcciones))
+                {
+                    foreach (string mail in direcciones.Split(';'))
+                    {
+                        destinatarios.Add(mail.Trim());
+                    }
+                }
+            }
+
+            return destinatarios.ToList(); 
+        }
+
         public void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id)
         {
             ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
@@ -13072,8 +13092,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId)
         {
-            var destinatarios = new List<string>();
-            destinatarios = repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "PlanillaDeTurnos").Direcciones.Split(';').ToList();
+            var moduloCarga = this.ObtenerModuloDeCarga(moduloDeCargaId);
+            var templates = new List<string> { "PlanillaDeTurnos" };
+            if(moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()){
+                templates.Add("NirManual");
+            }
+            var destinatarios = this.ObtenerDireccionesDeMailPorTemplates(templates);
 
             var mail = new MailDto
             {
