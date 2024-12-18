@@ -29,10 +29,14 @@ namespace Molinos.Scato.WebPuertoApi.Helper
         {
             string plantillaEmail = string.Empty;
             StringBuilder plantillaDetalle = new StringBuilder();
-
+            string textoInicio = "Se enviará la planilla de turnos";
+            if(_modulo.ModuloDeCargaNirManualPuerto != null && _modulo.ModuloDeCargaNirManualPuerto.Any())
+            {
+                textoInicio += " junto con el resultado de muestras de embarque.";
+            }
             using (StreamReader reader = new StreamReader(Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Plantilla", "Email", "template_planilla_solidos.html")))
                 plantillaEmail = reader.ReadToEnd();
-
+            plantillaEmail = plantillaEmail.Replace("#textoInicio", textoInicio);
             plantillaEmail = plantillaEmail.Replace("#buque", ObtenerNombreBuque());
             plantillaEmail = plantillaEmail.Replace("#totalTurno", ObtenerTotalTurno().ToString("F3") + " TN");
             plantillaEmail = plantillaEmail.Replace("#totalCargado", ObtenerTotalCargado().ToString("F3") + " TN");

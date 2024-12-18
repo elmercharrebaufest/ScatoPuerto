@@ -2515,6 +2515,9 @@ namespace Molinos.Scato.Servicios
         string obtenerDireccionesDeMail(string templateMail);
 
         [OperationContract]
+        List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates);
+
+        [OperationContract]
         ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion);
 
         [OperationContract]

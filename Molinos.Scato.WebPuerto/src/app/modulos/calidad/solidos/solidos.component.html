@@ -9,6 +9,8 @@
   <app-manos class="break" [celdasManoDeEmbarque]="celdasManoDeEmbarque"
     [sentidosManoDeEmbarque]="sentidosManoDeEmbarque" [esCalidad]="true"></app-manos>
 
+  <app-nir class="break"></app-nir>
+
   <div class='bg-white px-4 min-h5 shadow mt-4 break'>
     <app-planilla-turnos-solido (turnoCerrado)="recargarModuloDeCarga($event)"></app-planilla-turnos-solido>
   </div>
@@ -18,8 +20,6 @@
   </div>
 
   <app-registro-recibos class="break"></app-registro-recibos>
-
-  <app-nir class="break"></app-nir>
 
   <app-new-balanzas-ritmos *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados"></app-new-balanzas-ritmos>
   <app-balanzas-ritmos *ngIf="moduloDeCarga!=null && !ingresoManualSolido" class="break"></app-balanzas-ritmos>
