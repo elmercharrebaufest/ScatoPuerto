@@ -80,7 +80,7 @@
 	      <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;"/>
       </ng-container>
       <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
-        <button type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)="guardar(true)">FINALIZAR</button>
+        <button type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)="guardar(true)">FINALIZAR (Reenviar a tablerista)</button>
 			</ng-container>
     </div>
   </div>
